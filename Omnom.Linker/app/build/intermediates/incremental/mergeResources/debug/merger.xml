@@ -72,17 +72,17 @@
             <file
                 path="C:\Projects\omnom\mobileapp_android\Omnom.Linker\app\src\main\res\values\strings.xml"
                 qualifiers="" >
-                <string name="action_settings" >Settings
-                </string>
                 <string name="title_activity_splash" >SplashActivity
+                </string>
+                <string name="action_settings" >Settings
                 </string>
                 <string name="app_name" >Omnom.Linker
                 </string>
                 <string name="dummy_content" >DUMMY\nCONTENT
                 </string>
-                <string name="hello_world" >Hello world!
-                </string>
                 <string name="dummy_button" >Dummy Button
+                </string>
+                <string name="hello_world" >Hello world!
                 </string>
             </file>
             <file
