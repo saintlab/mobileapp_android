@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Linker/app/src/main/res/values/colors.xml -->
+    <eat-comment />
+
+    <color name="black_overlay">#66000000</color>
+    <!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Linker/app/src/main/res/values/attrs.xml -->
+    <eat-comment />
+
+    <declare-styleable name="ButtonBarContainerTheme">
+        <attr name="metaButtonBarStyle" format="reference" />
+        <attr name="metaButtonBarButtonStyle" format="reference" />
+    </declare-styleable>
     <!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Linker/app/src/main/res/values/dimens.xml -->
     <eat-comment />
 
@@ -11,12 +22,63 @@
 
     <string name="action_settings">Settings</string>
     <string name="app_name">Omnom.Linker</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Linker/app/src/main/res/values/strings_activity_login.xml -->
+    <eat-comment />
+
+    <string name="error_field_required">This field is required</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Linker/app/src/main/res/values/strings.xml -->
+    <eat-comment />
+
     <string name="hello_world">Hello world!</string>
+    <!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Linker/app/src/main/res/values/strings_activity_login.xml -->
+    <eat-comment />
+
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="sign_in">Sign In</string>
+    <string name="title_activity_login">Omnom Login</string>
+    <!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Linker/app/src/main/res/values/strings.xml -->
+    <eat-comment />
+
+    <string name="title_activity_splash">SplashActivity</string>
     <!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Linker/app/src/main/res/values/styles.xml -->
     <eat-comment />
 
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
         <!-- Customize your theme here. -->
+    </style>
+
+    <style name="ButtonBar">
+        <item name="android:paddingLeft">2dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingRight">2dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:background">@android:drawable/bottom_bar</item>
+    </style>
+
+    <style name="ButtonBarButton" />
+
+    <style name="FullscreenActionBarStyle" parent="android:Widget.Holo.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
+    </style>
+
+    <style name="FullscreenTheme" parent="android:Theme.Holo">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <style name="Theme.Splash" parent="android:Theme.Holo.Light.NoActionBar.Fullscreen">
+
+        <!-- Customize your theme here. -->
+        <item name="android:textColorPrimary">@android:color/white</item>
     </style>
 
 </resources>
