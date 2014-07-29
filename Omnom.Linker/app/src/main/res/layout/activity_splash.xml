@@ -1,15 +1,67 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc">
+    android:animateLayoutChanges="true"
+    android:background="#cdcdcd">
 
-    <TextView
+    <ImageView
+        android:id="@+id/img_loader"
         android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="42sp"
-        android:text="LOGO"
-        android:textAppearance="?android:textAppearance"/>
+        android:layout_width="700dp"
+        android:layout_height="700dp"
+        android:src="@drawable/bg_loader_rounded"/>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="@dimen/loader_progress_size"
+        android:layout_height="@dimen/loader_progress_size"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:indeterminate="false"
+        android:progress="0"
+        android:max="100"
+        android:progressDrawable="@drawable/loader_progress"
+        style="?android:attr/progressBarStyleHorizontal"/>
+
+    <RelativeLayout
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/img_logo"
+            android:layout_centerInParent="true"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_launcher"/>
+
+        <ImageView
+            android:id="@+id/img_logo_left"
+            android:layout_toLeftOf="@+id/img_logo"
+            android:layout_centerVertical="true"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_launcher"/>
+
+        <ImageView
+            android:id="@+id/img_logo_right"
+            android:layout_toRightOf="@+id/img_logo"
+            android:layout_centerVertical="true"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_launcher"/>
+
+        <ViewStub
+            android:id="@+id/stub_login"
+            android:layout="@layout/view_login"
+            android:layout_below="@+id/img_logo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
 
 </FrameLayout>

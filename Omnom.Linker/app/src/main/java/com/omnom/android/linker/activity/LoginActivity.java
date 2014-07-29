@@ -1,5 +1,8 @@
 package com.omnom.android.linker.activity;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
@@ -9,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -16,6 +20,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
+import com.omnom.android.linker.utils.AnimationUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +30,14 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
-
 	@InjectView(R.id.txt_email)
 	protected AutoCompleteTextView mEmailView;
 
 	@InjectView(R.id.edit_password)
 	protected EditText mPasswordView;
+
+	@InjectView(R.id.root)
+	protected View mRootView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +61,18 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 	@OnClick(R.id.btn_login)
 	protected void performLogin() {
 		// TODO:
+	}
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if(hasFocus) {
+			ValueAnimator colorAnim = ObjectAnimator.ofInt(mRootView, "backgroundColor", getResources().getColor(android.R.color.holo_red_light),
+			                                               getResources().getColor(android.R.color.white));
+			colorAnim.setDuration(AnimationUtils.DURATION_LONG);
+			colorAnim.setEvaluator(new ArgbEvaluator());
+			colorAnim.start();
+		}
 	}
 
 	private void populateAutoComplete() {

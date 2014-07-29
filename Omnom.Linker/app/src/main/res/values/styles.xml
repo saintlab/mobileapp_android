@@ -9,6 +9,7 @@
     <style name="Theme.Splash" parent="android:Theme.Holo.Light.NoActionBar.Fullscreen">
         <!-- Customize your theme here. -->
         <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:windowBackground">@android:color/holo_red_light</item>
     </style>
 
     <style name="FullscreenTheme" parent="android:Theme.Holo">
