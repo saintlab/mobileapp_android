@@ -6,32 +6,18 @@
     android:animateLayoutChanges="true"
     android:background="#cdcdcd">
 
-    <ImageView
-        android:id="@+id/img_loader"
-        android:layout_gravity="center"
-        android:layout_width="700dp"
-        android:layout_height="700dp"
-        android:src="@drawable/bg_loader_rounded"/>
-
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="@dimen/loader_progress_size"
-        android:layout_height="@dimen/loader_progress_size"
-        android:layout_centerInParent="true"
-        android:layout_gravity="center"
-        android:indeterminate="false"
-        android:progress="0"
-        android:max="100"
-        android:progressDrawable="@drawable/loader_progress"
-        style="?android:attr/progressBarStyleHorizontal"/>
+    <com.omnom.android.linker.widget.LoaderView
+        android:id="@+id/loader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <RelativeLayout
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/img_logo"
+        <Space
+            android:id="@+id/img_logo_fake"
             android:layout_centerInParent="true"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -39,7 +25,7 @@
 
         <ImageView
             android:id="@+id/img_logo_left"
-            android:layout_toLeftOf="@+id/img_logo"
+            android:layout_toLeftOf="@+id/img_logo_fake"
             android:layout_centerVertical="true"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -47,7 +33,7 @@
 
         <ImageView
             android:id="@+id/img_logo_right"
-            android:layout_toRightOf="@+id/img_logo"
+            android:layout_toRightOf="@+id/img_logo_fake"
             android:layout_centerVertical="true"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -56,12 +42,11 @@
         <ViewStub
             android:id="@+id/stub_login"
             android:layout="@layout/view_login"
-            android:layout_below="@+id/img_logo"
+            android:layout_below="@+id/img_logo_fake"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"/>
 
     </RelativeLayout>
-
 
 </FrameLayout>
