@@ -1,0 +1,14 @@
+<resources>
+        <string name="title_activity_login">Omnom Login</string>
+
+    <!-- Strings related to login -->
+    <string name="hint_email">Логин</string>
+    <string name="hint_password">Пароль</string>
+
+    <string name="sign_in">Войти</string>
+
+    <string name="server_do_not_respond">Сервер не отвечает</string>
+    <string name="error_invalid_email">Неверный логин</string>
+    <string name="error_invalid_password">Неверный пароль</string>
+    <string name="error_email_and_password_required">Пожалуйста введите логин и пароль</string>
+</resources>
