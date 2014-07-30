@@ -19,8 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-import static com.omnom.android.linker.utils.AnimationUtils.DURATION_LONG;
-
 public class SplashActivity extends Activity implements View.OnClickListener {
 
 	@InjectView(R.id.img_logo_left)
@@ -72,7 +70,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(!mAnimated) {
+		if (!mAnimated) {
 			startAnimation();
 		}
 	}
