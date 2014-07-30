@@ -15,7 +15,7 @@
             android:toDegrees="-90">
             <shape
                 android:shape="ring"
-                android:thickness="4dp"
+                android:thickness="8dp"
                 android:innerRadiusRatio="2.25">
                 <solid android:color="#77ffffff"/>
             </shape>
