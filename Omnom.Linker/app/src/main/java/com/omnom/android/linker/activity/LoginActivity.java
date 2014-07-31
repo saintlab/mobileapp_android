@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.omnom.android.linker.R;
+import com.omnom.android.linker.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
 		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			view.setText("");
+			view.setText(StringUtils.EMPTY_STRING);
 		}
 
 		@Override
@@ -124,16 +125,22 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 			view.setEnabled(value);
 		}
 	};
+
 	@InjectViews({R.id.txt_email, R.id.edit_password, R.id.btn_login, R.id.btn_remind_password})
 	protected List<View> loginViews;
+
 	@InjectView(R.id.txt_email)
 	protected AutoCompleteTextView mEditEmail;
+
 	@InjectView(R.id.edit_password)
 	protected EditText mEditPassword;
+
 	@InjectView(R.id.txt_email_error)
 	protected TextView mTextEmailError;
+
 	@InjectView(R.id.txt_password_error)
 	protected TextView mTextPasswordError;
+
 	@InjectView(R.id.view_connecting)
 	protected View mViewConnecting;
 
