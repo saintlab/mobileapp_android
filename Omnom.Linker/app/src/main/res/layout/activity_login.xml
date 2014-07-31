@@ -1,0 +1,100 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:animateLayoutChanges="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_gravity="top"
+        android:layout_margin="@dimen/activity_horizontal_margin_large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <AutoCompleteTextView
+            android:id="@+id/txt_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_email"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"
+            android:singleLine="true"/>
+
+        <TextView
+            android:id="@+id/txt_email_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextView.Error"/>
+
+        <EditText
+            android:id="@+id/edit_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_password"
+            android:imeActionId="@+id/login"
+            android:imeActionLabel="@string/sign_in"
+            android:imeOptions="actionUnspecified"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:singleLine="true"/>
+
+        <TextView
+            android:id="@+id/txt_password_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextView.Error"/>
+
+        <Button
+            android:layout_gravity="center"
+            android:id="@+id/btn_login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:text="@string/sign_in"
+            style="?android:textAppearanceSmall"/>
+
+        <LinearLayout
+            android:id="@+id/view_connecting"
+            android:layout_gravity="center"
+            android:paddingTop="@dimen/activity_horizontal_margin"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@android:style/Widget.Holo.Light.ProgressBar"/>
+            <TextView
+                android:paddingLeft="@dimen/activity_horizontal_margin_small"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Подключение..."/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+        <Button
+            android:id="@+id/btn_remind_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/remind_password"
+            style="@android:style/Widget.Holo.Light.Button.Borderless.Small"/>
+    </LinearLayout>
+
+</FrameLayout>

@@ -15,17 +15,11 @@
             android:name=".activity.MainActivity"
             android:label="@string/app_name">
         </activity>
-
         <activity
             android:name=".activity.SplashActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_splash"
             android:theme="@style/Theme.Splash">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
 
         <activity
@@ -34,6 +28,21 @@
             android:theme="@style/Theme.Splash">
         </activity>
 
+        <activity
+            android:name=".activity.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:theme="@style/Theme.Splash">
+        </activity>
+
+        <activity
+            android:name=".activity.SimpleSplashActivity"
+            android:label="@string/title_activity_simple_splash"
+            android:theme="@style/Theme.Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET"/>
