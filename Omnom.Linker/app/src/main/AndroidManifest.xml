@@ -34,17 +34,6 @@
             android:theme="@style/Theme.Splash">
         </activity>
 
-        <activity
-            android:name=".activity.LoginActivity"
-            android:label="@string/title_activity_login"
-            android:parentActivityName=".activity.SplashActivity"
-            android:theme="@style/Theme.Splash"
-            android:windowSoftInputMode="adjustResize|stateHidden">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.omnom.android.linker.activity.SplashActivity"/>
-        </activity>
-
     </application>
 
     <uses-permission android:name="android.permission.INTERNET"/>
