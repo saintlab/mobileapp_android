@@ -1,25 +1,20 @@
 package com.omnom.android.linker.activity;
 
-import android.app.Activity;
-import android.app.ActivityOptions;
-import android.content.Intent;
-import android.os.Build;
-import android.os.Bundle;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import com.omnom.android.linker.R;
+import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.widget.LoaderView;
 
 import org.jetbrains.annotations.Nullable;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class SplashActivity extends Activity implements View.OnClickListener {
+public class SplashActivity extends BaseActivity implements View.OnClickListener {
 
 	@InjectView(R.id.img_logo_left)
 	protected ImageView imgLogoLeft;
@@ -38,33 +33,14 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 
 	private boolean mAnimated;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_splash);
-		ButterKnife.inject(this);
-	}
-
 	public void performLogin() {
 		findViewById(R.id.view_login_root).setVisibility(View.GONE);
 		viewLoader.performLogin(new LoaderView.Callback() {
 			@Override
 			public void execute() {
-				startValidationActivity();
+				startActivity(ValidationActivity.class);
 			}
 		});
-	}
-
-	private void startValidationActivity() {
-		final Intent intent = new Intent(this, ValidationActivity.class);
-		if (Build.VERSION.SDK_INT >= 16) {
-			ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out);
-			startActivity(intent, activityOptions.toBundle());
-			finish();
-		} else {
-			finish();
-			startActivity(intent);
-		}
 	}
 
 	@Override
@@ -110,5 +86,15 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 				performLogin();
 				break;
 		}
+	}
+
+	@Override
+	public void initUi() {
+
+	}
+
+	@Override
+	public int getLayoutResource() {
+		return R.layout.activity_splash;
 	}
 }

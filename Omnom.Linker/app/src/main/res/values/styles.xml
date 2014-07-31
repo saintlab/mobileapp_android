@@ -8,7 +8,7 @@
 
     <style name="Theme.Splash" parent="android:Theme.Holo.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="android:textColorPrimary">@android:color/white</item>
+        <!--<item name="android:textColorPrimary">@android:color/white</item>-->
         <item name="android:windowBackground">@color/window_background</item>
     </style>
 

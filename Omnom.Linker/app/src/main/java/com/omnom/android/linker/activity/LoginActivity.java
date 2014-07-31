@@ -1,10 +1,6 @@
 package com.omnom.android.linker.activity;
 
-import android.app.Activity;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -18,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.omnom.android.linker.R;
+import com.omnom.android.linker.activity.base.BaseActivity;
+import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.StringUtils;
 
 import java.util.List;
@@ -27,7 +25,7 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends BaseActivity {
 
 	private static class ErrorTextWatcher implements TextWatcher {
 		private TextView view;
@@ -99,6 +97,7 @@ public class LoginActivity extends Activity {
 					break;
 
 				case RESULT_CODE_SUCCESS:
+					activity.startActivity(ValidationActivity.class);
 					break;
 			}
 		}
@@ -130,11 +129,7 @@ public class LoginActivity extends Activity {
 	protected View mViewConnecting;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_login);
-		ButterKnife.inject(this);
-
+	public void initUi() {
 		mEditEmail.addTextChangedListener(new ErrorTextWatcher(mTextEmailError));
 		mEditPassword.addTextChangedListener(new ErrorTextWatcher(mTextPasswordError));
 		mEditPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -149,6 +144,11 @@ public class LoginActivity extends Activity {
 		});
 	}
 
+	@Override
+	public int getLayoutResource() {
+		return R.layout.activity_login;
+	}
+
 	@OnClick(R.id.btn_login)
 	protected void performLogin() {
 		if (!validate()) {
@@ -158,7 +158,7 @@ public class LoginActivity extends Activity {
 	}
 
 	private boolean validate() {
-		if (!hasConnection()) {
+		if (!AndroidUtils.hasConnection(this)) {
 			Toast.makeText(this, getString(R.string.please_check_internet_connection), Toast.LENGTH_LONG).show();
 			return false;
 		}
@@ -169,12 +169,6 @@ public class LoginActivity extends Activity {
 			return false;
 		}
 		return true;
-	}
-
-	private boolean hasConnection() {
-		final ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-		final NetworkInfo activeNetworkInfo = cm.getActiveNetworkInfo();
-		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
 }
 

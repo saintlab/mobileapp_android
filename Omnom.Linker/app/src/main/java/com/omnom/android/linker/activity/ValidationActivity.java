@@ -1,26 +1,20 @@
 package com.omnom.android.linker.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
+import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.utils.AndroidUtils;
+import com.omnom.android.linker.utils.AnimationBuilder;
 import com.omnom.android.linker.utils.AnimationUtils;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-import static com.omnom.android.linker.utils.AnimationUtils.DURATION_LONG;
-
-public class ValidationActivity extends Activity {
+public class ValidationActivity extends BaseActivity {
 
 	@InjectView(R.id.img_loader)
 	protected ImageView imgLoader;
@@ -37,19 +31,13 @@ public class ValidationActivity extends Activity {
 	private int loaderSize;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_validation);
-		ButterKnife.inject(this);
+	public void initUi() {
 		loaderSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
 	}
 
 	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		if (hasFocus) {
-			animateStart();
-		}
+	public int getLayoutResource() {
+		return R.layout.activity_validation;
 	}
 
 	public void onProgress(int progress) {
@@ -64,47 +52,32 @@ public class ValidationActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		animateStart();
 	}
 
 	private void animateStart() {
 		AnimationUtils.animateAlpha(progressBar, true);
-		final ValueAnimator widthAnimator = prepareIntValueAnimator(imgLoader.getMeasuredWidth(), loaderSize);
-		final ValueAnimator heightAnimator = prepareIntValueAnimator(imgLoader.getMeasuredHeight(), loaderSize);
-		widthAnimator.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				startValidation();
-			}
-		});
 
-		heightAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+		AnimationBuilder.create(imgLoader.getMeasuredWidth(), loaderSize).addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
-			public void onAnimationUpdate(ValueAnimator animation) {
-				imgLoader.getLayoutParams().height = (Integer) animation.getAnimatedValue();
-				imgLoader.requestLayout();
-			}
-		});
-		widthAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-			@Override
-			public void onAnimationUpdate(ValueAnimator animation) {
+			public void invoke(ValueAnimator animation) {
 				imgLoader.getLayoutParams().width = (Integer) animation.getAnimatedValue();
 				imgLoader.requestLayout();
 			}
-		});
-		widthAnimator.start();
-		heightAnimator.start();
-	}
+		}).onEnd(new AnimationBuilder.Action() {
+			@Override
+			public void invoke() {
+				new ValidationAsyncTask(ValidationActivity.this).execute();
+			}
+		}).build().start();
 
-	private void startValidation() {
-		ValidationAsyncTask task = new ValidationAsyncTask(this);
-		task.execute();
-	}
-
-	private ValueAnimator prepareIntValueAnimator(int... values) {
-		ValueAnimator widthAnimator = ValueAnimator.ofInt(values);
-		widthAnimator.setDuration(DURATION_LONG);
-		widthAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-		return widthAnimator;
+		AnimationBuilder.create(imgLoader.getMeasuredHeight(), loaderSize).addListener(new AnimationBuilder.UpdateLisetener() {
+			@Override
+			public void invoke(ValueAnimator animation) {
+				imgLoader.getLayoutParams().height = (Integer) animation.getAnimatedValue();
+				imgLoader.requestLayout();
+			}
+		}).build().start();
 	}
 
 	private void setError(String s) {
