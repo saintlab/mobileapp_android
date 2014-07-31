@@ -2,13 +2,15 @@
     <string name="title_activity_login">Omnom Login</string>
 
     <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="remind_password">Remind Password</string>
 
     <string name="sign_in">Sign In</string>
 
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_email_and_password_required">Please enter login and password</string>
     <string name="error_field_required">This field is required</string>
 </resources>

@@ -3,7 +3,6 @@ package com.omnom.android.linker.utils;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.content.Context;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
@@ -11,15 +10,23 @@ import android.view.animation.Interpolator;
  * Created by Ch3D on 30.07.2014.
  */
 public class AnimationBuilder {
-	private ValueAnimator animator;
+	public interface Action {
+		public void invoke();
+	}
 
-	private AnimationBuilder() {
+	public interface UpdateLisetener {
+		public void invoke(ValueAnimator animation);
 	}
 
 	public static AnimationBuilder create(int... values) {
 		AnimationBuilder animationBuilder = new AnimationBuilder().ofInt(values);
 		animationBuilder.initDefaults();
 		return animationBuilder;
+	}
+
+	private ValueAnimator animator;
+
+	private AnimationBuilder() {
 	}
 
 	public void setDuration(int duration) {
@@ -40,7 +47,9 @@ public class AnimationBuilder {
 		animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
-				lisetener.invoke(animation);
+				if (lisetener != null) {
+					lisetener.invoke(animation);
+				}
 			}
 		});
 		return this;
@@ -50,7 +59,9 @@ public class AnimationBuilder {
 		animator.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(Animator animation) {
-				action.invoke();
+				if (action != null) {
+					action.invoke();
+				}
 			}
 		});
 		return this;
@@ -63,13 +74,5 @@ public class AnimationBuilder {
 	public AnimationBuilder setInterpolator(Interpolator interpolator) {
 		animator.setInterpolator(interpolator);
 		return this;
-	}
-
-	public interface Action {
-		public void invoke();
-	}
-
-	public interface UpdateLisetener {
-		public void invoke(ValueAnimator animation);
 	}
 }

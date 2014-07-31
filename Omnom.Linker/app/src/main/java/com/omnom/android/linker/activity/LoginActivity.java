@@ -13,10 +13,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.StringUtils;
+import com.omnom.android.linker.utils.ViewUtils;
 
 import java.util.List;
 
@@ -114,7 +116,7 @@ public class LoginActivity extends BaseActivity {
 	protected List<View> loginViews;
 
 	@InjectView(R.id.txt_email)
-	protected AutoCompleteTextView mEditEmail;
+	protected AutoCompleteTextView mEditLogin;
 
 	@InjectView(R.id.edit_password)
 	protected EditText mEditPassword;
@@ -130,7 +132,8 @@ public class LoginActivity extends BaseActivity {
 
 	@Override
 	public void initUi() {
-		mEditEmail.addTextChangedListener(new ErrorTextWatcher(mTextEmailError));
+		mEditLogin.addTextChangedListener(new ErrorTextWatcher(mTextEmailError));
+		ViewUtils.fixPasswordTypeface(mEditPassword);
 		mEditPassword.addTextChangedListener(new ErrorTextWatcher(mTextPasswordError));
 		mEditPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
@@ -142,6 +145,10 @@ public class LoginActivity extends BaseActivity {
 				return false;
 			}
 		});
+		if(BuildConfig.DEBUG) {
+			mEditPassword.setText("123");
+			mEditLogin.setText("123");
+		}
 	}
 
 	@Override
@@ -154,7 +161,7 @@ public class LoginActivity extends BaseActivity {
 		if (!validate()) {
 			return;
 		}
-		new LoginAsyncTask(this).execute(mEditEmail.getText().toString().trim(), mEditPassword.getText().toString().trim());
+		new LoginAsyncTask(this).execute(mEditLogin.getText().toString().trim(), mEditPassword.getText().toString().trim());
 	}
 
 	private boolean validate() {
@@ -162,7 +169,7 @@ public class LoginActivity extends BaseActivity {
 			Toast.makeText(this, getString(R.string.please_check_internet_connection), Toast.LENGTH_LONG).show();
 			return false;
 		}
-		String email = mEditEmail.getText().toString().trim();
+		String email = mEditLogin.getText().toString().trim();
 		String password = mEditPassword.getText().toString().trim();
 		if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
 			Toast.makeText(this, getString(R.string.error_email_and_password_required), Toast.LENGTH_LONG).show();

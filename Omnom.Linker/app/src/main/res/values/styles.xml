@@ -4,6 +4,7 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light">
         <!-- Customize your theme here. -->
+        <item name="android:textViewStyle">@style/TextView</item>
     </style>
 
     <style name="Theme.Splash" parent="android:Theme.Holo.Light.NoActionBar">
@@ -34,9 +35,39 @@
 
     <style name="ButtonBarButton"/>
 
-    <style name="TextView.Error" parent="android:Widget.Holo.Light.TextView">
-        <item name="android:textColor">@android:color/holo_red_light</item>
+    <style name="TextView" parent="android:Widget.Holo.Light.TextView"/>
+
+    <style name="TextView.Place"/>
+
+    <style name="TextView.Place.Data">
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+        <item name="android:fontFamily">sans-serif-thin</item>
+    </style>
+
+    <style name="TextView.Place.Data.Location">
+        <!--<item name="android:drawableLeft">@android:drawable/ic_menu_mylocation</item>
+        <item name="android:drawablePadding">@dimen/activity_horizontal_margin_small</item>-->
+    </style>
+
+    <style name="TextView.Place.Title">
         <item name="android:textAppearance">?android:textAppearanceMedium</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="TextView.Error">
+        <item name="android:textColor">@android:color/holo_red_light</item>
+        <item name="android:textAppearance">?android:textAppearance</item>
+    </style>
+
+    <style name="ImageView" />
+
+    <style name="ImageView.Place" />
+
+    <style name="ImageView.Place.ListLogo">
+        <item name="android:layout_width">?android:attr/listPreferredItemHeight</item>
+        <item name="android:layout_height">?android:attr/listPreferredItemHeight</item>
     </style>
 
 </resources>

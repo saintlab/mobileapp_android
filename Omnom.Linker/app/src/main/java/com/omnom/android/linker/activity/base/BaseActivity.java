@@ -2,6 +2,7 @@ package com.omnom.android.linker.activity.base;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 /**
  * Created by Ch3D on 31.07.2014.
@@ -22,8 +23,29 @@ public abstract class BaseActivity extends Activity implements OmnomActivity {
 		mHelper.onPostCreate();
 	}
 
+	public void startActivity(Class<?> cls, int delay) {
+		mHelper.startActivity(cls, delay);
+	}
+
+	public void startActivity(Class<?> cls, int animIn, int animOut) {
+		mHelper.startActivity(cls, animIn, animOut);
+	}
+
 	public void startActivity(Class<?> cls) {
 		mHelper.startActivity(cls);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId())
+		{
+			case android.R.id.home:
+				finish();
+				return true;
+
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@Override

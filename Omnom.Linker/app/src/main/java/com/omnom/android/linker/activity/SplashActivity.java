@@ -57,12 +57,13 @@ public class SplashActivity extends BaseActivity implements View.OnClickListener
 			@Override
 			public void run() {
 				viewLoader.showProgress(true);
-				viewLoader.scaleDown(new LoaderView.Callback() {
+				viewLoader.translateUp(new LoaderView.Callback() {
 					@Override
 					public void execute() {
 						showLoginForm();
 					}
-				}, new LoaderView.Callback() {
+				});
+				viewLoader.scaleDown(new LoaderView.Callback() {
 					@Override
 					public void execute() {
 						AnimationUtils.animateAlpha(imgLogoLeft, false);

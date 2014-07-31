@@ -23,15 +23,28 @@ public class ActivityHelper {
 		mActivity.initUi();
 	}
 
-	public void startActivity(Class<?> cls) {
+	public void startActivity(final Class<?> cls, int delay) {
+		mActivity.getActivity().findViewById(android.R.id.content).postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				startActivity(cls);
+			}
+		}, delay);
+	}
+
+	public void startActivity(Class<?> cls, int animIn, int aninOut) {
 		Intent intent = new Intent(mActivity.getActivity(), cls);
 		if (Build.VERSION.SDK_INT >= 16) {
-			ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(mActivity.getActivity(), R.anim.fade_in, R.anim.fake_fade_out);
+			ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(mActivity.getActivity(), animIn, aninOut);
 			mActivity.getActivity().startActivity(intent, activityOptions.toBundle());
 			mActivity.getActivity().finish();
 		} else {
 			mActivity.getActivity().finish();
 			mActivity.getActivity().startActivity(intent);
 		}
+	}
+
+	public void startActivity(Class<?> cls) {
+		startActivity(cls, R.anim.fade_in, R.anim.fake_fade_out);
 	}
 }

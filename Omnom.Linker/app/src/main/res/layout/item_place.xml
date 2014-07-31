@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_marginTop="@dimen/activity_horizontal_margin_small"
+    android:layout_marginBottom="@dimen/activity_horizontal_margin_small">
+
+    <ImageView
+        android:id="@+id/img_place_logo"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/ic_launcher"
+        android:padding="8dp"
+        style="@style/ImageView.Place.ListLogo"/>
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/img_place_logo"
+        android:paddingLeft="@dimen/activity_horizontal_margin_small"
+        android:text="Place Name"
+        style="@style/TextView.Place.Title"/>
+
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/name"
+        android:layout_below="@+id/name"
+        android:paddingLeft="@dimen/activity_horizontal_margin_small"
+        android:gravity="center_vertical"
+        android:text="Location"
+        style="@style/TextView.Place.Data.Location"/>
+
+    <RatingBar
+        android:id="@+id/rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@+id/type"
+        android:layout_alignTop="@+id/type"
+        android:layout_below="@+id/location"
+        style="@android:style/Widget.Holo.RatingBar.Small"/>
+
+    <TextView
+        android:id="@+id/type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/name"
+        android:layout_toLeftOf="@+id/rating"
+        android:layout_below="@+id/location"
+        android:paddingLeft="@dimen/activity_horizontal_margin_small"
+        android:text="Type Type Type Type Type Type Type"
+        style="@style/TextView.Place.Data"/>
+
+</RelativeLayout>

@@ -22,6 +22,10 @@ import static com.omnom.android.linker.utils.AnimationUtils.DURATION_LONG;
  * Created by Ch3D on 30.07.2014.
  */
 public class LoaderView extends FrameLayout {
+	public interface Callback {
+		public void execute();
+	}
+
 	public static final int PROGRESS_MAX = 100;
 
 	@InjectView(R.id.img_loader)
@@ -64,13 +68,16 @@ public class LoaderView extends FrameLayout {
 		AnimationUtils.animateAlpha(mProgressBar, visible);
 	}
 
-	public void scaleDown(final Callback translateEnded, final Callback scaleDownUpdate) {
-		scaleDownHeight();
-		scaleDownWidth(scaleDownUpdate);
-		translateUp(translateEnded);
+	public void scaleDown(final Callback scaleDownUpdate) {
+		scaleDown(scaleDownUpdate, null);
 	}
 
-	private void translateUp(final Callback endCallback) {
+	public void scaleDown(final Callback scaleDownUpdate, AnimationBuilder.Action endAction) {
+		scaleDownHeight();
+		scaleDownWidth(scaleDownUpdate, endAction);
+	}
+
+	public void translateUp(final Callback endCallback) {
 		final AnimationBuilder builder = AnimationBuilder.create(0, -loaderSize);
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
@@ -82,21 +89,29 @@ public class LoaderView extends FrameLayout {
 		}).onEnd(new AnimationBuilder.Action() {
 			@Override
 			public void invoke() {
-				endCallback.execute();
+				if (endCallback != null) {
+					endCallback.execute();
+				}
 			}
 		}).build().start();
 	}
 
-	private void scaleDownWidth(final Callback callback) {
-		AnimationBuilder.create(mImgLoader.getMeasuredWidth(), loaderSize).
-				addListener(new AnimationBuilder.UpdateLisetener() {
-					@Override
-					public void invoke(ValueAnimator animation) {
-						mImgLoader.getLayoutParams().width = (Integer) animation.getAnimatedValue();
-						mImgLoader.requestLayout();
-						callback.execute();
-					}
-				}).build().start();
+	private void scaleDownWidth(final Callback updateCallback, final AnimationBuilder.Action endCallback) {
+		AnimationBuilder builder = AnimationBuilder.create(mImgLoader.getMeasuredWidth(), loaderSize);
+		builder.addListener(new AnimationBuilder.UpdateLisetener() {
+			@Override
+			public void invoke(ValueAnimator animation) {
+				mImgLoader.getLayoutParams().width = (Integer) animation.getAnimatedValue();
+				mImgLoader.requestLayout();
+				if (updateCallback != null) {
+					updateCallback.execute();
+				}
+			}
+		});
+		if (endCallback != null) {
+			builder.onEnd(endCallback);
+		}
+		builder.build().start();
 	}
 
 	private void scaleDownHeight() {
@@ -109,9 +124,9 @@ public class LoaderView extends FrameLayout {
 		}).build().start();
 	}
 
-	public void scaleUp(final Callback callback) {
+	public void scaleUp(final Callback endCallback) {
 		scaleUpHeight();
-		scaleUpWidth(callback);
+		scaleUpWidth(endCallback);
 	}
 
 	private void scaleUpWidth(final Callback endCallback) {
@@ -127,7 +142,9 @@ public class LoaderView extends FrameLayout {
 			public void invoke() {
 				mProgressBar.setProgress(PROGRESS_MAX);
 				showProgress(false);
-				endCallback.execute();
+				if (endCallback != null) {
+					endCallback.execute();
+				}
 			}
 		}).build().start();
 	}
@@ -172,9 +189,5 @@ public class LoaderView extends FrameLayout {
 				simulateLoading(callback);
 			}
 		}).build().start();
-	}
-
-	public interface Callback {
-		public void execute();
 	}
 }
