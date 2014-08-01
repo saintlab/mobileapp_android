@@ -65,8 +65,10 @@ public class ValidationActivity extends BaseActivity {
 
 	@InjectView(R.id.loader)
 	protected LoaderView loader;
+
 	@InjectView(R.id.txt_error)
 	protected TextView txtError;
+
 	private int loaderSize;
 
 	@Override
