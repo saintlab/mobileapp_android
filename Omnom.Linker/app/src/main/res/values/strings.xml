@@ -9,4 +9,8 @@
     <string name="title_activity_places_list">PlacesListActivity</string>
     <string name="title_activity_place">PlaceActivity</string>
     <string name="bind_table">Bind Table</string>
+    <string name="unknown_service">Unknown BLE Service</string>
+    <string name="unknown_characteristic">Unknown BLE Characteristic</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
 </resources>
