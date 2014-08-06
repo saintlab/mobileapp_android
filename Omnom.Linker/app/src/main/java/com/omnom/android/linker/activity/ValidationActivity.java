@@ -20,20 +20,22 @@ import android.widget.TextView;
 
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
-import com.omnom.android.linker.service.BluetoothGattAttributes;
 import com.omnom.android.linker.service.BluetoothLeService;
+import com.omnom.android.linker.service.RBLBluetoothAttributes;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationBuilder;
 import com.omnom.android.linker.widget.LoaderView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconParser;
+
+import java.util.Arrays;
 
 import butterknife.InjectView;
-import hugo.weaving.DebugLog;
 
 public class ValidationActivity extends BaseActivity {
+
+	private static final String TAG = ValidationActivity.class.getSimpleName();
 
 	private class ValidationAsyncTask extends AsyncTask<Void, Integer, Integer> {
 		private final int ERROR_CODE_EMPTY = -1;
@@ -83,8 +85,6 @@ public class ValidationActivity extends BaseActivity {
 		}
 	}
 
-	private static final String TAG = ValidationActivity.class.getSimpleName();
-	private static final String LIST_UUID = "UUID";
 	private static final int REQUEST_ENABLE_BT = 100;
 	private static final long BLE_SCAN_PERIOD = 2000;
 
@@ -97,103 +97,84 @@ public class ValidationActivity extends BaseActivity {
 				finish();
 			}
 			scanBleDevices(true);
+			mBound = true;
 		}
 
 		@Override
 		public void onServiceDisconnected(ComponentName componentName) {
 			mBluetoothLeService = null;
+			mBound = false;
 		}
 	};
+
 	@InjectView(R.id.loader)
 	protected LoaderView loader;
+
 	@InjectView(R.id.txt_error)
 	protected TextView txtError;
-	private String mDeviceAddress = null;
-	private String LIST_NAME = "NAME";
-	private boolean mConnected;
+
+	BroadcastReceiver gattConnectedReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(intent.getAction())) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						final BluetoothGattService service = mBluetoothLeService.getService(RBLBluetoothAttributes
+								                                                               .UUID_BLE_REDBEAR_PASSWORD_SERVICE);
+						final BluetoothGattCharacteristic characteristic = service.getCharacteristic(RBLBluetoothAttributes
+								                                                                        .UUID_BLE_REDBEAR_PASSWORD);
+						characteristic.setValue(RBLBluetoothAttributes.RBL_PASSKEY);
+						mBluetoothLeService.writeCharacteristic(characteristic);
+					}
+				});
+			}
+			if (intent.getAction() == BluetoothLeService.ACTION_GATT_CONNECTED) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								mBluetoothLeService.getDiscoverGattService();
+							}
+						});
+					}
+				});
+			}
+		}
+	};
+
+	private boolean mBound;
 	private BluetoothAdapter mBluetoothAdapter;
 	private boolean mBtEnabled = false;
-	private boolean mScanning = false;
 	private Handler mHandler = new Handler();
 	private int loaderSize;
 
-	BroadcastReceiver gattConnectedReceiver  = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if(intent.getAction() == BluetoothLeService.ACTION_GATT_CONNECTED) {
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						mBluetoothLeService.getDiscoverGattService();
-					}
-				});
-			}
-		}
-	};
-
 	private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		@Override
-		@DebugLog
 		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-			if (device.getAddress().equals("20:CD:39:A4:A1:70")) {
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						mDeviceAddress = device.getAddress();
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					final BeaconParser parser = new BeaconParser();
+					parser.setBeaconLayout(RBLBluetoothAttributes.REDBEAR_BEACON_LAYOUT);
+					final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
+					Log.d(TAG, device.getAddress() + "->" + device.getName() + "->" + beacon + "->" + Arrays.toString(scanRecord));
+					// if (device.getAddress().startsWith("F3:77")) {
+					if (device.getName().equals("B1")) {
 						mBluetoothLeService.connect(device.getAddress());
 					}
-				});
-			}
+				}
+			});
 		}
 	};
 
 	private BluetoothLeService mBluetoothLeService;
-	private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics;
 
 	@Override
 	public void initUi() {
-		startBleService();
-		registerReceiver(gattConnectedReceiver, new IntentFilter(BluetoothLeService.ACTION_GATT_CONNECTED));
 		loaderSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
-	}
-
-	private void displayGattServices(List<BluetoothGattService> gattServices) {
-		if (gattServices == null) {
-			return;
-		}
-		String uuid = null;
-		String unknownServiceString = getResources().
-				getString(R.string.unknown_service);
-		String unknownCharaString = getResources().
-				getString(R.string.unknown_characteristic);
-		ArrayList<HashMap<String, String>> gattServiceData = new ArrayList<HashMap<String, String>>();
-		ArrayList<ArrayList<HashMap<String, String>>> gattCharacteristicData = new ArrayList<ArrayList<HashMap<String, String>>>();
-		mGattCharacteristics = new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
-
-		// Loops through available GATT Services.
-		for (BluetoothGattService gattService : gattServices) {
-			HashMap<String, String> currentServiceData = new HashMap<String, String>();
-			uuid = gattService.getUuid().toString();
-			currentServiceData.put(LIST_NAME, BluetoothGattAttributes.
-					lookup(uuid, unknownServiceString));
-			currentServiceData.put(LIST_UUID, uuid);
-			gattServiceData.add(currentServiceData);
-
-			ArrayList<HashMap<String, String>> gattCharacteristicGroupData = new ArrayList<HashMap<String, String>>();
-			List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
-			ArrayList<BluetoothGattCharacteristic> charas = new ArrayList<BluetoothGattCharacteristic>();
-			// Loops through available Characteristics.
-			for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-				charas.add(gattCharacteristic);
-				HashMap<String, String> currentCharaData = new HashMap<String, String>();
-				uuid = gattCharacteristic.getUuid().toString();
-				currentCharaData.put(LIST_NAME, BluetoothGattAttributes.lookup(uuid, unknownCharaString));
-				currentCharaData.put(LIST_UUID, uuid);
-				gattCharacteristicGroupData.add(currentCharaData);
-			}
-			mGattCharacteristics.add(charas);
-			gattCharacteristicData.add(gattCharacteristicGroupData);
-		}
 	}
 
 	private void setupBluetooth() {
@@ -210,27 +191,17 @@ public class ValidationActivity extends BaseActivity {
 		}
 	}
 
-	private void startBleService() {
-		bindService(new Intent(this, BluetoothLeService.class), mServiceConnection, BIND_AUTO_CREATE);
-	}
-
-	@DebugLog
 	private void scanBleDevices(boolean enable) {
 		if (enable) {
-			startBleService();
-			// Stops scanning after a pre-defined scan period.
 			mHandler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					mScanning = false;
 					mBluetoothAdapter.stopLeScan(mLeScanCallback);
 				}
 			}, BLE_SCAN_PERIOD);
 
-			mScanning = true;
 			mBluetoothAdapter.startLeScan(mLeScanCallback);
 		} else {
-			mScanning = false;
 			mBluetoothAdapter.stopLeScan(mLeScanCallback);
 		}
 	}
@@ -240,7 +211,7 @@ public class ValidationActivity extends BaseActivity {
 		if (requestCode == REQUEST_ENABLE_BT) {
 			mBtEnabled = resultCode == RESULT_OK ? true : false;
 			if (mBtEnabled) {
-				// scanBleDevices(true);
+				scanBleDevices(true);
 			}
 		}
 	}
@@ -260,11 +231,26 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	@Override
-	@DebugLog
+	protected void onPause() {
+		super.onPause();
+		unregisterReceiver(gattConnectedReceiver);
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		if (mBluetoothLeService == null) {
+			bindService(new Intent(this, BluetoothLeService.class), mServiceConnection, BIND_AUTO_CREATE);
+		}
+	}
+
+	@Override
 	protected void onStop() {
 		super.onStop();
-		unregisterReceiver(gattConnectedReceiver);
-		unbindService(mServiceConnection);
+		if (mBound) {
+			unbindService(mServiceConnection);
+			mBound = false;
+		}
 	}
 
 	@Override
@@ -273,6 +259,9 @@ public class ValidationActivity extends BaseActivity {
 		// animateStart();
 		setupBluetooth();
 		checkBluetoothEnabled();
+		IntentFilter filter = new IntentFilter(BluetoothLeService.ACTION_GATT_CONNECTED);
+		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+		registerReceiver(gattConnectedReceiver, filter);
 	}
 
 	private void animateStart() {

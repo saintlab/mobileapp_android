@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'hugo'
+//apply plugin: 'hugo'
 
 android {
     compileSdkVersion 19
@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.omnom.android.linker"
-        minSdkVersion 18
+        minSdkVersion 19
         targetSdkVersion 19
         versionCode 1
         versionName "1.0"

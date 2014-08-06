@@ -4,6 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_wood"/>
+
     <LinearLayout
         android:layout_gravity="top"
         android:layout_margin="@dimen/activity_horizontal_margin_large"
@@ -17,6 +23,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/hint_email"
             android:inputType="textEmailAddress"
+            android:textAppearance="?android:textAppearanceMedium"
             android:maxLines="1"
             android:singleLine="true"/>
 
@@ -36,6 +43,7 @@
             android:imeOptions="actionUnspecified"
             android:inputType="textPassword"
             android:maxLines="1"
+            android:textAppearance="?android:textAppearanceMedium"
             android:singleLine="true"/>
 
         <TextView
@@ -48,12 +56,15 @@
             android:layout_gravity="center"
             android:id="@+id/btn_login"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_marginTop="16dp"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:text="@string/sign_in"
-            style="?android:textAppearanceSmall"/>
+            android:paddingLeft="64dp"
+            android:paddingRight="64dp"
+            android:text="Войти"
+            android:background="@drawable/btn_login"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            style="?android:textAppearanceMedium"/>
 
         <LinearLayout
             android:id="@+id/view_connecting"

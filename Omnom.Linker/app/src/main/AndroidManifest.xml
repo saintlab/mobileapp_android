@@ -34,12 +34,13 @@
         </activity>
         <activity
             android:name=".activity.ValidationActivity"
-            android:label="@string/title_activity_validation"
+            android:label="BLE Validation"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Splash">
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            </intent-filter>-->
         </activity>
         <activity
             android:name=".activity.LoginActivity"
@@ -50,13 +51,10 @@
             android:name=".activity.SimpleSplashActivity"
             android:label="@string/title_activity_simple_splash"
             android:theme="@style/Theme.Splash">
-
-            <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            -->
         </activity>
         <activity
             android:name=".activity.PlacesListActivity"
@@ -73,6 +71,7 @@
             android:name=".service.BluetoothLeService"
             android:enabled="true"
             android:exported="false"/>
+
     </application>
 
 </manifest>
