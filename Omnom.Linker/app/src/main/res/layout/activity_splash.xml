@@ -3,8 +3,7 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:background="@drawable/bg_wood">
+    android:animateLayoutChanges="true">
 
     <com.omnom.android.linker.widget.LoaderView
         android:id="@+id/loader"

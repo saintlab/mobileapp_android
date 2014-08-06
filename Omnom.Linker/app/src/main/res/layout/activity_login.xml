@@ -4,15 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/bg_wood"/>
+    <!--<Button
+        android:layout_margin="24dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/btn_back"/>-->
 
     <LinearLayout
         android:layout_gravity="top"
-        android:layout_margin="@dimen/activity_horizontal_margin_large"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin_large"
+        android:layout_marginRight="@dimen/activity_horizontal_margin_large"
+        android:layout_marginTop="96dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -61,6 +63,7 @@
             android:paddingLeft="64dp"
             android:paddingRight="64dp"
             android:text="Войти"
+            android:typeface="monospace"
             android:background="@drawable/btn_login"
             android:textStyle="bold"
             android:textColor="@android:color/white"
@@ -105,6 +108,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/remind_password"
+            android:textSize="18sp"
+            android:typeface="monospace"
             style="@android:style/Widget.Holo.Light.Button.Borderless.Small"/>
     </LinearLayout>
 
