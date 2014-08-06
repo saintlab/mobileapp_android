@@ -7,13 +7,18 @@ import android.widget.Toast;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.model.Place;
+import com.omnom.android.linker.widget.LoaderView;
 
+import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class PlaceActivity extends BaseActivity {
 
 	public static final String EXTRA_SELECTED_PLACE = "com.omnom.android.linker.selected_place";
 	public static final String EXTRA_PLACE = "com.omnom.android.linker.place";
+
+	@InjectView(R.id.loader)
+	LoaderView loader;
 
 	@Override
 	public void initUi() {
@@ -28,9 +33,10 @@ public class PlaceActivity extends BaseActivity {
 		} else {
 			finish();
 		}
+		loader.scaleDown(null);
 	}
 
-	@OnClick(R.id.img_btn_back)
+	@OnClick(R.id.btn_back)
 	protected void onBackClicked(View view) {
 		finish();
 	}

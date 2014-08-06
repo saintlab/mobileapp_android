@@ -10,6 +10,7 @@
         <item name="android:textViewStyle">@style/TextView</item>
         <item name="android:editTextStyle">@style/EditText</item>
         <item name="android:autoCompleteTextViewStyle">@style/EditText</item>
+        <item name="android:ratingBarStyle">@style/RatingBar</item>
     </style>
 
     <style name="FullscreenTheme" parent="android:Theme.Holo">
@@ -22,6 +23,13 @@
 
     <style name="FullscreenActionBarStyle" parent="android:Widget.Holo.ActionBar">
         <item name="android:background">@color/black_overlay</item>
+    </style>
+
+    <style name="RatingBar" parent="android:Widget.Holo.RatingBar.Small">
+        <item name="android:progressDrawable">@drawable/ratingbar_small</item>
+        <item name="android:indeterminateDrawable">@drawable/ratingbar_small</item>
+        <item name="android:minHeight">16dip</item>
+        <item name="android:maxHeight">16dip</item>
     </style>
 
     <style name="ButtonBar">

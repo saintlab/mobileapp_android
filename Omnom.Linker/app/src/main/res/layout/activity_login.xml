@@ -4,12 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--<Button
-        android:layout_margin="24dp"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:background="@drawable/btn_back"/>-->
-
     <LinearLayout
         android:layout_gravity="top"
         android:layout_marginLeft="@dimen/activity_horizontal_margin_large"

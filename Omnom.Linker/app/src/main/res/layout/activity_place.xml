@@ -4,14 +4,16 @@
     android:layout_height="match_parent">
 
     <com.omnom.android.linker.widget.LoaderView
+        android:id="@+id/loader"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <Button
-        android:id="@+id/img_btn_back"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_delete"/>
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="@dimen/btn_back_size"
+        android:layout_height="@dimen/btn_back_size"
+        android:layout_margin="@dimen/btn_back_margin"
+        android:background="@drawable/btn_back"/>
 
     <LinearLayout
         android:layout_gravity="bottom"

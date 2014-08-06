@@ -33,6 +33,8 @@
         android:layout_below="@+id/name"
         android:paddingLeft="@dimen/activity_horizontal_margin_small"
         android:gravity="center_vertical"
+        android:drawableLeft="@drawable/ic_location_marker"
+        android:drawablePadding="4dp"
         android:text="Location"
         style="@style/TextView.Place.Data.Location"/>
 
@@ -43,8 +45,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignBottom="@+id/type"
         android:layout_alignTop="@+id/type"
-        android:layout_below="@+id/location"
-        style="@android:style/Widget.Holo.RatingBar.Small"/>
+        android:layout_below="@+id/location"/>
 
     <TextView
         android:id="@+id/type"

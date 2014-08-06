@@ -15,4 +15,5 @@ public class RBLBluetoothAttributes {
 	public static final UUID UUID_BLE_REDBEAR_PASSWORD_SERVICE = UUID.fromString("81dcb1fe-31d2-d293-e311-f58390c8c39d");
 	public static final UUID UUID_BLE_REDBEAR_PASSWORD = UUID.fromString("81DCB1FE-31D2-D293-E311-F583B0CBC39D");
 	public static final String RBL_PASSKEY = "000000";
+	public static final String BEACON_ID = "e2c56db5-dffb-48d2-b060-d0f5a71096e0";
 }

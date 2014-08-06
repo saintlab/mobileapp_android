@@ -24,12 +24,15 @@ import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.service.RBLBluetoothAttributes;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationBuilder;
+import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.widget.LoaderView;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.Identifier;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.InjectView;
 
@@ -74,12 +77,12 @@ public class ValidationActivity extends BaseActivity {
 
 				default:
 					activity.setError("OK");
-//					loader.scaleUp(new LoaderView.Callback() {
-//						@Override
-//						public void execute() {
-//							startActivity(PlacesListActivity.class, AnimationUtils.DURATION_LONG);
-//						}
-//					});
+					loader.scaleUp(new LoaderView.Callback() {
+						@Override
+						public void execute() {
+							startActivity(PlacesListActivity.class, AnimationUtils.DURATION_LONG);
+						}
+					});
 					break;
 			}
 		}
@@ -113,7 +116,7 @@ public class ValidationActivity extends BaseActivity {
 	@InjectView(R.id.txt_error)
 	protected TextView txtError;
 
-	BroadcastReceiver gattConnectedReceiver = new BroadcastReceiver() {
+ 	private BroadcastReceiver gattConnectedReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(intent.getAction())) {
@@ -151,6 +154,8 @@ public class ValidationActivity extends BaseActivity {
 	private Handler mHandler = new Handler();
 	private int loaderSize;
 
+	private List<Beacon> beacons = new ArrayList<Beacon>();
+
 	private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		@Override
 		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
@@ -160,10 +165,13 @@ public class ValidationActivity extends BaseActivity {
 					final BeaconParser parser = new BeaconParser();
 					parser.setBeaconLayout(RBLBluetoothAttributes.REDBEAR_BEACON_LAYOUT);
 					final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
-					Log.d(TAG, device.getAddress() + "->" + device.getName() + "->" + beacon + "->" + Arrays.toString(scanRecord));
-					// if (device.getAddress().startsWith("F3:77")) {
-					if (device.getName().equals("B1")) {
-						mBluetoothLeService.connect(device.getAddress());
+					if(beacon != null && beacon.getId1() != null ) {
+						Identifier id1 = beacon.getId1();
+						final String beaconId = id1.toString().toLowerCase();
+						if (RBLBluetoothAttributes.BEACON_ID.equals(beaconId)) {
+							beacons.add(beacon);
+							// mBluetoothLeService.connect(beacon.getBluetoothAddress());
+						}
 					}
 				}
 			});
@@ -193,6 +201,7 @@ public class ValidationActivity extends BaseActivity {
 
 	private void scanBleDevices(boolean enable) {
 		if (enable) {
+			beacons.clear();
 			mHandler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -256,7 +265,7 @@ public class ValidationActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		// animateStart();
+		animateStart();
 		setupBluetooth();
 		checkBluetoothEnabled();
 		IntentFilter filter = new IntentFilter(BluetoothLeService.ACTION_GATT_CONNECTED);
