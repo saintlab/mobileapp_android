@@ -7,7 +7,9 @@
     <string name="remind_password">Remind Password</string>
 
     <string name="sign_in">Sign In</string>
+    <string name="connecting">Connecting...</string>
 
+    <string name="server_do_not_respond">Server do not respond</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>

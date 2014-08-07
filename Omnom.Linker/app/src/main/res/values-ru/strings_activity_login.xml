@@ -6,6 +6,7 @@
     <string name="hint_password">Пароль</string>
 
     <string name="sign_in">Войти</string>
+    <string name="connecting">Подключение...</string>
 
     <string name="server_do_not_respond">Сервер не отвечает</string>
     <string name="error_invalid_email">Неверный логин</string>

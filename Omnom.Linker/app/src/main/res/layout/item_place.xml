@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_height="?android:attr/listPreferredItemHeightLarge"
     android:layout_marginTop="@dimen/activity_horizontal_margin_small"
     android:layout_marginBottom="@dimen/activity_horizontal_margin_small">
 
@@ -13,7 +13,9 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
         android:src="@drawable/ic_launcher"
-        android:padding="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="8dp"
         style="@style/ImageView.Place.ListLogo"/>
 
     <TextView
@@ -21,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/img_place_logo"
-        android:paddingLeft="@dimen/activity_horizontal_margin_small"
+        android:paddingTop="@dimen/activity_horizontal_margin_small"
         android:text="Place Name"
         style="@style/TextView.Place.Title"/>
 
@@ -31,10 +33,9 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/name"
         android:layout_below="@+id/name"
-        android:paddingLeft="@dimen/activity_horizontal_margin_small"
         android:gravity="center_vertical"
         android:drawableLeft="@drawable/ic_location_marker"
-        android:drawablePadding="4dp"
+        android:drawablePadding="8dp"
         android:text="Location"
         style="@style/TextView.Place.Data.Location"/>
 
@@ -54,7 +55,6 @@
         android:layout_alignLeft="@+id/name"
         android:layout_toLeftOf="@+id/rating"
         android:layout_below="@+id/location"
-        android:paddingLeft="@dimen/activity_horizontal_margin_small"
         android:text="Type Type Type Type Type Type Type"
         style="@style/TextView.Place.Data"/>
 

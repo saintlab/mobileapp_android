@@ -8,103 +8,79 @@
         android:layout_gravity="top"
         android:layout_marginLeft="@dimen/activity_horizontal_margin_large"
         android:layout_marginRight="@dimen/activity_horizontal_margin_large"
-        android:layout_marginTop="96dp"
+        android:layout_marginTop="@dimen/activity_login_padding_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <AutoCompleteTextView
-            android:id="@+id/txt_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <com.omnom.android.linker.widget.ErrorEditText
+            android:id="@+id/edit_email"
             android:hint="@string/hint_email"
             android:inputType="textEmailAddress"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:maxLines="1"
-            android:singleLine="true"/>
+            style="@style/EditText.Login"/>
 
         <TextView
             android:id="@+id/txt_email_error"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             style="@style/TextView.Error"/>
 
-        <EditText
+        <com.omnom.android.linker.widget.ErrorEditText
             android:id="@+id/edit_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:hint="@string/hint_password"
             android:imeActionId="@+id/login"
             android:imeActionLabel="@string/sign_in"
             android:imeOptions="actionUnspecified"
             android:inputType="textPassword"
-            android:maxLines="1"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:singleLine="true"/>
+            style="@style/EditText.Login"/>
 
         <TextView
             android:id="@+id/txt_password_error"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             style="@style/TextView.Error"/>
 
         <Button
-            android:layout_gravity="center"
             android:id="@+id/btn_login"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_marginTop="16dp"
-            android:paddingLeft="64dp"
-            android:paddingRight="64dp"
-            android:text="Войти"
-            android:typeface="monospace"
-            android:background="@drawable/btn_login"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            style="?android:textAppearanceMedium"/>
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:text="@string/sign_in"
+            style="@style/Button.Rounded.Blue"/>
 
         <LinearLayout
             android:id="@+id/view_connecting"
             android:layout_gravity="center"
-            android:paddingTop="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/login_progress_margin_top"
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@android:style/Widget.Holo.Light.ProgressBar"/>
+
             <TextView
                 android:paddingLeft="@dimen/activity_horizontal_margin_small"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Подключение..."/>
+                android:textAppearance="?android:textAppearance"
+                android:text="@string/connecting"/>
         </LinearLayout>
 
 
     </LinearLayout>
 
     <LinearLayout
-        android:layout_gravity="bottom"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_gravity="bottom">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
+        <include layout="@layout/delimiter_vertical"/>
 
         <Button
             android:id="@+id/btn_remind_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:text="@string/remind_password"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            style="@android:style/Widget.Holo.Light.Button.Borderless.Small"/>
+            style="@style/Button.Bottom"/>
     </LinearLayout>
 
 </FrameLayout>

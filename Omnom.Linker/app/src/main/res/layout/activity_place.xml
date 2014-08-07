@@ -8,29 +8,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <ImageButton
+    <Button
         android:id="@+id/btn_back"
         android:layout_width="@dimen/btn_back_size"
         android:layout_height="@dimen/btn_back_size"
         android:layout_margin="@dimen/btn_back_margin"
         android:background="@drawable/btn_back"/>
 
-    <LinearLayout
-        android:layout_gravity="bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    <Button
+        android:id="@+id/btn_bind_table"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin_large"
+        android:text="@string/bind"
+        style="@style/Button.Rounded.Blue"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
-
-        <Button
-            android:id="@+id/btn_bind_table"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/bind_table"
-            style="@android:style/Widget.Holo.Light.Button.Borderless.Small"/>
-    </LinearLayout>
 </FrameLayout>
