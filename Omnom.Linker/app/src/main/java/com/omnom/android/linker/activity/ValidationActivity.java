@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -81,7 +82,7 @@ public class ValidationActivity extends BaseActivity {
 			super.onPreExecute();
 			publishProgress(0);
 			countDownTimer.start();
-			loader.animateColor();
+			loader.animateColor(Color.BLUE);
 		}
 
 		@Override

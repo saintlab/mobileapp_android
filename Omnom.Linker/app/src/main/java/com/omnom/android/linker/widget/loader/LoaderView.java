@@ -1,8 +1,8 @@
 package com.omnom.android.linker.widget.loader;
 
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
@@ -62,15 +62,20 @@ public class LoaderView extends FrameLayout {
 		loaderSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
 	}
 
-	public void animateColor() {
-		ValueAnimator colorAnimator = ValueAnimator.ofInt(Color.RED, Color.BLUE);
+	public void animateColor(int endColor) {
+		animateColor(getContext().getResources().getColor(R.color.loader_bg), endColor);
+	}
+
+	public void animateColor(int startColor, int endColor) {
+		ValueAnimator colorAnimator = ValueAnimator.ofInt(startColor, endColor);
 		colorAnimator.setDuration(5000);
+		colorAnimator.setEvaluator(new ArgbEvaluator());
 		colorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 		colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
 				GradientDrawable sd = (GradientDrawable) mImgLoader.getDrawable();
-				sd.setColor((Integer)animation.getAnimatedValue());
+				sd.setColors(new int[]{(Integer) animation.getAnimatedValue(), (Integer) animation.getAnimatedValue()});
 				sd.invalidateSelf();
 			}
 		});
