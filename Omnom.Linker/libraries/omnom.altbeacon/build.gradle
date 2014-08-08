@@ -1,18 +1,16 @@
-apply plugin: 'com.android.application'
-//apply plugin: 'hugo'
+apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '20.0.0'
+    compileSdkVersion 'android-18'
+    buildToolsVersion "20.0.0"
 
     defaultConfig {
-        applicationId "com.omnom.android.linker"
+        applicationId "com.omnom.android.altbeacon"
         minSdkVersion 18
         targetSdkVersion 19
         versionCode 1
         versionName "1.0"
     }
-
     buildTypes {
         release {
             runProguard false
@@ -23,7 +21,4 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    // You must install or update the Support Repository through the SDK manager to use this dependency.
-    compile 'com.jakewharton:butterknife:5.1.1'
-    compile project(':libraries:omnom.altbeacon')
 }

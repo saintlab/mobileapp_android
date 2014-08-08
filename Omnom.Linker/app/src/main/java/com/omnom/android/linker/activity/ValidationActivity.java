@@ -28,13 +28,12 @@ import com.omnom.android.linker.utils.AnimationBuilder;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
-import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.Identifier;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import altbeacon.beacon.Beacon;
+import altbeacon.beacon.BeaconParser;
+import altbeacon.beacon.Identifier;
 import butterknife.InjectView;
 
 public class ValidationActivity extends BaseActivity {
