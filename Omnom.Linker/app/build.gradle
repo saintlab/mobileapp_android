@@ -5,6 +5,11 @@ android {
     compileSdkVersion 19
     buildToolsVersion '20.0.0'
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
     defaultConfig {
         applicationId "com.omnom.android.linker"
         minSdkVersion 19
@@ -24,4 +29,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // You must install or update the Support Repository through the SDK manager to use this dependency.
     compile 'com.jakewharton:butterknife:5.1.1'
+    compile project(':libraries:omnom.zxing')
 }

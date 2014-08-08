@@ -19,6 +19,7 @@
         android:required="true"/>
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -54,6 +55,10 @@
             android:screenOrientation="portrait"
             android:label="@string/title_activity_login">
         </activity>
+
+        <activity
+            android:name="com.google.zxing.client.android.CaptureActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".activity.SimpleSplashActivity"
