@@ -27,14 +27,21 @@ import butterknife.OnClick;
 
 import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
+import static com.omnom.android.linker.utils.ViewUtils.getTextValue;
 
 public class LoginActivity extends BaseActivity {
 
-	private static class ErrorTextWatcher implements TextWatcher {
+	private static final ButterKnife.Setter<View, Boolean> ENABLED = new ButterKnife.Setter<View, Boolean>() {
+		@Override
+		public void set(View view, Boolean value, int index) {
+			view.setEnabled(value);
+		}
+	};
 
-		private LoginActivity activity;
+	private static class ErrorTextWatcher implements TextWatcher {
 		private final ErrorEditText view;
-		private final TextView errView;
+		private final TextView      errView;
+		private       LoginActivity activity;
 
 		private ErrorTextWatcher(LoginActivity activity, ErrorEditText view, TextView errView) {
 			this.activity = activity;
@@ -59,9 +66,9 @@ public class LoginActivity extends BaseActivity {
 	}
 
 	private static class LoginAsyncTask extends AsyncTask<String, Integer, Integer> {
-		private static final int RESULT_CODE_SUCCESS = 0;
-		private static final int RESULT_CODE_LOGIN_ERROR = 1;
-		private static final int RESULT_CODE_PASSWORD_ERROR = 2;
+		private static final int RESULT_CODE_SUCCESS            = 0;
+		private static final int RESULT_CODE_LOGIN_ERROR        = 1;
+		private static final int RESULT_CODE_PASSWORD_ERROR     = 2;
 		private static final int RESULT_CODE_SERVER_UNAVAILABLE = 3;
 
 		private LoginActivity activity;
@@ -90,7 +97,7 @@ public class LoginActivity extends BaseActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 			activity.mViewConnecting.setVisibility(View.GONE);
-			switch (result) {
+			switch(result) {
 				case RESULT_CODE_LOGIN_ERROR:
 					activity.setError(activity.mEditLogin, activity.mTextLoginError, R.string.error_invalid_email);
 					break;
@@ -110,13 +117,6 @@ public class LoginActivity extends BaseActivity {
 			}
 		}
 	}
-
-	private static final ButterKnife.Setter<View, Boolean> ENABLED = new ButterKnife.Setter<View, Boolean>() {
-		@Override
-		public void set(View view, Boolean value, int index) {
-			view.setEnabled(value);
-		}
-	};
 
 	@InjectViews({R.id.edit_email, R.id.edit_password, R.id.btn_login, R.id.btn_remind_password})
 	protected List<View> loginViews;
@@ -144,7 +144,7 @@ public class LoginActivity extends BaseActivity {
 		mEditPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-				if (id == R.id.login || id == EditorInfo.IME_NULL) {
+				if(id == R.id.login || id == EditorInfo.IME_NULL) {
 					performLogin();
 					return true;
 				}
@@ -164,10 +164,10 @@ public class LoginActivity extends BaseActivity {
 
 	@OnClick(R.id.btn_login)
 	protected void performLogin() {
-		if (!validate()) {
+		if(!validate()) {
 			return;
 		}
-		new LoginAsyncTask(this).execute(mEditLogin.getText().toString().trim(), mEditPassword.getText().toString().trim());
+		new LoginAsyncTask(this).execute(getTextValue(mEditLogin), getTextValue(mEditPassword));
 	}
 
 	private void setError(ErrorEditText view, TextView errView, int resId) {
@@ -183,17 +183,17 @@ public class LoginActivity extends BaseActivity {
 	}
 
 	private boolean validate() {
-		if (!AndroidUtils.hasConnection(this)) {
+		if(!AndroidUtils.hasConnection(this)) {
 			showToast(this, R.string.please_check_internet_connection);
 			return false;
 		}
-		if (!AndroidUtils.isLocationEnabled(this)) {
+		if(!AndroidUtils.isLocationEnabled(this)) {
 			AndroidUtils.startLocationSettings(this);
 			return false;
 		}
 		String email = mEditLogin.getText().toString().trim();
 		String password = mEditPassword.getText().toString().trim();
-		if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+		if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
 			showToast(this, R.string.error_email_and_password_required);
 			return false;
 		}

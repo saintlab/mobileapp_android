@@ -17,4 +17,8 @@ public class ViewUtils {
 	public static void fixPasswordTypeface(EditText editText) {
 		editText.setTypeface(Typeface.DEFAULT, 0);
 	}
+
+	public static String getTextValue(EditText view) {
+		return view.getText().toString().trim();
+	}
 }
