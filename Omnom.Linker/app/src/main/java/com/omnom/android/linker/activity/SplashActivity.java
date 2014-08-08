@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.utils.AnimationUtils;
-import com.omnom.android.linker.widget.LoaderView;
+import com.omnom.android.linker.widget.loader.LoaderView;
 
 import org.jetbrains.annotations.Nullable;
 

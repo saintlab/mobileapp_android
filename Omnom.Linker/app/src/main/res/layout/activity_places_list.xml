@@ -1,7 +1,23 @@
-<ListView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin" />
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/loader_progress"
+        android:text="Список заведений"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:gravity="left|center_vertical"
+        android:textColor="@android:color/black"
+        android:textAppearance="?android:textAppearanceMedium"/>
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"/>
+</LinearLayout>

@@ -3,4 +3,5 @@
     <string name="please_check_internet_connection">Пожалуйста проверьте подключение к сети</string>
     <string name="title_activity_places_list">Список заведений</string>
     <string name="bind_table">Привязка столика</string>
+    <string name="bind">Привязать</string>
 </resources>

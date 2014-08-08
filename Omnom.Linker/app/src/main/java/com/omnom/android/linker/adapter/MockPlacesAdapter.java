@@ -35,7 +35,7 @@ public class MockPlacesAdapter extends ArrayAdapter<Place> {
 		protected RatingBar ratingBar;
 
 		private ViewHolder(View convertView) {
-			ButterKnife.inject(convertView);
+			ButterKnife.inject(this, convertView);
 		}
 	}
 
@@ -53,6 +53,7 @@ public class MockPlacesAdapter extends ArrayAdapter<Place> {
 		if (view == null) {
 			view = inflater.inflate(R.layout.item_place, parent, false);
 			holder = new ViewHolder(view);
+			holder.ratingBar.setProgress(5);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();

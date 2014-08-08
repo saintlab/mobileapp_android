@@ -3,32 +3,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.omnom.android.linker.widget.LoaderView
+    <com.omnom.android.linker.widget.loader.LoaderView
+        android:id="@+id/loader"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <Button
-        android:id="@+id/img_btn_back"
+    <FrameLayout
+        android:id="@+id/btn_back"
         android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_delete"/>
+        android:layout_height="48dp">
 
-    <LinearLayout
-        android:layout_gravity="bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        <ImageView
+            android:layout_gravity="center"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/btn_back"/>
+    </FrameLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
+    <Button
+        android:id="@+id/btn_bind_table"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin_large"
+        android:text="@string/bind"
+        style="@style/Button.Rounded.Blue"/>
 
-        <Button
-            android:id="@+id/btn_bind_table"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/bind_table"
-            style="@android:style/Widget.Holo.Light.Button.Borderless.Small"/>
-    </LinearLayout>
 </FrameLayout>

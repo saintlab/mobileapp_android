@@ -1,10 +1,9 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#cdcdcd">
+    android:layout_height="match_parent">
 
-    <com.omnom.android.linker.widget.LoaderView
+    <com.omnom.android.linker.widget.loader.LoaderView
         android:id="@+id/loader"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
@@ -12,11 +11,11 @@
     <TextView
         android:id="@+id/txt_error"
         android:layout_gravity="bottom"
-        android:gravity="center"
-        android:layout_marginBottom="48dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/holo_red_light"
-        android:textAppearance="?android:textAppearanceLarge"/>
-
+        android:textColor="@android:color/white"
+        android:paddingBottom="48dp"
+        android:textStyle="bold"
+        android:textIsSelectable="true"
+        android:textAppearance="?android:textAppearanceSmall"/>
 </FrameLayout>

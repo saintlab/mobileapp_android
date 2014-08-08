@@ -3,8 +3,19 @@
     <dimen name="activity_horizontal_margin_small">8dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_horizontal_margin_large">48dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <dimen name="loader_size">172dp</dimen>
-    <dimen name="loader_progress_size">194dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin_small">8dp</dimen>
+    <dimen name="activity_vertical_margin_large">48dp</dimen>
+
+    <dimen name="btn_back_margin">16dp</dimen>
+
+    <dimen name="login_progress_margin_top">32dp</dimen>
+    <dimen name="btn_rounded_width">144dp</dimen>
+    <dimen name="btn_rounded_height">48dp</dimen>
+
+    <dimen name="loader_size">230dp</dimen>
+    <dimen name="loader_progress_size">260dp</dimen>
+    <dimen name="btn_back_size">24dp</dimen>
+    <dimen name="activity_login_padding_top">96dp</dimen>
 </resources>

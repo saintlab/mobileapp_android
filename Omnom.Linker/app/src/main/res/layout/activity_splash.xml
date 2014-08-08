@@ -3,10 +3,9 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:background="#cdcdcd">
+    android:animateLayoutChanges="true">
 
-    <com.omnom.android.linker.widget.LoaderView
+    <com.omnom.android.linker.widget.loader.LoaderView
         android:id="@+id/loader"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

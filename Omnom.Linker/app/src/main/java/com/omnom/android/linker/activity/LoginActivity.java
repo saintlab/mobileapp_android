@@ -8,10 +8,7 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.R;
@@ -19,6 +16,7 @@ import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.ViewUtils;
+import com.omnom.android.linker.widget.ErrorEditText;
 
 import java.util.List;
 
@@ -27,18 +25,26 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 
+import static com.omnom.android.linker.utils.AndroidUtils.showToast;
+import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
+
 public class LoginActivity extends BaseActivity {
 
 	private static class ErrorTextWatcher implements TextWatcher {
-		private TextView view;
 
-		private ErrorTextWatcher(TextView view) {
+		private LoginActivity activity;
+		private final ErrorEditText view;
+		private final TextView errView;
+
+		private ErrorTextWatcher(LoginActivity activity, ErrorEditText view, TextView errView) {
+			this.activity = activity;
 			this.view = view;
+			this.errView = errView;
 		}
 
 		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			view.setText(StringUtils.EMPTY_STRING);
+			activity.clearError(view, errView);
 		}
 
 		@Override
@@ -84,18 +90,18 @@ public class LoginActivity extends BaseActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 			activity.mViewConnecting.setVisibility(View.GONE);
-			ButterKnife.apply(activity.loginViews, ENABLED, true);
 			switch (result) {
 				case RESULT_CODE_LOGIN_ERROR:
-					activity.mTextEmailError.setText(R.string.error_invalid_email);
+					activity.setError(activity.mEditLogin, activity.mTextLoginError, R.string.error_invalid_email);
 					break;
 
 				case RESULT_CODE_PASSWORD_ERROR:
-					activity.mTextPasswordError.setText(R.string.error_invalid_password);
+					activity.setError(activity.mEditPassword, activity.mTextPasswordError, R.string.error_invalid_password);
 					break;
 
 				case RESULT_CODE_SERVER_UNAVAILABLE:
-					Toast.makeText(activity, activity.getString(R.string.server_do_not_respond), Toast.LENGTH_LONG).show();
+					ButterKnife.apply(activity.loginViews, ENABLED, true);
+					showToastLong(activity, R.string.server_do_not_respond);
 					break;
 
 				case RESULT_CODE_SUCCESS:
@@ -112,17 +118,17 @@ public class LoginActivity extends BaseActivity {
 		}
 	};
 
-	@InjectViews({R.id.txt_email, R.id.edit_password, R.id.btn_login, R.id.btn_remind_password})
+	@InjectViews({R.id.edit_email, R.id.edit_password, R.id.btn_login, R.id.btn_remind_password})
 	protected List<View> loginViews;
 
-	@InjectView(R.id.txt_email)
-	protected AutoCompleteTextView mEditLogin;
+	@InjectView(R.id.edit_email)
+	protected ErrorEditText mEditLogin;
 
 	@InjectView(R.id.edit_password)
-	protected EditText mEditPassword;
+	protected ErrorEditText mEditPassword;
 
 	@InjectView(R.id.txt_email_error)
-	protected TextView mTextEmailError;
+	protected TextView mTextLoginError;
 
 	@InjectView(R.id.txt_password_error)
 	protected TextView mTextPasswordError;
@@ -132,9 +138,9 @@ public class LoginActivity extends BaseActivity {
 
 	@Override
 	public void initUi() {
-		mEditLogin.addTextChangedListener(new ErrorTextWatcher(mTextEmailError));
+		mEditLogin.addTextChangedListener(new ErrorTextWatcher(this, mEditLogin, mTextLoginError));
 		ViewUtils.fixPasswordTypeface(mEditPassword);
-		mEditPassword.addTextChangedListener(new ErrorTextWatcher(mTextPasswordError));
+		mEditPassword.addTextChangedListener(new ErrorTextWatcher(this, mEditPassword, mTextPasswordError));
 		mEditPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -164,15 +170,31 @@ public class LoginActivity extends BaseActivity {
 		new LoginAsyncTask(this).execute(mEditLogin.getText().toString().trim(), mEditPassword.getText().toString().trim());
 	}
 
+	private void setError(ErrorEditText view, TextView errView, int resId) {
+		ButterKnife.apply(loginViews, ENABLED, true);
+		view.setError(true);
+		errView.setVisibility(View.VISIBLE);
+		errView.setText(resId);
+	}
+
+	private void clearError(ErrorEditText view, TextView errView) {
+		view.setError(false);
+		errView.setText(StringUtils.EMPTY_STRING);
+	}
+
 	private boolean validate() {
 		if (!AndroidUtils.hasConnection(this)) {
-			Toast.makeText(this, getString(R.string.please_check_internet_connection), Toast.LENGTH_LONG).show();
+			showToast(this, R.string.please_check_internet_connection);
+			return false;
+		}
+		if (!AndroidUtils.isLocationEnabled(this)) {
+			AndroidUtils.startLocationSettings(this);
 			return false;
 		}
 		String email = mEditLogin.getText().toString().trim();
 		String password = mEditPassword.getText().toString().trim();
 		if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-			Toast.makeText(this, getString(R.string.error_email_and_password_required), Toast.LENGTH_LONG).show();
+			showToast(this, R.string.error_email_and_password_required);
 			return false;
 		}
 		return true;
