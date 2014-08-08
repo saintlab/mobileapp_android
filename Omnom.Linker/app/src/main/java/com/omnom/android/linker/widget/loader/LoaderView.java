@@ -1,10 +1,13 @@
-package com.omnom.android.linker.widget;
+package com.omnom.android.linker.widget.loader;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -25,8 +28,6 @@ public class LoaderView extends FrameLayout {
 	public interface Callback {
 		public void execute();
 	}
-
-	public static final int PROGRESS_MAX = 100;
 
 	@InjectView(R.id.img_loader)
 	protected ImageView mImgLoader;
@@ -57,7 +58,23 @@ public class LoaderView extends FrameLayout {
 	private void init() {
 		LayoutInflater.from(getContext()).inflate(R.layout.view_loader, this);
 		ButterKnife.inject(this);
+		mProgressBar.setMax(getContext().getResources().getInteger(R.integer.loader_progress_max));
 		loaderSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
+	}
+
+	public void animateColor() {
+		ValueAnimator colorAnimator = ValueAnimator.ofInt(Color.RED, Color.BLUE);
+		colorAnimator.setDuration(5000);
+		colorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+		colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation) {
+				GradientDrawable sd = (GradientDrawable) mImgLoader.getDrawable();
+				sd.setColor((Integer)animation.getAnimatedValue());
+				sd.invalidateSelf();
+			}
+		});
+		colorAnimator.start();
 	}
 
 	public void updateProgress(int progress) {
@@ -140,7 +157,6 @@ public class LoaderView extends FrameLayout {
 				}).onEnd(new AnimationBuilder.Action() {
 			@Override
 			public void invoke() {
-				mProgressBar.setProgress(PROGRESS_MAX);
 				showProgress(false);
 				if (endCallback != null) {
 					endCallback.execute();

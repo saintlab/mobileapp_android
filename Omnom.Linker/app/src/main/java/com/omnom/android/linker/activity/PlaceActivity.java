@@ -7,7 +7,7 @@ import android.widget.Toast;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.model.Place;
-import com.omnom.android.linker.widget.LoaderView;
+import com.omnom.android.linker.widget.loader.LoaderView;
 
 import butterknife.InjectView;
 import butterknife.OnClick;

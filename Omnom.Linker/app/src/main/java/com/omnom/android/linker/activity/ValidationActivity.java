@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -25,7 +26,7 @@ import com.omnom.android.linker.service.RBLBluetoothAttributes;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationBuilder;
 import com.omnom.android.linker.utils.AnimationUtils;
-import com.omnom.android.linker.widget.LoaderView;
+import com.omnom.android.linker.widget.loader.LoaderView;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconParser;
@@ -44,22 +45,54 @@ public class ValidationActivity extends BaseActivity {
 		private final int ERROR_CODE_EMPTY = -1;
 		private final int ERROR_CODE_NETWORK = 0;
 		private final int ERROR_CODE_SERVER = 1;
+
+		private final CountDownTimer countDownTimer;
+
 		private ValidationActivity activity;
+
+		private volatile boolean mFinished = false;
 
 		public ValidationAsyncTask(ValidationActivity activity) {
 			this.activity = activity;
+			final int progressMax = activity.getResources().getInteger(R.integer.loader_progress_max);
+			final int timeMax = activity.getResources().getInteger(R.integer.loader_time_max);
+			final int tick = activity.getResources().getInteger(R.integer.loader_tick_interval);
+			final int ticksCount = timeMax / tick;
+			final int magic = progressMax / ticksCount;
+
+			countDownTimer = new CountDownTimer(timeMax, tick) {
+				int j = 0;
+
+				@Override
+				public void onTick(long millisUntilFinished) {
+					j += magic * 2;
+					publishProgress(j);
+				}
+
+				@Override
+				public void onFinish() {
+					publishProgress(progressMax);
+					mFinished = true;
+				}
+			};
+		}
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			publishProgress(0);
+			countDownTimer.start();
+			loader.animateColor();
 		}
 
 		@Override
 		protected Integer doInBackground(Void... params) {
-			publishProgress(0);
 			if (!AndroidUtils.hasConnection(activity)) {
-				publishProgress(100);
 				return ERROR_CODE_NETWORK;
 			}
-			publishProgress(48);
-			SystemClock.sleep(2000);
-			publishProgress(100);
+			while (!mFinished) {
+				SystemClock.sleep(activity.getResources().getInteger(R.integer.loader_tick_interval));
+			}
 			return ERROR_CODE_EMPTY;
 		}
 
@@ -231,7 +264,7 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	public void onProgress(int progress) {
-		if (progress == 0 || progress >= 100) {
+		if (progress == 0 || progress >= getResources().getInteger(R.integer.loader_progress_max)) {
 			loader.showProgress(false);
 		} else {
 			loader.showProgress(true);

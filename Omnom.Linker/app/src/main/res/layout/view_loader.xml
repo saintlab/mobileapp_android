@@ -15,14 +15,14 @@
         android:layout_gravity="center"
         android:indeterminate="false"
         android:progress="0"
-        android:max="100"
+        android:max="@integer/loader_progress_max"
         android:progressDrawable="@drawable/loader_progress"
         style="?android:attr/progressBarStyleHorizontal"/>
 
     <ImageView
         android:id="@+id/img_logo"
         android:layout_gravity="center"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:src="@drawable/ic_launcher"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_fork_n_knife"/>
 </merge>
