@@ -65,7 +65,7 @@
   <string name="msg_default_format">Формат</string>
   <string name="msg_default_meta">Метаданные</string>
   <string name="msg_default_mms_subject">Привет</string>
-  <string name="msg_default_status">Чтобы сканировать штрих-код, поместите его в прямоугольник видоискателя.</string>
+  <string name="msg_default_status">Сканируем QR код</string>
   <string name="msg_default_time">Время</string>
   <string name="msg_default_type">Тип</string>
   <string name="msg_encode_contents_failed">Невозможно создать штрих-код из текущих данных.</string>
