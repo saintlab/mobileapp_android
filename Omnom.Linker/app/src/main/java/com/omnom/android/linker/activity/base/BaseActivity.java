@@ -1,8 +1,11 @@
 package com.omnom.android.linker.activity.base;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Created by Ch3D on 31.07.2014.
@@ -15,6 +18,11 @@ public abstract class BaseActivity extends Activity implements OmnomActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(getLayoutResource());
 		mHelper = new ActivityHelper(this);
+	}
+
+	@Override
+	protected void attachBaseContext(Context newBase) {
+		super.attachBaseContext(new CalligraphyContextWrapper(newBase));
 	}
 
 	@Override
