@@ -1,1 +1,1 @@
-include ':app', ':libraries:omnom.zxing'
+include ':app' , ':libraries:omnom.zxing'
