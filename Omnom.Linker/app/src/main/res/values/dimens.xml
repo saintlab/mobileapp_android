@@ -18,4 +18,9 @@
     <dimen name="loader_progress_size">260dp</dimen>
     <dimen name="btn_back_size">24dp</dimen>
     <dimen name="activity_login_padding_top">96dp</dimen>
+
+    <dimen name="font_small">16sp</dimen>
+    <dimen name="font_normal">18sp</dimen>
+    <dimen name="font_medium">20sp</dimen>
+    <dimen name="font_large">22sp</dimen>
 </resources>

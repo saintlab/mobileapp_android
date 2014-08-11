@@ -2,6 +2,10 @@
 <resources>
 
     <style name="AppTheme" parent="android:Theme.Holo.Light.NoActionBar">
+        <item name="android:textAppearance">@style/TextAppearance</item>
+        <item name="android:textAppearanceSmall">@style/TextAppearance.Small</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance.Large</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance.Medium</item>
     </style>
 
     <style name="Theme.Wood" parent="AppTheme">
@@ -10,18 +14,6 @@
         <item name="android:editTextStyle">@style/EditText</item>
         <item name="android:autoCompleteTextViewStyle">@style/EditText</item>
         <item name="android:ratingBarStyle">@style/RatingBar</item>
-    </style>
-
-    <style name="FullscreenTheme" parent="android:Theme.Holo">
-        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
-        <item name="android:windowActionBarOverlay">true</item>
-        <item name="android:windowBackground">@null</item>
-        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
-        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
-    </style>
-
-    <style name="FullscreenActionBarStyle" parent="android:Widget.Holo.ActionBar">
-        <item name="android:background">@color/black_overlay</item>
     </style>
 
     <style name="RatingBar" parent="android:Widget.Holo.RatingBar.Small">
@@ -37,6 +29,22 @@
         <item name="android:paddingRight">2dp</item>
         <item name="android:paddingBottom">0dp</item>
         <item name="android:background">@android:drawable/bottom_bar</item>
+    </style>
+
+    <style name="TextAppearance" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/font_normal</item>
+    </style>
+
+    <style name="TextAppearance.Small" parent="android:TextAppearance.Small">
+        <item name="android:textSize">@dimen/font_small</item>
+    </style>
+
+    <style name="TextAppearance.Medium" parent="android:TextAppearance.Medium">
+        <item name="android:textSize">@dimen/font_medium</item>
+    </style>
+
+    <style name="TextAppearance.Large" parent="android:TextAppearance.Large">
+        <item name="android:textSize">@dimen/font_large</item>
     </style>
 
     <style name="ButtonBarButton"/>
@@ -60,7 +68,7 @@
     <style name="TextView.Restaurant.Data">
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
-        <item name="android:textAppearance">?android:textAppearance</item>
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
@@ -97,7 +105,7 @@
     <style name="Button.Bottom" parent="android:Widget.Holo.Light.Button.Borderless.Small">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">@dimen/font_large</item>
         <item name="android:typeface">monospace</item>
     </style>
 
