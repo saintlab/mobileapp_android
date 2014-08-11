@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 
+import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 
 import butterknife.ButterKnife;
@@ -16,6 +17,7 @@ public class ActivityHelper {
 
 	public ActivityHelper(OmnomActivity activity) {
 		this.mActivity = activity;
+		LinkerApplication.get(activity).inject(activity);
 	}
 
 	public void onPostCreate() {
