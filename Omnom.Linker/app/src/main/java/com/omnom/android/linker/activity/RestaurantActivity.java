@@ -6,29 +6,29 @@ import android.widget.Toast;
 
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
-import com.omnom.android.linker.model.Place;
+import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class PlaceActivity extends BaseActivity {
+public class RestaurantActivity extends BaseActivity {
 
-	public static final String EXTRA_SELECTED_PLACE = "com.omnom.android.linker.selected_place";
-	public static final String EXTRA_PLACE = "com.omnom.android.linker.place";
+	public static final String EXTRA_SELECTED_RESTAURANT = "com.omnom.android.linker.selected_restaurant";
+	public static final String EXTRA_RESTAURANT          = "com.omnom.android.linker.restaurant";
 
 	@InjectView(R.id.loader)
 	LoaderView loader;
 
 	@Override
 	public void initUi() {
-		Parcelable selectedPlace = getIntent().getParcelableExtra(EXTRA_SELECTED_PLACE);
-		Parcelable place = getIntent().getParcelableExtra(EXTRA_PLACE);
+		Parcelable selectedPlace = getIntent().getParcelableExtra(EXTRA_SELECTED_RESTAURANT);
+		Parcelable place = getIntent().getParcelableExtra(EXTRA_RESTAURANT);
 		if(selectedPlace != null) {
-			final Place p = (Place) selectedPlace;
+			final Restaurant p = (Restaurant) selectedPlace;
 			Toast.makeText(this, p.getName(), Toast.LENGTH_LONG).show();
 		} else if(place != null) {
-			final Place p = (Place) place;
+			final Restaurant p = (Restaurant) place;
 			Toast.makeText(this, p.getName(), Toast.LENGTH_LONG).show();
 		} else {
 			finish();
@@ -43,6 +43,6 @@ public class PlaceActivity extends BaseActivity {
 
 	@Override
 	public int getLayoutResource() {
-		return R.layout.activity_place;
+		return R.layout.activity_restaurant;
 	}
 }

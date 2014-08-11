@@ -113,7 +113,7 @@ public class ValidationActivity extends BaseActivity {
 					loader.scaleUp(new LoaderView.Callback() {
 						@Override
 						public void execute() {
-							startActivity(PlacesListActivity.class, AnimationUtils.DURATION_LONG);
+							startActivity(RestaurantsListActivity.class, AnimationUtils.DURATION_LONG);
 						}
 					});
 					break;

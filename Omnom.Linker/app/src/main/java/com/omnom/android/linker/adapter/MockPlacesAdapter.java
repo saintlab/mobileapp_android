@@ -9,7 +9,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.model.Place;
+import com.omnom.android.linker.model.Restaurant;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import butterknife.InjectView;
 /**
  * Created by Ch3D on 31.07.2014.
  */
-public class MockPlacesAdapter extends ArrayAdapter<Place> {
+public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 
 	static class ViewHolder {
 		@InjectView(R.id.name)
@@ -42,8 +42,8 @@ public class MockPlacesAdapter extends ArrayAdapter<Place> {
 	private final LayoutInflater inflater;
 	private ViewHolder holder;
 
-	public MockPlacesAdapter(Context context, List<Place> objects) {
-		super(context, R.layout.item_place, objects);
+	public MockPlacesAdapter(Context context, List<Restaurant> objects) {
+		super(context, R.layout.item_restaurant, objects);
 		inflater = LayoutInflater.from(context);
 	}
 
@@ -51,7 +51,7 @@ public class MockPlacesAdapter extends ArrayAdapter<Place> {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view = convertView;
 		if (view == null) {
-			view = inflater.inflate(R.layout.item_place, parent, false);
+			view = inflater.inflate(R.layout.item_restaurant, parent, false);
 			holder = new ViewHolder(view);
 			holder.ratingBar.setProgress(5);
 			view.setTag(holder);
