@@ -55,21 +55,21 @@
 
     <style name="TextView" parent="android:Widget.Holo.Light.TextView"/>
 
-    <style name="TextView.Place"/>
+    <style name="TextView.Restaurant"/>
 
-    <style name="TextView.Place.Data">
+    <style name="TextView.Restaurant.Data">
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
         <item name="android:textAppearance">?android:textAppearanceSmall</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
-    <style name="TextView.Place.Data.Location">
+    <style name="TextView.Restaurant.Data.Location">
         <!--<item name="android:drawableLeft">@android:drawable/ic_menu_mylocation</item>
         <item name="android:drawablePadding">@dimen/activity_horizontal_margin_small</item>-->
     </style>
 
-    <style name="TextView.Place.Title">
+    <style name="TextView.Restaurant.Title">
         <item name="android:textAppearance">?android:textAppearanceMedium</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>

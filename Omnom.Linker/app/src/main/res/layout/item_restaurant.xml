@@ -27,7 +27,7 @@
         android:layout_toEndOf="@+id/img_logo"
         android:paddingTop="@dimen/activity_vertical_margin_small"
         android:text="Place Name"
-        style="@style/TextView.Place.Title"/>
+        style="@style/TextView.Restaurant.Title"/>
 
     <TextView
         android:id="@+id/location"
@@ -39,7 +39,7 @@
         android:drawableStart="@drawable/ic_location_marker"
         android:drawablePadding="8dp"
         android:text="Location"
-        style="@style/TextView.Place.Data.Location"/>
+        style="@style/TextView.Restaurant.Data.Location"/>
 
     <RatingBar
         android:id="@+id/rating"
@@ -58,6 +58,6 @@
         android:layout_toStartOf="@+id/rating"
         android:layout_below="@+id/location"
         android:text="Type Type Type Type Type Type Type"
-        style="@style/TextView.Place.Data"/>
+        style="@style/TextView.Restaurant.Data"/>
 
 </RelativeLayout>
