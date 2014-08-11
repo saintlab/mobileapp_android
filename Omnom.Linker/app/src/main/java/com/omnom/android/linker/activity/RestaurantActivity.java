@@ -26,10 +26,10 @@ public class RestaurantActivity extends BaseActivity {
 		Parcelable place = getIntent().getParcelableExtra(EXTRA_RESTAURANT);
 		if(selectedPlace != null) {
 			final Restaurant p = (Restaurant) selectedPlace;
-			Toast.makeText(this, p.getName(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this, p.getTitle(), Toast.LENGTH_LONG).show();
 		} else if(place != null) {
 			final Restaurant p = (Restaurant) place;
-			Toast.makeText(this, p.getName(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this, p.getTitle(), Toast.LENGTH_LONG).show();
 		} else {
 			finish();
 		}

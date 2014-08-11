@@ -17,16 +17,26 @@ android {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            runProguard false
+            proguardFiles 'proguard-rules.pro'
+        }
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // You must install or update the Support Repository through the SDK manager to use this dependency.
+    compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup.dagger:dagger:1.2.2'
     provided 'com.squareup.dagger:dagger-compiler:1.2.2'
+    compile 'com.squareup.retrofit:retrofit:1.6.1'
     compile 'com.jakewharton:butterknife:5.1.1'
+    compile 'com.netflix.rxjava:rxjava-core:0.19.6'
+    compile 'com.netflix.rxjava:rxjava-android:0.19.6'
+
     compile 'uk.co.chrisjenx:calligraphy:1.1.+'
+
     compile project(':libraries:omnom.altbeacon')
     compile project(':libraries:omnom.zxing')
 }
