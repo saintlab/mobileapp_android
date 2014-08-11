@@ -36,13 +36,6 @@ import static com.omnom.android.linker.utils.ViewUtils.getTextValue;
 
 public class LoginActivity extends BaseActivity {
 
-	private static final ButterKnife.Setter<View, Boolean> ENABLED = new ButterKnife.Setter<View, Boolean>() {
-		@Override
-		public void set(View view, Boolean value, int index) {
-			view.setEnabled(value);
-		}
-	};
-
 	private static final String TAG = LoginActivity.class.getSimpleName();
 
 	private static class ErrorTextWatcher implements TextWatcher {
@@ -131,7 +124,7 @@ public class LoginActivity extends BaseActivity {
 			return;
 		}
 		mViewConnecting.setVisibility(View.VISIBLE);
-		ButterKnife.apply(loginViews, ENABLED, false);
+		ButterKnife.apply(loginViews, ViewUtils.ENABLED, false);
 
 		api.authenticate(getTextValue(mEditLogin), getTextValue(mEditPassword)).subscribe(new Action1<String>() {
 			@Override
@@ -149,13 +142,13 @@ public class LoginActivity extends BaseActivity {
 		}, new Action0() {
 			@Override
 			public void call() {
-				ButterKnife.apply(loginViews, ENABLED, true);
+				ButterKnife.apply(loginViews, ViewUtils.ENABLED, true);
 			}
 		});
 	}
 
 	private void setError(ErrorEditText view, TextView errView, int resId) {
-		ButterKnife.apply(loginViews, ENABLED, true);
+		ButterKnife.apply(loginViews, ViewUtils.ENABLED, true);
 		view.setError(true);
 		errView.setVisibility(View.VISIBLE);
 		errView.setText(resId);
