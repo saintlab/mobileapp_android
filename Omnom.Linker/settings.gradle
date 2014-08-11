@@ -1,1 +1,1 @@
-include ':app', ':libraries:omnom.altbeacon'
+include ':app', ':libraries:omnom.altbeacon', ':libraries:omnom.zxing'

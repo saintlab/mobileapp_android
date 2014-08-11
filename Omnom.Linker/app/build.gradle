@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'hugo'
 
 android {
     compileSdkVersion 19
@@ -27,4 +26,5 @@ dependencies {
     compile 'com.jakewharton:butterknife:5.1.1'
     compile 'uk.co.chrisjenx:calligraphy:1.1.+'
     compile project(':libraries:omnom.altbeacon')
+    compile project(':libraries:omnom.zxing')
 }
