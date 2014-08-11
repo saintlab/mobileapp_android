@@ -11,14 +11,18 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
 import com.omnom.android.linker.BuildConfig;
+import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
+import com.omnom.android.linker.api.LinkerApi;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.ErrorEditText;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -86,11 +90,15 @@ public class LoginActivity extends BaseActivity {
 		@Override
 		protected Integer doInBackground(String... params) {
 			assert params.length == 2;
-			String login = params[0];
+			String username = params[0];
 			String password = params[1];
 
-			SystemClock.sleep(2000);
+			final String authToken = activity.linkerApi.authenticate(username, password);
+			if(TextUtils.isEmpty(authToken)) {
+				return RESULT_CODE_LOGIN_ERROR;
+			}
 
+			SystemClock.sleep(2000);
 			return RESULT_CODE_SUCCESS;
 		}
 
@@ -135,6 +143,12 @@ public class LoginActivity extends BaseActivity {
 
 	@InjectView(R.id.view_connecting)
 	protected View mViewConnecting;
+
+	@Inject
+	protected LinkerApi linkerApi;
+
+	@Inject
+	protected LinkerApplication app;
 
 	@Override
 	public void initUi() {
