@@ -16,4 +16,7 @@
     <string name="unknown_characteristic">Unknown BLE Characteristic</string>
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
+    <string name="error_bluetooth_disabled">Чтобы пользоваться Омном, необходимо включить Bluetooth.</string>
+    <string name="open_settings">Перейти в настройки</string>
+    <string name="error_location_disabled">Чтобы пользоваться Омном, необходимо разрешить использование службы геопозиции.</string>
 </resources>
