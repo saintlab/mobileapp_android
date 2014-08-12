@@ -1,4 +1,4 @@
-package com.omnom.android.linker.api;
+package com.omnom.android.linker.api.simple;
 
 import com.omnom.android.linker.model.Restaurant;
 
@@ -20,7 +20,7 @@ public interface LinkerApi {
 
 	public int bindQrCode(String restaurantId, String qrData);
 
-	public Restaurant getRestaurantData(String restaurantId);
+	public Restaurant getRestaurant(String restaurantId);
 
 	public List<Restaurant> getRestaurants();
 }

@@ -1,8 +1,9 @@
 package com.omnom.android.linker.model;
 
-import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.google.gson.annotations.Expose;
 
 /**
  * Created by Ch3D on 31.07.2014.
@@ -21,34 +22,35 @@ public class Restaurant implements Parcelable {
 		}
 	};
 
-	private String   id;
-	private String   name;
-	private Location location;
-	private String   locationName;
-	private int      rating;
+	@Expose
+	private String id;
 
-	public Restaurant(Parcel parcel) {
-		this.id = parcel.readString();
-		this.name = parcel.readString();
-		this.location = parcel.readParcelable(Location.class.getClassLoader());
-		this.locationName = parcel.readString();
-		this.rating = parcel.readInt();
-	}
+	@Expose
+	private String authCode;
 
-	protected Restaurant(String id, String name, Location location, String locationName, int rating) {
+	@Expose
+	private String description;
+
+	@Expose
+	private String title;
+
+	@Expose
+	private Decoration decoration;
+
+	public Restaurant(String id, String title, String authCode, String descr, Decoration decoration) {
 		this.id = id;
-		this.name = name;
-		this.location = location;
-		this.locationName = locationName;
-		this.rating = rating;
+		this.title = title;
+		this.authCode = authCode;
+		this.description = descr;
+		this.decoration = decoration;
 	}
 
-	public String getLocationName() {
-		return locationName;
-	}
-
-	public void setLocationName(String locationName) {
-		this.locationName = locationName;
+	public Restaurant(Parcel in) {
+		id = in.readString();
+		title = in.readString();
+		authCode = in.readString();
+		description = in.readString();
+		decoration = in.readParcelable(Decoration.class.getClassLoader());
 	}
 
 	public String getId() {
@@ -59,28 +61,36 @@ public class Restaurant implements Parcelable {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getAuthCode() {
+		return authCode;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setAuthCode(String authCode) {
+		this.authCode = authCode;
 	}
 
-	public Location getLocation() {
-		return location;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setLocation(Location location) {
-		this.location = location;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
-	public int getRating() {
-		return rating;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setRating(int rating) {
-		this.rating = rating;
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public Decoration getDecoration() {
+		return decoration;
+	}
+
+	public void setDecoration(Decoration decoration) {
+		this.decoration = decoration;
 	}
 
 	@Override
@@ -91,9 +101,9 @@ public class Restaurant implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(id);
-		dest.writeString(name);
-		dest.writeParcelable(location, flags);
-		dest.writeString(locationName);
-		dest.writeInt(rating);
+		dest.writeString(title);
+		dest.writeString(authCode);
+		dest.writeString(description);
+		dest.writeParcelable(decoration, flags);
 	}
 }

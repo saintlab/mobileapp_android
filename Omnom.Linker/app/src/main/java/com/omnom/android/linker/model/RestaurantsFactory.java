@@ -1,8 +1,6 @@
 package com.omnom.android.linker.model;
 
-import android.location.Location;
-
-import java.util.Random;
+import com.omnom.android.linker.utils.StringUtils;
 
 /**
  * Created by Ch3D on 31.07.2014.
@@ -13,11 +11,12 @@ public class RestaurantsFactory {
 		return null;
 	}
 
-	public static Restaurant create(String id, String name, Location location, String locationInfo, int rating) {
-		return new Restaurant(id, name, location, locationInfo, rating);
+	public static Restaurant create(String id, String title, String authCode, String descr, Decoration decoration) {
+		return new Restaurant(id, title, authCode, descr, decoration);
 	}
 
 	public static Restaurant createFake(String postfix) {
-		return new Restaurant("id " + postfix, "Name " + postfix, new Location(""), "Info " + postfix, new Random().nextInt(5));
+		return new Restaurant("id " + postfix, "Title " + postfix, "Auth " + postfix, "Info " + postfix,
+		                      new Decoration(StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING));
 	}
 }

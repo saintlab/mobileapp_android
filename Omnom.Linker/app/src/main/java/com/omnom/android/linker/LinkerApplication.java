@@ -32,7 +32,7 @@ public class LinkerApplication extends Application {
 	private ObjectGraph objectGraph;
 
 	protected List<Object> getModules() {
-		return Arrays.asList(new StubDataProviderModule() /*new LinkerDataProviderModule()  */, new AndroidModule(this),
+		return Arrays.asList(new StubDataProviderModule(),/* new LinkerDataProviderModule(),*/ new AndroidModule(this),
 		                     new ApplicationModule());
 	}
 
