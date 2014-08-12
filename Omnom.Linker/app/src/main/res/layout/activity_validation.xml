@@ -17,5 +17,6 @@
         android:paddingBottom="48dp"
         android:textStyle="bold"
         android:textIsSelectable="true"
+        android:visibility="gone"
         android:textAppearance="?android:textAppearanceSmall"/>
 </FrameLayout>

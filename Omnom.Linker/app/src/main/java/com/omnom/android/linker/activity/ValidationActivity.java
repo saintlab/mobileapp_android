@@ -27,6 +27,7 @@ import com.omnom.android.linker.service.RBLBluetoothAttributes;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationBuilder;
 import com.omnom.android.linker.utils.AnimationUtils;
+import com.omnom.android.linker.utils.BluetoothUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
 import java.util.ArrayList;
@@ -216,20 +217,17 @@ public class ValidationActivity extends BaseActivity {
 	@Override
 	public void initUi() {
 		loaderSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
-	}
-
-	private void setupBluetooth() {
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
 	}
 
-	private void checkBluetoothEnabled() {
+	private boolean checkBluetoothEnabled() {
 		if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
-			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+			mBtEnabled = false;
 		} else {
 			mBtEnabled = true;
 		}
+		return mBtEnabled;
 	}
 
 	private void scanBleDevices(boolean enable) {
@@ -298,12 +296,37 @@ public class ValidationActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		if(!AndroidUtils.isLocationEnabled(this)) {
+			showLocationError();
+			return;
+		}
+		if(!BluetoothUtils.hasBleSupport(this)) {
+			showErrorNoBle();
+			return;
+		}
+		if(!checkBluetoothEnabled()) {
+			showErrorBluetoothDisabled();
+			return;
+		}
+
 		animateStart();
-		setupBluetooth();
-		checkBluetoothEnabled();
 		IntentFilter filter = new IntentFilter(BluetoothLeService.ACTION_GATT_CONNECTED);
 		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
 		registerReceiver(gattConnectedReceiver, filter);
+	}
+
+	private void showErrorBluetoothDisabled() {
+		Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+		startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+	}
+
+	private void showErrorNoBle() {
+
+	}
+
+	private void showLocationError() {
+		// AndroidUtils.startLocationSettings(this);
 	}
 
 	private void animateStart() {

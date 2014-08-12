@@ -1,8 +1,8 @@
 package com.omnom.android.linker.providers;
 
 import com.omnom.android.linker.api.LinkerApi;
-import com.omnom.android.linker.model.Place;
-import com.omnom.android.linker.model.PlaceFactory;
+import com.omnom.android.linker.model.Restaurant;
+import com.omnom.android.linker.model.RestaurantsFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,13 +43,13 @@ public class StubDataProvider implements LinkerApi {
 	}
 
 	@Override
-	public Place getRestaurantData(String restaurantId) {
-		return PlaceFactory.createFake(restaurantId);
+	public Restaurant getRestaurantData(String restaurantId) {
+		return RestaurantsFactory.createFake(restaurantId);
 	}
 
 	@Override
-	public List<Place> getRestaurants() {
-		return Arrays.asList(PlaceFactory.createFake("fake 1"), PlaceFactory.createFake("fake 2"), PlaceFactory.createFake("fake 3"),
-		                     PlaceFactory.createFake("fake 4"), PlaceFactory.createFake("fake 5"));
+	public List<Restaurant> getRestaurants() {
+		return Arrays.asList(RestaurantsFactory.createFake("fake 1"), RestaurantsFactory.createFake("fake 2"), RestaurantsFactory.createFake("fake 3"),
+		                     RestaurantsFactory.createFake("fake 4"), RestaurantsFactory.createFake("fake 5"));
 	}
 }

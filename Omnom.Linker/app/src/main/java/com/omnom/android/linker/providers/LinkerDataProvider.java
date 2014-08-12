@@ -1,7 +1,7 @@
 package com.omnom.android.linker.providers;
 
 import com.omnom.android.linker.api.LinkerApi;
-import com.omnom.android.linker.model.Place;
+import com.omnom.android.linker.model.Restaurant;
 
 import java.util.List;
 
@@ -40,12 +40,12 @@ public class LinkerDataProvider implements LinkerApi {
 	}
 
 	@Override
-	public Place getRestaurantData(String restaurantId) {
+	public Restaurant getRestaurantData(String restaurantId) {
 		return null;
 	}
 
 	@Override
-	public List<Place> getRestaurants() {
+	public List<Restaurant> getRestaurants() {
 		return null;
 	}
 }
