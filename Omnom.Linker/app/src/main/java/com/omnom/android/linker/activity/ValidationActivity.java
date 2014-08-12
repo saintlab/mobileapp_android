@@ -16,8 +16,11 @@ import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
@@ -27,7 +30,7 @@ import com.omnom.android.linker.service.RBLBluetoothAttributes;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationBuilder;
 import com.omnom.android.linker.utils.AnimationUtils;
-import com.omnom.android.linker.utils.BluetoothUtils;
+import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
 import java.util.ArrayList;
@@ -36,16 +39,22 @@ import java.util.List;
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
 import altbeacon.beacon.Identifier;
+import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.InjectViews;
 
 public class ValidationActivity extends BaseActivity {
 
-	private static final String TAG = ValidationActivity.class.getSimpleName();
+	private static final String TAG               = ValidationActivity.class.getSimpleName();
+	private static final int    REQUEST_ENABLE_BT = 100;
+	private static final long   BLE_SCAN_PERIOD   = 2000;
+
+	private static final int MSG_LE_STOP = 0x01;
 
 	private class ValidationAsyncTask extends AsyncTask<Void, Integer, Integer> {
-		private final int ERROR_CODE_EMPTY = -1;
+		private final int ERROR_CODE_EMPTY   = -1;
 		private final int ERROR_CODE_NETWORK = 0;
-		private final int ERROR_CODE_SERVER = 1;
+		private final int ERROR_CODE_SERVER  = 1;
 
 		private final CountDownTimer countDownTimer;
 
@@ -83,15 +92,15 @@ public class ValidationActivity extends BaseActivity {
 			super.onPreExecute();
 			publishProgress(0);
 			countDownTimer.start();
-			loader.animateColor(Color.BLUE);
+			loader.animateColor(Color.BLACK);
 		}
 
 		@Override
 		protected Integer doInBackground(Void... params) {
-			if (!AndroidUtils.hasConnection(activity)) {
+			if(!AndroidUtils.hasConnection(activity)) {
 				return ERROR_CODE_NETWORK;
 			}
-			while (!mFinished) {
+			while(!mFinished) {
 				SystemClock.sleep(activity.getResources().getInteger(R.integer.loader_tick_interval));
 			}
 			return ERROR_CODE_EMPTY;
@@ -104,7 +113,7 @@ public class ValidationActivity extends BaseActivity {
 
 		@Override
 		protected void onPostExecute(final Integer errorCode) {
-			switch (errorCode) {
+			switch(errorCode) {
 				case ERROR_CODE_NETWORK:
 					activity.setError("Пожалуйста проверьте подключение к сети");
 					break;
@@ -122,51 +131,32 @@ public class ValidationActivity extends BaseActivity {
 		}
 	}
 
-	private static final int REQUEST_ENABLE_BT = 100;
-	private static final long BLE_SCAN_PERIOD = 2000;
-
-	private final ServiceConnection mServiceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName componentName, IBinder service) {
-			mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-			if (!mBluetoothLeService.initialize()) {
-				Log.e(TAG, "Unable to initialize Bluetooth");
-				finish();
-			}
-			scanBleDevices(true);
-			mBound = true;
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName componentName) {
-			mBluetoothLeService = null;
-			mBound = false;
-		}
-	};
-
 	@InjectView(R.id.loader)
 	protected LoaderView loader;
-
 	@InjectView(R.id.txt_error)
-	protected TextView txtError;
+	protected TextView   txtError;
+	@InjectView(R.id.btn_settings)
+	protected Button     btnSettings;
+	@InjectViews({R.id.txt_error, R.id.panel_bottom})
+	protected List<View> errorViews;
 
- 	private BroadcastReceiver gattConnectedReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver gattConnectedReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(intent.getAction())) {
+			if(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(intent.getAction())) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						final BluetoothGattService service = mBluetoothLeService.getService(RBLBluetoothAttributes
-								                                                               .UUID_BLE_REDBEAR_PASSWORD_SERVICE);
-						final BluetoothGattCharacteristic characteristic = service.getCharacteristic(RBLBluetoothAttributes
-								                                                                        .UUID_BLE_REDBEAR_PASSWORD);
+						final BluetoothGattService service = mBluetoothLeService.getService(
+								RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE);
+						final BluetoothGattCharacteristic characteristic = service.getCharacteristic(
+								RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD);
 						characteristic.setValue(RBLBluetoothAttributes.RBL_PASSKEY);
 						mBluetoothLeService.writeCharacteristic(characteristic);
 					}
 				});
 			}
-			if (intent.getAction() == BluetoothLeService.ACTION_GATT_CONNECTED) {
+			if(intent.getAction() == BluetoothLeService.ACTION_GATT_CONNECTED) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -181,15 +171,11 @@ public class ValidationActivity extends BaseActivity {
 			}
 		}
 	};
-
-	private boolean mBound;
+	private boolean          mBound;
 	private BluetoothAdapter mBluetoothAdapter;
 	private boolean mBtEnabled = false;
-	private Handler mHandler = new Handler();
 	private int loaderSize;
-
-	private List<Beacon> beacons = new ArrayList<Beacon>();
-
+	private List<Beacon>                    beacons         = new ArrayList<Beacon>();
 	private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		@Override
 		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
@@ -199,10 +185,10 @@ public class ValidationActivity extends BaseActivity {
 					final BeaconParser parser = new BeaconParser();
 					parser.setBeaconLayout(RBLBluetoothAttributes.REDBEAR_BEACON_LAYOUT);
 					final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
-					if(beacon != null && beacon.getId1() != null ) {
+					if(beacon != null && beacon.getId1() != null) {
 						Identifier id1 = beacon.getId1();
 						final String beaconId = id1.toString().toLowerCase();
-						if (RBLBluetoothAttributes.BEACON_ID.equals(beaconId)) {
+						if(RBLBluetoothAttributes.BEACON_ID.equals(beaconId)) {
 							beacons.add(beacon);
 							// mBluetoothLeService.connect(beacon.getBluetoothAddress());
 						}
@@ -211,8 +197,36 @@ public class ValidationActivity extends BaseActivity {
 			});
 		}
 	};
+	private Handler                         mHandler        = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			if(msg.what == MSG_LE_STOP) {
+				mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			}
+		}
+	};
 
 	private BluetoothLeService mBluetoothLeService;
+	private final ServiceConnection mServiceConnection      = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName componentName, IBinder service) {
+			mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
+			if(!mBluetoothLeService.initialize()) {
+				Log.e(TAG, "Unable to initialize Bluetooth");
+				finish();
+			}
+			scanBleDevices(true);
+			mBound = true;
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName componentName) {
+			mBluetoothLeService = null;
+			mBound = false;
+		}
+	};
+	private       boolean           mGattReceiverRegistered = false;
 
 	@Override
 	public void initUi() {
@@ -222,7 +236,7 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private boolean checkBluetoothEnabled() {
-		if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+		if(mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
 			mBtEnabled = false;
 		} else {
 			mBtEnabled = true;
@@ -231,15 +245,14 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void scanBleDevices(boolean enable) {
-		if (enable) {
+		if(enable) {
 			beacons.clear();
-			mHandler.postDelayed(new Runnable() {
+			findViewById(android.R.id.content).postDelayed(new Runnable() {
 				@Override
 				public void run() {
 					mBluetoothAdapter.stopLeScan(mLeScanCallback);
 				}
 			}, BLE_SCAN_PERIOD);
-
 			mBluetoothAdapter.startLeScan(mLeScanCallback);
 		} else {
 			mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -248,9 +261,9 @@ public class ValidationActivity extends BaseActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == REQUEST_ENABLE_BT) {
+		if(requestCode == REQUEST_ENABLE_BT) {
 			mBtEnabled = resultCode == RESULT_OK ? true : false;
-			if (mBtEnabled) {
+			if(mBtEnabled) {
 				scanBleDevices(true);
 			}
 		}
@@ -262,7 +275,7 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	public void onProgress(int progress) {
-		if (progress == 0 || progress >= getResources().getInteger(R.integer.loader_progress_max)) {
+		if(progress == 0 || progress >= getResources().getInteger(R.integer.loader_progress_max)) {
 			loader.showProgress(false);
 		} else {
 			loader.showProgress(true);
@@ -273,36 +286,41 @@ public class ValidationActivity extends BaseActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		unregisterReceiver(gattConnectedReceiver);
+		if(mGattReceiverRegistered) {
+			unregisterReceiver(gattConnectedReceiver);
+		}
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		if (mBluetoothLeService == null) {
-			bindService(new Intent(this, BluetoothLeService.class), mServiceConnection, BIND_AUTO_CREATE);
-		}
+		// TODO:
+		//		if(mBluetoothLeService == null) {
+		//			bindService(new Intent(this, BluetoothLeService.class), mServiceConnection, BIND_AUTO_CREATE);
+		//		}
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		if (mBound) {
-			unbindService(mServiceConnection);
-			mBound = false;
-		}
+		// TODO:
+		//		if(mBound) {
+		//			unbindService(mServiceConnection);
+		//			mBound = false;
+		//		}
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	protected void onPostResume() {
+		super.onPostResume();
+
+		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
+
+		loader.showProgress(false);
+		loader.scaleDown(null);
 
 		if(!AndroidUtils.isLocationEnabled(this)) {
 			showLocationError();
-			return;
-		}
-		if(!BluetoothUtils.hasBleSupport(this)) {
-			showErrorNoBle();
 			return;
 		}
 		if(!checkBluetoothEnabled()) {
@@ -310,23 +328,42 @@ public class ValidationActivity extends BaseActivity {
 			return;
 		}
 
+		loader.setLogo(R.drawable.ic_fork_n_knife);
 		animateStart();
 		IntentFilter filter = new IntentFilter(BluetoothLeService.ACTION_GATT_CONNECTED);
 		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
 		registerReceiver(gattConnectedReceiver, filter);
+		mGattReceiverRegistered = true;
 	}
 
 	private void showErrorBluetoothDisabled() {
-		Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-		startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-	}
-
-	private void showErrorNoBle() {
-
+		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, true);
+		loader.setLogo(R.drawable.ic_bluetooth_white);
+		txtError.setText(getString(R.string.error_bluetooth_disabled));
+		btnSettings.setText(getString(R.string.open_settings));
+		btnSettings.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				loader.scaleDown(null);
+				ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
+				startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT);
+			}
+		});
 	}
 
 	private void showLocationError() {
-		// AndroidUtils.startLocationSettings(this);
+		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, true);
+		loader.setLogo(R.drawable.ic_geolocation_white);
+		txtError.setText(getString(R.string.error_location_disabled));
+		btnSettings.setText(R.string.open_settings);
+		btnSettings.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				loader.scaleDown(null);
+				ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
+				AndroidUtils.startLocationSettings(v.getContext());
+			}
+		});
 	}
 
 	private void animateStart() {

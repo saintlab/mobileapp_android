@@ -201,10 +201,6 @@ public class LoginActivity extends BaseActivity {
 			showToast(this, R.string.please_check_internet_connection);
 			return false;
 		}
-		if(!AndroidUtils.isLocationEnabled(this)) {
-			AndroidUtils.startLocationSettings(this);
-			return false;
-		}
 		String email = mEditLogin.getText().toString().trim();
 		String password = mEditPassword.getText().toString().trim();
 		if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {

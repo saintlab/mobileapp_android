@@ -211,4 +211,8 @@ public class LoaderView extends FrameLayout {
 			}
 		}).build().start();
 	}
+
+	public void setLogo(int resId) {
+		mImgLogo.setImageResource(resId);
+	}
 }
