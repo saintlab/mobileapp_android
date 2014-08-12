@@ -24,7 +24,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 		return new Observable<String>(new Observable.OnSubscribe<String>() {
 			@Override
 			public void call(Subscriber<? super String> subscriber) {
-				final boolean error = true;
+				final boolean error = false;
 				if(error) {
 					subscriber.onError(new AuthenticationException());
 				} else {

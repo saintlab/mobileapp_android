@@ -111,7 +111,7 @@ public class LoaderView extends FrameLayout {
 		}).onEnd(new AnimationBuilder.Action() {
 			@Override
 			public void invoke() {
-				if (endCallback != null) {
+				if(endCallback != null) {
 					endCallback.execute();
 				}
 			}
@@ -125,12 +125,12 @@ public class LoaderView extends FrameLayout {
 			public void invoke(ValueAnimator animation) {
 				mImgLoader.getLayoutParams().width = (Integer) animation.getAnimatedValue();
 				mImgLoader.requestLayout();
-				if (updateCallback != null) {
+				if(updateCallback != null) {
 					updateCallback.execute();
 				}
 			}
 		});
-		if (endCallback != null) {
+		if(endCallback != null) {
 			builder.onEnd(endCallback);
 		}
 		builder.build().start();
@@ -152,8 +152,8 @@ public class LoaderView extends FrameLayout {
 	}
 
 	private void scaleUpWidth(final Callback endCallback) {
-		AnimationBuilder.create(mImgLoader.getMeasuredWidth(), mImgLoader.getMeasuredWidth() * 10)
-				.addListener(new AnimationBuilder.UpdateLisetener() {
+		AnimationBuilder.create(mImgLoader.getMeasuredWidth(), mImgLoader.getMeasuredWidth() * 10).addListener(
+				new AnimationBuilder.UpdateLisetener() {
 					@Override
 					public void invoke(ValueAnimator animation) {
 						mImgLoader.getLayoutParams().width = (Integer) animation.getAnimatedValue();
@@ -163,7 +163,7 @@ public class LoaderView extends FrameLayout {
 			@Override
 			public void invoke() {
 				showProgress(false);
-				if (endCallback != null) {
+				if(endCallback != null) {
 					endCallback.execute();
 				}
 			}
@@ -171,8 +171,8 @@ public class LoaderView extends FrameLayout {
 	}
 
 	private void scaleUpHeight() {
-		AnimationBuilder.create(mImgLoader.getMeasuredHeight(), mImgLoader.getMeasuredHeight() * 10)
-				.addListener(new AnimationBuilder.UpdateLisetener() {
+		AnimationBuilder.create(mImgLoader.getMeasuredHeight(), mImgLoader.getMeasuredHeight() * 10).addListener(
+				new AnimationBuilder.UpdateLisetener() {
 					@Override
 					public void invoke(ValueAnimator animation) {
 						mImgLoader.getLayoutParams().height = (Integer) animation.getAnimatedValue();
@@ -212,7 +212,13 @@ public class LoaderView extends FrameLayout {
 		}).build().start();
 	}
 
-	public void setLogo(int resId) {
-		mImgLogo.setImageResource(resId);
+	public void setLogo(final int resId) {
+		AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
+			@Override
+			public void run() {
+				mImgLogo.setImageResource(resId);
+				AnimationUtils.animateAlpha(mImgLogo, true);
+			}
+		});
 	}
 }

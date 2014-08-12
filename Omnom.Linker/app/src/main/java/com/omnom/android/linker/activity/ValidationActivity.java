@@ -297,6 +297,7 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 					@Override
 					public void onNext(RestaurantsResult restaurantsResult) {
 						restaurants = restaurantsResult;
+						loader.setLogo(R.drawable.ic_mexico_logo);
 					}
 				});
 			}
