@@ -43,30 +43,6 @@
             android:text="@string/sign_in"
             style="@style/Button.Rounded.Blue"/>
 
-        <LinearLayout
-            android:id="@+id/view_connecting"
-            android:layout_gravity="center"
-            android:paddingTop="@dimen/login_progress_margin_top"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@android:style/Widget.Holo.Light.ProgressBar"/>
-
-            <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin_small"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearance"
-                android:text="@string/connecting"/>
-        </LinearLayout>
-
-
     </LinearLayout>
 
     <LinearLayout

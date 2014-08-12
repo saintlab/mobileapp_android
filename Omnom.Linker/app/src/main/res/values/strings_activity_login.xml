@@ -15,4 +15,6 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_email_and_password_required">Please enter login and password</string>
     <string name="error_field_required">This field is required</string>
+
+    <string name="please_check_internet_connection">Please check your internet connection</string>
 </resources>

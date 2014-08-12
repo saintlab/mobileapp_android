@@ -19,4 +19,6 @@
     <string name="error_bluetooth_disabled">Чтобы пользоваться Омном, необходимо включить Bluetooth.</string>
     <string name="open_settings">Перейти в настройки</string>
     <string name="error_location_disabled">Чтобы пользоваться Омном, необходимо разрешить использование службы геопозиции.</string>
+    <string name="error_you_have_no_internet_connection">У вас нет доступа к интернету</string>
+    <string name="try_once_again">Проверить ещё</string>
 </resources>

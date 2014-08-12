@@ -3,6 +3,7 @@ package com.omnom.android.linker.activity.base;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
@@ -25,6 +26,23 @@ public class ActivityHelper {
 		mActivity.initUi();
 	}
 
+	public void startActivity(final Intent intent, int delay) {
+		mActivity.getActivity().findViewById(android.R.id.content).postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				startActivity(intent);
+			}
+		}, delay);
+	}
+
+	public void startActivity(final Intent intent) {
+		mActivity.getActivity().startActivity(intent, getDefaultOptions());
+	}
+
+	private Bundle getDefaultOptions() {
+		return ActivityOptions.makeCustomAnimation(mActivity.getActivity(), R.anim.fade_in, R.anim.fake_fade_out).toBundle();
+	}
+
 	public void startActivity(final Class<?> cls, int delay) {
 		mActivity.getActivity().findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
@@ -36,7 +54,7 @@ public class ActivityHelper {
 
 	public void startActivity(Class<?> cls, int animIn, int aninOut) {
 		Intent intent = new Intent(mActivity.getActivity(), cls);
-		if (Build.VERSION.SDK_INT >= 16) {
+		if(Build.VERSION.SDK_INT >= 16) {
 			ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(mActivity.getActivity(), animIn, aninOut);
 			mActivity.getActivity().startActivity(intent, activityOptions.toBundle());
 			mActivity.getActivity().finish();

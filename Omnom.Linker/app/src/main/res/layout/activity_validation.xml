@@ -39,7 +39,7 @@
             <include layout="@layout/delimiter_vertical"/>
 
             <Button
-                android:id="@+id/btn_settings"
+                android:id="@+id/btn_bottom"
                 android:text="@string/remind_password"
                 style="@style/Button.Bottom"/>
         </LinearLayout>

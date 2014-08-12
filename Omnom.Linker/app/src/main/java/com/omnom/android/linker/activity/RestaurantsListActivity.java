@@ -1,18 +1,29 @@
 package com.omnom.android.linker.activity;
 
+import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
 
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseListActivity;
 import com.omnom.android.linker.adapter.MockPlacesAdapter;
-import com.omnom.android.linker.model.RestaurantsFactory;
+import com.omnom.android.linker.model.Restaurant;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.OnItemClick;
 
 public class RestaurantsListActivity extends BaseListActivity {
+
+	public static final String EXTRA_RESTAURANTS = "com.omnom.android.linker.restaurants";
+
+	public static void start(final Context context, List<Restaurant> restaurants) {
+		final Intent intent = new Intent(context, RestaurantsListActivity.class);
+		intent.putParcelableArrayListExtra(EXTRA_RESTAURANTS, new ArrayList<Parcelable>(restaurants));
+		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
+	}
 
 	@Override
 	public int getLayoutResource() {
@@ -21,15 +32,14 @@ public class RestaurantsListActivity extends BaseListActivity {
 
 	@Override
 	public void initUi() {
-		setListAdapter(new MockPlacesAdapter(this, Arrays.asList(RestaurantsFactory.createFake("test1"), RestaurantsFactory.createFake("test2"),
-		                                                         RestaurantsFactory.createFake("test3"), RestaurantsFactory.createFake("test4"),
-		                                                         RestaurantsFactory.createFake("test5"))));
+		if(getIntent().hasExtra(EXTRA_RESTAURANTS)) {
+			ArrayList<Restaurant> restaurants = getIntent().getParcelableArrayListExtra(EXTRA_RESTAURANTS);
+			setListAdapter(new MockPlacesAdapter(this, restaurants));
+		}
 	}
 
 	@OnItemClick(android.R.id.list)
 	protected void showPlaceActivity(int position) {
-		Intent intent = new Intent(this, RestaurantActivity.class);
-		intent.putExtra(RestaurantActivity.EXTRA_SELECTED_RESTAURANT, (Parcelable) getListAdapter().getItem(position));
-		startActivity(intent);
+		ValidationActivity.start(this, (Restaurant) getListAdapter().getItem(position));
 	}
 }

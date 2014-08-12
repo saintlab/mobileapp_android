@@ -24,4 +24,6 @@ public interface LinkerObeservableApi {
 	public Observable<Restaurant> getRestaurant(String restaurantId);
 
 	public Observable<RestaurantsResult> getRestaurants();
+
+	void setAuthToken(String token);
 }

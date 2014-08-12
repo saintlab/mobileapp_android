@@ -4,10 +4,15 @@ import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsFactory;
 import com.omnom.android.linker.model.RestaurantsResult;
 
+import org.apache.http.auth.AuthenticationException;
+
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Ch3D on 11.08.2014.
@@ -19,10 +24,15 @@ public class StubDataProvider implements LinkerObeservableApi {
 		return new Observable<String>(new Observable.OnSubscribe<String>() {
 			@Override
 			public void call(Subscriber<? super String> subscriber) {
-				subscriber.onNext("OK");
-				subscriber.onCompleted();
+				final boolean error = true;
+				if(error) {
+					subscriber.onError(new AuthenticationException());
+				} else {
+					subscriber.onNext("OK");
+					subscriber.onCompleted();
+				}
 			}
-		}) {};
+		}) {}.delaySubscription(2000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
@@ -99,8 +109,8 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 				RestaurantsResult result = new RestaurantsResult();
 				result.setItems(Arrays.asList(RestaurantsFactory.createFake("fake 1"), RestaurantsFactory.createFake("fake 2"),
-				                              RestaurantsFactory.createFake("fake 3"),
-				                              RestaurantsFactory.createFake("fake 4"), RestaurantsFactory.createFake("fake 5")));
+				                              RestaurantsFactory.createFake("fake 3"), RestaurantsFactory.createFake("fake 4"),
+				                              RestaurantsFactory.createFake("fake 5")));
 				result.setLimit(0);
 				result.setOffset(0);
 				result.setTotal(0);
@@ -108,5 +118,10 @@ public class StubDataProvider implements LinkerObeservableApi {
 				subscriber.onCompleted();
 			}
 		}) {};
+	}
+
+	@Override
+	public void setAuthToken(String token) {
+		// Do nothing
 	}
 }

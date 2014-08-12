@@ -12,4 +12,5 @@ public interface ApiProtocol {
 	public static final String FIELD_MAJOR_ID      = "majorId";
 	public static final String FIELD_MINOR_ID      = "minorId";
 	public static final String FIELD_QR_DATA       = "qrData";
+	public static final String HEADER_AUTH_TOKEN   = "auth_token";
 }

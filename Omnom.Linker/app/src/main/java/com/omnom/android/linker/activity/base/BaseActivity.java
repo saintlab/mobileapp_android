@@ -2,6 +2,7 @@ package com.omnom.android.linker.activity.base;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -35,6 +36,14 @@ public abstract class BaseActivity extends Activity implements OmnomActivity {
 		mHelper.startActivity(cls, delay);
 	}
 
+	public void startActivity(final Intent intent, int delay) {
+		mHelper.startActivity(intent, delay);
+	}
+
+	public void startActivity(final Intent intent) {
+		mHelper.startActivity(intent);
+	}
+
 	public void startActivity(Class<?> cls, int animIn, int animOut) {
 		mHelper.startActivity(cls, animIn, animOut);
 	}
@@ -45,8 +54,7 @@ public abstract class BaseActivity extends Activity implements OmnomActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId())
-		{
+		switch(item.getItemId()) {
 			case android.R.id.home:
 				finish();
 				return true;

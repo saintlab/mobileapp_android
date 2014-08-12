@@ -68,7 +68,7 @@ public class LoaderView extends FrameLayout {
 
 	public void animateColor(int startColor, int endColor) {
 		ValueAnimator colorAnimator = ValueAnimator.ofInt(startColor, endColor);
-		colorAnimator.setDuration(5000);
+		colorAnimator.setDuration(AnimationUtils.DURATION_SHORT);
 		colorAnimator.setEvaluator(new ArgbEvaluator());
 		colorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 		colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
