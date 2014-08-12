@@ -14,7 +14,6 @@ import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.api.simple.LinkerApi;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.ViewUtils;
@@ -82,9 +81,6 @@ public class LoginActivity extends BaseActivity {
 
 	@InjectView(R.id.view_connecting)
 	protected View mViewConnecting;
-
-	@Inject
-	protected LinkerApi linkerApi;
 
 	@Inject
 	protected LinkerObeservableApi api;
@@ -162,10 +158,6 @@ public class LoginActivity extends BaseActivity {
 	private boolean validate() {
 		if(!AndroidUtils.hasConnection(this)) {
 			showToast(this, R.string.please_check_internet_connection);
-			return false;
-		}
-		if(!AndroidUtils.isLocationEnabled(this)) {
-			AndroidUtils.startLocationSettings(this);
 			return false;
 		}
 		String email = mEditLogin.getText().toString().trim();

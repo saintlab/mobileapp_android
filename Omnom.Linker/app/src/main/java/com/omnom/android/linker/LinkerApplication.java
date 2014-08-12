@@ -6,7 +6,6 @@ import android.content.Context;
 import com.omnom.android.linker.activity.base.OmnomActivity;
 import com.omnom.android.linker.modules.AndroidModule;
 import com.omnom.android.linker.modules.ApplicationModule;
-import com.omnom.android.linker.modules.LinkerDataProviderModule;
 import com.omnom.android.linker.modules.StubDataProviderModule;
 
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ public class LinkerApplication extends Application {
 	private ObjectGraph objectGraph;
 
 	protected List<Object> getModules() {
-		return Arrays.asList(new StubDataProviderModule(), new LinkerDataProviderModule(), new AndroidModule(this),
+		return Arrays.asList(new StubDataProviderModule(),/* new LinkerDataProviderModule(),*/ new AndroidModule(this),
 		                     new ApplicationModule());
 	}
 

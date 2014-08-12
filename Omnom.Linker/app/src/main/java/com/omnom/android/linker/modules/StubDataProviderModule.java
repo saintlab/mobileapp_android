@@ -1,8 +1,8 @@
 package com.omnom.android.linker.modules;
 
 import com.omnom.android.linker.activity.LoginActivity;
-import com.omnom.android.linker.api.simple.LinkerApi;
-import com.omnom.android.linker.api.simple.StubDataProvider;
+import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.api.observable.StubDataProvider;
 
 import javax.inject.Singleton;
 
@@ -16,7 +16,7 @@ import dagger.Provides;
 public class StubDataProviderModule {
 	@Provides
 	@Singleton
-	LinkerApi providerLinkerApi() {
+	LinkerObeservableApi providerLinkerApi() {
 		return new StubDataProvider();
 	}
 }
