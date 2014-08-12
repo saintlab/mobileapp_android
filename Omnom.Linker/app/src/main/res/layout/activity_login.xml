@@ -30,6 +30,7 @@
             android:imeActionLabel="@string/sign_in"
             android:imeOptions="actionUnspecified"
             android:inputType="textPassword"
+            android:typeface="normal"
             style="@style/EditText.Login"/>
 
         <TextView

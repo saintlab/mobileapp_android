@@ -12,6 +12,7 @@ import com.omnom.android.linker.R;
 import com.omnom.android.linker.model.Restaurant;
 
 import java.util.List;
+import java.util.Random;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -40,17 +41,19 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 	}
 
 	private final LayoutInflater inflater;
-	private ViewHolder holder;
+	private final Random         mRandom;
+	private       ViewHolder     holder;
 
 	public MockPlacesAdapter(Context context, List<Restaurant> objects) {
 		super(context, R.layout.item_restaurant, objects);
 		inflater = LayoutInflater.from(context);
+		mRandom = new Random();
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view = convertView;
-		if (view == null) {
+		if(view == null) {
 			view = inflater.inflate(R.layout.item_restaurant, parent, false);
 			holder = new ViewHolder(view);
 			holder.ratingBar.setProgress(5);
@@ -58,6 +61,14 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 		} else {
 			holder = (ViewHolder) view.getTag();
 		}
+		bindView(getItem(position), holder);
 		return view;
+	}
+
+	private void bindView(Restaurant item, ViewHolder holder) {
+		holder.name.setText(item.getTitle());
+		holder.location.setText(item.getDescription());
+		holder.type.setText(item.getDescription());
+		holder.ratingBar.setProgress(mRandom.nextInt(10));
 	}
 }

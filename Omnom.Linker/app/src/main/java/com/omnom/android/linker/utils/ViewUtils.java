@@ -36,7 +36,7 @@ public class ViewUtils {
 	}
 
 	public static void fixPasswordTypeface(EditText editText, EditText like) {
-		editText.setTypeface(like.getTypeface(), 0);
+		editText.setTypeface(like.getTypeface());
 	}
 
 	public static String getTextValue(EditText view) {
