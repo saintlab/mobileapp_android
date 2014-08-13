@@ -33,6 +33,7 @@ public class ViewUtils {
 
 	public static void setVisible(View view, boolean visible) {
 		view.setVisibility(visible ? View.VISIBLE : View.GONE);
+		view.setTag(visible);
 	}
 
 	public static void fixPasswordTypeface(EditText editText, EditText like) {

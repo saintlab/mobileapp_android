@@ -6,7 +6,14 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.Settings;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.omnom.android.linker.R;
+
+import static butterknife.ButterKnife.findById;
 
 /**
  * Created by Ch3D on 29.07.2014.
@@ -34,10 +41,17 @@ public class AndroidUtils {
 	}
 
 	public static void showToast(Context context, int resId) {
-		Toast.makeText(context, context.getString(resId), Toast.LENGTH_SHORT).show();
+		Toast toast = Toast.makeText(context, context.getString(resId), Toast.LENGTH_SHORT);
+		View view = LayoutInflater.from(context).inflate(R.layout.transient_notification, null);
+		TextView tv = findById(view, android.R.id.message);
+		tv.setText(resId);
+		toast.setView(view);
+		toast.show();
 	}
 
 	public static void showToastLong(Context context, int resId) {
-		Toast.makeText(context, context.getString(resId), Toast.LENGTH_LONG).show();
+		Toast toast = Toast.makeText(context, context.getString(resId), Toast.LENGTH_LONG);
+		toast.setView(LayoutInflater.from(context).inflate(R.layout.transient_notification, null));
+		toast.show();
 	}
 }

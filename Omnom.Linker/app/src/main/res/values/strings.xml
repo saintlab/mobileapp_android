@@ -21,4 +21,8 @@
     <string name="error_location_disabled">Чтобы пользоваться Омном, необходимо разрешить использование службы геопозиции.</string>
     <string name="error_you_have_no_internet_connection">У вас нет доступа к интернету</string>
     <string name="try_once_again">Проверить ещё</string>
+    <string name="please_enter_username">Пожалуйста введите логин</string>
+    <string name="remind_password_sent">Письмо для восстановления будет выслано вам на почту</string>
+    <string name="error_weak_beacon_signal">Слабый сигнал. Положите телефон в центр стола пожалуйста</string>
+    <string name="error_more_than_one_beacon">Обноружено несколько маячков. Положите телефон в центр стола пожалуйста</string>
 </resources>

@@ -40,6 +40,8 @@ public class LoaderView extends FrameLayout {
 
 	private int loaderSize;
 
+	private int currentColor = -1;
+
 	public LoaderView(Context context) {
 		super(context);
 		init();
@@ -58,32 +60,59 @@ public class LoaderView extends FrameLayout {
 	private void init() {
 		LayoutInflater.from(getContext()).inflate(R.layout.view_loader, this);
 		ButterKnife.inject(this);
+		currentColor = getDefaultBgColor();
+		mImgLogo.setTag(R.id.img_loader, R.drawable.ic_fork_n_knife);
 		mProgressBar.setMax(getContext().getResources().getInteger(R.integer.loader_progress_max));
 		loaderSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
 	}
 
+	private int getDefaultBgColor() {return getContext().getResources().getColor(R.color.loader_bg);}
+
 	public void animateColor(int endColor) {
-		animateColor(getContext().getResources().getColor(R.color.loader_bg), endColor);
+		animateColor(currentColor, endColor, AnimationUtils.DURATION_SHORT);
 	}
 
-	public void animateColor(int startColor, int endColor) {
-		ValueAnimator colorAnimator = ValueAnimator.ofInt(startColor, endColor);
-		colorAnimator.setDuration(AnimationUtils.DURATION_SHORT);
-		colorAnimator.setEvaluator(new ArgbEvaluator());
-		colorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-		colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+	public void animateColor(int endColor, long duration) {
+		animateColor(currentColor, endColor, duration);
+	}
+
+	public void animateColorDefault() {
+		animateColor(currentColor, getDefaultBgColor(), AnimationUtils.DURATION_SHORT);
+	}
+
+	public void animateColorDefault(long duration) {
+		animateColor(currentColor, getDefaultBgColor(), duration);
+	}
+
+	public void animateColor(final int startColor, final int endColor, final long duration) {
+		post(new Runnable() {
 			@Override
-			public void onAnimationUpdate(ValueAnimator animation) {
-				GradientDrawable sd = (GradientDrawable) mImgLoader.getDrawable();
-				sd.setColors(new int[]{(Integer) animation.getAnimatedValue(), (Integer) animation.getAnimatedValue()});
-				sd.invalidateSelf();
+			public void run() {
+				ValueAnimator colorAnimator = ValueAnimator.ofInt(startColor, endColor);
+				colorAnimator.setDuration(duration);
+				colorAnimator.setEvaluator(new ArgbEvaluator());
+				colorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+				colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+					@Override
+					public void onAnimationUpdate(ValueAnimator animation) {
+						GradientDrawable sd = (GradientDrawable) mImgLoader.getDrawable();
+						currentColor = (Integer) animation.getAnimatedValue();
+						sd.setColors(new int[]{currentColor, currentColor});
+						sd.invalidateSelf();
+					}
+				});
+				colorAnimator.start();
 			}
 		});
-		colorAnimator.start();
 	}
 
-	public void updateProgress(int progress) {
-		mProgressBar.setProgress(progress);
+	public void updateProgress(final int progress) {
+		mProgressBar.post(new Runnable() {
+			@Override
+			public void run() {
+				mProgressBar.setProgress(progress);
+			}
+		});
 	}
 
 	public void showProgress(boolean visible) {
@@ -94,7 +123,7 @@ public class LoaderView extends FrameLayout {
 		scaleDown(scaleDownUpdate, null);
 	}
 
-	public void scaleDown(final Callback scaleDownUpdate, AnimationBuilder.Action endAction) {
+	public void scaleDown(final Callback scaleDownUpdate, final AnimationBuilder.Action endAction) {
 		scaleDownHeight();
 		scaleDownWidth(scaleDownUpdate, endAction);
 	}
@@ -190,7 +219,7 @@ public class LoaderView extends FrameLayout {
 
 			@Override
 			public void onFinish() {
-				updateProgress(DURATION_LONG);
+				updateProgress((int) DURATION_LONG);
 				scaleUp(callback);
 			}
 		}.start();
@@ -212,7 +241,13 @@ public class LoaderView extends FrameLayout {
 		}).build().start();
 	}
 
-	public void setLogo(final int resId) {
+	public void animateLogo(final int resId) {
+		final Object tag = mImgLogo.getTag(R.id.img_loader);
+		if(tag != null && resId == (Integer) tag) {
+			// skip
+			return;
+		}
+		mImgLogo.setTag(R.id.img_loader, resId);
 		AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
 			@Override
 			public void run() {
@@ -220,5 +255,15 @@ public class LoaderView extends FrameLayout {
 				AnimationUtils.animateAlpha(mImgLogo, true);
 			}
 		});
+	}
+
+	public void setLogo(int resId) {
+		final Object tag = mImgLogo.getTag(R.id.img_loader);
+		if(tag != null && resId == (Integer) tag) {
+			// skip
+			return;
+		}
+		mImgLogo.setImageResource(resId);
+		mImgLogo.setTag(R.id.img_loader, resId);
 	}
 }

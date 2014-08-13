@@ -71,6 +71,7 @@
 
         <activity
             android:name=".activity.RestaurantsListActivity"
+            android:theme="@style/Theme.White"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_places_list">
         </activity>

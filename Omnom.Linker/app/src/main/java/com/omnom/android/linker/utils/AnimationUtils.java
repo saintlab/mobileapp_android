@@ -9,8 +9,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
  * Created by Ch3D on 29.07.2014.
  */
 public class AnimationUtils {
-	public static final int DURATION_LONG  = 1000;
-	public static final int DURATION_SHORT = 350;
+	public static final long DURATION_LONG  = 1000;
+	public static final long DURATION_SHORT = 350;
 
 	public static void animateAlpha(final View view, final boolean visible) {
 		animateAlpha(view, visible, null);

@@ -7,11 +7,13 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
+import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.ViewUtils;
@@ -21,6 +23,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.functions.Action1;
 
 import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 import static com.omnom.android.linker.utils.ViewUtils.getTextValue;
@@ -78,6 +81,9 @@ public class LoginActivity extends BaseActivity {
 	@Inject
 	protected LinkerApplication app;
 
+	@Inject
+	protected LinkerObeservableApi api;
+
 	@Override
 	public void initUi() {
 		if(getIntent() != null) {
@@ -121,16 +127,27 @@ public class LoginActivity extends BaseActivity {
 		return R.layout.activity_login;
 	}
 
+	@OnClick(R.id.btn_remind_password)
+	protected void performRemindPassword() {
+		if(validate(R.string.please_enter_username, mEditLogin)) {
+			api.remindPassword(getTextValue(mEditLogin)).subscribe(new Action1<String>() {
+				@Override
+				public void call(String result) {
+					showToast(LoginActivity.this, R.string.remind_password_sent);
+				}
+			});
+		}
+	}
+
 	@OnClick(R.id.btn_login)
 	protected void performLogin() {
-		if(!validate()) {
-			return;
+		if(validate(R.string.error_email_and_password_required, mEditLogin, mEditPassword)) {
+			final Intent intent = new Intent(this, ValidationActivity.class);
+			intent.putExtra(EXTRA_USERNAME, getTextValue(mEditLogin));
+			intent.putExtra(EXTRA_PASSWORD, getTextValue(mEditPassword));
+			startActivity(intent);
+			finish();
 		}
-		final Intent intent = new Intent(this, ValidationActivity.class);
-		intent.putExtra(EXTRA_USERNAME, getTextValue(mEditLogin));
-		intent.putExtra(EXTRA_PASSWORD, getTextValue(mEditPassword));
-		startActivity(intent);
-		finish();
 	}
 
 	private void setError(ErrorEditText view, TextView errView, int resId) {
@@ -144,16 +161,16 @@ public class LoginActivity extends BaseActivity {
 		errView.setText(StringUtils.EMPTY_STRING);
 	}
 
-	private boolean validate() {
+	private boolean validate(int errResId, EditText... views) {
 		if(!AndroidUtils.hasConnection(this)) {
 			showToast(this, R.string.please_check_internet_connection);
 			return false;
 		}
-		String email = mEditLogin.getText().toString().trim();
-		String password = mEditPassword.getText().toString().trim();
-		if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-			showToast(this, R.string.error_email_and_password_required);
-			return false;
+		for(EditText edit : views) {
+			if(TextUtils.isEmpty(edit.getText().toString().trim())) {
+				showToast(this, errResId);
+				return false;
+			}
 		}
 		return true;
 	}

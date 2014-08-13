@@ -8,11 +8,11 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.os.IBinder;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,8 +34,9 @@ import com.omnom.android.linker.widget.loader.LoaderView;
 
 import org.apache.http.auth.AuthenticationException;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -45,19 +46,22 @@ import altbeacon.beacon.Identifier;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
+import butterknife.OnClick;
 import rx.Observable;
 import rx.Observer;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
+import static butterknife.ButterKnife.findById;
 import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 
-public class ValidationActivity extends BaseActivity implements Observer<String> {
+public class ValidationActivity extends BaseActivity /*implements Observer<String>*/ {
 
-	public static final  String EXTRA_RESTAURANT  = "com.omnom.android.linker.restaurant";
-	private static final String TAG               = ValidationActivity.class.getSimpleName();
-	private static final int    REQUEST_ENABLE_BT = 100;
-	private static final long   BLE_SCAN_PERIOD   = 2000;
+	public static final  String EXTRA_RESTAURANT = "com.omnom.android.linker.restaurant";
+	private static final String TAG              = ValidationActivity.class.getSimpleName();
+
+	private static final int  REQUEST_ENABLE_BT = 100;
+	private static final long BLE_SCAN_PERIOD   = 2000;
 
 	public static void start(final Context context, Restaurant restaurant) {
 		final Intent intent = new Intent(context, ValidationActivity.class);
@@ -82,15 +86,12 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 
 	@Inject
 	protected LinkerObeservableApi api;
-	protected BluetoothLeService   mBluetoothLeService;
-	private   CountDownTimer       cdt;
+
+	protected BluetoothLeService mBluetoothLeService;
+	private   CountDownTimer     cdt;
 	private BroadcastReceiver gattConnectedReceiver = new GattBroadcastReceiver(this);
 
-	private final int MODE_SINGLE = 1;
-	private final int MODE_MILTIPLE = 2;
-
 	private boolean mBound;
-
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName componentName, IBinder service) {
@@ -99,7 +100,6 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 				Log.e(TAG, "Unable to initialize Bluetooth");
 				finish();
 			}
-			scanBleDevices(true);
 			mBound = true;
 		}
 
@@ -110,10 +110,9 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 		}
 	};
 	private BluetoothAdapter mBluetoothAdapter;
-	private boolean mBtEnabled = false;
-	private int loaderSize;
-	private List<Beacon>                    beacons                 = new ArrayList<Beacon>();
-	private BluetoothAdapter.LeScanCallback mLeScanCallback         = new BluetoothAdapter.LeScanCallback() {
+	private Set<Beacon> beacons = new HashSet<Beacon>();
+
+	private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		@Override
 		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
 			runOnUiThread(new Runnable() {
@@ -127,18 +126,18 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 						final String beaconId = id1.toString().toLowerCase();
 						if(RBLBluetoothAttributes.BEACON_ID.equals(beaconId)) {
 							beacons.add(beacon);
-							// mBluetoothLeService.connect(beacon.getBluetoothAddress());
 						}
 					}
 				}
 			});
 		}
 	};
-	private boolean                         mGattReceiverRegistered = false;
-	private String                          mUsername               = null;
-	private String                          mPassword               = null;
-	private RestaurantsResult               restaurants             = null;
-	private Restaurant                      mRestaurant             = null;
+
+	private boolean           mGattReceiverRegistered = false;
+	private String            mUsername               = null;
+	private String            mPassword               = null;
+	private RestaurantsResult restaurants             = null;
+	private Restaurant        mRestaurant             = null;
 
 	@Override
 	public void initUi() {
@@ -146,42 +145,42 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 		mUsername = getIntent().getStringExtra(LoginActivity.EXTRA_USERNAME);
 		mPassword = getIntent().getStringExtra(LoginActivity.EXTRA_PASSWORD);
 
-		loaderSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
 	}
 
 	private boolean checkBluetoothEnabled() {
-		if(mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
-			mBtEnabled = false;
-		} else {
-			mBtEnabled = true;
-		}
-		return mBtEnabled;
+		return mBluetoothAdapter != null && mBluetoothAdapter.isEnabled();
 	}
 
-	private void scanBleDevices(boolean enable) {
+	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
 		if(enable) {
 			beacons.clear();
 			findViewById(android.R.id.content).postDelayed(new Runnable() {
 				@Override
 				public void run() {
 					mBluetoothAdapter.stopLeScan(mLeScanCallback);
+					if(endCallback != null) {
+						endCallback.run();
+					}
 				}
 			}, BLE_SCAN_PERIOD);
 			mBluetoothAdapter.startLeScan(mLeScanCallback);
 		} else {
 			mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			if(endCallback != null) {
+				endCallback.run();
+			}
 		}
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(requestCode == REQUEST_ENABLE_BT) {
-			mBtEnabled = resultCode == RESULT_OK ? true : false;
-			if(mBtEnabled) {
-				scanBleDevices(true);
-			}
+			// TODO:
+			//			if(mBtEnabled) {
+			//				scanBleDevices(true);
+			//			}
 		}
 	}
 
@@ -210,57 +209,100 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 	@Override
 	protected void onStart() {
 		super.onStart();
-		// TODO:
-		//		if(mBluetoothLeService == null) {
-		//			bindService(new Intent(this, BluetoothLeService.class), mServiceConnection, BIND_AUTO_CREATE);
-		//		}
+		if(mBluetoothLeService == null) {
+			bindService(new Intent(this, BluetoothLeService.class), mServiceConnection, BIND_AUTO_CREATE);
+		}
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		// TODO:
-		//		if(mBound) {
-		//			unbindService(mServiceConnection);
-		//			mBound = false;
-		//		}
+		if(mBound) {
+			unbindService(mServiceConnection);
+			mBound = false;
+		}
 	}
 
 	@Override
 	protected void onPostResume() {
 		super.onPostResume();
+
+		IntentFilter filter = new IntentFilter(BluetoothLeService.ACTION_GATT_CONNECTED);
+		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+		registerReceiver(gattConnectedReceiver, filter);
+		mGattReceiverRegistered = true;
+
 		validate();
-		// TODO:
-		//		IntentFilter filter = new IntentFilter(BluetoothLeService.ACTION_GATT_CONNECTED);
-		//		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-		//		registerReceiver(gattConnectedReceiver, filter);
-		//		mGattReceiverRegistered = true;
+	}
+
+	@OnClick(R.id.btn_back)
+	public void onBack() {
+		onBackPressed();
+	}
+
+	@Override
+	public void finish() {
+		loader.animateColor(Color.WHITE);
+		loader.scaleUp(new LoaderView.Callback() {
+			@Override
+			public void execute() {
+				ValidationActivity.super.finish();
+				overridePendingTransition(android.R.anim.fade_in, R.anim.fake_fade_out);
+			}
+		});
 	}
 
 	private void validate() {
 		if(getIntent().hasExtra(EXTRA_RESTAURANT)) {
 			mRestaurant = getIntent().getParcelableExtra(EXTRA_RESTAURANT);
+			loader.setLogo(R.drawable.ic_mexico_logo);
 			onRestaurantLoaded(mRestaurant);
+			ViewUtils.setVisible(panelBottom, false);
 			loader.post(new Runnable() {
 				@Override
 				public void run() {
-					loader.scaleDown(null);
+					loader.animateColor(Color.WHITE, getResources().getColor(R.color.loader_bg), AnimationUtils.DURATION_LONG);
+					loader.scaleDown(null, new AnimationBuilder.Action() {
+						@Override
+						public void invoke() {
+							AnimationUtils.animateAlpha(findById(ValidationActivity.this, R.id.panel_bottom), true);
+							AnimationUtils.animateAlpha(findById(ValidationActivity.this, R.id.btn_back), true);
+						}
+					});
 				}
 			});
 			return;
 		}
 
 		loader.animateColor(getResources().getColor(R.color.loader_bg));
-		loader.setLogo(R.drawable.ic_fork_n_knife);
+		loader.animateLogo(R.drawable.ic_fork_n_knife);
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 		initCountDownTimer();
 		loader.showProgress(false);
 		loader.scaleDown(null, new AnimationBuilder.Action() {
 			@Override
 			public void invoke() {
-				cdt.start();
+				startLoader();
 			}
 		});
+	}
+
+	private void startLoader() {
+		cdt.start();
+
+		if(!AndroidUtils.hasConnection(ValidationActivity.this)) {
+			showInternetError();
+			return;
+		}
+
+		if(!AndroidUtils.isLocationEnabled(ValidationActivity.this)) {
+			showLocationError();
+			return;
+		}
+		if(!checkBluetoothEnabled()) {
+			showErrorBluetoothDisabled();
+			return;
+		}
 
 		api.authenticate(mUsername, mPassword).map(new Func1<String, Observable<RestaurantsResult>>() {
 			@Override
@@ -297,7 +339,6 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 					@Override
 					public void onNext(RestaurantsResult restaurantsResult) {
 						restaurants = restaurantsResult;
-						loader.setLogo(R.drawable.ic_mexico_logo);
 					}
 				});
 			}
@@ -335,7 +376,9 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 
 				if(size == 1) {
 					onRestaurantLoaded(items.get(0));
+					ViewUtils.setVisible(findById(ValidationActivity.this, R.id.btn_back), false);
 				} else {
+					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
 					loader.scaleUp(new LoaderView.Callback() {
 						@Override
 						public void execute() {
@@ -357,9 +400,45 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 		btnSettings.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(CaptureActivity.class);
+				bindTable();
 			}
 		});
+	}
+
+	private void bindTable() {
+		loader.animateColorDefault();
+		loader.animateLogo(R.drawable.ic_mexico_logo);
+		initCountDownTimer();
+		clearErrors();
+		cdt.start();
+		scanBleDevices(true, new Runnable() {
+			@Override
+			public void run() {
+				if(beacons.size() == 0) {
+					showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again,
+					          new View.OnClickListener() {
+						          @Override
+						          public void onClick(View v) {
+							          bindTable();
+						          }
+					          });
+				} else if(beacons.size() > 1) {
+					showError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon, R.string.try_once_again,
+					          new View.OnClickListener() {
+						          @Override
+						          public void onClick(View v) {
+							          bindTable();
+						          }
+					          });
+				} else if(beacons.size() == 1) {
+					startActivity(new Intent(ValidationActivity.this, CaptureActivity.class));
+				}
+			}
+		});
+	}
+
+	private void clearErrors() {
+		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 	}
 
 	private void onAuthError(Throwable e) {
@@ -373,10 +452,9 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 
 	private void showError(int logoResId, int errTextResId, int btnTextResId, View.OnClickListener onClickListener) {
 		loader.showProgress(false);
-		loader.animateColor(Color.RED);
 		cdt.cancel();
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, true);
-		loader.setLogo(logoResId);
+		loader.animateLogo(logoResId);
 		txtError.setText(errTextResId);
 		btnSettings.setText(btnTextResId);
 		btnSettings.setOnClickListener(onClickListener);
@@ -414,7 +492,7 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 		});
 	}
 
-	@Override
+	/*@Override
 	public void onCompleted() {
 		if(!AndroidUtils.hasConnection(ValidationActivity.this)) {
 			showInternetError();
@@ -428,7 +506,7 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 			showErrorBluetoothDisabled();
 			return;
 		}
-		loader.setLogo(R.drawable.ic_fork_n_knife);
+		loader.animateLogo(R.drawable.ic_fork_n_knife);
 	}
 
 	@Override
@@ -444,5 +522,5 @@ public class ValidationActivity extends BaseActivity implements Observer<String>
 			api.setAuthToken(result);
 			api.getRestaurants().subscribe();
 		}
-	}
+	}*/
 }
