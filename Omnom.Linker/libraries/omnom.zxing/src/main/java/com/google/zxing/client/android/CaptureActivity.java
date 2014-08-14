@@ -86,7 +86,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			                                                                                                   .ERROR_CORRECTION_LEVEL,
 	                                                                                                   ResultMetadataType
 			                                                                                                   .POSSIBLE_COUNTRY);
-	private static final String                         EXTRA_SCANNED_URI                 = "zxing.scan.result";
+	public static final String                         EXTRA_SCANNED_URI                 = "zxing.scan.result";
 
 	private static void drawLine(Canvas canvas, Paint paint, ResultPoint a, ResultPoint b, float scaleFactor) {
 		if(a != null && b != null) {

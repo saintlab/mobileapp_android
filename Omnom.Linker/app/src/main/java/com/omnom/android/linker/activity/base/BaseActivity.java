@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import com.omnom.android.linker.activity.Extras;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Created by Ch3D on 31.07.2014.
  */
-public abstract class BaseActivity extends Activity implements OmnomActivity {
+public abstract class BaseActivity extends Activity implements OmnomActivity, Extras {
 	private ActivityHelper mHelper;
 
 	@Override
@@ -19,6 +21,17 @@ public abstract class BaseActivity extends Activity implements OmnomActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(getLayoutResource());
 		mHelper = new ActivityHelper(this);
+		handleIntent(getIntent());
+	}
+
+	protected void handleIntent(Intent intent) {
+		// Do nothing
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		handleIntent(intent);
 	}
 
 	@Override

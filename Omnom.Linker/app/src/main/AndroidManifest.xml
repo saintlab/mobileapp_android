@@ -48,6 +48,11 @@
         </activity>
 
         <activity
+            android:name=".activity.BindActivity"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity
             android:name=".activity.LoginActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_login">

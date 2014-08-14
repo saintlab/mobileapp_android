@@ -7,6 +7,7 @@ import com.omnom.android.linker.api.ApiProtocol;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
 
+import altbeacon.beacon.Beacon;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import rx.Observable;
@@ -42,15 +43,15 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	}
 
 	@Override
-	public Observable<Integer> checkBeacon(String restaurantId, String beaconUuid, String majorId, String minorId) {
-		return mDataService.checkBeacon(restaurantId, beaconUuid, majorId, minorId).subscribeOn(Schedulers.io()).observeOn(
-				AndroidSchedulers.mainThread());
+	public Observable<Integer> checkBeacon(String restaurantId, Beacon beacon) {
+		return mDataService.checkBeacon(restaurantId, beacon.getIdValue(0), beacon.getIdValue(1), beacon.getIdValue(2)).subscribeOn(
+				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<Integer> bindBeacon(String restaurantId, String beaconUuid, String majorId, String minorId) {
-		return mDataService.bindBeacon(restaurantId, beaconUuid, majorId, minorId).subscribeOn(Schedulers.io()).observeOn(
-				AndroidSchedulers.mainThread());
+	public Observable<Integer> bindBeacon(String restaurantId, Beacon beacon) {
+		return mDataService.bindBeacon(restaurantId, beacon.getIdValue(0), beacon.getIdValue(1), beacon.getIdValue(2)).subscribeOn(
+				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

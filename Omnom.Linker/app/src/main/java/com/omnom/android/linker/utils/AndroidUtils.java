@@ -1,6 +1,8 @@
 package com.omnom.android.linker.utils;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -53,5 +55,16 @@ public class AndroidUtils {
 		Toast toast = Toast.makeText(context, context.getString(resId), Toast.LENGTH_LONG);
 		toast.setView(LayoutInflater.from(context).inflate(R.layout.transient_notification, null));
 		toast.show();
+	}
+
+	public static AlertDialog showDialog(Context context, int msg, int okResId, DialogInterface.OnClickListener okListener,
+	                                      int cancelResId,
+	                               DialogInterface.OnClickListener cancelListener) {
+		final AlertDialog alertDialog = new AlertDialog.Builder(context).setMessage(msg).setPositiveButton(okResId, okListener)
+				.setNegativeButton(cancelResId, cancelListener).create();
+		alertDialog.setCancelable(false);
+		alertDialog.setCanceledOnTouchOutside(false);
+		alertDialog.show();
+		return alertDialog;
 	}
 }

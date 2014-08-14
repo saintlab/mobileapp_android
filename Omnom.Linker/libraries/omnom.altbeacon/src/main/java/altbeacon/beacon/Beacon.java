@@ -223,6 +223,10 @@ public class Beacon implements Parcelable {
         return mIdentifiers.get(0);
     }
 
+	public String getIdValue(int i) {
+		return mIdentifiers.get(i).getValue();
+	}
+
     /**
      * Convenience method to get the second identifier
      * @return

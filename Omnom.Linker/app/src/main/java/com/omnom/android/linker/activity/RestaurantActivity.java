@@ -17,12 +17,9 @@ import butterknife.OnClick;
 
 public class RestaurantActivity extends BaseActivity {
 
-	public static final String EXTRA_SELECTED_RESTAURANT = "com.omnom.android.linker.selected_restaurant";
-	public static final String EXTRA_RESTAURANT          = "com.omnom.android.linker.restaurant";
-
 	public static void start(final Context context, Restaurant restaurant) {
 		final Intent intent = new Intent(context, RestaurantActivity.class);
-		intent.putExtra(RestaurantActivity.EXTRA_RESTAURANT, restaurant);
+		intent.putExtra(EXTRA_RESTAURANT, restaurant);
 		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
 	}
 
@@ -58,6 +55,6 @@ public class RestaurantActivity extends BaseActivity {
 
 	@Override
 	public int getLayoutResource() {
-		return R.layout.activity_restaurant;
+		return R.layout.activity_bind;
 	}
 }

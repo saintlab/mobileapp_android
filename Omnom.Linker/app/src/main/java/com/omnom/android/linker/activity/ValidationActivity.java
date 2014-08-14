@@ -2,7 +2,6 @@ package com.omnom.android.linker.activity;
 
 import android.app.ActivityOptions;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -18,54 +17,52 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
+import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
 import com.omnom.android.linker.service.BluetoothLeService;
-import com.omnom.android.linker.service.RBLBluetoothAttributes;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationBuilder;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.ViewUtils;
+import com.omnom.android.linker.widget.loader.LoaderController;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
 import org.apache.http.auth.AuthenticationException;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import altbeacon.beacon.Beacon;
-import altbeacon.beacon.BeaconParser;
-import altbeacon.beacon.Identifier;
+import altbeacon.beacon.BleNotAvailableException;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 import static butterknife.ButterKnife.findById;
 import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 
 public class ValidationActivity extends BaseActivity /*implements Observer<String>*/ {
 
-	public static final  String EXTRA_RESTAURANT = "com.omnom.android.linker.restaurant";
-	private static final String TAG              = ValidationActivity.class.getSimpleName();
+	private static final String TAG = ValidationActivity.class.getSimpleName();
 
-	private static final int  REQUEST_ENABLE_BT = 100;
-	private static final long BLE_SCAN_PERIOD   = 2000;
+	private static final int REQUEST_CODE_ENABLE_BT = 100;
 
 	public static void start(final Context context, Restaurant restaurant) {
 		final Intent intent = new Intent(context, ValidationActivity.class);
-		intent.putExtra(ValidationActivity.EXTRA_RESTAURANT, restaurant);
+		intent.putExtra(EXTRA_RESTAURANT, restaurant);
 		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
 	}
 
@@ -110,40 +107,20 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 		}
 	};
 	private BluetoothAdapter mBluetoothAdapter;
-	private Set<Beacon> beacons = new HashSet<Beacon>();
-
-	private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
-		@Override
-		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					final BeaconParser parser = new BeaconParser();
-					parser.setBeaconLayout(RBLBluetoothAttributes.REDBEAR_BEACON_LAYOUT);
-					final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
-					if(beacon != null && beacon.getId1() != null) {
-						Identifier id1 = beacon.getId1();
-						final String beaconId = id1.toString().toLowerCase();
-						if(RBLBluetoothAttributes.BEACON_ID.equals(beaconId)) {
-							beacons.add(beacon);
-						}
-					}
-				}
-			});
-		}
-	};
 
 	private boolean           mGattReceiverRegistered = false;
 	private String            mUsername               = null;
 	private String            mPassword               = null;
 	private RestaurantsResult restaurants             = null;
 	private Restaurant        mRestaurant             = null;
+	private Beacon            mBeacon                 = null;
+	private LoaderController mLoaderController;
 
 	@Override
 	public void initUi() {
-
-		mUsername = getIntent().getStringExtra(LoginActivity.EXTRA_USERNAME);
-		mPassword = getIntent().getStringExtra(LoginActivity.EXTRA_PASSWORD);
+		mUsername = getIntent().getStringExtra(EXTRA_USERNAME);
+		mPassword = getIntent().getStringExtra(EXTRA_PASSWORD);
+		mLoaderController = new LoaderController(this, loader);
 
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
@@ -153,49 +130,21 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 		return mBluetoothAdapter != null && mBluetoothAdapter.isEnabled();
 	}
 
-	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
-		if(enable) {
-			beacons.clear();
-			findViewById(android.R.id.content).postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					mBluetoothAdapter.stopLeScan(mLeScanCallback);
-					if(endCallback != null) {
-						endCallback.run();
-					}
-				}
-			}, BLE_SCAN_PERIOD);
-			mBluetoothAdapter.startLeScan(mLeScanCallback);
-		} else {
-			mBluetoothAdapter.stopLeScan(mLeScanCallback);
-			if(endCallback != null) {
-				endCallback.run();
-			}
-		}
-	}
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(requestCode == REQUEST_ENABLE_BT) {
-			// TODO:
-			//			if(mBtEnabled) {
-			//				scanBleDevices(true);
-			//			}
+		if(resultCode == RESULT_OK) {
+			if(requestCode == REQUEST_CODE_ENABLE_BT) {
+				// TODO:
+				//			if(mBtEnabled) {
+				//				scanBleDevices(true);
+				//			}
+			}
 		}
 	}
 
 	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_validation;
-	}
-
-	public void onProgress(int progress) {
-		if(progress == 0 || progress >= getResources().getInteger(R.integer.loader_progress_max)) {
-			loader.showProgress(false);
-		} else {
-			loader.showProgress(true);
-		}
-		loader.updateProgress(progress);
 	}
 
 	@Override
@@ -243,34 +192,23 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 	@Override
 	public void finish() {
 		loader.animateColor(Color.WHITE);
-		loader.scaleUp(new LoaderView.Callback() {
-			@Override
-			public void execute() {
-				ValidationActivity.super.finish();
-				overridePendingTransition(android.R.anim.fade_in, R.anim.fake_fade_out);
-			}
-		});
+		if(findById(this, R.id.btn_back).getVisibility() != View.VISIBLE) {
+			ValidationActivity.super.finish();
+		} else {
+			loader.scaleUp(new LoaderView.Callback() {
+				@Override
+				public void execute() {
+					ValidationActivity.super.finish();
+					overridePendingTransition(android.R.anim.fade_in, R.anim.fake_fade_out);
+				}
+			});
+		}
 	}
 
 	private void validate() {
 		if(getIntent().hasExtra(EXTRA_RESTAURANT)) {
 			mRestaurant = getIntent().getParcelableExtra(EXTRA_RESTAURANT);
-			loader.setLogo(R.drawable.ic_mexico_logo);
-			onRestaurantLoaded(mRestaurant);
-			ViewUtils.setVisible(panelBottom, false);
-			loader.post(new Runnable() {
-				@Override
-				public void run() {
-					loader.animateColor(Color.WHITE, getResources().getColor(R.color.loader_bg), AnimationUtils.DURATION_LONG);
-					loader.scaleDown(null, new AnimationBuilder.Action() {
-						@Override
-						public void invoke() {
-							AnimationUtils.animateAlpha(findById(ValidationActivity.this, R.id.panel_bottom), true);
-							AnimationUtils.animateAlpha(findById(ValidationActivity.this, R.id.btn_back), true);
-						}
-					});
-				}
-			});
+
 			return;
 		}
 
@@ -289,21 +227,45 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 
 	private void startLoader() {
 		cdt.start();
+		ValidationObservable.create(this).
+				subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).all(
+				new Func1<ValidationObservable.Error, Boolean>() {
+					@Override
+					public Boolean call(ValidationObservable.Error o) {
+						if(o == ValidationObservable.Error.OK) {
+							loader.jumpProgress(0.30f);
+						}
+						return true;
+					}
+				}).onErrorReturn(new Func1<Throwable, Boolean>() {
+			@Override
+			public Boolean call(Throwable throwable) {
+				return showError(throwable);
+			}
+		}).delaySubscription(1000, TimeUnit.MILLISECONDS).subscribe(new Action1<Boolean>() {
+			@Override
+			public void call(Boolean valid) {
+				if(valid) {
+					authenticateAndGetData();
+				}
+			}
+		});
+	}
 
-		if(!AndroidUtils.hasConnection(ValidationActivity.this)) {
-			showInternetError();
-			return;
-		}
-
-		if(!AndroidUtils.isLocationEnabled(ValidationActivity.this)) {
-			showLocationError();
-			return;
-		}
-		if(!checkBluetoothEnabled()) {
+	private boolean showError(Throwable throwable) {
+		if(throwable instanceof BleNotAvailableException) {
 			showErrorBluetoothDisabled();
-			return;
 		}
+		if(throwable instanceof LocationException) {
+			showLocationError();
+		}
+		if(throwable instanceof ConnectionExecption) {
+			showInternetError();
+		}
+		return false;
+	}
 
+	private void authenticateAndGetData() {
 		api.authenticate(mUsername, mPassword).map(new Func1<String, Observable<RestaurantsResult>>() {
 			@Override
 			public Observable<RestaurantsResult> call(String s) {
@@ -353,17 +315,15 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 		final int magic = progressMax / ticksCount;
 
 		cdt = new CountDownTimer(timeMax, tick) {
-			int j = 0;
 
 			@Override
 			public void onTick(long millisUntilFinished) {
-				j += magic * 2;
-				onProgress(j);
+				loader.addProgress(magic * 2);
 			}
 
 			@Override
 			public void onFinish() {
-				onProgress(progressMax);
+				loader.updateProgress(progressMax);
 				if(restaurants == null) {
 					// TODO: error happened
 					return;
@@ -375,7 +335,7 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 				}
 
 				if(size == 1) {
-					onRestaurantLoaded(items.get(0));
+					BindActivity.start(ValidationActivity.this, items.get(0));
 					ViewUtils.setVisible(findById(ValidationActivity.this, R.id.btn_back), false);
 				} else {
 					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
@@ -393,64 +353,17 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 		};
 	}
 
-	private void onRestaurantLoaded(Restaurant restaurant) {
-		mRestaurant = restaurant;
-		AnimationUtils.animateAlpha(panelBottom, true);
-		btnSettings.setText(R.string.bind_table);
-		btnSettings.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				bindTable();
-			}
-		});
-	}
-
-	private void bindTable() {
-		loader.animateColorDefault();
-		loader.animateLogo(R.drawable.ic_mexico_logo);
-		initCountDownTimer();
-		clearErrors();
-		cdt.start();
-		scanBleDevices(true, new Runnable() {
-			@Override
-			public void run() {
-				if(beacons.size() == 0) {
-					showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again,
-					          new View.OnClickListener() {
-						          @Override
-						          public void onClick(View v) {
-							          bindTable();
-						          }
-					          });
-				} else if(beacons.size() > 1) {
-					showError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon, R.string.try_once_again,
-					          new View.OnClickListener() {
-						          @Override
-						          public void onClick(View v) {
-							          bindTable();
-						          }
-					          });
-				} else if(beacons.size() == 1) {
-					startActivity(new Intent(ValidationActivity.this, CaptureActivity.class));
-				}
-			}
-		});
-	}
-
-	private void clearErrors() {
-		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-	}
-
 	private void onAuthError(Throwable e) {
 		final Intent intent = new Intent(this, LoginActivity.class);
-		intent.putExtra(LoginActivity.EXTRA_ERROR_CODE, LoginActivity.EXTRA_ERROR_WRONG_USERNAME);
-		intent.putExtra(LoginActivity.EXTRA_USERNAME, mUsername);
-		intent.putExtra(LoginActivity.EXTRA_PASSWORD, mPassword);
+		intent.putExtra(EXTRA_ERROR_CODE, EXTRA_ERROR_WRONG_USERNAME);
+		intent.putExtra(EXTRA_USERNAME, mUsername);
+		intent.putExtra(EXTRA_PASSWORD, mPassword);
 		startActivity(intent);
 		finish();
 	}
 
 	private void showError(int logoResId, int errTextResId, int btnTextResId, View.OnClickListener onClickListener) {
+		loader.updateProgress(0);
 		loader.showProgress(false);
 		cdt.cancel();
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, true);
@@ -476,7 +389,7 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 			public void onClick(View v) {
 				loader.scaleDown(null);
 				ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-				startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT);
+				startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_CODE_ENABLE_BT);
 			}
 		});
 	}
@@ -491,36 +404,4 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 			}
 		});
 	}
-
-	/*@Override
-	public void onCompleted() {
-		if(!AndroidUtils.hasConnection(ValidationActivity.this)) {
-			showInternetError();
-			return;
-		}
-		if(!AndroidUtils.isLocationEnabled(ValidationActivity.this)) {
-			showLocationError();
-			return;
-		}
-		if(!checkBluetoothEnabled()) {
-			showErrorBluetoothDisabled();
-			return;
-		}
-		loader.animateLogo(R.drawable.ic_fork_n_knife);
-	}
-
-	@Override
-	public void onError(Throwable e) {
-		onAuthError(e);
-		cdt.cancel();
-		Log.e(TAG, "authenticate()", e);
-	}
-
-	@Override
-	public void onNext(String result) {
-		if(!TextUtils.isEmpty(result)) {
-			api.setAuthToken(result);
-			api.getRestaurants().subscribe();
-		}
-	}*/
 }

@@ -11,6 +11,8 @@
 
     <string name="bind_table">Bind Table</string>
     <string name="bind">Bind</string>
+    <string name="beacon_bound">Beacon bound</string>
+    <string name="qr_bound">QR bound</string>
 
     <string name="unknown_service">Unknown BLE Service</string>
     <string name="unknown_characteristic">Unknown BLE Characteristic</string>
@@ -25,4 +27,7 @@
     <string name="remind_password_sent">Письмо для восстановления будет выслано вам на почту</string>
     <string name="error_weak_beacon_signal">Слабый сигнал. Положите телефон в центр стола пожалуйста</string>
     <string name="error_more_than_one_beacon">Обноружено несколько маячков. Положите телефон в центр стола пожалуйста</string>
+    <string name="beacon_already_bound">Маячок уже связан со столом 11. Продолжить всё равно?</string>
+    <string name="proceed">Продолжить</string>
+    <string name="cancel">Отменить</string>
 </resources>

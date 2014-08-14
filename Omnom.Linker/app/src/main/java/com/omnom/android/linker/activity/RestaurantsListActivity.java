@@ -17,8 +17,6 @@ import butterknife.OnItemClick;
 
 public class RestaurantsListActivity extends BaseListActivity {
 
-	public static final String EXTRA_RESTAURANTS = "com.omnom.android.linker.restaurants";
-
 	public static void start(final Context context, List<Restaurant> restaurants) {
 		final Intent intent = new Intent(context, RestaurantsListActivity.class);
 		intent.putParcelableArrayListExtra(EXTRA_RESTAURANTS, new ArrayList<Parcelable>(restaurants));
@@ -39,7 +37,7 @@ public class RestaurantsListActivity extends BaseListActivity {
 	}
 
 	@OnItemClick(android.R.id.list)
-	protected void showPlaceActivity(int position) {
-		ValidationActivity.start(this, (Restaurant) getListAdapter().getItem(position));
+	protected void showBindActivity(int position) {
+		BindActivity.start(this, (Restaurant) getListAdapter().getItem(position));
 	}
 }

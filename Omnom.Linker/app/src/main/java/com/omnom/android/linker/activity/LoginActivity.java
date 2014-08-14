@@ -29,14 +29,6 @@ import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 import static com.omnom.android.linker.utils.ViewUtils.getTextValue;
 
 public class LoginActivity extends BaseActivity {
-
-	public static final String EXTRA_USERNAME   = "com.omnom.android.linker.username";
-	public static final String EXTRA_PASSWORD   = "com.omnom.android.linker.password";
-	public static final String EXTRA_ERROR_CODE = "com.omnom.android.linker.error.code";
-
-	public static final int EXTRA_ERROR_WRONG_PASSWORD = 0;
-	public static final int EXTRA_ERROR_WRONG_USERNAME = 1;
-
 	private static final String TAG = LoginActivity.class.getSimpleName();
 
 	private static class ErrorTextWatcher implements TextWatcher {

@@ -3,6 +3,7 @@ package com.omnom.android.linker.api.observable;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
 
+import altbeacon.beacon.Beacon;
 import rx.Observable;
 
 /**
@@ -13,9 +14,9 @@ public interface LinkerObeservableApi {
 
 	public Observable<String> remindPassword(String username);
 
-	public Observable<Integer> checkBeacon(String restaurantId, String beaconUuid, String majorId, String minorId);
+	public Observable<Integer> checkBeacon(String restaurantId, Beacon beacon);
 
-	public Observable<Integer> bindBeacon(String restaurantId, String beaconUuid, String majorId, String minorId);
+	public Observable<Integer> bindBeacon(String restaurantId, Beacon beacon);
 
 	public Observable<Integer> checkQrCode(String restaurantId, String qrData);
 

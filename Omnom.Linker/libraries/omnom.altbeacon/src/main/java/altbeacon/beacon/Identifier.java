@@ -33,6 +33,11 @@ public class Identifier {
     public String toString() {
         return mStringValue;
     }
+
+	public String getValue() {
+		return mStringValue;
+	}
+
     public int toInt() {
         return Integer.parseInt(mStringValue);
     }

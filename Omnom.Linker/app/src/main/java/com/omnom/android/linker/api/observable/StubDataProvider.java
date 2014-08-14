@@ -1,5 +1,6 @@
 package com.omnom.android.linker.api.observable;
 
+import com.omnom.android.linker.activity.BeaconAlreadyBoundException;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsFactory;
 import com.omnom.android.linker.model.RestaurantsResult;
@@ -9,6 +10,7 @@ import org.apache.http.auth.AuthenticationException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import altbeacon.beacon.Beacon;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -19,13 +21,16 @@ import rx.schedulers.Schedulers;
  */
 public class StubDataProvider implements LinkerObeservableApi {
 
+	private boolean authError = false;
+	private boolean checkBeaconError = false;
+
 	@Override
 	public Observable<String> authenticate(String username, String password) {
 		return new Observable<String>(new Observable.OnSubscribe<String>() {
 			@Override
 			public void call(Subscriber<? super String> subscriber) {
-				final boolean error = false;
-				if(error) {
+				authError = false;
+				if(authError) {
 					subscriber.onError(new AuthenticationException());
 				} else {
 					subscriber.onNext("OK");
@@ -47,18 +52,22 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
-	public Observable<Integer> checkBeacon(String restaurantId, String beaconUuid, String majorId, String minorId) {
+	public Observable<Integer> checkBeacon(String restaurantId, Beacon beacon) {
 		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
 			@Override
 			public void call(Subscriber<? super Integer> subscriber) {
-				subscriber.onNext(0);
-				subscriber.onCompleted();
+				if(checkBeaconError) {
+					subscriber.onError(new BeaconAlreadyBoundException());
+				} else {
+					subscriber.onNext(0);
+					subscriber.onCompleted();
+				}
 			}
 		}) {};
 	}
 
 	@Override
-	public Observable<Integer> bindBeacon(String restaurantId, String beaconUuid, String majorId, String minorId) {
+	public Observable<Integer> bindBeacon(String restaurantId, Beacon beacon) {
 		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
 			@Override
 			public void call(Subscriber<? super Integer> subscriber) {
