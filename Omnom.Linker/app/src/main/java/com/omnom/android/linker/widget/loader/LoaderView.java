@@ -20,6 +20,7 @@ import com.omnom.android.linker.utils.ViewUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import hugo.weaving.DebugLog;
 
 import static com.omnom.android.linker.utils.AnimationUtils.DURATION_LONG;
 
@@ -93,6 +94,8 @@ public class LoaderView extends FrameLayout {
 		animateColor(currentColor, getDefaultBgColor(), duration);
 	}
 
+
+	@DebugLog
 	public void animateColor(final int startColor, final int endColor, final long duration) {
 		post(new Runnable() {
 			@Override

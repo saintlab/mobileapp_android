@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import com.omnom.android.linker.activity.Extras;
 
+import butterknife.ButterKnife;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
@@ -20,6 +21,7 @@ public abstract class BaseListActivity extends ListActivity implements OmnomActi
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(getLayoutResource());
+		ButterKnife.inject(getActivity());
 		mHelper = new ActivityHelper(this);
 		handleIntent(getIntent());
 	}

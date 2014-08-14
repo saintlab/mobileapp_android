@@ -117,9 +117,9 @@ public class StubDataProvider implements LinkerObeservableApi {
 			public void call(Subscriber<? super RestaurantsResult> subscriber) {
 
 				RestaurantsResult result = new RestaurantsResult();
-				result.setItems(Arrays.asList(RestaurantsFactory.createFake("fake 1"), RestaurantsFactory.createFake("fake 2"),
+				result.setItems(Arrays.asList(RestaurantsFactory.createFake("fake 1")/*, RestaurantsFactory.createFake("fake 2"),
 				                              RestaurantsFactory.createFake("fake 3"), RestaurantsFactory.createFake("fake 4"),
-				                              RestaurantsFactory.createFake("fake 5")));
+				                              RestaurantsFactory.createFake("fake 5")*/));
 				result.setLimit(0);
 				result.setOffset(0);
 				result.setTotal(0);

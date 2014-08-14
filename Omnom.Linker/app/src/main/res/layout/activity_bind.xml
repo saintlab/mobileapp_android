@@ -52,6 +52,7 @@
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="@dimen/activity_horizontal_margin_large"
         android:text="@string/bind"
+        android:visibility="gone"
         style="@style/Button.Rounded.Blue"/>
 
 </FrameLayout>

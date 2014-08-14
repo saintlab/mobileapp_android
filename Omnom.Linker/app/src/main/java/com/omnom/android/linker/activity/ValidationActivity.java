@@ -43,7 +43,6 @@ import altbeacon.beacon.BleNotAvailableException;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
-import butterknife.OnClick;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -111,7 +110,7 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 	private boolean           mGattReceiverRegistered = false;
 	private String            mUsername               = null;
 	private String            mPassword               = null;
-	private RestaurantsResult restaurants             = null;
+	private RestaurantsResult mRestaurants = null;
 	private Restaurant        mRestaurant             = null;
 	private Beacon            mBeacon                 = null;
 	private LoaderController mLoaderController;
@@ -184,17 +183,13 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 		validate();
 	}
 
-	@OnClick(R.id.btn_back)
-	public void onBack() {
-		onBackPressed();
-	}
-
 	@Override
 	public void finish() {
-		loader.animateColor(Color.WHITE);
-		if(findById(this, R.id.btn_back).getVisibility() != View.VISIBLE) {
-			ValidationActivity.super.finish();
+		if(mRestaurants.getItems().size() == 1) {
+			super.finish();
+			overridePendingTransition(android.R.anim.fade_in, R.anim.fake_fade_out);
 		} else {
+			loader.animateColor(Color.WHITE);
 			loader.scaleUp(new LoaderView.Callback() {
 				@Override
 				public void execute() {
@@ -206,12 +201,6 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 	}
 
 	private void validate() {
-		if(getIntent().hasExtra(EXTRA_RESTAURANT)) {
-			mRestaurant = getIntent().getParcelableExtra(EXTRA_RESTAURANT);
-
-			return;
-		}
-
 		loader.animateColor(getResources().getColor(R.color.loader_bg));
 		loader.animateLogo(R.drawable.ic_fork_n_knife);
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
@@ -300,7 +289,7 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 
 					@Override
 					public void onNext(RestaurantsResult restaurantsResult) {
-						restaurants = restaurantsResult;
+						mRestaurants = restaurantsResult;
 					}
 				});
 			}
@@ -324,19 +313,18 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 			@Override
 			public void onFinish() {
 				loader.updateProgress(progressMax);
-				if(restaurants == null) {
+				if(mRestaurants == null) {
 					// TODO: error happened
 					return;
 				}
-				final List<Restaurant> items = restaurants.getItems();
+				final List<Restaurant> items = mRestaurants.getItems();
 				int size = items.size();
 				if(items.isEmpty()) {
 					return;
 				}
 
 				if(size == 1) {
-					BindActivity.start(ValidationActivity.this, items.get(0));
-					ViewUtils.setVisible(findById(ValidationActivity.this, R.id.btn_back), false);
+					BindActivity.start(ValidationActivity.this, items.get(0), false);
 				} else {
 					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
 					loader.scaleUp(new LoaderView.Callback() {

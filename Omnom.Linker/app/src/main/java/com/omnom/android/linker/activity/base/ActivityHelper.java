@@ -22,7 +22,6 @@ public class ActivityHelper {
 	}
 
 	public void onPostCreate() {
-		ButterKnife.inject(mActivity.getActivity());
 		mActivity.initUi();
 	}
 
