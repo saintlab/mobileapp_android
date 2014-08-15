@@ -2,16 +2,12 @@ package com.omnom.android.linker.activity;
 
 import android.app.ActivityOptions;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.CountDownTimer;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,7 +23,6 @@ import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.ViewUtils;
-import com.omnom.android.linker.widget.loader.LoaderController;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
 import org.apache.http.auth.AuthenticationException;
@@ -37,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BleNotAvailableException;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -85,46 +79,15 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 	private   CountDownTimer     cdt;
 	private BroadcastReceiver gattConnectedReceiver = new GattBroadcastReceiver(this);
 
-	private boolean mBound;
-	private final ServiceConnection mServiceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName componentName, IBinder service) {
-			mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-			if(!mBluetoothLeService.initialize()) {
-				Log.e(TAG, "Unable to initialize Bluetooth");
-				finish();
-			}
-			mBound = true;
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName componentName) {
-			mBluetoothLeService = null;
-			mBound = false;
-		}
-	};
-	private BluetoothAdapter mBluetoothAdapter;
-
 	private boolean           mGattReceiverRegistered = false;
 	private String            mUsername               = null;
 	private String            mPassword               = null;
 	private RestaurantsResult mRestaurants = null;
-	private Restaurant        mRestaurant             = null;
-	private Beacon            mBeacon                 = null;
-	private LoaderController mLoaderController;
 
 	@Override
 	public void initUi() {
 		mUsername = getIntent().getStringExtra(EXTRA_USERNAME);
 		mPassword = getIntent().getStringExtra(EXTRA_PASSWORD);
-		mLoaderController = new LoaderController(this, loader);
-
-		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-		mBluetoothAdapter = bluetoothManager.getAdapter();
-	}
-
-	private boolean checkBluetoothEnabled() {
-		return mBluetoothAdapter != null && mBluetoothAdapter.isEnabled();
 	}
 
 	@Override
@@ -149,23 +112,6 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 		super.onPause();
 		if(mGattReceiverRegistered) {
 			unregisterReceiver(gattConnectedReceiver);
-		}
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-		if(mBluetoothLeService == null) {
-			bindService(new Intent(this, BluetoothLeService.class), mServiceConnection, BIND_AUTO_CREATE);
-		}
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		if(mBound) {
-			unbindService(mServiceConnection);
-			mBound = false;
 		}
 	}
 

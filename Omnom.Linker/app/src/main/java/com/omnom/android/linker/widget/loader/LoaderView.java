@@ -77,6 +77,7 @@ public class LoaderView extends FrameLayout {
 		translationViews.add(mProgressBar);
 		translationViews.add(mImgLoader);
 		translationViews.add(mImgLogo);
+		translationViews.add(mEditTableNumber);
 	}
 
 	private int getDefaultBgColor() {return getContext().getResources().getColor(R.color.loader_bg);}
@@ -121,7 +122,7 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void updateProgress(final int progress) {
-		showProgress(progress > 0 || progress < mProgressBar.getMax());
+		showProgress(progress > 0 && progress < mProgressBar.getMax());
 		mProgressBar.post(new Runnable() {
 			@Override
 			public void run() {
@@ -130,7 +131,7 @@ public class LoaderView extends FrameLayout {
 		});
 	}
 
-	public void showProgress(boolean visible) {
+	public void showProgress(final boolean visible) {
 		AnimationUtils.animateAlpha(mProgressBar, visible);
 	}
 

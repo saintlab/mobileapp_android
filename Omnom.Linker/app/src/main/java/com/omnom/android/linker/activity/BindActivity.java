@@ -4,10 +4,14 @@ import android.app.ActivityOptions;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.CountDownTimer;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -20,9 +24,11 @@ import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.Restaurant;
+import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.service.RBLBluetoothAttributes;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
+import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderController;
 import com.omnom.android.linker.widget.loader.LoaderView;
@@ -30,6 +36,7 @@ import com.omnom.android.linker.widget.loader.LoaderView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,8 +57,9 @@ import rx.functions.Action1;
  */
 public class BindActivity extends BaseActivity {
 
-	private static final int  REQUEST_CODE_SCAN_QR = 101;
-	private static final long BLE_SCAN_PERIOD      = 2000;
+	private static final int    REQUEST_CODE_SCAN_QR = 101;
+	private static final long   BLE_SCAN_PERIOD      = 2000;
+	private static final String TAG                  = BindActivity.class.getSimpleName();
 
 	public static void start(final Context context, Restaurant restaurant, final boolean showBack) {
 		final Intent intent = new Intent(context, BindActivity.class);
@@ -61,29 +69,40 @@ public class BindActivity extends BaseActivity {
 	}
 
 	@InjectView(R.id.loader)
-	protected LoaderView mLoader;
-
+	protected LoaderView           mLoader;
 	@InjectView(R.id.panel_bottom)
-	protected View mPanelBottom;
-
+	protected View                 mPanelBottom;
 	@InjectView(R.id.btn_bottom)
-	protected Button mBtnBottom;
-
+	protected Button               mBtnBottom;
 	@InjectView(R.id.btn_bind_table)
-	protected Button mBtnBindTable;
-
+	protected Button               mBtnBindTable;
 	@InjectView(R.id.btn_back)
-	protected View mBtnBack;
-
+	protected View                 mBtnBack;
 	@InjectView(R.id.txt_error)
-	protected TextView mTxtError;
-
+	protected TextView             mTxtError;
 	@InjectViews({R.id.txt_error, R.id.panel_bottom})
-	protected List<View> errorViews;
-
+	protected List<View>           errorViews;
 	@Inject
 	protected LinkerObeservableApi api;
+	private boolean mBound = false;
+	private BluetoothLeService mBluetoothLeService;
+	private final ServiceConnection mServiceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName componentName, IBinder service) {
+			mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
+			if(!mBluetoothLeService.initialize()) {
+				Log.e(TAG, "Unable to initialize Bluetooth");
+				finish();
+			}
+			mBound = true;
+		}
 
+		@Override
+		public void onServiceDisconnected(ComponentName componentName) {
+			mBluetoothLeService = null;
+			mBound = false;
+		}
+	};
 	@NotNull
 	private Restaurant mRestaurant;
 
@@ -116,6 +135,7 @@ public class BindActivity extends BaseActivity {
 	};
 	private BluetoothAdapter mBluetoothAdapter;
 	private int              mLoaderTranslation;
+	private String mQrData = StringUtils.EMPTY_STRING;
 
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
 		if(enable) {
@@ -154,10 +174,31 @@ public class BindActivity extends BaseActivity {
 		onBackPressed();
 	}
 
+	@OnClick(R.id.btn_bind_table)
+	public void onBind() {
+		api.bindBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
+			@Override
+			public void call(Integer integer) {
+				api.bindQrCode(mRestaurant.getId(), mQrData).subscribe(new Action1<Integer>() {
+					@Override
+					public void call(Integer integer) {
+						mLoaderController.setMode(LoaderView.Mode.NONE);
+						writeBeaconData();
+					}
+				});
+			}
+		});
+	}
+
+	private void writeBeaconData() {
+
+	}
+
 	@Override
 	public void finish() {
-		mLoaderController.hideKeyboard();
-
+		mLoaderController.setMode(LoaderView.Mode.NONE);
+		AnimationUtils.animateAlpha(mBtnBack, false);
+		AnimationUtils.animateAlpha(mBtnBindTable, false);
 		if(getIntent().getBooleanExtra(EXTRA_SHOW_BACK, false)) {
 			mLoader.animateColor(Color.WHITE);
 			ButterKnife.apply(errorViews, ViewUtils.VISIBLITY_ALPHA, false);
@@ -222,13 +263,13 @@ public class BindActivity extends BaseActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(resultCode == RESULT_OK) {
 			if(requestCode == REQUEST_CODE_SCAN_QR) {
-				final String qrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
-				api.checkQrCode(mRestaurant.getId(), qrData).subscribe(new Action1<Integer>() {
+				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
+				api.checkQrCode(mRestaurant.getId(), mQrData).subscribe(new Action1<Integer>() {
 					@Override
 					public void call(Integer result) {
 						mLoaderController.setMode(LoaderView.Mode.ENTER_DATA);
 						AnimationUtils.animateAlpha(mBtnBindTable, true);
-						//						api.bindQrCode(mRestaurant.getId(), qrData).subscribe(new Action1<Integer>() {
+						//						api.bindQrCode(mRestaurant.getId(), mQrData).subscribe(new Action1<Integer>() {
 						//							@Override
 						//							public void call(Integer integer) {
 						//								showToast(getActivity(), R.string.qr_bound);
@@ -337,7 +378,8 @@ public class BindActivity extends BaseActivity {
 
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
-		mLoaderTranslation = ViewUtils.dipToPixels(this, 72);
+		mLoaderTranslation = ViewUtils.dipToPixels(this, 48);
+		final int btnTranslation = (int) (mLoaderTranslation * 1.75);
 		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		ViewTreeObserver.OnGlobalLayoutListener listener = AndroidUtils.createKeyboardListener(activityRootView,
 		                                                                                       new AndroidUtils.KeyboardVisibilityListener
@@ -346,15 +388,45 @@ public class BindActivity extends BaseActivity {
 			                                                                                       public void onVisibilityChanged(boolean
 					                                                                                                                       isVisible) {
 				                                                                                       if(isVisible) {
+					                                                                                       AnimationUtils.translateUp(
+							                                                                                       Collections
+									                                                                                       .singletonList(
+											                                                                                       (View)
+													                                                                                       mBtnBindTable),
+							                                                                                       btnTranslation, null);
+
 					                                                                                       mLoader.translateUp(null,
 					                                                                                                           mLoaderTranslation);
 				                                                                                       } else {
+					                                                                                       AnimationUtils.translateDown(
+							                                                                                       Collections
+									                                                                                       .singletonList(
+											                                                                                       (View)
+													                                                                                       mBtnBindTable),
+							                                                                                       btnTranslation, null);
 					                                                                                       mLoader.translateDown(null,
 					                                                                                                             mLoaderTranslation);
 				                                                                                       }
 			                                                                                       }
 		                                                                                       });
 		activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(listener);
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		if(mBluetoothLeService == null) {
+			bindService(new Intent(this, BluetoothLeService.class), mServiceConnection, BIND_AUTO_CREATE);
+		}
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		if(mBound) {
+			unbindService(mServiceConnection);
+			mBound = false;
+		}
 	}
 
 	@Override

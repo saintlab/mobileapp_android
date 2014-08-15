@@ -30,7 +30,7 @@ public class LoaderController {
 						AnimationUtils.animateAlpha(view.mImgLogo, false);
 						AndroidUtils.showKeyboard(view.mEditTableNumber);
 					}
-				}, AnimationUtils.DURATION_LONG);
+				}, AnimationUtils.DURATION_SHORT);
 				break;
 
 			case NONE:
@@ -41,7 +41,7 @@ public class LoaderController {
 						AnimationUtils.animateAlpha(view.mImgLogo, true);
 						AndroidUtils.hideKeyboard(view.mEditTableNumber);
 					}
-				}, AnimationUtils.DURATION_LONG);
+				}, AnimationUtils.DURATION_SHORT);
 				break;
 		}
 	}
