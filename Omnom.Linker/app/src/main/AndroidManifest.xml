@@ -49,7 +49,6 @@
 
         <activity
             android:name=".activity.BindActivity"
-            android:theme="@style/Theme.White"
             android:screenOrientation="portrait">
         </activity>
 
