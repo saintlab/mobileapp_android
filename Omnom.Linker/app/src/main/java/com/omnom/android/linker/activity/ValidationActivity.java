@@ -257,6 +257,7 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 		api.authenticate(mUsername, mPassword).map(new Func1<String, Observable<RestaurantsResult>>() {
 			@Override
 			public Observable<RestaurantsResult> call(String s) {
+				getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, s).commit();
 				api.setAuthToken(s);
 				return api.getRestaurants();
 			}
