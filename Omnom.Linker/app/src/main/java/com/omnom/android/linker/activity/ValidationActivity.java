@@ -2,10 +2,8 @@ package com.omnom.android.linker.activity;
 
 import android.app.ActivityOptions;
 import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -16,10 +14,11 @@ import android.widget.TextView;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.base.ValidationObservable;
+import com.omnom.android.linker.activity.bind.BindActivity;
+import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
-import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.ViewUtils;
@@ -51,6 +50,7 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 
 	private static final int REQUEST_CODE_ENABLE_BT = 100;
 
+	@SuppressWarnings("UnusedDeclaration")
 	public static void start(final Context context, Restaurant restaurant) {
 		final Intent intent = new Intent(context, ValidationActivity.class);
 		intent.putExtra(EXTRA_RESTAURANT, restaurant);
@@ -75,13 +75,9 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 	@Inject
 	protected LinkerObeservableApi api;
 
-	protected BluetoothLeService mBluetoothLeService;
-	private   CountDownTimer     cdt;
-	private BroadcastReceiver gattConnectedReceiver = new GattBroadcastReceiver(this);
-
-	private boolean           mGattReceiverRegistered = false;
-	private String            mUsername               = null;
-	private String            mPassword               = null;
+	private CountDownTimer cdt;
+	private String            mUsername    = null;
+	private String            mPassword    = null;
 	private RestaurantsResult mRestaurants = null;
 
 	@Override
@@ -91,39 +87,13 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(resultCode == RESULT_OK) {
-			if(requestCode == REQUEST_CODE_ENABLE_BT) {
-				// TODO:
-				//			if(mBtEnabled) {
-				//				scanBleDevices(true);
-				//			}
-			}
-		}
-	}
-
-	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_validation;
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		if(mGattReceiverRegistered) {
-			unregisterReceiver(gattConnectedReceiver);
-		}
-	}
-
-	@Override
 	protected void onPostResume() {
 		super.onPostResume();
-
-		IntentFilter filter = new IntentFilter(BluetoothLeService.ACTION_GATT_CONNECTED);
-		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-		registerReceiver(gattConnectedReceiver, filter);
-		mGattReceiverRegistered = true;
-
 		validate();
 	}
 

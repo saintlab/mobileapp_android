@@ -43,7 +43,7 @@
         </activity>
 
         <activity
-            android:name=".activity.BindActivity"
+            android:name=".activity.bind.BindActivity"
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait">
         </activity>
@@ -73,7 +73,7 @@
         </activity>
 
         <activity
-            android:name=".activity.RestaurantsListActivity"
+            android:name=".activity.restaurant.RestaurantsListActivity"
             android:theme="@style/Theme.White"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden"
@@ -81,7 +81,7 @@
         </activity>
 
         <activity
-            android:name=".activity.RestaurantActivity"
+            android:name=".activity.restaurant.RestaurantActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_place">
         </activity>

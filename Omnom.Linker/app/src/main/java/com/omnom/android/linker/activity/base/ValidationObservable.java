@@ -10,6 +10,8 @@ import com.omnom.android.linker.utils.BluetoothUtils;
 import altbeacon.beacon.BleNotAvailableException;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Ch3D on 14.08.2014.
@@ -46,6 +48,6 @@ public class ValidationObservable {
 				}
 				subscriber.onCompleted();
 			}
-		});
+		}).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread());
 	}
 }

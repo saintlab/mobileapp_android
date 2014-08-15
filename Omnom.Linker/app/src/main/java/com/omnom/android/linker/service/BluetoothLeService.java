@@ -16,12 +16,62 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import hugo.weaving.DebugLog;
 
 public class BluetoothLeService extends Service {
-	private static final String TAG = BluetoothLeService.class.getSimpleName();
+	public final static  String                ACTION_GATT_CONNECTED           = "ACTION_GATT_CONNECTED";
+	public final static  String                ACTION_GATT_DISCONNECTED        = "ACTION_GATT_DISCONNECTED";
+	public final static  String                ACTION_GATT_SERVICES_DISCOVERED = "ACTION_GATT_SERVICES_DISCOVERED";
+	public final static  String                ACTION_DATA_AVAILABLE           = "ACTION_DATA_AVAILABLE";
+	private              BluetoothGattCallback callback                        = new BluetoothGattCallback() {
+		@Override
+		@DebugLog
+		public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+			super.onCharacteristicWrite(gatt, characteristic, status);
+			if(!mWriteQueue.isEmpty()) {
+				checkWritingQueue();
+			} else {
+				disconnect();
+				close();
+			}
+		}
+
+		@Override
+		@DebugLog
+		public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+			String intentAction;
+			if(newState == BluetoothProfile.STATE_CONNECTED) {
+				intentAction = ACTION_GATT_CONNECTED;
+				broadcastUpdate(intentAction);
+			} else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
+				intentAction = ACTION_GATT_DISCONNECTED;
+				broadcastUpdate(intentAction);
+			}
+		}
+
+		@Override
+		@DebugLog
+		public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+			if(status == BluetoothGatt.GATT_SUCCESS) {
+				broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
+			}
+		}
+
+		@Override
+		@DebugLog
+		public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+			if(status == BluetoothGatt.GATT_SUCCESS) {
+				broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+			}
+		}
+	};
+	public final static  String                ACTION_PASSWORD_WRITTEN         = "ACTION_PASSWORD_WRITTEN";
+	public final static  String                EXTRA_DATA                      = "EXTRA_DATA";
+	private static final String                TAG                             = BluetoothLeService.class.getSimpleName();
 
 	public class LocalBinder extends Binder {
 		public BluetoothLeService getService() {
@@ -29,64 +79,12 @@ public class BluetoothLeService extends Service {
 		}
 	}
 
-	public final static String ACTION_GATT_CONNECTED = "ACTION_GATT_CONNECTED";
-	public final static String ACTION_GATT_DISCONNECTED = "ACTION_GATT_DISCONNECTED";
-	public final static String ACTION_GATT_SERVICES_DISCOVERED = "ACTION_GATT_SERVICES_DISCOVERED";
-	public final static String ACTION_DATA_AVAILABLE = "ACTION_DATA_AVAILABLE";
-
-	public final static String EXTRA_DATA = "EXTRA_DATA";
-
-
-	private BluetoothGattCallback callback = new BluetoothGattCallback() {
-		@Override
-		public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-			super.onCharacteristicWrite(gatt, characteristic, status);
-			if(characteristic.getUuid().equals(RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD))
-			{
-				BluetoothGattService service = getService(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE);
-				BluetoothGattCharacteristic cMinor = service.getCharacteristic(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID);
-				cMinor.setValue(new byte[]{0x00, 0x01});
-				writeCharacteristic(cMinor);
-			}
-			Log.d(TAG,
-			      "onCharacteristicWrite >>> value = " + Arrays.toString(characteristic.getValue()) + " >>> status = "
-					      + status);
-		}
-
-		@Override
-		public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-			String intentAction;
-			if (newState == BluetoothProfile.STATE_CONNECTED) {
-				intentAction = ACTION_GATT_CONNECTED;
-				broadcastUpdate(intentAction);
-			} else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-				intentAction = ACTION_GATT_DISCONNECTED;
-				broadcastUpdate(intentAction);
-			}
-		}
-
-		@Override
-		public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-			Log.d(TAG, "onServicesDiscovered received >>> status = " + status);
-			if (status == BluetoothGatt.GATT_SUCCESS) {
-				broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
-			}
-		}
-
-		@Override
-		public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-			if (status == BluetoothGatt.GATT_SUCCESS) {
-				broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-			}
-		}
-	};
-
-
-	private final IBinder mBinder = new LocalBinder();
+	private final LinkedBlockingQueue<BluetoothGattCharacteristic> mWriteQueue = new LinkedBlockingQueue<BluetoothGattCharacteristic>();
+	private final IBinder                                          mBinder     = new LocalBinder();
 	private BluetoothManager mBluetoothManager;
 	private BluetoothAdapter mBluetoothAdapter;
-	private String mBluetoothDeviceAddress;
-	private BluetoothGatt mBluetoothGatt;
+	private String           mBluetoothDeviceAddress;
+	private BluetoothGatt    mBluetoothGatt;
 
 	private void broadcastUpdate(final String action) {
 		final Intent intent = new Intent(action);
@@ -116,16 +114,16 @@ public class BluetoothLeService extends Service {
 	}
 
 	public boolean initialize() {
-		if (mBluetoothManager == null) {
+		if(mBluetoothManager == null) {
 			mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-			if (mBluetoothManager == null) {
+			if(mBluetoothManager == null) {
 				Log.e(TAG, "Unable to initialize BluetoothManager.");
 				return false;
 			}
 		}
 
 		mBluetoothAdapter = mBluetoothManager.getAdapter();
-		if (mBluetoothAdapter == null) {
+		if(mBluetoothAdapter == null) {
 			Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
 			return false;
 		}
@@ -133,16 +131,17 @@ public class BluetoothLeService extends Service {
 		return true;
 	}
 
+	@DebugLog
 	public boolean connect(final String address) {
-		if (mBluetoothAdapter == null || address == null) {
+		if(mBluetoothAdapter == null || address == null) {
 			Log.d(TAG, "BluetoothAdapter not initialized or unspecified address.");
 			return false;
 		}
 
 		// Previously connected device. Try to reconnect.
-		if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress) && mBluetoothGatt != null) {
+		if(mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress) && mBluetoothGatt != null) {
 			Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection.");
-			if (mBluetoothGatt.connect()) {
+			if(mBluetoothGatt.connect()) {
 				return true;
 			} else {
 				return false;
@@ -150,7 +149,7 @@ public class BluetoothLeService extends Service {
 		}
 
 		final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-		if (device == null) {
+		if(device == null) {
 			Log.w(TAG, "Device not found.  Unable to connect.");
 			return false;
 		}
@@ -171,7 +170,7 @@ public class BluetoothLeService extends Service {
 	 * callback.
 	 */
 	public void disconnect() {
-		if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+		if(mBluetoothAdapter == null || mBluetoothGatt == null) {
 			Log.w(TAG, "BluetoothAdapter not initialized");
 			return;
 		}
@@ -190,7 +189,7 @@ public class BluetoothLeService extends Service {
 	 * resources are released properly.
 	 */
 	public void close() {
-		if (mBluetoothGatt == null) {
+		if(mBluetoothGatt == null) {
 			return;
 		}
 		mBluetoothGatt.close();
@@ -198,24 +197,41 @@ public class BluetoothLeService extends Service {
 	}
 
 	public boolean readCharacteristic(BluetoothGattCharacteristic characteristic) {
-		if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+		if(mBluetoothAdapter == null || mBluetoothGatt == null) {
 			Log.w(TAG, "BluetoothAdapter not initialized");
 			return false;
 		}
 		return mBluetoothGatt.readCharacteristic(characteristic);
 	}
 
-	public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
-		if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+	@DebugLog
+	public void queueCharacteristic(BluetoothGattCharacteristic characteristic) {
+		if(mBluetoothAdapter == null || mBluetoothGatt == null) {
+			Log.w(TAG, "BluetoothAdapter not initialized");
+			return;
+		}
+		mWriteQueue.add(characteristic);
+	}
+
+	@DebugLog
+	public void checkWritingQueue() {
+		if(mBluetoothAdapter == null || mBluetoothGatt == null) {
 			Log.w(TAG, "BluetoothAdapter not initialized");
 			return;
 		}
 
-		mBluetoothGatt.writeCharacteristic(characteristic);
+		if(mWriteQueue.isEmpty()) {
+			return;
+		}
+
+		BluetoothGattCharacteristic characteristic = mWriteQueue.poll();
+		if(characteristic != null) {
+			mBluetoothGatt.writeCharacteristic(characteristic);
+		}
 	}
 
 	public boolean getDiscoverGattService() {
-		if (mBluetoothGatt == null) {
+		if(mBluetoothGatt == null) {
 			return false;
 		}
 		return mBluetoothGatt.discoverServices();
@@ -229,7 +245,7 @@ public class BluetoothLeService extends Service {
 		BluetoothGattService service = mBluetoothGatt.getService(uuid);
 		BluetoothGattCharacteristic characteristic = service.getCharacteristic(cuuid);
 		List<BluetoothGattDescriptor> descriptors = characteristic.getDescriptors();
-		for (BluetoothGattDescriptor d : descriptors) {
+		for(BluetoothGattDescriptor d : descriptors) {
 			mBluetoothGatt.readDescriptor(d);
 		}
 	}
