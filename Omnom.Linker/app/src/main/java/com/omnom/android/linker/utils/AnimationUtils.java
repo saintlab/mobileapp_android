@@ -23,10 +23,10 @@ public class AnimationUtils {
 			return;
 		}
 
+		view.setAlpha(visible ? 0 : 1);
 		if(visible) {
 			ViewUtils.setVisible(view, visible);
 		}
-		view.setAlpha(visible ? 0 : 1);
 		view.setTag(visible);
 		view.animate().setDuration(DURATION_SHORT).
 				setInterpolator(new AccelerateDecelerateInterpolator()).

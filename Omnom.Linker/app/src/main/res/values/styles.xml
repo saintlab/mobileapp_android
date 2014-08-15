@@ -18,7 +18,7 @@
     </style>
 
     <style name="Theme.White" parent="AppTheme">
-        <item name="android:windowBackground">@null</item>
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
     <style name="RatingBar" parent="android:Widget.Holo.RatingBar.Small">

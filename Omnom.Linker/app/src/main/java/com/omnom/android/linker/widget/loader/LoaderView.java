@@ -145,6 +145,12 @@ public class LoaderView extends FrameLayout {
 		scaleDownWidth(scaleDownUpdate, endAction);
 	}
 
+	public void scaleDown() {
+		mImgLoader.getLayoutParams().height = loaderSize;
+		mImgLoader.getLayoutParams().width = loaderSize;
+		mImgLoader.requestLayout();
+	}
+
 	public void translateUp(final Callback endCallback) {
 		final AnimationBuilder builder = AnimationBuilder.create(0, -loaderSize);
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {

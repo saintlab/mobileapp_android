@@ -50,7 +50,6 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-import static butterknife.ButterKnife.findById;
 import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 
 public class ValidationActivity extends BaseActivity /*implements Observer<String>*/ {
@@ -325,6 +324,7 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 
 				if(size == 1) {
 					BindActivity.start(ValidationActivity.this, items.get(0), false);
+					finish();
 				} else {
 					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
 					loader.scaleUp(new LoaderView.Callback() {

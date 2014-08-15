@@ -38,6 +38,6 @@ public class RestaurantsListActivity extends BaseListActivity {
 
 	@OnItemClick(android.R.id.list)
 	protected void showBindActivity(int position) {
-		BindActivity.start(this, (Restaurant) getListAdapter().getItem(position), false);
+		BindActivity.start(this, (Restaurant) getListAdapter().getItem(position), true);
 	}
 }
