@@ -35,8 +35,12 @@
         android:layout_width="@dimen/loader_edit_with"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:gravity="center"
         android:singleLine="true"
         android:inputType="number"
+        android:hint="@string/hint_table_number"
+        android:textColorHint="#99ffffff"
+        android:textColor="@android:color/white"
         android:textAppearance="?android:textAppearanceLarge"
         android:visibility="gone" />
 </merge>

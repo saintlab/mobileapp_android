@@ -4,25 +4,25 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
-import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.utils.AnimationBuilder;
 import com.omnom.android.linker.utils.AnimationUtils;
-import com.omnom.android.linker.utils.ViewUtils;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import hugo.weaving.DebugLog;
-
-import static com.omnom.android.linker.utils.AnimationUtils.DURATION_LONG;
 
 /**
  * Created by Ch3D on 30.07.2014.
@@ -31,10 +31,6 @@ public class LoaderView extends FrameLayout {
 
 	public enum Mode {
 		NONE, ENTER_DATA
-	}
-
-	public interface Callback {
-		public void execute();
 	}
 
 	@InjectView(R.id.img_loader)
@@ -50,19 +46,23 @@ public class LoaderView extends FrameLayout {
 	protected EditText mEditTableNumber;
 
 	private int loaderSize;
-	private Mode mCurrentMode = Mode.NONE;
-	private int  currentColor = -1;
+	private int currentColor = -1;
 
+	private List<View> translationViews = new LinkedList<View>();
+
+	@SuppressWarnings("UnusedDeclaration")
 	public LoaderView(Context context) {
 		super(context);
 		init();
 	}
 
+	@SuppressWarnings("UnusedDeclaration")
 	public LoaderView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
 
+	@SuppressWarnings("UnusedDeclaration")
 	public LoaderView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
@@ -74,6 +74,9 @@ public class LoaderView extends FrameLayout {
 		currentColor = getDefaultBgColor();
 		mImgLogo.setTag(R.id.img_loader, R.drawable.ic_fork_n_knife);
 		loaderSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
+		translationViews.add(mProgressBar);
+		translationViews.add(mImgLoader);
+		translationViews.add(mImgLogo);
 	}
 
 	private int getDefaultBgColor() {return getContext().getResources().getColor(R.color.loader_bg);}
@@ -93,7 +96,6 @@ public class LoaderView extends FrameLayout {
 	public void animateColorDefault(long duration) {
 		animateColor(currentColor, getDefaultBgColor(), duration);
 	}
-
 
 	@DebugLog
 	public void animateColor(final int startColor, final int endColor, final long duration) {
@@ -119,11 +121,7 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void updateProgress(final int progress) {
-		if(progress == 0 || progress >= getResources().getInteger(R.integer.loader_progress_max)) {
-			showProgress(false);
-		} else {
-			showProgress(true);
-		}
+		showProgress(progress > 0 || progress < mProgressBar.getMax());
 		mProgressBar.post(new Runnable() {
 			@Override
 			public void run() {
@@ -136,13 +134,13 @@ public class LoaderView extends FrameLayout {
 		AnimationUtils.animateAlpha(mProgressBar, visible);
 	}
 
-	public void scaleDown(final Callback scaleDownUpdate) {
+	public void scaleDown(final Runnable scaleDownUpdate) {
 		scaleDown(scaleDownUpdate, null);
 	}
 
-	public void scaleDown(final Callback scaleDownUpdate, final AnimationBuilder.Action endAction) {
-		scaleDownHeight();
-		scaleDownWidth(scaleDownUpdate, endAction);
+	public void scaleDown(final Runnable scaleDownUpdate, final Runnable endAction) {
+		AnimationUtils.scaleHeight(mImgLoader, loaderSize);
+		AnimationUtils.scaleWidth(mImgLoader, loaderSize, scaleDownUpdate, endAction);
 	}
 
 	public void scaleDown() {
@@ -151,117 +149,17 @@ public class LoaderView extends FrameLayout {
 		mImgLoader.requestLayout();
 	}
 
-	public void translateUp(final Callback endCallback) {
-		final AnimationBuilder builder = AnimationBuilder.create(0, -loaderSize);
-		builder.addListener(new AnimationBuilder.UpdateLisetener() {
-			@Override
-			public void invoke(ValueAnimator animation1) {
-				mProgressBar.setTranslationY((Integer) animation1.getAnimatedValue());
-				mImgLoader.setTranslationY((Integer) animation1.getAnimatedValue());
-				mImgLogo.setTranslationY((Integer) animation1.getAnimatedValue());
-			}
-		}).onEnd(new AnimationBuilder.Action() {
-			@Override
-			public void invoke() {
-				if(endCallback != null) {
-					endCallback.execute();
-				}
-			}
-		}).build().start();
+	public void translateUp(final Runnable endCallback, final int translation) {
+		AnimationUtils.translateUp(translationViews, translation, endCallback);
 	}
 
-	private void scaleDownWidth(final Callback updateCallback, final AnimationBuilder.Action endCallback) {
-		AnimationBuilder builder = AnimationBuilder.create(mImgLoader.getMeasuredWidth(), loaderSize);
-		builder.addListener(new AnimationBuilder.UpdateLisetener() {
-			@Override
-			public void invoke(ValueAnimator animation) {
-				mImgLoader.getLayoutParams().width = (Integer) animation.getAnimatedValue();
-				mImgLoader.requestLayout();
-				if(updateCallback != null) {
-					updateCallback.execute();
-				}
-			}
-		});
-		if(endCallback != null) {
-			builder.onEnd(endCallback);
-		}
-		builder.build().start();
+	public void translateDown(final Runnable endCallback, final int translation) {
+		AnimationUtils.translateDown(translationViews, translation, endCallback);
 	}
 
-	private void scaleDownHeight() {
-		AnimationBuilder.create(mImgLoader.getMeasuredHeight(), loaderSize).addListener(new AnimationBuilder.UpdateLisetener() {
-			@Override
-			public void invoke(ValueAnimator animation) {
-				mImgLoader.getLayoutParams().height = (Integer) animation.getAnimatedValue();
-				mImgLoader.requestLayout();
-			}
-		}).build().start();
-	}
-
-	public void scaleUp(final Callback endCallback) {
-		scaleUpHeight();
-		scaleUpWidth(endCallback);
-	}
-
-	private void scaleUpWidth(final Callback endCallback) {
-		AnimationBuilder.create(mImgLoader.getMeasuredWidth(), mImgLoader.getMeasuredWidth() * 10).addListener(
-				new AnimationBuilder.UpdateLisetener() {
-					@Override
-					public void invoke(ValueAnimator animation) {
-						mImgLoader.getLayoutParams().width = (Integer) animation.getAnimatedValue();
-						mImgLoader.requestLayout();
-					}
-				}).onEnd(new AnimationBuilder.Action() {
-			@Override
-			public void invoke() {
-				showProgress(false);
-				if(endCallback != null) {
-					endCallback.execute();
-				}
-			}
-		}).build().start();
-	}
-
-	private void scaleUpHeight() {
-		AnimationBuilder.create(mImgLoader.getMeasuredHeight(), mImgLoader.getMeasuredHeight() * 10).addListener(
-				new AnimationBuilder.UpdateLisetener() {
-					@Override
-					public void invoke(ValueAnimator animation) {
-						mImgLoader.getLayoutParams().height = (Integer) animation.getAnimatedValue();
-						mImgLoader.requestLayout();
-					}
-				}).build().start();
-	}
-
-	private void simulateLoading(final Callback callback) {
-		new CountDownTimer(DURATION_LONG, 10) {
-			@Override
-			public void onTick(long millisUntilFinished) {
-				updateProgress((int) ((DURATION_LONG - millisUntilFinished) / 10));
-			}
-
-			@Override
-			public void onFinish() {
-				updateProgress((int) DURATION_LONG);
-				scaleUp(callback);
-			}
-		}.start();
-	}
-
-	public void performLogin(final Callback callback) {
-		AnimationBuilder.create(-loaderSize, 0).addListener(new AnimationBuilder.UpdateLisetener() {
-			@Override
-			public void invoke(ValueAnimator animation) {
-				mProgressBar.setTranslationY((Integer) animation.getAnimatedValue());
-				mImgLoader.setTranslationY((Integer) animation.getAnimatedValue());
-				mImgLogo.setTranslationY((Integer) animation.getAnimatedValue());
-			}
-		}).onEnd(new AnimationBuilder.Action() {
-			@Override
-			public void invoke() {
-				simulateLoading(callback);
-			}
-		}).build().start();
+	public void scaleUp(final Runnable endCallback) {
+		AnimationUtils.scaleHeight(mImgLoader, mImgLoader.getMeasuredHeight() * 10);
+		AnimationUtils.scaleWidth(mImgLoader, mImgLoader.getMeasuredWidth() * 10, null, endCallback);
 	}
 
 	public void animateLogo(final int resId) {
@@ -290,22 +188,14 @@ public class LoaderView extends FrameLayout {
 		mImgLogo.setTag(R.id.img_loader, resId);
 	}
 
-	public void jumpProgress(float v) {
-		assert v <= 1;
-		addProgress((int) (mProgressBar.getMax() * v));
-	}
-
-	protected void setMode(Mode m) {
-		mCurrentMode = m;
-		switch(mCurrentMode) {
-			case ENTER_DATA:
-				ViewUtils.setVisible(mEditTableNumber, true);
-				break;
-
-			case NONE:
-				ViewUtils.setVisible(mEditTableNumber, false);
-				break;
+	public void jumpProgress(float fraction) {
+		if(BuildConfig.DEBUG) {
+			if(fraction > 1 || fraction < 0) {
+				throw new AssertionError("progess must be between 0 and 1");
+			}
 		}
+		float value = Math.max(0, Math.min(1, fraction));
+		addProgress((int) (mProgressBar.getMax() * value));
 	}
 
 	public void addProgress(int i) {

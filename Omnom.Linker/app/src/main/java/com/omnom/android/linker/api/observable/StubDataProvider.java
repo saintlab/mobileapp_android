@@ -21,7 +21,7 @@ import rx.schedulers.Schedulers;
  */
 public class StubDataProvider implements LinkerObeservableApi {
 
-	private boolean authError = false;
+	private boolean authError        = false;
 	private boolean checkBeaconError = false;
 
 	@Override
@@ -115,11 +115,15 @@ public class StubDataProvider implements LinkerObeservableApi {
 		return new Observable<RestaurantsResult>(new Observable.OnSubscribe<RestaurantsResult>() {
 			@Override
 			public void call(Subscriber<? super RestaurantsResult> subscriber) {
-
+				final boolean fast = false;
 				RestaurantsResult result = new RestaurantsResult();
-				result.setItems(Arrays.asList(RestaurantsFactory.createFake("fake 1"), RestaurantsFactory.createFake("fake 2"),
-				                              RestaurantsFactory.createFake("fake 3"), RestaurantsFactory.createFake("fake 4"),
-				                              RestaurantsFactory.createFake("fake 5")));
+				if(fast) {
+					result.setItems(Arrays.asList(RestaurantsFactory.createFake("fake 1")));
+				} else {
+					result.setItems(Arrays.asList(RestaurantsFactory.createFake("fake 1"), RestaurantsFactory.createFake("fake 2"),
+					                              RestaurantsFactory.createFake("fake 3"), RestaurantsFactory.createFake("fake 4"),
+					                              RestaurantsFactory.createFake("fake 5")));
+				}
 				result.setLimit(0);
 				result.setOffset(0);
 				result.setTotal(0);

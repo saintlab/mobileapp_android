@@ -30,4 +30,5 @@
     <string name="beacon_already_bound">Маячок уже связан со столом 11. Продолжить всё равно?</string>
     <string name="proceed">Продолжить</string>
     <string name="cancel">Отменить</string>
+    <string name="hint_table_number">Номер стола</string>
 </resources>

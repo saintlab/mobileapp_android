@@ -25,7 +25,6 @@ import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
 import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.utils.AndroidUtils;
-import com.omnom.android.linker.utils.AnimationBuilder;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderController;
@@ -189,9 +188,9 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 			overridePendingTransition(android.R.anim.fade_in, R.anim.fake_fade_out);
 		} else {
 			loader.animateColor(Color.WHITE);
-			loader.scaleUp(new LoaderView.Callback() {
+			loader.scaleUp(new Runnable() {
 				@Override
-				public void execute() {
+				public void run() {
 					ValidationActivity.super.finish();
 					overridePendingTransition(android.R.anim.fade_in, R.anim.fake_fade_out);
 				}
@@ -205,9 +204,9 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 		initCountDownTimer();
 		loader.showProgress(false);
-		loader.scaleDown(null, new AnimationBuilder.Action() {
+		loader.scaleDown(null, new Runnable() {
 			@Override
-			public void invoke() {
+			public void run() {
 				startLoader();
 			}
 		});
@@ -327,9 +326,9 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 					finish();
 				} else {
 					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
-					loader.scaleUp(new LoaderView.Callback() {
+					loader.scaleUp(new Runnable() {
 						@Override
-						public void execute() {
+						public void run() {
 							ViewUtils.setVisible(panelBottom, false);
 							RestaurantsListActivity.start(ValidationActivity.this, items);
 							finish();

@@ -10,10 +10,6 @@ import android.view.animation.Interpolator;
  * Created by Ch3D on 30.07.2014.
  */
 public class AnimationBuilder {
-	public interface Action {
-		public void invoke();
-	}
-
 	public interface UpdateLisetener {
 		public void invoke(ValueAnimator animation);
 	}
@@ -55,12 +51,12 @@ public class AnimationBuilder {
 		return this;
 	}
 
-	public AnimationBuilder onEnd(final Action action) {
+	public AnimationBuilder onEnd(final Runnable action) {
 		animator.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(Animator animation) {
 				if (action != null) {
-					action.invoke();
+					action.run();
 				}
 			}
 		});
