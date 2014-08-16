@@ -31,14 +31,20 @@ public interface LinkerDataService {
 	@POST("/remind_password")
 	Observable<String> remindPassword(@Field(ApiProtocol.FIELD_USERNAME) String username);
 
-	@GET("/checkBeacon/")
+	@GET("/checkBeacon")
 	Observable<Integer> checkBeacon(
 			@Query(ApiProtocol.FIELD_RESTAURANT_ID) String restaurantId,
 			@Query(ApiProtocol.FIELD_BEACON_UUID) String beaconUuid,
 			@Query(ApiProtocol.FIELD_MAJOR_ID) String majorId, @Query(ApiProtocol.FIELD_MINOR_ID) String minorId);
 
-	@POST("/bindBeacon/")
+	@POST("/bindBeacon")
 	Observable<Integer> bindBeacon(
+			@Field(ApiProtocol.FIELD_RESTAURANT_ID) String restaurantId,
+			@Field(ApiProtocol.FIELD_BEACON_UUID) String beaconUuid,
+			@Field(ApiProtocol.FIELD_MAJOR_ID) String majorId, @Field(ApiProtocol.FIELD_MINOR_ID) String minorId);
+
+	@POST("/commitBeacon")
+	Observable<Integer> commitBeacon(
 			@Field(ApiProtocol.FIELD_RESTAURANT_ID) String restaurantId,
 			@Field(ApiProtocol.FIELD_BEACON_UUID) String beaconUuid,
 			@Field(ApiProtocol.FIELD_MAJOR_ID) String majorId, @Field(ApiProtocol.FIELD_MINOR_ID) String minorId);

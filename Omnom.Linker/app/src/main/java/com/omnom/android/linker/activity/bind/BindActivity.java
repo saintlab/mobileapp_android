@@ -3,8 +3,6 @@ package com.omnom.android.linker.activity.bind;
 import android.app.ActivityOptions;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -30,6 +28,7 @@ import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.service.BluetoothLeService;
+import com.omnom.android.linker.service.DataHolder;
 import com.omnom.android.linker.service.RBLBluetoothAttributes;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
@@ -45,6 +44,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -60,15 +60,19 @@ import hugo.weaving.DebugLog;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
+import static com.omnom.android.linker.service.BluetoothLeService.ACTION_DATA_AVAILABLE;
+import static com.omnom.android.linker.service.BluetoothLeService.ACTION_GATT_CONNECTED;
+import static com.omnom.android.linker.service.BluetoothLeService.ACTION_GATT_DISCONNECTED;
+import static com.omnom.android.linker.service.BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED;
+
 /**
  * Created by Ch3D on 14.08.2014.
  */
 public class BindActivity extends BaseActivity {
 
-	private static final int                             REQUEST_CODE_SCAN_QR = 101;
-	private static final long                            BLE_SCAN_PERIOD      = 2000;
-	private static final String                          TAG                  = BindActivity.class.getSimpleName();
-	private              BluetoothAdapter.LeScanCallback mLeScanCallback      = new BluetoothAdapter.LeScanCallback() {
+	private static final String TAG = BindActivity.class.getSimpleName();
+
+	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		@Override
 		@DebugLog
 		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
@@ -91,6 +95,8 @@ public class BindActivity extends BaseActivity {
 			});
 		}
 	};
+	private static final int REQUEST_CODE_SCAN_QR = 101;
+	private static final long BLE_SCAN_PERIOD = 2000;
 
 	public static void start(final Context context, Restaurant restaurant, final boolean showBack) {
 		final Intent intent = new Intent(context, BindActivity.class);
@@ -101,27 +107,36 @@ public class BindActivity extends BaseActivity {
 
 	public volatile boolean gattConnected = false;
 	public volatile boolean gattAvailable = false;
+
 	@InjectView(R.id.loader)
-	protected LoaderView           mLoader;
+	protected LoaderView mLoader;
+
 	@InjectView(R.id.panel_bottom)
-	protected View                 mPanelBottom;
+	protected View mPanelBottom;
+
 	@InjectView(R.id.btn_bottom)
-	protected Button               mBtnBottom;
+	protected Button mBtnBottom;
+
 	@InjectView(R.id.btn_bind_table)
-	protected Button               mBtnBindTable;
+	protected Button mBtnBindTable;
+
 	@InjectView(R.id.btn_back)
-	protected View                 mBtnBack;
+	protected View mBtnBack;
+
 	@InjectView(R.id.txt_error)
-	protected TextView             mTxtError;
+	protected TextView mTxtError;
+
 	@InjectViews({R.id.txt_error, R.id.panel_bottom})
-	protected List<View>           errorViews;
+	protected List<View> errorViews;
+
 	@Inject
 	protected LinkerObeservableApi api;
+
 	BluetoothLeService mBluetoothLeService;
-	private       BroadcastReceiver gattConnectedReceiver   = new GattBroadcastReceiver(this);
-	private       boolean           mGattReceiverRegistered = false;
-	private       boolean           mBound                  = false;
-	private final ServiceConnection mServiceConnection      = new ServiceConnection() {
+	private BroadcastReceiver gattConnectedReceiver = new GattBroadcastReceiver(this);
+	private boolean mGattReceiverRegistered = false;
+	private boolean mBound = false;
+	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName componentName, IBinder service) {
 			mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
@@ -138,15 +153,16 @@ public class BindActivity extends BaseActivity {
 			mBound = false;
 		}
 	};
+
 	@NotNull
 	private Restaurant mRestaurant;
 	@Nullable
-	private Beacon      mBeacon  = null;
+	private Beacon mBeacon = null;
 	private Set<Beacon> mBeacons = new HashSet<Beacon>();
 	private LoaderController mLoaderController;
-	private CountDownTimer   cdt;
+	private CountDownTimer cdt;
 	private BluetoothAdapter mBluetoothAdapter;
-	private int              mLoaderTranslation;
+	private int mLoaderTranslation;
 	private String mQrData = StringUtils.EMPTY_STRING;
 
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
@@ -188,6 +204,8 @@ public class BindActivity extends BaseActivity {
 
 	@OnClick(R.id.btn_bind_table)
 	public void onBind() {
+		mLoaderController.hideKeyboard();
+		AnimationUtils.animateAlpha(mBtnBindTable, false);
 		api.bindBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
 			@Override
 			public void call(Integer integer) {
@@ -466,11 +484,11 @@ public class BindActivity extends BaseActivity {
 	protected void onPostResume() {
 		super.onPostResume();
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-		filter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-		filter.addAction(BluetoothLeService.ACTION_PASSWORD_WRITTEN);
-		filter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+		filter.addAction(ACTION_GATT_CONNECTED);
+		filter.addAction(ACTION_GATT_DISCONNECTED);
+		filter.addAction(ACTION_GATT_SERVICES_DISCOVERED);
+		filter.addAction(ACTION_DATA_AVAILABLE);
+		filter.addAction(BluetoothLeService.ACTION_CHARACTERISTIC_UPDATE);
 		registerReceiver(gattConnectedReceiver, filter);
 		mGattReceiverRegistered = true;
 	}
@@ -490,21 +508,35 @@ public class BindActivity extends BaseActivity {
 
 	@DebugLog
 	public void writeBeaconData() {
-		final BluetoothGattService passwordService = mBluetoothLeService.getService(RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE);
-		final BluetoothGattCharacteristic characteristic = passwordService.getCharacteristic(RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD);
-		characteristic.setValue(RBLBluetoothAttributes.RBL_PASSKEY);
+		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE,
+		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD,
+		                                                       RBLBluetoothAttributes.RBL_PASSKEY.getBytes()));
 
-		final BluetoothGattService beaconService = mBluetoothLeService.getService(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE);
-		final BluetoothGattCharacteristic characteristicMinor = beaconService.getCharacteristic(
-				RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID);
-		characteristicMinor.setValue(new byte[]{0x00, 0x06});
-		final BluetoothGattCharacteristic characteristicMajor = beaconService.getCharacteristic(
-				RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MAJOR_ID);
-		characteristicMinor.setValue(new byte[]{0x00, 0x02});
+		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
+		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MAJOR_ID, 312));
 
-		mBluetoothLeService.queueCharacteristic(characteristic);
-		mBluetoothLeService.queueCharacteristic(characteristicMajor);
-		mBluetoothLeService.queueCharacteristic(characteristicMinor);
-		mBluetoothLeService.checkWritingQueue();
+		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
+		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID, 256));
+
+		mBluetoothLeService.startWritingQueue(new Runnable() {
+			@Override
+			public void run() {
+				api.commitBeacon(mRestaurant.getId(), mBeacon);
+			}
+		});
+	}
+
+	public void updateBeaconData(final UUID cUuid, final byte[] cValue) {
+		if(BuildConfig.DEBUG) {
+			if(mBeacon == null) {
+				throw new AssertionError("Beacon cannot be null");
+			}
+		}
+		if(cUuid.equals(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MAJOR_ID)) {
+			mBeacon.getId2().updateValue(cValue);
+		}
+		if(cUuid.equals(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID)) {
+			mBeacon.getId3().updateValue(cValue);
+		}
 	}
 }

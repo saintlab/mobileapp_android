@@ -75,6 +75,12 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	}
 
 	@Override
+	public Observable<Integer> commitBeacon(String restaurantId, Beacon beacon) {
+		return mDataService.commitBeacon(restaurantId, beacon.getIdValue(0), beacon.getIdValue(1), beacon.getIdValue(2)).subscribeOn(
+				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
 	public void setAuthToken(final String token) {
 		mAuthToken = token;
 	}

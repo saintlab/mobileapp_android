@@ -4,7 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.omnom.android.linker.activity.base.Extras;
 import com.omnom.android.linker.service.BluetoothLeService;
+
+import java.util.UUID;
 
 import hugo.weaving.DebugLog;
 
@@ -38,9 +41,10 @@ class GattBroadcastReceiver extends BroadcastReceiver {
 					activity.mBluetoothLeService.getDiscoverGattService();
 				}
 			});
-		} else if(BluetoothLeService.ACTION_PASSWORD_WRITTEN.equals(intent.getAction())) {
-			activity.gattAvailable = true;
-			activity.writeBeaconData();
+		} else if(BluetoothLeService.ACTION_CHARACTERISTIC_UPDATE.equals(intent.getAction())) {
+			final UUID cUuid = UUID.fromString(intent.getExtras().getString(Extras.EXTRA_CHARACTERISTIC_UUID));
+			final byte[] cValue = intent.getByteArrayExtra(Extras.EXTRA_CHARACTERISTIC_VALUE);
+			activity.updateBeaconData(cUuid, cValue);
 		}
 	}
 }

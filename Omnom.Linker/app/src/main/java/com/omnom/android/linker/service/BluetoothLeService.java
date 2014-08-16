@@ -16,6 +16,8 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.omnom.android.linker.activity.base.Extras;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -27,14 +29,17 @@ public class BluetoothLeService extends Service {
 	public final static  String                ACTION_GATT_DISCONNECTED        = "ACTION_GATT_DISCONNECTED";
 	public final static  String                ACTION_GATT_SERVICES_DISCOVERED = "ACTION_GATT_SERVICES_DISCOVERED";
 	public final static  String                ACTION_DATA_AVAILABLE           = "ACTION_DATA_AVAILABLE";
+	public final static  String                ACTION_CHARACTERISTIC_UPDATE    = "ACTION_CHARACTERISTIC_UPDATE";
+
 	private              BluetoothGattCallback callback                        = new BluetoothGattCallback() {
 		@Override
 		@DebugLog
 		public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-			super.onCharacteristicWrite(gatt, characteristic, status);
-			if(!mWriteQueue.isEmpty()) {
-				checkWritingQueue();
-			} else {
+			if(status == BluetoothGatt.GATT_SUCCESS) {
+				broadcastUpdate(characteristic);
+			}
+			if(!processQueue()) {
+				mQueueEndCallback.run();
 				disconnect();
 				close();
 			}
@@ -60,16 +65,7 @@ public class BluetoothLeService extends Service {
 				broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
 			}
 		}
-
-		@Override
-		@DebugLog
-		public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-			if(status == BluetoothGatt.GATT_SUCCESS) {
-				broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-			}
-		}
 	};
-	public final static  String                ACTION_PASSWORD_WRITTEN         = "ACTION_PASSWORD_WRITTEN";
 	public final static  String                EXTRA_DATA                      = "EXTRA_DATA";
 	private static final String                TAG                             = BluetoothLeService.class.getSimpleName();
 
@@ -79,26 +75,32 @@ public class BluetoothLeService extends Service {
 		}
 	}
 
-	private final LinkedBlockingQueue<BluetoothGattCharacteristic> mWriteQueue = new LinkedBlockingQueue<BluetoothGattCharacteristic>();
-	private final IBinder                                          mBinder     = new LocalBinder();
+	private final LinkedBlockingQueue<DataHolder> mWriteQueue = new LinkedBlockingQueue<DataHolder>();
+	private final IBinder                         mBinder     = new LocalBinder();
 	private BluetoothManager mBluetoothManager;
 	private BluetoothAdapter mBluetoothAdapter;
 	private String           mBluetoothDeviceAddress;
 	private BluetoothGatt    mBluetoothGatt;
+	private Runnable         mQueueEndCallback;
 
+	@DebugLog
 	private void broadcastUpdate(final String action) {
 		final Intent intent = new Intent(action);
 		sendBroadcast(intent);
 	}
 
+	@DebugLog
 	private void broadcastUpdate(final String action, int rssi) {
 		final Intent intent = new Intent(action);
 		intent.putExtra(EXTRA_DATA, String.valueOf(rssi));
 		sendBroadcast(intent);
 	}
 
-	private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
-		final Intent intent = new Intent(action);
+	@DebugLog
+	private void broadcastUpdate(final BluetoothGattCharacteristic characteristic) {
+		final Intent intent = new Intent(ACTION_CHARACTERISTIC_UPDATE);
+		intent.putExtra(Extras.EXTRA_CHARACTERISTIC_UUID, characteristic.getUuid().toString());
+		intent.putExtra(Extras.EXTRA_CHARACTERISTIC_VALUE, characteristic.getValue());
 		sendBroadcast(intent);
 	}
 
@@ -169,6 +171,7 @@ public class BluetoothLeService extends Service {
 	 * {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
 	 * callback.
 	 */
+	@DebugLog
 	public void disconnect() {
 		if(mBluetoothAdapter == null || mBluetoothGatt == null) {
 			Log.w(TAG, "BluetoothAdapter not initialized");
@@ -188,6 +191,7 @@ public class BluetoothLeService extends Service {
 	 * After using a given BLE device, the app must call this method to ensure
 	 * resources are released properly.
 	 */
+	@DebugLog
 	public void close() {
 		if(mBluetoothGatt == null) {
 			return;
@@ -205,29 +209,39 @@ public class BluetoothLeService extends Service {
 	}
 
 	@DebugLog
-	public void queueCharacteristic(BluetoothGattCharacteristic characteristic) {
+	public void queueCharacteristic(DataHolder data) {
 		if(mBluetoothAdapter == null || mBluetoothGatt == null) {
 			Log.w(TAG, "BluetoothAdapter not initialized");
 			return;
 		}
-		mWriteQueue.add(characteristic);
+		mWriteQueue.add(data);
 	}
 
 	@DebugLog
-	public void checkWritingQueue() {
+	public void startWritingQueue(final Runnable queueEndCallback) {
+		this.mQueueEndCallback = queueEndCallback;
 		if(mBluetoothAdapter == null || mBluetoothGatt == null) {
 			Log.w(TAG, "BluetoothAdapter not initialized");
 			return;
 		}
+		processQueue();
+	}
 
+	@DebugLog
+	private boolean processQueue() {
 		if(mWriteQueue.isEmpty()) {
-			return;
+			return false;
 		}
 
-		BluetoothGattCharacteristic characteristic = mWriteQueue.poll();
-		if(characteristic != null) {
+		final DataHolder data = mWriteQueue.poll();
+		if(data != null) {
+			BluetoothGattService service = mBluetoothGatt.getService(data.serviceId);
+			BluetoothGattCharacteristic characteristic = service.getCharacteristic(data.charId);
+			characteristic.setValue(data.data);
 			mBluetoothGatt.writeCharacteristic(characteristic);
+			return true;
 		}
+		return false;
 	}
 
 	public boolean getDiscoverGattService() {

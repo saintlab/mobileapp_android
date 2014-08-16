@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import altbeacon.beacon.Beacon;
+import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -25,6 +26,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 	private boolean checkBeaconError = false;
 
 	@Override
+	@DebugLog
 	public Observable<String> authenticate(String username, String password) {
 		return new Observable<String>(new Observable.OnSubscribe<String>() {
 			@Override
@@ -41,6 +43,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
+	@DebugLog
 	public Observable<String> remindPassword(String username) {
 		return new Observable<String>(new Observable.OnSubscribe<String>() {
 			@Override
@@ -52,6 +55,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
+	@DebugLog
 	public Observable<Integer> checkBeacon(String restaurantId, Beacon beacon) {
 		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
 			@Override
@@ -67,6 +71,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
+	@DebugLog
 	public Observable<Integer> bindBeacon(String restaurantId, Beacon beacon) {
 		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
 			@Override
@@ -78,6 +83,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
+	@DebugLog
 	public Observable<Integer> checkQrCode(String restaurantId, String qrData) {
 		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
 			@Override
@@ -89,6 +95,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
+	@DebugLog
 	public Observable<Integer> bindQrCode(String restaurantId, String qrData) {
 		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
 			@Override
@@ -100,6 +107,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
+	@DebugLog
 	public Observable<Restaurant> getRestaurant(String restaurantId) {
 		return new Observable<Restaurant>(new Observable.OnSubscribe<Restaurant>() {
 			@Override
@@ -111,6 +119,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
+	@DebugLog
 	public Observable<RestaurantsResult> getRestaurants() {
 		return new Observable<RestaurantsResult>(new Observable.OnSubscribe<RestaurantsResult>() {
 			@Override
@@ -134,6 +143,19 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
+	@DebugLog
+	public Observable<Integer> commitBeacon(String restaurantId, Beacon beacon) {
+		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
+			@Override
+			public void call(Subscriber<? super Integer> subscriber) {
+				subscriber.onNext(0);
+				subscriber.onCompleted();
+			}
+		}) {};
+	}
+
+	@Override
+	@DebugLog
 	public void setAuthToken(String token) {
 		// Do nothing
 	}
