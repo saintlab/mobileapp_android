@@ -68,8 +68,17 @@ import static butterknife.ButterKnife.findById;
 public class BindActivity extends BaseActivity {
 
 	private static final String TAG = BindActivity.class.getSimpleName();
-	final BeaconParser parser = new BeaconParser();
+	private static final int REQUEST_CODE_SCAN_QR = 101;
+	private static final long BLE_SCAN_PERIOD = 2000;
 
+	public static void start(final Context context, Restaurant restaurant, final boolean showBack) {
+		final Intent intent = new Intent(context, BindActivity.class);
+		intent.putExtra(EXTRA_RESTAURANT, restaurant);
+		intent.putExtra(EXTRA_SHOW_BACK, showBack);
+		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
+	}
+
+	private final BeaconParser parser = new BeaconParser();
 	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		@Override
 		@DebugLog
@@ -91,16 +100,6 @@ public class BindActivity extends BaseActivity {
 			});
 		}
 	};
-	private static final int REQUEST_CODE_SCAN_QR = 101;
-	private static final long BLE_SCAN_PERIOD = 2000;
-
-	public static void start(final Context context, Restaurant restaurant, final boolean showBack) {
-		final Intent intent = new Intent(context, BindActivity.class);
-		intent.putExtra(EXTRA_RESTAURANT, restaurant);
-		intent.putExtra(EXTRA_SHOW_BACK, showBack);
-		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
-	}
-
 	public volatile boolean gattConnected = false;
 	public volatile boolean gattAvailable = false;
 
@@ -165,6 +164,7 @@ public class BindActivity extends BaseActivity {
 			mBound = false;
 		}
 	};
+
 	@NotNull
 	private Restaurant mRestaurant;
 
