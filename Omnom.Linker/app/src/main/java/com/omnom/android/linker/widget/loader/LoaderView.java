@@ -211,4 +211,8 @@ public class LoaderView extends FrameLayout {
 			updateProgress(mProgressBar.getProgress() + i);
 		}
 	}
+
+	public int getTableNumber() {
+		return Integer.parseInt(mEditTableNumber.getText().toString());
+	}
 }

@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.R;
+import com.omnom.android.linker.activity.ErrorHelper;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
@@ -58,7 +59,13 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 import hugo.weaving.DebugLog;
+import rx.Observable;
+import rx.Subscription;
+import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
+import rx.observers.Observers;
 
 import static butterknife.ButterKnife.findById;
 
@@ -68,6 +75,7 @@ import static butterknife.ButterKnife.findById;
 public class BindActivity extends BaseActivity {
 
 	private static final String TAG = BindActivity.class.getSimpleName();
+	private static final int REQUEST_CODE_ENABLE_BLUETOOTH = 100;
 	private static final int REQUEST_CODE_SCAN_QR = 101;
 	private static final long BLE_SCAN_PERIOD = 2000;
 
@@ -79,6 +87,7 @@ public class BindActivity extends BaseActivity {
 	}
 
 	private final BeaconParser parser = new BeaconParser();
+
 	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		@Override
 		@DebugLog
@@ -100,8 +109,9 @@ public class BindActivity extends BaseActivity {
 			});
 		}
 	};
-	public volatile boolean gattConnected = false;
-	public volatile boolean gattAvailable = false;
+
+	protected volatile boolean gattConnected = false;
+	protected volatile boolean gattAvailable = false;
 
 	@InjectView(R.id.loader)
 	protected LoaderView mLoader;
@@ -177,6 +187,9 @@ public class BindActivity extends BaseActivity {
 	private BluetoothAdapter mBluetoothAdapter;
 	private int mLoaderTranslation;
 	private String mQrData = StringUtils.EMPTY_STRING;
+	private Subscription mErrValidationSubscription;
+	private Subscription mErrBindSubscription;
+	private ErrorHelper mErrorHelper;
 
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
 		if(enable) {
@@ -219,18 +232,15 @@ public class BindActivity extends BaseActivity {
 	public void onBind() {
 		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
-		api.bindBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
+		Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mBeacon), api.bindQrCode(mRestaurant.getId(), mQrData), new Func2
+				<Integer, Integer, Void>() {
 			@Override
-			public void call(Integer integer) {
-				api.bindQrCode(mRestaurant.getId(), mQrData).subscribe(new Action1<Integer>() {
-					@Override
-					public void call(Integer integer) {
-						mLoaderController.setMode(LoaderView.Mode.NONE);
-						connectToBeacon();
-					}
-				});
+			public Void call(Integer integer, Integer integer2) {
+				mLoaderController.setMode(LoaderView.Mode.NONE);
+				connectToBeacon();
+				return null;
 			}
-		});
+		}).onErrorResumeNext(Observable.<Void>empty()).subscribe();
 	}
 
 	@Override
@@ -246,16 +256,50 @@ public class BindActivity extends BaseActivity {
 
 	@DebugLog
 	private void connectToBeacon() {
-		initCountDownTimer(beaconInteractionCallback);
+		cdt = AndroidUtils.createTimer(mLoader, beaconInteractionCallback, 10000);
 		cdt.start();
-		ValidationObservable.validate(this, new Action1<Boolean>() {
+		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
+				new Func1<ValidationObservable.Error, Boolean>() {
+					@Override
+					public Boolean call(ValidationObservable.Error error) {
+						switch(error) {
+							case BLUETOOTH_DISABLED:
+								mErrorHelper.showErrorBluetoothDisabled(getActivity(), REQUEST_CODE_ENABLE_BLUETOOTH);
+								break;
+
+							case NO_CONNECTION:
+								mErrorHelper.showInternetError(new View.OnClickListener() {
+									@Override
+									public void onClick(View v) {
+										connectToBeacon();
+									}
+								});
+								break;
+
+							case LOCATION_DISABLED:
+								mErrorHelper.showLocationError();
+								break;
+						}
+						return false;
+					}
+				}).isEmpty()).subscribe(new Action1<Boolean>() {
 			@Override
-			public void call(Boolean valid) {
-				if(valid) {
+			public void call(Boolean hasNoErrors) {
+				if(hasNoErrors) {
 					if(!mBluetoothLeService.connect(mBeacon.getBluetoothAddress())) {
 						cdt.cancel();
 					}
 				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				mErrorHelper.showInternetError(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						connectToBeacon();
+					}
+				});
 			}
 		});
 	}
@@ -332,6 +376,9 @@ public class BindActivity extends BaseActivity {
 	@DebugLog
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(resultCode == RESULT_OK) {
+			if(requestCode == REQUEST_CODE_ENABLE_BLUETOOTH) {
+				clearErrors();
+			}
 			if(requestCode == REQUEST_CODE_SCAN_QR) {
 				mPanelBottom.setVisibility(View.GONE);
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
@@ -346,63 +393,47 @@ public class BindActivity extends BaseActivity {
 		}
 	}
 
-	private void initCountDownTimer(final Runnable runnable) {
-		final int progressMax = getResources().getInteger(R.integer.loader_progress_max);
-		final int timeMax = getResources().getInteger(R.integer.loader_time_max);
-		final int tick = getResources().getInteger(R.integer.loader_tick_interval);
-		final int ticksCount = timeMax / tick;
-		final int magic = progressMax / ticksCount;
-		mLoader.updateProgress(0);
-
-		cdt = new CountDownTimer(timeMax, tick) {
-			@Override
-			public void onTick(long millisUntilFinished) {
-				mLoader.addProgress(magic * 2);
-			}
-
-			@Override
-			public void onFinish() {
-				mLoader.updateProgress(progressMax);
-				if(runnable != null) {
-					runnable.run();
-				}
-			}
-		};
-	}
-
-	private void showError(int logoResId, int errTextResId, int btnTextResId, View.OnClickListener onClickListener) {
-		mLoader.updateProgress(0);
-		mLoader.showProgress(false);
-		cdt.cancel();
-		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, true);
-		mLoader.animateLogo(logoResId);
-		mTxtError.setText(errTextResId);
-		mBtnBottom.setText(btnTextResId);
-		mBtnBottom.setOnClickListener(onClickListener);
-	}
-
 	private void bindTable() {
 		mLoader.animateColorDefault();
 		mLoader.animateLogo(R.drawable.ic_mexico_logo);
-		initCountDownTimer(new Runnable() {
-			@Override
-			public void run() {
-				scanQrCode();
-			}
-		});
 		clearErrors();
 		cdt.start();
 
-		ValidationObservable.validate(this, new Action1<Boolean>() {
+		mErrBindSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
+				new Func1<ValidationObservable.Error, Boolean>() {
+					@Override
+					public Boolean call(ValidationObservable.Error error) {
+						switch(error) {
+							case BLUETOOTH_DISABLED:
+								mErrorHelper.showErrorBluetoothDisabled(getActivity(), REQUEST_CODE_ENABLE_BLUETOOTH);
+								break;
+
+							case NO_CONNECTION:
+								mErrorHelper.showInternetError(new View.OnClickListener() {
+									@Override
+									public void onClick(View v) {
+										bindTable();
+									}
+								});
+								break;
+
+							case LOCATION_DISABLED:
+								mErrorHelper.showLocationError();
+								break;
+						}
+						return false;
+					}
+				}).isEmpty()).subscribe(new Action1<Boolean>() {
 			@Override
-			public void call(Boolean valid) {
-				if(valid) {
+			public void call(Boolean hasNoErrors) {
+				if(hasNoErrors) {
 					scanBleDevices(true, new Runnable() {
 						@Override
 						public void run() {
 							final int size = mBeacons.size();
 							if(size == 0) {
-								showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again,
+								mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal,
+								                       R.string.try_once_again,
 								          new View.OnClickListener() {
 									          @Override
 									          public void onClick(View v) {
@@ -410,7 +441,7 @@ public class BindActivity extends BaseActivity {
 									          }
 								          });
 							} else if(size > 1) {
-								showError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon, R.string.try_once_again,
+								mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon, R.string.try_once_again,
 								          new View.OnClickListener() {
 									          @Override
 									          public void onClick(View v) {
@@ -419,15 +450,21 @@ public class BindActivity extends BaseActivity {
 								          });
 							} else if(size == 1) {
 								mBeacon = (Beacon) mBeacons.toArray()[0];
-								api.checkBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
-									@Override
-									public void call(final Integer integer) {
-									}
-								});
+								api.checkBeacon(mRestaurant.getId(), mBeacon).subscribe(Observers.empty());
 							}
 						}
 					});
 				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				mErrorHelper.showInternetError(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						bindTable();
+					}
+				});
 			}
 		});
 	}
@@ -449,6 +486,13 @@ public class BindActivity extends BaseActivity {
 	@Override
 	public void initUi() {
 		mLoaderController = new LoaderController(this, mLoader);
+		cdt = AndroidUtils.createTimer(mLoader, new Runnable() {
+			@Override
+			public void run() {
+				scanQrCode();
+			}
+		});
+		mErrorHelper = new ErrorHelper(mLoader, mTxtError, mBtnBottom, errorViews, cdt);
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
 		mLoaderTranslation = ViewUtils.dipToPixels(this, 48);
@@ -525,21 +569,33 @@ public class BindActivity extends BaseActivity {
 	}
 
 	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if(mErrValidationSubscription != null) {
+			mErrValidationSubscription.unsubscribe();
+		}
+	}
+
+	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_bind;
 	}
 
 	@DebugLog
 	public void writeBeaconData() {
+		// TODO: Fix
+		// int majorId = mRestaurant.getId();
+		int majorId = 1;
+		int minorId = mLoader.getTableNumber();
 		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE,
 		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD,
 		                                                       RBLBluetoothAttributes.RBL_PASSKEY.getBytes()));
 
 		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
-		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MAJOR_ID, 312));
+		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MAJOR_ID, majorId));
 
 		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
-		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID, 256));
+		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID, minorId));
 
 		mBluetoothLeService.startWritingQueue(new Runnable() {
 			@Override
@@ -569,7 +625,8 @@ public class BindActivity extends BaseActivity {
 	}
 
 	public void onGattFailed() {
-		showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again, new View.OnClickListener() {
+		mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again,
+		                       new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				bindTable();

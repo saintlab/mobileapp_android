@@ -42,8 +42,6 @@ public class DataHolder implements Parcelable {
 		int m2 = data % 256;
 		this.data[0] = (byte) (m1 & 0xff);
 		this.data[1] = (byte) (m2 & 0xff);
-// 		this.data[0] = (byte) (data & 0xff);
-//		this.data[1] = (byte) ((data >> 8) & 0xff);
 	}
 
 	public DataHolder(UUID serviceId, UUID charId, byte[] data) {

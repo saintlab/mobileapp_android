@@ -52,6 +52,10 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 		mHelper.onPostCreate();
 	}
 
+	protected final void postDelayed(long delay, Runnable action) {
+		findViewById(android.R.id.content).postDelayed(action, delay);
+	}
+
 	public void startActivity(Class<?> cls, int delay) {
 		mHelper.startActivity(cls, delay);
 	}
