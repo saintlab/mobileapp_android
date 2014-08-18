@@ -49,6 +49,7 @@ public class LoaderView extends FrameLayout {
 	private int currentColor = -1;
 
 	private List<View> translationViews = new LinkedList<View>();
+	private int mSpeedUpLimit;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public LoaderView(Context context) {
@@ -196,10 +197,18 @@ public class LoaderView extends FrameLayout {
 			}
 		}
 		float value = Math.max(0, Math.min(1, fraction));
-		addProgress((int) (mProgressBar.getMax() * value));
+		speedUpProgress((int) (mProgressBar.getMax() * value));
+	}
+
+	private void speedUpProgress(int i) {
+		mSpeedUpLimit = i;
 	}
 
 	public void addProgress(int i) {
-		updateProgress(mProgressBar.getProgress() + i);
+		if(mSpeedUpLimit >= mProgressBar.getProgress()) {
+			updateProgress(mProgressBar.getProgress() + (int) (i * 2));
+		} else {
+			updateProgress(mProgressBar.getProgress() + i);
+		}
 	}
 }

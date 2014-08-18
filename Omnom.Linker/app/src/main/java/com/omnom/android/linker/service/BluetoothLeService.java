@@ -25,13 +25,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import hugo.weaving.DebugLog;
 
 public class BluetoothLeService extends Service {
-	public final static  String                ACTION_GATT_CONNECTED           = "ACTION_GATT_CONNECTED";
-	public final static  String                ACTION_GATT_DISCONNECTED        = "ACTION_GATT_DISCONNECTED";
-	public final static  String                ACTION_GATT_SERVICES_DISCOVERED = "ACTION_GATT_SERVICES_DISCOVERED";
-	public final static  String                ACTION_DATA_AVAILABLE           = "ACTION_DATA_AVAILABLE";
-	public final static  String                ACTION_CHARACTERISTIC_UPDATE    = "ACTION_CHARACTERISTIC_UPDATE";
+	public final static String ACTION_GATT_CONNECTED = "ACTION_GATT_CONNECTED";
+	public final static String ACTION_GATT_FAILED = "ACTION_GATT_FAILED";
+	public final static String ACTION_GATT_DISCONNECTED = "ACTION_GATT_DISCONNECTED";
+	public final static String ACTION_GATT_SERVICES_DISCOVERED = "ACTION_GATT_SERVICES_DISCOVERED";
 
-	private              BluetoothGattCallback callback                        = new BluetoothGattCallback() {
+	private BluetoothGattCallback callback = new BluetoothGattCallback() {
 		@Override
 		@DebugLog
 		public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
@@ -40,8 +39,8 @@ public class BluetoothLeService extends Service {
 			}
 			if(!processQueue()) {
 				mQueueEndCallback.run();
-				disconnect();
-				close();
+				// disconnect();
+				// close();
 			}
 		}
 
@@ -50,8 +49,13 @@ public class BluetoothLeService extends Service {
 		public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
 			String intentAction;
 			if(newState == BluetoothProfile.STATE_CONNECTED) {
-				intentAction = ACTION_GATT_CONNECTED;
-				broadcastUpdate(intentAction);
+				if(status == BluetoothGatt.GATT_SUCCESS) {
+					intentAction = ACTION_GATT_CONNECTED;
+					broadcastUpdate(intentAction);
+				} else {
+					intentAction = ACTION_GATT_FAILED;
+					broadcastUpdate(intentAction);
+				}
 			} else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
 				intentAction = ACTION_GATT_DISCONNECTED;
 				broadcastUpdate(intentAction);
@@ -66,8 +70,10 @@ public class BluetoothLeService extends Service {
 			}
 		}
 	};
-	public final static  String                EXTRA_DATA                      = "EXTRA_DATA";
-	private static final String                TAG                             = BluetoothLeService.class.getSimpleName();
+	public final static String ACTION_DATA_AVAILABLE = "ACTION_DATA_AVAILABLE";
+	public final static String ACTION_CHARACTERISTIC_UPDATE = "ACTION_CHARACTERISTIC_UPDATE";
+	public final static String EXTRA_DATA = "EXTRA_DATA";
+	private static final String TAG = BluetoothLeService.class.getSimpleName();
 
 	public class LocalBinder extends Binder {
 		public BluetoothLeService getService() {
@@ -76,12 +82,12 @@ public class BluetoothLeService extends Service {
 	}
 
 	private final LinkedBlockingQueue<DataHolder> mWriteQueue = new LinkedBlockingQueue<DataHolder>();
-	private final IBinder                         mBinder     = new LocalBinder();
+	private final IBinder mBinder = new LocalBinder();
 	private BluetoothManager mBluetoothManager;
 	private BluetoothAdapter mBluetoothAdapter;
-	private String           mBluetoothDeviceAddress;
-	private BluetoothGatt    mBluetoothGatt;
-	private Runnable         mQueueEndCallback;
+	private String mBluetoothDeviceAddress;
+	private BluetoothGatt mBluetoothGatt;
+	private Runnable mQueueEndCallback;
 
 	@DebugLog
 	private void broadcastUpdate(final String action) {
@@ -159,7 +165,7 @@ public class BluetoothLeService extends Service {
 		// autoConnect
 		// parameter to false.
 		mBluetoothGatt = device.connectGatt(this, false, callback);
-		Log.d(TAG, "Trying to create a new connection.");
+		Log.d(TAG, "Trying to validate a new connection.");
 		mBluetoothDeviceAddress = address;
 
 		return true;

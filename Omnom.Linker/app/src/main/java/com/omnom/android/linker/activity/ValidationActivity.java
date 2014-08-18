@@ -25,9 +25,9 @@ import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
 import org.apache.http.auth.AuthenticationException;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -37,10 +37,8 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import rx.Observable;
 import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 
@@ -76,8 +74,10 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 	protected LinkerObeservableApi api;
 
 	private CountDownTimer cdt;
-	private String            mUsername    = null;
-	private String            mPassword    = null;
+	private String mUsername = null;
+	private String mPassword = null;
+
+	@Nullable
 	private RestaurantsResult mRestaurants = null;
 
 	@Override
@@ -99,6 +99,11 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 
 	@Override
 	public void finish() {
+		cdt.cancel();
+		if(mRestaurants == null) {
+			super.finish();
+			return;
+		}
 		if(mRestaurants.getItems().size() == 1) {
 			super.finish();
 			overridePendingTransition(android.R.anim.fade_in, R.anim.fake_fade_out);
@@ -126,26 +131,43 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 				startLoader();
 			}
 		});
+
+		/*final LoaderController loaderController = new LoaderController(this, loader);
+		new LoaderObservable.Builder(this).addTask(new LoaderTask(this, 500, loaderController) {
+			@Override
+			protected boolean runTask() {
+				SystemClock.sleep(1000);
+				return AndroidUtils.hasConnection(getActivity());
+			}
+		}).build().all(new Func1<LoaderTask.Result, Boolean>() {
+			@Override
+			public Boolean call(LoaderTask.Result result) {
+				return result.isOk();
+			}
+		}).onErrorReturn(new Func1<Throwable, Boolean>() {
+			@Override
+			public Boolean call(Throwable throwable) {
+				return false;
+			}
+		}).subscribe();*/
 	}
 
 	private void startLoader() {
 		cdt.start();
-		ValidationObservable.create(this).
-				subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).all(
-				new Func1<ValidationObservable.Error, Boolean>() {
-					@Override
-					public Boolean call(ValidationObservable.Error o) {
-						if(o == ValidationObservable.Error.OK) {
-							loader.jumpProgress(0.30f);
-						}
-						return true;
-					}
-				}).onErrorReturn(new Func1<Throwable, Boolean>() {
+		ValidationObservable.validate(this).all(new Func1<ValidationObservable.Error, Boolean>() {
+			@Override
+			public Boolean call(ValidationObservable.Error o) {
+				if(o == ValidationObservable.Error.OK) {
+					loader.jumpProgress(.5f);
+				}
+				return true;
+			}
+		}).onErrorReturn(new Func1<Throwable, Boolean>() {
 			@Override
 			public Boolean call(Throwable throwable) {
 				return showError(throwable);
 			}
-		}).delaySubscription(1000, TimeUnit.MILLISECONDS).subscribe(new Action1<Boolean>() {
+		}).subscribe(new Action1<Boolean>() {
 			@Override
 			public void call(Boolean valid) {
 				if(valid) {
@@ -218,7 +240,6 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 		final int magic = progressMax / ticksCount;
 
 		cdt = new CountDownTimer(timeMax, tick) {
-
 			@Override
 			public void onTick(long millisUntilFinished) {
 				loader.addProgress(magic * 2);

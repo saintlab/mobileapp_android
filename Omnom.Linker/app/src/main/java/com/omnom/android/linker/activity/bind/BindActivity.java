@@ -7,10 +7,12 @@ import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
@@ -45,7 +47,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -58,12 +59,8 @@ import butterknife.InjectViews;
 import butterknife.OnClick;
 import hugo.weaving.DebugLog;
 import rx.functions.Action1;
-import rx.functions.Func1;
 
-import static com.omnom.android.linker.service.BluetoothLeService.ACTION_DATA_AVAILABLE;
-import static com.omnom.android.linker.service.BluetoothLeService.ACTION_GATT_CONNECTED;
-import static com.omnom.android.linker.service.BluetoothLeService.ACTION_GATT_DISCONNECTED;
-import static com.omnom.android.linker.service.BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED;
+import static butterknife.ButterKnife.findById;
 
 /**
  * Created by Ch3D on 14.08.2014.
@@ -71,6 +68,7 @@ import static com.omnom.android.linker.service.BluetoothLeService.ACTION_GATT_SE
 public class BindActivity extends BaseActivity {
 
 	private static final String TAG = BindActivity.class.getSimpleName();
+	final BeaconParser parser = new BeaconParser();
 
 	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		@Override
@@ -79,7 +77,6 @@ public class BindActivity extends BaseActivity {
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					final BeaconParser parser = new BeaconParser();
 					parser.setBeaconLayout(RBLBluetoothAttributes.REDBEAR_BEACON_LAYOUT);
 					final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
 
@@ -87,7 +84,6 @@ public class BindActivity extends BaseActivity {
 						Identifier id1 = beacon.getId1();
 						final String beaconId = id1.toString().toLowerCase();
 						if(RBLBluetoothAttributes.BEACON_ID.equals(beaconId)) {
-							Log.d(TAG, "beacon >>> " + beacon.toString());
 							mBeacons.add(beacon);
 						}
 					}
@@ -114,6 +110,21 @@ public class BindActivity extends BaseActivity {
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
 
+	final Runnable beaconInteractionCallback = new Runnable() {
+		@Override
+		public void run() {
+			if(!gattAvailable || !gattConnected) {
+				onGattFailed();
+			} else {
+				mLoader.animateLogo(R.drawable.ic_camera_white);
+				AnimationUtils.animateAlpha(mPanelBottom, true);
+				mPanelBottom.setVisibility(View.VISIBLE);
+			}
+			mBluetoothLeService.disconnect();
+			mBluetoothLeService.close();
+		}
+	};
+
 	@InjectView(R.id.btn_bottom)
 	protected Button mBtnBottom;
 
@@ -132,10 +143,11 @@ public class BindActivity extends BaseActivity {
 	@Inject
 	protected LinkerObeservableApi api;
 
-	BluetoothLeService mBluetoothLeService;
+	protected BluetoothLeService mBluetoothLeService;
 	private BroadcastReceiver gattConnectedReceiver = new GattBroadcastReceiver(this);
 	private boolean mGattReceiverRegistered = false;
 	private boolean mBound = false;
+
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName componentName, IBinder service) {
@@ -153,11 +165,12 @@ public class BindActivity extends BaseActivity {
 			mBound = false;
 		}
 	};
-
 	@NotNull
 	private Restaurant mRestaurant;
+
 	@Nullable
 	private Beacon mBeacon = null;
+
 	private Set<Beacon> mBeacons = new HashSet<Beacon>();
 	private LoaderController mLoaderController;
 	private CountDownTimer cdt;
@@ -204,7 +217,7 @@ public class BindActivity extends BaseActivity {
 
 	@OnClick(R.id.btn_bind_table)
 	public void onBind() {
-		mLoaderController.hideKeyboard();
+		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
 		api.bindBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
 			@Override
@@ -220,20 +233,22 @@ public class BindActivity extends BaseActivity {
 		});
 	}
 
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putParcelable(EXTRA_BEACON, mBeacon);
+	}
+
+	@Override
+	protected void handleSavedState(Bundle savedInstanceState) {
+		mBeacon = savedInstanceState.getParcelable(EXTRA_BEACON);
+	}
+
 	@DebugLog
 	private void connectToBeacon() {
+		initCountDownTimer(beaconInteractionCallback);
 		cdt.start();
-		ValidationObservable.create(this).all(new Func1<ValidationObservable.Error, Boolean>() {
-			@Override
-			public Boolean call(ValidationObservable.Error o) {
-				return o == ValidationObservable.Error.OK;
-			}
-		}).onErrorReturn(new Func1<Throwable, Boolean>() {
-			@Override
-			public Boolean call(Throwable throwable) {
-				return false;
-			}
-		}).delaySubscription(1000, TimeUnit.MILLISECONDS).subscribe(new Action1<Boolean>() {
+		ValidationObservable.validate(this, new Action1<Boolean>() {
 			@Override
 			public void call(Boolean valid) {
 				if(valid) {
@@ -266,17 +281,18 @@ public class BindActivity extends BaseActivity {
 		}
 	}
 
+	@DebugLog
 	private void onRestaurantLoaded(Restaurant restaurant) {
 		if(getIntent().getBooleanExtra(EXTRA_SHOW_BACK, false)) {
 			mLoader.animateColor(Color.WHITE, getResources().getColor(R.color.loader_bg), AnimationUtils.DURATION_LONG);
 			mLoader.setLogo(R.drawable.ic_mexico_logo);
+			AnimationUtils.animateAlpha(mPanelBottom, true);
 			mLoader.post(new Runnable() {
 				@Override
 				public void run() {
 					mLoader.scaleDown(null, new Runnable() {
 						@Override
 						public void run() {
-							AnimationUtils.animateAlpha(mPanelBottom, true);
 							AnimationUtils.animateAlpha(mBtnBack, true);
 						}
 					});
@@ -302,51 +318,43 @@ public class BindActivity extends BaseActivity {
 		});
 	}
 
+	@DebugLog
 	private void scanQrCode() {
 		startActivityForResult(new Intent(this, CaptureActivity.class), REQUEST_CODE_SCAN_QR);
 	}
 
+	@DebugLog
 	private void clearErrors() {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 	}
 
 	@Override
+	@DebugLog
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(resultCode == RESULT_OK) {
 			if(requestCode == REQUEST_CODE_SCAN_QR) {
+				mPanelBottom.setVisibility(View.GONE);
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
 				api.checkQrCode(mRestaurant.getId(), mQrData).subscribe(new Action1<Integer>() {
 					@Override
 					public void call(Integer result) {
 						mLoaderController.setMode(LoaderView.Mode.ENTER_DATA);
 						AnimationUtils.animateAlpha(mBtnBindTable, true);
-						//						api.bindQrCode(mRestaurant.getId(), mQrData).subscribe(new Action1<Integer>() {
-						//							@Override
-						//							public void call(Integer integer) {
-						//								showToast(getActivity(), R.string.qr_bound);
-						//								api.bindBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
-						//									@Override
-						//									public void call(Integer integer) {
-						//										showToast(getActivity(), R.string.beacon_bound);
-						//									}
-						//								});
-						//							}
-						//						});
 					}
 				});
 			}
 		}
 	}
 
-	private void initCountDownTimer() {
+	private void initCountDownTimer(final Runnable runnable) {
 		final int progressMax = getResources().getInteger(R.integer.loader_progress_max);
 		final int timeMax = getResources().getInteger(R.integer.loader_time_max);
 		final int tick = getResources().getInteger(R.integer.loader_tick_interval);
 		final int ticksCount = timeMax / tick;
 		final int magic = progressMax / ticksCount;
+		mLoader.updateProgress(0);
 
 		cdt = new CountDownTimer(timeMax, tick) {
-
 			@Override
 			public void onTick(long millisUntilFinished) {
 				mLoader.addProgress(magic * 2);
@@ -355,6 +363,9 @@ public class BindActivity extends BaseActivity {
 			@Override
 			public void onFinish() {
 				mLoader.updateProgress(progressMax);
+				if(runnable != null) {
+					runnable.run();
+				}
 			}
 		};
 	}
@@ -373,49 +384,47 @@ public class BindActivity extends BaseActivity {
 	private void bindTable() {
 		mLoader.animateColorDefault();
 		mLoader.animateLogo(R.drawable.ic_mexico_logo);
-		initCountDownTimer();
-		clearErrors();
-		cdt.start();
-		scanBleDevices(true, new Runnable() {
+		initCountDownTimer(new Runnable() {
 			@Override
 			public void run() {
-				if(mBeacons.size() == 0) {
-					showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again,
-					          new View.OnClickListener() {
-						          @Override
-						          public void onClick(View v) {
-							          bindTable();
-						          }
-					          });
-				} else if(mBeacons.size() > 1) {
-					showError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon, R.string.try_once_again,
-					          new View.OnClickListener() {
-						          @Override
-						          public void onClick(View v) {
-							          bindTable();
-						          }
-					          });
-				} else if(mBeacons.size() == 1) {
-					mBeacon = (Beacon) mBeacons.toArray()[0];
-					api.checkBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
+				scanQrCode();
+			}
+		});
+		clearErrors();
+		cdt.start();
+
+		ValidationObservable.validate(this, new Action1<Boolean>() {
+			@Override
+			public void call(Boolean valid) {
+				if(valid) {
+					scanBleDevices(true, new Runnable() {
 						@Override
-						public void call(final Integer integer) {
-							scanQrCode();
-							// TODO: error case
-							//							AndroidUtils.showDialog(ValidationActivity.this, R.string.beacon_already_bound,
-							// R.string.proceed,
-							//							                        new DialogInterface.OnClickListener() {
-							//								                        @Override
-							//								                        public void onClick(DialogInterface dialog,
-							// int which) {
-							//									                        scanQrCode();
-							//								                        }
-							//							                        }, R.string.cancel, new DialogInterface.OnClickListener() {
-							//										@Override
-							//										public void onClick(DialogInterface dialog, int which) {
-							//											finish();
-							//										}
-							//									});
+						public void run() {
+							final int size = mBeacons.size();
+							if(size == 0) {
+								showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again,
+								          new View.OnClickListener() {
+									          @Override
+									          public void onClick(View v) {
+										          bindTable();
+									          }
+								          });
+							} else if(size > 1) {
+								showError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon, R.string.try_once_again,
+								          new View.OnClickListener() {
+									          @Override
+									          public void onClick(View v) {
+										          bindTable();
+									          }
+								          });
+							} else if(size == 1) {
+								mBeacon = (Beacon) mBeacons.toArray()[0];
+								api.checkBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
+									@Override
+									public void call(final Integer integer) {
+									}
+								});
+							}
 						}
 					});
 				}
@@ -423,10 +432,23 @@ public class BindActivity extends BaseActivity {
 		});
 	}
 
+	private void onQrBindError() {
+		AndroidUtils.showDialog(getActivity(), R.string.beacon_already_bound, R.string.proceed, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				scanQrCode();
+			}
+		}, R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				finish();
+			}
+		});
+	}
+
 	@Override
 	public void initUi() {
 		mLoaderController = new LoaderController(this, mLoader);
-
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
 		mLoaderTranslation = ViewUtils.dipToPixels(this, 48);
@@ -484,10 +506,11 @@ public class BindActivity extends BaseActivity {
 	protected void onPostResume() {
 		super.onPostResume();
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(ACTION_GATT_CONNECTED);
-		filter.addAction(ACTION_GATT_DISCONNECTED);
-		filter.addAction(ACTION_GATT_SERVICES_DISCOVERED);
-		filter.addAction(ACTION_DATA_AVAILABLE);
+		filter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+		filter.addAction(BluetoothLeService.ACTION_GATT_FAILED);
+		filter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+		filter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
 		filter.addAction(BluetoothLeService.ACTION_CHARACTERISTIC_UPDATE);
 		registerReceiver(gattConnectedReceiver, filter);
 		mGattReceiverRegistered = true;
@@ -521,7 +544,12 @@ public class BindActivity extends BaseActivity {
 		mBluetoothLeService.startWritingQueue(new Runnable() {
 			@Override
 			public void run() {
-				api.commitBeacon(mRestaurant.getId(), mBeacon);
+				api.commitBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
+					@Override
+					public void call(Integer integer) {
+						mLoader.jumpProgress(1);
+					}
+				});
 			}
 		});
 	}
@@ -538,5 +566,14 @@ public class BindActivity extends BaseActivity {
 		if(cUuid.equals(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID)) {
 			mBeacon.getId3().updateValue(cValue);
 		}
+	}
+
+	public void onGattFailed() {
+		showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again, new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				bindTable();
+			}
+		});
 	}
 }

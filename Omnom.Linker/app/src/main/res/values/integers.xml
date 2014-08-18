@@ -3,4 +3,5 @@
     <integer name="loader_progress_max">5000</integer>
     <integer name="loader_time_max">5000</integer>
     <integer name="loader_tick_interval">10</integer>
+    <integer name="loader_data_max_length">5</integer>
 </resources>

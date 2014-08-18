@@ -30,6 +30,9 @@ class GattBroadcastReceiver extends BroadcastReceiver {
 					activity.writeBeaconData();
 				}
 			});
+		} else if(BluetoothLeService.ACTION_GATT_FAILED.equals(intent.getAction())) {
+			activity.gattConnected = false;
+			activity.gattAvailable = false;
 		} else if(BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(intent.getAction())) {
 			activity.gattConnected = false;
 			activity.gattAvailable = false;

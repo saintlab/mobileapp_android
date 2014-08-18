@@ -151,7 +151,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 				subscriber.onNext(0);
 				subscriber.onCompleted();
 			}
-		}) {};
+		}) {}.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

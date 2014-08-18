@@ -18,6 +18,7 @@
         android:indeterminate="false"
         android:progress="0"
         android:max="@integer/loader_progress_max"
+        android:visibility="gone"
         android:progressDrawable="@drawable/loader_progress"
         style="?android:attr/progressBarStyleHorizontal"/>
 
@@ -38,6 +39,7 @@
         android:gravity="center"
         android:singleLine="true"
         android:inputType="number"
+        android:maxLength="@integer/loader_data_max_length"
         android:hint="@string/hint_table_number"
         android:textColorHint="#99ffffff"
         android:textColor="@android:color/white"

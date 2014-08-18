@@ -27,6 +27,7 @@
             android:textColor="@android:color/secondary_text_light"
             android:textStyle="bold"
             android:textIsSelectable="true"
+            android:visibility="gone"
             android:textAppearance="?android:textAppearanceLarge"/>
 
         <LinearLayout
@@ -42,7 +43,7 @@
 
             <Button
                 android:id="@+id/btn_bottom"
-                android:text="@string/remind_password"
+                android:text="@string/bind_table"
                 style="@style/Button.Bottom"/>
         </LinearLayout>
 

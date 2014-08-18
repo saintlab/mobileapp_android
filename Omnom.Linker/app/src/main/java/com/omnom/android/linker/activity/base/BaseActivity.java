@@ -21,7 +21,14 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 		setContentView(getLayoutResource());
 		ButterKnife.inject(getActivity());
 		mHelper = new ActivityHelper(this);
+		if(savedInstanceState != null) {
+			handleSavedState(savedInstanceState);
+		}
 		handleIntent(getIntent());
+	}
+
+	protected void handleSavedState(Bundle savedInstanceState) {
+		// Do nothing
 	}
 
 	protected void handleIntent(Intent intent) {

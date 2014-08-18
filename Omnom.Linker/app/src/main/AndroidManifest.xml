@@ -44,7 +44,7 @@
 
         <activity
             android:name=".activity.bind.BindActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
             android:screenOrientation="portrait">
         </activity>
 

@@ -4,13 +4,17 @@ import android.content.Context;
 
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
+import com.omnom.android.linker.utils.StringUtils;
+
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by Ch3D on 07.08.2014.
  */
-public class LoaderController {
-	private final Context    context;
+public class LoaderController implements LoaderTask.ProgressListener {
+	private final Context context;
 	private final LoaderView view;
+	private LinkedBlockingQueue<LoaderTask> taskQueue = new LinkedBlockingQueue<LoaderTask>();
 
 	private LoaderView.Mode mMode = LoaderView.Mode.NONE;
 
@@ -26,6 +30,7 @@ public class LoaderController {
 				view.postDelayed(new Runnable() {
 					@Override
 					public void run() {
+						view.mEditTableNumber.setText(StringUtils.EMPTY_STRING);
 						AnimationUtils.animateAlpha(view.mEditTableNumber, true);
 						AnimationUtils.animateAlpha(view.mImgLogo, false);
 						AndroidUtils.showKeyboard(view.mEditTableNumber);
@@ -46,7 +51,29 @@ public class LoaderController {
 		}
 	}
 
-	public void hideKeyboard() {
-		AndroidUtils.hideKeyboard(view.mEditTableNumber);
+	public void addTask(final LoaderTask task) {
+		taskQueue.add(task);
+	}
+
+	public void executeTasks() {
+		while(!taskQueue.isEmpty()) {
+			final LoaderTask poll = taskQueue.poll();
+			poll.execute();
+		}
+	}
+
+	@Override
+	public void onError(Throwable e) {
+
+	}
+
+	@Override
+	public void onProgress(int progress) {
+
+	}
+
+	@Override
+	public void onFinished() {
+
 	}
 }
