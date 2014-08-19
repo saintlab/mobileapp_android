@@ -17,6 +17,10 @@
         <item name="android:windowBackground">@drawable/bg_wood</item>
     </style>
 
+    <style name="Theme.Wood.Blue" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/bg_wood_b</item>
+    </style>
+
     <style name="Theme.White" parent="AppTheme">
         <item name="android:windowBackground">@android:color/white</item>
     </style>

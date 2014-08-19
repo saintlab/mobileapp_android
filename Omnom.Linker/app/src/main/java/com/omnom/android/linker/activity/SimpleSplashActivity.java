@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
-import com.omnom.android.linker.utils.AnimationUtils;
 
 public class SimpleSplashActivity extends BaseActivity {
 	@Override
@@ -13,9 +12,9 @@ public class SimpleSplashActivity extends BaseActivity {
 		findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				startActivity(LoginActivity.class);
+				startActivity(LoginActivity.class, android.R.anim.fade_in, android.R.anim.fade_out);
 			}
-		}, AnimationUtils.DURATION_LONG);
+		}, getResources().getInteger(R.integer.splash_screen_timeout));
 	}
 
 	@Override

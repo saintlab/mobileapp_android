@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/bg_wood"/>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="@color/loader_bg_transparent"
+                android:endColor="@color/loader_bg_transparent"/>
+        </shape>
+    </item>
+</layer-list>
