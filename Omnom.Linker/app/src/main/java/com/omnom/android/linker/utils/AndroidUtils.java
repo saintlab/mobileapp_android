@@ -70,7 +70,7 @@ public class AndroidUtils {
 		};
 	}
 
-	public static CountDownTimer createTimer(final LoaderView loader, final Runnable finishCallback, final int duration) {
+	public static CountDownTimer createTimer(final LoaderView loader, final Runnable finishCallback, final long duration) {
 		final Context context = loader.getContext();
 		final int progressMax = context.getResources().getInteger(R.integer.loader_progress_max);
 		final float f = duration / progressMax;
@@ -79,7 +79,7 @@ public class AndroidUtils {
 		return new CountDownTimer(duration, context.getResources().getInteger(R.integer.loader_tick_interval)) {
 			@Override
 			public void onTick(long millisUntilFinished) {
-				final int currValue = duration - (int)millisUntilFinished;
+				final long currValue = duration - millisUntilFinished;
 				loader.updateProgress((int) (currValue / f));
 			}
 
