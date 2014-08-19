@@ -125,7 +125,7 @@ public class BindActivity extends BaseActivity {
 			if(!gattAvailable || !gattConnected) {
 				onGattFailed();
 			} else {
-				mLoader.animateLogo(R.drawable.ic_camera_white);
+				mLoader.animateLogo(R.drawable.ic_done);
 				AnimationUtils.animateAlpha(mPanelBottom, true);
 				mBtnBottom.setText(R.string.bind_table);
 				mPanelBottom.setVisibility(View.VISIBLE);
