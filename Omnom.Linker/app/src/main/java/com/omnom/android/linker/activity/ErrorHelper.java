@@ -36,12 +36,16 @@ public class ErrorHelper {
 		mTimer = timer;
 	}
 
-	public void showError(int logoResId, int errTextResId, int btnTextResId, View.OnClickListener onClickListener) {
+	public void showError(final int logoResId, int errTextResId, int btnTextResId, View.OnClickListener onClickListener) {
 		mLoader.updateProgress(0);
-		mLoader.showProgress(false);
 		mTimer.cancel();
 		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, true);
-		mLoader.animateLogo(logoResId);
+		mLoader.post(new Runnable() {
+			@Override
+			public void run() {
+				mLoader.animateLogo(logoResId);
+			}
+		});
 		mTxtError.setText(errTextResId);
 		mBtnBottom.setText(btnTextResId);
 		mBtnBottom.setOnClickListener(onClickListener);
@@ -72,5 +76,9 @@ public class ErrorHelper {
 				AndroidUtils.startLocationSettings(v.getContext());
 			}
 		});
+	}
+
+	public void setTimer(CountDownTimer timer) {
+		mTimer = timer;
 	}
 }

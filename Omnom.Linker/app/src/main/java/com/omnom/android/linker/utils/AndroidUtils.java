@@ -73,23 +73,21 @@ public class AndroidUtils {
 	public static CountDownTimer createTimer(final LoaderView loader, final Runnable finishCallback, final int duration) {
 		final Context context = loader.getContext();
 		final int progressMax = context.getResources().getInteger(R.integer.loader_progress_max);
-		final int timeMax = duration;
-		final int tick = context.getResources().getInteger(R.integer.loader_tick_interval);
-		final int ticksCount = timeMax / tick;
-		final int magic = progressMax / ticksCount;
+		final float f = duration / progressMax;
 		loader.updateProgress(0);
 
-		return new CountDownTimer(timeMax, tick) {
+		return new CountDownTimer(duration, context.getResources().getInteger(R.integer.loader_tick_interval)) {
 			@Override
 			public void onTick(long millisUntilFinished) {
-				loader.addProgress(magic * 2);
+				final int currValue = duration - (int)millisUntilFinished;
+				loader.updateProgress((int) (currValue / f));
 			}
 
 			@Override
 			public void onFinish() {
 				loader.updateProgress(progressMax);
 				if(finishCallback != null) {
-					finishCallback.run();
+					loader.post(finishCallback);
 				}
 			}
 		};

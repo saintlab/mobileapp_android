@@ -127,6 +127,7 @@ public class BindActivity extends BaseActivity {
 			} else {
 				mLoader.animateLogo(R.drawable.ic_camera_white);
 				AnimationUtils.animateAlpha(mPanelBottom, true);
+				mBtnBottom.setText(R.string.bind_table);
 				mPanelBottom.setVisibility(View.VISIBLE);
 			}
 			mBluetoothLeService.disconnect();
@@ -190,6 +191,7 @@ public class BindActivity extends BaseActivity {
 	private Subscription mErrValidationSubscription;
 	private Subscription mErrBindSubscription;
 	private ErrorHelper mErrorHelper;
+	private boolean mBindClicked = false;
 
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
 		if(enable) {
@@ -257,6 +259,7 @@ public class BindActivity extends BaseActivity {
 	@DebugLog
 	private void connectToBeacon() {
 		cdt = AndroidUtils.createTimer(mLoader, beaconInteractionCallback, 10000);
+		mErrorHelper.setTimer(cdt);
 		cdt.start();
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
@@ -357,6 +360,7 @@ public class BindActivity extends BaseActivity {
 		mBtnBottom.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				mBindClicked = true;
 				bindTable();
 			}
 		});
@@ -364,6 +368,7 @@ public class BindActivity extends BaseActivity {
 
 	@DebugLog
 	private void scanQrCode() {
+		mBindClicked = false;
 		startActivityForResult(new Intent(this, CaptureActivity.class), REQUEST_CODE_SCAN_QR);
 	}
 
@@ -378,8 +383,7 @@ public class BindActivity extends BaseActivity {
 		if(resultCode == RESULT_OK) {
 			if(requestCode == REQUEST_CODE_ENABLE_BLUETOOTH) {
 				clearErrors();
-			}
-			if(requestCode == REQUEST_CODE_SCAN_QR) {
+			} else if(requestCode == REQUEST_CODE_SCAN_QR) {
 				mPanelBottom.setVisibility(View.GONE);
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
 				api.checkQrCode(mRestaurant.getId(), mQrData).subscribe(new Action1<Integer>() {
@@ -390,15 +394,23 @@ public class BindActivity extends BaseActivity {
 					}
 				});
 			}
+		} else {
+			ViewUtils.setVisible(mPanelBottom, true);
 		}
 	}
 
 	private void bindTable() {
-		mLoader.animateColorDefault();
 		mLoader.animateLogo(R.drawable.ic_mexico_logo);
+		mLoader.animateColorDefault();
 		clearErrors();
+		cdt = AndroidUtils.createTimer(mLoader, new Runnable() {
+			@Override
+			public void run() {
+				scanQrCode();
+			}
+		}, 5000);
+		mErrorHelper.setTimer(cdt);
 		cdt.start();
-
 		mErrBindSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
 					@Override
@@ -434,20 +446,21 @@ public class BindActivity extends BaseActivity {
 							if(size == 0) {
 								mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal,
 								                       R.string.try_once_again,
-								          new View.OnClickListener() {
-									          @Override
-									          public void onClick(View v) {
-										          bindTable();
-									          }
-								          });
+								                       new View.OnClickListener() {
+									                       @Override
+									                       public void onClick(View v) {
+										                       bindTable();
+									                       }
+								                       });
 							} else if(size > 1) {
-								mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon, R.string.try_once_again,
-								          new View.OnClickListener() {
-									          @Override
-									          public void onClick(View v) {
-										          bindTable();
-									          }
-								          });
+								mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon,
+								                       R.string.try_once_again,
+								                       new View.OnClickListener() {
+									                       @Override
+									                       public void onClick(View v) {
+										                       bindTable();
+									                       }
+								                       });
 							} else if(size == 1) {
 								mBeacon = (Beacon) mBeacons.toArray()[0];
 								api.checkBeacon(mRestaurant.getId(), mBeacon).subscribe(Observers.empty());
@@ -486,12 +499,6 @@ public class BindActivity extends BaseActivity {
 	@Override
 	public void initUi() {
 		mLoaderController = new LoaderController(this, mLoader);
-		cdt = AndroidUtils.createTimer(mLoader, new Runnable() {
-			@Override
-			public void run() {
-				scanQrCode();
-			}
-		});
 		mErrorHelper = new ErrorHelper(mLoader, mTxtError, mBtnBottom, errorViews, cdt);
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
@@ -547,9 +554,21 @@ public class BindActivity extends BaseActivity {
 	}
 
 	@Override
-	protected void onPostResume() {
-		super.onPostResume();
-		IntentFilter filter = new IntentFilter();
+	public void onWindowFocusChanged(boolean hasFocus) {
+		if(hasFocus && mBindClicked) {
+			postDelayed(AnimationUtils.DURATION_SHORT, new Runnable() {
+				@Override
+				public void run() {
+					bindTable();
+				}
+			});
+		}
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		final IntentFilter filter = new IntentFilter();
 		filter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
 		filter.addAction(BluetoothLeService.ACTION_GATT_FAILED);
 		filter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
@@ -627,10 +646,10 @@ public class BindActivity extends BaseActivity {
 	public void onGattFailed() {
 		mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again,
 		                       new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				bindTable();
-			}
-		});
+			                       @Override
+			                       public void onClick(View v) {
+				                       bindTable();
+			                       }
+		                       });
 	}
 }

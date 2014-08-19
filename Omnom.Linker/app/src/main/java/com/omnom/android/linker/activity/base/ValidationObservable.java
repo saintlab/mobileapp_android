@@ -2,6 +2,7 @@ package com.omnom.android.linker.activity.base;
 
 import android.content.Context;
 
+import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.BluetoothUtils;
 
@@ -21,7 +22,8 @@ public class ValidationObservable {
 		OK, NO_CONNECTION, BLUETOOTH_DISABLED, LOCATION_DISABLED
 	}
 
-	public static final int TIMEOUT = 20;
+	public static final int TIMEOUT = 100;
+	public static final int TIMEOUT_DEBUG = 2000;
 
 //	public static rx.Subscription validate(final Context context, Action1<Boolean> onNext) {
 //		return ValidationObservable.validate(context).all(new Func1<Error, Boolean>() {
@@ -80,8 +82,9 @@ public class ValidationObservable {
 	}
 
 	public static Observable<? extends ValidationObservable.Error> validate(final Context context) {
+		final int timeout = BuildConfig.DEBUG ? TIMEOUT_DEBUG : TIMEOUT;
 		return Observable.concat(hasConnection(context), isLocationEnabled(context),
-		                         isBluetoothEnabled(context)).timeout(60, TimeUnit.MILLISECONDS)
+		                         isBluetoothEnabled(context)).timeout(timeout, TimeUnit.MILLISECONDS)
 				.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).delaySubscription(400,
 				                                                                                          TimeUnit.MILLISECONDS)
 				.takeFirst(new Func1<Error, Boolean>() {
