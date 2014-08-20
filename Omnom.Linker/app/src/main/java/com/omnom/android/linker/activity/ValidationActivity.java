@@ -227,9 +227,20 @@ public class ValidationActivity extends BaseActivity {
 				}).isEmpty()).subscribe(new Action1<Boolean>() {
 			@Override
 			public void call(Boolean hasNoErrors) {
+				loader.jumpProgress(0.4f);
 				if(hasNoErrors) {
 					authenticateAndGetData();
 				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				mErrorHelper.showInternetError(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						validate();
+					}
+				});
 			}
 		});
 	}

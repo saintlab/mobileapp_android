@@ -2,7 +2,6 @@ package com.omnom.android.linker.activity.base;
 
 import android.content.Context;
 
-import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.BluetoothUtils;
 
@@ -23,21 +22,6 @@ public class ValidationObservable {
 	}
 
 	public static final int TIMEOUT = 100;
-	public static final int TIMEOUT_DEBUG = 2000;
-
-//	public static rx.Subscription validate(final Context context, Action1<Boolean> onNext) {
-//		return ValidationObservable.validate(context).all(new Func1<Error, Boolean>() {
-//			@Override
-//			public Boolean call(ValidationObservable.Error o) {
-//				return o == ValidationObservable.Error.OK;
-//			}
-//		}).onErrorReturn(new Func1<Throwable, Boolean>() {
-//			@Override
-//			public Boolean call(Throwable throwable) {
-//				return false;
-//			}
-//		}).delaySubscription(1000, TimeUnit.MILLISECONDS).subscribe(onNext);
-//	}
 
 	public static Observable<? extends ValidationObservable.Error> hasConnection(final Context context) {
 		return Observable.create(new Observable.OnSubscribe<Error>() {
@@ -82,16 +66,15 @@ public class ValidationObservable {
 	}
 
 	public static Observable<? extends ValidationObservable.Error> validate(final Context context) {
-		final int timeout = BuildConfig.DEBUG ? TIMEOUT_DEBUG : TIMEOUT;
-		return Observable.concat(hasConnection(context), isLocationEnabled(context),
-		                         isBluetoothEnabled(context)).timeout(timeout, TimeUnit.MILLISECONDS)
-				.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).delaySubscription(400,
-				                                                                                          TimeUnit.MILLISECONDS)
-				.takeFirst(new Func1<Error, Boolean>() {
-					@Override
-					public Boolean call(Error error) {
-						return error != Error.OK;
-					}
-				});
+		return Observable.concat(hasConnection(context), isLocationEnabled(context), isBluetoothEnabled(context))
+		                 .timeout(TIMEOUT, TimeUnit.MILLISECONDS)
+		                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+		                 .delaySubscription(400, TimeUnit.MILLISECONDS)
+		                 .takeFirst(new Func1<Error, Boolean>() {
+			                 @Override
+			                 public Boolean call(Error error) {
+				                 return error != Error.OK;
+			                 }
+		                 });
 	}
 }

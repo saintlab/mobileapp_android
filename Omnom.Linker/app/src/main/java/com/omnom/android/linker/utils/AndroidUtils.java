@@ -80,7 +80,8 @@ public class AndroidUtils {
 			@Override
 			public void onTick(long millisUntilFinished) {
 				final long currValue = duration - millisUntilFinished;
-				loader.updateProgress((int) (currValue / f));
+				int progress = (int) (currValue / f);
+				loader.updateProgress(progress);
 			}
 
 			@Override
@@ -141,7 +142,7 @@ public class AndroidUtils {
 	public static AlertDialog showDialog(Context context, int msg, int okResId, DialogInterface.OnClickListener okListener,
 	                                     int cancelResId, DialogInterface.OnClickListener cancelListener) {
 		final AlertDialog alertDialog = new AlertDialog.Builder(context).setMessage(msg).setPositiveButton(okResId, okListener)
-				.setNegativeButton(cancelResId, cancelListener).create();
+		                                                                .setNegativeButton(cancelResId, cancelListener).create();
 		alertDialog.setCancelable(false);
 		alertDialog.setCanceledOnTouchOutside(false);
 		alertDialog.show();

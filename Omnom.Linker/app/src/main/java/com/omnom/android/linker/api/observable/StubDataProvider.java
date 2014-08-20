@@ -124,7 +124,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 		return new Observable<RestaurantsResult>(new Observable.OnSubscribe<RestaurantsResult>() {
 			@Override
 			public void call(Subscriber<? super RestaurantsResult> subscriber) {
-				final boolean fast = false;
+				final boolean fast = true;
 				RestaurantsResult result = new RestaurantsResult();
 				if(fast) {
 					result.setItems(Arrays.asList(RestaurantsFactory.createFake("fake 1")));
