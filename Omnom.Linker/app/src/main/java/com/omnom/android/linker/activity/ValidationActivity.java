@@ -214,10 +214,10 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 
 	private void authenticateAndGetData() {
 		mAuthDataSubscription = AndroidObservable.bindActivity(this, api.authenticate(mUsername, mPassword).map(
-				new Func1<String, Observable<RestaurantsResult>>
-						() {
+				new Func1<String, Observable<RestaurantsResult>>() {
 					@Override
 					public Observable<RestaurantsResult> call(String s) {
+						getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, s).commit();
 						api.setAuthToken(s);
 						return api.getRestaurants();
 					}
