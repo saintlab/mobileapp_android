@@ -10,6 +10,8 @@ import rx.Observable;
  * Created by Ch3D on 11.08.2014.
  */
 public interface LinkerObeservableApi {
+	public void setAuthToken(String token);
+
 	public Observable<String> authenticate(String username, String password);
 
 	public Observable<String> remindPassword(String username);
@@ -26,5 +28,5 @@ public interface LinkerObeservableApi {
 
 	public Observable<RestaurantsResult> getRestaurants();
 
-	void setAuthToken(String token);
+	public Observable<Integer> commitBeacon(String restaurantId, Beacon beacon);
 }

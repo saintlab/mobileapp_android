@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.omnom.android.linker.activity.Extras;
-
 import butterknife.ButterKnife;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -23,7 +21,14 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 		setContentView(getLayoutResource());
 		ButterKnife.inject(getActivity());
 		mHelper = new ActivityHelper(this);
+		if(savedInstanceState != null) {
+			handleSavedState(savedInstanceState);
+		}
 		handleIntent(getIntent());
+	}
+
+	protected void handleSavedState(Bundle savedInstanceState) {
+		// Do nothing
 	}
 
 	protected void handleIntent(Intent intent) {
@@ -45,6 +50,10 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		mHelper.onPostCreate();
+	}
+
+	protected final void postDelayed(long delay, Runnable action) {
+		findViewById(android.R.id.content).postDelayed(action, delay);
 	}
 
 	public void startActivity(Class<?> cls, int delay) {

@@ -1,4 +1,4 @@
-package com.omnom.android.linker.activity;
+package com.omnom.android.linker.activity.restaurant;
 
 import android.app.ActivityOptions;
 import android.content.Context;

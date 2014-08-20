@@ -5,4 +5,5 @@
     <integer name="loader_tick_interval">10</integer>
     <integer name="login_animation_duration">1000</integer>
     <integer name="splash_screen_timeout">1000</integer>
+    <integer name="loader_data_max_length">5</integer>
 </resources>

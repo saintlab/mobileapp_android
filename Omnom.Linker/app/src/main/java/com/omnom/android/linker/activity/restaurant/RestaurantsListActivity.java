@@ -1,4 +1,4 @@
-package com.omnom.android.linker.activity;
+package com.omnom.android.linker.activity.restaurant;
 
 import android.app.ActivityOptions;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.os.Parcelable;
 
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseListActivity;
+import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.adapter.MockPlacesAdapter;
 import com.omnom.android.linker.model.Restaurant;
 
