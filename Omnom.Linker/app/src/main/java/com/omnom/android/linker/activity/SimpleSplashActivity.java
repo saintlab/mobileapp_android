@@ -1,5 +1,6 @@
 package com.omnom.android.linker.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -14,11 +15,13 @@ public class SimpleSplashActivity extends BaseActivity {
 		findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				startActivity(LoginActivity.class, android.R.anim.fade_in, android.R.anim.fade_out);
 				boolean hasToken = !TextUtils.isEmpty(getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).getString(AUTH_TOKEN,
 				                                                                                                     StringUtils
 						                                                                                                     .EMPTY_STRING));
-				startActivity(hasToken ? ValidationActivity.class : LoginActivity.class);
+				final Class<?> cls = hasToken ? ValidationActivity.class : LoginActivity.class;
+				Intent intent = new Intent(SimpleSplashActivity.this, cls);
+				intent.putExtra(EXTRA_LOADER_ANIMATION, hasToken ? EXTRA_LOADER_ANIMATION_SCALE_DOWN : EXTRA_LOADER_ANIMATION_SCALE_UP);
+				startActivity(intent, android.R.anim.fade_in, android.R.anim.fade_out);
 			}
 		}, getResources().getInteger(R.integer.splash_screen_timeout));
 	}

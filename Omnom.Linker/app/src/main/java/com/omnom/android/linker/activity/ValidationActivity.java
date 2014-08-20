@@ -41,16 +41,16 @@ import rx.functions.Func1;
 
 import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 
-public class ValidationActivity extends BaseActivity /*implements Observer<String>*/ {
+public class ValidationActivity extends BaseActivity {
 
 	private static final String TAG = ValidationActivity.class.getSimpleName();
-
 	private static final int REQUEST_CODE_ENABLE_BT = 100;
 
 	@SuppressWarnings("UnusedDeclaration")
-	public static void start(final Context context, Restaurant restaurant) {
+	public static void start(final Context context, Restaurant restaurant, int animation) {
 		final Intent intent = new Intent(context, ValidationActivity.class);
 		intent.putExtra(EXTRA_RESTAURANT, restaurant);
+		intent.putExtra(EXTRA_LOADER_ANIMATION, animation);
 		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
 	}
 
@@ -82,6 +82,12 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 	private Subscription mErrValidationSubscription;
 	private Subscription mAuthDataSubscription;
 	private ErrorHelper mErrorHelper;
+	private int mAnimationType;
+
+	@Override
+	protected void handleIntent(Intent intent) {
+		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_UP);
+	}
 
 	@Override
 	public void initUi() {
@@ -127,7 +133,12 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 	@Override
 	protected void onPostResume() {
 		super.onPostResume();
-		validate();
+		postDelayed(350, new Runnable() {
+			@Override
+			public void run() {
+				validate();
+			}
+		});
 	}
 
 	@Override
@@ -163,8 +174,19 @@ public class ValidationActivity extends BaseActivity /*implements Observer<Strin
 		}
 	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+		loader.setColor(getResources().getColor(R.color.loader_bg));
+		if(mAnimationType == EXTRA_LOADER_ANIMATION_SCALE_DOWN) {
+			final int dpSize = ViewUtils.dipToPixels(this, 900);
+			loader.setSize(dpSize, dpSize);
+		} else {
+			loader.setSize(0, 0);
+		}
+	}
+
 	private void validate() {
-		loader.animateColor(getResources().getColor(R.color.loader_bg));
 		loader.animateLogo(R.drawable.ic_fork_n_knife);
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 		loader.showProgress(false);

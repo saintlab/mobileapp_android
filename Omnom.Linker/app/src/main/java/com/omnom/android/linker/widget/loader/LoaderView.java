@@ -128,6 +128,14 @@ public class LoaderView extends FrameLayout {
 		});
 	}
 
+	@DebugLog
+	public void setColor(final int color) {
+		final GradientDrawable sd = (GradientDrawable) mImgLoader.getDrawable();
+		sd.setColors(new int[]{color, color});
+		currentColor = color;
+		sd.invalidateSelf();
+	}
+
 	public void updateProgress(final int progress) {
 		showProgress(progress > 0 && progress < mProgressBar.getMax());
 		mProgressBar.post(new Runnable() {
@@ -155,9 +163,7 @@ public class LoaderView extends FrameLayout {
 
 	@DebugLog
 	public void scaleDown() {
-		mImgLoader.getLayoutParams().height = loaderSize;
-		mImgLoader.getLayoutParams().width = loaderSize;
-		mImgLoader.requestLayout();
+		setSize(loaderSize, loaderSize);
 	}
 
 	@DebugLog
@@ -229,5 +235,11 @@ public class LoaderView extends FrameLayout {
 	@DebugLog
 	public int getTableNumber() {
 		return Integer.parseInt(mEditTableNumber.getText().toString());
+	}
+
+	public void setSize(int width, int height) {
+		mImgLoader.getLayoutParams().width = width;
+		mImgLoader.getLayoutParams().height = height;
+		mImgLoader.requestLayout();
 	}
 }
