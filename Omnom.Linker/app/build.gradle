@@ -13,16 +13,35 @@ android {
         versionName "1.0"
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
+    signingConfigs {
+        release {
+            Properties releaseProps = new Properties()
+            releaseProps.load(new FileInputStream('./release.properties'))
+
+            storeFile file('./release-key.jks')
+            storePassword releaseProps['keystore.password']
+            keyAlias releaseProps['keyAlias']
+            keyPassword releaseProps['keyPassword']
+        }
+    }
+
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
         debug {
             runProguard false
             proguardFiles 'proguard-rules.pro'
         }
     }
+
+
 }
 
 dependencies {

@@ -32,7 +32,7 @@
             android:layout_gravity="center"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/btn_back"/>
+            android:src="@drawable/btn_back_white"/>
     </FrameLayout>
 
     <com.google.zxing.client.android.ViewfinderView

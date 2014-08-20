@@ -15,6 +15,7 @@ import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.utils.AndroidUtils;
+import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.ErrorEditText;
@@ -70,6 +71,12 @@ public class LoginActivity extends BaseActivity {
 	@InjectView(R.id.txt_password_error)
 	protected TextView mTextPasswordError;
 
+	@InjectView(R.id.panel_top)
+	protected View mPanelTop;
+
+	@InjectView(R.id.panel_bottom)
+	protected View mPanelBottom;
+
 	@Inject
 	protected LinkerApplication app;
 
@@ -98,6 +105,13 @@ public class LoginActivity extends BaseActivity {
 				return false;
 			}
 		});
+		mPanelTop.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				AnimationUtils.animateAlpha(mPanelTop, true);
+				AnimationUtils.animateAlpha(mPanelBottom, true);
+			}
+		}, getResources().getInteger(R.integer.login_animation_duration));
 	}
 
 	private void onAuthError(int errorCode) {

@@ -1,17 +1,19 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:animateLayoutChanges="true"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/panel_top"
         android:layout_gravity="top"
         android:layout_marginLeft="@dimen/activity_horizontal_margin_large"
         android:layout_marginRight="@dimen/activity_horizontal_margin_large"
         android:layout_marginTop="@dimen/activity_login_padding_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <com.omnom.android.linker.widget.ErrorEditText
             android:id="@+id/edit_email"
@@ -47,10 +49,12 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/panel_bottom"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        android:visibility="gone">
 
         <include layout="@layout/delimiter_vertical"/>
 
