@@ -65,7 +65,6 @@ import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import rx.observers.Observers;
 
 import static butterknife.ButterKnife.findById;
 
@@ -368,7 +367,6 @@ public class BindActivity extends BaseActivity {
 
 	@DebugLog
 	private void scanQrCode() {
-		mBindClicked = false;
 		startActivityForResult(new Intent(this, CaptureActivity.class), REQUEST_CODE_SCAN_QR);
 	}
 
@@ -379,7 +377,7 @@ public class BindActivity extends BaseActivity {
 
 	@Override
 	@DebugLog
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
 		if(resultCode == RESULT_OK) {
 			if(requestCode == REQUEST_CODE_ENABLE_BLUETOOTH) {
 				clearErrors();
@@ -389,14 +387,22 @@ public class BindActivity extends BaseActivity {
 				api.checkQrCode(mRestaurant.getId(), mQrData).subscribe(new Action1<Integer>() {
 					@Override
 					public void call(Integer result) {
-						mLoaderController.setMode(LoaderView.Mode.ENTER_DATA);
-						AnimationUtils.animateAlpha(mBtnBindTable, true);
+						if(result > 0) {
+							onQrCheckError(result);
+						} else {
+							swithToEnterDataMode();
+						}
 					}
 				});
 			}
 		} else {
 			ViewUtils.setVisible(mPanelBottom, true);
 		}
+	}
+
+	private void swithToEnterDataMode() {
+		mLoaderController.setMode(LoaderView.Mode.ENTER_DATA);
+		AnimationUtils.animateAlpha(mBtnBindTable, true);
 	}
 
 	private void bindTable() {
@@ -406,7 +412,7 @@ public class BindActivity extends BaseActivity {
 		cdt = AndroidUtils.createTimer(mLoader, new Runnable() {
 			@Override
 			public void run() {
-				scanQrCode();
+				// scanQrCode();
 			}
 		}, 5000);
 		mErrorHelper.setTimer(cdt);
@@ -463,7 +469,18 @@ public class BindActivity extends BaseActivity {
 								                       });
 							} else if(size == 1) {
 								mBeacon = (Beacon) mBeacons.toArray()[0];
-								api.checkBeacon(mRestaurant.getId(), mBeacon).subscribe(Observers.empty());
+								api.checkBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
+									@Override
+									public void call(Integer integer) {
+										mBindClicked = false;
+										mLoader.jumpProgress(1);
+										if(integer > 0) {
+											onBeaconCheckError(integer);
+										} else {
+											scanQrCode();
+										}
+									}
+								});
 							}
 						}
 					});
@@ -482,18 +499,34 @@ public class BindActivity extends BaseActivity {
 		});
 	}
 
-	private void onQrBindError() {
-		AndroidUtils.showDialog(getActivity(), R.string.beacon_already_bound, R.string.proceed, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				scanQrCode();
-			}
-		}, R.string.cancel, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				finish();
-			}
-		});
+	private void onQrCheckError(final int number) {
+		AndroidUtils.showDialog(getActivity(), getString(R.string.qr_already_bound, number), R.string.proceed,
+		                        new DialogInterface.OnClickListener() {
+			                        @Override
+			                        public void onClick(DialogInterface dialog, int which) {
+				                        swithToEnterDataMode();
+			                        }
+		                        }, R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				});
+	}
+
+	private void onBeaconCheckError(final int number) {
+		AndroidUtils.showDialog(getActivity(), getString(R.string.beacon_already_bound, number), R.string.proceed,
+		                        new DialogInterface.OnClickListener() {
+			                        @Override
+			                        public void onClick(DialogInterface dialog, int which) {
+				                        scanQrCode();
+			                        }
+		                        }, R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				});
 	}
 
 	@Override

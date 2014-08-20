@@ -26,7 +26,8 @@
     <string name="remind_password_sent">Письмо для восстановления будет выслано вам на почту</string>
     <string name="error_weak_beacon_signal">Слабый сигнал. Положите телефон в центр стола пожалуйста</string>
     <string name="error_more_than_one_beacon">Обноружено несколько маячков. Положите телефон в центр стола пожалуйста</string>
-    <string name="beacon_already_bound">Маячок уже связан со столом 11. Продолжить всё равно?</string>
+    <string name="beacon_already_bound">Маячок уже связан со столом %1$s. Продолжить всё равно?</string>
+    <string name="qr_already_bound">QR код уже связан со столом %1$s. Продолжить всё равно?</string>
     <string name="proceed">Продолжить</string>
     <string name="cancel">Отменить</string>
     <string name="hint_table_number">Номер стола</string>

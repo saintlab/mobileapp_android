@@ -128,16 +128,6 @@ public class LoaderView extends FrameLayout {
 		});
 	}
 
-	public void updateProgress(final int progress) {
-		showProgress(progress > 0 && progress < mProgressBar.getMax());
-		mProgressBar.post(new Runnable() {
-			@Override
-			public void run() {
-				mProgressBar.setProgress(progress);
-			}
-		});
-	}
-
 	public void showProgress(final boolean visible) {
 		AnimationUtils.animateAlpha(mProgressBar, visible);
 	}
@@ -220,10 +210,21 @@ public class LoaderView extends FrameLayout {
 
 	public void addProgress(int i) {
 		if(mSpeedUpLimit >= mProgressBar.getProgress()) {
-			updateProgress(mProgressBar.getProgress() + (int) (i * 2));
+			updateProgress(mProgressBar.getProgress() + (int) (i * 1.1));
 		} else {
 			updateProgress(mProgressBar.getProgress() + i);
 		}
+	}
+
+	public void updateProgress(final int progress) {
+		final int value = mSpeedUpLimit >= progress ? (int)(progress * 1.5f) : progress;
+		showProgress(value > 0 && value < mProgressBar.getMax());
+		mProgressBar.post(new Runnable() {
+			@Override
+			public void run() {
+				mProgressBar.setProgress(value);
+			}
+		});
 	}
 
 	@DebugLog
