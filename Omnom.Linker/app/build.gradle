@@ -19,13 +19,13 @@ android {
 
     signingConfigs {
         release {
-            /*Properties releaseProps = new Properties()
-            releaseProps.load(new FileInputStream('../release.properties'))
+            Properties releaseProps = new Properties()
+            releaseProps.load(new FileInputStream('./release.properties'))
 
             storeFile file('../release-key.jks')
             storePassword releaseProps['keystore.password']
             keyAlias releaseProps['keyAlias']
-            keyPassword releaseProps['keyPassword']*/
+            keyPassword releaseProps['keyPassword']
         }
     }
 
