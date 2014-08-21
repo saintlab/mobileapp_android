@@ -34,6 +34,8 @@ public class AndroidUtils {
 		public void onVisibilityChanged(boolean isVisible);
 	}
 
+	public static final int MAX_ANIMATION_INCEREMENT = 20;
+
 	@DebugLog
 	public static void showKeyboard(EditText view) {
 		InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -74,13 +76,16 @@ public class AndroidUtils {
 		final Context context = loader.getContext();
 		final int progressMax = context.getResources().getInteger(R.integer.loader_progress_max);
 		final float f = duration / progressMax;
+		final float progressPerDuration = (float)progressMax / (float)duration;
 		loader.updateProgress(0);
 
 		return new CountDownTimer(duration, context.getResources().getInteger(R.integer.loader_tick_interval)) {
 			@Override
 			public void onTick(long millisUntilFinished) {
 				final long currValue = duration - millisUntilFinished;
-				loader.updateProgress((int) (currValue / f));
+				final int increment = Math.max(0, Math.min(MAX_ANIMATION_INCEREMENT, (int) (currValue * progressPerDuration)));
+				final int realTimeProgress = (int) (currValue / f);
+				loader.addProgress(increment, realTimeProgress);
 			}
 
 			@Override
@@ -147,7 +152,7 @@ public class AndroidUtils {
 	public static AlertDialog showDialog(Context context, String msg, int okResId, DialogInterface.OnClickListener okListener,
 	                                     int cancelResId, DialogInterface.OnClickListener cancelListener) {
 		final AlertDialog alertDialog = new AlertDialog.Builder(context).setMessage(msg).setPositiveButton(okResId, okListener)
-				.setNegativeButton(cancelResId, cancelListener).create();
+		                                                                .setNegativeButton(cancelResId, cancelListener).create();
 		alertDialog.setCancelable(false);
 		alertDialog.setCanceledOnTouchOutside(false);
 		alertDialog.show();

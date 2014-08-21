@@ -32,6 +32,8 @@ public class LoaderController implements LoaderTask.ProgressListener {
 					public void run() {
 						view.mEditTableNumber.setText(StringUtils.EMPTY_STRING);
 						AnimationUtils.animateAlpha(view.mEditTableNumber, true);
+						view.mEditTableNumber.setFocusable(true);
+						view.mEditTableNumber.setFocusableInTouchMode(true);
 						AnimationUtils.animateAlpha(view.mImgLogo, false);
 						AndroidUtils.showKeyboard(view.mEditTableNumber);
 					}
@@ -43,6 +45,8 @@ public class LoaderController implements LoaderTask.ProgressListener {
 					@Override
 					public void run() {
 						AnimationUtils.animateAlpha(view.mEditTableNumber, false);
+						view.mEditTableNumber.setFocusable(false);
+						view.mEditTableNumber.setFocusableInTouchMode(false);
 						AnimationUtils.animateAlpha(view.mImgLogo, true);
 						AndroidUtils.hideKeyboard(view.mEditTableNumber);
 					}

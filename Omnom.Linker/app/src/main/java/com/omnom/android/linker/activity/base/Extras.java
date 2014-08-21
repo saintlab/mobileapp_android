@@ -12,10 +12,14 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_ERROR_CODE = "com.omnom.android.linker.error.code";
 	public static final String EXTRA_SELECTED_RESTAURANT = "com.omnom.android.linker.selected_restaurant";
 	public static final String EXTRA_SHOW_BACK = "com.omnom.android.linker.bind.show_back";
+	public static final String EXTRA_LOADER_ANIMATION = "com.omnom.android.linker.loader.animation";
 
 	public static final String EXTRA_CHARACTERISTIC_UUID = "ble.characteristic.uuid";
 	public static final String EXTRA_CHARACTERISTIC_VALUE = "ble.characteristic.value";
 
 	public static final int EXTRA_ERROR_WRONG_PASSWORD = 0;
 	public static final int EXTRA_ERROR_WRONG_USERNAME = 1;
+
+	public static final int EXTRA_LOADER_ANIMATION_SCALE_UP = 0;
+	public static final int EXTRA_LOADER_ANIMATION_SCALE_DOWN = 1;
 }

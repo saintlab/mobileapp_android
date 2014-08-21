@@ -8,8 +8,6 @@ import android.os.Bundle;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 
-import butterknife.ButterKnife;
-
 /**
  * Created by Ch3D on 31.07.2014.
  */
@@ -53,6 +51,17 @@ public class ActivityHelper {
 
 	public void startActivity(Class<?> cls, int animIn, int aninOut) {
 		Intent intent = new Intent(mActivity.getActivity(), cls);
+		if(Build.VERSION.SDK_INT >= 16) {
+			ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(mActivity.getActivity(), animIn, aninOut);
+			mActivity.getActivity().startActivity(intent, activityOptions.toBundle());
+			mActivity.getActivity().finish();
+		} else {
+			mActivity.getActivity().finish();
+			mActivity.getActivity().startActivity(intent);
+		}
+	}
+
+	public void startActivity(Intent intent, int animIn, int aninOut) {
 		if(Build.VERSION.SDK_INT >= 16) {
 			ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(mActivity.getActivity(), animIn, aninOut);
 			mActivity.getActivity().startActivity(intent, activityOptions.toBundle());

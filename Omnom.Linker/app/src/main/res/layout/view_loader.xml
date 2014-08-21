@@ -39,6 +39,8 @@
         android:gravity="center"
         android:singleLine="true"
         android:inputType="number"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:maxLength="@integer/loader_data_max_length"
         android:hint="@string/hint_table_number"
         android:textColorHint="#99ffffff"
