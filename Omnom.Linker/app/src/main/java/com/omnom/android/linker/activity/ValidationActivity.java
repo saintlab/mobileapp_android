@@ -83,6 +83,7 @@ public class ValidationActivity extends BaseActivity {
 	private Subscription mAuthDataSubscription;
 	private ErrorHelper mErrorHelper;
 	private int mAnimationType;
+	private boolean mFirstRun = true;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -178,11 +179,13 @@ public class ValidationActivity extends BaseActivity {
 	protected void onStart() {
 		super.onStart();
 		loader.setColor(getResources().getColor(R.color.loader_bg));
-		if(mAnimationType == EXTRA_LOADER_ANIMATION_SCALE_DOWN) {
-			final int dpSize = ViewUtils.dipToPixels(this, 900);
-			loader.setSize(dpSize, dpSize);
-		} else {
-			loader.setSize(0, 0);
+		if(mFirstRun) {
+			if(mAnimationType == EXTRA_LOADER_ANIMATION_SCALE_DOWN) {
+				final int dpSize = ViewUtils.dipToPixels(this, 900);
+				loader.setSize(dpSize, dpSize);
+			} else {
+				loader.setSize(0, 0);
+			}
 		}
 	}
 
@@ -190,12 +193,17 @@ public class ValidationActivity extends BaseActivity {
 		loader.animateLogo(R.drawable.ic_fork_n_knife);
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 		loader.showProgress(false);
-		loader.scaleDown(null, new Runnable() {
-			@Override
-			public void run() {
-				startLoader();
-			}
-		});
+		if(mFirstRun) {
+			loader.scaleDown(null, new Runnable() {
+				@Override
+				public void run() {
+					startLoader();
+				}
+			});
+		} else {
+			startLoader();
+		}
+		mFirstRun = false;
 	}
 
 	private void startLoader() {
