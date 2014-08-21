@@ -235,7 +235,7 @@ public class ValidationActivity extends BaseActivity {
 				}).isEmpty()).subscribe(new Action1<Boolean>() {
 			@Override
 			public void call(Boolean hasNoErrors) {
-				loader.jumpProgress(0.4f);
+				loader.jumpProgress(0.25f);
 				if(hasNoErrors) {
 					authenticateAndGetData();
 				}

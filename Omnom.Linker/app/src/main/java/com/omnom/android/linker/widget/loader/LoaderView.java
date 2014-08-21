@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Interpolator;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -33,6 +34,8 @@ public class LoaderView extends FrameLayout {
 		NONE, ENTER_DATA
 	}
 
+	public static final float PROGRESS_INCREMENT_FACTOR = 1.5f;
+
 	@InjectView(R.id.img_loader)
 	protected ImageView mImgLoader;
 
@@ -50,6 +53,8 @@ public class LoaderView extends FrameLayout {
 
 	private List<View> translationViews = new LinkedList<View>();
 	private int mSpeedUpLimit;
+	private Interpolator interpolation;
+	private int mInterEdge;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public LoaderView(Context context) {
@@ -80,6 +85,7 @@ public class LoaderView extends FrameLayout {
 		translationViews.add(mImgLoader);
 		translationViews.add(mImgLogo);
 		translationViews.add(mEditTableNumber);
+		interpolation = new AccelerateDecelerateInterpolator();
 	}
 
 	@DebugLog
@@ -214,21 +220,59 @@ public class LoaderView extends FrameLayout {
 		mSpeedUpLimit = i;
 	}
 
-	public void addProgress(final int i) {
+	@DebugLog
+	public void addProgress(final int increment, final int real) {
 		int progress = mProgressBar.getProgress();
-		if(mSpeedUpLimit > progress) {
-			updateProgress(progress + (int) (i * 1.8));
+		if(mSpeedUpLimit >= progress) {
+			updateProgress(progress + (int)(increment * PROGRESS_INCREMENT_FACTOR), real);
 		} else {
-			updateProgress(progress + i);
+			updateProgress(progress + increment, real);
 		}
+	}
+
+	public void updateProgress(final int progress, final int realProgress) {
+		mProgressBar.post(new Runnable() {
+			@Override
+			public void run() {
+				final int max = mProgressBar.getMax();
+				showProgress(progress > 0 && progress < max);
+				// TODO: Improve
+				int edge = max - (max / 4);
+				final float endPeriod = max - edge;
+				if(realProgress > edge && realProgress < max) {
+					float i = realProgress - mInterEdge;
+					float fraction = i / (max - mInterEdge);
+					float interpolation1 = interpolation.getInterpolation(fraction);
+					int value = (int) (interpolation1 * (realProgress - edge));
+					mProgressBar.setProgress(mProgressBar.getProgress() + value);
+				} else if (progress > edge && progress < max) {
+					int progress1 = mProgressBar.getProgress() + 1;
+					mProgressBar.setProgress(progress1);
+					mInterEdge = progress1;
+				} else if (progress < edge) {
+					mProgressBar.setProgress(progress);
+				}
+			}
+		});
 	}
 
 	public void updateProgress(final int progress) {
 		mProgressBar.post(new Runnable() {
 			@Override
 			public void run() {
-				showProgress(progress > 0 && progress < mProgressBar.getMax());
-				mProgressBar.setProgress(progress);
+				final int max = mProgressBar.getMax();
+				showProgress(progress > 0 && progress < max);
+				final int edge = max - (max / 10);
+				final float endPeriod = max - edge;
+				if(progress > edge && progress < max) {
+					float i = progress - edge;
+					float fraction = i / endPeriod;
+					float interpolation1 = interpolation.getInterpolation(fraction);
+					int value = (int) (interpolation1 * (progress - edge));
+					mProgressBar.setProgress(edge + value);
+				} else {
+					mProgressBar.setProgress(progress);
+				}
 			}
 		});
 	}
