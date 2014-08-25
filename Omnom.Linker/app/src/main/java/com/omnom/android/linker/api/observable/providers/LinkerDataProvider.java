@@ -1,10 +1,12 @@
-package com.omnom.android.linker.api.observable;
+package com.omnom.android.linker.api.observable.providers;
 
 import android.text.TextUtils;
 
 import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.api.ApiProtocol;
 import com.omnom.android.linker.api.ServerResponse;
+import com.omnom.android.linker.api.LinkerDataService;
+import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
 

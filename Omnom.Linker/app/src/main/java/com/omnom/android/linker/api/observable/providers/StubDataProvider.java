@@ -1,7 +1,8 @@
-package com.omnom.android.linker.api.observable;
+package com.omnom.android.linker.api.observable.providers;
 
 import com.omnom.android.linker.activity.BeaconAlreadyBoundException;
 import com.omnom.android.linker.api.ServerResponse;
+import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsFactory;
 import com.omnom.android.linker.model.RestaurantsResult;
