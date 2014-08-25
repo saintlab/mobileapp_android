@@ -21,11 +21,11 @@ public interface LinkerObeservableApi {
 
 	public Observable<Integer> checkBeacon(String restaurantId, Beacon beacon);
 
-	public Observable<Integer> bindBeacon(String restaurantId, Beacon beacon);
+	public Observable<Integer> bindBeacon(String restaurantId, int tableNumber, Beacon beacon);
 
 	public Observable<Integer> checkQrCode(String restaurantId, String qrData);
 
-	public Observable<Integer> bindQrCode(String restaurantId, String qrData);
+	public Observable<Integer> bindQrCode(String restaurantId, int tableNumber, String qrData);
 
 	public Observable<Restaurant> getRestaurant(String restaurantId);
 

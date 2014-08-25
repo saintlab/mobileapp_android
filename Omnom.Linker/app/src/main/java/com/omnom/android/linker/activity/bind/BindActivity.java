@@ -233,7 +233,8 @@ public class BindActivity extends BaseActivity {
 	public void onBind() {
 		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
-		Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mBeacon), api.bindQrCode(mRestaurant.getId(), mQrData), new Func2
+		Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon),
+		                         api.bindQrCode(mRestaurant.getId(), mLoader.getTableNumber(), mQrData), new Func2
 				<Integer, Integer, Void>() {
 			@Override
 			public Void call(Integer integer, Integer integer2) {

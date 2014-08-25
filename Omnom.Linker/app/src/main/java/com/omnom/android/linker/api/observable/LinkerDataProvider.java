@@ -50,8 +50,9 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	}
 
 	@Override
-	public Observable<Integer> bindBeacon(String restaurantId, Beacon beacon) {
-		return mDataService.bindBeacon(restaurantId, beacon.getIdValue(0), beacon.getIdValue(1), beacon.getIdValue(2)).subscribeOn(
+	public Observable<Integer> bindBeacon(String restaurantId, int tableNumber, Beacon beacon) {
+		return mDataService.bindBeacon(restaurantId, tableNumber, beacon.getIdValue(0), beacon.getIdValue(1),
+		                               beacon.getIdValue(2)).subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
@@ -61,8 +62,8 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	}
 
 	@Override
-	public Observable<Integer> bindQrCode(String restaurantId, String qrData) {
-		return mDataService.bindQrCode(restaurantId, qrData).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<Integer> bindQrCode(String restaurantId, int tableNumber, String qrData) {
+		return mDataService.bindQrCode(restaurantId, tableNumber, qrData).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

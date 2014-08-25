@@ -73,7 +73,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 	@Override
 	@DebugLog
-	public Observable<Integer> bindBeacon(String restaurantId, Beacon beacon) {
+	public Observable<Integer> bindBeacon(String restaurantId, int tableNumber, Beacon beacon) {
 		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
 			@Override
 			public void call(Subscriber<? super Integer> subscriber) {
@@ -97,7 +97,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 	@Override
 	@DebugLog
-	public Observable<Integer> bindQrCode(String restaurantId, String qrData) {
+	public Observable<Integer> bindQrCode(String restaurantId, int tableNumber, String qrData) {
 		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
 			@Override
 			public void call(Subscriber<? super Integer> subscriber) {
