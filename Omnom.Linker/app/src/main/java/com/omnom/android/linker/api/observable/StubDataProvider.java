@@ -1,6 +1,7 @@
 package com.omnom.android.linker.api.observable;
 
 import com.omnom.android.linker.activity.BeaconAlreadyBoundException;
+import com.omnom.android.linker.api.ServerResponse;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsFactory;
 import com.omnom.android.linker.model.RestaurantsResult;
@@ -158,5 +159,16 @@ public class StubDataProvider implements LinkerObeservableApi {
 	@DebugLog
 	public void setAuthToken(String token) {
 		// Do nothing
+	}
+
+	@Override
+	public Observable<ServerResponse> build(String restaurantId, int tableNumber, String uuid) {
+		return new Observable<ServerResponse>(new Observable.OnSubscribe<ServerResponse>() {
+			@Override
+			public void call(Subscriber<? super ServerResponse> subscriber) {
+				subscriber.onNext(new ServerResponse());
+				subscriber.onCompleted();
+			}
+		}) {}.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 }

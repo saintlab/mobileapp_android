@@ -1,6 +1,7 @@
 package com.omnom.android.linker.api.observable;
 
 import com.omnom.android.linker.api.ApiProtocol;
+import com.omnom.android.linker.api.ServerResponse;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
 
@@ -25,7 +26,8 @@ public interface LinkerDataService {
 
 	@FormUrlEncoded
 	@POST("/authenticate")
-	Observable<String> authenticate(@Field(ApiProtocol.FIELD_USERNAME) String username, @Field(ApiProtocol.FIELD_PASSWORD) String password);
+	Observable<String> authenticate(@Field(ApiProtocol.FIELD_USERNAME) String username, @Field(ApiProtocol.FIELD_PASSWORD) String
+			password);
 
 	@FormUrlEncoded
 	@POST("/remind_password")
@@ -37,11 +39,13 @@ public interface LinkerDataService {
 			@Query(ApiProtocol.FIELD_BEACON_UUID) String beaconUuid,
 			@Query(ApiProtocol.FIELD_MAJOR_ID) String majorId, @Query(ApiProtocol.FIELD_MINOR_ID) String minorId);
 
-	@POST("/bindBeacon")
+	@POST("/ibeacons/bind")
 	Observable<Integer> bindBeacon(
 			@Field(ApiProtocol.FIELD_RESTAURANT_ID) String restaurantId,
+			@Field(ApiProtocol.FIELD_TABLE_NUMBER) int tableNumber,
 			@Field(ApiProtocol.FIELD_BEACON_UUID) String beaconUuid,
-			@Field(ApiProtocol.FIELD_MAJOR_ID) String majorId, @Field(ApiProtocol.FIELD_MINOR_ID) String minorId);
+			@Field(ApiProtocol.FIELD_MAJOR_ID) String majorId,
+			@Field(ApiProtocol.FIELD_MINOR_ID) String minorId);
 
 	@POST("/commitBeacon")
 	Observable<Integer> commitBeacon(
@@ -56,4 +60,9 @@ public interface LinkerDataService {
 	@POST("/bindQrCode")
 	Observable<Integer> bindQrCode(
 			@Field(ApiProtocol.FIELD_RESTAURANT_ID) String restaurantId, @Field(ApiProtocol.FIELD_QR_DATA) String qrData);
+
+	@POST("/ibeacons/build")
+	Observable<ServerResponse> build(@Field(ApiProtocol.FIELD_RESTAURANT_ID) String restaurantId,
+	                                 @Field(ApiProtocol.FIELD_TABLE_NUMBER) int tableNumber,
+	                                 @Field(ApiProtocol.FIELD_BEACON_UUID) String uuid);
 }

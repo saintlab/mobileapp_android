@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.api.ApiProtocol;
+import com.omnom.android.linker.api.ServerResponse;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
 
@@ -83,6 +84,11 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	@Override
 	public void setAuthToken(final String token) {
 		mAuthToken = token;
+	}
+
+	@Override
+	public Observable<ServerResponse> build(String restaurantId, int tableNumber, String uuid) {
+		return mDataService.build(restaurantId, tableNumber, uuid);
 	}
 
 	@Override

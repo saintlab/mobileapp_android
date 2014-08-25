@@ -1,5 +1,6 @@
 package com.omnom.android.linker.api.observable;
 
+import com.omnom.android.linker.api.ServerResponse;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
 
@@ -11,6 +12,8 @@ import rx.Observable;
  */
 public interface LinkerObeservableApi {
 	public void setAuthToken(String token);
+
+	public Observable<ServerResponse> build(String restaurantId, int tableNumber, String uuid);
 
 	public Observable<String> authenticate(String username, String password);
 
