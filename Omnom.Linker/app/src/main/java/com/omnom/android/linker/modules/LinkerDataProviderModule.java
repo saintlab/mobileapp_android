@@ -14,9 +14,11 @@ import dagger.Provides;
  */
 @Module(injects = {LoginActivity.class}, complete = false, library = true)
 public class LinkerDataProviderModule {
+	public static final String ENDPOINT = "http://restaurateur.laaaab.com";
+
 	@Provides
 	@Singleton
 	LinkerObeservableApi providerLinkerApi() {
-		return new LinkerDataProvider();
+		return new LinkerDataProvider(ENDPOINT);
 	}
 }

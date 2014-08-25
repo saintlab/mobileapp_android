@@ -1,6 +1,6 @@
 package com.omnom.android.linker.api.observable;
 
-import com.omnom.android.linker.api.ServerResponse;
+import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
 
@@ -13,7 +13,9 @@ import rx.Observable;
 public interface LinkerObeservableApi {
 	public void setAuthToken(String token);
 
-	public Observable<ServerResponse> build(String restaurantId, int tableNumber, String uuid);
+	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
+
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon);
 
 	public Observable<String> authenticate(String username, String password);
 
@@ -21,7 +23,6 @@ public interface LinkerObeservableApi {
 
 	public Observable<Integer> checkBeacon(String restaurantId, Beacon beacon);
 
-	public Observable<Integer> bindBeacon(String restaurantId, int tableNumber, Beacon beacon);
 
 	public Observable<Integer> checkQrCode(String restaurantId, String qrData);
 

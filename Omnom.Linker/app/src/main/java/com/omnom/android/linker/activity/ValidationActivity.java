@@ -18,6 +18,7 @@ import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
+import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.ViewUtils;
@@ -30,7 +31,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
+import altbeacon.beacon.Beacon;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import rx.Observable;
@@ -190,20 +191,33 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void validate() {
-		loader.animateLogo(R.drawable.ic_fork_n_knife);
-		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-		loader.showProgress(false);
-		if(mFirstRun) {
-			loader.scaleDown(null, new Runnable() {
-				@Override
-				public void run() {
-					startLoader();
-				}
-			});
-		} else {
-			startLoader();
-		}
-		mFirstRun = false;
+		//		loader.animateLogo(R.drawable.ic_fork_n_knife);
+		//		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
+		//		loader.showProgress(false);
+		//		if(mFirstRun) {
+		//			loader.scaleDown(null, new Runnable() {
+		//				@Override
+		//				public void run() {
+		//					startLoader();
+		//				}
+		//			});
+		//		} else {
+		//			startLoader();
+		//		}
+		//		mFirstRun = false;
+		api.buildBeacon("A", 27, "E2C56DB5-DFFB-48D2-B060-D0F5A7109E0").subscribe(new Action1<BeaconDataResponse>() {
+			@Override
+			public void call(BeaconDataResponse data) {
+				System.err.println("buildBeacon = " + data);
+			}
+		});
+		api.bindBeacon("A", 27, new Beacon.Builder().setId1("E2C56DB5-DFFB-48D2-B060-D0F5A7109E0").setId2("1").setId3("27").build())
+		   .subscribe(new Action1<BeaconDataResponse>() {
+			   @Override
+			   public void call(BeaconDataResponse data) {
+				   System.err.println("bind = " + data);
+			   }
+		   });
 	}
 
 	private void startLoader() {

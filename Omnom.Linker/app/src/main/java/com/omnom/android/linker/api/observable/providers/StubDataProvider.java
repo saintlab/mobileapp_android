@@ -1,8 +1,8 @@
 package com.omnom.android.linker.api.observable.providers;
 
 import com.omnom.android.linker.activity.BeaconAlreadyBoundException;
-import com.omnom.android.linker.api.ServerResponse;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsFactory;
 import com.omnom.android.linker.model.RestaurantsResult;
@@ -74,11 +74,11 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 	@Override
 	@DebugLog
-	public Observable<Integer> bindBeacon(String restaurantId, int tableNumber, Beacon beacon) {
-		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon) {
+		return new Observable<BeaconDataResponse>(new Observable.OnSubscribe<BeaconDataResponse>() {
 			@Override
-			public void call(Subscriber<? super Integer> subscriber) {
-				subscriber.onNext(0);
+			public void call(Subscriber<? super BeaconDataResponse> subscriber) {
+				subscriber.onNext(new BeaconDataResponse());
 				subscriber.onCompleted();
 			}
 		}) {};
@@ -163,11 +163,11 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
-	public Observable<ServerResponse> build(String restaurantId, int tableNumber, String uuid) {
-		return new Observable<ServerResponse>(new Observable.OnSubscribe<ServerResponse>() {
+	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid) {
+		return new Observable<BeaconDataResponse>(new Observable.OnSubscribe<BeaconDataResponse>() {
 			@Override
-			public void call(Subscriber<? super ServerResponse> subscriber) {
-				subscriber.onNext(new ServerResponse());
+			public void call(Subscriber<? super BeaconDataResponse> subscriber) {
+				subscriber.onNext(new BeaconDataResponse());
 				subscriber.onCompleted();
 			}
 		}) {}.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());

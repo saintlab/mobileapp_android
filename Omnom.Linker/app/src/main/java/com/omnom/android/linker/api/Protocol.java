@@ -3,7 +3,7 @@ package com.omnom.android.linker.api;
 /**
  * Created by Ch3D on 11.08.2014.
  */
-public interface ApiProtocol {
+public interface Protocol {
 	public static final String FIELD_ID = "id";
 	public static final String FIELD_USERNAME = "username";
 	public static final String FIELD_PASSWORD = "password";

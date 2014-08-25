@@ -30,6 +30,7 @@ import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.Restaurant;
+import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
 import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.service.DataHolder;
 import com.omnom.android.linker.service.RBLBluetoothAttributes;
@@ -235,14 +236,14 @@ public class BindActivity extends BaseActivity {
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
 		Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon),
 		                         api.bindQrCode(mRestaurant.getId(), mLoader.getTableNumber(), mQrData), new Func2
-				<Integer, Integer, Void>() {
-			@Override
-			public Void call(Integer integer, Integer integer2) {
-				mLoaderController.setMode(LoaderView.Mode.NONE);
-				connectToBeacon();
-				return null;
-			}
-		}).onErrorResumeNext(Observable.<Void>empty()).subscribe();
+						<BeaconDataResponse, Integer, Void>() {
+					@Override
+					public Void call(BeaconDataResponse integer, Integer integer2) {
+						mLoaderController.setMode(LoaderView.Mode.NONE);
+						connectToBeacon();
+						return null;
+					}
+				}).onErrorResumeNext(Observable.<Void>empty()).subscribe();
 	}
 
 	@Override

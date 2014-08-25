@@ -2,17 +2,23 @@ package com.omnom.android.linker.api.observable.providers;
 
 import android.text.TextUtils;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.omnom.android.linker.BuildConfig;
-import com.omnom.android.linker.api.ApiProtocol;
-import com.omnom.android.linker.api.ServerResponse;
+import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.LinkerDataService;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.RestaurantsResult;
+import com.omnom.android.linker.model.ibeacon.BeaconBindRequest;
+import com.omnom.android.linker.model.ibeacon.BeaconBuildRequest;
+import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
 
 import altbeacon.beacon.Beacon;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -21,18 +27,19 @@ import rx.schedulers.Schedulers;
  * Created by Ch3D on 11.08.2014.
  */
 public class LinkerDataProvider implements LinkerObeservableApi, RequestInterceptor {
-
-	public static final String ENDPOINT          = "http://admin-interface.laaaab.com";
-	public static final String HEADER_AUTH_TOKEN = "auth_token";
-
 	private final LinkerDataService mDataService;
-	private final RestAdapter       mRestAdapter;
-	private       String            mAuthToken;
+	private final RestAdapter mRestAdapter;
+	private String mAuthToken;
 
-	public LinkerDataProvider() {
+	public LinkerDataProvider(final String endPoint) {
 		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
-		mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(this).setEndpoint(ENDPOINT).setLogLevel(logLevel).build();
+		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+		final GsonConverter converter = new GsonConverter(gson);
+		mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(this).setEndpoint(endPoint).setLogLevel(logLevel)
+		                                        .setConverter(converter).build();
 		mDataService = mRestAdapter.create(LinkerDataService.class);
+		// TODO: Remove
+		setAuthToken("stub_auth_token");
 	}
 
 	@Override
@@ -52,9 +59,11 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	}
 
 	@Override
-	public Observable<Integer> bindBeacon(String restaurantId, int tableNumber, Beacon beacon) {
-		return mDataService.bindBeacon(restaurantId, tableNumber, beacon.getIdValue(0), beacon.getIdValue(1),
-		                               beacon.getIdValue(2)).subscribeOn(
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon) {
+		final BeaconBindRequest request = new BeaconBindRequest(restaurantId, tableNumber, beacon.getIdValue(0),
+		                                                        Integer.valueOf(beacon.getIdValue(1)),
+		                                                        Integer.valueOf(beacon.getIdValue(2)));
+		return mDataService.bindBeacon(request).subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
@@ -65,7 +74,8 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 
 	@Override
 	public Observable<Integer> bindQrCode(String restaurantId, int tableNumber, String qrData) {
-		return mDataService.bindQrCode(restaurantId, tableNumber, qrData).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		return mDataService.bindQrCode(restaurantId, tableNumber, qrData).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
 	}
 
 	@Override
@@ -90,14 +100,14 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	}
 
 	@Override
-	public Observable<ServerResponse> build(String restaurantId, int tableNumber, String uuid) {
-		return mDataService.build(restaurantId, tableNumber, uuid);
+	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid) {
+		return mDataService.build(new BeaconBuildRequest(uuid, String.valueOf(tableNumber), restaurantId));
 	}
 
 	@Override
 	public void intercept(RequestFacade request) {
 		if(!TextUtils.isEmpty(mAuthToken)) {
-			request.addHeader(ApiProtocol.HEADER_AUTH_TOKEN, mAuthToken);
+			request.addHeader(Protocol.HEADER_AUTH_TOKEN, mAuthToken);
 		}
 	}
 }
