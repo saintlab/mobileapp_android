@@ -31,7 +31,7 @@ import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.service.BluetoothLeService;
-import com.omnom.android.linker.service.DataHolder;
+import com.omnom.android.linker.service.CharacteristicDataHolder;
 import com.omnom.android.linker.service.RBLBluetoothAttributes;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
@@ -639,10 +639,11 @@ public class BindActivity extends BaseActivity {
 		// int majorId = mRestaurant.getId();
 		int majorId = 1;
 		int minorId = mLoader.getTableNumber();
-		mBluetoothLeService.queueCharacteristic(DataHolder.createPassword(RBLBluetoothAttributes.RBL_DEFAULT_PASSKEY.getBytes()));
-		mBluetoothLeService.queueCharacteristic(DataHolder.createTx(RBLBluetoothAttributes.RBL_DEFAULT_TX));
-		mBluetoothLeService.queueCharacteristic(DataHolder.createMajorId(majorId));
-		mBluetoothLeService.queueCharacteristic(DataHolder.createMinorId(minorId));
+		mBluetoothLeService.queueCharacteristic(CharacteristicDataHolder.createPassword(
+				RBLBluetoothAttributes.RBL_DEFAULT_PASSKEY.getBytes()));
+		mBluetoothLeService.queueCharacteristic(CharacteristicDataHolder.createTx(RBLBluetoothAttributes.RBL_DEFAULT_TX));
+		mBluetoothLeService.queueCharacteristic(CharacteristicDataHolder.createMajorId(majorId));
+		mBluetoothLeService.queueCharacteristic(CharacteristicDataHolder.createMinorId(minorId));
 		mBluetoothLeService.startWritingQueue(new Runnable() {
 			@Override
 			public void run() {

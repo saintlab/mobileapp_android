@@ -12,41 +12,41 @@ import java.util.UUID;
 /**
  * Created by Ch3D on 16.08.2014.
  */
-public class DataHolder implements Parcelable {
+public class CharacteristicDataHolder implements Parcelable {
 
-	public static final Creator<DataHolder> CREATOR = new Creator<DataHolder>() {
+	public static final Creator<CharacteristicDataHolder> CREATOR = new Creator<CharacteristicDataHolder>() {
 
 		@Override
-		public DataHolder createFromParcel(Parcel in) {
-			return new DataHolder(in);
+		public CharacteristicDataHolder createFromParcel(Parcel in) {
+			return new CharacteristicDataHolder(in);
 		}
 
 		@Override
-		public DataHolder[] newArray(int size) {
-			return new DataHolder[size];
+		public CharacteristicDataHolder[] newArray(int size) {
+			return new CharacteristicDataHolder[size];
 		}
 	};
 
-	public static DataHolder createTx(byte[] data) {
+	public static CharacteristicDataHolder createTx(byte[] data) {
 		if(BuildConfig.DEBUG && data.length != 1) {
 			throw new InvalidParameterException("data should contain only one byte: data" + Arrays.toString(data));
 		}
-		return new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
+		return new CharacteristicDataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
 		                        RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SIGNAL_TX, data);
 	}
 
-	public static DataHolder createMajorId(int major) {
-		return new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
+	public static CharacteristicDataHolder createMajorId(int major) {
+		return new CharacteristicDataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
 		                      RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MAJOR_ID, major);
 	}
 
-	public static DataHolder createPassword(byte[] data) {
-		return new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE,
+	public static CharacteristicDataHolder createPassword(byte[] data) {
+		return new CharacteristicDataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE,
 		                      RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD, data);
 	}
 
-	public static DataHolder createMinorId(int minor) {
-		return new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
+	public static CharacteristicDataHolder createMinorId(int minor) {
+		return new CharacteristicDataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
 		                      RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID, minor);
 	}
 
@@ -54,13 +54,13 @@ public class DataHolder implements Parcelable {
 	public final UUID charId;
 	public byte[] data;
 
-	public DataHolder(Parcel parcel) {
+	public CharacteristicDataHolder(Parcel parcel) {
 		serviceId = UUID.fromString(parcel.readString());
 		charId = UUID.fromString(parcel.readString());
 		parcel.readByteArray(data);
 	}
 
-	public DataHolder(UUID serviceId, UUID charId, int data) {
+	public CharacteristicDataHolder(UUID serviceId, UUID charId, int data) {
 		this.serviceId = serviceId;
 		this.charId = charId;
 		this.data = new byte[2];
@@ -71,7 +71,7 @@ public class DataHolder implements Parcelable {
 		this.data[1] = (byte) (m2 & 0xff);
 	}
 
-	public DataHolder(UUID serviceId, UUID charId, byte[] data) {
+	public CharacteristicDataHolder(UUID serviceId, UUID charId, byte[] data) {
 		this.serviceId = serviceId;
 		this.charId = charId;
 		this.data = data;

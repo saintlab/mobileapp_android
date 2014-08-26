@@ -81,7 +81,7 @@ public class BluetoothLeService extends Service {
 		}
 	}
 
-	private final LinkedBlockingQueue<DataHolder> mWriteQueue = new LinkedBlockingQueue<DataHolder>();
+	private final LinkedBlockingQueue<CharacteristicDataHolder> mWriteQueue = new LinkedBlockingQueue<CharacteristicDataHolder>();
 	private final IBinder mBinder = new LocalBinder();
 	private BluetoothManager mBluetoothManager;
 	private BluetoothAdapter mBluetoothAdapter;
@@ -215,7 +215,7 @@ public class BluetoothLeService extends Service {
 	}
 
 	@DebugLog
-	public void queueCharacteristic(DataHolder data) {
+	public void queueCharacteristic(CharacteristicDataHolder data) {
 		if(mBluetoothAdapter == null || mBluetoothGatt == null) {
 			Log.w(TAG, "BluetoothAdapter not initialized");
 			return;
@@ -239,7 +239,7 @@ public class BluetoothLeService extends Service {
 			return false;
 		}
 
-		final DataHolder data = mWriteQueue.poll();
+		final CharacteristicDataHolder data = mWriteQueue.poll();
 		if(data != null) {
 			BluetoothGattService service = mBluetoothGatt.getService(data.serviceId);
 			BluetoothGattCharacteristic characteristic = service.getCharacteristic(data.charId);
