@@ -639,16 +639,10 @@ public class BindActivity extends BaseActivity {
 		// int majorId = mRestaurant.getId();
 		int majorId = 1;
 		int minorId = mLoader.getTableNumber();
-		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE,
-		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD,
-		                                                       RBLBluetoothAttributes.RBL_PASSKEY.getBytes()));
-
-		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
-		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MAJOR_ID, majorId));
-
-		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
-		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID, minorId));
-
+		mBluetoothLeService.queueCharacteristic(DataHolder.createPassword(RBLBluetoothAttributes.RBL_DEFAULT_PASSKEY.getBytes()));
+		mBluetoothLeService.queueCharacteristic(DataHolder.createTx(RBLBluetoothAttributes.RBL_DEFAULT_TX));
+		mBluetoothLeService.queueCharacteristic(DataHolder.createMajorId(majorId));
+		mBluetoothLeService.queueCharacteristic(DataHolder.createMinorId(minorId));
 		mBluetoothLeService.startWritingQueue(new Runnable() {
 			@Override
 			public void run() {

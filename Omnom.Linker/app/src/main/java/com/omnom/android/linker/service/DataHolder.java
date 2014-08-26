@@ -3,6 +3,10 @@ package com.omnom.android.linker.service;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.omnom.android.linker.BuildConfig;
+
+import java.security.InvalidParameterException;
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -23,8 +27,31 @@ public class DataHolder implements Parcelable {
 		}
 	};
 
-	public final UUID   serviceId;
-	public final UUID   charId;
+	public static DataHolder createTx(byte[] data) {
+		if(BuildConfig.DEBUG && data.length != 1) {
+			throw new InvalidParameterException("data should contain only one byte: data" + Arrays.toString(data));
+		}
+		return new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
+		                        RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SIGNAL_TX, data);
+	}
+
+	public static DataHolder createMajorId(int major) {
+		return new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
+		                      RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MAJOR_ID, major);
+	}
+
+	public static DataHolder createPassword(byte[] data) {
+		return new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE,
+		                      RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD, data);
+	}
+
+	public static DataHolder createMinorId(int minor) {
+		return new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
+		                      RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID, minor);
+	}
+
+	public final UUID serviceId;
+	public final UUID charId;
 	public byte[] data;
 
 	public DataHolder(Parcel parcel) {
