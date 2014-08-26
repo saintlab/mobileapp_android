@@ -1,10 +1,14 @@
 package com.omnom.android.linker.api;
 
-import com.omnom.android.linker.model.Restaurant;
-import com.omnom.android.linker.model.RestaurantsResult;
 import com.omnom.android.linker.model.ibeacon.BeaconBindRequest;
 import com.omnom.android.linker.model.ibeacon.BeaconBuildRequest;
 import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
+import com.omnom.android.linker.model.ibeacon.BeaconFindRequest;
+import com.omnom.android.linker.model.qrcode.QRCodeBindRequest;
+import com.omnom.android.linker.model.restaurant.Restaurant;
+import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
+import com.omnom.android.linker.model.table.RestaurantTablesResponse;
+import com.omnom.android.linker.model.table.TableDataResponse;
 
 import retrofit.http.Body;
 import retrofit.http.Field;
@@ -20,12 +24,6 @@ import rx.Observable;
  */
 public interface LinkerDataService {
 
-	@GET("/data/restaurants")
-	Observable<RestaurantsResult> getRestaurants();
-
-	@GET("/restaurant/{id}")
-	Observable<Restaurant> getRestaurant(@Path(Protocol.FIELD_ID) String restaurantId);
-
 	@FormUrlEncoded
 	@POST("/authenticate")
 	Observable<String> authenticate(@Field(Protocol.FIELD_USERNAME) String username,
@@ -35,32 +33,34 @@ public interface LinkerDataService {
 	@POST("/remind_password")
 	Observable<String> remindPassword(@Field(Protocol.FIELD_USERNAME) String username);
 
-	@GET("/checkBeacon")
-	Observable<Integer> checkBeacon(@Query(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
-	                                @Query(Protocol.FIELD_BEACON_UUID) String beaconUuid,
-	                                @Query(Protocol.FIELD_MAJOR_ID) String majorId,
-	                                @Query(Protocol.FIELD_MINOR_ID) String minorId);
+	// migration done
+	@GET("/restaurants")
+	Observable<RestaurantsResponse> getRestaurants();
 
-	@FormUrlEncoded
-	@POST("/commitBeacon")
-	Observable<Integer> commitBeacon(@Field(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
-	                                 @Field(Protocol.FIELD_BEACON_UUID) String beaconUuid,
-	                                 @Field(Protocol.FIELD_MAJOR_ID) String majorId,
-	                                 @Field(Protocol.FIELD_MINOR_ID) String minorId);
+	@GET("/restaurants/{id}")
+	Observable<Restaurant> getRestaurant(@Path(Protocol.FIELD_ID) String restaurantId);
 
-	@GET("/checkQrCode")
-	Observable<Integer> checkQrCode(@Query(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
-	                                @Query(Protocol.FIELD_QR_DATA) String qrData);
+	@GET("/restaurants/{id}/tables")
+	Observable<RestaurantTablesResponse> getRestaurantTables(@Path(Protocol.FIELD_ID) String restaurantId);
 
-	@FormUrlEncoded
-	@POST("/bindQrCode")
-	Observable<Integer> bindQrCode(@Field(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
-	                               @Field(Protocol.FIELD_TABLE_NUMBER) int tableNumber,
-	                               @Field(Protocol.FIELD_QR_DATA) String qrData);
+	@POST("/qr/bind")
+	Observable<TableDataResponse> bindQrCode(@Body QRCodeBindRequest request);
+
+	@GET("/qr/{qrData}")
+	Observable<TableDataResponse> checkQrCode(@Query(Protocol.FIELD_QR_DATA) String qrData);
 
 	@POST("/ibeacons/buildBeacon")
-	Observable<BeaconDataResponse> build(@Body BeaconBuildRequest request);
+	Observable<BeaconDataResponse> buildBeacon(@Body BeaconBuildRequest request);
 
 	@POST("/ibeacons/bind")
 	Observable<BeaconDataResponse> bindBeacon(@Body BeaconBindRequest request);
+
+	@POST("/ibeacons/find")
+	Observable<TableDataResponse> findBeacon(@Body BeaconFindRequest request);
+
+	@GET("/ibeacons/decode")
+	Observable<Integer> checkBeacon(@Query(Protocol.FIELD_BEACON_UUID) String beaconUuid,
+	                                @Query(Protocol.FIELD_MAJOR_ID) String majorId,
+	                                @Query(Protocol.FIELD_MINOR_ID) String minorId);
+
 }

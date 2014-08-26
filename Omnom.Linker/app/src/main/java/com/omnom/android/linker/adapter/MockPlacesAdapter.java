@@ -9,7 +9,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.model.Restaurant;
+import com.omnom.android.linker.model.restaurant.Restaurant;
 
 import java.util.List;
 import java.util.Random;

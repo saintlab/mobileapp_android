@@ -29,8 +29,9 @@ import com.omnom.android.linker.activity.ErrorHelper;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.Restaurant;
 import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
+import com.omnom.android.linker.model.restaurant.Restaurant;
+import com.omnom.android.linker.model.table.TableDataResponse;
 import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.service.DataHolder;
 import com.omnom.android.linker.service.RBLBluetoothAttributes;
@@ -236,9 +237,9 @@ public class BindActivity extends BaseActivity {
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
 		Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon),
 		                         api.bindQrCode(mRestaurant.getId(), mLoader.getTableNumber(), mQrData), new Func2
-						<BeaconDataResponse, Integer, Void>() {
+						<BeaconDataResponse, TableDataResponse, Void>() {
 					@Override
-					public Void call(BeaconDataResponse integer, Integer integer2) {
+					public Void call(BeaconDataResponse beaconData, TableDataResponse tableData) {
 						mLoaderController.setMode(LoaderView.Mode.NONE);
 						connectToBeacon();
 						return null;
@@ -386,11 +387,11 @@ public class BindActivity extends BaseActivity {
 			} else if(requestCode == REQUEST_CODE_SCAN_QR) {
 				mPanelBottom.setVisibility(View.GONE);
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
-				api.checkQrCode(mRestaurant.getId(), mQrData).subscribe(new Action1<Integer>() {
+				api.checkQrCode(mQrData).subscribe(new Action1<TableDataResponse>() {
 					@Override
-					public void call(Integer result) {
-						if(result > 0) {
-							onQrCheckError(result);
+					public void call(TableDataResponse result) {
+						if(result != null) {
+							onQrCheckError(result.getInternalId());
 						} else {
 							swithToEnterDataMode();
 						}
@@ -471,13 +472,13 @@ public class BindActivity extends BaseActivity {
 								                       });
 							} else if(size == 1) {
 								mBeacon = (Beacon) mBeacons.toArray()[0];
-								api.checkBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
+								api.findBeacon(mBeacon).subscribe(new Action1<TableDataResponse>() {
 									@Override
-									public void call(Integer integer) {
+									public void call(TableDataResponse tableData) {
 										mBindClicked = false;
 										mLoader.jumpProgress(1);
-										if(integer > 0) {
-											onBeaconCheckError(integer);
+										if(tableData != null) {
+											onBeaconCheckError(tableData.getInternalId());
 										} else {
 											scanQrCode();
 										}
@@ -654,9 +655,9 @@ public class BindActivity extends BaseActivity {
 		mBluetoothLeService.startWritingQueue(new Runnable() {
 			@Override
 			public void run() {
-				api.commitBeacon(mRestaurant.getId(), mBeacon).subscribe(new Action1<Integer>() {
+				api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon).subscribe(new Action1<BeaconDataResponse>() {
 					@Override
-					public void call(Integer integer) {
+					public void call(BeaconDataResponse beaconData) {
 						mLoader.jumpProgress(1);
 					}
 				});

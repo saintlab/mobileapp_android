@@ -10,12 +10,16 @@ import altbeacon.beacon.Beacon;
 public class BeaconBindRequest {
 	@Expose
 	public String restaurantId;
+
 	@Expose
 	public int table_num;
+
 	@Expose
 	public String uuid;
+
 	@Expose
 	public int major;
+
 	@Expose
 	public int minor;
 

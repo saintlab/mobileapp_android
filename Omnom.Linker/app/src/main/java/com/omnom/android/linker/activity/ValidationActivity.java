@@ -16,8 +16,9 @@ import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.Restaurant;
-import com.omnom.android.linker.model.RestaurantsResult;
+import com.omnom.android.linker.model.restaurant.Restaurant;
+import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
+import com.omnom.android.linker.model.table.TableDataResponse;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.ViewUtils;
@@ -30,7 +31,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import rx.Observable;
@@ -77,7 +77,7 @@ public class ValidationActivity extends BaseActivity {
 	private String mPassword = null;
 
 	@Nullable
-	private RestaurantsResult mRestaurants = null;
+	private RestaurantsResponse mRestaurants = null;
 
 	private Subscription mErrValidationSubscription;
 	private Subscription mAuthDataSubscription;
@@ -190,20 +190,26 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void validate() {
-		loader.animateLogo(R.drawable.ic_fork_n_knife);
-		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-		loader.showProgress(false);
-		if(mFirstRun) {
-			loader.scaleDown(null, new Runnable() {
-				@Override
-				public void run() {
-					startLoader();
-				}
-			});
-		} else {
-			startLoader();
-		}
-		mFirstRun = false;
+		//		loader.animateLogo(R.drawable.ic_fork_n_knife);
+		//		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
+		//		loader.showProgress(false);
+		//		if(mFirstRun) {
+		//			loader.scaleDown(null, new Runnable() {
+		//				@Override
+		//				public void run() {
+		//					startLoader();
+		//				}
+		//			});
+		//		} else {
+		//			startLoader();
+		//		}
+		//		mFirstRun = false;
+		api.bindQrCode("A", 27, "test_qr_data").subscribe(new Action1<TableDataResponse>() {
+			@Override
+			public void call(TableDataResponse data) {
+				System.err.println("bind_qr = " + data);
+			}
+		});
 	}
 
 	private void startLoader() {
@@ -255,19 +261,19 @@ public class ValidationActivity extends BaseActivity {
 
 	private void authenticateAndGetData() {
 		mAuthDataSubscription = AndroidObservable.bindActivity(this, api.authenticate(mUsername, mPassword).map(
-				new Func1<String, Observable<RestaurantsResult>>() {
+				new Func1<String, Observable<RestaurantsResponse>>() {
 					@Override
-					public Observable<RestaurantsResult> call(String s) {
+					public Observable<RestaurantsResponse> call(String s) {
 						getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, s).commit();
 						api.setAuthToken(s);
 						return api.getRestaurants();
 					}
-				})).subscribe(new Action1<Observable<RestaurantsResult>>() {
+				})).subscribe(new Action1<Observable<RestaurantsResponse>>() {
 			@Override
-			public void call(Observable<RestaurantsResult> restaurantsResultObservable) {
-				restaurantsResultObservable.subscribe(new Action1<RestaurantsResult>() {
+			public void call(Observable<RestaurantsResponse> restaurantsResultObservable) {
+				restaurantsResultObservable.subscribe(new Action1<RestaurantsResponse>() {
 					@Override
-					public void call(RestaurantsResult restaurantsResult) {
+					public void call(RestaurantsResponse restaurantsResult) {
 						mRestaurants = restaurantsResult;
 					}
 				});

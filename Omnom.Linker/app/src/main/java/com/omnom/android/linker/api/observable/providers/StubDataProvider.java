@@ -1,11 +1,11 @@
 package com.omnom.android.linker.api.observable.providers;
 
-import com.omnom.android.linker.activity.BeaconAlreadyBoundException;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
-import com.omnom.android.linker.model.Restaurant;
-import com.omnom.android.linker.model.RestaurantsFactory;
-import com.omnom.android.linker.model.RestaurantsResult;
+import com.omnom.android.linker.model.restaurant.Restaurant;
+import com.omnom.android.linker.model.restaurant.RestaurantsFactory;
+import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
+import com.omnom.android.linker.model.table.TableDataResponse;
 
 import org.apache.http.auth.AuthenticationException;
 
@@ -24,7 +24,7 @@ import rx.schedulers.Schedulers;
  */
 public class StubDataProvider implements LinkerObeservableApi {
 
-	private boolean authError        = false;
+	private boolean authError = false;
 	private boolean checkBeaconError = false;
 
 	@Override
@@ -57,17 +57,12 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
-	@DebugLog
-	public Observable<Integer> checkBeacon(String restaurantId, Beacon beacon) {
-		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
+	public Observable<TableDataResponse> findBeacon(Beacon beacon) {
+		return new Observable<TableDataResponse>(new Observable.OnSubscribe<TableDataResponse>() {
 			@Override
-			public void call(Subscriber<? super Integer> subscriber) {
-				if(checkBeaconError) {
-					subscriber.onError(new BeaconAlreadyBoundException());
-				} else {
-					subscriber.onNext(0);
-					subscriber.onCompleted();
-				}
+			public void call(Subscriber<? super TableDataResponse> subscriber) {
+				subscriber.onNext(TableDataResponse.NULL);
+				subscriber.onCompleted();
 			}
 		}) {};
 	}
@@ -86,11 +81,11 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 	@Override
 	@DebugLog
-	public Observable<Integer> checkQrCode(String restaurantId, String qrData) {
-		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
+	public Observable<TableDataResponse> checkQrCode(String qrData) {
+		return new Observable<TableDataResponse>(new Observable.OnSubscribe<TableDataResponse>() {
 			@Override
-			public void call(Subscriber<? super Integer> subscriber) {
-				subscriber.onNext(0);
+			public void call(Subscriber<? super TableDataResponse> subscriber) {
+				subscriber.onNext(TableDataResponse.NULL);
 				subscriber.onCompleted();
 			}
 		}) {};
@@ -98,11 +93,11 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 	@Override
 	@DebugLog
-	public Observable<Integer> bindQrCode(String restaurantId, int tableNumber, String qrData) {
-		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
+	public Observable<TableDataResponse> bindQrCode(String restaurantId, int tableNumber, String qrData) {
+		return new Observable<TableDataResponse>(new Observable.OnSubscribe<TableDataResponse>() {
 			@Override
-			public void call(Subscriber<? super Integer> subscriber) {
-				subscriber.onNext(0);
+			public void call(Subscriber<? super TableDataResponse> subscriber) {
+				subscriber.onNext(TableDataResponse.NULL);
 				subscriber.onCompleted();
 			}
 		}) {};
@@ -122,12 +117,12 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 	@Override
 	@DebugLog
-	public Observable<RestaurantsResult> getRestaurants() {
-		return new Observable<RestaurantsResult>(new Observable.OnSubscribe<RestaurantsResult>() {
+	public Observable<RestaurantsResponse> getRestaurants() {
+		return new Observable<RestaurantsResponse>(new Observable.OnSubscribe<RestaurantsResponse>() {
 			@Override
-			public void call(Subscriber<? super RestaurantsResult> subscriber) {
+			public void call(Subscriber<? super RestaurantsResponse> subscriber) {
 				final boolean fast = false;
-				RestaurantsResult result = new RestaurantsResult();
+				RestaurantsResponse result = new RestaurantsResponse();
 				if(fast) {
 					result.setItems(Arrays.asList(RestaurantsFactory.createFake("fake 1")));
 				} else {
@@ -142,18 +137,6 @@ public class StubDataProvider implements LinkerObeservableApi {
 				subscriber.onCompleted();
 			}
 		}) {};
-	}
-
-	@Override
-	@DebugLog
-	public Observable<Integer> commitBeacon(String restaurantId, Beacon beacon) {
-		return new Observable<Integer>(new Observable.OnSubscribe<Integer>() {
-			@Override
-			public void call(Subscriber<? super Integer> subscriber) {
-				subscriber.onNext(0);
-				subscriber.onCompleted();
-			}
-		}) {}.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

@@ -9,11 +9,14 @@ import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.LinkerDataService;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.Restaurant;
-import com.omnom.android.linker.model.RestaurantsResult;
+import com.omnom.android.linker.model.ibeacon.BeaconFindRequest;
+import com.omnom.android.linker.model.restaurant.Restaurant;
+import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.model.ibeacon.BeaconBindRequest;
 import com.omnom.android.linker.model.ibeacon.BeaconBuildRequest;
 import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
+import com.omnom.android.linker.model.qrcode.QRCodeBindRequest;
+import com.omnom.android.linker.model.table.TableDataResponse;
 
 import altbeacon.beacon.Beacon;
 import retrofit.RequestInterceptor;
@@ -53,28 +56,26 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	}
 
 	@Override
-	public Observable<Integer> checkBeacon(String restaurantId, Beacon beacon) {
-		return mDataService.checkBeacon(restaurantId, beacon.getIdValue(0), beacon.getIdValue(1), beacon.getIdValue(2)).subscribeOn(
+	public Observable<TableDataResponse> findBeacon(Beacon beacon) {
+		return mDataService.findBeacon(new BeaconFindRequest(beacon)).subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon) {
-		final BeaconBindRequest request = new BeaconBindRequest(restaurantId, tableNumber, beacon.getIdValue(0),
-		                                                        Integer.valueOf(beacon.getIdValue(1)),
-		                                                        Integer.valueOf(beacon.getIdValue(2)));
+		final BeaconBindRequest request = new BeaconBindRequest(restaurantId, tableNumber, beacon);
 		return mDataService.bindBeacon(request).subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<Integer> checkQrCode(String restaurantId, String qrData) {
-		return mDataService.checkQrCode(restaurantId, qrData).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<TableDataResponse> checkQrCode(String qrData) {
+		return mDataService.checkQrCode(qrData).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<Integer> bindQrCode(String restaurantId, int tableNumber, String qrData) {
-		return mDataService.bindQrCode(restaurantId, tableNumber, qrData).subscribeOn(Schedulers.io()).observeOn(
+	public Observable<TableDataResponse> bindQrCode(String restaurantId, int tableNumber, String qrData) {
+		return mDataService.bindQrCode(new QRCodeBindRequest(restaurantId, tableNumber, qrData)).subscribeOn(Schedulers.io()).observeOn(
 				AndroidSchedulers.mainThread());
 	}
 
@@ -84,14 +85,8 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	}
 
 	@Override
-	public Observable<RestaurantsResult> getRestaurants() {
+	public Observable<RestaurantsResponse> getRestaurants() {
 		return mDataService.getRestaurants().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-	}
-
-	@Override
-	public Observable<Integer> commitBeacon(String restaurantId, Beacon beacon) {
-		return mDataService.commitBeacon(restaurantId, beacon.getIdValue(0), beacon.getIdValue(1), beacon.getIdValue(2)).subscribeOn(
-				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
@@ -101,7 +96,7 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 
 	@Override
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid) {
-		return mDataService.build(new BeaconBuildRequest(uuid, String.valueOf(tableNumber), restaurantId));
+		return mDataService.buildBeacon(new BeaconBuildRequest(uuid, String.valueOf(tableNumber), restaurantId));
 	}
 
 	@Override

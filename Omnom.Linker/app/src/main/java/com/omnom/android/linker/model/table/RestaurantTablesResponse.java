@@ -1,16 +1,17 @@
-package com.omnom.android.linker.model;
+package com.omnom.android.linker.model.table;
 
 import com.google.gson.annotations.Expose;
+import com.omnom.android.linker.model.ResponseBase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Ch3D on 11.08.2014.
+ * Created by Ch3D on 26.08.2014.
  */
-public class RestaurantsResult {
+public class RestaurantTablesResponse extends ResponseBase {
 	@Expose
-	private List<Restaurant> items = new ArrayList<Restaurant>();
+	private List<TableDataResponse> items = new ArrayList<TableDataResponse>();
 
 	@Expose
 	private Integer total;
@@ -21,11 +22,11 @@ public class RestaurantsResult {
 	@Expose
 	private Integer limit;
 
-	public List<Restaurant> getItems() {
+	public List<TableDataResponse> getItems() {
 		return items;
 	}
 
-	public void setItems(List<Restaurant> items) {
+	public void setItems(List<TableDataResponse> items) {
 		this.items = items;
 	}
 

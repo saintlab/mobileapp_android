@@ -4,6 +4,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
+import com.omnom.android.linker.model.table.TableDataResponse;
 
 import altbeacon.beacon.Beacon;
 import rx.functions.Action1;
@@ -23,6 +24,18 @@ public class LinkerApiTest {
 		   .subscribe(new Action1<BeaconDataResponse>() {
 			   @Override
 			   public void call(BeaconDataResponse data) {
+				   System.err.println("bind = " + data);
+			   }
+		   });
+	}
+
+	@SmallTest
+	public void testQrBind() {
+		// TODO: implement
+		api.bindQrCode("A", 27, "test_qr_data")
+		   .subscribe(new Action1<TableDataResponse>() {
+			   @Override
+			   public void call(TableDataResponse data) {
 				   System.err.println("bind = " + data);
 			   }
 		   });

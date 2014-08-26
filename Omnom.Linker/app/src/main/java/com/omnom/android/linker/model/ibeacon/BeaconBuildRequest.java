@@ -8,8 +8,10 @@ import com.google.gson.annotations.Expose;
 public class BeaconBuildRequest {
 	@Expose
 	public String uuid;
+
 	@Expose
 	public String tableNum;
+
 	@Expose
 	public String restaurantId;
 
