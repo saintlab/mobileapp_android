@@ -16,8 +16,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.omnom.android.linker.activity.base.Extras;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -35,7 +33,7 @@ public class BluetoothLeService extends Service {
 		@DebugLog
 		public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
 			if(status == BluetoothGatt.GATT_SUCCESS) {
-				broadcastUpdate(characteristic);
+				// broadcastUpdate(characteristic);
 			}
 			if(!processQueue()) {
 				mQueueEndCallback.run();
@@ -102,13 +100,13 @@ public class BluetoothLeService extends Service {
 		sendBroadcast(intent);
 	}
 
-	@DebugLog
-	private void broadcastUpdate(final BluetoothGattCharacteristic characteristic) {
-		final Intent intent = new Intent(ACTION_CHARACTERISTIC_UPDATE);
-		intent.putExtra(Extras.EXTRA_CHARACTERISTIC_UUID, characteristic.getUuid().toString());
-		intent.putExtra(Extras.EXTRA_CHARACTERISTIC_VALUE, characteristic.getStringValue(0));
-		sendBroadcast(intent);
-	}
+	//	@DebugLog
+	//	private void broadcastUpdate(final BluetoothGattCharacteristic characteristic) {
+	//		final Intent intent = new Intent(ACTION_CHARACTERISTIC_UPDATE);
+	//		intent.putExtra(Extras.EXTRA_CHARACTERISTIC_UUID, characteristic.getUuid().toString());
+	//		intent.putExtra(Extras.EXTRA_CHARACTERISTIC_VALUE, characteristic.getStringValue(0));
+	//		sendBroadcast(intent);
+	//	}
 
 	@Override
 	public IBinder onBind(Intent intent) {

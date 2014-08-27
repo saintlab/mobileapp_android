@@ -3,7 +3,7 @@ package com.omnom.android.linker;
 import android.test.suitebuilder.annotation.SmallTest;
 
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
+import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.table.TableDataResponse;
 
 import altbeacon.beacon.Beacon;

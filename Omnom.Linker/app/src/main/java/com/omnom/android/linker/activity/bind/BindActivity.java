@@ -29,7 +29,7 @@ import com.omnom.android.linker.activity.ErrorHelper;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
+import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.table.TableDataResponse;
 import com.omnom.android.linker.service.BluetoothLeService;
@@ -50,7 +50,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -119,6 +118,12 @@ public class BindActivity extends BaseActivity {
 			bindTable();
 		}
 	};
+	private final View.OnClickListener mConnectBeaconClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			connectToBeacon();
+		}
+	};
 
 	protected volatile boolean gattConnected = false;
 	protected volatile boolean gattAvailable = false;
@@ -129,7 +134,7 @@ public class BindActivity extends BaseActivity {
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
 
-	final Runnable beaconInteractionCallback = new Runnable() {
+	final Runnable beaconTimeoutCallback = new Runnable() {
 		@Override
 		public void run() {
 			if(!gattAvailable || !gattConnected) {
@@ -269,7 +274,7 @@ public class BindActivity extends BaseActivity {
 
 	@DebugLog
 	private void connectToBeacon() {
-		cdt = AndroidUtils.createTimer(mLoader, beaconInteractionCallback, 10000);
+		cdt = AndroidUtils.createTimer(mLoader, beaconTimeoutCallback, 10000);
 		mErrorHelper.setTimer(cdt);
 		cdt.start();
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
@@ -282,12 +287,7 @@ public class BindActivity extends BaseActivity {
 								break;
 
 							case NO_CONNECTION:
-								mErrorHelper.showInternetError(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										connectToBeacon();
-									}
-								});
+								mErrorHelper.showInternetError(mConnectBeaconClickListener);
 								break;
 
 							case LOCATION_DISABLED:
@@ -300,7 +300,7 @@ public class BindActivity extends BaseActivity {
 			@Override
 			public void call(Boolean hasNoErrors) {
 				if(hasNoErrors) {
-					if(!mBluetoothLeService.connect(mBeacon.getBluetoothAddress())) {
+					if(mBeacon == null || !mBluetoothLeService.connect(mBeacon.getBluetoothAddress())) {
 						cdt.cancel();
 					}
 				}
@@ -308,12 +308,7 @@ public class BindActivity extends BaseActivity {
 		}, new Action1<Throwable>() {
 			@Override
 			public void call(Throwable throwable) {
-				mErrorHelper.showInternetError(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						connectToBeacon();
-					}
-				});
+				mErrorHelper.showInternetError(mConnectBeaconClickListener);
 			}
 		});
 	}
@@ -629,7 +624,7 @@ public class BindActivity extends BaseActivity {
 		filter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
 		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
 		filter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
-		filter.addAction(BluetoothLeService.ACTION_CHARACTERISTIC_UPDATE);
+		// filter.addAction(BluetoothLeService.ACTION_CHARACTERISTIC_UPDATE);
 		registerReceiver(gattConnectedReceiver, filter);
 		mGattReceiverRegistered = true;
 	}
@@ -656,27 +651,23 @@ public class BindActivity extends BaseActivity {
 	}
 
 	@DebugLog
-	public void writeBeaconData(String uuid, final int majorId, final int minorId) {
-
-		final Beacon b = new Beacon.Builder()
-				.setId1(uuid)
-				.setId2(Integer.toString(majorId))
-				.setId3(Integer.toString(minorId)).build();
-
+	public void writeBeaconData() {
 		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE,
 		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD,
 		                                                       RBLBluetoothAttributes.RBL_PASSKEY.getBytes()));
 
 		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
-		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MAJOR_ID, majorId));
+		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MAJOR_ID,
+		                                                       mBeaconData.getMajor()));
 
 		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
-		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID, minorId));
+		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID,
+		                                                       mBeaconData.getMinor()));
 
 		mBluetoothLeService.startWritingQueue(new Runnable() {
 			@Override
 			public void run() {
-				Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), b),
+				Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeaconData),
 				                         api.bindQrCode(mRestaurant.getId(), mLoader.getTableNumber(), mQrData),
 				                         new Func2<BeaconDataResponse, TableDataResponse, Void>() {
 					                         @Override
@@ -689,26 +680,8 @@ public class BindActivity extends BaseActivity {
 		});
 	}
 
-	public void updateBeaconData(final UUID cUuid, final String cValue) {
-		if(BuildConfig.DEBUG) {
-			if(mBeacon == null) {
-				throw new AssertionError("Beacon cannot be null");
-			}
-		}
-		if(cUuid.equals(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MAJOR_ID)) {
-			mBeacon.getId2().updateValue(cValue);
-		}
-		if(cUuid.equals(RBLBluetoothAttributes.UUID_BLE_REDBEAR_BEACON_MINOR_ID)) {
-			mBeacon.getId3().updateValue(cValue);
-		}
-	}
-
 	public void onGattFailed() {
 		mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again,
 		                       mInternetErrorClickListener);
-	}
-
-	public BeaconDataResponse getBeaconData() {
-		return mBeaconData;
 	}
 }

@@ -1,4 +1,4 @@
-package com.omnom.android.linker.model.ibeacon;
+package com.omnom.android.linker.model.beacon;
 
 import com.google.gson.annotations.Expose;
 import com.omnom.android.linker.model.ResponseBase;
@@ -8,13 +8,25 @@ import com.omnom.android.linker.model.ResponseBase;
  */
 public class BeaconDataResponse extends ResponseBase {
 	@Expose
-	public String uuid;
+	private String uuid;
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public int getMajor() {
+		return major;
+	}
+
+	public int getMinor() {
+		return minor;
+	}
 
 	@Expose
-	public int major;
+	private int major;
 
 	@Expose
-	public int minor;
+	private int minor;
 
 	@Override
 	public String toString() {

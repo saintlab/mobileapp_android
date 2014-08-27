@@ -1,4 +1,4 @@
-package com.omnom.android.linker.model.ibeacon;
+package com.omnom.android.linker.model.beacon;
 
 import com.google.gson.annotations.Expose;
 
@@ -24,8 +24,11 @@ public class BeaconBindRequest {
 	public int minor;
 
 	public BeaconBindRequest(String restaurantId, int table_num, Beacon beacon) {
-		this(restaurantId, table_num, beacon.getIdValue(0), Integer.valueOf(beacon.getIdValue(1)),
-		     Integer.valueOf(beacon.getIdValue(2)));
+		this(restaurantId, table_num, beacon.getIdValue(0), Integer.valueOf(beacon.getIdValue(1)), Integer.valueOf(beacon.getIdValue(2)));
+	}
+
+	public BeaconBindRequest(String restaurantId, int table_num, BeaconDataResponse beaconData) {
+		this(restaurantId, table_num, beaconData.getUuid(), beaconData.getMajor(), beaconData.getMinor());
 	}
 
 	public BeaconBindRequest(String restaurantId, int table_num, String uuid, int major, int minor) {

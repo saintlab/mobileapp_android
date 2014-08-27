@@ -1,7 +1,7 @@
 package com.omnom.android.linker.api.observable;
 
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
-import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
+import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.table.TableDataResponse;
 
@@ -17,6 +17,8 @@ public interface LinkerObeservableApi {
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
 
 	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon);
+
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, BeaconDataResponse beaconData);
 
 	public Observable<String> authenticate(String username, String password);
 

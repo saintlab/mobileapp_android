@@ -1,7 +1,7 @@
 package com.omnom.android.linker.api.observable.providers;
 
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
+import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsFactory;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
@@ -77,6 +77,11 @@ public class StubDataProvider implements LinkerObeservableApi {
 				subscriber.onCompleted();
 			}
 		}) {};
+	}
+
+	@Override
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, BeaconDataResponse beaconData) {
+		return bindBeacon(restaurantId, tableNumber, (Beacon) null);
 	}
 
 	@Override

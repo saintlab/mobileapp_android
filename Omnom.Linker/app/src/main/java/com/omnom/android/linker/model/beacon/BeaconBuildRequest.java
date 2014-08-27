@@ -1,4 +1,4 @@
-package com.omnom.android.linker.model.ibeacon;
+package com.omnom.android.linker.model.beacon;
 
 import com.google.gson.annotations.Expose;
 

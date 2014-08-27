@@ -1,9 +1,9 @@
 package com.omnom.android.linker.api;
 
-import com.omnom.android.linker.model.ibeacon.BeaconBindRequest;
-import com.omnom.android.linker.model.ibeacon.BeaconBuildRequest;
-import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
-import com.omnom.android.linker.model.ibeacon.BeaconFindRequest;
+import com.omnom.android.linker.model.beacon.BeaconBindRequest;
+import com.omnom.android.linker.model.beacon.BeaconBuildRequest;
+import com.omnom.android.linker.model.beacon.BeaconDataResponse;
+import com.omnom.android.linker.model.beacon.BeaconFindRequest;
 import com.omnom.android.linker.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;

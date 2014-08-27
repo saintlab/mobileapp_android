@@ -9,10 +9,10 @@ import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.api.LinkerDataService;
 import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.ibeacon.BeaconBindRequest;
-import com.omnom.android.linker.model.ibeacon.BeaconBuildRequest;
-import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
-import com.omnom.android.linker.model.ibeacon.BeaconFindRequest;
+import com.omnom.android.linker.model.beacon.BeaconBindRequest;
+import com.omnom.android.linker.model.beacon.BeaconBuildRequest;
+import com.omnom.android.linker.model.beacon.BeaconDataResponse;
+import com.omnom.android.linker.model.beacon.BeaconFindRequest;
 import com.omnom.android.linker.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
@@ -95,6 +95,13 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	@Override
 	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon) {
 		final BeaconBindRequest request = new BeaconBindRequest(restaurantId, tableNumber, beacon);
+		return mDataService.bindBeacon(request).subscribeOn(
+				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, BeaconDataResponse beaconData) {
+		final BeaconBindRequest request = new BeaconBindRequest(restaurantId, tableNumber, beaconData);
 		return mDataService.bindBeacon(request).subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
