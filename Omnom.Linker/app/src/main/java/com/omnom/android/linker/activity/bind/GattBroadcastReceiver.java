@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.omnom.android.linker.activity.base.Extras;
+import com.omnom.android.linker.model.ibeacon.BeaconDataResponse;
 import com.omnom.android.linker.service.BluetoothLeService;
 
 import java.util.UUID;
@@ -27,7 +28,8 @@ class GattBroadcastReceiver extends BroadcastReceiver {
 				@Override
 				public void run() {
 					activity.gattAvailable = true;
-					activity.writeBeaconData();
+					BeaconDataResponse data = activity.getBeaconData();
+					activity.writeBeaconData(data.uuid, data.major, data.minor);
 				}
 			});
 		} else if(BluetoothLeService.ACTION_GATT_FAILED.equals(intent.getAction())) {
@@ -46,7 +48,7 @@ class GattBroadcastReceiver extends BroadcastReceiver {
 			});
 		} else if(BluetoothLeService.ACTION_CHARACTERISTIC_UPDATE.equals(intent.getAction())) {
 			final UUID cUuid = UUID.fromString(intent.getExtras().getString(Extras.EXTRA_CHARACTERISTIC_UUID));
-			final byte[] cValue = intent.getByteArrayExtra(Extras.EXTRA_CHARACTERISTIC_VALUE);
+			final String cValue = intent.getStringExtra(Extras.EXTRA_CHARACTERISTIC_VALUE);
 			activity.updateBeaconData(cUuid, cValue);
 		}
 	}

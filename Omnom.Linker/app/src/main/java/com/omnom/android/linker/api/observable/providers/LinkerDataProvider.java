@@ -18,11 +18,16 @@ import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.model.table.TableDataResponse;
 
+import org.apache.http.auth.AuthenticationException;
+
+import java.util.concurrent.TimeUnit;
+
 import altbeacon.beacon.Beacon;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -47,12 +52,38 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 
 	@Override
 	public Observable<String> authenticate(String username, String password) {
-		return mDataService.authenticate(username, password).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		// TODO:
+		// return mDataService.authenticate(username, password).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		return new Observable<String>(new Observable.OnSubscribe<String>() {
+			@Override
+			public void call(Subscriber<? super String> subscriber) {
+				boolean authError = false;
+				if(authError) {
+					subscriber.onError(new AuthenticationException());
+				} else {
+					subscriber.onNext("OK");
+					subscriber.onCompleted();
+				}
+			}
+		}) {}.delaySubscription(2000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<String> remindPassword(String username) {
-		return mDataService.remindPassword(username).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		// TODO:
+		// return mDataService.remindPassword(username).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		return new Observable<String>(new Observable.OnSubscribe<String>() {
+			@Override
+			public void call(Subscriber<? super String> subscriber) {
+				boolean authError = false;
+				if(authError) {
+					subscriber.onError(new AuthenticationException());
+				} else {
+					subscriber.onNext("OK");
+					subscriber.onCompleted();
+				}
+			}
+		}) {}.delaySubscription(2000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
@@ -96,7 +127,8 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 
 	@Override
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid) {
-		return mDataService.buildBeacon(new BeaconBuildRequest(uuid, String.valueOf(tableNumber), restaurantId));
+		return mDataService.buildBeacon(new BeaconBuildRequest(uuid, String.valueOf(tableNumber), restaurantId))
+		                   .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

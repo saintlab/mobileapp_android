@@ -46,10 +46,10 @@ public interface LinkerDataService {
 	@POST("/qr/bind")
 	Observable<TableDataResponse> bindQrCode(@Body QRCodeBindRequest request);
 
-	@GET("/qr/{qrData}")
-	Observable<TableDataResponse> checkQrCode(@Query(Protocol.FIELD_QR_DATA) String qrData);
+	@GET("/qr/{qr}")
+	Observable<TableDataResponse> checkQrCode(@Path(Protocol.FIELD_QR_DATA) String qrData);
 
-	@POST("/ibeacons/buildBeacon")
+	@POST("/ibeacons/build")
 	Observable<BeaconDataResponse> buildBeacon(@Body BeaconBuildRequest request);
 
 	@POST("/ibeacons/bind")

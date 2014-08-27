@@ -18,7 +18,6 @@ import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
-import com.omnom.android.linker.model.table.TableDataResponse;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.ViewUtils;
@@ -31,6 +30,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import rx.Observable;
@@ -190,26 +190,20 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void validate() {
-		//		loader.animateLogo(R.drawable.ic_fork_n_knife);
-		//		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-		//		loader.showProgress(false);
-		//		if(mFirstRun) {
-		//			loader.scaleDown(null, new Runnable() {
-		//				@Override
-		//				public void run() {
-		//					startLoader();
-		//				}
-		//			});
-		//		} else {
-		//			startLoader();
-		//		}
-		//		mFirstRun = false;
-		api.bindQrCode("A", 27, "test_qr_data").subscribe(new Action1<TableDataResponse>() {
-			@Override
-			public void call(TableDataResponse data) {
-				System.err.println("bind_qr = " + data);
-			}
-		});
+		loader.animateLogo(R.drawable.ic_fork_n_knife);
+		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
+		loader.showProgress(false);
+		if(mFirstRun) {
+			loader.scaleDown(null, new Runnable() {
+				@Override
+				public void run() {
+					startLoader();
+				}
+			});
+		} else {
+			startLoader();
+		}
+		mFirstRun = false;
 	}
 
 	private void startLoader() {

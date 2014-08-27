@@ -42,6 +42,7 @@ import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderController;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
+import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,6 +62,7 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 import hugo.weaving.DebugLog;
+import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -108,6 +110,13 @@ public class BindActivity extends BaseActivity {
 					}
 				}
 			});
+		}
+	};
+
+	private final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			bindTable();
 		}
 	};
 
@@ -193,6 +202,7 @@ public class BindActivity extends BaseActivity {
 	private Subscription mErrBindSubscription;
 	private ErrorHelper mErrorHelper;
 	private boolean mBindClicked = false;
+	private BeaconDataResponse mBeaconData;
 
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
 		if(enable) {
@@ -235,16 +245,15 @@ public class BindActivity extends BaseActivity {
 	public void onBind() {
 		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
-		Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon),
-		                         api.bindQrCode(mRestaurant.getId(), mLoader.getTableNumber(), mQrData), new Func2
-						<BeaconDataResponse, TableDataResponse, Void>() {
-					@Override
-					public Void call(BeaconDataResponse beaconData, TableDataResponse tableData) {
-						mLoaderController.setMode(LoaderView.Mode.NONE);
-						connectToBeacon();
-						return null;
-					}
-				}).onErrorResumeNext(Observable.<Void>empty()).subscribe();
+		api.buildBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon.getIdValue(0))
+		   .subscribe(new Action1<BeaconDataResponse>() {
+			   @Override
+			   public void call(final BeaconDataResponse beaconData) {
+				   mBeaconData = beaconData;
+				   mLoaderController.setMode(LoaderView.Mode.NONE);
+				   connectToBeacon();
+			   }
+		   });
 	}
 
 	@Override
@@ -387,10 +396,24 @@ public class BindActivity extends BaseActivity {
 			} else if(requestCode == REQUEST_CODE_SCAN_QR) {
 				mPanelBottom.setVisibility(View.GONE);
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
-				api.checkQrCode(mQrData).subscribe(new Action1<TableDataResponse>() {
+				api.checkQrCode(mQrData).onErrorReturn(new Func1<Throwable, TableDataResponse>() {
+					@Override
+					public TableDataResponse call(Throwable throwable) {
+						if(throwable instanceof RetrofitError) {
+							RetrofitError error = (RetrofitError) throwable;
+							if(error.getResponse().getStatus() == HttpStatus.SC_NOT_FOUND) {
+								return TableDataResponse.NULL;
+							}
+						}
+						return null;
+					}
+				}).subscribe(new Action1<TableDataResponse>() {
 					@Override
 					public void call(TableDataResponse result) {
-						if(result != null) {
+						if(result == null) {
+							mErrorHelper.showInternetError(mInternetErrorClickListener);
+						}
+						if(result != TableDataResponse.NULL) {
 							onQrCheckError(result.getInternalId());
 						} else {
 							swithToEnterDataMode();
@@ -430,12 +453,7 @@ public class BindActivity extends BaseActivity {
 								break;
 
 							case NO_CONNECTION:
-								mErrorHelper.showInternetError(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										bindTable();
-									}
-								});
+								mErrorHelper.showInternetError(mInternetErrorClickListener);
 								break;
 
 							case LOCATION_DISABLED:
@@ -455,35 +473,41 @@ public class BindActivity extends BaseActivity {
 							if(size == 0) {
 								mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal,
 								                       R.string.try_once_again,
-								                       new View.OnClickListener() {
-									                       @Override
-									                       public void onClick(View v) {
-										                       bindTable();
-									                       }
-								                       });
+								                       mInternetErrorClickListener);
 							} else if(size > 1) {
 								mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon,
 								                       R.string.try_once_again,
-								                       new View.OnClickListener() {
-									                       @Override
-									                       public void onClick(View v) {
-										                       bindTable();
-									                       }
-								                       });
+								                       mInternetErrorClickListener);
 							} else if(size == 1) {
 								mBeacon = (Beacon) mBeacons.toArray()[0];
-								api.findBeacon(mBeacon).subscribe(new Action1<TableDataResponse>() {
+								api.findBeacon(mBeacon).onErrorReturn(new Func1<Throwable, TableDataResponse>() {
 									@Override
-									public void call(TableDataResponse tableData) {
-										mBindClicked = false;
-										mLoader.jumpProgress(1);
-										if(tableData != null) {
-											onBeaconCheckError(tableData.getInternalId());
-										} else {
-											scanQrCode();
+									public TableDataResponse call(Throwable throwable) {
+										if(throwable instanceof RetrofitError) {
+											RetrofitError error = (RetrofitError) throwable;
+											if(error.getResponse().getStatus() == HttpStatus.SC_NOT_FOUND) {
+												return TableDataResponse.NULL;
+											}
 										}
+										return null;
 									}
-								});
+								}).subscribe(
+										new Action1<TableDataResponse>() {
+											@Override
+											public void call(final TableDataResponse tableData) {
+												if(tableData == null) {
+													mErrorHelper.showInternetError(mInternetErrorClickListener);
+													return;
+												}
+												mBindClicked = false;
+												mLoader.jumpProgress(1);
+												if(tableData != TableDataResponse.NULL) {
+													onBeaconCheckError(tableData.getInternalId());
+												} else {
+													scanQrCode();
+												}
+											}
+										});
 							}
 						}
 					});
@@ -492,12 +516,7 @@ public class BindActivity extends BaseActivity {
 		}, new Action1<Throwable>() {
 			@Override
 			public void call(Throwable throwable) {
-				mErrorHelper.showInternetError(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						bindTable();
-					}
-				});
+				mErrorHelper.showInternetError(mInternetErrorClickListener);
 			}
 		});
 	}
@@ -637,11 +656,13 @@ public class BindActivity extends BaseActivity {
 	}
 
 	@DebugLog
-	public void writeBeaconData() {
-		// TODO: Fix
-		// int majorId = mRestaurant.getId();
-		int majorId = 1;
-		int minorId = mLoader.getTableNumber();
+	public void writeBeaconData(String uuid, final int majorId, final int minorId) {
+
+		final Beacon b = new Beacon.Builder()
+				.setId1(uuid)
+				.setId2(Integer.toString(majorId))
+				.setId3(Integer.toString(minorId)).build();
+
 		mBluetoothLeService.queueCharacteristic(new DataHolder(RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE,
 		                                                       RBLBluetoothAttributes.UUID_BLE_REDBEAR_PASSWORD,
 		                                                       RBLBluetoothAttributes.RBL_PASSKEY.getBytes()));
@@ -655,17 +676,20 @@ public class BindActivity extends BaseActivity {
 		mBluetoothLeService.startWritingQueue(new Runnable() {
 			@Override
 			public void run() {
-				api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon).subscribe(new Action1<BeaconDataResponse>() {
-					@Override
-					public void call(BeaconDataResponse beaconData) {
-						mLoader.jumpProgress(1);
-					}
-				});
+				Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), b),
+				                         api.bindQrCode(mRestaurant.getId(), mLoader.getTableNumber(), mQrData),
+				                         new Func2<BeaconDataResponse, TableDataResponse, Void>() {
+					                         @Override
+					                         public Void call(BeaconDataResponse beaconData, TableDataResponse tableData) {
+						                         mLoader.jumpProgress(1);
+						                         return null;
+					                         }
+				                         }).onErrorResumeNext(Observable.<Void>empty()).subscribe();
 			}
 		});
 	}
 
-	public void updateBeaconData(final UUID cUuid, final byte[] cValue) {
+	public void updateBeaconData(final UUID cUuid, final String cValue) {
 		if(BuildConfig.DEBUG) {
 			if(mBeacon == null) {
 				throw new AssertionError("Beacon cannot be null");
@@ -681,11 +705,10 @@ public class BindActivity extends BaseActivity {
 
 	public void onGattFailed() {
 		mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again,
-		                       new View.OnClickListener() {
-			                       @Override
-			                       public void onClick(View v) {
-				                       bindTable();
-			                       }
-		                       });
+		                       mInternetErrorClickListener);
+	}
+
+	public BeaconDataResponse getBeaconData() {
+		return mBeaconData;
 	}
 }

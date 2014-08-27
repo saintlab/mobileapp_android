@@ -7,10 +7,10 @@ import com.google.gson.annotations.Expose;
  */
 public class QRCodeBindRequest {
 
-	public QRCodeBindRequest(String restaurantId, int table_num, String uuid) {
+	public QRCodeBindRequest(String restaurantId, int table_num, String qrData) {
 		this.restaurantId = restaurantId;
 		this.table_num = table_num;
-		this.uuid = uuid;
+		this.qr = qrData;
 	}
 
 	@Expose
@@ -20,5 +20,5 @@ public class QRCodeBindRequest {
 	public int table_num;
 
 	@Expose
-	public String uuid;
+	public String qr;
 }

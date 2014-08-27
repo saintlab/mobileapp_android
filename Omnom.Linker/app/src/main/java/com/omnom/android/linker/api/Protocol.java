@@ -12,6 +12,6 @@ public interface Protocol {
 	public static final String FIELD_BEACON_UUID = "uuid";
 	public static final String FIELD_MAJOR_ID = "major";
 	public static final String FIELD_MINOR_ID = "minor";
-	public static final String FIELD_QR_DATA = "qrData";
+	public static final String FIELD_QR_DATA = "qr";
 	public static final String HEADER_AUTH_TOKEN = "auth_token";
 }
