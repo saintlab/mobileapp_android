@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">Omnom Linker</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_splash">SplashActivity</string>
@@ -7,12 +8,10 @@
     <string name="title_activity_simple_splash">SimpleSplashActivity</string>
     <string name="title_activity_places_list">PlacesListActivity</string>
     <string name="title_activity_place">PlaceActivity</string>
-
     <string name="bind_table">Bind Table</string>
     <string name="bind">Bind</string>
     <string name="beacon_bound">Beacon bound</string>
     <string name="qr_bound">QR bound</string>
-
     <string name="unknown_service">Unknown BLE Service</string>
     <string name="unknown_characteristic">Unknown BLE Characteristic</string>
     <string name="connected">Connected</string>
@@ -31,4 +30,8 @@
     <string name="proceed">Продолжить</string>
     <string name="cancel">Отменить</string>
     <string name="hint_table_number">Номер стола</string>
+    <string name="title_activity_user_profile">UserProfileActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="logout_user">Выход из аккаунта</string>
+
 </resources>
