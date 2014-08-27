@@ -72,6 +72,16 @@
 
     <style name="TextView" parent="android:Widget.Holo.Light.TextView"/>
 
+    <style name="TextView.User"/>
+
+    <style name="TextView.User.Data">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:textAppearance">?android:textAppearanceLarge</item>
+    </style>
+
     <style name="TextView.Restaurant"/>
 
     <style name="TextView.Restaurant.Data">

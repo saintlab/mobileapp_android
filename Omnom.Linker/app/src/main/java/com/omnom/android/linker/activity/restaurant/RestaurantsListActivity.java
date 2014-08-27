@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Parcelable;
 
 import com.omnom.android.linker.R;
+import com.omnom.android.linker.activity.UserProfileActivity;
 import com.omnom.android.linker.activity.base.BaseListActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.adapter.MockPlacesAdapter;
@@ -14,6 +15,7 @@ import com.omnom.android.linker.model.Restaurant;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 public class RestaurantsListActivity extends BaseListActivity {
@@ -22,6 +24,11 @@ public class RestaurantsListActivity extends BaseListActivity {
 		final Intent intent = new Intent(context, RestaurantsListActivity.class);
 		intent.putParcelableArrayListExtra(EXTRA_RESTAURANTS, new ArrayList<Parcelable>(restaurants));
 		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
+	}
+
+	@OnClick(R.id.btn_profile)
+	public void onProfile() {
+		startActivity(new Intent(this, UserProfileActivity.class));
 	}
 
 	@Override

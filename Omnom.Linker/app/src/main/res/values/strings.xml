@@ -33,5 +33,6 @@
     <string name="title_activity_user_profile">UserProfileActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="logout_user">Выход из аккаунта</string>
+    <string name="restaurants_list">Список заведений</string>
 
 </resources>

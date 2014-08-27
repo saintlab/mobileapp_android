@@ -26,6 +26,7 @@ import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.ErrorHelper;
+import com.omnom.android.linker.activity.UserProfileActivity;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
@@ -128,6 +129,7 @@ public class BindActivity extends BaseActivity {
 				AnimationUtils.animateAlpha(mPanelBottom, true);
 				mBtnBottom.setText(R.string.bind_table);
 				mPanelBottom.setVisibility(View.VISIBLE);
+				mBtnProfile.setVisibility(View.VISIBLE);
 			}
 			mBluetoothLeService.disconnect();
 			mBluetoothLeService.close();
@@ -143,10 +145,13 @@ public class BindActivity extends BaseActivity {
 	@InjectView(R.id.btn_back)
 	protected View mBtnBack;
 
+	@InjectView(R.id.btn_profile)
+	protected View mBtnProfile;
+
 	@InjectView(R.id.txt_error)
 	protected TextView mTxtError;
 
-	@InjectViews({R.id.txt_error, R.id.panel_bottom})
+	@InjectViews({R.id.txt_error, R.id.panel_bottom, R.id.btn_profile})
 	protected List<View> errorViews;
 
 	@Inject
@@ -227,6 +232,12 @@ public class BindActivity extends BaseActivity {
 	@OnClick(R.id.btn_back)
 	public void onBack() {
 		onBackPressed();
+	}
+
+	@OnClick(R.id.btn_profile)
+	public void onProfile() {
+		mBindClicked = false;
+		startActivity(new Intent(this, UserProfileActivity.class));
 	}
 
 	@OnClick(R.id.btn_bind_table)
@@ -310,6 +321,7 @@ public class BindActivity extends BaseActivity {
 	public void finish() {
 		mLoaderController.setMode(LoaderView.Mode.NONE);
 		AnimationUtils.animateAlpha(mBtnBack, false);
+		AnimationUtils.animateAlpha(mBtnProfile, false);
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
 		if(getIntent().getBooleanExtra(EXTRA_SHOW_BACK, false)) {
 			mLoader.animateColor(Color.WHITE);
@@ -333,6 +345,7 @@ public class BindActivity extends BaseActivity {
 			mLoader.animateColor(Color.WHITE, getResources().getColor(R.color.loader_bg), AnimationUtils.DURATION_LONG);
 			mLoader.setLogo(R.drawable.ic_mexico_logo);
 			AnimationUtils.animateAlpha(mPanelBottom, true);
+			AnimationUtils.animateAlpha(mBtnProfile, true);
 			mLoader.post(new Runnable() {
 				@Override
 				public void run() {
@@ -351,6 +364,7 @@ public class BindActivity extends BaseActivity {
 				@Override
 				public void run() {
 					AnimationUtils.animateAlpha(mPanelBottom, true);
+					AnimationUtils.animateAlpha(mBtnProfile, true);
 				}
 			}, AnimationUtils.DURATION_LONG);
 		}
@@ -383,6 +397,7 @@ public class BindActivity extends BaseActivity {
 				clearErrors();
 			} else if(requestCode == REQUEST_CODE_SCAN_QR) {
 				mPanelBottom.setVisibility(View.GONE);
+				mBtnProfile.setVisibility(View.GONE);
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
 				api.checkQrCode(mRestaurant.getId(), mQrData).subscribe(new Action1<Integer>() {
 					@Override
@@ -397,6 +412,7 @@ public class BindActivity extends BaseActivity {
 			}
 		} else {
 			ViewUtils.setVisible(mPanelBottom, true);
+			ViewUtils.setVisible(mBtnProfile, true);
 		}
 	}
 

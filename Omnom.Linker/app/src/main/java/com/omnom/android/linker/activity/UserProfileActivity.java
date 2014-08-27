@@ -32,7 +32,7 @@ public class UserProfileActivity extends BaseActivity {
 
 	@Override
 	public void initUi() {
-		RoundedDrawable.setRoundedDrawable(mImgUser, BitmapFactory.decodeResource(getResources(), R.drawable.ic_camera_black));
+		RoundedDrawable.setRoundedDrawable(mImgUser, BitmapFactory.decodeResource(getResources(), R.drawable.empty_avatar));
 	}
 
 	@OnClick(R.id.btn_back)

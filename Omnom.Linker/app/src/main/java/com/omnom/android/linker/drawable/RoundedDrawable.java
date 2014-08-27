@@ -20,7 +20,7 @@ import android.widget.ImageView;
  * Created by xCh3Dx on 13.07.2014.
  */
 public class RoundedDrawable extends Drawable {
-	private static final boolean USE_VIGNETTE = true;
+	private static final boolean USE_VIGNETTE = false;
 
 	private final float mCornerRadius;
 	private final RectF mRect = new RectF();
@@ -33,7 +33,7 @@ public class RoundedDrawable extends Drawable {
 	}
 
 	public static void setRoundedDrawable(ImageView imgView, Bitmap bitmap, int margin) {
-		RoundedDrawable drawable = new RoundedDrawable(bitmap, 100, margin);
+		RoundedDrawable drawable = new RoundedDrawable(bitmap, 156, margin);
 		imgView.setImageDrawable(drawable);
 	}
 

@@ -4,15 +4,29 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/loader_progress"
-        android:text="Список заведений"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:gravity="left|center_vertical"
-        android:textColor="@android:color/black"
-        android:textAppearance="?android:textAppearanceMedium"/>
+        android:layout_height="@dimen/view_size_default"
+        android:background="@color/list_header">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/btn_profile"
+            android:paddingStart="@dimen/activity_horizontal_margin_small"
+            android:ellipsize="end"
+            android:gravity="start|center_vertical"
+            android:text="@string/restaurants_list"
+            android:textColor="@android:color/black"
+            android:textAppearance="?android:textAppearanceLarge"/>
+
+        <include
+            layout="@layout/view_btn_profile"
+            android:layout_alignParentRight="true"
+            android:layout_height="@dimen/view_size_default"
+            android:layout_width="@dimen/view_size_default"/>
+    </RelativeLayout>
 
     <ListView
         android:id="@android:id/list"
