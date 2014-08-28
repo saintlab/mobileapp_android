@@ -4,7 +4,10 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -84,6 +87,26 @@ public class LoaderView extends FrameLayout {
 		translationViews.add(mImgLogo);
 		translationViews.add(mEditTableNumber);
 		interpolation = new AccelerateDecelerateInterpolator();
+		mEditTableNumber.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				if(s.length() > 0) {
+					mEditTableNumber.setTextSize(TypedValue.COMPLEX_UNIT_SP, 40);
+				} else {
+					mEditTableNumber.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
+				}
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+
+			}
+		});
 	}
 
 	private int getDefaultBgColor() {return getContext().getResources().getColor(R.color.loader_bg);}
