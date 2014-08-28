@@ -13,6 +13,8 @@ import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -26,6 +28,8 @@ public class ErrorHelper {
 	private TextView mTxtError;
 	private Button mBtnBottom;
 	private List<View> mErrorViews;
+
+	@Nullable
 	private CountDownTimer mTimer;
 
 	public ErrorHelper(LoaderView loader, TextView txtError, Button btnBottom, List<View> errorViews, CountDownTimer timer) {
@@ -36,9 +40,19 @@ public class ErrorHelper {
 		mTimer = timer;
 	}
 
+	public ErrorHelper(LoaderView loader, TextView txtError, Button btnBottom, List<View> errorViews) {
+		mLoader = loader;
+		mTxtError = txtError;
+		mBtnBottom = btnBottom;
+		mErrorViews = errorViews;
+		mTimer = null;
+	}
+
 	public void showError(final int logoResId, int errTextResId, int btnTextResId, View.OnClickListener onClickListener) {
 		mLoader.updateProgress(0);
-		mTimer.cancel();
+		if(mTimer != null) {
+			mTimer.cancel();
+		}
 		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, true);
 		mLoader.post(new Runnable() {
 			@Override

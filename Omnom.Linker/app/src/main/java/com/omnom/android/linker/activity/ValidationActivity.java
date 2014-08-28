@@ -1,10 +1,10 @@
 package com.omnom.android.linker.activity;
 
+import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,7 +18,6 @@ import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
-import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
@@ -73,12 +72,14 @@ public class ValidationActivity extends BaseActivity {
 	@Inject
 	protected LinkerObeservableApi api;
 
-	private CountDownTimer cdt;
+	// private CountDownTimer cdt;
 	private String mUsername = null;
 	private String mPassword = null;
 
 	@Nullable
 	private RestaurantsResponse mRestaurants = null;
+	@Nullable
+	private ObjectAnimator mCurrentAnimation;
 
 	private Subscription mErrValidationSubscription;
 	private Subscription mAuthDataSubscription;
@@ -95,36 +96,7 @@ public class ValidationActivity extends BaseActivity {
 	public void initUi() {
 		mUsername = getIntent().getStringExtra(EXTRA_USERNAME);
 		mPassword = getIntent().getStringExtra(EXTRA_PASSWORD);
-		cdt = AndroidUtils.createTimer(loader, new Runnable() {
-			@Override
-			public void run() {
-				if(mRestaurants == null) {
-					// TODO: error happened
-					return;
-				}
-				final List<Restaurant> items = mRestaurants.getItems();
-				int size = items.size();
-				if(items.isEmpty()) {
-					return;
-				}
-
-				if(size == 1) {
-					BindActivity.start(ValidationActivity.this, items.get(0), false);
-					finish();
-				} else {
-					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
-					loader.scaleUp(new Runnable() {
-						@Override
-						public void run() {
-							ViewUtils.setVisible(panelBottom, false);
-							RestaurantsListActivity.start(ValidationActivity.this, items);
-							finish();
-						}
-					});
-				}
-			}
-		}, DURATION_VALIDATION);
-		mErrorHelper = new ErrorHelper(loader, txtError, btnSettings, errorViews, cdt);
+		mErrorHelper = new ErrorHelper(loader, txtError, btnSettings, errorViews);
 	}
 
 	@Override
@@ -156,7 +128,6 @@ public class ValidationActivity extends BaseActivity {
 
 	@Override
 	public void finish() {
-		cdt.cancel();
 		if(mRestaurants == null) {
 			super.finish();
 			return;
@@ -208,8 +179,35 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void startLoader() {
-		cdt.start();
-		loader.startProgressAnimation(DURATION_VALIDATION);
+		mCurrentAnimation = loader.startProgressAnimation(DURATION_VALIDATION, new Runnable() {
+			@Override
+			public void run() {
+				if(mRestaurants == null) {
+					// TODO: error happened
+					return;
+				}
+				final List<Restaurant> items = mRestaurants.getItems();
+				int size = items.size();
+				if(items.isEmpty()) {
+					return;
+				}
+
+				if(size == 1) {
+					BindActivity.start(ValidationActivity.this, items.get(0), false);
+					finish();
+				} else {
+					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
+					loader.scaleUp(new Runnable() {
+						@Override
+						public void run() {
+							ViewUtils.setVisible(panelBottom, false);
+							RestaurantsListActivity.start(ValidationActivity.this, items);
+							finish();
+						}
+					});
+				}
+			}
+		});
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
 					@Override
@@ -276,7 +274,7 @@ public class ValidationActivity extends BaseActivity {
 		}, new Action1<Throwable>() {
 			@Override
 			public void call(Throwable throwable) {
-				cdt.cancel();
+				mCurrentAnimation.cancel();
 				loader.showProgress(false);
 				showToast(ValidationActivity.this, R.string.msg_error);
 				if(throwable instanceof AuthenticationException) {

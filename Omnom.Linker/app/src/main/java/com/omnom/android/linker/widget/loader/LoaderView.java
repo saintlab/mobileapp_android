@@ -1,5 +1,7 @@
 package com.omnom.android.linker.widget.loader;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -294,12 +296,7 @@ public class LoaderView extends FrameLayout {
 		mImgLoader.requestLayout();
 	}
 
-	public int getProgress() {
-		return mProgressBar.getProgress();
-	}
-
-	public void startProgressAnimation(long duration) {
-		mProgressBar.setVisibility(VISIBLE);
+	public ObjectAnimator startProgressAnimation(long duration, final Runnable callback) {
 		final ObjectAnimator progressAnimator = ObjectAnimator.ofInt(mProgressBar, PROPERTY_PROGRESS, 0, mProgressBar.getMax());
 		progressAnimator.setInterpolator(interpolation);
 		progressAnimator.setDuration(duration);
@@ -309,6 +306,15 @@ public class LoaderView extends FrameLayout {
 				updateProgress((Integer) animation.getAnimatedValue());
 			}
 		});
+		progressAnimator.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				if(callback != null) {
+					callback.run();
+				}
+			}
+		});
 		progressAnimator.start();
+		return progressAnimator;
 	}
 }
