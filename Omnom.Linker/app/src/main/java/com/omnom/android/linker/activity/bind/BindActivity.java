@@ -492,23 +492,22 @@ public class BindActivity extends BaseActivity {
 										}
 										return null;
 									}
-								}).subscribe(
-										new Action1<TableDataResponse>() {
-											@Override
-											public void call(final TableDataResponse tableData) {
-												if(tableData == null) {
-													mErrorHelper.showInternetError(mInternetErrorClickListener);
-													return;
-												}
-												mBindClicked = false;
-												mLoader.jumpProgress(1);
-												if(tableData != TableDataResponse.NULL) {
-													onErrorBeaconCheck(tableData.getInternalId());
-												} else {
-													scanQrCode();
-												}
-											}
-										});
+								}).subscribe(new Action1<TableDataResponse>() {
+									@Override
+									public void call(final TableDataResponse tableData) {
+										if(tableData == null) {
+											mErrorHelper.showInternetError(mInternetErrorClickListener);
+											return;
+										}
+										mBindClicked = false;
+										mLoader.jumpProgress(1);
+										if(tableData != TableDataResponse.NULL) {
+											onErrorBeaconCheck(tableData.getInternalId());
+										} else {
+											scanQrCode();
+										}
+									}
+								});
 							}
 						}
 					});
@@ -693,7 +692,7 @@ public class BindActivity extends BaseActivity {
 		mBluetoothLeService.startWritingQueue(new Runnable() {
 			@Override
 			public void run() {
-				Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeaconData),
+				Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon),
 				                         api.bindQrCode(mRestaurant.getId(), mLoader.getTableNumber(), mQrData),
 				                         new Func2<BeaconDataResponse, TableDataResponse, Void>() {
 					                         @Override
