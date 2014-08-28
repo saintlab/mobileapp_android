@@ -511,7 +511,6 @@ public class BindActivity extends BaseActivity {
 											return;
 										}
 										mBindClicked = false;
-										mLoader.jumpProgress(1);
 										if(tableData != TableDataResponse.NULL) {
 											onErrorBeaconCheck(tableData.getInternalId());
 										} else {
@@ -534,7 +533,6 @@ public class BindActivity extends BaseActivity {
 
 	private void onErrorQrCheck(final int number) {
 		cdt.cancel();
-		mLoader.jumpProgress(1);
 		AndroidUtils.showDialog(getActivity(), getString(R.string.qr_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
@@ -560,7 +558,6 @@ public class BindActivity extends BaseActivity {
 
 	private void onErrorBeaconCheck(final int number) {
 		cdt.cancel();
-		mLoader.jumpProgress(1);
 		AndroidUtils.showDialog(getActivity(), getString(R.string.beacon_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
@@ -703,7 +700,6 @@ public class BindActivity extends BaseActivity {
 				                         new Func2<BeaconDataResponse, TableDataResponse, Void>() {
 					                         @Override
 					                         public Void call(BeaconDataResponse beaconData, TableDataResponse tableData) {
-						                         mLoader.jumpProgress(1);
 						                         return null;
 					                         }
 				                         }).onErrorResumeNext(Observable.<Void>empty()).subscribe();

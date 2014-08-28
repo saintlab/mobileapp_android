@@ -45,6 +45,7 @@ public class ValidationActivity extends BaseActivity {
 
 	private static final String TAG = ValidationActivity.class.getSimpleName();
 	private static final int REQUEST_CODE_ENABLE_BT = 100;
+	public static final int DURATION_VALIDATION = 3000;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public static void start(final Context context, Restaurant restaurant, int animation) {
@@ -122,7 +123,7 @@ public class ValidationActivity extends BaseActivity {
 					});
 				}
 			}
-		});
+		}, DURATION_VALIDATION);
 		mErrorHelper = new ErrorHelper(loader, txtError, btnSettings, errorViews, cdt);
 	}
 
@@ -208,6 +209,7 @@ public class ValidationActivity extends BaseActivity {
 
 	private void startLoader() {
 		cdt.start();
+		loader.startProgressAnimation(DURATION_VALIDATION);
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
 					@Override
@@ -235,7 +237,6 @@ public class ValidationActivity extends BaseActivity {
 				}).isEmpty()).subscribe(new Action1<Boolean>() {
 			@Override
 			public void call(Boolean hasNoErrors) {
-				loader.jumpProgress(0.25f);
 				if(hasNoErrors) {
 					authenticateAndGetData();
 				}

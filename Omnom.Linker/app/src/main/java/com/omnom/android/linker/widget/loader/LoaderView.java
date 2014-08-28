@@ -1,12 +1,14 @@
 package com.omnom.android.linker.widget.loader;
 
 import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Property;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +19,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.R;
+import com.omnom.android.linker.animation.BezierCubicInterpolation;
 import com.omnom.android.linker.utils.AnimationUtils;
+import com.omnom.android.linker.utils.ViewUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,22 +40,27 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public static final float PROGRESS_INCREMENT_FACTOR = 1.5f;
+	public static final Property<View, Integer> PROPERTY_PROGRESS = new Property<View, Integer>(Integer.class, "progress") {
+		@Override
+		public void set(View object, Integer value) {
+			((ProgressBar) object).setProgress(value);
+		}
 
+		@Override
+		public Integer get(View object) {
+			return ((ProgressBar) object).getProgress();
+		}
+	};
 	@InjectView(R.id.img_loader)
 	protected ImageView mImgLoader;
-
 	@InjectView(R.id.img_logo)
 	protected ImageView mImgLogo;
-
 	@InjectView(R.id.progress)
 	protected ProgressBar mProgressBar;
-
 	@InjectView(R.id.edit_table_number)
 	protected EditText mEditTableNumber;
-
 	private int loaderSize;
 	private int currentColor = -1;
-
 	private List<View> translationViews = new LinkedList<View>();
 	private int mSpeedUpLimit;
 	private Interpolator interpolation;
@@ -86,7 +94,7 @@ public class LoaderView extends FrameLayout {
 		translationViews.add(mImgLoader);
 		translationViews.add(mImgLogo);
 		translationViews.add(mEditTableNumber);
-		interpolation = new AccelerateDecelerateInterpolator();
+		interpolation = new BezierCubicInterpolation(.53f, 1.25f, .61f, .89f);
 		mEditTableNumber.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -157,7 +165,15 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void showProgress(final boolean visible) {
-		AnimationUtils.animateAlpha(mProgressBar, visible);
+		showProgress(visible, false);
+	}
+
+	public void showProgress(final boolean visible, boolean animate) {
+		if(animate) {
+			AnimationUtils.animateAlpha(mProgressBar, visible);
+		} else {
+			ViewUtils.setVisible(mProgressBar, visible);
+		}
 	}
 
 	public void scaleDown(final Runnable scaleDownUpdate) {
@@ -212,24 +228,10 @@ public class LoaderView extends FrameLayout {
 		mImgLogo.setTag(R.id.img_loader, resId);
 	}
 
-	public void jumpProgress(float fraction) {
-		if(BuildConfig.DEBUG) {
-			if(fraction > 1 || fraction < 0) {
-				throw new AssertionError("progess must be between 0 and 1");
-			}
-		}
-		float value = Math.max(0, Math.min(1, fraction));
-		speedUpProgress((int) (mProgressBar.getMax() * value));
-	}
-
-	private void speedUpProgress(int i) {
-		mSpeedUpLimit = i;
-	}
-
 	public void addProgress(final int increment, final int real) {
 		int progress = mProgressBar.getProgress();
 		if(mSpeedUpLimit >= progress) {
-			updateProgress(progress + (int)(increment * PROGRESS_INCREMENT_FACTOR), real);
+			updateProgress(progress + (int) (increment * PROGRESS_INCREMENT_FACTOR), real);
 		} else {
 			updateProgress(progress + increment, real);
 		}
@@ -240,7 +242,7 @@ public class LoaderView extends FrameLayout {
 			@Override
 			public void run() {
 				final int max = mProgressBar.getMax();
-				showProgress(progress > 0 && progress < max);
+				showProgress(progress > 0 && progress < max, progress > max);
 				// TODO: Improve
 				int edge = max - (max / 4);
 				final float endPeriod = max - edge;
@@ -250,11 +252,11 @@ public class LoaderView extends FrameLayout {
 					float interpolation1 = interpolation.getInterpolation(fraction);
 					int value = (int) (interpolation1 * (realProgress - edge));
 					mProgressBar.setProgress(mProgressBar.getProgress() + value);
-				} else if (progress > edge && progress < max) {
+				} else if(progress > edge && progress < max) {
 					int progress1 = mProgressBar.getProgress() + 1;
 					mProgressBar.setProgress(progress1);
 					mInterEdge = progress1;
-				} else if (progress < edge) {
+				} else if(progress < edge) {
 					mProgressBar.setProgress(progress);
 				}
 			}
@@ -266,7 +268,7 @@ public class LoaderView extends FrameLayout {
 			@Override
 			public void run() {
 				final int max = mProgressBar.getMax();
-				showProgress(progress > 0 && progress < max);
+				showProgress(progress > 0 && progress < max, progress >= max);
 				final int edge = max - (max / 10);
 				final float endPeriod = max - edge;
 				if(progress > edge && progress < max) {
@@ -294,5 +296,19 @@ public class LoaderView extends FrameLayout {
 
 	public int getProgress() {
 		return mProgressBar.getProgress();
+	}
+
+	public void startProgressAnimation(long duration) {
+		mProgressBar.setVisibility(VISIBLE);
+		final ObjectAnimator progressAnimator = ObjectAnimator.ofInt(mProgressBar, PROPERTY_PROGRESS, 0, mProgressBar.getMax());
+		progressAnimator.setInterpolator(interpolation);
+		progressAnimator.setDuration(duration);
+		progressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation) {
+				updateProgress((Integer) animation.getAnimatedValue());
+			}
+		});
+		progressAnimator.start();
 	}
 }
