@@ -56,7 +56,6 @@ import javax.inject.Inject;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
-import altbeacon.beacon.Identifier;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
@@ -93,6 +92,8 @@ public class BindActivity extends BaseActivity {
 	private final BeaconParser parser = new BeaconParser();
 
 	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+		BeaconFilter mFilter = new BeaconFilter();
+
 		@Override
 		@DebugLog
 		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
@@ -101,11 +102,8 @@ public class BindActivity extends BaseActivity {
 				public void run() {
 					parser.setBeaconLayout(RBLBluetoothAttributes.REDBEAR_BEACON_LAYOUT);
 					final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
-
-					if(beacon != null && beacon.getId1() != null) {
-						Identifier id1 = beacon.getId1();
-						final String beaconId = id1.toString().toLowerCase();
-						if(RBLBluetoothAttributes.BEACON_ID.equals(beaconId)) {
+					if(beacon != null) {
+						if(mFilter.check(beacon)) {
 							mBeacons.add(beacon);
 						}
 					}
