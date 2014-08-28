@@ -4,12 +4,10 @@ import android.app.ActivityOptions;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -41,6 +39,8 @@ import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderController;
 import com.omnom.android.linker.widget.loader.LoaderView;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
@@ -169,8 +169,10 @@ public class BindActivity extends BaseActivity {
 	protected LinkerObeservableApi api;
 
 	protected BluetoothLeService mBluetoothLeService;
-	private BroadcastReceiver gattConnectedReceiver = new GattBroadcastReceiver(this);
-	private boolean mGattReceiverRegistered = false;
+	@Inject
+	protected Bus mBus;
+	//private BroadcastReceiver gattConnectedReceiver = new GattBroadcastReceiver(this);
+	//private boolean mGattReceiverRegistered = false;
 	private boolean mBound = false;
 
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -629,23 +631,42 @@ public class BindActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		final IntentFilter filter = new IntentFilter();
-		filter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-		filter.addAction(BluetoothLeService.ACTION_GATT_FAILED);
-		filter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-		filter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
-		// filter.addAction(BluetoothLeService.ACTION_CHARACTERISTIC_UPDATE);
-		registerReceiver(gattConnectedReceiver, filter);
-		mGattReceiverRegistered = true;
+		//		final IntentFilter filter = new IntentFilter();
+		//		filter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+		//		filter.addAction(BluetoothLeService.ACTION_GATT_FAILED);
+		//		filter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+		//		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+		//		filter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+		//		// filter.addAction(BluetoothLeService.ACTION_CHARACTERISTIC_UPDATE);
+		//		registerReceiver(gattConnectedReceiver, filter);
+		//		mGattReceiverRegistered = true;
+		mBus.register(this);
+	}
+
+	@Subscribe
+	public void onGattEvent(GattEvent event) {
+		if(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(event.getAction())) {
+			gattAvailable = true;
+			writeBeaconData();
+		} else if(BluetoothLeService.ACTION_GATT_FAILED.equals(event.getAction())) {
+			gattConnected = false;
+			gattAvailable = false;
+		} else if(BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(event.getAction())) {
+			gattConnected = false;
+			gattAvailable = false;
+		} else if(BluetoothLeService.ACTION_GATT_CONNECTED.equals(event.getAction())) {
+			gattConnected = true;
+			mBluetoothLeService.getDiscoverGattService();
+		}
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if(mGattReceiverRegistered) {
-			unregisterReceiver(gattConnectedReceiver);
-		}
+		mBus.unregister(this);
+		//		if(mGattReceiverRegistered) {
+		//			unregisterReceiver(gattConnectedReceiver);
+		//		}
 	}
 
 	@Override
