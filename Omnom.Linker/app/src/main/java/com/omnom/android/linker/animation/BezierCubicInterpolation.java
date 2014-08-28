@@ -41,7 +41,7 @@ public class BezierCubicInterpolation implements Interpolator {
 		c.y = 3 * start.y;
 		b.y = 3 * (end.y - start.y) - c.y;
 		a.y = 1 - c.y - b.y;
-		return time * (c.y + time * (b.y + time * a.y));
+		return Math.min(time * (c.y + time * (b.y + time * a.y)), .996f);
 	}
 
 	protected float getXForTime(float time) {

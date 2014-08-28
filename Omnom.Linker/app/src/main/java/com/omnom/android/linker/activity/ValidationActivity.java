@@ -39,6 +39,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 import static com.omnom.android.linker.utils.AndroidUtils.showToast;
+import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class ValidationActivity extends BaseActivity {
 
@@ -182,30 +183,7 @@ public class ValidationActivity extends BaseActivity {
 		mCurrentAnimation = loader.startProgressAnimation(DURATION_VALIDATION, new Runnable() {
 			@Override
 			public void run() {
-				if(mRestaurants == null) {
-					// TODO: error happened
-					return;
-				}
-				final List<Restaurant> items = mRestaurants.getItems();
-				int size = items.size();
-				if(items.isEmpty()) {
-					return;
-				}
-
-				if(size == 1) {
-					BindActivity.start(ValidationActivity.this, items.get(0), false);
-					finish();
-				} else {
-					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
-					loader.scaleUp(new Runnable() {
-						@Override
-						public void run() {
-							ViewUtils.setVisible(panelBottom, false);
-							RestaurantsListActivity.start(ValidationActivity.this, items);
-							finish();
-						}
-					});
-				}
+				onAnimationEnd();
 			}
 		});
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
@@ -250,6 +228,36 @@ public class ValidationActivity extends BaseActivity {
 				});
 			}
 		});
+	}
+
+	private void onAnimationEnd() {
+		if(mRestaurants == null) {
+			showToastLong(this, R.string.error_server_unavailable_please_try_again);
+//			finish();
+			return;
+		}
+		final List<Restaurant> items = mRestaurants.getItems();
+		int size = items.size();
+		if(items.isEmpty()) {
+			showToastLong(this, R.string.error_no_restaurants_please_try_again_later);
+//			finish();
+			return;
+		}
+
+		if(size == 1) {
+			BindActivity.start(this, items.get(0), false);
+			finish();
+		} else {
+			loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
+			loader.scaleUp(new Runnable() {
+				@Override
+				public void run() {
+					ViewUtils.setVisible(panelBottom, false);
+					RestaurantsListActivity.start(ValidationActivity.this, items);
+					finish();
+				}
+			});
+		}
 	}
 
 	private void authenticateAndGetData() {

@@ -29,15 +29,11 @@ public class ErrorHelper {
 	private Button mBtnBottom;
 	private List<View> mErrorViews;
 
-	@Nullable
-	private CountDownTimer mTimer;
-
 	public ErrorHelper(LoaderView loader, TextView txtError, Button btnBottom, List<View> errorViews, CountDownTimer timer) {
 		mLoader = loader;
 		mTxtError = txtError;
 		mBtnBottom = btnBottom;
 		mErrorViews = errorViews;
-		mTimer = timer;
 	}
 
 	public ErrorHelper(LoaderView loader, TextView txtError, Button btnBottom, List<View> errorViews) {
@@ -45,14 +41,11 @@ public class ErrorHelper {
 		mTxtError = txtError;
 		mBtnBottom = btnBottom;
 		mErrorViews = errorViews;
-		mTimer = null;
 	}
 
 	public void showError(final int logoResId, int errTextResId, int btnTextResId, View.OnClickListener onClickListener) {
 		mLoader.updateProgress(0);
-		if(mTimer != null) {
-			mTimer.cancel();
-		}
+		mLoader.stopAnimation();
 		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, true);
 		mLoader.post(new Runnable() {
 			@Override
@@ -90,9 +83,5 @@ public class ErrorHelper {
 				AndroidUtils.startLocationSettings(v.getContext());
 			}
 		});
-	}
-
-	public void setTimer(CountDownTimer timer) {
-		mTimer = timer;
 	}
 }

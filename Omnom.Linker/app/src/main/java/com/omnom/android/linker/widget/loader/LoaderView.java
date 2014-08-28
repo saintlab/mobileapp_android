@@ -37,6 +37,14 @@ import butterknife.InjectView;
  */
 public class LoaderView extends FrameLayout {
 
+	private ObjectAnimator mProgressAnimator;
+
+	public void stopAnimation() {
+		if (mProgressAnimator != null && mProgressAnimator.isStarted()) {
+			mProgressAnimator.cancel();
+		}
+	}
+
 	public enum Mode {
 		NONE, ENTER_DATA
 	}
@@ -105,7 +113,7 @@ public class LoaderView extends FrameLayout {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if(s.length() > 0) {
+				if (s.length() > 0) {
 					mEditTableNumber.setTextSize(TypedValue.COMPLEX_UNIT_SP, 40);
 				} else {
 					mEditTableNumber.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
@@ -119,7 +127,9 @@ public class LoaderView extends FrameLayout {
 		});
 	}
 
-	private int getDefaultBgColor() {return getContext().getResources().getColor(R.color.loader_bg);}
+	private int getDefaultBgColor() {
+		return getContext().getResources().getColor(R.color.loader_bg);
+	}
 
 	public void animateColor(int endColor) {
 		animateColor(currentColor, endColor, AnimationUtils.DURATION_SHORT);
@@ -171,7 +181,7 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void showProgress(final boolean visible, boolean animate) {
-		if(animate) {
+		if (animate) {
 			AnimationUtils.animateAlpha(mProgressBar, visible);
 		} else {
 			ViewUtils.setVisible(mProgressBar, visible);
@@ -206,7 +216,7 @@ public class LoaderView extends FrameLayout {
 
 	public void animateLogo(final int resId) {
 		final Object tag = mImgLogo.getTag(R.id.img_loader);
-		if(tag != null && resId == (Integer) tag) {
+		if (tag != null && resId == (Integer) tag) {
 			// skip
 			return;
 		}
@@ -222,7 +232,7 @@ public class LoaderView extends FrameLayout {
 
 	public void setLogo(int resId) {
 		final Object tag = mImgLogo.getTag(R.id.img_loader);
-		if(tag != null && resId == (Integer) tag) {
+		if (tag != null && resId == (Integer) tag) {
 			// skip
 			return;
 		}
@@ -232,7 +242,7 @@ public class LoaderView extends FrameLayout {
 
 	public void addProgress(final int increment, final int real) {
 		int progress = mProgressBar.getProgress();
-		if(mSpeedUpLimit >= progress) {
+		if (mSpeedUpLimit >= progress) {
 			updateProgress(progress + (int) (increment * PROGRESS_INCREMENT_FACTOR), real);
 		} else {
 			updateProgress(progress + increment, real);
@@ -248,17 +258,17 @@ public class LoaderView extends FrameLayout {
 				// TODO: Improve
 				int edge = max - (max / 4);
 				final float endPeriod = max - edge;
-				if(realProgress > edge && realProgress < max) {
+				if (realProgress > edge && realProgress < max) {
 					float i = realProgress - mInterEdge;
 					float fraction = i / (max - mInterEdge);
 					float interpolation1 = interpolation.getInterpolation(fraction);
 					int value = (int) (interpolation1 * (realProgress - edge));
 					mProgressBar.setProgress(mProgressBar.getProgress() + value);
-				} else if(progress > edge && progress < max) {
+				} else if (progress > edge && progress < max) {
 					int progress1 = mProgressBar.getProgress() + 1;
 					mProgressBar.setProgress(progress1);
 					mInterEdge = progress1;
-				} else if(progress < edge) {
+				} else if (progress < edge) {
 					mProgressBar.setProgress(progress);
 				}
 			}
@@ -273,7 +283,7 @@ public class LoaderView extends FrameLayout {
 				showProgress(progress > 0 && progress < max, progress >= max);
 				final int edge = max - (max / 10);
 				final float endPeriod = max - edge;
-				if(progress > edge && progress < max) {
+				if (progress > edge && progress < max) {
 					float i = progress - edge;
 					float fraction = i / endPeriod;
 					float interpolation1 = interpolation.getInterpolation(fraction);
@@ -297,24 +307,24 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public ObjectAnimator startProgressAnimation(long duration, final Runnable callback) {
-		final ObjectAnimator progressAnimator = ObjectAnimator.ofInt(mProgressBar, PROPERTY_PROGRESS, 0, mProgressBar.getMax());
-		progressAnimator.setInterpolator(interpolation);
-		progressAnimator.setDuration(duration);
-		progressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+		mProgressAnimator = ObjectAnimator.ofInt(mProgressBar, PROPERTY_PROGRESS, 0, mProgressBar.getMax());
+		mProgressAnimator.setInterpolator(interpolation);
+		mProgressAnimator.setDuration(duration);
+		mProgressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
 				updateProgress((Integer) animation.getAnimatedValue());
 			}
 		});
-		progressAnimator.addListener(new AnimatorListenerAdapter() {
+		mProgressAnimator.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(Animator animation) {
-				if(callback != null) {
+				if (callback != null) {
 					callback.run();
 				}
 			}
 		});
-		progressAnimator.start();
-		return progressAnimator;
+		mProgressAnimator.start();
+		return mProgressAnimator;
 	}
 }

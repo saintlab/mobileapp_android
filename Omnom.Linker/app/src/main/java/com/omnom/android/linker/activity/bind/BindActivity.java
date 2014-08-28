@@ -281,7 +281,8 @@ public class BindActivity extends BaseActivity {
 	@DebugLog
 	private void connectToBeacon() {
 		cdt = AndroidUtils.createTimer(mLoader, beaconTimeoutCallback, 10000);
-		mErrorHelper.setTimer(cdt);
+		// TODO:
+		// mErrorHelper.setTimer(cdt);
 		cdt.start();
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
@@ -453,7 +454,8 @@ public class BindActivity extends BaseActivity {
 				// scanQrCode();
 			}
 		}, 5000);
-		mErrorHelper.setTimer(cdt);
+		// TODO:
+		// mErrorHelper.setTimer(cdt);
 		cdt.start();
 		mErrBindSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
