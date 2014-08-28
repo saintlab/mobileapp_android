@@ -62,7 +62,6 @@ import butterknife.InjectViews;
 import butterknife.OnClick;
 import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
-import retrofit.http.HEAD;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -89,7 +88,7 @@ public class BindActivity extends BaseActivity {
 		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
 	}
 
-	private final BeaconParser parser = new BeaconParser();
+	private BeaconParser parser;
 
 	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		BeaconFilter mFilter = new BeaconFilter();
@@ -100,12 +99,9 @@ public class BindActivity extends BaseActivity {
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					parser.setBeaconLayout(RBLBluetoothAttributes.REDBEAR_BEACON_LAYOUT);
 					final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
-					if(beacon != null) {
-						if(mFilter.check(beacon)) {
-							mBeacons.add(beacon);
-						}
+					if(mFilter.check(beacon)) {
+						mBeacons.add(beacon);
 					}
 				}
 			});
@@ -586,6 +582,8 @@ public class BindActivity extends BaseActivity {
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
 		mLoaderTranslation = ViewUtils.dipToPixels(this, 48);
+		parser = new BeaconParser();
+		parser.setBeaconLayout(RBLBluetoothAttributes.REDBEAR_BEACON_LAYOUT);
 		final int btnTranslation = (int) (mLoaderTranslation * 1.75);
 		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		ViewTreeObserver.OnGlobalLayoutListener listener = AndroidUtils.createKeyboardListener(activityRootView,

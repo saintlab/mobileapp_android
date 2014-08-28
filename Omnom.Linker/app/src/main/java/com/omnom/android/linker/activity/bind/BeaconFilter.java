@@ -12,7 +12,7 @@ public class BeaconFilter {
 	public static final int RSSI_MIN_VALUE = -68;
 
 	public boolean check(Beacon beacon) {
-		if(beacon.getId1() == null) {
+		if(beacon == null || beacon.getId1() == null) {
 			return false;
 		}
 		final Identifier id1 = beacon.getId1();
