@@ -169,11 +169,9 @@ public class BindActivity extends BaseActivity {
 	protected LinkerObeservableApi api;
 
 	protected BluetoothLeService mBluetoothLeService;
-	private boolean mBound = false;
-
 	@Inject
 	protected Bus mBus;
-
+	private boolean mBound = false;
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName componentName, IBinder service) {
@@ -363,6 +361,10 @@ public class BindActivity extends BaseActivity {
 				}
 			}, AnimationUtils.DURATION_LONG);
 		}
+		initRestaurantUi(restaurant);
+	}
+
+	private void initRestaurantUi(Restaurant restaurant) {
 		mRestaurant = restaurant;
 		mBtnBottom.setText(R.string.bind_table);
 		mBtnBottom.setOnClickListener(new View.OnClickListener() {
@@ -372,6 +374,8 @@ public class BindActivity extends BaseActivity {
 				bindTable();
 			}
 		});
+		ViewUtils.setVisible(mPanelBottom, true);
+		ViewUtils.setVisible(mBtnBottom, true);
 	}
 
 	@DebugLog
@@ -411,7 +415,7 @@ public class BindActivity extends BaseActivity {
 							mErrorHelper.showInternetError(mInternetErrorClickListener);
 						}
 						if(result != TableDataResponse.NULL) {
-							onQrCheckError(result.getInternalId());
+							onErrorQrCheck(result.getInternalId());
 						} else {
 							swithToEnterDataMode();
 						}
@@ -499,7 +503,7 @@ public class BindActivity extends BaseActivity {
 												mBindClicked = false;
 												mLoader.jumpProgress(1);
 												if(tableData != TableDataResponse.NULL) {
-													onBeaconCheckError(tableData.getInternalId());
+													onErrorBeaconCheck(tableData.getInternalId());
 												} else {
 													scanQrCode();
 												}
@@ -518,7 +522,9 @@ public class BindActivity extends BaseActivity {
 		});
 	}
 
-	private void onQrCheckError(final int number) {
+	private void onErrorQrCheck(final int number) {
+		cdt.cancel();
+		mLoader.jumpProgress(1);
 		AndroidUtils.showDialog(getActivity(), getString(R.string.qr_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
@@ -534,16 +540,17 @@ public class BindActivity extends BaseActivity {
 	}
 
 	private void resetActivityState() {
-		if(cdt != null) {
-			cdt.cancel();
-		}
 		mBeaconData = BeaconDataResponse.NULL;
 		mQrData = StringUtils.EMPTY_STRING;
 		mBeacons.clear();
 		mBindClicked = false;
+		mLoader.updateProgress(0);
+		initRestaurantUi(mRestaurant);
 	}
 
-	private void onBeaconCheckError(final int number) {
+	private void onErrorBeaconCheck(final int number) {
+		cdt.cancel();
+		mLoader.jumpProgress(1);
 		AndroidUtils.showDialog(getActivity(), getString(R.string.beacon_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
