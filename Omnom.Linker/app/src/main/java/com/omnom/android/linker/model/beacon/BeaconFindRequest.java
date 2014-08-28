@@ -16,6 +16,7 @@ public class BeaconFindRequest {
 	private int minor;
 
 	public BeaconFindRequest(Beacon beacon) {
+		// FIXME: uppercase vs lowercase
 		this(beacon.getIdValue(0).toUpperCase(), Integer.valueOf(beacon.getIdValue(1)), Integer.valueOf(beacon.getIdValue(2)));
 	}
 
