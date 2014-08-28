@@ -1,6 +1,6 @@
 package com.omnom.android.linker.api.simple;
 
-import com.omnom.android.linker.model.Restaurant;
+import com.omnom.android.linker.model.restaurant.Restaurant;
 
 import java.util.List;
 

@@ -8,7 +8,7 @@ import android.view.View;
 
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
-import com.omnom.android.linker.model.Restaurant;
+import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
 

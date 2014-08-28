@@ -2,7 +2,7 @@ package com.omnom.android.linker.modules;
 
 import com.omnom.android.linker.activity.LoginActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.api.observable.LinkerDataProvider;
+import com.omnom.android.linker.api.observable.providers.LinkerDataProvider;
 
 import javax.inject.Singleton;
 
@@ -14,9 +14,13 @@ import dagger.Provides;
  */
 @Module(injects = {LoginActivity.class}, complete = false, library = true)
 public class LinkerDataProviderModule {
+	public static final String ENDPOINT_LAAAAB = "http://restaurateur.laaaab.com";
+	public static final String ENDPOINT_STAND = "http://restaurateur.stand.saintlab.com/";
+
+
 	@Provides
 	@Singleton
 	LinkerObeservableApi providerLinkerApi() {
-		return new LinkerDataProvider();
+		return new LinkerDataProvider(ENDPOINT_STAND);
 	}
 }

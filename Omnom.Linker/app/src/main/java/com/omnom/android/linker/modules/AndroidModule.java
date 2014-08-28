@@ -6,6 +6,8 @@ import android.os.PowerManager;
 import android.telephony.TelephonyManager;
 
 import com.omnom.android.linker.LinkerApplication;
+import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 
 import javax.inject.Singleton;
 
@@ -29,6 +31,12 @@ public class AndroidModule {
 	@Singleton
 	LinkerApplication provideApplicationContext() {
 		return application;
+	}
+
+	@Provides
+	@Singleton
+	Bus provideEventBus() {
+		return new Bus(ThreadEnforcer.ANY);
 	}
 
 	@Provides

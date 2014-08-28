@@ -82,11 +82,12 @@
         <item name="android:textAppearance">?android:textAppearanceLarge</item>
     </style>
 
-    <style name="TextView.Restaurant"/>
-
-    <style name="TextView.Restaurant.Data">
+    <style name="TextView.Restaurant">
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="TextView.Restaurant.Data">
         <item name="android:textAppearance">?android:textAppearanceSmall</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>

@@ -6,8 +6,6 @@ import android.animation.ValueAnimator;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
-import hugo.weaving.DebugLog;
-
 /**
  * Created by Ch3D on 29.07.2014.
  */
@@ -43,19 +41,16 @@ public class AnimationUtils {
 				}).alpha(visible ? 1 : 0).start();
 	}
 
-	@DebugLog
 	public static void translateUp(final Iterable<View> views, final int translation, final Runnable endCallback) {
 		final AnimationBuilder builder = AnimationBuilder.create(0, -translation);
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
-	@DebugLog
 	public static void translateDown(final Iterable<View> views, final int translation, final Runnable endCallback) {
 		final AnimationBuilder builder = AnimationBuilder.create(-translation, 0);
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
-	@DebugLog
 	private static ValueAnimator prepareTranslation(final Iterable<View> views, final Runnable endCallback, AnimationBuilder builder) {
 		return builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
@@ -67,7 +62,6 @@ public class AnimationUtils {
 		}).onEnd(endCallback).build();
 	}
 
-	@DebugLog
 	public static void scaleWidth(final View view, final int width, final Runnable updateCallback, final Runnable endCallback) {
 		AnimationBuilder builder = AnimationBuilder.create(view.getMeasuredWidth(), width);
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {
@@ -86,7 +80,6 @@ public class AnimationUtils {
 		builder.build().start();
 	}
 
-	@DebugLog
 	public static void scaleHeight(final View view, int height) {
 		AnimationBuilder.create(view.getMeasuredHeight(), height).addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override

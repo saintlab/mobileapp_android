@@ -10,7 +10,7 @@ import com.omnom.android.linker.activity.UserProfileActivity;
 import com.omnom.android.linker.activity.base.BaseListActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.adapter.MockPlacesAdapter;
-import com.omnom.android.linker.model.Restaurant;
+import com.omnom.android.linker.model.restaurant.Restaurant;
 
 import java.util.ArrayList;
 import java.util.List;

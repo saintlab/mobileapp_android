@@ -61,7 +61,7 @@ public class Identifier {
     }
     private Identifier() {}
 
-	public void updateValue(byte[] cValue) {
-		this.mStringValue = new String(cValue, 0, 2);
+	public void updateValue(String cValue) {
+		this.mStringValue = cValue;
 	}
 }

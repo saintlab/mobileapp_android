@@ -1,4 +1,4 @@
-package com.omnom.android.linker.model;
+package com.omnom.android.linker.model.restaurant;
 
 import com.omnom.android.linker.utils.StringUtils;
 
