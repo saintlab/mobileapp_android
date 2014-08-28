@@ -1,6 +1,7 @@
 package com.omnom.android.linker.api.observable.providers;
 
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsFactory;
@@ -26,6 +27,22 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 	private boolean authError = false;
 	private boolean checkBeaconError = false;
+
+	@Override
+	public Observable<UserProfile> getUserProfile(String authToken) {
+		return new Observable<UserProfile>(new Observable.OnSubscribe<UserProfile>() {
+			@Override
+			public void call(Subscriber<? super UserProfile> subscriber) {
+				authError = false;
+				if(authError) {
+					subscriber.onError(new AuthenticationException());
+				} else {
+					subscriber.onNext(new UserProfile());
+					subscriber.onCompleted();
+				}
+			}
+		}) {}.delaySubscription(2000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
 
 	@Override
 	@DebugLog
@@ -73,7 +90,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 		return new Observable<BeaconDataResponse>(new Observable.OnSubscribe<BeaconDataResponse>() {
 			@Override
 			public void call(Subscriber<? super BeaconDataResponse> subscriber) {
-				subscriber.onNext(new BeaconDataResponse());
+				subscriber.onNext(BeaconDataResponse.NULL);
 				subscriber.onCompleted();
 			}
 		}) {};
@@ -155,7 +172,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 		return new Observable<BeaconDataResponse>(new Observable.OnSubscribe<BeaconDataResponse>() {
 			@Override
 			public void call(Subscriber<? super BeaconDataResponse> subscriber) {
-				subscriber.onNext(new BeaconDataResponse());
+				subscriber.onNext(BeaconDataResponse.NULL);
 				subscriber.onCompleted();
 			}
 		}) {}.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());

@@ -202,12 +202,13 @@ public class BindActivity extends BaseActivity {
 	private CountDownTimer cdt;
 	private BluetoothAdapter mBluetoothAdapter;
 	private int mLoaderTranslation;
-	private String mQrData = StringUtils.EMPTY_STRING;
 	private Subscription mErrValidationSubscription;
 	private Subscription mErrBindSubscription;
 	private ErrorHelper mErrorHelper;
+
 	private boolean mBindClicked = false;
-	private BeaconDataResponse mBeaconData;
+	private String mQrData = StringUtils.EMPTY_STRING;
+	private BeaconDataResponse mBeaconData = BeaconDataResponse.NULL;
 
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
 		if(enable) {
@@ -526,9 +527,19 @@ public class BindActivity extends BaseActivity {
 		                        }, R.string.cancel, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						finish();
+						resetActivityState();
 					}
 				});
+	}
+
+	private void resetActivityState() {
+		if(cdt != null) {
+			cdt.cancel();
+		}
+		mBeaconData = BeaconDataResponse.NULL;
+		mQrData = StringUtils.EMPTY_STRING;
+		mBeacons.clear();
+		mBindClicked = false;
 	}
 
 	private void onBeaconCheckError(final int number) {
@@ -541,7 +552,7 @@ public class BindActivity extends BaseActivity {
 		                        }, R.string.cancel, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						finish();
+						resetActivityState();
 					}
 				});
 	}

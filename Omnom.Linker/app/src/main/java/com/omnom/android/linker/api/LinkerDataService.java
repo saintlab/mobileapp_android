@@ -1,5 +1,6 @@
 package com.omnom.android.linker.api;
 
+import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.beacon.BeaconBindRequest;
 import com.omnom.android.linker.model.beacon.BeaconBuildRequest;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
@@ -32,6 +33,10 @@ public interface LinkerDataService {
 	@FormUrlEncoded
 	@POST("/remind_password")
 	Observable<String> remindPassword(@Field(Protocol.FIELD_USERNAME) String username);
+
+	@FormUrlEncoded
+	@POST("/user")
+	Observable<UserProfile> getUserProfile(@Field(Protocol.HEADER_AUTH_TOKEN) String authToken);
 
 	// migration done
 	@GET("/restaurants")

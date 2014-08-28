@@ -2,13 +2,27 @@ package com.omnom.android.linker.model.beacon;
 
 import com.google.gson.annotations.Expose;
 import com.omnom.android.linker.model.ResponseBase;
+import com.omnom.android.linker.utils.StringUtils;
 
 /**
  * Created by Ch3D on 25.08.2014.
  */
 public class BeaconDataResponse extends ResponseBase {
+
+	public static BeaconDataResponse NULL = new BeaconDataResponse(StringUtils.EMPTY_STRING, -1, -1);
+
 	@Expose
 	private String uuid;
+	@Expose
+	private int major;
+	@Expose
+	private int minor;
+
+	public BeaconDataResponse(String uuid, int major, int minor) {
+		this.uuid = uuid;
+		this.major = major;
+		this.minor = minor;
+	}
 
 	public String getUuid() {
 		return uuid;
@@ -21,12 +35,6 @@ public class BeaconDataResponse extends ResponseBase {
 	public int getMinor() {
 		return minor;
 	}
-
-	@Expose
-	private int major;
-
-	@Expose
-	private int minor;
 
 	@Override
 	public String toString() {

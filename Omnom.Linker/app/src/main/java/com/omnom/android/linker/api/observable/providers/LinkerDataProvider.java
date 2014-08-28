@@ -9,6 +9,7 @@ import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.api.LinkerDataService;
 import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.beacon.BeaconBindRequest;
 import com.omnom.android.linker.model.beacon.BeaconBuildRequest;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
@@ -48,6 +49,17 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 		mDataService = mRestAdapter.create(LinkerDataService.class);
 		// TODO: Remove
 		setAuthToken("stub_auth_token");
+	}
+
+	@Override
+	public Observable<UserProfile> getUserProfile(String authToken) {
+		return new Observable<UserProfile>(new Observable.OnSubscribe<UserProfile>() {
+			@Override
+			public void call(Subscriber<? super UserProfile> subscriber) {
+				subscriber.onNext(new UserProfile());
+				subscriber.onCompleted();
+			}
+		}) {}.delaySubscription(2000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
