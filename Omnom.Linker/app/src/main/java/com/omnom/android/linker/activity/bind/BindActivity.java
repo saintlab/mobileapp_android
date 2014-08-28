@@ -169,11 +169,10 @@ public class BindActivity extends BaseActivity {
 	protected LinkerObeservableApi api;
 
 	protected BluetoothLeService mBluetoothLeService;
+	private boolean mBound = false;
+
 	@Inject
 	protected Bus mBus;
-	//private BroadcastReceiver gattConnectedReceiver = new GattBroadcastReceiver(this);
-	//private boolean mGattReceiverRegistered = false;
-	private boolean mBound = false;
 
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
@@ -631,15 +630,6 @@ public class BindActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		//		final IntentFilter filter = new IntentFilter();
-		//		filter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-		//		filter.addAction(BluetoothLeService.ACTION_GATT_FAILED);
-		//		filter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-		//		filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-		//		filter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
-		//		// filter.addAction(BluetoothLeService.ACTION_CHARACTERISTIC_UPDATE);
-		//		registerReceiver(gattConnectedReceiver, filter);
-		//		mGattReceiverRegistered = true;
 		mBus.register(this);
 	}
 
@@ -664,9 +654,6 @@ public class BindActivity extends BaseActivity {
 	protected void onPause() {
 		super.onPause();
 		mBus.unregister(this);
-		//		if(mGattReceiverRegistered) {
-		//			unregisterReceiver(gattConnectedReceiver);
-		//		}
 	}
 
 	@Override
