@@ -16,7 +16,8 @@ public class BeaconFindRequest {
 	private int minor;
 
 	public BeaconFindRequest(Beacon beacon) {
-		this(beacon.getIdValue(0), Integer.valueOf(beacon.getIdValue(1)), Integer.valueOf(beacon.getIdValue(2)));
+		// FIXME: uppercase vs lowercase
+		this(beacon.getIdValue(0).toUpperCase(), Integer.valueOf(beacon.getIdValue(1)), Integer.valueOf(beacon.getIdValue(2)));
 	}
 
 	public BeaconFindRequest(String uuid, int major, int minor) {

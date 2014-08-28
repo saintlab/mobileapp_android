@@ -16,9 +16,15 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.omnom.android.linker.LinkerApplication;
+import com.omnom.android.linker.activity.bind.GattEvent;
+import com.squareup.otto.Bus;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.inject.Inject;
 
 import hugo.weaving.DebugLog;
 
@@ -27,6 +33,9 @@ public class BluetoothLeService extends Service {
 	public final static String ACTION_GATT_FAILED = "ACTION_GATT_FAILED";
 	public final static String ACTION_GATT_DISCONNECTED = "ACTION_GATT_DISCONNECTED";
 	public final static String ACTION_GATT_SERVICES_DISCOVERED = "ACTION_GATT_SERVICES_DISCOVERED";
+
+	@Inject
+	protected Bus mBus;
 
 	private BluetoothGattCallback callback = new BluetoothGattCallback() {
 		@Override
@@ -87,17 +96,25 @@ public class BluetoothLeService extends Service {
 	private BluetoothGatt mBluetoothGatt;
 	private Runnable mQueueEndCallback;
 
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		LinkerApplication.get(this).inject(this);
+	}
+
 	@DebugLog
 	private void broadcastUpdate(final String action) {
-		final Intent intent = new Intent(action);
-		sendBroadcast(intent);
+		mBus.post(new GattEvent(action));
+//		final Intent intent = new Intent(action);
+//		sendBroadcast(intent);
 	}
 
 	@DebugLog
 	private void broadcastUpdate(final String action, int rssi) {
-		final Intent intent = new Intent(action);
-		intent.putExtra(EXTRA_DATA, String.valueOf(rssi));
-		sendBroadcast(intent);
+		mBus.post(new GattEvent(action));
+//		final Intent intent = new Intent(action);
+//		intent.putExtra(EXTRA_DATA, String.valueOf(rssi));
+//		sendBroadcast(intent);
 	}
 
 	//	@DebugLog
