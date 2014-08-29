@@ -9,12 +9,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.utils.AnimationUtils;
@@ -37,6 +39,7 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
@@ -288,34 +291,50 @@ public class ValidationActivity extends BaseActivity {
 					public Observable<RestaurantsResponse> call(String s) {
 						getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, s).commit();
 						api.setAuthToken(s);
-						return api.getRestaurants();
+						return Observable.combineLatest(api.getRestaurants(),
+						                                api.getUserProfile(s),
+						                                new Func2<RestaurantsResponse, UserProfile,
+								                                RestaurantsResponse>() {
+							                                @Override
+							                                public RestaurantsResponse call(RestaurantsResponse restaurants,
+							                                                                UserProfile profile) {
+								                                LinkerApplication.get(getActivity()).cacheUserProfile(profile);
+								                                return restaurants;
+							                                }
+						                                });
 					}
 				})).subscribe(new Action1<Observable<RestaurantsResponse>>() {
-			@Override
-			public void call(Observable<RestaurantsResponse> restaurantsResultObservable) {
-				restaurantsResultObservable.subscribe(new Action1<RestaurantsResponse>() {
+					              @Override
+					              public void call(Observable<RestaurantsResponse> restaurantsResultObservable) {
+						              restaurantsResultObservable.subscribe(new Action1<RestaurantsResponse>() {
+							                                                    @Override
+							                                                    public void call(RestaurantsResponse restaurantsResult) {
+								                                                    mRestaurants = restaurantsResult;
+								                                                    mDataLoaded = true;
+								                                                    if(mAnimationFinished) {
+									                                                    onTasksFinished();
+								                                                    }
+							                                                    }
+						                                                    }
+						                                                   );
+					              }
+				              }
+
+				, new Action1<Throwable>() {
 					@Override
-					public void call(RestaurantsResponse restaurantsResult) {
-						mRestaurants = restaurantsResult;
-						mDataLoaded = true;
-						if(mAnimationFinished && mDataLoaded) {
-							onTasksFinished();
+					public void call(Throwable throwable) {
+						//TODO:
+						// loader.stopProgressAnimation(true);
+						loader.stopProgressAnimation();
+						showToast(getActivity(), R.string.msg_error);
+						if(throwable instanceof AuthenticationException) {
+							onAuthError(throwable);
 						}
+						Log.e(TAG, "authenticate()", throwable);
 					}
-				});
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				loader.stopProgressAnimation();
-				loader.showProgress(false);
-				showToast(ValidationActivity.this, R.string.msg_error);
-				if(throwable instanceof AuthenticationException) {
-					onAuthError(throwable);
 				}
-				Log.e(TAG, "authenticate()", throwable);
-			}
-		});
+
+		                     );
 	}
 
 	private void onAuthError(Throwable e) {

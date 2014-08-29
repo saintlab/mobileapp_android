@@ -5,13 +5,17 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.base.OmnomActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.drawable.RoundTransformation;
 import com.omnom.android.linker.drawable.RoundedDrawable;
+import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.ViewUtils;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -52,6 +56,15 @@ public class UserProfileActivity extends BaseActivity {
 	@Override
 	public void initUi() {
 		RoundedDrawable.setRoundedDrawable(mImgUser, BitmapFactory.decodeResource(getResources(), R.drawable.empty_avatar));
+		final UserProfile userProfile = LinkerApplication.get(getActivity()).getUserProfile();
+		mTxtInfo.setText(userProfile.getInfo());
+		mTxtLogin.setText(userProfile.getLogin());
+		mTxtUsername.setText(userProfile.getUsername());
+		float dimension = getResources().getDimension(R.dimen.profile_avatar_size);
+		Picasso.with(this).load(userProfile.getImageUrl()).resize((int) dimension, (int) dimension).centerCrop().transform(
+				RoundTransformation.create
+						(156,
+						 0)).into(mImgUser);
 	}
 
 	@OnClick(R.id.btn_back)

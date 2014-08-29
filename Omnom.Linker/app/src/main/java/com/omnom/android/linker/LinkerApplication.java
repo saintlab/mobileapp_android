@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.omnom.android.linker.activity.base.OmnomActivity;
+import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.modules.AndroidModule;
 import com.omnom.android.linker.modules.ApplicationModule;
 import com.omnom.android.linker.modules.LinkerDataProviderModule;
@@ -30,6 +31,7 @@ public class LinkerApplication extends Application {
 
 	private final List<Object> injectList = new ArrayList<Object>();
 	private ObjectGraph objectGraph;
+	private UserProfile mUserProfile;
 
 	protected List<Object> getModules() {
 		return Arrays.asList(/*new StubDataProviderModule(),*/new LinkerDataProviderModule(), new AndroidModule(this),
@@ -56,5 +58,13 @@ public class LinkerApplication extends Application {
 		injectList.clear();
 		inject(this);
 		int i = 1;
+	}
+
+	public void cacheUserProfile(UserProfile profile) {
+		mUserProfile = profile;
+	}
+
+	public UserProfile getUserProfile() {
+		return mUserProfile;
 	}
 }
