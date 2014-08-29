@@ -42,8 +42,7 @@ public class ErrorHelper {
 	}
 
 	public void showError(final int logoResId, int errTextResId, int btnTextResId, View.OnClickListener onClickListener) {
-		mLoader.updateProgress(0);
-		mLoader.stopProgressAnimation();
+		mLoader.stopProgressAnimation(true);
 		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, true);
 		mLoader.post(new Runnable() {
 			@Override

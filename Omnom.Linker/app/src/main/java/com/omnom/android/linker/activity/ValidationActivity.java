@@ -174,7 +174,6 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void validate() {
-		// loader.animateLogo(R.drawable.ic_fork_n_knife);
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 		loader.showProgress(false);
 		if(mFirstRun) {
@@ -244,7 +243,7 @@ public class ValidationActivity extends BaseActivity {
 	@DebugLog
 	private void onAnimationEnd() {
 		mAnimationFinished = true;
-		if(mAnimationFinished && mDataLoaded) {
+		if(mDataLoaded) {
 			onTasksFinished();
 		}
 	}
@@ -254,20 +253,20 @@ public class ValidationActivity extends BaseActivity {
 			@Override
 			public void run() {
 				if(mRestaurants == null) {
-					showToastLong(ValidationActivity.this, R.string.error_server_unavailable_please_try_again);
+					showToastLong(loader, R.string.error_server_unavailable_please_try_again);
 					finish();
 					return;
 				}
 				final List<Restaurant> items = mRestaurants.getItems();
 				int size = items.size();
 				if(items.isEmpty()) {
-					showToastLong(ValidationActivity.this, R.string.error_no_restaurants_please_try_again_later);
+					showToastLong(loader, R.string.error_no_restaurants_please_try_again_later);
 					finish();
 					return;
 				}
 
 				if(size == 1) {
-					BindActivity.start(ValidationActivity.this, items.get(0), false);
+					BindActivity.start(getActivity(), items.get(0), false);
 					finish();
 				} else {
 					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
@@ -275,7 +274,7 @@ public class ValidationActivity extends BaseActivity {
 						@Override
 						public void run() {
 							ViewUtils.setVisible(panelBottom, false);
-							RestaurantsListActivity.start(ValidationActivity.this, items);
+							RestaurantsListActivity.start(getActivity(), items);
 							finish();
 						}
 					});
@@ -291,50 +290,48 @@ public class ValidationActivity extends BaseActivity {
 					public Observable<RestaurantsResponse> call(String s) {
 						getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, s).commit();
 						api.setAuthToken(s);
-						return Observable.combineLatest(api.getRestaurants(),
-						                                api.getUserProfile(s),
-						                                new Func2<RestaurantsResponse, UserProfile,
-								                                RestaurantsResponse>() {
-							                                @Override
-							                                public RestaurantsResponse call(RestaurantsResponse restaurants,
-							                                                                UserProfile profile) {
-								                                LinkerApplication.get(getActivity()).cacheUserProfile(profile);
-								                                return restaurants;
-							                                }
-						                                });
+						return Observable.combineLatest(
+								api.getRestaurants(),
+								api.getUserProfile(s),
+								new Func2<RestaurantsResponse, UserProfile,
+										RestaurantsResponse>() {
+									@Override
+									public RestaurantsResponse call(RestaurantsResponse restaurants,
+									                                UserProfile profile) {
+										LinkerApplication.get(getActivity()).cacheUserProfile(profile);
+										return restaurants;
+									}
+								});
 					}
 				})).subscribe(new Action1<Observable<RestaurantsResponse>>() {
-					              @Override
-					              public void call(Observable<RestaurantsResponse> restaurantsResultObservable) {
-						              restaurantsResultObservable.subscribe(new Action1<RestaurantsResponse>() {
-							                                                    @Override
-							                                                    public void call(RestaurantsResponse restaurantsResult) {
-								                                                    mRestaurants = restaurantsResult;
-								                                                    mDataLoaded = true;
-								                                                    if(mAnimationFinished) {
-									                                                    onTasksFinished();
-								                                                    }
-							                                                    }
-						                                                    }
-						                                                   );
-					              }
-				              }
+			@Override
+			public void call(Observable<RestaurantsResponse> restaurantsResultObservable) {
+				restaurantsResultObservable.subscribe(
+						new Action1<RestaurantsResponse>() {
+							@Override
+							public void call(RestaurantsResponse restaurantsResult) {
+								mRestaurants = restaurantsResult;
+								mDataLoaded = true;
+								if(mAnimationFinished) {
+									onTasksFinished();
+								}
+							}
+						}
+				                                     );
+			}
+		}
 
 				, new Action1<Throwable>() {
-					@Override
-					public void call(Throwable throwable) {
-						//TODO:
-						// loader.stopProgressAnimation(true);
-						loader.stopProgressAnimation();
-						showToast(getActivity(), R.string.msg_error);
-						if(throwable instanceof AuthenticationException) {
-							onAuthError(throwable);
-						}
-						Log.e(TAG, "authenticate()", throwable);
-					}
+			@Override
+			public void call(Throwable throwable) {
+				loader.stopProgressAnimation(true);
+				showToast(getActivity(), R.string.msg_error);
+				if(throwable instanceof AuthenticationException) {
+					onAuthError(throwable);
 				}
-
-		                     );
+				Log.e(TAG, "authenticate()", throwable);
+			}
+		});
 	}
 
 	private void onAuthError(Throwable e) {

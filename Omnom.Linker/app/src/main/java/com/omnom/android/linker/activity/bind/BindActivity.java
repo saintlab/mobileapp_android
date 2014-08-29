@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
@@ -76,6 +75,9 @@ import static butterknife.ButterKnife.findById;
  */
 public class BindActivity extends BaseActivity {
 
+	public static final int DURATION_BEACON_WRITING = 10000;
+	public static final int DURATION_VALIDATE = 5000;
+
 	private static final String TAG = BindActivity.class.getSimpleName();
 	private static final int REQUEST_CODE_ENABLE_BLUETOOTH = 100;
 	private static final int REQUEST_CODE_SCAN_QR = 101;
@@ -87,8 +89,6 @@ public class BindActivity extends BaseActivity {
 		intent.putExtra(EXTRA_SHOW_BACK, showBack);
 		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
 	}
-
-	private BeaconParser parser;
 
 	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		BeaconFilter mFilter = new BeaconFilter();
@@ -107,7 +107,6 @@ public class BindActivity extends BaseActivity {
 			});
 		}
 	};
-
 	private final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -120,7 +119,6 @@ public class BindActivity extends BaseActivity {
 			connectToBeacon();
 		}
 	};
-
 	protected volatile boolean gattConnected = false;
 	protected volatile boolean gattAvailable = false;
 
@@ -137,6 +135,7 @@ public class BindActivity extends BaseActivity {
 				onGattFailed();
 			} else {
 				mLoader.animateLogo(R.drawable.ic_done_white);
+				mLoader.showProgress(false, true);
 				AnimationUtils.animateAlpha(mPanelBottom, true);
 				mBtnBottom.setText(R.string.bind_table);
 				mPanelBottom.setVisibility(View.VISIBLE);
@@ -146,31 +145,24 @@ public class BindActivity extends BaseActivity {
 			mBluetoothLeService.close();
 		}
 	};
-
 	@InjectView(R.id.btn_bottom)
 	protected Button mBtnBottom;
-
 	@InjectView(R.id.btn_bind_table)
 	protected Button mBtnBindTable;
-
 	@InjectView(R.id.btn_back)
 	protected View mBtnBack;
-
 	@InjectView(R.id.btn_profile)
 	protected View mBtnProfile;
-
 	@InjectView(R.id.txt_error)
 	protected TextView mTxtError;
-
 	@InjectViews({R.id.txt_error, R.id.panel_bottom, R.id.btn_profile})
 	protected List<View> errorViews;
-
 	@Inject
 	protected LinkerObeservableApi api;
-
 	protected BluetoothLeService mBluetoothLeService;
 	@Inject
 	protected Bus mBus;
+	private BeaconParser parser;
 	private boolean mBound = false;
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
@@ -198,7 +190,7 @@ public class BindActivity extends BaseActivity {
 
 	private Set<Beacon> mBeacons = new HashSet<Beacon>();
 	private LoaderController mLoaderController;
-	private CountDownTimer cdt;
+	// private CountDownTimer cdt;
 	private BluetoothAdapter mBluetoothAdapter;
 	private int mLoaderTranslation;
 	private Subscription mErrValidationSubscription;
@@ -286,10 +278,7 @@ public class BindActivity extends BaseActivity {
 
 	@DebugLog
 	private void connectToBeacon() {
-		cdt = AndroidUtils.createTimer(mLoader, beaconTimeoutCallback, 10000);
-		// TODO:
-		// mErrorHelper.setTimer(cdt);
-		cdt.start();
+		mLoader.startProgressAnimation(DURATION_BEACON_WRITING, beaconTimeoutCallback);
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
 					@Override
@@ -314,7 +303,7 @@ public class BindActivity extends BaseActivity {
 			public void call(Boolean hasNoErrors) {
 				if(hasNoErrors) {
 					if(mBeacon == null || !mBluetoothLeService.connect(mBeacon.getBluetoothAddress())) {
-						cdt.cancel();
+						mLoader.stopProgressAnimation(true);
 					}
 				}
 			}
@@ -454,15 +443,7 @@ public class BindActivity extends BaseActivity {
 		mLoader.animateLogo(R.drawable.ic_mexico_logo);
 		mLoader.animateColorDefault();
 		clearErrors();
-		cdt = AndroidUtils.createTimer(mLoader, new Runnable() {
-			@Override
-			public void run() {
-				// scanQrCode();
-			}
-		}, 5000);
-		// TODO:
-		// mErrorHelper.setTimer(cdt);
-		cdt.start();
+		mLoader.startProgressAnimation(DURATION_VALIDATE, null);
 		mErrBindSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
 					@Override
@@ -540,7 +521,7 @@ public class BindActivity extends BaseActivity {
 	}
 
 	private void onErrorQrCheck(final int number) {
-		cdt.cancel();
+		mLoader.stopProgressAnimation(true);
 		AndroidUtils.showDialog(getActivity(), getString(R.string.qr_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
@@ -565,7 +546,7 @@ public class BindActivity extends BaseActivity {
 	}
 
 	private void onErrorBeaconCheck(final int number) {
-		cdt.cancel();
+		mLoader.stopProgressAnimation(true);
 		AndroidUtils.showDialog(getActivity(), getString(R.string.beacon_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
@@ -583,7 +564,7 @@ public class BindActivity extends BaseActivity {
 	@Override
 	public void initUi() {
 		mLoaderController = new LoaderController(this, mLoader);
-		mErrorHelper = new ErrorHelper(mLoader, mTxtError, mBtnBottom, errorViews, cdt);
+		mErrorHelper = new ErrorHelper(mLoader, mTxtError, mBtnBottom, errorViews);
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
 		mLoaderTranslation = ViewUtils.dipToPixels(this, 48);
@@ -696,6 +677,7 @@ public class BindActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		mLoader.onDestroy();
 		if(mErrValidationSubscription != null) {
 			mErrValidationSubscription.unsubscribe();
 		}

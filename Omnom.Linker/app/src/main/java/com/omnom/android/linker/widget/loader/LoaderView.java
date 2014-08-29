@@ -312,6 +312,11 @@ public class LoaderView extends FrameLayout {
 
 	@DebugLog
 	public void stopProgressAnimation() {
+		stopProgressAnimation(false);
+	}
+
+	public void stopProgressAnimation(boolean hideProgress) {
+		showProgress(!hideProgress);
 		if(mProgressAnimator != null && mProgressAnimator.isRunning()) {
 			mProgressBar.setTag(R.id.canceled, true);
 			mProgressAnimator.cancel();
@@ -381,8 +386,7 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void onDestroy() {
-		stopProgressAnimation();
-		updateProgress(0);
+		stopProgressAnimation(true);
 	}
 
 	public void hideLogo() {
