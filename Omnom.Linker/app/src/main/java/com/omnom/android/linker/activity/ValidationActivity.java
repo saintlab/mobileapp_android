@@ -241,7 +241,7 @@ public class ValidationActivity extends BaseActivity {
 	@DebugLog
 	private void onAnimationEnd() {
 		mAnimationFinished = true;
-		if(mAnimationFinished && mDataLoaded) {
+		if(mDataLoaded) {
 			onTasksFinished();
 		}
 	}
@@ -298,7 +298,7 @@ public class ValidationActivity extends BaseActivity {
 					public void call(RestaurantsResponse restaurantsResult) {
 						mRestaurants = restaurantsResult;
 						mDataLoaded = true;
-						if(mAnimationFinished && mDataLoaded) {
+						if(mAnimationFinished) {
 							onTasksFinished();
 						}
 					}

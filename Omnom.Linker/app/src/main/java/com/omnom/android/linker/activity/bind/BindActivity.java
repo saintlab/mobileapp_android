@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
@@ -198,7 +197,7 @@ public class BindActivity extends BaseActivity {
 
 	private Set<Beacon> mBeacons = new HashSet<Beacon>();
 	private LoaderController mLoaderController;
-	private CountDownTimer cdt;
+	// private CountDownTimer cdt;
 	private BluetoothAdapter mBluetoothAdapter;
 	private int mLoaderTranslation;
 	private Subscription mErrValidationSubscription;
@@ -286,10 +285,7 @@ public class BindActivity extends BaseActivity {
 
 	@DebugLog
 	private void connectToBeacon() {
-		cdt = AndroidUtils.createTimer(mLoader, beaconTimeoutCallback, 10000);
-		// TODO:
-		// mErrorHelper.setTimer(cdt);
-		cdt.start();
+		mLoader.startProgressAnimation(10000, beaconTimeoutCallback);
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
 					@Override
@@ -314,7 +310,7 @@ public class BindActivity extends BaseActivity {
 			public void call(Boolean hasNoErrors) {
 				if(hasNoErrors) {
 					if(mBeacon == null || !mBluetoothLeService.connect(mBeacon.getBluetoothAddress())) {
-						cdt.cancel();
+						mLoader.stopProgressAnimation();
 					}
 				}
 			}
@@ -454,15 +450,7 @@ public class BindActivity extends BaseActivity {
 		mLoader.animateLogo(R.drawable.ic_mexico_logo);
 		mLoader.animateColorDefault();
 		clearErrors();
-		cdt = AndroidUtils.createTimer(mLoader, new Runnable() {
-			@Override
-			public void run() {
-				// scanQrCode();
-			}
-		}, 5000);
-		// TODO:
-		// mErrorHelper.setTimer(cdt);
-		cdt.start();
+		mLoader.startProgressAnimation(5000, null);
 		mErrBindSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
 					@Override
@@ -540,7 +528,7 @@ public class BindActivity extends BaseActivity {
 	}
 
 	private void onErrorQrCheck(final int number) {
-		cdt.cancel();
+		mLoader.stopProgressAnimation();
 		AndroidUtils.showDialog(getActivity(), getString(R.string.qr_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
@@ -565,7 +553,7 @@ public class BindActivity extends BaseActivity {
 	}
 
 	private void onErrorBeaconCheck(final int number) {
-		cdt.cancel();
+		mLoader.stopProgressAnimation();
 		AndroidUtils.showDialog(getActivity(), getString(R.string.beacon_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
@@ -583,7 +571,7 @@ public class BindActivity extends BaseActivity {
 	@Override
 	public void initUi() {
 		mLoaderController = new LoaderController(this, mLoader);
-		mErrorHelper = new ErrorHelper(mLoader, mTxtError, mBtnBottom, errorViews, cdt);
+		mErrorHelper = new ErrorHelper(mLoader, mTxtError, mBtnBottom, errorViews);
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
 		mLoaderTranslation = ViewUtils.dipToPixels(this, 48);
@@ -696,6 +684,7 @@ public class BindActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		mLoader.onDestroy();
 		if(mErrValidationSubscription != null) {
 			mErrValidationSubscription.unsubscribe();
 		}
