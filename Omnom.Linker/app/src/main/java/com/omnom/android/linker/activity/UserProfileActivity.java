@@ -23,6 +23,7 @@ import butterknife.InjectViews;
 import butterknife.OnClick;
 
 public class UserProfileActivity extends BaseActivity {
+	public static final long DURATION = 500;
 
 	public static void start(OmnomActivity activity) {
 		activity.startActivity(UserProfileActivity.class, false);
@@ -73,11 +74,11 @@ public class UserProfileActivity extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		final int dimension = (int) getResources().getDimension(R.dimen.profile_avatar_size);
-		postDelayed(350, new Runnable() {
+		postDelayed(AnimationUtils.DURATION_SHORT, new Runnable() {
 			@Override
 			public void run() {
-				AnimationUtils.scaleHeight(mImgUser, dimension);
-				AnimationUtils.scaleWidth(mImgUser, dimension, null, new Runnable() {
+				AnimationUtils.scaleHeight(mImgUser, dimension, DURATION);
+				AnimationUtils.scaleWidth(mImgUser, dimension, DURATION, new Runnable() {
 					@Override
 					public void run() {
 						ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, true);
@@ -90,8 +91,8 @@ public class UserProfileActivity extends BaseActivity {
 	@Override
 	public void finish() {
 		ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
-		AnimationUtils.scaleHeight(mImgUser, 0);
-		AnimationUtils.scaleWidth(mImgUser, 0, null, new Runnable() {
+		AnimationUtils.scaleHeight(mImgUser, 0, DURATION);
+		AnimationUtils.scaleWidth(mImgUser, 0, DURATION, new Runnable() {
 			@Override
 			public void run() {
 				UserProfileActivity.super.finish();

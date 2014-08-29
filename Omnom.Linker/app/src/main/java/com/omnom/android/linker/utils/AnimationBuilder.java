@@ -25,7 +25,7 @@ public class AnimationBuilder {
 	private AnimationBuilder() {
 	}
 
-	public void setDuration(int duration) {
+	public void setDuration(long duration) {
 		animator.setDuration(duration);
 	}
 
