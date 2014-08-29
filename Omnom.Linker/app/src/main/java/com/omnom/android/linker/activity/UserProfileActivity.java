@@ -1,6 +1,5 @@
 package com.omnom.android.linker.activity;
 
-import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -11,7 +10,6 @@ import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.base.OmnomActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.drawable.RoundTransformation;
-import com.omnom.android.linker.drawable.RoundedDrawable;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.ViewUtils;
@@ -55,13 +53,12 @@ public class UserProfileActivity extends BaseActivity {
 
 	@Override
 	public void initUi() {
-		RoundedDrawable.setRoundedDrawable(mImgUser, BitmapFactory.decodeResource(getResources(), R.drawable.empty_avatar));
 		final UserProfile userProfile = LinkerApplication.get(getActivity()).getUserProfile();
 		mTxtInfo.setText(userProfile.getInfo());
 		mTxtLogin.setText(userProfile.getLogin());
 		mTxtUsername.setText(userProfile.getUsername());
 		int dimension = (int) getResources().getDimension(R.dimen.profile_avatar_size);
-		Picasso.with(this).load(userProfile.getImageUrl()).resize(dimension, dimension).centerCrop().transform(
+		Picasso.with(this).load(userProfile.getImageUrl()).placeholder(R.drawable.empty_avatar).resize(dimension, dimension).centerCrop().transform(
 				RoundTransformation.create(dimension, 0)).into(mImgUser);
 	}
 
@@ -88,8 +85,7 @@ public class UserProfileActivity extends BaseActivity {
 		postDelayed(AnimationUtils.DURATION_SHORT, new Runnable() {
 			@Override
 			public void run() {
-				AnimationUtils.scaleHeight(mImgUser, dimension, DURATION);
-				AnimationUtils.scaleWidth(mImgUser, dimension, DURATION, new Runnable() {
+				AnimationUtils.scale(mImgUser, dimension, DURATION, new Runnable() {
 					@Override
 					public void run() {
 						ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, true);

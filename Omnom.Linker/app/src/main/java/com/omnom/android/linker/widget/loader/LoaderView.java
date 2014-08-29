@@ -197,8 +197,7 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void scaleDown(int size, final long duration, final Runnable endAction) {
-		AnimationUtils.scaleHeight(mImgLoader, size, duration);
-		AnimationUtils.scaleWidth(mImgLoader, size, duration, endAction);
+		AnimationUtils.scale(mImgLoader, size, duration, endAction);
 	}
 
 	public void scaleDown() {
@@ -214,8 +213,7 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void scaleUp(final Runnable endCallback) {
-		AnimationUtils.scaleHeight(mImgLoader, mImgLoader.getMeasuredHeight() * 10);
-		AnimationUtils.scaleWidth(mImgLoader, mImgLoader.getMeasuredWidth() * 10, null, endCallback);
+		AnimationUtils.scale(mImgLoader, mImgLoader.getMeasuredWidth() * 10, endCallback);
 	}
 
 	public void animateLogo(final int resId) {
@@ -242,41 +240,6 @@ public class LoaderView extends FrameLayout {
 		}
 		mImgLogo.setImageResource(resId);
 		mImgLogo.setTag(R.id.img_loader, resId);
-	}
-
-	public void addProgress(final int increment, final int real) {
-		int progress = mProgressBar.getProgress();
-		if(mSpeedUpLimit >= progress) {
-			updateProgress(progress + (int) (increment * PROGRESS_INCREMENT_FACTOR), real);
-		} else {
-			updateProgress(progress + increment, real);
-		}
-	}
-
-	public void updateProgress(final int progress, final int realProgress) {
-		mProgressBar.post(new Runnable() {
-			@Override
-			public void run() {
-				final int max = mProgressBar.getMax();
-				showProgress(progress > 0 && progress < max, progress > max);
-				// TODO: Improve
-				int edge = max - (max / 4);
-				final float endPeriod = max - edge;
-				if(realProgress > edge && realProgress < max) {
-					float i = realProgress - mInterEdge;
-					float fraction = i / (max - mInterEdge);
-					float interpolation1 = interpolation.getInterpolation(fraction);
-					int value = (int) (interpolation1 * (realProgress - edge));
-					mProgressBar.setProgress(mProgressBar.getProgress() + value);
-				} else if(progress > edge && progress < max) {
-					int progress1 = mProgressBar.getProgress() + 1;
-					mProgressBar.setProgress(progress1);
-					mInterEdge = progress1;
-				} else if(progress < edge) {
-					mProgressBar.setProgress(progress);
-				}
-			}
-		});
 	}
 
 	public void updateProgress(final int progress) {

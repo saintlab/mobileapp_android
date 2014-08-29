@@ -49,6 +49,7 @@ public class ValidationActivity extends BaseActivity {
 	public static final int DURATION_VALIDATION = 5000;
 	private static final String TAG = ValidationActivity.class.getSimpleName();
 	private static final int REQUEST_CODE_ENABLE_BT = 100;
+	public static final int LOADER_SIZE_HUGE = 900;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public static void start(final Context context, Restaurant restaurant, int animation) {
@@ -165,7 +166,7 @@ public class ValidationActivity extends BaseActivity {
 		loader.setColor(getResources().getColor(R.color.loader_bg));
 		if(mFirstRun) {
 			if(mAnimationType == EXTRA_LOADER_ANIMATION_SCALE_DOWN) {
-				final int dpSize = ViewUtils.dipToPixels(this, 900);
+				final int dpSize = ViewUtils.dipToPixels(this, LOADER_SIZE_HUGE);
 				loader.setSize(dpSize, dpSize);
 			} else {
 				loader.setSize(0, 0);

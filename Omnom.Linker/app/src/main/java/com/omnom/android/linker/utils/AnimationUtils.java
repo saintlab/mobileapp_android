@@ -127,4 +127,13 @@ public class AnimationUtils {
 		}).build().start();
 	}
 
+	public static void scale(final View view, int size, Runnable endCallback) {
+		scaleHeight(view, size);
+		scaleWidth(view, size, null, endCallback);
+	}
+
+	public static void scale(final View view, int size, long duration, Runnable endCallback) {
+		scaleHeight(view, size, duration);
+		scaleWidth(view, size, duration, endCallback);
+	}
 }
