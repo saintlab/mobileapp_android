@@ -49,8 +49,14 @@ public abstract class BaseListActivity extends ListActivity implements OmnomActi
 		mHelper.startActivity(cls, delay);
 	}
 
+	@Override
 	public void startActivity(Class<?> cls) {
 		mHelper.startActivity(cls);
+	}
+
+	@Override
+	public void startActivity(Class<?> cls, boolean finish) {
+		mHelper.startActivity(cls, finish);
 	}
 
 	@Override
