@@ -60,11 +60,9 @@ public class UserProfileActivity extends BaseActivity {
 		mTxtInfo.setText(userProfile.getInfo());
 		mTxtLogin.setText(userProfile.getLogin());
 		mTxtUsername.setText(userProfile.getUsername());
-		float dimension = getResources().getDimension(R.dimen.profile_avatar_size);
-		Picasso.with(this).load(userProfile.getImageUrl()).resize((int) dimension, (int) dimension).centerCrop().transform(
-				RoundTransformation.create
-						(156,
-						 0)).into(mImgUser);
+		int dimension = (int) getResources().getDimension(R.dimen.profile_avatar_size);
+		Picasso.with(this).load(userProfile.getImageUrl()).resize(dimension, dimension).centerCrop().transform(
+				RoundTransformation.create(dimension, 0)).into(mImgUser);
 	}
 
 	@OnClick(R.id.btn_back)
