@@ -76,8 +76,14 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 		mHelper.startActivity(intent, animIn, animOut);
 	}
 
+	@Override
 	public void startActivity(Class<?> cls) {
 		mHelper.startActivity(cls);
+	}
+
+	@Override
+	public void startActivity(Class<?> cls, boolean finish) {
+		mHelper.startActivity(cls, finish);
 	}
 
 	@Override

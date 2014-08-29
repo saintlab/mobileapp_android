@@ -237,7 +237,13 @@ public class BindActivity extends BaseActivity {
 	@OnClick(R.id.btn_profile)
 	public void onProfile() {
 		mBindClicked = false;
-		startActivity(new Intent(this, UserProfileActivity.class));
+		mLoader.hideLogo();
+		mLoader.scaleDown(0, null, new Runnable() {
+			@Override
+			public void run() {
+				UserProfileActivity.start(BindActivity.this);
+			}
+		});
 	}
 
 	@OnClick(R.id.btn_bind_table)
@@ -626,6 +632,19 @@ public class BindActivity extends BaseActivity {
 		filter.addAction(BluetoothLeService.ACTION_CHARACTERISTIC_UPDATE);
 		registerReceiver(gattConnectedReceiver, filter);
 		mGattReceiverRegistered = true;
+		postDelayed(300, new Runnable() {
+			@Override
+			public void run() {
+				if(mLoader.getSize() == 0) {
+					mLoader.scaleDown(null, new Runnable() {
+						@Override
+						public void run() {
+							mLoader.showLogo();
+						}
+					});
+				}
+			}
+		});
 	}
 
 	@Override

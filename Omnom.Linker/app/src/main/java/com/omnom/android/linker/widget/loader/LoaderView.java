@@ -157,6 +157,11 @@ public class LoaderView extends FrameLayout {
 		AnimationUtils.scaleWidth(mImgLoader, loaderSize, scaleDownUpdate, endAction);
 	}
 
+	public void scaleDown(int size, final Runnable scaleDownUpdate, final Runnable endAction) {
+		AnimationUtils.scaleHeight(mImgLoader, size);
+		AnimationUtils.scaleWidth(mImgLoader, size, scaleDownUpdate, endAction);
+	}
+
 	@DebugLog
 	public void scaleDown() {
 		setSize(loaderSize, loaderSize);
@@ -245,11 +250,11 @@ public class LoaderView extends FrameLayout {
 					float interpolation1 = interpolation.getInterpolation(fraction);
 					int value = (int) (interpolation1 * (realProgress - edge));
 					mProgressBar.setProgress(mProgressBar.getProgress() + value);
-				} else if (progress > edge && progress < max) {
+				} else if(progress > edge && progress < max) {
 					int progress1 = mProgressBar.getProgress() + 1;
 					mProgressBar.setProgress(progress1);
 					mInterEdge = progress1;
-				} else if (progress < edge) {
+				} else if(progress < edge) {
 					mProgressBar.setProgress(progress);
 				}
 			}
@@ -290,5 +295,17 @@ public class LoaderView extends FrameLayout {
 
 	public int getProgress() {
 		return mProgressBar.getProgress();
+	}
+
+	public void hideLogo() {
+		AnimationUtils.animateAlpha(mImgLogo, false);
+	}
+
+	public void showLogo() {
+		AnimationUtils.animateAlpha(mImgLogo, true);
+	}
+
+	public int getSize() {
+		return mImgLoader.getLayoutParams().width;
 	}
 }

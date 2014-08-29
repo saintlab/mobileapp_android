@@ -28,7 +28,7 @@ public class RestaurantsListActivity extends BaseListActivity {
 
 	@OnClick(R.id.btn_profile)
 	public void onProfile() {
-		startActivity(new Intent(this, UserProfileActivity.class));
+		UserProfileActivity.start(this);
 	}
 
 	@Override

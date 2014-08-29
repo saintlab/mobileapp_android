@@ -18,10 +18,17 @@ public class ViewUtils {
 		}
 	};
 
+	public static final ButterKnife.Setter<View, Boolean> VISIBLITY2 = new ButterKnife.Setter<View, Boolean>() {
+		@Override
+		public void set(View view, Boolean value, int index) {
+			view.setVisibility(value ? View.VISIBLE : View.INVISIBLE);
+		}
+	};
+
 	public static final ButterKnife.Setter<View, Boolean> VISIBLITY_ALPHA = new ButterKnife.Setter<View, Boolean>() {
 		@Override
 		public void set(View view, Boolean value, int index) {
-			AnimationUtils.animateAlpha(view, false);
+			AnimationUtils.animateAlpha(view, value);
 		}
 	};
 
