@@ -307,8 +307,7 @@ public class ValidationActivity extends BaseActivity {
 		}, new Action1<Throwable>() {
 			@Override
 			public void call(Throwable throwable) {
-				loader.stopProgressAnimation();
-				loader.showProgress(false);
+				loader.stopProgressAnimation(true);
 				showToast(ValidationActivity.this, R.string.msg_error);
 				if(throwable instanceof AuthenticationException) {
 					onAuthError(throwable);

@@ -136,6 +136,7 @@ public class BindActivity extends BaseActivity {
 				onGattFailed();
 			} else {
 				mLoader.animateLogo(R.drawable.ic_done_white);
+				mLoader.showProgress(false, true);
 				AnimationUtils.animateAlpha(mPanelBottom, true);
 				mBtnBottom.setText(R.string.bind_table);
 				mPanelBottom.setVisibility(View.VISIBLE);
@@ -310,7 +311,7 @@ public class BindActivity extends BaseActivity {
 			public void call(Boolean hasNoErrors) {
 				if(hasNoErrors) {
 					if(mBeacon == null || !mBluetoothLeService.connect(mBeacon.getBluetoothAddress())) {
-						mLoader.stopProgressAnimation();
+						mLoader.stopProgressAnimation(true);
 					}
 				}
 			}
@@ -528,7 +529,7 @@ public class BindActivity extends BaseActivity {
 	}
 
 	private void onErrorQrCheck(final int number) {
-		mLoader.stopProgressAnimation();
+		mLoader.stopProgressAnimation(true);
 		AndroidUtils.showDialog(getActivity(), getString(R.string.qr_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
@@ -553,7 +554,7 @@ public class BindActivity extends BaseActivity {
 	}
 
 	private void onErrorBeaconCheck(final int number) {
-		mLoader.stopProgressAnimation();
+		mLoader.stopProgressAnimation(true);
 		AndroidUtils.showDialog(getActivity(), getString(R.string.beacon_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
