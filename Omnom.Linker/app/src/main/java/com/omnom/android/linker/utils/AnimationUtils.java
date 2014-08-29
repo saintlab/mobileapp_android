@@ -14,10 +14,18 @@ public class AnimationUtils {
 	public static final long DURATION_SHORT = 350;
 
 	public static void animateAlpha(final View view, final boolean visible) {
-		animateAlpha(view, visible, null);
+		animateAlpha(view, visible, DURATION_SHORT);
+	}
+
+	public static void animateAlpha(final View view, final boolean visible, long duration) {
+		animateAlpha(view, visible, null, duration);
 	}
 
 	public static void animateAlpha(final View view, final boolean visible, final Runnable callback) {
+		animateAlpha(view, visible, callback, DURATION_SHORT);
+	}
+
+	public static void animateAlpha(final View view, final boolean visible, final Runnable callback, long duration) {
 		final Boolean tag = (Boolean) view.getTag();
 		if(tag != null && tag == visible) {
 			// skip
@@ -29,7 +37,7 @@ public class AnimationUtils {
 			ViewUtils.setVisible(view, visible);
 		}
 		view.setTag(visible);
-		view.animate().setDuration(DURATION_SHORT).
+		view.animate().setDuration(duration).
 				setInterpolator(new AccelerateDecelerateInterpolator()).
 				setListener(new AnimatorListenerAdapter() {
 					@Override
@@ -80,8 +88,37 @@ public class AnimationUtils {
 		builder.build().start();
 	}
 
+	public static void scaleWidth(final View view, final int width, final long duration,
+	                              final Runnable endCallback) {
+		AnimationBuilder builder = AnimationBuilder.create(view.getMeasuredWidth(), width);
+		builder.setDuration(duration);
+		builder.addListener(new AnimationBuilder.UpdateLisetener() {
+			@Override
+			public void invoke(ValueAnimator animation) {
+				view.getLayoutParams().width = (Integer) animation.getAnimatedValue();
+				view.requestLayout();
+			}
+		});
+		if(endCallback != null) {
+			builder.onEnd(endCallback);
+		}
+		builder.build().start();
+	}
+
 	public static void scaleHeight(final View view, int height) {
 		AnimationBuilder.create(view.getMeasuredHeight(), height).addListener(new AnimationBuilder.UpdateLisetener() {
+			@Override
+			public void invoke(ValueAnimator animation) {
+				view.getLayoutParams().height = (Integer) animation.getAnimatedValue();
+				view.requestLayout();
+			}
+		}).build().start();
+	}
+
+	public static void scaleHeight(final View view, int height, long duration) {
+		AnimationBuilder builder = AnimationBuilder.create(view.getMeasuredHeight(), height);
+		builder.setDuration(duration);
+		builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
 			public void invoke(ValueAnimator animation) {
 				view.getLayoutParams().height = (Integer) animation.getAnimatedValue();

@@ -249,8 +249,8 @@ public class BindActivity extends BaseActivity {
 	@OnClick(R.id.btn_profile)
 	public void onProfile() {
 		mBindClicked = false;
-		mLoader.hideLogo();
-		mLoader.scaleDown(0, null, new Runnable() {
+		mLoader.hideLogo(UserProfileActivity.DURATION);
+		mLoader.scaleDown(0, UserProfileActivity.DURATION, new Runnable() {
 			@Override
 			public void run() {
 				UserProfileActivity.start(BindActivity.this);
@@ -655,14 +655,14 @@ public class BindActivity extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		mBus.register(this);
-		postDelayed(300, new Runnable() {
+		postDelayed(AnimationUtils.DURATION_SHORT, new Runnable() {
 			@Override
 			public void run() {
 				if(mLoader.getSize() == 0) {
 					mLoader.scaleDown(null, new Runnable() {
 						@Override
 						public void run() {
-							mLoader.showLogo();
+							mLoader.showLogo(UserProfileActivity.DURATION);
 						}
 					});
 				}

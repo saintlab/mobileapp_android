@@ -196,6 +196,11 @@ public class LoaderView extends FrameLayout {
 		AnimationUtils.scaleWidth(mImgLoader, size, scaleDownUpdate, endAction);
 	}
 
+	public void scaleDown(int size, final long duration, final Runnable endAction) {
+		AnimationUtils.scaleHeight(mImgLoader, size, duration);
+		AnimationUtils.scaleWidth(mImgLoader, size, duration, endAction);
+	}
+
 	public void scaleDown() {
 		setSize(loaderSize, loaderSize);
 	}
@@ -386,6 +391,14 @@ public class LoaderView extends FrameLayout {
 
 	public void showLogo() {
 		AnimationUtils.animateAlpha(mImgLogo, true);
+	}
+
+	public void hideLogo(long duration) {
+		AnimationUtils.animateAlpha(mImgLogo, false, duration);
+	}
+
+	public void showLogo(long duration) {
+		AnimationUtils.animateAlpha(mImgLogo, true, duration);
 	}
 
 	public int getSize() {
