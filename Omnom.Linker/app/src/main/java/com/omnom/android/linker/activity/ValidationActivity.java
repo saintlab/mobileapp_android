@@ -47,9 +47,9 @@ import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 public class ValidationActivity extends BaseActivity {
 
 	public static final int DURATION_VALIDATION = 5000;
+	public static final int LOADER_SIZE_HUGE = 900;
 	private static final String TAG = ValidationActivity.class.getSimpleName();
 	private static final int REQUEST_CODE_ENABLE_BT = 100;
-	public static final int LOADER_SIZE_HUGE = 900;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public static void start(final Context context, Restaurant restaurant, int animation) {
@@ -304,11 +304,11 @@ public class ValidationActivity extends BaseActivity {
 									}
 								});
 					}
-				})).subscribe(new Action1<Observable<RestaurantsResponse>>() {
-			@Override
-			public void call(Observable<RestaurantsResponse> restaurantsResultObservable) {
-				restaurantsResultObservable.subscribe(
-						new Action1<RestaurantsResponse>() {
+				})).subscribe(
+				new Action1<Observable<RestaurantsResponse>>() {
+					@Override
+					public void call(Observable<RestaurantsResponse> restaurantsResultObservable) {
+						restaurantsResultObservable.subscribe(new Action1<RestaurantsResponse>() {
 							@Override
 							public void call(RestaurantsResponse restaurantsResult) {
 								mRestaurants = restaurantsResult;
@@ -317,22 +317,19 @@ public class ValidationActivity extends BaseActivity {
 									onTasksFinished();
 								}
 							}
+						});
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						loader.stopProgressAnimation(true);
+						showToast(getActivity(), R.string.msg_error);
+						if(throwable instanceof AuthenticationException) {
+							onAuthError(throwable);
 						}
-				                                     );
-			}
-		}
-
-				, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				loader.stopProgressAnimation(true);
-				showToast(getActivity(), R.string.msg_error);
-				if(throwable instanceof AuthenticationException) {
-					onAuthError(throwable);
-				}
-				Log.e(TAG, "authenticate()", throwable);
-			}
-		});
+						Log.e(TAG, "authenticate()", throwable);
+					}
+				});
 	}
 
 	private void onAuthError(Throwable e) {
