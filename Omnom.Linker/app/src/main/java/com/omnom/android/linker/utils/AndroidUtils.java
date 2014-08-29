@@ -116,6 +116,10 @@ public class AndroidUtils {
 		return lm.isProviderEnabled(LocationManager.GPS_PROVIDER) || lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 	}
 
+	public static void showToast(View view, int resId) {
+		showToast(view.getContext(), resId);
+	}
+
 	public static void showToast(Context context, int resId) {
 		Toast toast = Toast.makeText(context, context.getString(resId), Toast.LENGTH_SHORT);
 		View view = LayoutInflater.from(context).inflate(R.layout.transient_notification, null);
@@ -129,6 +133,10 @@ public class AndroidUtils {
 		Toast toast = Toast.makeText(context, context.getString(resId), Toast.LENGTH_LONG);
 		toast.setView(LayoutInflater.from(context).inflate(R.layout.transient_notification, null));
 		toast.show();
+	}
+
+	public static void showToastLong(View view, int resId) {
+		showToastLong(view.getContext(), resId);
 	}
 
 	public static AlertDialog showDialog(Context context, int msg, int okResId, DialogInterface.OnClickListener okListener,

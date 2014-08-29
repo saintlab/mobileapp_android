@@ -171,7 +171,6 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void validate() {
-		// loader.animateLogo(R.drawable.ic_fork_n_knife);
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 		loader.showProgress(false);
 		if(mFirstRun) {
@@ -251,20 +250,20 @@ public class ValidationActivity extends BaseActivity {
 			@Override
 			public void run() {
 				if(mRestaurants == null) {
-					showToastLong(ValidationActivity.this, R.string.error_server_unavailable_please_try_again);
+					showToastLong(loader, R.string.error_server_unavailable_please_try_again);
 					finish();
 					return;
 				}
 				final List<Restaurant> items = mRestaurants.getItems();
 				int size = items.size();
 				if(items.isEmpty()) {
-					showToastLong(ValidationActivity.this, R.string.error_no_restaurants_please_try_again_later);
+					showToastLong(loader, R.string.error_no_restaurants_please_try_again_later);
 					finish();
 					return;
 				}
 
 				if(size == 1) {
-					BindActivity.start(ValidationActivity.this, items.get(0), false);
+					BindActivity.start(getActivity(), items.get(0), false);
 					finish();
 				} else {
 					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
@@ -272,7 +271,7 @@ public class ValidationActivity extends BaseActivity {
 						@Override
 						public void run() {
 							ViewUtils.setVisible(panelBottom, false);
-							RestaurantsListActivity.start(ValidationActivity.this, items);
+							RestaurantsListActivity.start(getActivity(), items);
 							finish();
 						}
 					});
@@ -308,7 +307,7 @@ public class ValidationActivity extends BaseActivity {
 			@Override
 			public void call(Throwable throwable) {
 				loader.stopProgressAnimation(true);
-				showToast(ValidationActivity.this, R.string.msg_error);
+				showToast(loader, R.string.msg_error);
 				if(throwable instanceof AuthenticationException) {
 					onAuthError(throwable);
 				}
