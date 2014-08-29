@@ -13,8 +13,6 @@ import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -45,7 +43,7 @@ public class ErrorHelper {
 
 	public void showError(final int logoResId, int errTextResId, int btnTextResId, View.OnClickListener onClickListener) {
 		mLoader.updateProgress(0);
-		mLoader.stopAnimation();
+		mLoader.stopProgressAnimation();
 		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, true);
 		mLoader.post(new Runnable() {
 			@Override

@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
+import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -45,7 +46,7 @@ public class ValidationActivity extends BaseActivity {
 
 	private static final String TAG = ValidationActivity.class.getSimpleName();
 	private static final int REQUEST_CODE_ENABLE_BT = 100;
-	public static final int DURATION_VALIDATION = 3000;
+	public static final int DURATION_VALIDATION = 5000;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public static void start(final Context context, Restaurant restaurant, int animation) {
@@ -73,7 +74,6 @@ public class ValidationActivity extends BaseActivity {
 	@Inject
 	protected LinkerObeservableApi api;
 
-	// private CountDownTimer cdt;
 	private String mUsername = null;
 	private String mPassword = null;
 
@@ -86,7 +86,10 @@ public class ValidationActivity extends BaseActivity {
 	private Subscription mAuthDataSubscription;
 	private ErrorHelper mErrorHelper;
 	private int mAnimationType;
+
 	private boolean mFirstRun = true;
+	private boolean mAnimationFinished = false;
+	private boolean mDataLoaded = false;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -230,34 +233,47 @@ public class ValidationActivity extends BaseActivity {
 		});
 	}
 
+	@DebugLog
 	private void onAnimationEnd() {
-		if(mRestaurants == null) {
-			showToastLong(this, R.string.error_server_unavailable_please_try_again);
-//			finish();
-			return;
+		mAnimationFinished = true;
+		if(mAnimationFinished && mDataLoaded) {
+			onTasksFinished();
 		}
-		final List<Restaurant> items = mRestaurants.getItems();
-		int size = items.size();
-		if(items.isEmpty()) {
-			showToastLong(this, R.string.error_no_restaurants_please_try_again_later);
-//			finish();
-			return;
-		}
+	}
 
-		if(size == 1) {
-			BindActivity.start(this, items.get(0), false);
-			finish();
-		} else {
-			loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
-			loader.scaleUp(new Runnable() {
-				@Override
-				public void run() {
-					ViewUtils.setVisible(panelBottom, false);
-					RestaurantsListActivity.start(ValidationActivity.this, items);
+	private void onTasksFinished() {
+		loader.updateProgressMax(new Runnable() {
+			@Override
+			public void run() {
+				if(mRestaurants == null) {
+					showToastLong(ValidationActivity.this, R.string.error_server_unavailable_please_try_again);
 					finish();
+					return;
 				}
-			});
-		}
+				final List<Restaurant> items = mRestaurants.getItems();
+				int size = items.size();
+				if(items.isEmpty()) {
+					showToastLong(ValidationActivity.this, R.string.error_no_restaurants_please_try_again_later);
+					finish();
+					return;
+				}
+
+				if(size == 1) {
+					BindActivity.start(ValidationActivity.this, items.get(0), false);
+					finish();
+				} else {
+					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
+					loader.scaleUp(new Runnable() {
+						@Override
+						public void run() {
+							ViewUtils.setVisible(panelBottom, false);
+							RestaurantsListActivity.start(ValidationActivity.this, items);
+							finish();
+						}
+					});
+				}
+			}
+		});
 	}
 
 	private void authenticateAndGetData() {
@@ -276,6 +292,10 @@ public class ValidationActivity extends BaseActivity {
 					@Override
 					public void call(RestaurantsResponse restaurantsResult) {
 						mRestaurants = restaurantsResult;
+						mDataLoaded = true;
+						if(mAnimationFinished && mDataLoaded) {
+							onTasksFinished();
+						}
 					}
 				});
 			}
