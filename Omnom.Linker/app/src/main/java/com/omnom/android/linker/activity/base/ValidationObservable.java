@@ -68,8 +68,8 @@ public class ValidationObservable {
 	public static Observable<? extends ValidationObservable.Error> validate(final Context context) {
 		return Observable.concat(hasConnection(context), isLocationEnabled(context), isBluetoothEnabled(context))
 		                 .timeout(TIMEOUT, TimeUnit.MILLISECONDS)
-		                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
 		                 .delaySubscription(400, TimeUnit.MILLISECONDS)
+		                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
 		                 .takeFirst(new Func1<Error, Boolean>() {
 			                 @Override
 			                 public Boolean call(Error error) {

@@ -1,6 +1,5 @@
 package com.omnom.android.linker.activity;
 
-import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
@@ -44,9 +43,9 @@ import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class ValidationActivity extends BaseActivity {
 
+	public static final int DURATION_VALIDATION = 5000;
 	private static final String TAG = ValidationActivity.class.getSimpleName();
 	private static final int REQUEST_CODE_ENABLE_BT = 100;
-	public static final int DURATION_VALIDATION = 5000;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public static void start(final Context context, Restaurant restaurant, int animation) {
@@ -79,8 +78,6 @@ public class ValidationActivity extends BaseActivity {
 
 	@Nullable
 	private RestaurantsResponse mRestaurants = null;
-	@Nullable
-	private ObjectAnimator mCurrentAnimation;
 
 	private Subscription mErrValidationSubscription;
 	private Subscription mAuthDataSubscription;
@@ -120,8 +117,15 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	@Override
+	protected void onPause() {
+		super.onPause();
+		loader.animateLogo(R.drawable.ic_fork_n_knife);
+	}
+
+	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		loader.onDestroy();
 		if(mErrValidationSubscription != null) {
 			mErrValidationSubscription.unsubscribe();
 		}
@@ -132,6 +136,7 @@ public class ValidationActivity extends BaseActivity {
 
 	@Override
 	public void finish() {
+		loader.onDestroy();
 		if(mRestaurants == null) {
 			super.finish();
 			return;
@@ -166,7 +171,7 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void validate() {
-		loader.animateLogo(R.drawable.ic_fork_n_knife);
+		// loader.animateLogo(R.drawable.ic_fork_n_knife);
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 		loader.showProgress(false);
 		if(mFirstRun) {
@@ -183,7 +188,7 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void startLoader() {
-		mCurrentAnimation = loader.startProgressAnimation(DURATION_VALIDATION, new Runnable() {
+		loader.startProgressAnimation(DURATION_VALIDATION, new Runnable() {
 			@Override
 			public void run() {
 				onAnimationEnd();
@@ -302,7 +307,7 @@ public class ValidationActivity extends BaseActivity {
 		}, new Action1<Throwable>() {
 			@Override
 			public void call(Throwable throwable) {
-				mCurrentAnimation.cancel();
+				loader.stopProgressAnimation();
 				loader.showProgress(false);
 				showToast(ValidationActivity.this, R.string.msg_error);
 				if(throwable instanceof AuthenticationException) {

@@ -302,7 +302,7 @@ public class LoaderView extends FrameLayout {
 
 	@DebugLog
 	public void stopProgressAnimation() {
-		if(mProgressAnimator != null && mProgressAnimator.isStarted()) {
+		if(mProgressAnimator != null && mProgressAnimator.isRunning()) {
 			mProgressBar.setTag(R.id.canceled, true);
 			mProgressAnimator.cancel();
 		}
@@ -311,8 +311,9 @@ public class LoaderView extends FrameLayout {
 	public ObjectAnimator startProgressAnimation(long duration, final Runnable callback) {
 		mProgressAnimator = ObjectAnimator.ofInt(mProgressBar, PROPERTY_PROGRESS, 0, mProgressBar.getMax());
 		mProgressAnimator.setInterpolator(interpolation);
+		mProgressAnimator.setAutoCancel(true);
 		mProgressAnimator.setDuration(duration);
-		final int limit = (mProgressBar.getMax() / 100) * 98;
+		final int limit = (mProgressBar.getMax() / 100) * 99;
 		mProgressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
@@ -327,7 +328,6 @@ public class LoaderView extends FrameLayout {
 			@DebugLog
 			public void onAnimationEnd(Animator animation) {
 				final Object tag = ((View) mProgressAnimator.getTarget()).getTag(R.id.canceled);
-				System.err.println(">>> tag = " + tag);
 				if(tag != null && (Boolean) tag) {
 					// skip callback
 					return;
@@ -342,9 +342,10 @@ public class LoaderView extends FrameLayout {
 		return mProgressAnimator;
 	}
 
-	public void updateProgressMax(final Runnable callback) {
+	public ObjectAnimator updateProgressMax(final Runnable callback) {
 		mProgressAnimator = ObjectAnimator.ofInt(mProgressBar, PROPERTY_PROGRESS, mProgressBar.getProgress(), mProgressBar.getMax());
-		mProgressAnimator.setDuration(200);
+		mProgressAnimator.setDuration(100);
+		mProgressAnimator.setAutoCancel(true);
 		mProgressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
@@ -355,11 +356,22 @@ public class LoaderView extends FrameLayout {
 			@Override
 			@DebugLog
 			public void onAnimationEnd(Animator animation) {
+				final Object tag = ((View) mProgressAnimator.getTarget()).getTag(R.id.canceled);
+				if(tag != null && (Boolean) tag) {
+					// skip callback
+					return;
+				}
 				if(callback != null) {
 					callback.run();
 				}
 			}
 		});
 		mProgressAnimator.start();
+		return mProgressAnimator;
+	}
+
+	public void onDestroy() {
+		stopProgressAnimation();
+		updateProgress(0);
 	}
 }
