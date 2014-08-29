@@ -281,7 +281,8 @@ public class BindActivity extends BaseActivity {
 	@DebugLog
 	private void connectToBeacon() {
 		cdt = AndroidUtils.createTimer(mLoader, beaconTimeoutCallback, 10000);
-		mErrorHelper.setTimer(cdt);
+		// TODO:
+		// mErrorHelper.setTimer(cdt);
 		cdt.start();
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
@@ -453,7 +454,8 @@ public class BindActivity extends BaseActivity {
 				// scanQrCode();
 			}
 		}, 5000);
-		mErrorHelper.setTimer(cdt);
+		// TODO:
+		// mErrorHelper.setTimer(cdt);
 		cdt.start();
 		mErrBindSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
@@ -511,7 +513,6 @@ public class BindActivity extends BaseActivity {
 											return;
 										}
 										mBindClicked = false;
-										mLoader.jumpProgress(1);
 										if(tableData != TableDataResponse.NULL) {
 											onErrorBeaconCheck(tableData.getInternalId());
 										} else {
@@ -534,7 +535,6 @@ public class BindActivity extends BaseActivity {
 
 	private void onErrorQrCheck(final int number) {
 		cdt.cancel();
-		mLoader.jumpProgress(1);
 		AndroidUtils.showDialog(getActivity(), getString(R.string.qr_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
@@ -560,7 +560,6 @@ public class BindActivity extends BaseActivity {
 
 	private void onErrorBeaconCheck(final int number) {
 		cdt.cancel();
-		mLoader.jumpProgress(1);
 		AndroidUtils.showDialog(getActivity(), getString(R.string.beacon_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
@@ -703,7 +702,6 @@ public class BindActivity extends BaseActivity {
 				                         new Func2<BeaconDataResponse, TableDataResponse, Void>() {
 					                         @Override
 					                         public Void call(BeaconDataResponse beaconData, TableDataResponse tableData) {
-						                         mLoader.jumpProgress(1);
 						                         return null;
 					                         }
 				                         }).onErrorResumeNext(Observable.<Void>empty()).subscribe();

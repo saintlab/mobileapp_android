@@ -71,16 +71,15 @@ public class AndroidUtils {
 		final Context context = loader.getContext();
 		final int progressMax = context.getResources().getInteger(R.integer.loader_progress_max);
 		final float f = duration / progressMax;
-		final float progressPerDuration = (float)progressMax / (float)duration;
+		final float progressPerDuration = (float) progressMax / (float) duration;
 		loader.updateProgress(0);
 
 		return new CountDownTimer(duration, context.getResources().getInteger(R.integer.loader_tick_interval)) {
 			@Override
 			public void onTick(long millisUntilFinished) {
 				final long currValue = duration - millisUntilFinished;
-				final int increment = Math.max(0, Math.min(MAX_ANIMATION_INCEREMENT, (int) (currValue * progressPerDuration)));
 				final int realTimeProgress = (int) (currValue / f);
-				loader.addProgress(increment, realTimeProgress);
+				// loader.updateProgress(realTimeProgress);
 			}
 
 			@Override

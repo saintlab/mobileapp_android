@@ -34,5 +34,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="logout_user">Выход из аккаунта</string>
     <string name="restaurants_list">Список заведений</string>
+    <string name="error_server_unavailable_please_try_again">Невозможно получить данные с сервера. Пожалуйста, попробуйте еще раз</string>
+    <string name="error_no_restaurants_please_try_again_later">Не найдено ни одного доступоного ресторана. Пожалуйста, попробуйте позже</string>
 
 </resources>
