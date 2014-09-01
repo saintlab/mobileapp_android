@@ -30,4 +30,9 @@ public class LoginActivityTest extends ActivityInstrumentationTestCase2<LoginAct
 		SystemClock.sleep(4000);
 		Espresso.onView(withId(R.id.btn_login)).perform(click());
 	}
+
+	public void testLoginFail() {
+		SystemClock.sleep(4000);
+		Espresso.onView(withId(R.id.btn_bind_table)).perform(click());
+	}
 }
