@@ -26,21 +26,22 @@ import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.ErrorHelper;
 import com.omnom.android.linker.activity.UserProfileActivity;
 import com.omnom.android.linker.activity.base.BaseActivity;
-import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.model.ResponseBase;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.table.TableDataResponse;
+import com.omnom.android.linker.observable.BaseErrorHandler;
+import com.omnom.android.linker.observable.ValidationObservable;
+import com.omnom.android.linker.service.BeaconAttributes;
 import com.omnom.android.linker.service.BluetoothLeService;
-import com.omnom.android.linker.service.CharacteristicDataHolder;
-import com.omnom.android.linker.service.RBLBluetoothAttributes;
+import com.omnom.android.linker.service.CharacteristicHolder;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderController;
 import com.omnom.android.linker.widget.loader.LoaderView;
-import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import org.apache.http.HttpStatus;
@@ -67,7 +68,6 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 
 import static butterknife.ButterKnife.findById;
 
@@ -88,8 +88,6 @@ public class BindActivity extends BaseActivity {
 		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
 	}
 
-	private BeaconParser parser;
-
 	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		BeaconFilter mFilter = new BeaconFilter();
 
@@ -107,7 +105,6 @@ public class BindActivity extends BaseActivity {
 			});
 		}
 	};
-
 	private final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -120,16 +117,12 @@ public class BindActivity extends BaseActivity {
 			connectToBeacon();
 		}
 	};
-
 	protected volatile boolean gattConnected = false;
 	protected volatile boolean gattAvailable = false;
-
 	@InjectView(R.id.loader)
 	protected LoaderView mLoader;
-
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
-
 	final Runnable beaconTimeoutCallback = new Runnable() {
 		@Override
 		public void run() {
@@ -146,31 +139,22 @@ public class BindActivity extends BaseActivity {
 			mBluetoothLeService.close();
 		}
 	};
-
 	@InjectView(R.id.btn_bottom)
 	protected Button mBtnBottom;
-
 	@InjectView(R.id.btn_bind_table)
 	protected Button mBtnBindTable;
-
 	@InjectView(R.id.btn_back)
 	protected View mBtnBack;
-
 	@InjectView(R.id.btn_profile)
 	protected View mBtnProfile;
-
 	@InjectView(R.id.txt_error)
 	protected TextView mTxtError;
-
 	@InjectViews({R.id.txt_error, R.id.panel_bottom, R.id.btn_profile})
 	protected List<View> errorViews;
-
 	@Inject
 	protected LinkerObeservableApi api;
-
 	protected BluetoothLeService mBluetoothLeService;
-	@Inject
-	protected Bus mBus;
+	private BeaconParser parser;
 	private boolean mBound = false;
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
@@ -269,6 +253,11 @@ public class BindActivity extends BaseActivity {
 				   mBeaconData = beaconData;
 				   mLoaderController.setMode(LoaderView.Mode.NONE);
 				   connectToBeacon();
+			   }
+		   }, new BaseErrorHandler(this) {
+			   @Override
+			   protected void onThrowable(Throwable throwable) {
+				   mErrorHelper.showInternetError(mInternetErrorClickListener);
 			   }
 		   });
 	}
@@ -437,6 +426,11 @@ public class BindActivity extends BaseActivity {
 							swithToEnterDataMode();
 						}
 					}
+				}, new BaseErrorHandler(this) {
+					@Override
+					protected void onThrowable(Throwable throwable) {
+						mErrorHelper.showInternetError(mInternetErrorClickListener);
+					}
 				});
 			}
 		} else {
@@ -588,7 +582,7 @@ public class BindActivity extends BaseActivity {
 		mBluetoothAdapter = bluetoothManager.getAdapter();
 		mLoaderTranslation = ViewUtils.dipToPixels(this, 48);
 		parser = new BeaconParser();
-		parser.setBeaconLayout(RBLBluetoothAttributes.REDBEAR_BEACON_LAYOUT);
+		parser.setBeaconLayout(BeaconAttributes.REDBEAR_BEACON_LAYOUT);
 		final int btnTranslation = (int) (mLoaderTranslation * 1.75);
 		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		ViewTreeObserver.OnGlobalLayoutListener listener = AndroidUtils.createKeyboardListener(activityRootView,
@@ -708,22 +702,26 @@ public class BindActivity extends BaseActivity {
 
 	@DebugLog
 	public void writeBeaconData() {
-		mBluetoothLeService.queueCharacteristic(CharacteristicDataHolder.createPassword(
-				RBLBluetoothAttributes.RBL_DEFAULT_PASSKEY.getBytes()));
-		mBluetoothLeService.queueCharacteristic(CharacteristicDataHolder.createTx(RBLBluetoothAttributes.RBL_DEFAULT_TX));
-		mBluetoothLeService.queueCharacteristic(CharacteristicDataHolder.createMajorId(mBeaconData.getMajor()));
-		mBluetoothLeService.queueCharacteristic(CharacteristicDataHolder.createMinorId(mBeaconData.getMinor()));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createPassword(BeaconAttributes.RBL_DEFAULT_PASSKEY.getBytes()));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createTx(BeaconAttributes.RBL_DEFAULT_TX));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMajorId(mBeaconData.getMajor()));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMinorId(mBeaconData.getMinor()));
 		mBluetoothLeService.startWritingQueue(new Runnable() {
 			@Override
 			public void run() {
-				Observable.combineLatest(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon),
-				                         api.bindQrCode(mRestaurant.getId(), mLoader.getTableNumber(), mQrData),
-				                         new Func2<BeaconDataResponse, TableDataResponse, Void>() {
-					                         @Override
-					                         public Void call(BeaconDataResponse beaconData, TableDataResponse tableData) {
-						                         return null;
-					                         }
-				                         }).onErrorResumeNext(Observable.<Void>empty()).subscribe();
+				Observable.concat(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon),
+				                  api.bindQrCode(mRestaurant.getId(), mLoader.getTableNumber(), mQrData))
+				          .subscribe(new Action1<ResponseBase>() {
+					          @Override
+					          public void call(ResponseBase responseBase) {
+						          // Do nothing
+					          }
+				          }, new BaseErrorHandler(BindActivity.this) {
+					          @Override
+					          protected void onThrowable(Throwable throwable) {
+						          mErrorHelper.showInternetError(mInternetErrorClickListener);
+					          }
+				          });
 			}
 		});
 	}

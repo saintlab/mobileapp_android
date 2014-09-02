@@ -19,6 +19,7 @@ public interface Extras extends Preferences {
 
 	public static final int EXTRA_ERROR_WRONG_PASSWORD = 0;
 	public static final int EXTRA_ERROR_WRONG_USERNAME = 1;
+	public static final int EXTRA_ERROR_AUTHTOKEN_EXPIRED = 2;
 
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_UP = 0;
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_DOWN = 1;

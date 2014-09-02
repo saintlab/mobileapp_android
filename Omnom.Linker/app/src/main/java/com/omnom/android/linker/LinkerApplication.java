@@ -57,7 +57,6 @@ public class LinkerApplication extends Application {
 		}
 		injectList.clear();
 		inject(this);
-		int i = 1;
 	}
 
 	public void cacheUserProfile(UserProfile profile) {

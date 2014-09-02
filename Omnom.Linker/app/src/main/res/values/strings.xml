@@ -36,5 +36,6 @@
     <string name="restaurants_list">Список заведений</string>
     <string name="error_server_unavailable_please_try_again">Невозможно получить данные с сервера. Пожалуйста, попробуйте еще раз</string>
     <string name="error_no_restaurants_please_try_again_later">Не найдено ни одного доступоного ресторана. Пожалуйста, попробуйте позже</string>
+    <string name="error_unknown_server_error">Произошла ошибка соединения с сервером. Пожалуйста повторите </string>
 
 </resources>

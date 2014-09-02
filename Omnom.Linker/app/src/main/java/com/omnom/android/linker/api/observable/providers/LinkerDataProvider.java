@@ -11,7 +11,6 @@ import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.beacon.BeaconBindRequest;
-import com.omnom.android.linker.model.beacon.BeaconBuildRequest;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.beacon.BeaconFindRequest;
 import com.omnom.android.linker.model.qrcode.QRCodeBindRequest;
@@ -19,14 +18,21 @@ import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.model.table.TableDataResponse;
 
+import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthenticationException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import altbeacon.beacon.Beacon;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
+import retrofit.mime.TypedInput;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -146,8 +152,25 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 
 	@Override
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid) {
-		return mDataService.buildBeacon(new BeaconBuildRequest(uuid, String.valueOf(tableNumber), restaurantId))
-		                   .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		Response response = new Response("", HttpStatus.SC_UNAUTHORIZED, "", Collections.EMPTY_LIST, new TypedInput() {
+			@Override
+			public String mimeType() {
+				return null;
+			}
+
+			@Override
+			public long length() {
+				return 0;
+			}
+
+			@Override
+			public InputStream in() throws IOException {
+				return null;
+			}
+		});
+		return Observable.error(RetrofitError.httpError("", response, null, null));
+//		return mDataService.buildBeacon(new BeaconBuildRequest(uuid, String.valueOf(tableNumber), restaurantId))
+//		                   .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
