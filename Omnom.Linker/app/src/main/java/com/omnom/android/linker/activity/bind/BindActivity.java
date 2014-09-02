@@ -699,7 +699,7 @@ public class BindActivity extends BaseActivity {
 		mLoader.onDestroy();
 		OmnomObservable.unsubscribe(mErrValidationSubscription);
 		OmnomObservable.unsubscribe(mApiBindingSubscription);
-	}
+пше ые	}
 
 	@Override
 	public int getLayoutResource() {
