@@ -1,5 +1,6 @@
 package com.omnom.android.linker.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -13,10 +14,12 @@ import android.widget.TextView;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
+import com.omnom.android.linker.activity.base.Extras;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.StringUtils;
+import com.omnom.android.linker.utils.UserDataHolder;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.ErrorEditText;
 
@@ -31,6 +34,21 @@ import static com.omnom.android.linker.utils.ViewUtils.getTextValue;
 
 public class LoginActivity extends BaseActivity {
 	private static final String TAG = LoginActivity.class.getSimpleName();
+
+	public static void start(final Context context) {
+		start(context, null);
+	}
+
+	public static void start(final Context context, UserDataHolder dataHolder) {
+		Intent intent = new Intent(context, LoginActivity.class);
+		if(dataHolder != null) {
+			intent.putExtra(Extras.EXTRA_USERNAME, dataHolder.getUsername());
+			intent.putExtra(Extras.EXTRA_PASSWORD, dataHolder.getPassword());
+		}
+		intent.putExtra(Extras.EXTRA_ERROR_CODE, Extras.EXTRA_ERROR_AUTHTOKEN_EXPIRED);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		context.startActivity(intent);
+	}
 
 	private static class ErrorTextWatcher implements TextWatcher {
 		private final ErrorEditText view;

@@ -1,6 +1,6 @@
 package com.omnom.android.linker.activity.bind;
 
-import com.omnom.android.linker.service.RBLBluetoothAttributes;
+import com.omnom.android.linker.service.BeaconAttributes;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.Identifier;
@@ -17,6 +17,6 @@ public class BeaconFilter {
 		}
 		final Identifier id1 = beacon.getId1();
 		final String beaconId = id1.toString().toLowerCase();
-		return RBLBluetoothAttributes.BEACON_ID.equals(beaconId) && beacon.getRssi() >= RSSI_MIN_VALUE;
+		return BeaconAttributes.BEACON_ID.equals(beaconId) && beacon.getRssi() >= RSSI_MIN_VALUE;
 	}
 }

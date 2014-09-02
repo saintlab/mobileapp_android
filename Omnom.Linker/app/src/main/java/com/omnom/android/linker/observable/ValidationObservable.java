@@ -1,4 +1,4 @@
-package com.omnom.android.linker.activity.base;
+package com.omnom.android.linker.observable;
 
 import android.content.Context;
 

@@ -46,8 +46,6 @@ public class BluetoothLeService extends Service {
 			}
 			if(!processQueue()) {
 				mQueueEndCallback.run();
-				// disconnect();
-				// close();
 			}
 		}
 
@@ -77,9 +75,7 @@ public class BluetoothLeService extends Service {
 			}
 		}
 	};
-	public final static String ACTION_DATA_AVAILABLE = "ACTION_DATA_AVAILABLE";
-	public final static String ACTION_CHARACTERISTIC_UPDATE = "ACTION_CHARACTERISTIC_UPDATE";
-	public final static String EXTRA_DATA = "EXTRA_DATA";
+
 	private static final String TAG = BluetoothLeService.class.getSimpleName();
 
 	public class LocalBinder extends Binder {
@@ -88,7 +84,7 @@ public class BluetoothLeService extends Service {
 		}
 	}
 
-	private final LinkedBlockingQueue<CharacteristicDataHolder> mWriteQueue = new LinkedBlockingQueue<CharacteristicDataHolder>();
+	private final LinkedBlockingQueue<CharacteristicHolder> mWriteQueue = new LinkedBlockingQueue<CharacteristicHolder>();
 	private final IBinder mBinder = new LocalBinder();
 	private BluetoothManager mBluetoothManager;
 	private BluetoothAdapter mBluetoothAdapter;
@@ -105,25 +101,7 @@ public class BluetoothLeService extends Service {
 	@DebugLog
 	private void broadcastUpdate(final String action) {
 		mBus.post(new GattEvent(action));
-//		final Intent intent = new Intent(action);
-//		sendBroadcast(intent);
 	}
-
-	@DebugLog
-	private void broadcastUpdate(final String action, int rssi) {
-		mBus.post(new GattEvent(action));
-//		final Intent intent = new Intent(action);
-//		intent.putExtra(EXTRA_DATA, String.valueOf(rssi));
-//		sendBroadcast(intent);
-	}
-
-	//	@DebugLog
-	//	private void broadcastUpdate(final BluetoothGattCharacteristic characteristic) {
-	//		final Intent intent = new Intent(ACTION_CHARACTERISTIC_UPDATE);
-	//		intent.putExtra(Extras.EXTRA_CHARACTERISTIC_UUID, characteristic.getUuid().toString());
-	//		intent.putExtra(Extras.EXTRA_CHARACTERISTIC_VALUE, characteristic.getStringValue(0));
-	//		sendBroadcast(intent);
-	//	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -230,7 +208,7 @@ public class BluetoothLeService extends Service {
 	}
 
 	@DebugLog
-	public void queueCharacteristic(CharacteristicDataHolder data) {
+	public void queueCharacteristic(CharacteristicHolder data) {
 		if(mBluetoothAdapter == null || mBluetoothGatt == null) {
 			Log.w(TAG, "BluetoothAdapter not initialized");
 			return;
@@ -254,11 +232,11 @@ public class BluetoothLeService extends Service {
 			return false;
 		}
 
-		final CharacteristicDataHolder data = mWriteQueue.poll();
+		final CharacteristicHolder data = mWriteQueue.poll();
 		if(data != null) {
-			BluetoothGattService service = mBluetoothGatt.getService(data.serviceId);
-			BluetoothGattCharacteristic characteristic = service.getCharacteristic(data.charId);
-			characteristic.setValue(data.data);
+			BluetoothGattService service = mBluetoothGatt.getService(data.getServiceId());
+			BluetoothGattCharacteristic characteristic = service.getCharacteristic(data.getCharId());
+			characteristic.setValue(data.getData());
 			mBluetoothGatt.writeCharacteristic(characteristic);
 			return true;
 		}

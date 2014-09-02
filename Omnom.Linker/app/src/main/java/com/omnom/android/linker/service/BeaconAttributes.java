@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * Created by Ch3D on 01.08.2014.
  */
-public class RBLBluetoothAttributes {
+public class BeaconAttributes {
 	public static final String REDBEAR_BEACON_LAYOUT = "m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24";
 
 	public static final UUID UUID_BLE_REDBEAR_BEACON_SERVICE = UUID.fromString("b0702980-a295-a8ab-f734-031a98a512de");

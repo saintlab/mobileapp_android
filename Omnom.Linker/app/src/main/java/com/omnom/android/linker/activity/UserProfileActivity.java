@@ -1,5 +1,8 @@
 package com.omnom.android.linker.activity;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,8 +13,12 @@ import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.base.OmnomActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.drawable.RoundTransformation;
+import com.omnom.android.linker.drawable.RoundedDrawable;
 import com.omnom.android.linker.model.UserProfile;
+import com.omnom.android.linker.observable.BaseErrorHandler;
+import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.utils.AnimationUtils;
+import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
 
@@ -23,6 +30,11 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
+import rx.Subscription;
+import rx.android.observables.AndroidObservable;
+import rx.functions.Action1;
+
+import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseActivity {
 	public static final long DURATION = 500;
@@ -50,16 +62,51 @@ public class UserProfileActivity extends BaseActivity {
 	protected LinkerObeservableApi api;
 
 	private boolean mFirstRun = true;
+	private Subscription profileObservable;
 
 	@Override
 	public void initUi() {
 		final UserProfile userProfile = LinkerApplication.get(getActivity()).getUserProfile();
+		if(userProfile != null) {
+			initUserData(userProfile);
+		} else {
+			final String token = getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
+			if(TextUtils.isEmpty(token)) {
+				LoginActivity.start(this);
+				return;
+			}
+			profileObservable = AndroidObservable.bindActivity(this, api.getUserProfile(token)).subscribe(new Action1<UserProfile>() {
+				@Override
+				public void call(UserProfile userProfile) {
+					LinkerApplication.get(getActivity()).cacheUserProfile(userProfile);
+					initUserData(userProfile);
+				}
+			}, new BaseErrorHandler(getActivity()) {
+				@Override
+				protected void onThrowable(Throwable throwable) {
+					showToastLong(getActivity(), R.string.error_server_unavailable_please_try_again);
+					finish();
+				}
+			});
+		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		OmnomObservable.unsubscribe(profileObservable);
+	}
+
+	private void initUserData(UserProfile userProfile) {
 		mTxtInfo.setText(userProfile.getInfo());
 		mTxtLogin.setText(userProfile.getLogin());
 		mTxtUsername.setText(userProfile.getUsername());
 		int dimension = (int) getResources().getDimension(R.dimen.profile_avatar_size);
-		Picasso.with(this).load(userProfile.getImageUrl()).placeholder(R.drawable.empty_avatar).resize(dimension, dimension).centerCrop().transform(
-				RoundTransformation.create(dimension, 0)).into(mImgUser);
+		final Bitmap placeholderBmp = BitmapFactory.decodeResource(getResources(), R.drawable.empty_avatar);
+		final RoundedDrawable placeholder = new RoundedDrawable(placeholderBmp, 156, 0);
+		Picasso.with(this).load(userProfile.getImageUrl()).placeholder(placeholder)
+		       .resize(dimension, dimension).centerCrop()
+		       .transform(RoundTransformation.create(dimension, 0)).into(mImgUser);
 	}
 
 	@OnClick(R.id.btn_back)

@@ -146,6 +146,23 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 
 	@Override
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid) {
+//		Response response = new Response("", HttpStatus.SC_UNAUTHORIZED, "", Collections.EMPTY_LIST, new TypedInput() {
+//			@Override
+//			public String mimeType() {
+//				return null;
+//			}
+//
+//			@Override
+//			public long length() {
+//				return 0;
+//			}
+//
+//			@Override
+//			public InputStream in() throws IOException {
+//				return null;
+//			}
+//		});
+//		return Observable.error(RetrofitError.httpError("", response, null, null));
 		return mDataService.buildBeacon(new BeaconBuildRequest(uuid, String.valueOf(tableNumber), restaurantId))
 		                   .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}

@@ -4,7 +4,6 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,18 +11,20 @@ import android.widget.TextView;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
-import com.omnom.android.linker.activity.base.ValidationObservable;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
+import com.omnom.android.linker.observable.BaseErrorHandler;
+import com.omnom.android.linker.observable.OmnomObservable;
+import com.omnom.android.linker.observable.ValidationObservable;
 import com.omnom.android.linker.utils.AnimationUtils;
+import com.omnom.android.linker.utils.UserDataHolder;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
-import org.apache.http.auth.AuthenticationException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -41,14 +42,11 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 
-import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class ValidationActivity extends BaseActivity {
-
 	public static final int DURATION_VALIDATION = 5000;
 	public static final int LOADER_SIZE_HUGE = 900;
-	private static final String TAG = ValidationActivity.class.getSimpleName();
 	private static final int REQUEST_CODE_ENABLE_BT = 100;
 
 	@SuppressWarnings("UnusedDeclaration")
@@ -130,12 +128,8 @@ public class ValidationActivity extends BaseActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		loader.onDestroy();
-		if(mErrValidationSubscription != null) {
-			mErrValidationSubscription.unsubscribe();
-		}
-		if(mAuthDataSubscription != null) {
-			mAuthDataSubscription.unsubscribe();
-		}
+		OmnomObservable.unsubscribe(mErrValidationSubscription);
+		OmnomObservable.unsubscribe(mAuthDataSubscription);
 	}
 
 	@Override
@@ -319,25 +313,14 @@ public class ValidationActivity extends BaseActivity {
 							}
 						});
 					}
-				}, new Action1<Throwable>() {
+				}, new BaseErrorHandler(this,
+				                        UserDataHolder
+						                        .create(mUsername, mPassword)) {
 					@Override
-					public void call(Throwable throwable) {
-						loader.stopProgressAnimation(true);
-						showToast(getActivity(), R.string.msg_error);
-						if(throwable instanceof AuthenticationException) {
-							onAuthError(throwable);
-						}
-						Log.e(TAG, "authenticate()", throwable);
+					protected void onThrowable(Throwable throwable) {
+						showToastLong(getActivity(), R.string.error_unknown_server_error);
+						finish();
 					}
 				});
-	}
-
-	private void onAuthError(Throwable e) {
-		final Intent intent = new Intent(this, LoginActivity.class);
-		intent.putExtra(EXTRA_ERROR_CODE, EXTRA_ERROR_WRONG_USERNAME);
-		intent.putExtra(EXTRA_USERNAME, mUsername);
-		intent.putExtra(EXTRA_PASSWORD, mPassword);
-		startActivity(intent);
-		finish();
 	}
 }

@@ -6,6 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import com.squareup.otto.Bus;
+
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -14,6 +18,9 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  */
 public abstract class BaseActivity extends Activity implements OmnomActivity, Extras {
 	private ActivityHelper mHelper;
+
+	@Inject
+	protected Bus mBus;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
