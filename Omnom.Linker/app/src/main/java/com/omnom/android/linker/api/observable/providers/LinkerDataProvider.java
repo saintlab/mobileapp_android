@@ -49,7 +49,7 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 		                                        .setConverter(converter).build();
 		mDataService = mRestAdapter.create(LinkerDataService.class);
 
-		mAuthAdapter = new RestAdapter.Builder().setRequestInterceptor(this).setEndpoint("https://wicket.saintlab.com").setLogLevel(logLevel)
+		mAuthAdapter = new RestAdapter.Builder().setRequestInterceptor(this).setEndpoint("http://wicket.saintlab.com").setLogLevel(logLevel)
 		                                        .setConverter(converter).build();
 		mAuthService = mRestAdapter.create(AuthService.class);
 		

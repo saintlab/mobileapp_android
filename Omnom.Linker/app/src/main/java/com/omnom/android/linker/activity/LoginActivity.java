@@ -40,12 +40,16 @@ public class LoginActivity extends BaseActivity {
 	}
 
 	public static void start(final Context context, UserDataHolder dataHolder) {
+		start(context, dataHolder, Extras.EXTRA_ERROR_AUTHTOKEN_EXPIRED);
+	}
+
+	public static void start(final Context context, UserDataHolder dataHolder, int error) {
 		Intent intent = new Intent(context, LoginActivity.class);
 		if(dataHolder != null) {
 			intent.putExtra(Extras.EXTRA_USERNAME, dataHolder.getUsername());
 			intent.putExtra(Extras.EXTRA_PASSWORD, dataHolder.getPassword());
 		}
-		intent.putExtra(Extras.EXTRA_ERROR_CODE, Extras.EXTRA_ERROR_AUTHTOKEN_EXPIRED);
+		intent.putExtra(Extras.EXTRA_ERROR_CODE, error);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(intent);
 	}

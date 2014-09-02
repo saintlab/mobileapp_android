@@ -13,6 +13,7 @@ import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
+import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.restaurant.Restaurant;
@@ -35,6 +36,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import hugo.weaving.DebugLog;
+import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -298,29 +300,36 @@ public class ValidationActivity extends BaseActivity {
 									}
 								});
 					}
-				})).subscribe(
-				new Action1<Observable<RestaurantsResponse>>() {
+				})).subscribe(new Action1<Observable<RestaurantsResponse>>() {
+			@Override
+			public void call(Observable<RestaurantsResponse> restaurantsResultObservable) {
+				restaurantsResultObservable.subscribe(new Action1<RestaurantsResponse>() {
 					@Override
-					public void call(Observable<RestaurantsResponse> restaurantsResultObservable) {
-						restaurantsResultObservable.subscribe(new Action1<RestaurantsResponse>() {
-							@Override
-							public void call(RestaurantsResponse restaurantsResult) {
-								mRestaurants = restaurantsResult;
-								mDataLoaded = true;
-								if(mAnimationFinished) {
-									onTasksFinished();
-								}
-							}
-						});
-					}
-				}, new BaseErrorHandler(this,
-				                        UserDataHolder
-						                        .create(mUsername, mPassword)) {
-					@Override
-					protected void onThrowable(Throwable throwable) {
-						showToastLong(getActivity(), R.string.error_unknown_server_error);
-						finish();
+					public void call(RestaurantsResponse restaurantsResult) {
+						mRestaurants = restaurantsResult;
+						mDataLoaded = true;
+						if(mAnimationFinished) {
+							onTasksFinished();
+						}
 					}
 				});
+			}
+		}, new BaseErrorHandler(this, UserDataHolder.create(mUsername, mPassword)) {
+			@Override
+			protected void onThrowable(Throwable throwable) {
+				if(throwable instanceof RetrofitError) {
+					final RetrofitError cause = (RetrofitError) throwable;
+					if(cause.getResponse() != null) {
+						// TODO: Refactor this ugly piece of ... code
+						if(cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
+							LoginActivity.start(getActivity(), mDataHolder, EXTRA_ERROR_WRONG_USERNAME);
+							return;
+						}
+					}
+				}
+				showToastLong(getActivity(), R.string.error_unknown_server_error);
+				finish();
+			}
+		});
 	}
 }
