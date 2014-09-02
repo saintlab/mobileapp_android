@@ -31,30 +31,25 @@ import rx.schedulers.Schedulers;
 /**
  * Created by Ch3D on 11.08.2014.
  */
-public class LinkerDataProvider implements LinkerObeservableApi, RequestInterceptor {
-	private final RestAdapter mRestAdapter;
-	private final RestAdapter mAuthAdapter;
-
+public class LinkerDataProvider implements LinkerObeservableApi {
 	private final LinkerDataService mDataService;
 	private final AuthService mAuthService;
 
-	private String mAuthToken;
-
-	public LinkerDataProvider(final String endPoint) {
+	public static LinkerDataProvider create(final String dataEndPoint, final String authEndPoint, final RequestInterceptor interceptor) {
 		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		final GsonConverter converter = new GsonConverter(gson);
 
-		mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(this).setEndpoint(endPoint).setLogLevel(logLevel)
-		                                        .setConverter(converter).build();
-		mDataService = mRestAdapter.create(LinkerDataService.class);
+		RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(interceptor).setEndpoint(dataEndPoint).setLogLevel(logLevel)
+				.setConverter(converter).build();
+		RestAdapter mAuthAdapter = new RestAdapter.Builder().setEndpoint(authEndPoint).setLogLevel(logLevel)
+				.setConverter(converter).build();
+		return new LinkerDataProvider(mRestAdapter.create(LinkerDataService.class), mAuthAdapter.create(AuthService.class));
+	}
 
-		mAuthAdapter = new RestAdapter.Builder().setRequestInterceptor(this).setEndpoint("http://wicket.saintlab.com").setLogLevel(logLevel)
-		                                        .setConverter(converter).build();
-		mAuthService = mRestAdapter.create(AuthService.class);
-		
-		// TODO: Remove
-		setAuthToken("stub_auth_token");
+	public LinkerDataProvider(final LinkerDataService dataService, final AuthService authService) {
+		mDataService = dataService;
+		mAuthService = authService;
 	}
 
 	@Override
@@ -114,20 +109,8 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	}
 
 	@Override
-	public void setAuthToken(final String token) {
-		mAuthToken = token;
-	}
-
-	@Override
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid) {
 		return mDataService.buildBeacon(new BeaconBuildRequest(uuid, String.valueOf(tableNumber), restaurantId))
 		                   .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-	}
-
-	@Override
-	public void intercept(RequestFacade request) {
-		if(!TextUtils.isEmpty(mAuthToken)) {
-			request.addHeader(Protocol.HEADER_AUTH_TOKEN, mAuthToken);
-		}
 	}
 }
