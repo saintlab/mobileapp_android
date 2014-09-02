@@ -681,6 +681,9 @@ public class BindActivity extends BaseActivity {
 		if(mErrValidationSubscription != null) {
 			mErrValidationSubscription.unsubscribe();
 		}
+		if(mErrBindSubscription != null) {
+			mErrBindSubscription.unsubscribe();
+		}
 	}
 
 	@Override
