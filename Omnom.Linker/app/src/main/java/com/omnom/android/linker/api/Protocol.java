@@ -6,6 +6,7 @@ package com.omnom.android.linker.api;
 public interface Protocol {
 	public static final String FIELD_ID = "id";
 	public static final String FIELD_LOGIN = "login";
+	public static final String FIELD_EMAIL = "email";
 	public static final String FIELD_PASSWORD = "password";
 	public static final String FIELD_RESTAURANT_ID = "restaurant_id";
 	public static final String FIELD_TABLE_NUMBER = " table_num";

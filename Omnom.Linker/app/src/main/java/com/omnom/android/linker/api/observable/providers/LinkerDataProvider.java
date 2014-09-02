@@ -68,8 +68,8 @@ public class LinkerDataProvider implements LinkerObeservableApi, RequestIntercep
 	}
 
 	@Override
-	public Observable<String> remindPassword(String username) {
-		return mAuthService.remindPassword(username).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<String> remindPassword(String email) {
+		return mAuthService.remindPassword(email).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

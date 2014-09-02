@@ -19,8 +19,8 @@ public interface AuthService {
 	                                @Field(Protocol.FIELD_PASSWORD) String password);
 
 	@FormUrlEncoded
-	@POST("/remind_password")
-	Observable<String> remindPassword(@Field(Protocol.FIELD_LOGIN) String username);
+	@POST("/recover")
+	Observable<String> remindPassword(@Field(Protocol.FIELD_EMAIL) String email);
 
 	@GET("/user")
 	Observable<UserProfile> getUserProfile(@Query(Protocol.HEADER_AUTH_TOKEN) String authToken);
