@@ -76,7 +76,6 @@ import static butterknife.ButterKnife.findById;
  * Created by Ch3D on 14.08.2014.
  */
 public class BindActivity extends BaseActivity {
-
 	public static final int DURATION_BEACON_WRITING = 10000;
 	public static final int DURATION_VALIDATE = 5000;
 
@@ -188,6 +187,7 @@ public class BindActivity extends BaseActivity {
 	private BeaconDataResponse mBeaconData = BeaconDataResponse.NULL;
 	private boolean mApiBindComplete = false;
 	private Subscription mApiBindingSubscription;
+
 	final Runnable beaconTimeoutCallback = new Runnable() {
 		@Override
 		public void run() {
@@ -201,12 +201,17 @@ public class BindActivity extends BaseActivity {
 				mErrorHelper.showError(R.drawable.ic_no_connection, R.string.error_unknown_server_error, R.string.bind_table,
 				                       mInternetErrorClickListener);
 			} else {
-				mLoader.animateLogo(R.drawable.ic_done_white);
-				mLoader.showProgress(false, true);
-				AnimationUtils.animateAlpha(mPanelBottom, true);
-				mBtnBottom.setText(R.string.bind_table);
-				mPanelBottom.setVisibility(View.VISIBLE);
-				mBtnProfile.setVisibility(View.VISIBLE);
+				mLoader.updateProgressMax(new Runnable() {
+					@Override
+					public void run() {
+						mLoader.animateLogo(R.drawable.ic_done_white);
+						mLoader.showProgress(false, true);
+						AnimationUtils.animateAlpha(mPanelBottom, true);
+						mBtnBottom.setText(R.string.bind_table);
+						mPanelBottom.setVisibility(View.VISIBLE);
+						mBtnProfile.setVisibility(View.VISIBLE);
+					}
+				});
 			}
 			mBluetoothLeService.disconnect();
 			mBluetoothLeService.close();

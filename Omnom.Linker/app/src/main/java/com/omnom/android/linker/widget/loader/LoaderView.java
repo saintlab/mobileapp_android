@@ -62,7 +62,7 @@ public class LoaderView extends FrameLayout {
 	protected ProgressBar mProgressBar;
 	@InjectView(R.id.edit_table_number)
 	protected EditText mEditTableNumber;
-	private ObjectAnimator mProgressAnimator;
+	private ValueAnimator mProgressAnimator;
 	private int loaderSize;
 	private int currentColor = -1;
 	private List<View> translationViews = new LinkedList<View>();
@@ -242,25 +242,11 @@ public class LoaderView extends FrameLayout {
 		mImgLogo.setTag(R.id.img_loader, resId);
 	}
 
+	@DebugLog
 	public void updateProgress(final int progress) {
-		mProgressBar.post(new Runnable() {
-			@Override
-			public void run() {
-				final int max = mProgressBar.getMax();
-				showProgress(progress > 0 && progress < max, progress >= max);
-				final int edge = max - (max / 10);
-				final float endPeriod = max - edge;
-				if(progress > edge && progress < max) {
-					float i = progress - edge;
-					float fraction = i / endPeriod;
-					float interpolation1 = interpolation.getInterpolation(fraction);
-					int value = (int) (interpolation1 * (progress - edge));
-					mProgressBar.setProgress(edge + value);
-				} else {
-					mProgressBar.setProgress(progress);
-				}
-			}
-		});
+		final boolean progressVisible = progress < mProgressBar.getMax();
+		showProgress(progress > 0 && progressVisible, !progressVisible);
+		mProgressBar.setProgress(progress);
 	}
 
 	public int getTableNumber() {
@@ -279,51 +265,18 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void stopProgressAnimation(boolean hideProgress) {
-		showProgress(!hideProgress);
+		showProgress(!hideProgress, true);
 		if(mProgressAnimator != null && mProgressAnimator.isRunning()) {
 			mProgressBar.setTag(R.id.canceled, true);
 			mProgressAnimator.cancel();
 		}
 	}
 
-	public ObjectAnimator startProgressAnimation(long duration, final Runnable callback) {
-		mProgressAnimator = ObjectAnimator.ofInt(mProgressBar, PROPERTY_PROGRESS, 0, mProgressBar.getMax());
-		mProgressAnimator.setInterpolator(interpolation);
-		mProgressAnimator.setAutoCancel(true);
-		mProgressAnimator.setDuration(duration);
+	public ValueAnimator startProgressAnimation(long duration, final Runnable callback) {
 		final int limit = (mProgressBar.getMax() / 100) * 99;
-		mProgressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-			@Override
-			public void onAnimationUpdate(ValueAnimator animation) {
-				Integer animatedValue = (Integer) animation.getAnimatedValue();
-				if(animatedValue < limit) {
-					updateProgress(animatedValue);
-				}
-			}
-		});
-		mProgressAnimator.addListener(new AnimatorListenerAdapter() {
-			@Override
-			@DebugLog
-			public void onAnimationEnd(Animator animation) {
-				final Object tag = ((View) mProgressAnimator.getTarget()).getTag(R.id.canceled);
-				if(tag != null && (Boolean) tag) {
-					// skip callback
-					return;
-				}
-				if(callback != null) {
-					callback.run();
-				}
-			}
-		});
-		mProgressBar.setTag(R.id.canceled, false);
-		mProgressAnimator.start();
-		return mProgressAnimator;
-	}
-
-	public ObjectAnimator updateProgressMax(final Runnable callback) {
-		mProgressAnimator = ObjectAnimator.ofInt(mProgressBar, PROPERTY_PROGRESS, mProgressBar.getProgress(), mProgressBar.getMax());
-		mProgressAnimator.setDuration(100);
-		mProgressAnimator.setAutoCancel(true);
+		mProgressAnimator = ObjectAnimator.ofInt(0, limit);
+		mProgressAnimator.setInterpolator(interpolation);
+		mProgressAnimator.setDuration(duration);
 		mProgressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
@@ -334,7 +287,37 @@ public class LoaderView extends FrameLayout {
 			@Override
 			@DebugLog
 			public void onAnimationEnd(Animator animation) {
-				final Object tag = ((View) mProgressAnimator.getTarget()).getTag(R.id.canceled);
+				final Object tag = mProgressBar.getTag(R.id.canceled);
+				if(tag != null && (Boolean) tag) {
+					// skip callback
+					return;
+				}
+				if(callback != null) {
+					callback.run();
+				}
+			}
+		});
+		mProgressBar.setTag(R.id.canceled, false);
+		showProgress(true, true);
+		mProgressAnimator.start();
+		return mProgressAnimator;
+	}
+
+	public ValueAnimator updateProgressMax(final Runnable callback) {
+		mProgressAnimator = ValueAnimator.ofInt(mProgressBar.getProgress(), mProgressBar.getMax());
+		mProgressAnimator.setDuration(AnimationUtils.DURATION_SHORT);
+		mProgressAnimator.setInterpolator(interpolation);
+		mProgressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation) {
+				updateProgress((Integer) animation.getAnimatedValue());
+			}
+		});
+		mProgressAnimator.addListener(new AnimatorListenerAdapter() {
+			@Override
+			@DebugLog
+			public void onAnimationEnd(Animator animation) {
+				final Object tag = mProgressBar.getTag(R.id.canceled);
 				if(tag != null && (Boolean) tag) {
 					// skip callback
 					return;
