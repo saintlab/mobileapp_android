@@ -73,7 +73,8 @@ public class UserProfileActivity extends BaseActivity {
 		} else {
 			final String token = getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
 			if(TextUtils.isEmpty(token)) {
-				LoginActivity.start(this);
+				// TODO: Fix
+				// LoginActivity.start(this);
 				return;
 			}
 			profileObservable = AndroidObservable.bindActivity(this, api.getUserProfile(token)).subscribe(new Action1<UserProfile>() {
@@ -95,7 +96,8 @@ public class UserProfileActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		OmnomObservable.unsubscribe(profileObservable);
+		// TODO: Fix
+		// OmnomObservable.unsubscribe(profileObservable);
 	}
 
 	private void initUserData(UserProfile userProfile) {
