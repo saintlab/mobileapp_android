@@ -37,7 +37,6 @@ import rx.functions.Action1;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseActivity {
-	public static final long DURATION = 500;
 
 	public static void start(OmnomActivity activity) {
 		activity.startActivity(UserProfileActivity.class, false);
@@ -63,9 +62,11 @@ public class UserProfileActivity extends BaseActivity {
 
 	private boolean mFirstRun = true;
 	private Subscription profileObservable;
+	private int mAnimDuration;
 
 	@Override
 	public void initUi() {
+		mAnimDuration = getResources().getInteger(R.integer.user_profile_animation_duration);
 		final UserProfile userProfile = LinkerApplication.get(getActivity()).getUserProfile();
 		if(userProfile != null) {
 			initUserData(userProfile);
@@ -101,9 +102,9 @@ public class UserProfileActivity extends BaseActivity {
 		mTxtInfo.setText(userProfile.getInfo());
 		mTxtLogin.setText(userProfile.getLogin());
 		mTxtUsername.setText(userProfile.getUsername());
-		int dimension = (int) getResources().getDimension(R.dimen.profile_avatar_size);
+		int dimension = (int) getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
 		final Bitmap placeholderBmp = BitmapFactory.decodeResource(getResources(), R.drawable.empty_avatar);
-		final RoundedDrawable placeholder = new RoundedDrawable(placeholderBmp, 156, 0);
+		final RoundedDrawable placeholder = new RoundedDrawable(placeholderBmp, dimension, 0);
 		Picasso.with(this).load(userProfile.getImageUrl()).placeholder(placeholder)
 		       .resize(dimension, dimension).centerCrop()
 		       .transform(RoundTransformation.create(dimension, 0)).into(mImgUser);
@@ -128,11 +129,11 @@ public class UserProfileActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		final int dimension = (int) getResources().getDimension(R.dimen.profile_avatar_size);
-		postDelayed(AnimationUtils.DURATION_SHORT, new Runnable() {
+		final int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
+		postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 			@Override
 			public void run() {
-				AnimationUtils.scale(mImgUser, dimension, DURATION, new Runnable() {
+				AnimationUtils.scale(mImgUser, dimension, mAnimDuration, new Runnable() {
 					@Override
 					public void run() {
 						ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, true);
@@ -145,8 +146,8 @@ public class UserProfileActivity extends BaseActivity {
 	@Override
 	public void finish() {
 		ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
-		AnimationUtils.scaleHeight(mImgUser, 0, DURATION);
-		AnimationUtils.scaleWidth(mImgUser, 0, DURATION, new Runnable() {
+		AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
+		AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
 			@Override
 			public void run() {
 				UserProfileActivity.super.finish();

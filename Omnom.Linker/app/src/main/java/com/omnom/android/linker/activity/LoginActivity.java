@@ -129,7 +129,7 @@ public class LoginActivity extends BaseActivity {
 				AnimationUtils.animateAlpha(mPanelTop, true);
 				AnimationUtils.animateAlpha(mPanelBottom, true);
 			}
-		}, getResources().getInteger(R.integer.login_animation_duration));
+		}, getResources().getInteger(R.integer.login_animation_timeout));
 	}
 
 	private void onAuthError(int errorCode) {

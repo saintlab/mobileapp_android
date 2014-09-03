@@ -5,8 +5,8 @@
         android:id="@+id/img_loader"
         android:layout_marginTop="@dimen/loader_margin_top"
         android:layout_gravity="center"
-        android:layout_width="900dp"
-        android:layout_height="900dp"
+        android:layout_width="@dimen/loader_size_huge"
+        android:layout_height="@dimen/loader_size_huge"
         android:src="@drawable/bg_loader_rounded"/>
 
     <ProgressBar
@@ -43,7 +43,7 @@
         android:focusableInTouchMode="false"
         android:maxLength="@integer/loader_data_max_length"
         android:hint="@string/hint_table_number"
-        android:textColorHint="#99ffffff"
+        android:textColorHint="@color/loader_hint_text_color"
         android:textColor="@android:color/white"
         android:textAppearance="?android:textAppearanceLarge"
         android:textSize="40sp"

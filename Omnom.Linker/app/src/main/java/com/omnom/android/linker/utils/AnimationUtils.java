@@ -6,15 +6,17 @@ import android.animation.ValueAnimator;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
+import com.omnom.android.linker.R;
+
 /**
  * Created by Ch3D on 29.07.2014.
  */
 public class AnimationUtils {
-	public static final long DURATION_LONG  = 1000;
-	public static final long DURATION_SHORT = 350;
+//	public static final long DURATION_LONG  = 1000;
+//	public static final long DURATION_SHORT = 350;
 
 	public static void animateAlpha(final View view, final boolean visible) {
-		animateAlpha(view, visible, DURATION_SHORT);
+		animateAlpha(view, visible, view.getResources().getInteger(R.integer.default_animation_duration_short));
 	}
 
 	public static void animateAlpha(final View view, final boolean visible, long duration) {
@@ -22,7 +24,7 @@ public class AnimationUtils {
 	}
 
 	public static void animateAlpha(final View view, final boolean visible, final Runnable callback) {
-		animateAlpha(view, visible, callback, DURATION_SHORT);
+		animateAlpha(view, visible, callback, view.getResources().getInteger(R.integer.default_animation_duration_short));
 	}
 
 	public static void animateAlpha(final View view, final boolean visible, final Runnable callback, long duration) {
@@ -50,12 +52,12 @@ public class AnimationUtils {
 	}
 
 	public static void translateUp(final Iterable<View> views, final int translation, final Runnable endCallback) {
-		final AnimationBuilder builder = AnimationBuilder.create(0, -translation);
+		final AnimationBuilder builder = AnimationBuilder.create(views.iterator().next(), 0, -translation);
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
 	public static void translateDown(final Iterable<View> views, final int translation, final Runnable endCallback) {
-		final AnimationBuilder builder = AnimationBuilder.create(-translation, 0);
+		final AnimationBuilder builder = AnimationBuilder.create(views.iterator().next(), -translation, 0);
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
@@ -71,7 +73,7 @@ public class AnimationUtils {
 	}
 
 	public static void scaleWidth(final View view, final int width, final Runnable updateCallback, final Runnable endCallback) {
-		AnimationBuilder builder = AnimationBuilder.create(view.getMeasuredWidth(), width);
+		AnimationBuilder builder = AnimationBuilder.create(view, view.getMeasuredWidth(), width);
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
 			public void invoke(ValueAnimator animation) {
@@ -90,7 +92,7 @@ public class AnimationUtils {
 
 	public static void scaleWidth(final View view, final int width, final long duration,
 	                              final Runnable endCallback) {
-		AnimationBuilder builder = AnimationBuilder.create(view.getMeasuredWidth(), width);
+		AnimationBuilder builder = AnimationBuilder.create(view, view.getMeasuredWidth(), width);
 		builder.setDuration(duration);
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
@@ -106,7 +108,7 @@ public class AnimationUtils {
 	}
 
 	public static void scaleHeight(final View view, int height) {
-		AnimationBuilder.create(view.getMeasuredHeight(), height).addListener(new AnimationBuilder.UpdateLisetener() {
+		AnimationBuilder.create(view, view.getMeasuredHeight(), height).addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
 			public void invoke(ValueAnimator animation) {
 				view.getLayoutParams().height = (Integer) animation.getAnimatedValue();
@@ -116,7 +118,7 @@ public class AnimationUtils {
 	}
 
 	public static void scaleHeight(final View view, int height, long duration) {
-		AnimationBuilder builder = AnimationBuilder.create(view.getMeasuredHeight(), height);
+		AnimationBuilder builder = AnimationBuilder.create(view, view.getMeasuredHeight(), height);
 		builder.setDuration(duration);
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override

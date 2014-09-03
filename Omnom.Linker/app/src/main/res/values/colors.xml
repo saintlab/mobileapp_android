@@ -3,6 +3,7 @@
     <color name="window_background">#cdcdcd</color>
     <color name="loader_bg">#dc16a5d7</color>
     <color name="loader_bg_transparent">#aa16a5d7</color>
+    <color name="loader_hint_text_color">#99ffffff</color>
     <color name="loader_progress">#40000000</color>
     <color name="list_header">#e5e5e5</color>
     <color name="error_red">#ff0000</color>
