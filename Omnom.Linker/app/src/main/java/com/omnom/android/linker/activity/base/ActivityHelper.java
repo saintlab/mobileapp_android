@@ -69,13 +69,25 @@ public class ActivityHelper {
 		}
 	}
 
+	public void startActivity(Intent intent, boolean finish) {
+		startActivity(intent, R.anim.fade_in, R.anim.fake_fade_out, finish);
+	}
+
 	public void startActivity(Intent intent, int animIn, int aninOut) {
+		startActivity(intent, animIn, aninOut, false);
+	}
+
+	public void startActivity(Intent intent, int animIn, int aninOut, boolean finish) {
 		if(Build.VERSION.SDK_INT >= 16) {
 			ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(mActivity.getActivity(), animIn, aninOut);
 			mActivity.getActivity().startActivity(intent, activityOptions.toBundle());
-			mActivity.getActivity().finish();
+			if(finish) {
+				mActivity.getActivity().finish();
+			}
 		} else {
-			mActivity.getActivity().finish();
+			if(finish) {
+				mActivity.getActivity().finish();
+			}
 			mActivity.getActivity().startActivity(intent);
 		}
 	}

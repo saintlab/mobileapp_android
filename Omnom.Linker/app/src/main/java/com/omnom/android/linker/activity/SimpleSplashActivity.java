@@ -21,7 +21,7 @@ public class SimpleSplashActivity extends BaseActivity {
 				final Class<?> cls = hasToken ? ValidationActivity.class : LoginActivity.class;
 				Intent intent = new Intent(SimpleSplashActivity.this, cls);
 				intent.putExtra(EXTRA_LOADER_ANIMATION, hasToken ? EXTRA_LOADER_ANIMATION_SCALE_DOWN : EXTRA_LOADER_ANIMATION_SCALE_UP);
-				startActivity(intent, android.R.anim.fade_in, android.R.anim.fade_out);
+				startActivity(intent, android.R.anim.fade_in, android.R.anim.fade_out, true);
 			}
 		}, getResources().getInteger(R.integer.splash_screen_timeout));
 	}

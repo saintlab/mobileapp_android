@@ -1,5 +1,6 @@
 package com.omnom.android.linker.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
+import com.omnom.android.linker.activity.base.Extras;
 import com.omnom.android.linker.activity.base.OmnomActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.drawable.RoundTransformation;
@@ -34,12 +36,19 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
+import static butterknife.ButterKnife.findById;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseActivity {
 
 	public static void start(OmnomActivity activity) {
-		activity.startActivity(UserProfileActivity.class, false);
+		start(activity, false);
+	}
+
+	public static void start(OmnomActivity activity, boolean animate) {
+		final Intent intent = new Intent(activity.getActivity(), UserProfileActivity.class);
+		intent.putExtra(Extras.EXTRA_ANIMATE, animate);
+		activity.startActivity(intent, false);
 	}
 
 	@InjectView(R.id.img_user)
@@ -63,6 +72,12 @@ public class UserProfileActivity extends BaseActivity {
 	private boolean mFirstRun = true;
 	private Subscription profileObservable;
 	private int mAnimDuration;
+	private boolean mAnimate;
+
+	@Override
+	protected void handleIntent(Intent intent) {
+		mAnimate = intent.getBooleanExtra(EXTRA_ANIMATE, false);
+	}
 
 	@Override
 	public void initUi() {
@@ -120,6 +135,10 @@ public class UserProfileActivity extends BaseActivity {
 		super.onStart();
 		ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY2, false);
 		if(mFirstRun) {
+			if(mAnimate) {
+				findById(this, R.id.btn_back).setTranslationY(-100);
+				findById(this, R.id.btn_back).setRotation(180);
+			}
 			mImgUser.getLayoutParams().width = 0;
 			mImgUser.getLayoutParams().height = 0;
 			mImgUser.requestLayout();
@@ -133,6 +152,9 @@ public class UserProfileActivity extends BaseActivity {
 		postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 			@Override
 			public void run() {
+				if(mAnimate) {
+					findById(getActivity(), R.id.btn_back).animate().rotation(0).translationY(0).start();
+				}
 				AnimationUtils.scale(mImgUser, dimension, mAnimDuration, new Runnable() {
 					@Override
 					public void run() {
@@ -145,6 +167,9 @@ public class UserProfileActivity extends BaseActivity {
 
 	@Override
 	public void finish() {
+		if(mAnimate) {
+			findById(this, R.id.btn_back).animate().rotation(180).translationY(-100).start();
+		}
 		ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
 		AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
 		AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
