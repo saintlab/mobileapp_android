@@ -61,8 +61,9 @@ public class UserProfileActivity extends BaseActivity {
 	protected LinkerObeservableApi api;
 
 	private boolean mFirstRun = true;
-	private Subscription profileObservable;
 	private int mAnimDuration;
+
+	private Subscription profileObservable;
 
 	@Override
 	public void initUi() {
@@ -99,10 +100,10 @@ public class UserProfileActivity extends BaseActivity {
 	}
 
 	private void initUserData(UserProfile userProfile) {
-		mTxtInfo.setText(userProfile.getInfo());
-		mTxtLogin.setText(userProfile.getLogin());
-		mTxtUsername.setText(userProfile.getUsername());
-		int dimension = (int) getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
+		mTxtInfo.setText(userProfile.getUser().getPhone());
+		mTxtLogin.setText(userProfile.getUser().getEmail());
+		mTxtUsername.setText(userProfile.getUser().getName());
+		int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
 		final Bitmap placeholderBmp = BitmapFactory.decodeResource(getResources(), R.drawable.empty_avatar);
 		final RoundedDrawable placeholder = new RoundedDrawable(placeholderBmp, dimension, 0);
 		Picasso.with(this).load(userProfile.getImageUrl()).placeholder(placeholder)
