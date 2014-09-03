@@ -1,10 +1,8 @@
 package com.omnom.android.linker.modules;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import com.omnom.android.linker.activity.LoginActivity;
-import com.omnom.android.linker.api.LinkerDataService;
 import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.api.observable.providers.LinkerDataProvider;
@@ -22,7 +20,7 @@ import retrofit.RequestInterceptor;
 public class LinkerDataProviderModule {
 	public static final String ENDPOINT_LAAAAB = "http://restaurateur.laaaab.com";
 	public static final String ENDPOINT_STAND = "http://restaurateur.stand.saintlab.com/";
-	public static final String ENDPOINT_AUTH = "http://wicket.saintlab.com";
+	public static final String ENDPOINT_AUTH = "http://wicket.laaaab.com";
 
 	private AuthTokenProvider tokenProvider;
 

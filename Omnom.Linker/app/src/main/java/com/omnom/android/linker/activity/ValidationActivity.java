@@ -15,6 +15,7 @@ import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.model.LoginResponse;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
@@ -279,11 +280,11 @@ public class ValidationActivity extends BaseActivity {
 
 	private void authenticateAndGetData() {
 		mAuthDataSubscription = AndroidObservable
-				.bindActivity(this, api.authenticate(mUsername, mPassword).flatMap(new Func1<String, Observable<RestaurantsResponse>>() {
+				.bindActivity(this, api.authenticate(mUsername, mPassword).flatMap(new Func1<LoginResponse, Observable<RestaurantsResponse>>() {
 					@Override
-					public Observable<RestaurantsResponse> call(String s) {
-						getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, s).commit();
-						return Observable.combineLatest(api.getRestaurants(), api.getUserProfile(s),
+					public Observable<RestaurantsResponse> call(LoginResponse s) {
+						getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, s.getToken()).commit();
+						return Observable.combineLatest(api.getRestaurants(), api.getUserProfile(s.getToken()),
 						                                new Func2<RestaurantsResponse, UserProfile, RestaurantsResponse>() {
 							                                @Override
 							                                public RestaurantsResponse call(RestaurantsResponse restaurants,

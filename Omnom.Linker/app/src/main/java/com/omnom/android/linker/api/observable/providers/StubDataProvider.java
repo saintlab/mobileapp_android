@@ -1,6 +1,7 @@
 package com.omnom.android.linker.api.observable.providers;
 
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.model.LoginResponse;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
@@ -46,15 +47,15 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 	@Override
 	@DebugLog
-	public Observable<String> authenticate(String username, String password) {
-		return new Observable<String>(new Observable.OnSubscribe<String>() {
+	public Observable<LoginResponse> authenticate(String username, String password) {
+		return new Observable<LoginResponse>(new Observable.OnSubscribe<LoginResponse>() {
 			@Override
-			public void call(Subscriber<? super String> subscriber) {
+			public void call(Subscriber<? super LoginResponse> subscriber) {
 				authError = false;
 				if(authError) {
 					subscriber.onError(new AuthenticationException());
 				} else {
-					subscriber.onNext("OK");
+					subscriber.onNext(new LoginResponse());
 					subscriber.onCompleted();
 				}
 			}
