@@ -1,7 +1,4 @@
 <resources>
-    <string name="title_activity_login">Omnom Login</string>
-
-    <!-- Strings related to login -->
     <string name="hint_email">Логин</string>
     <string name="hint_password">Пароль</string>
 
@@ -13,8 +10,4 @@
     <string name="error_invalid_password">Неверный пароль</string>
     <string name="error_email_and_password_required">Пожалуйста введите логин и пароль</string>
     <string name="remind_password">Вспомнить пароль</string>
-
-    <!-- Strings related to login -->
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
 </resources>

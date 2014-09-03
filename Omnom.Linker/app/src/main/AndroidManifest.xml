@@ -44,7 +44,6 @@
         </activity>
         <activity
             android:name=".activity.LoginActivity"
-            android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden" >
@@ -76,7 +75,6 @@
         </activity>
         <activity
             android:name=".activity.restaurant.RestaurantActivity"
-            android:label="@string/title_activity_place"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood" >
         </activity>
@@ -90,8 +88,7 @@
             android:name=".activity.UserProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
-            android:windowSoftInputMode="stateAlwaysHidden"
-            android:label="@string/title_activity_user_profile" >
+            android:windowSoftInputMode="stateAlwaysHidden" >
         </activity>
     </application>
 
