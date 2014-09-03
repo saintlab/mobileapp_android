@@ -40,12 +40,16 @@ public class LoginActivity extends BaseActivity {
 	}
 
 	public static void start(final Context context, UserDataHolder dataHolder) {
+		start(context, dataHolder, Extras.EXTRA_ERROR_AUTHTOKEN_EXPIRED);
+	}
+
+	public static void start(final Context context, UserDataHolder dataHolder, int error) {
 		Intent intent = new Intent(context, LoginActivity.class);
 		if(dataHolder != null) {
 			intent.putExtra(Extras.EXTRA_USERNAME, dataHolder.getUsername());
 			intent.putExtra(Extras.EXTRA_PASSWORD, dataHolder.getPassword());
 		}
-		intent.putExtra(Extras.EXTRA_ERROR_CODE, Extras.EXTRA_ERROR_AUTHTOKEN_EXPIRED);
+		intent.putExtra(Extras.EXTRA_ERROR_CODE, error);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(intent);
 	}
@@ -117,7 +121,7 @@ public class LoginActivity extends BaseActivity {
 			@Override
 			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
 				if(id == R.id.login || id == EditorInfo.IME_NULL) {
-					performLogin();
+					doLogin();
 					return true;
 				}
 				return false;
@@ -152,7 +156,7 @@ public class LoginActivity extends BaseActivity {
 	}
 
 	@OnClick(R.id.btn_remind_password)
-	protected void performRemindPassword() {
+	protected void doRemindPassword() {
 		if(validate(R.string.please_enter_username, mEditLogin)) {
 			api.remindPassword(getTextValue(mEditLogin)).subscribe(new Action1<String>() {
 				@Override
@@ -164,7 +168,7 @@ public class LoginActivity extends BaseActivity {
 	}
 
 	@OnClick(R.id.btn_login)
-	protected void performLogin() {
+	protected void doLogin() {
 		if(validate(R.string.error_email_and_password_required, mEditLogin, mEditPassword)) {
 			final Intent intent = new Intent(this, ValidationActivity.class);
 			intent.putExtra(EXTRA_USERNAME, getTextValue(mEditLogin));

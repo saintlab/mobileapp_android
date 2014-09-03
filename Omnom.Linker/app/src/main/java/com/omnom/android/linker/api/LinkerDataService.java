@@ -1,6 +1,5 @@
 package com.omnom.android.linker.api;
 
-import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.beacon.BeaconBindRequest;
 import com.omnom.android.linker.model.beacon.BeaconBuildRequest;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
@@ -12,8 +11,6 @@ import com.omnom.android.linker.model.table.RestaurantTablesResponse;
 import com.omnom.android.linker.model.table.TableDataResponse;
 
 import retrofit.http.Body;
-import retrofit.http.Field;
-import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;
@@ -24,21 +21,6 @@ import rx.Observable;
  * Created by Ch3D on 11.08.2014.
  */
 public interface LinkerDataService {
-
-	@FormUrlEncoded
-	@POST("/authenticate")
-	Observable<String> authenticate(@Field(Protocol.FIELD_USERNAME) String username,
-	                                @Field(Protocol.FIELD_PASSWORD) String password);
-
-	@FormUrlEncoded
-	@POST("/remind_password")
-	Observable<String> remindPassword(@Field(Protocol.FIELD_USERNAME) String username);
-
-	@FormUrlEncoded
-	@POST("/user")
-	Observable<UserProfile> getUserProfile(@Field(Protocol.HEADER_AUTH_TOKEN) String authToken);
-
-	// migration done
 	@GET("/restaurants")
 	Observable<RestaurantsResponse> getRestaurants();
 

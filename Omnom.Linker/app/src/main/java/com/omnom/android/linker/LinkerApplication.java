@@ -4,10 +4,12 @@ import android.app.Application;
 import android.content.Context;
 
 import com.omnom.android.linker.activity.base.OmnomActivity;
+import com.omnom.android.linker.activity.base.Preferences;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.modules.AndroidModule;
 import com.omnom.android.linker.modules.ApplicationModule;
 import com.omnom.android.linker.modules.LinkerDataProviderModule;
+import com.omnom.android.linker.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +21,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 /**
  * Created by Ch3D on 10.08.2014.
  */
-public class LinkerApplication extends Application {
+public class LinkerApplication extends Application implements LinkerDataProviderModule.AuthTokenProvider {
 
 	public static LinkerApplication get(Context context) {
 		return (LinkerApplication) context.getApplicationContext();
@@ -34,7 +36,7 @@ public class LinkerApplication extends Application {
 	private UserProfile mUserProfile;
 
 	protected List<Object> getModules() {
-		return Arrays.asList(/*new StubDataProviderModule(),*/new LinkerDataProviderModule(), new AndroidModule(this),
+		return Arrays.asList(/*new StubDataProviderModule(),*/new LinkerDataProviderModule(this), new AndroidModule(this),
 		                     new ApplicationModule());
 	}
 
@@ -65,5 +67,10 @@ public class LinkerApplication extends Application {
 
 	public UserProfile getUserProfile() {
 		return mUserProfile;
+	}
+
+	@Override
+	public String getAuthToken() {
+		return getSharedPreferences(Preferences.USER_PREFERENCES, MODE_PRIVATE).getString(Preferences.AUTH_TOKEN, StringUtils.EMPTY_STRING);
 	}
 }

@@ -20,7 +20,7 @@ public abstract class BaseErrorHandler implements Action1<Throwable> {
 	private Context mContext;
 
 	@Nullable
-	private UserDataHolder mDataHolder;
+	protected UserDataHolder mDataHolder;
 
 	public BaseErrorHandler(Context context) {
 		mContext = context;

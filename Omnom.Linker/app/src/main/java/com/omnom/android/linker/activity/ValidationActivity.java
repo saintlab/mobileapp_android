@@ -13,6 +13,7 @@ import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
+import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.restaurant.Restaurant;
@@ -34,6 +35,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import hugo.weaving.DebugLog;
+import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -132,11 +134,11 @@ public class ValidationActivity extends BaseActivity {
 	@Override
 	public void finish() {
 		loader.onDestroy();
-		if(mRestaurants == null) {
+		if (mRestaurants == null) {
 			super.finish();
 			return;
 		}
-		if(mRestaurants.getItems().size() == 1) {
+		if (mRestaurants.getItems().size() == 1) {
 			super.finish();
 			overridePendingTransition(android.R.anim.fade_in, R.anim.fake_fade_out);
 		} else {
@@ -168,7 +170,7 @@ public class ValidationActivity extends BaseActivity {
 	private void validate() {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 		loader.showProgress(false);
-		if(mFirstRun) {
+		if (mFirstRun) {
 			loader.scaleDown(null, new Runnable() {
 				@Override
 				public void run() {
@@ -188,11 +190,11 @@ public class ValidationActivity extends BaseActivity {
 				onAnimationEnd();
 			}
 		});
-		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
-				new Func1<ValidationObservable.Error, Boolean>() {
+		mErrValidationSubscription = AndroidObservable
+				.bindActivity(this, ValidationObservable.validate(this).map(new Func1<ValidationObservable.Error, Boolean>() {
 					@Override
 					public Boolean call(ValidationObservable.Error error) {
-						switch(error) {
+						switch (error) {
 							case BLUETOOTH_DISABLED:
 								mErrorHelper.showErrorBluetoothDisabled(getActivity(), REQUEST_CODE_ENABLE_BT);
 								break;
@@ -213,29 +215,29 @@ public class ValidationActivity extends BaseActivity {
 						return false;
 					}
 				}).isEmpty()).subscribe(new Action1<Boolean>() {
-			@Override
-			public void call(Boolean hasNoErrors) {
-				if(hasNoErrors) {
-					authenticateAndGetData();
-				}
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				mErrorHelper.showInternetError(new View.OnClickListener() {
 					@Override
-					public void onClick(View v) {
-						validate();
+					public void call(Boolean hasNoErrors) {
+						if (hasNoErrors) {
+							authenticateAndGetData();
+						}
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						mErrorHelper.showInternetError(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								validate();
+							}
+						});
 					}
 				});
-			}
-		});
 	}
 
 	@DebugLog
 	private void onAnimationEnd() {
 		mAnimationFinished = true;
-		if(mDataLoaded) {
+		if (mDataLoaded) {
 			onTasksFinished();
 		}
 	}
@@ -244,20 +246,20 @@ public class ValidationActivity extends BaseActivity {
 		loader.updateProgressMax(new Runnable() {
 			@Override
 			public void run() {
-				if(mRestaurants == null) {
+				if (mRestaurants == null) {
 					showToastLong(loader, R.string.error_server_unavailable_please_try_again);
 					finish();
 					return;
 				}
 				final List<Restaurant> items = mRestaurants.getItems();
 				int size = items.size();
-				if(items.isEmpty()) {
+				if (items.isEmpty()) {
 					showToastLong(loader, R.string.error_no_restaurants_please_try_again_later);
 					finish();
 					return;
 				}
 
-				if(size == 1) {
+				if (size == 1) {
 					BindActivity.start(getActivity(), items.get(0), false);
 					finish();
 				} else {
@@ -276,45 +278,43 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void authenticateAndGetData() {
-		mAuthDataSubscription = AndroidObservable.bindActivity(this, api.authenticate(mUsername, mPassword).map(
-				new Func1<String, Observable<RestaurantsResponse>>() {
+		mAuthDataSubscription = AndroidObservable
+				.bindActivity(this, api.authenticate(mUsername, mPassword).flatMap(new Func1<String, Observable<RestaurantsResponse>>() {
 					@Override
 					public Observable<RestaurantsResponse> call(String s) {
 						getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, s).commit();
-						api.setAuthToken(s);
-						return Observable.combineLatest(
-								api.getRestaurants(),
-								api.getUserProfile(s),
-								new Func2<RestaurantsResponse, UserProfile,
-										RestaurantsResponse>() {
-									@Override
-									public RestaurantsResponse call(RestaurantsResponse restaurants,
-									                                UserProfile profile) {
-										LinkerApplication.get(getActivity()).cacheUserProfile(profile);
-										return restaurants;
-									}
-								});
+						return Observable.combineLatest(api.getRestaurants(), api.getUserProfile(s),
+						                                new Func2<RestaurantsResponse, UserProfile, RestaurantsResponse>() {
+							                                @Override
+							                                public RestaurantsResponse call(RestaurantsResponse restaurants,
+							                                                                UserProfile profile) {
+								                                LinkerApplication.get(getActivity()).cacheUserProfile(profile);
+								                                return restaurants;
+							                                }
+						                                });
 					}
-				})).subscribe(
-				new Action1<Observable<RestaurantsResponse>>() {
+				})).subscribe(new Action1<RestaurantsResponse>() {
 					@Override
-					public void call(Observable<RestaurantsResponse> restaurantsResultObservable) {
-						restaurantsResultObservable.subscribe(new Action1<RestaurantsResponse>() {
-							@Override
-							public void call(RestaurantsResponse restaurantsResult) {
-								mRestaurants = restaurantsResult;
-								mDataLoaded = true;
-								if(mAnimationFinished) {
-									onTasksFinished();
-								}
-							}
-						});
+					public void call(RestaurantsResponse result) {
+						mRestaurants = result;
+						mDataLoaded = true;
+						if (mAnimationFinished) {
+							onTasksFinished();
+						}
 					}
-				}, new BaseErrorHandler(this,
-				                        UserDataHolder
-						                        .create(mUsername, mPassword)) {
+				}, new BaseErrorHandler(this, UserDataHolder.create(mUsername, mPassword)) {
 					@Override
 					protected void onThrowable(Throwable throwable) {
+						if (throwable instanceof RetrofitError) {
+							final RetrofitError cause = (RetrofitError) throwable;
+							if (cause.getResponse() != null) {
+								// TODO: Refactor this ugly piece of ... code
+								if (cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
+									LoginActivity.start(getActivity(), mDataHolder, EXTRA_ERROR_WRONG_USERNAME);
+									return;
+								}
+							}
+						}
 						showToastLong(getActivity(), R.string.error_unknown_server_error);
 						finish();
 					}

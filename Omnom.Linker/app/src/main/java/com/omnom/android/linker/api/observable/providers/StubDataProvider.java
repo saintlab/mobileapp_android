@@ -162,12 +162,6 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
-	@DebugLog
-	public void setAuthToken(String token) {
-		// Do nothing
-	}
-
-	@Override
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid) {
 		return new Observable<BeaconDataResponse>(new Observable.OnSubscribe<BeaconDataResponse>() {
 			@Override

@@ -1,5 +1,7 @@
 package com.omnom.android.linker.observable;
 
+
+import rx.Observable;
 import rx.Subscription;
 
 /**
@@ -7,8 +9,18 @@ import rx.Subscription;
  */
 public class OmnomObservable {
 	public static void unsubscribe(Subscription subscription) {
-		if(subscription != null && !subscription.isUnsubscribed()) {
+		if (subscription != null && !subscription.isUnsubscribed()) {
 			subscription.unsubscribe();
 		}
+	}
+
+	public class ChainObservable<T> extends Observable<T> {
+		protected ChainObservable(OnSubscribe<T> f) {
+			super(f);
+		}
+	}
+
+	public static void test() {
+
 	}
 }

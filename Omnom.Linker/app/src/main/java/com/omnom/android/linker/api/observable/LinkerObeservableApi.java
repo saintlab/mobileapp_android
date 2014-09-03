@@ -14,8 +14,6 @@ import rx.Observable;
  */
 public interface LinkerObeservableApi {
 
-	public void setAuthToken(String token);
-
 	public Observable<UserProfile> getUserProfile(String authToken);
 
 	public Observable<String> authenticate(String username, String password);
