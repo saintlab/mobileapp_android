@@ -37,14 +37,14 @@
         android:layout_below="@+id/name"
         android:gravity="center_vertical"
         android:drawableStart="@drawable/ic_location_marker"
-        android:drawablePadding="8dp"
+        android:drawablePadding="@dimen/activity_horizontal_margin_small"
         android:text="Location"
         style="@style/TextView.Restaurant.Data.Location"/>
 
     <RatingBar
         android:id="@+id/rating"
-        android:paddingTop="4dp"
-        android:paddingLeft="4dp"
+        android:paddingTop="@dimen/activity_horizontal_margin_xsmall"
+        android:paddingLeft="@dimen/activity_horizontal_margin_xsmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

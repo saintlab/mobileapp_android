@@ -2,6 +2,7 @@ package com.omnom.android.linker.widget.loader;
 
 import android.content.Context;
 
+import com.omnom.android.linker.R;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.StringUtils;
@@ -14,6 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class LoaderController implements LoaderTask.ProgressListener {
 	private final Context context;
 	private final LoaderView view;
+	private final int duration;
 	private LinkedBlockingQueue<LoaderTask> taskQueue = new LinkedBlockingQueue<LoaderTask>();
 
 	private LoaderView.Mode mMode = LoaderView.Mode.NONE;
@@ -21,6 +23,7 @@ public class LoaderController implements LoaderTask.ProgressListener {
 	public LoaderController(Context context, LoaderView view) {
 		this.context = context;
 		this.view = view;
+		this.duration = context.getResources().getInteger(R.integer.default_animation_duration_short);
 	}
 
 	public void setMode(final LoaderView.Mode mode) {
@@ -37,7 +40,7 @@ public class LoaderController implements LoaderTask.ProgressListener {
 						AnimationUtils.animateAlpha(view.mImgLogo, false);
 						AndroidUtils.showKeyboard(view.mEditTableNumber);
 					}
-				}, AnimationUtils.DURATION_SHORT);
+				}, duration);
 				break;
 
 			case NONE:
@@ -50,7 +53,7 @@ public class LoaderController implements LoaderTask.ProgressListener {
 						AnimationUtils.animateAlpha(view.mImgLogo, true);
 						AndroidUtils.hideKeyboard(view.mEditTableNumber);
 					}
-				}, AnimationUtils.DURATION_SHORT);
+				}, duration);
 				break;
 		}
 	}

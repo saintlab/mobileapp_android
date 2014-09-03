@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <integer name="default_animation_duration_long">1000</integer>
+    <integer name="default_animation_duration_short">350</integer>
+
     <integer name="loader_progress_max">5000</integer>
-    <integer name="loader_time_max">5000</integer>
-    <integer name="loader_tick_interval">10</integer>
-    <integer name="login_animation_duration">1000</integer>
-    <integer name="splash_screen_timeout">1000</integer>
+    <integer name="ble_scan_duration">2000</integer>
+    <integer name="validation_duration">5000</integer>
+    <integer name="user_profile_animation_duration">500</integer>
+    <integer name="bind_beacon_writing_duration">10000</integer>
+    <integer name="login_animation_timeout">1000</integer>
+    <integer name="splash_screen_timeout">1500</integer>
+
     <integer name="loader_data_max_length">5</integer>
+    <integer name="loader_font_size_normal">24</integer>
+    <integer name="loader_font_size_large">40</integer>
+    <integer name="loader_scale_factor">10</integer>
+    <integer name="loader_limit_percentage">99</integer>
 </resources>

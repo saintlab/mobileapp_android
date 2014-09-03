@@ -16,6 +16,8 @@ import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
+import com.omnom.android.linker.R;
+
 /**
  * Created by xCh3Dx on 13.07.2014.
  */
@@ -33,8 +35,8 @@ public class RoundedDrawable extends Drawable {
 	}
 
 	public static void setRoundedDrawable(ImageView imgView, Bitmap bitmap, int margin) {
-		RoundedDrawable drawable = new RoundedDrawable(bitmap, 156, margin);
-		imgView.setImageDrawable(drawable);
+		final int cornerRadius = imgView.getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
+		imgView.setImageDrawable(new RoundedDrawable(bitmap, cornerRadius, margin));
 	}
 
 	public RoundedDrawable(Bitmap bitmap, float cornerRadius, int margin) {

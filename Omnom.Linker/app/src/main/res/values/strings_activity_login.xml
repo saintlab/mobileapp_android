@@ -1,20 +1,13 @@
 <resources>
-    <string name="title_activity_login">Omnom Login</string>
+    <string name="hint_email">Логин</string>
+    <string name="hint_password">Пароль</string>
 
-    <!-- Strings related to login -->
-    <string name="hint_email">Email</string>
-    <string name="hint_password">Password</string>
-    <string name="remind_password">Remind Password</string>
+    <string name="sign_in">Войти</string>
+    <string name="connecting">Подключение...</string>
 
-    <string name="sign_in">Sign In</string>
-    <string name="connecting">Connecting...</string>
-
-    <string name="server_do_not_respond">Server do not respond</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_email_and_password_required">Please enter login and password</string>
-    <string name="error_field_required">This field is required</string>
-
-    <string name="please_check_internet_connection">Please check your internet connection</string>
+    <string name="server_do_not_respond">Сервер не отвечает</string>
+    <string name="error_invalid_email">Неверный логин</string>
+    <string name="error_invalid_password">Неверный пароль</string>
+    <string name="error_email_and_password_required">Пожалуйста введите логин и пароль</string>
+    <string name="remind_password">Вспомнить пароль</string>
 </resources>

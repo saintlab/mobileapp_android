@@ -76,14 +76,9 @@ import static butterknife.ButterKnife.findById;
  * Created by Ch3D on 14.08.2014.
  */
 public class BindActivity extends BaseActivity {
-
-	public static final int DURATION_BEACON_WRITING = 10000;
-	public static final int DURATION_VALIDATE = 5000;
-
 	private static final String TAG = BindActivity.class.getSimpleName();
 	private static final int REQUEST_CODE_ENABLE_BLUETOOTH = 100;
 	private static final int REQUEST_CODE_SCAN_QR = 101;
-	private static final long BLE_SCAN_PERIOD = 2000;
 
 	public static void start(final Context context, Restaurant restaurant, final boolean showBack) {
 		final Intent intent = new Intent(context, BindActivity.class);
@@ -188,6 +183,7 @@ public class BindActivity extends BaseActivity {
 	private BeaconDataResponse mBeaconData = BeaconDataResponse.NULL;
 	private boolean mApiBindComplete = false;
 	private Subscription mApiBindingSubscription;
+
 	final Runnable beaconTimeoutCallback = new Runnable() {
 		@Override
 		public void run() {
@@ -201,12 +197,17 @@ public class BindActivity extends BaseActivity {
 				mErrorHelper.showError(R.drawable.ic_no_connection, R.string.error_unknown_server_error, R.string.bind_table,
 				                       mInternetErrorClickListener);
 			} else {
-				mLoader.animateLogo(R.drawable.ic_done_white);
-				mLoader.showProgress(false, true);
-				AnimationUtils.animateAlpha(mPanelBottom, true);
-				mBtnBottom.setText(R.string.bind_table);
-				mPanelBottom.setVisibility(View.VISIBLE);
-				mBtnProfile.setVisibility(View.VISIBLE);
+				mLoader.updateProgressMax(new Runnable() {
+					@Override
+					public void run() {
+						mLoader.animateLogo(R.drawable.ic_done_white);
+						mLoader.showProgress(false, true);
+						AnimationUtils.animateAlpha(mPanelBottom, true);
+						mBtnBottom.setText(R.string.bind_table);
+						mPanelBottom.setVisibility(View.VISIBLE);
+						mBtnProfile.setVisibility(View.VISIBLE);
+					}
+				});
 			}
 			mBluetoothLeService.disconnect();
 			mBluetoothLeService.close();
@@ -224,7 +225,7 @@ public class BindActivity extends BaseActivity {
 						endCallback.run();
 					}
 				}
-			}, BLE_SCAN_PERIOD);
+			}, getResources().getInteger(R.integer.ble_scan_duration));
 			mBluetoothAdapter.startLeScan(mLeScanCallback);
 		} else {
 			mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -253,8 +254,9 @@ public class BindActivity extends BaseActivity {
 	@OnClick(R.id.btn_profile)
 	public void onProfile() {
 		mBindClicked = false;
-		mLoader.hideLogo(UserProfileActivity.DURATION);
-		mLoader.scaleDown(0, UserProfileActivity.DURATION, new Runnable() {
+		final int profileAnimDuration = getResources().getInteger(R.integer.user_profile_animation_duration);
+		mLoader.hideLogo(profileAnimDuration);
+		mLoader.scaleDown(0, profileAnimDuration, new Runnable() {
 			@Override
 			public void run() {
 				UserProfileActivity.start(BindActivity.this);
@@ -295,7 +297,7 @@ public class BindActivity extends BaseActivity {
 
 	@DebugLog
 	private void connectToBeacon() {
-		mLoader.startProgressAnimation(DURATION_BEACON_WRITING, beaconTimeoutCallback);
+		mLoader.startProgressAnimation(getResources().getInteger(R.integer.bind_beacon_writing_duration), beaconTimeoutCallback);
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
 					@Override
@@ -357,7 +359,9 @@ public class BindActivity extends BaseActivity {
 	@DebugLog
 	private void onRestaurantLoaded(Restaurant restaurant) {
 		if(getIntent().getBooleanExtra(EXTRA_SHOW_BACK, false)) {
-			mLoader.animateColor(Color.WHITE, getResources().getColor(R.color.loader_bg), AnimationUtils.DURATION_LONG);
+			mLoader.animateColor(Color.WHITE,
+			                     getResources().getColor(R.color.loader_bg),
+			                     getResources().getInteger(R.integer.default_animation_duration_long));
 			mLoader.setLogo(R.drawable.ic_mexico_logo);
 			AnimationUtils.animateAlpha(mPanelBottom, true);
 			AnimationUtils.animateAlpha(mBtnProfile, true);
@@ -381,7 +385,7 @@ public class BindActivity extends BaseActivity {
 					AnimationUtils.animateAlpha(mPanelBottom, true);
 					AnimationUtils.animateAlpha(mBtnProfile, true);
 				}
-			}, AnimationUtils.DURATION_LONG);
+			}, getResources().getInteger(R.integer.default_animation_duration_long));
 		}
 		initRestaurantUi(restaurant);
 	}
@@ -462,7 +466,7 @@ public class BindActivity extends BaseActivity {
 		mLoader.animateColorDefault();
 		clearErrors();
 		mApiBindComplete = false;
-		mLoader.startProgressAnimation(DURATION_VALIDATE, null);
+		mLoader.startProgressAnimation(getResources().getInteger(R.integer.validation_duration), null);
 		mErrBindSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				new Func1<ValidationObservable.Error, Boolean>() {
 					@Override
@@ -642,7 +646,7 @@ public class BindActivity extends BaseActivity {
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		if(hasFocus && mBindClicked) {
-			postDelayed(AnimationUtils.DURATION_SHORT, new Runnable() {
+			postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 				@Override
 				public void run() {
 					bindTable();
@@ -655,14 +659,15 @@ public class BindActivity extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		mBus.register(this);
-		postDelayed(AnimationUtils.DURATION_SHORT, new Runnable() {
+		postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 			@Override
 			public void run() {
 				if(mLoader.getSize() == 0) {
+
 					mLoader.scaleDown(null, new Runnable() {
 						@Override
 						public void run() {
-							mLoader.showLogo(UserProfileActivity.DURATION);
+							mLoader.showLogo(getResources().getInteger(R.integer.user_profile_animation_duration));
 						}
 					});
 				}

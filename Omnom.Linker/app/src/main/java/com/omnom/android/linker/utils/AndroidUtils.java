@@ -8,7 +8,6 @@ import android.graphics.Rect;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.CountDownTimer;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.widget.loader.LoaderView;
 
 import static butterknife.ButterKnife.findById;
 
@@ -65,35 +63,6 @@ public class AndroidUtils {
 				listener.onVisibilityChanged(isOpen);
 			}
 		};
-	}
-
-	public static CountDownTimer createTimer(final LoaderView loader, final Runnable finishCallback, final long duration) {
-		final Context context = loader.getContext();
-		final int progressMax = context.getResources().getInteger(R.integer.loader_progress_max);
-		final float f = duration / progressMax;
-		final float progressPerDuration = (float) progressMax / (float) duration;
-		loader.updateProgress(0);
-
-		return new CountDownTimer(duration, context.getResources().getInteger(R.integer.loader_tick_interval)) {
-			@Override
-			public void onTick(long millisUntilFinished) {
-				final long currValue = duration - millisUntilFinished;
-				final int realTimeProgress = (int) (currValue / f);
-				// loader.updateProgress(realTimeProgress);
-			}
-
-			@Override
-			public void onFinish() {
-				loader.updateProgress(progressMax);
-				if(finishCallback != null) {
-					loader.post(finishCallback);
-				}
-			}
-		};
-	}
-
-	public static CountDownTimer createTimer(final LoaderView loader, final Runnable finishCallback) {
-		return createTimer(loader, finishCallback, loader.getContext().getResources().getInteger(R.integer.loader_time_max));
 	}
 
 	public static boolean hasConnection(Context context) {

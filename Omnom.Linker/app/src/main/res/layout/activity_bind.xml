@@ -34,9 +34,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/panel_bottom"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:paddingBottom="24dp"
+            android:paddingStart="@dimen/error_text_padding"
+            android:paddingEnd="@dimen/error_text_padding"
+            android:paddingBottom="@dimen/error_text_padding"
             android:gravity="center"
             android:textColor="@android:color/secondary_text_light"
             android:textStyle="bold"
@@ -66,7 +66,7 @@
     <Button
         android:id="@+id/btn_bind_table"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="156dp"
+        android:layout_marginBottom="@dimen/bind_button_bind_margin_bottom"
         android:text="@string/bind"
         android:visibility="gone"
         style="@style/Button.Rounded.Blue"/>

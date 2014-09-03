@@ -3,8 +3,11 @@ package com.omnom.android.linker.utils;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
+
+import com.omnom.android.linker.R;
 
 /**
  * Created by Ch3D on 30.07.2014.
@@ -14,9 +17,9 @@ public class AnimationBuilder {
 		public void invoke(ValueAnimator animation);
 	}
 
-	public static AnimationBuilder create(int... values) {
+	public static AnimationBuilder create(View view, int... values) {
 		AnimationBuilder animationBuilder = new AnimationBuilder().ofInt(values);
-		animationBuilder.initDefaults();
+		animationBuilder.initDefaults(view);
 		return animationBuilder;
 	}
 
@@ -29,8 +32,8 @@ public class AnimationBuilder {
 		animator.setDuration(duration);
 	}
 
-	private void initDefaults() {
-		animator.setDuration(AnimationUtils.DURATION_LONG);
+	private void initDefaults(View view) {
+		animator.setDuration(view.getResources().getInteger(R.integer.default_animation_duration_long));
 		animator.setInterpolator(new AccelerateDecelerateInterpolator());
 	}
 

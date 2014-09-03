@@ -20,7 +20,6 @@ import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.observable.ValidationObservable;
-import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.UserDataHolder;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
@@ -45,8 +44,6 @@ import rx.functions.Func2;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class ValidationActivity extends BaseActivity {
-	public static final int DURATION_VALIDATION = 5000;
-	public static final int LOADER_SIZE_HUGE = 900;
 	private static final int REQUEST_CODE_ENABLE_BT = 100;
 
 	@SuppressWarnings("UnusedDeclaration")
@@ -110,7 +107,7 @@ public class ValidationActivity extends BaseActivity {
 	@Override
 	protected void onPostResume() {
 		super.onPostResume();
-		postDelayed(350, new Runnable() {
+		postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 			@Override
 			public void run() {
 				validate();
@@ -160,7 +157,7 @@ public class ValidationActivity extends BaseActivity {
 		loader.setColor(getResources().getColor(R.color.loader_bg));
 		if(mFirstRun) {
 			if(mAnimationType == EXTRA_LOADER_ANIMATION_SCALE_DOWN) {
-				final int dpSize = ViewUtils.dipToPixels(this, LOADER_SIZE_HUGE);
+				final int dpSize = getResources().getDimensionPixelSize(R.dimen.loader_size_huge);
 				loader.setSize(dpSize, dpSize);
 			} else {
 				loader.setSize(0, 0);
@@ -185,7 +182,7 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void startLoader() {
-		loader.startProgressAnimation(DURATION_VALIDATION, new Runnable() {
+		loader.startProgressAnimation(getResources().getInteger(R.integer.validation_duration), new Runnable() {
 			@Override
 			public void run() {
 				onAnimationEnd();
@@ -264,7 +261,7 @@ public class ValidationActivity extends BaseActivity {
 					BindActivity.start(getActivity(), items.get(0), false);
 					finish();
 				} else {
-					loader.animateColor(Color.WHITE, AnimationUtils.DURATION_LONG);
+					loader.animateColor(Color.WHITE, getResources().getInteger(R.integer.default_animation_duration_long));
 					loader.scaleUp(new Runnable() {
 						@Override
 						public void run() {
