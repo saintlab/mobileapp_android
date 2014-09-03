@@ -109,3 +109,41 @@
 -keepclasseswithmembers class * {
     @retrofit.http.* <methods>;
 }
+##---------------Begin:ButterKnife---------------
+-dontwarn butterknife.internal.**
+-keep class **$$ViewInjector { *; }
+-keepnames class * { @butterknife.InjectView *;}
+##---------------Begin:Dagger---------------
+-keepattributes *Annotation*
+-keepclassmembers,allowobfuscation class * {
+    @javax.inject.* *;
+    @dagger.* *;
+    <init>();
+}
+-keep class **$$ModuleAdapter
+-keep class **$$InjectAdapter
+-keep class **$$StaticInjection
+-keep class dagger.** { *; }
+-keep class javax.inject.** { *; }
+-keep class * extends dagger.internal.Binding
+-dontwarn dagger.internal.codegen.**
+-keepnames !abstract class coffee.*
+-keepnames class dagger.Lazy
+##---------------Begin:Piscasso---------------
+-dontwarn com.squareup.okhttp.**
+##---------------Begin:Retrofit---------------
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.squareup.okhttp.** { *; }
+-keep interface com.squareup.okhttp.** { *; }
+-dontwarn com.squareup.okhttp.**
+
+-dontwarn rx.**
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keepclasseswithmembers class * {
+    @retrofit.http.* <methods>;
+}
+-keep class sun.misc.Unsafe { *; }
+#gson models package
+-keep class com.omnom.android.linker.model.** { *; }

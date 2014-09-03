@@ -37,7 +37,7 @@ android {
 
     buildTypes {
         release {
-            runProguard false
+            runProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             applicationVariants.all { variant ->
                 def file = variant.outputFile
@@ -48,7 +48,6 @@ android {
         debug {
             runProguard false
             applicationIdSuffix '.debug'
-            proguardFiles 'proguard-rules.pro'
         }
     }
 
