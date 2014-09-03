@@ -40,6 +40,8 @@ import static butterknife.ButterKnife.findById;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseActivity {
+	public static final int ROTATION_VALUE = 180;
+	public static final int TRANSLATION_Y = -100;
 
 	public static void start(OmnomActivity activity) {
 		start(activity, false);
@@ -117,7 +119,7 @@ public class UserProfileActivity extends BaseActivity {
 		mTxtInfo.setText(userProfile.getInfo());
 		mTxtLogin.setText(userProfile.getLogin());
 		mTxtUsername.setText(userProfile.getUsername());
-		int dimension = (int) getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
+		int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
 		final Bitmap placeholderBmp = BitmapFactory.decodeResource(getResources(), R.drawable.empty_avatar);
 		final RoundedDrawable placeholder = new RoundedDrawable(placeholderBmp, dimension, 0);
 		Picasso.with(this).load(userProfile.getImageUrl()).placeholder(placeholder)
@@ -136,8 +138,8 @@ public class UserProfileActivity extends BaseActivity {
 		ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY2, false);
 		if(mFirstRun) {
 			if(mAnimate) {
-				findById(this, R.id.btn_back).setTranslationY(-100);
-				findById(this, R.id.btn_back).setRotation(180);
+				findById(this, R.id.btn_back).setTranslationY(TRANSLATION_Y);
+				findById(this, R.id.btn_back).setRotation(ROTATION_VALUE);
 			}
 			mImgUser.getLayoutParams().width = 0;
 			mImgUser.getLayoutParams().height = 0;
@@ -168,7 +170,7 @@ public class UserProfileActivity extends BaseActivity {
 	@Override
 	public void finish() {
 		if(mAnimate) {
-			findById(this, R.id.btn_back).animate().rotation(180).translationY(-100).start();
+			findById(this, R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y).start();
 		}
 		ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
 		AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
