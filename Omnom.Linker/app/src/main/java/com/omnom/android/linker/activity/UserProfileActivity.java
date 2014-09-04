@@ -3,6 +3,7 @@ package com.omnom.android.linker.activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,6 +33,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
+import hugo.weaving.DebugLog;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -40,6 +42,7 @@ import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseActivity {
+	private static final String TAG = UserProfileActivity.class.getSimpleName();
 
 	public static void start(OmnomActivity activity) {
 		activity.startActivity(UserProfileActivity.class, false);
@@ -84,6 +87,7 @@ public class UserProfileActivity extends BaseActivity {
 			}
 			profileSubscription = AndroidObservable.bindActivity(this, api.getUserProfile(token)).subscribe(new Action1<UserProfile>() {
 				@Override
+				@DebugLog
 				public void call(UserProfile userProfile) {
 					LinkerApplication.get(getActivity()).cacheUserProfile(userProfile);
 					initUserData(userProfile.getUser(), userProfile.getImageUrl());
@@ -92,7 +96,8 @@ public class UserProfileActivity extends BaseActivity {
 				@Override
 				protected void onThrowable(Throwable throwable) {
 					showToastLong(getActivity(), R.string.error_server_unavailable_please_try_again);
-					finish();
+					Log.e(TAG, "getUserProfile", throwable);
+					// finish();
 				}
 			});
 		}
