@@ -73,9 +73,11 @@ public class ValidationActivity extends BaseActivity {
 	protected LinkerObeservableApi api;
 	private String mUsername = null;
 	private String mPassword = null;
-	private BaseErrorHandler onError = new BaseErrorHandler(this, UserDataHolder.create(mUsername, mPassword)) {
+
+	private BaseErrorHandler onError = new BaseErrorHandler(this) {
 		@Override
 		protected void onThrowable(Throwable throwable) {
+			loader.stopProgressAnimation(true);
 			if(throwable instanceof RetrofitError) {
 				final RetrofitError cause = (RetrofitError) throwable;
 				if(cause.getResponse() != null) {
@@ -299,6 +301,7 @@ public class ValidationActivity extends BaseActivity {
 
 	private void authenticateAndGetData() {
 		final String token = getPreferences().getAuthToken(this);
+		onError.setDataHolder(UserDataHolder.create(mUsername, mPassword));
 		if(TextUtils.isEmpty(token)) {
 			mAuthDataSubscription = AndroidObservable
 					.bindActivity(this, api.authenticate(mUsername, mPassword).flatMap(

@@ -71,6 +71,12 @@ public class UserProfileActivity extends BaseActivity {
 	@InjectView(R.id.txt_info)
 	protected TextView mTxtInfo;
 
+	@InjectView(R.id.panel_bottom)
+	protected View mPanelBottom;
+
+	@InjectView(R.id.btn_back)
+	protected View mBtnBack;
+
 	@InjectViews({R.id.txt_username, R.id.txt_login, R.id.txt_info})
 	protected List<View> mTxtViews;
 
@@ -218,7 +224,16 @@ public class UserProfileActivity extends BaseActivity {
 				public void call(AuthResponseBase authResponseBase) {
 					if(!authResponseBase.isError()) {
 						getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
-						LoginActivity.start(getActivity(), null, EXTRA_ERROR_LOGOUT);
+						ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
+						AnimationUtils.animateAlpha(mPanelBottom, false);
+						findById(getActivity(), R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y).start();
+						AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
+						AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
+							@Override
+							public void run() {
+								LoginActivity.start(getActivity(), null, EXTRA_ERROR_LOGOUT);
+							}
+						});
 					} else {
 						showToast(getActivity(), R.string.error_unknown_server_error);
 					}

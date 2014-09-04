@@ -18,9 +18,11 @@ import retrofit.RequestInterceptor;
  */
 @Module(injects = {LoginActivity.class}, complete = false, library = true)
 public class LinkerDataProviderModule {
-	public static final String ENDPOINT_LAAAAB = "http://restaurateur.laaaab.com";
-	public static final String ENDPOINT_STAND = "http://restaurateur.stand.saintlab.com/";
-	public static final String ENDPOINT_AUTH = "http://wicket.laaaab.com";
+	public static final String ENDPOINT_DATA_STAND = "http://restaurateur.stand.saintlab.com/";
+	public static final String ENDPOINT_DATA_LAAAAB = "http://restaurateur.laaaab.com";
+
+	public static final String ENDPOINT_AUTH_STAND = "http://wicket.stand.saintlab.com";
+	public static final String ENDPOINT_AUTH_LAAAAB = "http://wicket.laaaab.com";
 
 	private AuthTokenProvider tokenProvider;
 
@@ -35,7 +37,7 @@ public class LinkerDataProviderModule {
 	@Provides
 	@Singleton
 	LinkerObeservableApi providerLinkerApi() {
-		return LinkerDataProvider.create(ENDPOINT_STAND, ENDPOINT_AUTH, new RequestInterceptor() {
+		return LinkerDataProvider.create(ENDPOINT_DATA_STAND, ENDPOINT_AUTH_STAND, new RequestInterceptor() {
 			@Override
 			public void intercept(RequestFacade request) {
 				final String token = tokenProvider.getAuthToken();
