@@ -15,6 +15,7 @@ import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.drawable.RoundTransformation;
 import com.omnom.android.linker.drawable.RoundedDrawable;
 import com.omnom.android.linker.model.UserProfile;
+import com.omnom.android.linker.model.auth.AuthResponseBase;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.utils.AnimationUtils;
@@ -34,6 +35,7 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
+import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseActivity {
@@ -64,6 +66,7 @@ public class UserProfileActivity extends BaseActivity {
 	private int mAnimDuration;
 
 	private Subscription profileObservable;
+	private Subscription logoutSubscription;
 
 	@Override
 	public void initUi() {
@@ -100,6 +103,11 @@ public class UserProfileActivity extends BaseActivity {
 	}
 
 	private void initUserData(UserProfile userProfile) {
+		if(userProfile.getUser() == null) {
+			showToast(this, R.string.error_user_not_found);
+			finish();
+			return;
+		}
 		mTxtInfo.setText(userProfile.getUser().getPhone());
 		mTxtLogin.setText(userProfile.getUser().getEmail());
 		mTxtUsername.setText(userProfile.getUser().getName());
@@ -159,8 +167,23 @@ public class UserProfileActivity extends BaseActivity {
 
 	@OnClick(R.id.btn_bottom)
 	public void onLogout() {
-		// TODO:
-		// api.logout();
+		final String token = getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
+		logoutSubscription = AndroidObservable.bindActivity(this, api.logout(token)).subscribe(new Action1<AuthResponseBase>() {
+			@Override
+			public void call(AuthResponseBase authResponseBase) {
+				if(!authResponseBase.isError()) {
+					LoginActivity.start(getActivity(), null, EXTRA_ERROR_LOGOUT);
+					return;
+				} else {
+					showToast(getActivity(), R.string.error_unknown_server_error);
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				showToast(getActivity(), R.string.error_unknown_server_error);
+			}
+		});
 	}
 
 	@Override

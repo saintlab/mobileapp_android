@@ -16,6 +16,8 @@ import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.activity.base.Extras;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.model.auth.AuthResponseBase;
+import com.omnom.android.linker.model.auth.Error;
 import com.omnom.android.linker.utils.AndroidUtils;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.StringUtils;
@@ -50,6 +52,22 @@ public class LoginActivity extends BaseActivity {
 			intent.putExtra(Extras.EXTRA_PASSWORD, dataHolder.getPassword());
 		}
 		intent.putExtra(Extras.EXTRA_ERROR_CODE, error);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		context.startActivity(intent);
+	}
+
+	public static void start(final Context context, UserDataHolder dataHolder, Error error) {
+		Intent intent = new Intent(context, LoginActivity.class);
+		if(dataHolder != null) {
+			intent.putExtra(Extras.EXTRA_USERNAME, dataHolder.getUsername());
+			intent.putExtra(Extras.EXTRA_PASSWORD, dataHolder.getPassword());
+		}
+		switch(error.getCode()) {
+			// TODO: recognize error code (discuss with Egor)
+			default:
+				intent.putExtra(Extras.EXTRA_ERROR_CODE, EXTRA_ERROR_WRONG_USERNAME);
+				break;
+		}
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(intent);
 	}
@@ -146,6 +164,13 @@ public class LoginActivity extends BaseActivity {
 				case EXTRA_ERROR_WRONG_USERNAME:
 					setError(mEditLogin, mTextLoginError, R.string.error_invalid_email);
 					break;
+
+				case EXTRA_ERROR_AUTHTOKEN_EXPIRED:
+					setError(mEditLogin, mTextLoginError, R.string.error_invalid_email);
+					break;
+
+				default:
+					break;
 			}
 		}
 	}
@@ -158,10 +183,14 @@ public class LoginActivity extends BaseActivity {
 	@OnClick(R.id.btn_remind_password)
 	protected void doRemindPassword() {
 		if(validate(R.string.please_enter_username, mEditLogin)) {
-			api.remindPassword(getTextValue(mEditLogin)).subscribe(new Action1<String>() {
+			api.remindPassword(getTextValue(mEditLogin)).subscribe(new Action1<AuthResponseBase>() {
 				@Override
-				public void call(String result) {
-					showToast(LoginActivity.this, R.string.remind_password_sent);
+				public void call(AuthResponseBase result) {
+					if(!result.isError()) {
+						showToast(LoginActivity.this, R.string.remind_password_sent);
+					} else {
+						setError(mEditLogin, mTextLoginError, R.string.error_invalid_email);
+					}
 				}
 			});
 		}

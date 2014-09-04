@@ -1,16 +1,13 @@
-package com.omnom.android.linker.model;
+package com.omnom.android.linker.model.auth;
 
 import com.google.gson.annotations.Expose;
 
 /**
  * Created by Ch3D on 03.09.2014.
  */
-public class LoginResponse {
+public class LoginResponse extends AuthResponseBase {
 	@Expose
 	private String token;
-
-	@Expose
-	private String status;
 
 	public String getToken() {
 		return token;
@@ -18,13 +15,5 @@ public class LoginResponse {
 
 	public void setToken(String token) {
 		this.token = token;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
 	}
 }
