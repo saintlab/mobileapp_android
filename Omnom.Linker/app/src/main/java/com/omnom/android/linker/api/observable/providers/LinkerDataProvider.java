@@ -7,6 +7,8 @@ import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.api.AuthService;
 import com.omnom.android.linker.api.LinkerDataService;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.model.auth.AuthResponseBase;
+import com.omnom.android.linker.model.auth.LoginResponse;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.beacon.BeaconBindRequest;
 import com.omnom.android.linker.model.beacon.BeaconBuildRequest;
@@ -55,13 +57,18 @@ public class LinkerDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
-	public Observable<String> authenticate(String username, String password) {
+	public Observable<LoginResponse> authenticate(String username, String password) {
 		return mAuthService.authenticate(username, password).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<String> remindPassword(String email) {
+	public Observable<AuthResponseBase> remindPassword(String email) {
 		return mAuthService.remindPassword(email).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<AuthResponseBase> logout(String token) {
+		return mAuthService.logout(token);
 	}
 
 	@Override

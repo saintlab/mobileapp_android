@@ -1,5 +1,7 @@
 package com.omnom.android.linker.api.observable;
 
+import com.omnom.android.linker.model.auth.AuthResponseBase;
+import com.omnom.android.linker.model.auth.LoginResponse;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
@@ -16,9 +18,11 @@ public interface LinkerObeservableApi {
 
 	public Observable<UserProfile> getUserProfile(String authToken);
 
-	public Observable<String> authenticate(String username, String password);
+	public Observable<LoginResponse> authenticate(String username, String password);
 
-	public Observable<String> remindPassword(String username);
+	public Observable<AuthResponseBase> remindPassword(String username);
+
+	public Observable<AuthResponseBase> logout(String token);
 
 	public Observable<Restaurant> getRestaurant(String restaurantId);
 

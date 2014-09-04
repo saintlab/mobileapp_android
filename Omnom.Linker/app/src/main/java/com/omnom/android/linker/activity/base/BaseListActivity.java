@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.omnom.android.linker.preferences.PreferenceProvider;
+
 import butterknife.ButterKnife;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -38,6 +40,11 @@ public abstract class BaseListActivity extends ListActivity implements OmnomActi
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		mHelper.onPostCreate();
+	}
+
+	@Override
+	public PreferenceProvider getPreferences() {
+		return mHelper.getPreferences();
 	}
 
 	@Override

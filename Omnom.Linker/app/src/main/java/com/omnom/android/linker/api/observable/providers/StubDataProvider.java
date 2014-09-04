@@ -1,12 +1,15 @@
 package com.omnom.android.linker.api.observable.providers;
 
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.model.auth.*;
 import com.omnom.android.linker.model.UserProfile;
+import com.omnom.android.linker.model.auth.Error;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsFactory;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.model.table.TableDataResponse;
+import com.omnom.android.linker.utils.StringUtils;
 
 import org.apache.http.auth.AuthenticationException;
 
@@ -46,15 +49,15 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 	@Override
 	@DebugLog
-	public Observable<String> authenticate(String username, String password) {
-		return new Observable<String>(new Observable.OnSubscribe<String>() {
+	public Observable<LoginResponse> authenticate(String username, String password) {
+		return new Observable<LoginResponse>(new Observable.OnSubscribe<LoginResponse>() {
 			@Override
-			public void call(Subscriber<? super String> subscriber) {
+			public void call(Subscriber<? super LoginResponse> subscriber) {
 				authError = false;
 				if(authError) {
 					subscriber.onError(new AuthenticationException());
 				} else {
-					subscriber.onNext("OK");
+					subscriber.onNext(new LoginResponse());
 					subscriber.onCompleted();
 				}
 			}
@@ -63,11 +66,22 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 	@Override
 	@DebugLog
-	public Observable<String> remindPassword(String username) {
-		return new Observable<String>(new Observable.OnSubscribe<String>() {
+	public Observable<AuthResponseBase> remindPassword(String username) {
+		return new Observable<AuthResponseBase>(new Observable.OnSubscribe<AuthResponseBase>() {
 			@Override
-			public void call(Subscriber<? super String> subscriber) {
-				subscriber.onNext("OK");
+			public void call(Subscriber<? super AuthResponseBase> subscriber) {
+				subscriber.onNext(AuthResponseBase.create(StringUtils.EMPTY_STRING, new Error(-1, "StubError!")));
+				subscriber.onCompleted();
+			}
+		}) {};
+	}
+
+	@Override
+	public Observable<AuthResponseBase> logout(String token) {
+		return new Observable<AuthResponseBase>(new Observable.OnSubscribe<AuthResponseBase>() {
+			@Override
+			public void call(Subscriber<? super AuthResponseBase> subscriber) {
+				subscriber.onNext(AuthResponseBase.create(StringUtils.EMPTY_STRING, new Error(-1, "StubError!")));
 				subscriber.onCompleted();
 			}
 		}) {};

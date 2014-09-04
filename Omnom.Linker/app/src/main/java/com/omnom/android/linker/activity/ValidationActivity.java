@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -16,6 +17,8 @@ import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.UserProfile;
+import com.omnom.android.linker.model.auth.AuthServiceException;
+import com.omnom.android.linker.model.auth.LoginResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.observable.BaseErrorHandler;
@@ -58,25 +61,40 @@ public class ValidationActivity extends BaseActivity {
 
 	@InjectView(R.id.loader)
 	protected LoaderView loader;
-
 	@InjectView(R.id.txt_error)
 	protected TextView txtError;
-
 	@InjectView(R.id.btn_bottom)
 	protected Button btnSettings;
-
 	@InjectViews({R.id.txt_error, R.id.panel_bottom})
 	protected List<View> errorViews;
-
 	@InjectView(R.id.panel_bottom)
 	protected View panelBottom;
-
 	@Inject
 	protected LinkerObeservableApi api;
-
 	private String mUsername = null;
 	private String mPassword = null;
-
+	private BaseErrorHandler onError = new BaseErrorHandler(this, UserDataHolder.create(mUsername, mPassword)) {
+		@Override
+		protected void onThrowable(Throwable throwable) {
+			if(throwable instanceof RetrofitError) {
+				final RetrofitError cause = (RetrofitError) throwable;
+				if(cause.getResponse() != null) {
+					// TODO: Refactor this ugly piece of ... code
+					if(cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
+						LoginActivity.start(getActivity(), mDataHolder, EXTRA_ERROR_WRONG_USERNAME);
+						return;
+					}
+				}
+			}
+			if(throwable instanceof AuthServiceException) {
+				final AuthServiceException authException = (AuthServiceException) throwable;
+				LoginActivity.start(getActivity(), mDataHolder, authException.getError());
+				return;
+			}
+			showToastLong(getActivity(), R.string.error_unknown_server_error);
+			finish();
+		}
+	};
 	@Nullable
 	private RestaurantsResponse mRestaurants = null;
 
@@ -88,6 +106,7 @@ public class ValidationActivity extends BaseActivity {
 	private boolean mFirstRun = true;
 	private boolean mAnimationFinished = false;
 	private boolean mDataLoaded = false;
+	private Subscription mRestaurantsSubscription;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -129,16 +148,17 @@ public class ValidationActivity extends BaseActivity {
 		loader.onDestroy();
 		OmnomObservable.unsubscribe(mErrValidationSubscription);
 		OmnomObservable.unsubscribe(mAuthDataSubscription);
+		OmnomObservable.unsubscribe(mRestaurantsSubscription);
 	}
 
 	@Override
 	public void finish() {
 		loader.onDestroy();
-		if (mRestaurants == null) {
+		if(mRestaurants == null) {
 			super.finish();
 			return;
 		}
-		if (mRestaurants.getItems().size() == 1) {
+		if(mRestaurants.getItems().size() == 1) {
 			super.finish();
 			overridePendingTransition(android.R.anim.fade_in, R.anim.fake_fade_out);
 		} else {
@@ -170,7 +190,7 @@ public class ValidationActivity extends BaseActivity {
 	private void validate() {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 		loader.showProgress(false);
-		if (mFirstRun) {
+		if(mFirstRun) {
 			loader.scaleDown(null, new Runnable() {
 				@Override
 				public void run() {
@@ -194,7 +214,7 @@ public class ValidationActivity extends BaseActivity {
 				.bindActivity(this, ValidationObservable.validate(this).map(new Func1<ValidationObservable.Error, Boolean>() {
 					@Override
 					public Boolean call(ValidationObservable.Error error) {
-						switch (error) {
+						switch(error) {
 							case BLUETOOTH_DISABLED:
 								mErrorHelper.showErrorBluetoothDisabled(getActivity(), REQUEST_CODE_ENABLE_BT);
 								break;
@@ -217,7 +237,7 @@ public class ValidationActivity extends BaseActivity {
 				}).isEmpty()).subscribe(new Action1<Boolean>() {
 					@Override
 					public void call(Boolean hasNoErrors) {
-						if (hasNoErrors) {
+						if(hasNoErrors) {
 							authenticateAndGetData();
 						}
 					}
@@ -237,7 +257,7 @@ public class ValidationActivity extends BaseActivity {
 	@DebugLog
 	private void onAnimationEnd() {
 		mAnimationFinished = true;
-		if (mDataLoaded) {
+		if(mDataLoaded) {
 			onTasksFinished();
 		}
 	}
@@ -246,20 +266,20 @@ public class ValidationActivity extends BaseActivity {
 		loader.updateProgressMax(new Runnable() {
 			@Override
 			public void run() {
-				if (mRestaurants == null) {
+				if(mRestaurants == null) {
 					showToastLong(loader, R.string.error_server_unavailable_please_try_again);
 					finish();
 					return;
 				}
 				final List<Restaurant> items = mRestaurants.getItems();
 				int size = items.size();
-				if (items.isEmpty()) {
+				if(items.isEmpty()) {
 					showToastLong(loader, R.string.error_no_restaurants_please_try_again_later);
 					finish();
 					return;
 				}
 
-				if (size == 1) {
+				if(size == 1) {
 					BindActivity.start(getActivity(), items.get(0), false);
 					finish();
 				} else {
@@ -278,46 +298,52 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void authenticateAndGetData() {
-		mAuthDataSubscription = AndroidObservable
-				.bindActivity(this, api.authenticate(mUsername, mPassword).flatMap(new Func1<String, Observable<RestaurantsResponse>>() {
-					@Override
-					public Observable<RestaurantsResponse> call(String s) {
-						getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, s).commit();
-						return Observable.combineLatest(api.getRestaurants(), api.getUserProfile(s),
-						                                new Func2<RestaurantsResponse, UserProfile, RestaurantsResponse>() {
-							                                @Override
-							                                public RestaurantsResponse call(RestaurantsResponse restaurants,
-							                                                                UserProfile profile) {
-								                                LinkerApplication.get(getActivity()).cacheUserProfile(profile);
-								                                return restaurants;
-							                                }
-						                                });
-					}
-				})).subscribe(new Action1<RestaurantsResponse>() {
-					@Override
-					public void call(RestaurantsResponse result) {
-						mRestaurants = result;
-						mDataLoaded = true;
-						if (mAnimationFinished) {
-							onTasksFinished();
-						}
-					}
-				}, new BaseErrorHandler(this, UserDataHolder.create(mUsername, mPassword)) {
-					@Override
-					protected void onThrowable(Throwable throwable) {
-						if (throwable instanceof RetrofitError) {
-							final RetrofitError cause = (RetrofitError) throwable;
-							if (cause.getResponse() != null) {
-								// TODO: Refactor this ugly piece of ... code
-								if (cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
-									LoginActivity.start(getActivity(), mDataHolder, EXTRA_ERROR_WRONG_USERNAME);
-									return;
+		final String token = getPreferences().getAuthToken(this);
+		if(TextUtils.isEmpty(token)) {
+			mAuthDataSubscription = AndroidObservable
+					.bindActivity(this, api.authenticate(mUsername, mPassword).flatMap(
+							new Func1<LoginResponse, Observable<RestaurantsResponse>>() {
+								@Override
+								@DebugLog
+								public Observable<RestaurantsResponse> call(LoginResponse response) {
+									if(response.isError()) {
+										throw new AuthServiceException(response.getStatus(), response.getError());
+									}
+									final String token = response.getToken();
+									getPreferences().setAuthToken(getActivity(), token);
+									return Observable.combineLatest(api.getRestaurants(),
+									                                api.getUserProfile(token),
+									                                new Func2<RestaurantsResponse, UserProfile, RestaurantsResponse>() {
+										                                @Override
+										                                public RestaurantsResponse call(RestaurantsResponse restaurants,
+										                                                                UserProfile profile) {
+											                                LinkerApplication.get(getActivity()).cacheUserProfile(profile);
+											                                return restaurants;
+										                                }
+									                                });
 								}
-							}
+							})).subscribe(new Action1<RestaurantsResponse>() {
+						@Override
+						public void call(RestaurantsResponse result) {
+							onRestaurantLoaded(result);
 						}
-						showToastLong(getActivity(), R.string.error_unknown_server_error);
-						finish();
-					}
-				});
+					}, onError);
+		} else {
+			mRestaurantsSubscription = AndroidObservable.bindActivity(this, api.getRestaurants()).subscribe(new Action1
+					<RestaurantsResponse>() {
+				@Override
+				public void call(RestaurantsResponse response) {
+					onRestaurantLoaded(response);
+				}
+			}, onError);
+		}
+	}
+
+	private void onRestaurantLoaded(RestaurantsResponse result) {
+		mRestaurants = result;
+		mDataLoaded = true;
+		if(mAnimationFinished) {
+			onTasksFinished();
+		}
 	}
 }

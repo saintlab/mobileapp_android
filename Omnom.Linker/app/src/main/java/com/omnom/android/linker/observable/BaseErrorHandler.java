@@ -2,7 +2,9 @@ package com.omnom.android.linker.observable;
 
 import android.content.Context;
 
+import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.activity.LoginActivity;
+import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.UserDataHolder;
 
 import org.apache.http.HttpStatus;
@@ -37,6 +39,7 @@ public abstract class BaseErrorHandler implements Action1<Throwable> {
 			final RetrofitError cause = (RetrofitError) throwable;
 			final Response response = cause.getResponse();
 			if(response != null && response.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
+				LinkerApplication.get(mContext).getPreferences().setAuthToken(mContext, StringUtils.EMPTY_STRING);
 				LoginActivity.start(mContext, mDataHolder);
 				return;
 			}

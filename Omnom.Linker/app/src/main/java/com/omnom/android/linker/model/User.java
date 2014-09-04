@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class User {
 	@Expose
-	private Integer id;
+	private int id;
 
 	@Expose
 	private String name;
@@ -23,16 +23,16 @@ public class User {
 	private String email;
 
 	@Expose
-	private Integer phone;
+	private String phone;
 
 	@SerializedName("birth_date")
 	@Expose
-	private Object birthDate;
+	private String birthDate;
 	
 	@Expose
 	private List<Object> groups = new ArrayList<Object>();
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
@@ -64,19 +64,19 @@ public class User {
 		this.email = email;
 	}
 
-	public Integer getPhone() {
+	public String getPhone() {
 		return phone;
 	}
 
-	public void setPhone(Integer phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 
-	public Object getBirthDate() {
+	public String getBirthDate() {
 		return birthDate;
 	}
 
-	public void setBirthDate(Object birthDate) {
+	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
 	}
 

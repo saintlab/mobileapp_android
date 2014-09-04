@@ -1,5 +1,7 @@
 package com.omnom.android.linker.api;
 
+import com.omnom.android.linker.model.auth.AuthResponseBase;
+import com.omnom.android.linker.model.auth.LoginResponse;
 import com.omnom.android.linker.model.UserProfile;
 
 import retrofit.http.Field;
@@ -14,14 +16,18 @@ import rx.Observable;
  */
 public interface AuthService {
 	@FormUrlEncoded
-	@POST("/login")
-	Observable<String> authenticate(@Field(Protocol.FIELD_LOGIN) String username,
-	                                @Field(Protocol.FIELD_PASSWORD) String password);
+	@POST("/login/simple")
+	Observable<LoginResponse> authenticate(@Field(Protocol.FIELD_LOGIN) String username,
+	                                       @Field(Protocol.FIELD_PASSWORD) String password);
 
 	@FormUrlEncoded
 	@POST("/recover")
-	Observable<String> remindPassword(@Field(Protocol.FIELD_EMAIL) String email);
+	Observable<AuthResponseBase> remindPassword(@Field(Protocol.FIELD_EMAIL) String email);
 
 	@GET("/user")
 	Observable<UserProfile> getUserProfile(@Query(Protocol.HEADER_AUTH_TOKEN) String authToken);
+
+	@FormUrlEncoded
+	@POST("/logout")
+	Observable<AuthResponseBase> logout(@Field(Protocol.HEADER_AUTH_TOKEN) String token);
 }

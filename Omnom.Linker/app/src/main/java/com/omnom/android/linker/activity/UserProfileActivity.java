@@ -3,6 +3,7 @@ package com.omnom.android.linker.activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,7 +15,9 @@ import com.omnom.android.linker.activity.base.OmnomActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.drawable.RoundTransformation;
 import com.omnom.android.linker.drawable.RoundedDrawable;
+import com.omnom.android.linker.model.User;
 import com.omnom.android.linker.model.UserProfile;
+import com.omnom.android.linker.model.auth.AuthResponseBase;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.utils.AnimationUtils;
@@ -30,13 +33,16 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
+import hugo.weaving.DebugLog;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
+import static com.omnom.android.linker.utils.AndroidUtils.showToast;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseActivity {
+	private static final String TAG = UserProfileActivity.class.getSimpleName();
 
 	public static void start(OmnomActivity activity) {
 		activity.startActivity(UserProfileActivity.class, false);
@@ -63,31 +69,35 @@ public class UserProfileActivity extends BaseActivity {
 	private boolean mFirstRun = true;
 	private int mAnimDuration;
 
-	private Subscription profileObservable;
+	private Subscription profileSubscription;
+	private Subscription logoutSubscription;
 
 	@Override
 	public void initUi() {
 		mAnimDuration = getResources().getInteger(R.integer.user_profile_animation_duration);
 		final UserProfile userProfile = LinkerApplication.get(getActivity()).getUserProfile();
-		if(userProfile != null) {
-			initUserData(userProfile);
+		if(userProfile != null && userProfile.getUser() != null) {
+			initUserData(userProfile.getUser(), userProfile.getImageUrl());
 		} else {
-			final String token = getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
+			updateUserImage(StringUtils.EMPTY_STRING);
+			final String token = getPreferences().getAuthToken(this);
 			if(TextUtils.isEmpty(token)) {
 				LoginActivity.start(this);
 				return;
 			}
-			profileObservable = AndroidObservable.bindActivity(this, api.getUserProfile(token)).subscribe(new Action1<UserProfile>() {
+			profileSubscription = AndroidObservable.bindActivity(this, api.getUserProfile(token)).subscribe(new Action1<UserProfile>() {
 				@Override
+				@DebugLog
 				public void call(UserProfile userProfile) {
 					LinkerApplication.get(getActivity()).cacheUserProfile(userProfile);
-					initUserData(userProfile);
+					initUserData(userProfile.getUser(), userProfile.getImageUrl());
 				}
 			}, new BaseErrorHandler(getActivity()) {
 				@Override
 				protected void onThrowable(Throwable throwable) {
 					showToastLong(getActivity(), R.string.error_server_unavailable_please_try_again);
-					finish();
+					Log.e(TAG, "getUserProfile", throwable);
+					// finish();
 				}
 			});
 		}
@@ -96,19 +106,36 @@ public class UserProfileActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		OmnomObservable.unsubscribe(profileObservable);
+		OmnomObservable.unsubscribe(profileSubscription);
+		OmnomObservable.unsubscribe(logoutSubscription);
 	}
 
-	private void initUserData(UserProfile userProfile) {
-		mTxtInfo.setText(userProfile.getUser().getPhone());
-		mTxtLogin.setText(userProfile.getUser().getEmail());
-		mTxtUsername.setText(userProfile.getUser().getName());
-		int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
+	private void initUserData(User user, String imgUrl) {
+		if(user == null) {
+			showToast(this, R.string.error_user_not_found);
+			finish();
+			return;
+		}
+		mTxtInfo.setText(user.getPhone());
+		mTxtLogin.setText(user.getEmail());
+		mTxtUsername.setText(user.getName());
+		updateUserImage(imgUrl);
+	}
+
+	private void updateUserImage(String url) {
+		final int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
+		if(TextUtils.isEmpty(url)) {
+			mImgUser.setImageDrawable(getPlaceholderDrawable(dimension));
+		} else {
+			Picasso.with(this).load(url).placeholder(getPlaceholderDrawable(dimension))
+			       .resize(dimension, dimension).centerCrop()
+			       .transform(RoundTransformation.create(dimension, 0)).into(mImgUser);
+		}
+	}
+
+	private RoundedDrawable getPlaceholderDrawable(int dimension) {
 		final Bitmap placeholderBmp = BitmapFactory.decodeResource(getResources(), R.drawable.empty_avatar);
-		final RoundedDrawable placeholder = new RoundedDrawable(placeholderBmp, dimension, 0);
-		Picasso.with(this).load(userProfile.getImageUrl()).placeholder(placeholder)
-		       .resize(dimension, dimension).centerCrop()
-		       .transform(RoundTransformation.create(dimension, 0)).into(mImgUser);
+		return new RoundedDrawable(placeholderBmp, dimension, 0);
 	}
 
 	@OnClick(R.id.btn_back)
@@ -159,8 +186,23 @@ public class UserProfileActivity extends BaseActivity {
 
 	@OnClick(R.id.btn_bottom)
 	public void onLogout() {
-		// TODO:
-		// api.logout();
+		final String token = getPreferences().getAuthToken(this);
+		logoutSubscription = AndroidObservable.bindActivity(this, api.logout(token)).subscribe(new Action1<AuthResponseBase>() {
+			@Override
+			public void call(AuthResponseBase authResponseBase) {
+				if(!authResponseBase.isError()) {
+					getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
+					LoginActivity.start(getActivity(), null, EXTRA_ERROR_LOGOUT);
+				} else {
+					showToast(getActivity(), R.string.error_unknown_server_error);
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				showToast(getActivity(), R.string.error_unknown_server_error);
+			}
+		});
 	}
 
 	@Override

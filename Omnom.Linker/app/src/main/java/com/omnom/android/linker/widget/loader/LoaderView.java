@@ -231,7 +231,6 @@ public class LoaderView extends FrameLayout {
 		mImgLogo.setTag(R.id.img_loader, resId);
 	}
 
-	@DebugLog
 	public void updateProgress(final int progress) {
 		final boolean progressVisible = progress < mProgressBar.getMax();
 		showProgress(progress > 0 && progressVisible, !progressVisible);

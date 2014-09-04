@@ -1,5 +1,7 @@
 package com.omnom.android.linker.activity.base;
 
+import com.omnom.android.linker.preferences.Preferences;
+
 /**
  * Created by Ch3D on 14.08.2014.
  */
@@ -20,6 +22,7 @@ public interface Extras extends Preferences {
 	public static final int EXTRA_ERROR_WRONG_PASSWORD = 0;
 	public static final int EXTRA_ERROR_WRONG_USERNAME = 1;
 	public static final int EXTRA_ERROR_AUTHTOKEN_EXPIRED = 2;
+	public static final int EXTRA_ERROR_LOGOUT = 3;
 
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_UP = 0;
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_DOWN = 1;
