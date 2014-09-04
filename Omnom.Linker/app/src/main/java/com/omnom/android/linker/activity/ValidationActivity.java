@@ -24,7 +24,6 @@ import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.observable.ValidationObservable;
-import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.UserDataHolder;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
@@ -299,7 +298,7 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private void authenticateAndGetData() {
-		final String token = getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
+		final String token = getPreferences().getAuthToken(this);
 		if(TextUtils.isEmpty(token)) {
 			mAuthDataSubscription = AndroidObservable
 					.bindActivity(this, api.authenticate(mUsername, mPassword).flatMap(
@@ -311,8 +310,7 @@ public class ValidationActivity extends BaseActivity {
 										throw new AuthServiceException(response.getStatus(), response.getError());
 									}
 									final String token = response.getToken();
-									getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, token)
-									                                                    .commit();
+									getPreferences().setAuthToken(getActivity(), token);
 									return Observable.combineLatest(api.getRestaurants(),
 									                                api.getUserProfile(token),
 									                                new Func2<RestaurantsResponse, UserProfile, RestaurantsResponse>() {

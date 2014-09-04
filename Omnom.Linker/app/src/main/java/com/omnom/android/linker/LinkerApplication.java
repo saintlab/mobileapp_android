@@ -4,12 +4,12 @@ import android.app.Application;
 import android.content.Context;
 
 import com.omnom.android.linker.activity.base.OmnomActivity;
-import com.omnom.android.linker.activity.base.Preferences;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.modules.AndroidModule;
 import com.omnom.android.linker.modules.ApplicationModule;
 import com.omnom.android.linker.modules.LinkerDataProviderModule;
-import com.omnom.android.linker.utils.StringUtils;
+import com.omnom.android.linker.preferences.PreferenceHelper;
+import com.omnom.android.linker.preferences.PreferenceProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +35,8 @@ public class LinkerApplication extends Application implements LinkerDataProvider
 	private ObjectGraph objectGraph;
 	private UserProfile mUserProfile;
 
+	private PreferenceHelper mPrefsHelper;
+
 	protected List<Object> getModules() {
 		return Arrays.asList(/*new StubDataProviderModule(),*/new LinkerDataProviderModule(this), new AndroidModule(this),
 		                     new ApplicationModule());
@@ -59,6 +61,11 @@ public class LinkerApplication extends Application implements LinkerDataProvider
 		}
 		injectList.clear();
 		inject(this);
+		mPrefsHelper = new PreferenceHelper();
+	}
+
+	public PreferenceProvider getPreferences() {
+		return mPrefsHelper;
 	}
 
 	public void cacheUserProfile(UserProfile profile) {
@@ -71,6 +78,6 @@ public class LinkerApplication extends Application implements LinkerDataProvider
 
 	@Override
 	public String getAuthToken() {
-		return getSharedPreferences(Preferences.USER_PREFERENCES, MODE_PRIVATE).getString(Preferences.AUTH_TOKEN, StringUtils.EMPTY_STRING);
+		return mPrefsHelper.getAuthToken(this);
 	}
 }

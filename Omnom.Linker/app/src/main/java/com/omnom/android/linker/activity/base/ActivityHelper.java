@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
+import com.omnom.android.linker.preferences.PreferenceProvider;
 
 /**
  * Created by Ch3D on 31.07.2014.
@@ -86,5 +87,9 @@ public class ActivityHelper {
 
 	public void startActivity(Class<?> cls, boolean finish) {
 		startActivity(cls, R.anim.fade_in, R.anim.fake_fade_out, finish);
+	}
+
+	public PreferenceProvider getPreferences() {
+		return LinkerApplication.get(mActivity).getPreferences();
 	}
 }

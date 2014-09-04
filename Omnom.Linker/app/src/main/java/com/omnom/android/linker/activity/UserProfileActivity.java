@@ -77,7 +77,7 @@ public class UserProfileActivity extends BaseActivity {
 			initUserData(userProfile.getUser(), userProfile.getImageUrl());
 		} else {
 			updateUserImage(StringUtils.EMPTY_STRING);
-			final String token = getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
+			final String token = getPreferences().getAuthToken(this);
 			if(TextUtils.isEmpty(token)) {
 				LoginActivity.start(this);
 				return;
@@ -181,12 +181,12 @@ public class UserProfileActivity extends BaseActivity {
 
 	@OnClick(R.id.btn_bottom)
 	public void onLogout() {
-		final String token = getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
+		final String token = getPreferences().getAuthToken(this);
 		logoutSubscription = AndroidObservable.bindActivity(this, api.logout(token)).subscribe(new Action1<AuthResponseBase>() {
 			@Override
 			public void call(AuthResponseBase authResponseBase) {
 				if(!authResponseBase.isError()) {
-					getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, StringUtils.EMPTY_STRING).commit();
+					getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
 					LoginActivity.start(getActivity(), null, EXTRA_ERROR_LOGOUT);
 				} else {
 					showToast(getActivity(), R.string.error_unknown_server_error);
