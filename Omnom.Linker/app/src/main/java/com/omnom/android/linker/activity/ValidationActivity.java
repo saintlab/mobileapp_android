@@ -149,6 +149,7 @@ public class ValidationActivity extends BaseActivity {
 		loader.onDestroy();
 		OmnomObservable.unsubscribe(mErrValidationSubscription);
 		OmnomObservable.unsubscribe(mAuthDataSubscription);
+		OmnomObservable.unsubscribe(mRestaurantsSubscription);
 	}
 
 	@Override
@@ -299,7 +300,6 @@ public class ValidationActivity extends BaseActivity {
 
 	private void authenticateAndGetData() {
 		final String token = getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
-		System.err.println(">>>> token = " + token);
 		if(TextUtils.isEmpty(token)) {
 			mAuthDataSubscription = AndroidObservable
 					.bindActivity(this, api.authenticate(mUsername, mPassword).flatMap(
@@ -311,7 +311,6 @@ public class ValidationActivity extends BaseActivity {
 										throw new AuthServiceException(response.getStatus(), response.getError());
 									}
 									final String token = response.getToken();
-									System.err.println(">>>> token = " + token);
 									getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE).edit().putString(AUTH_TOKEN, token)
 									                                                    .commit();
 									return Observable.combineLatest(api.getRestaurants(),
