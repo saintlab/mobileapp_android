@@ -39,6 +39,7 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
+import retrofit.http.HEAD;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -49,8 +50,6 @@ import rx.functions.Func2;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class ValidationActivity extends BaseActivity {
-	private static final int REQUEST_CODE_ENABLE_BT = 100;
-
 	@SuppressWarnings("UnusedDeclaration")
 	public static void start(final Context context, Restaurant restaurant, int animation) {
 		final Intent intent = new Intent(context, ValidationActivity.class);
@@ -213,45 +212,34 @@ public class ValidationActivity extends BaseActivity {
 			}
 		});
 		mErrValidationSubscription = AndroidObservable
-				.bindActivity(this, ValidationObservable.validate(this).map(new Func1<ValidationObservable.Error, Boolean>() {
-					@Override
-					public Boolean call(ValidationObservable.Error error) {
-						switch(error) {
-							case BLUETOOTH_DISABLED:
-								mErrorHelper.showErrorBluetoothDisabled(getActivity(), REQUEST_CODE_ENABLE_BT);
-								break;
-
-							case NO_CONNECTION:
-								mErrorHelper.showInternetError(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										validate();
-									}
-								});
-								break;
-
-							case LOCATION_DISABLED:
-								mErrorHelper.showLocationError();
-								break;
-						}
-						return false;
-					}
-				}).isEmpty()).subscribe(new Action1<Boolean>() {
-					@Override
-					public void call(Boolean hasNoErrors) {
-						if(hasNoErrors) {
-							authenticateAndGetData();
-						}
-					}
-				}, new Action1<Throwable>() {
-					@Override
-					public void call(Throwable throwable) {
-						mErrorHelper.showInternetError(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								validate();
-							}
-						});
+								.bindActivity(this, ValidationObservable.validate(this)
+								                                        .map(OmnomObservable.getValidationFunc(
+										                                             this,
+										                                             mErrorHelper,
+										                                             new View.OnClickListener() {
+											                                             @Override
+											                                             public void onClick(View v) {
+												                                             validate();
+											                                             }
+										                                             })
+								                                            ).isEmpty())
+									.subscribe(
+											new Action1<Boolean>() {
+												@Override
+												public void call(Boolean hasNoErrors) {
+													if(hasNoErrors) {
+														authenticateAndGetData();
+													}
+												}
+											}, new Action1<Throwable>() {
+												@Override
+												public void call(Throwable throwable) {
+													mErrorHelper.showInternetError(new View.OnClickListener() {
+														@Override
+														public void onClick(View v) {
+															validate();
+														}
+													});
 					}
 				});
 	}
