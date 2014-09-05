@@ -44,7 +44,6 @@ import com.omnom.android.linker.widget.loader.LoaderController;
 import com.omnom.android.linker.widget.loader.LoaderView;
 import com.squareup.otto.Subscribe;
 
-import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,13 +61,11 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 import hugo.weaving.DebugLog;
-import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action0;
 import rx.functions.Action1;
-import rx.functions.Func1;
 
 import static butterknife.ButterKnife.findById;
 
@@ -116,6 +113,7 @@ public class BindActivity extends BaseActivity {
 			connectToBeacon();
 		}
 	};
+
 	protected volatile boolean gattConnected = false;
 	protected volatile boolean gattAvailable = false;
 
@@ -299,39 +297,24 @@ public class BindActivity extends BaseActivity {
 	private void connectToBeacon() {
 		mLoader.startProgressAnimation(getResources().getInteger(R.integer.bind_beacon_writing_duration), beaconTimeoutCallback);
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
-				new Func1<ValidationObservable.Error, Boolean>() {
-					@Override
-					public Boolean call(ValidationObservable.Error error) {
-						switch(error) {
-							case BLUETOOTH_DISABLED:
-								mErrorHelper.showErrorBluetoothDisabled(getActivity(), REQUEST_CODE_ENABLE_BLUETOOTH);
-								break;
-
-							case NO_CONNECTION:
-								mErrorHelper.showInternetError(mConnectBeaconClickListener);
-								break;
-
-							case LOCATION_DISABLED:
-								mErrorHelper.showLocationError();
-								break;
-						}
-						return false;
-					}
-				}).isEmpty()).subscribe(new Action1<Boolean>() {
-			@Override
-			public void call(Boolean hasNoErrors) {
-				if(hasNoErrors) {
-					if(mBeacon == null || !mBluetoothLeService.connect(mBeacon.getBluetoothAddress())) {
-						mLoader.stopProgressAnimation(true);
-					}
-				}
-			}
-		}, new BaseErrorHandler(getActivity()) {
-			@Override
-			protected void onThrowable(Throwable throwable) {
-				mErrorHelper.showInternetError(mConnectBeaconClickListener);
-			}
-		});
+				OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickListener)).isEmpty())
+		                                              .subscribe(
+				                                              new Action1<Boolean>() {
+					                                              @Override
+					                                              public void call(Boolean hasNoErrors) {
+						                                              if(hasNoErrors) {
+							                                              if(mBeacon == null || !mBluetoothLeService.connect(
+									                                              mBeacon.getBluetoothAddress())) {
+								                                              mLoader.stopProgressAnimation(true);
+							                                              }
+						                                              }
+					                                              }
+				                                              }, new BaseErrorHandler(getActivity()) {
+					                                              @Override
+					                                              protected void onThrowable(Throwable throwable) {
+						                                              mErrorHelper.showInternetError(mConnectBeaconClickListener);
+					                                              }
+				                                              });
 	}
 
 	@Override
@@ -424,18 +407,7 @@ public class BindActivity extends BaseActivity {
 				mPanelBottom.setVisibility(View.GONE);
 				mBtnProfile.setVisibility(View.GONE);
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
-				api.checkQrCode(mQrData).onErrorReturn(new Func1<Throwable, TableDataResponse>() {
-					@Override
-					public TableDataResponse call(Throwable throwable) {
-						if(throwable instanceof RetrofitError) {
-							RetrofitError error = (RetrofitError) throwable;
-							if(error.getResponse().getStatus() == HttpStatus.SC_NOT_FOUND) {
-								return TableDataResponse.NULL;
-							}
-						}
-						return null;
-					}
-				}).subscribe(new Action1<TableDataResponse>() {
+				api.checkQrCode(mQrData).onErrorReturn(OmnomObservable.getTableOnError()).subscribe(new Action1<TableDataResponse>() {
 					@Override
 					public void call(TableDataResponse result) {
 						if(result == null) {
@@ -468,85 +440,57 @@ public class BindActivity extends BaseActivity {
 		mApiBindComplete = false;
 		mLoader.startProgressAnimation(getResources().getInteger(R.integer.validation_duration), null);
 		mErrBindSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
-				new Func1<ValidationObservable.Error, Boolean>() {
+				OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickListener)).isEmpty()).subscribe(
+				new Action1<Boolean>() {
 					@Override
-					public Boolean call(ValidationObservable.Error error) {
-						switch(error) {
-							case BLUETOOTH_DISABLED:
-								mErrorHelper.showErrorBluetoothDisabled(getActivity(), REQUEST_CODE_ENABLE_BLUETOOTH);
-								break;
-
-							case NO_CONNECTION:
-								mErrorHelper.showInternetError(mInternetErrorClickListener);
-								break;
-
-							case LOCATION_DISABLED:
-								mErrorHelper.showLocationError();
-								break;
-						}
-						return false;
-					}
-				}).isEmpty()).subscribe(new Action1<Boolean>() {
-			@Override
-			public void call(Boolean hasNoErrors) {
-				if(hasNoErrors) {
-					scanBleDevices(true, new Runnable() {
-						@Override
-						public void run() {
-							final int size = mBeacons.size();
-							if(size == 0) {
-								mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal,
-								                       R.string.try_once_again,
-								                       mInternetErrorClickListener);
-							} else if(size > 1) {
-								mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon,
-								                       R.string.try_once_again,
-								                       mInternetErrorClickListener);
-							} else if(size == 1) {
-								mBeacon = (Beacon) mBeacons.toArray()[0];
-								api.findBeacon(mBeacon).onErrorReturn(new Func1<Throwable, TableDataResponse>() {
-									@Override
-									public TableDataResponse call(Throwable throwable) {
-										if(throwable instanceof RetrofitError) {
-											RetrofitError error = (RetrofitError) throwable;
-											if(error.getResponse().getStatus() == HttpStatus.SC_NOT_FOUND) {
-												return TableDataResponse.NULL;
-											}
-										}
-										return null;
-									}
-								}).subscribe(new Action1<TableDataResponse>() {
-									@Override
-									public void call(final TableDataResponse tableData) {
-										if(tableData == null) {
-											mErrorHelper.showInternetError(mInternetErrorClickListener);
-											return;
-										}
-										mBindClicked = false;
-										mLoader.updateProgressMax(new Runnable() {
+					public void call(Boolean hasNoErrors) {
+						if(hasNoErrors) {
+							scanBleDevices(true, new Runnable() {
+								@Override
+								public void run() {
+									final int size = mBeacons.size();
+									if(size == 0) {
+										mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal,
+										                       R.string.try_once_again,
+										                       mInternetErrorClickListener);
+									} else if(size > 1) {
+										mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon,
+										                       R.string.try_once_again,
+										                       mInternetErrorClickListener);
+									} else if(size == 1) {
+										mBeacon = (Beacon) mBeacons.toArray()[0];
+										api.findBeacon(mBeacon).onErrorReturn(OmnomObservable.getTableOnError()).subscribe(new Action1<TableDataResponse>() {
 											@Override
-											public void run() {
-												if(tableData != TableDataResponse.NULL) {
-													onErrorBeaconCheck(tableData.getInternalId());
-												} else {
-													scanQrCode();
+											public void call(final TableDataResponse tableData) {
+												if(tableData == null) {
+													mErrorHelper.showInternetError(mInternetErrorClickListener);
+													return;
 												}
+												mBindClicked = false;
+												mLoader.updateProgressMax(new Runnable() {
+													@Override
+													public void run() {
+														if(tableData != TableDataResponse.NULL) {
+															onErrorBeaconCheck(tableData.getInternalId());
+														} else {
+															scanQrCode();
+														}
+													}
+												});
+											}
+										}, new BaseErrorHandler(getActivity()) {
+											@Override
+											protected void onThrowable(Throwable throwable) {
+												Log.e(TAG, "findBeacon", throwable);
+												mErrorHelper.showInternetError(mInternetErrorClickListener);
 											}
 										});
 									}
-								}, new BaseErrorHandler(getActivity()) {
-									@Override
-									protected void onThrowable(Throwable throwable) {
-										Log.e(TAG, "findBeacon", throwable);
-										mErrorHelper.showInternetError(mInternetErrorClickListener);
-									}
-								});
-							}
+								}
+							});
 						}
-					});
-				}
-			}
-		}, new BaseErrorHandler(getActivity()) {
+					}
+				}, new BaseErrorHandler(getActivity()) {
 			@Override
 			protected void onThrowable(Throwable throwable) {
 				Log.e(TAG, "bindTable", throwable);

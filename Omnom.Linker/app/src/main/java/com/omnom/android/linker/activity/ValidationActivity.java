@@ -44,8 +44,6 @@ import rx.functions.Func2;
 import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 
 public class ValidationActivity extends BaseActivity {
-	private static final int REQUEST_CODE_ENABLE_BT = 100;
-
 	@SuppressWarnings("UnusedDeclaration")
 	public static void start(final Context context, Restaurant restaurant, int animation) {
 		final Intent intent = new Intent(context, ValidationActivity.class);
@@ -188,48 +186,37 @@ public class ValidationActivity extends BaseActivity {
 				onAnimationEnd();
 			}
 		});
-		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
-				new Func1<ValidationObservable.Error, Boolean>() {
-					@Override
-					public Boolean call(ValidationObservable.Error error) {
-						switch(error) {
-							case BLUETOOTH_DISABLED:
-								mErrorHelper.showErrorBluetoothDisabled(getActivity(), REQUEST_CODE_ENABLE_BT);
-								break;
-
-							case NO_CONNECTION:
+		mErrValidationSubscription = AndroidObservable
+				.bindActivity(this, ValidationObservable.validate(this)
+				                                        .map(OmnomObservable.getValidationFunc(
+						                                             this,
+						                                             mErrorHelper,
+						                                             new View.OnClickListener() {
+							                                             @Override
+							                                             public void onClick(View v) {
+								                                             validate();
+							                                             }
+						                                             })
+				                                            ).isEmpty())
+				.subscribe(
+						new Action1<Boolean>() {
+							@Override
+							public void call(Boolean hasNoErrors) {
+								if(hasNoErrors) {
+									authenticateAndGetData();
+								}
+							}
+						}, new Action1<Throwable>() {
+							@Override
+							public void call(Throwable throwable) {
 								mErrorHelper.showInternetError(new View.OnClickListener() {
 									@Override
 									public void onClick(View v) {
 										validate();
 									}
 								});
-								break;
-
-							case LOCATION_DISABLED:
-								mErrorHelper.showLocationError();
-								break;
-						}
-						return false;
-					}
-				}).isEmpty()).subscribe(new Action1<Boolean>() {
-			@Override
-			public void call(Boolean hasNoErrors) {
-				if(hasNoErrors) {
-					authenticateAndGetData();
-				}
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				mErrorHelper.showInternetError(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						validate();
-					}
-				});
-			}
-		});
+							}
+						});
 	}
 
 	@DebugLog
@@ -285,11 +272,9 @@ public class ValidationActivity extends BaseActivity {
 						return Observable.combineLatest(
 								api.getRestaurants(),
 								api.getUserProfile(s),
-								new Func2<RestaurantsResponse, UserProfile,
-										RestaurantsResponse>() {
+								new Func2<RestaurantsResponse, UserProfile, RestaurantsResponse>() {
 									@Override
-									public RestaurantsResponse call(RestaurantsResponse restaurants,
-									                                UserProfile profile) {
+									public RestaurantsResponse call(RestaurantsResponse restaurants, UserProfile profile) {
 										LinkerApplication.get(getActivity()).cacheUserProfile(profile);
 										return restaurants;
 									}
@@ -310,9 +295,7 @@ public class ValidationActivity extends BaseActivity {
 							}
 						});
 					}
-				}, new BaseErrorHandler(this,
-				                        UserDataHolder
-						                        .create(mUsername, mPassword)) {
+				}, new BaseErrorHandler(this, UserDataHolder.create(mUsername, mPassword)) {
 					@Override
 					protected void onThrowable(Throwable throwable) {
 						showToastLong(getActivity(), R.string.error_unknown_server_error);
