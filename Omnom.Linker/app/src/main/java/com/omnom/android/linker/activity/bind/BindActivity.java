@@ -534,6 +534,12 @@ public class BindActivity extends BaseActivity {
 											}
 										});
 									}
+								}, new BaseErrorHandler(getActivity()) {
+									@Override
+									protected void onThrowable(Throwable throwable) {
+										Log.e(TAG, "findBeacon", throwable);
+										mErrorHelper.showInternetError(mInternetErrorClickListener);
+									}
 								});
 							}
 						}
@@ -543,6 +549,7 @@ public class BindActivity extends BaseActivity {
 		}, new BaseErrorHandler(getActivity()) {
 			@Override
 			protected void onThrowable(Throwable throwable) {
+				Log.e(TAG, "bindTable", throwable);
 				mErrorHelper.showInternetError(mInternetErrorClickListener);
 			}
 		});
