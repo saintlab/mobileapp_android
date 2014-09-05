@@ -35,6 +35,18 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 		handleIntent(getIntent());
 	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mBus.unregister(this);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		mBus.register(this);
+	}
+
 	protected void handleSavedState(Bundle savedInstanceState) {
 		// Do nothing
 	}

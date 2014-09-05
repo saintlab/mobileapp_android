@@ -170,7 +170,6 @@ public class BindActivity extends BaseActivity {
 	private Beacon mBeacon = null;
 	private Set<Beacon> mBeacons = new HashSet<Beacon>();
 	private LoaderController mLoaderController;
-	// private CountDownTimer cdt;
 	private BluetoothAdapter mBluetoothAdapter;
 	private int mLoaderTranslation;
 	private Subscription mErrValidationSubscription;
@@ -614,7 +613,6 @@ public class BindActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mBus.register(this);
 		postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 			@Override
 			public void run() {
@@ -649,17 +647,12 @@ public class BindActivity extends BaseActivity {
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		mBus.unregister(this);
-	}
-
-	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		mLoader.onDestroy();
 		OmnomObservable.unsubscribe(mErrValidationSubscription);
 		OmnomObservable.unsubscribe(mApiBindingSubscription);
+		OmnomObservable.unsubscribe(mErrBindSubscription);
 	}
 
 	@Override
