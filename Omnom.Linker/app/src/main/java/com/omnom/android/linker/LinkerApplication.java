@@ -80,4 +80,9 @@ public class LinkerApplication extends Application implements LinkerDataProvider
 	public String getAuthToken() {
 		return mPrefsHelper.getAuthToken(this);
 	}
+
+	@Override
+	public Context getContext() {
+		return this;
+	}
 }

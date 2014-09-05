@@ -22,22 +22,15 @@ import retrofit.RequestInterceptor;
 public class LinkerDataProviderModule {
 	public interface AuthTokenProvider {
 		public String getAuthToken();
+		public Context getContext();
 	}
 
-	//	public static final String ENDPOINT_DATA_STAND = "http://restaurateur.stand.saintlab.com/";
-	//	public static final String ENDPOINT_DATA_LAAAAB = "http://restaurateur.laaaab.com";
-	//
-	//	public static final String ENDPOINT_AUTH_STAND = "http://wicket.stand.saintlab.com";
-	//	public static final String ENDPOINT_AUTH_LAAAAB = "http://wicket.laaaab.com";
 	private AuthTokenProvider tokenProvider;
 	private Context mContext;
 
-	public LinkerDataProviderModule(final Context context) {
-		mContext = context;
-	}
-
 	public LinkerDataProviderModule(final AuthTokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
+		this.mContext = tokenProvider.getContext();
 	}
 
 	@Provides
