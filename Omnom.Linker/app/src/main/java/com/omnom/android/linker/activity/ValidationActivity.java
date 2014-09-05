@@ -212,36 +212,36 @@ public class ValidationActivity extends BaseActivity {
 			}
 		});
 		mErrValidationSubscription = AndroidObservable
-								.bindActivity(this, ValidationObservable.validate(this)
-								                                        .map(OmnomObservable.getValidationFunc(
-										                                             this,
-										                                             mErrorHelper,
-										                                             new View.OnClickListener() {
-											                                             @Override
-											                                             public void onClick(View v) {
-												                                             validate();
-											                                             }
-										                                             })
-								                                            ).isEmpty())
-									.subscribe(
-											new Action1<Boolean>() {
-												@Override
-												public void call(Boolean hasNoErrors) {
-													if(hasNoErrors) {
-														authenticateAndGetData();
-													}
-												}
-											}, new Action1<Throwable>() {
-												@Override
-												public void call(Throwable throwable) {
-													mErrorHelper.showInternetError(new View.OnClickListener() {
-														@Override
-														public void onClick(View v) {
-															validate();
-														}
-													});
-					}
-				});
+				.bindActivity(this, ValidationObservable.validate(this)
+				                                        .map(OmnomObservable.getValidationFunc(
+						                                             this,
+						                                             mErrorHelper,
+						                                             new View.OnClickListener() {
+							                                             @Override
+							                                             public void onClick(View v) {
+								                                             validate();
+							                                             }
+						                                             })
+				                                            ).isEmpty())
+				.subscribe(
+						new Action1<Boolean>() {
+							@Override
+							public void call(Boolean hasNoErrors) {
+								if(hasNoErrors) {
+									authenticateAndGetData();
+								}
+							}
+						}, new Action1<Throwable>() {
+							@Override
+							public void call(Throwable throwable) {
+								mErrorHelper.showInternetError(new View.OnClickListener() {
+									@Override
+									public void onClick(View v) {
+										validate();
+									}
+								});
+							}
+						});
 	}
 
 	@DebugLog
