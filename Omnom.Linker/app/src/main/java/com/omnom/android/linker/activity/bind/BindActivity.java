@@ -523,11 +523,22 @@ public class BindActivity extends BaseActivity {
 											return;
 										}
 										mBindClicked = false;
-										if(tableData != TableDataResponse.NULL) {
-											onErrorBeaconCheck(tableData.getInternalId());
-										} else {
-											scanQrCode();
-										}
+										mLoader.updateProgressMax(new Runnable() {
+											@Override
+											public void run() {
+												if(tableData != TableDataResponse.NULL) {
+													onErrorBeaconCheck(tableData.getInternalId());
+												} else {
+													scanQrCode();
+												}
+											}
+										});
+									}
+								}, new BaseErrorHandler(getActivity()) {
+									@Override
+									protected void onThrowable(Throwable throwable) {
+										Log.e(TAG, "findBeacon", throwable);
+										mErrorHelper.showInternetError(mInternetErrorClickListener);
 									}
 								});
 							}
@@ -538,6 +549,7 @@ public class BindActivity extends BaseActivity {
 		}, new BaseErrorHandler(getActivity()) {
 			@Override
 			protected void onThrowable(Throwable throwable) {
+				Log.e(TAG, "bindTable", throwable);
 				mErrorHelper.showInternetError(mInternetErrorClickListener);
 			}
 		});
