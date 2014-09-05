@@ -523,11 +523,16 @@ public class BindActivity extends BaseActivity {
 											return;
 										}
 										mBindClicked = false;
-										if(tableData != TableDataResponse.NULL) {
-											onErrorBeaconCheck(tableData.getInternalId());
-										} else {
-											scanQrCode();
-										}
+										mLoader.updateProgressMax(new Runnable() {
+											@Override
+											public void run() {
+												if(tableData != TableDataResponse.NULL) {
+													onErrorBeaconCheck(tableData.getInternalId());
+												} else {
+													scanQrCode();
+												}
+											}
+										});
 									}
 								});
 							}
