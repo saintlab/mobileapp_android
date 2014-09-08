@@ -458,44 +458,46 @@ public class BindActivity extends BaseActivity {
 										                       mInternetErrorClickListener);
 									} else if(size == 1) {
 										mBeacon = (Beacon) mBeacons.toArray()[0];
-										api.findBeacon(mBeacon).onErrorReturn(OmnomObservable.getTableOnError()).subscribe(new Action1<TableDataResponse>() {
-											@Override
-											public void call(final TableDataResponse tableData) {
-												if(tableData == null) {
-													mErrorHelper.showInternetError(mInternetErrorClickListener);
-													return;
-												}
-												mBindClicked = false;
-												mLoader.updateProgressMax(new Runnable() {
+										api.findBeacon(mBeacon).onErrorReturn(OmnomObservable.getTableOnError()).subscribe(
+												new Action1<TableDataResponse>() {
 													@Override
-													public void run() {
-														if(tableData != TableDataResponse.NULL) {
-															onErrorBeaconCheck(tableData.getInternalId());
-														} else {
-															scanQrCode();
+													public void call(final TableDataResponse tableData) {
+														if(tableData == null) {
+															mErrorHelper.showInternetError(mInternetErrorClickListener);
+															return;
 														}
+														mBindClicked = false;
+														mLoader.updateProgressMax(new Runnable() {
+															@Override
+															public void run() {
+																if(tableData != TableDataResponse.NULL
+																		&& tableData.getRestaurantId().equals(mRestaurant.getId())) {
+																	onErrorBeaconCheck(tableData.getInternalId());
+																} else {
+																	scanQrCode();
+																}
+															}
+														});
+													}
+												}, new BaseErrorHandler(getActivity()) {
+													@Override
+													protected void onThrowable(Throwable throwable) {
+														Log.e(TAG, "findBeacon", throwable);
+														mErrorHelper.showInternetError(mInternetErrorClickListener);
 													}
 												});
-											}
-										}, new BaseErrorHandler(getActivity()) {
-											@Override
-											protected void onThrowable(Throwable throwable) {
-												Log.e(TAG, "findBeacon", throwable);
-												mErrorHelper.showInternetError(mInternetErrorClickListener);
-											}
-										});
 									}
 								}
 							});
 						}
 					}
 				}, new BaseErrorHandler(getActivity()) {
-			@Override
-			protected void onThrowable(Throwable throwable) {
-				Log.e(TAG, "bindTable", throwable);
-				mErrorHelper.showInternetError(mInternetErrorClickListener);
-			}
-		});
+					@Override
+					protected void onThrowable(Throwable throwable) {
+						Log.e(TAG, "bindTable", throwable);
+						mErrorHelper.showInternetError(mInternetErrorClickListener);
+					}
+				});
 	}
 
 	private void onErrorQrCheck(final int number) {
