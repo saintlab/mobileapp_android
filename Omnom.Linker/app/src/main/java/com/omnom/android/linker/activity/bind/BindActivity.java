@@ -186,7 +186,7 @@ public class BindActivity extends BaseActivity {
 		public void run() {
 			if(!gattAvailable || !gattConnected) {
 				OmnomObservable.unsubscribe(mApiBindingSubscription);
-				mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_weak_beacon_signal, R.string.try_once_again,
+				mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_maintenance_mode_off, R.string.try_once_again,
 				                       mInternetErrorClickListener);
 			}
 			if(!mApiBindComplete) {
