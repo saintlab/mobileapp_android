@@ -41,7 +41,7 @@
         android:text="Location"
         style="@style/TextView.Restaurant.Data.Location"/>
 
-    <RatingBar
+    <!--<RatingBar
         android:id="@+id/rating"
         android:paddingTop="@dimen/activity_horizontal_margin_xsmall"
         android:paddingLeft="@dimen/activity_horizontal_margin_xsmall"
@@ -50,14 +50,13 @@
         android:layout_alignParentEnd="true"
         android:layout_alignBottom="@+id/type"
         android:layout_alignTop="@+id/type"
-        android:layout_below="@+id/location"/>
+        android:layout_below="@+id/location"/>-->
 
     <TextView
         android:id="@+id/type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/name"
-        android:layout_toStartOf="@+id/rating"
         android:layout_below="@+id/location"
         android:text="Type Type Type Type Type Type Type"
         style="@style/TextView.Restaurant.Data"/>

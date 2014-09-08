@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
@@ -32,8 +31,8 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 		@InjectView(R.id.type)
 		protected TextView type;
 
-		@InjectView(R.id.rating)
-		protected RatingBar ratingBar;
+//		@InjectView(R.id.rating)
+//		protected RatingBar ratingBar;
 
 		private ViewHolder(View convertView) {
 			ButterKnife.inject(this, convertView);
@@ -56,7 +55,7 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 		if(view == null) {
 			view = inflater.inflate(R.layout.item_restaurant, parent, false);
 			holder = new ViewHolder(view);
-			holder.ratingBar.setProgress(5);
+			// holder.ratingBar.setProgress(5);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
@@ -69,6 +68,6 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 		holder.name.setText(item.getTitle());
 		holder.location.setText(item.getDescription());
 		holder.type.setText(item.getDescription());
-		holder.ratingBar.setProgress(mRandom.nextInt(10));
+		// holder.ratingBar.setProgress(mRandom.nextInt(10));
 	}
 }
