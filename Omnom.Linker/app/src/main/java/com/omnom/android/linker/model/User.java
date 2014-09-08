@@ -3,9 +3,6 @@ package com.omnom.android.linker.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Ch3D on 03.09.2014.
  */
@@ -28,9 +25,9 @@ public class User {
 	@SerializedName("birth_date")
 	@Expose
 	private String birthDate;
-	
+
 	@Expose
-	private List<Object> groups = new ArrayList<Object>();
+	private Object groups;
 
 	public int getId() {
 		return id;
@@ -80,11 +77,11 @@ public class User {
 		this.birthDate = birthDate;
 	}
 
-	public List<Object> getGroups() {
+	public Object getGroups() {
 		return groups;
 	}
 
-	public void setGroups(List<Object> groups) {
+	public void setGroups(Object groups) {
 		this.groups = groups;
 	}
 }
