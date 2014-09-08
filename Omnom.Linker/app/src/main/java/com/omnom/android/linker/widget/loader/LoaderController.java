@@ -83,4 +83,10 @@ public class LoaderController implements LoaderTask.ProgressListener {
 	public void onFinished() {
 
 	}
+
+	public void hideEnterData() {
+		AnimationUtils.animateAlpha(view.mEditTableNumber, false);
+		view.mEditTableNumber.setFocusable(false);
+		view.mEditTableNumber.setFocusableInTouchMode(false);
+	}
 }

@@ -221,6 +221,42 @@ public class LoaderView extends FrameLayout {
 		});
 	}
 
+	public void animateLogoFast(final int resId) {
+		animateLogo(resId, getResources().getInteger(R.integer.default_animation_duration_quick));
+	}
+
+	public void animateLogo(final int resId, final long duration) {
+		final Object tag = mImgLogo.getTag(R.id.img_loader);
+		if(tag != null && resId == (Integer) tag) {
+			// skip
+			return;
+		}
+		mImgLogo.setTag(R.id.img_loader, resId);
+		AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
+			@Override
+			public void run() {
+				mImgLogo.setImageResource(resId);
+				AnimationUtils.animateAlpha(mImgLogo, true, duration);
+			}
+		}, duration);
+	}
+
+	public void animateLogo2(final int resId) {
+		mImgLogo.setTag(R.id.img_loader, resId);
+		if(mImgLogo.getVisibility() == GONE || mImgLogo.getAlpha() == 0) {
+			mImgLogo.setImageResource(resId);
+			AnimationUtils.animateAlpha(mImgLogo, true);
+		} else {
+			AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
+				@Override
+				public void run() {
+					mImgLogo.setImageResource(resId);
+					AnimationUtils.animateAlpha(mImgLogo, true);
+				}
+			});
+		}
+	}
+
 	public void setLogo(int resId) {
 		final Object tag = mImgLogo.getTag(R.id.img_loader);
 		if(tag != null && resId == (Integer) tag) {

@@ -39,7 +39,6 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
-import retrofit.http.HEAD;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -140,7 +139,7 @@ public class ValidationActivity extends BaseActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		loader.animateLogo(R.drawable.ic_fork_n_knife);
+		loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 	}
 
 	@Override
@@ -190,6 +189,7 @@ public class ValidationActivity extends BaseActivity {
 
 	private void validate() {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
+		loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 		loader.showProgress(false);
 		if(mFirstRun) {
 			loader.scaleDown(null, new Runnable() {

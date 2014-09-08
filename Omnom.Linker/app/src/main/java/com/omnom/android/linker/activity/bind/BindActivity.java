@@ -276,6 +276,7 @@ public class BindActivity extends BaseActivity {
 		   }, new BaseErrorHandler(this) {
 			   @Override
 			   protected void onThrowable(Throwable throwable) {
+				   mLoaderController.hideEnterData();
 				   mErrorHelper.showInternetError(mInternetErrorClickListener);
 			   }
 		   });
@@ -433,7 +434,7 @@ public class BindActivity extends BaseActivity {
 	}
 
 	private void bindTable() {
-		mLoader.animateLogo(R.drawable.ic_mexico_logo);
+		mLoader.animateLogoFast(R.drawable.ic_mexico_logo);
 		mLoader.animateColorDefault();
 		clearErrors();
 		mApiBindComplete = false;
