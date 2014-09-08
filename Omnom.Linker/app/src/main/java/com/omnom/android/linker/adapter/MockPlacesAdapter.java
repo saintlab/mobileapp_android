@@ -66,7 +66,7 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 
 	private void bindView(Restaurant item, ViewHolder holder) {
 		holder.name.setText(item.getTitle());
-		holder.location.setText(item.getDescription());
+		holder.location.setText(item.getAddress(getContext()));
 		holder.type.setText(item.getDescription());
 		// holder.ratingBar.setProgress(mRandom.nextInt(10));
 	}

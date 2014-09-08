@@ -19,6 +19,9 @@
     <string name="open_settings">Перейти в настройки</string>
     <string name="try_once_again">Проверить ещё</string>
 
+    <string name="floor_suffix"> этаж </string>
+    <string name="restaurant_address_delimiter">, </string>
+
     <string name="logout_user">Выход из аккаунта</string>
     <string name="please_enter_username">Пожалуйста введите логин</string>
 
