@@ -16,6 +16,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -291,11 +292,11 @@ public class LoaderView extends FrameLayout {
 		mImgLoader.requestLayout();
 	}
 
-	@DebugLog
 	public void stopProgressAnimation() {
 		stopProgressAnimation(false);
 	}
 
+	@DebugLog
 	public void stopProgressAnimation(boolean hideProgress) {
 		showProgress(!hideProgress, true);
 		if(mProgressAnimator != null && mProgressAnimator.isRunning()) {
@@ -329,8 +330,8 @@ public class LoaderView extends FrameLayout {
 				}
 			}
 		});
-		mProgressBar.setTag(R.id.canceled, false);
 		showProgress(true, true);
+		mProgressBar.setTag(R.id.canceled, false);
 		mProgressAnimator.start();
 		return mProgressAnimator;
 	}
@@ -338,7 +339,7 @@ public class LoaderView extends FrameLayout {
 	public ValueAnimator updateProgressMax(final Runnable callback) {
 		mProgressAnimator = ValueAnimator.ofInt(mProgressBar.getProgress(), mProgressBar.getMax());
 		mProgressAnimator.setDuration(getResources().getInteger(R.integer.default_animation_duration_short));
-		mProgressAnimator.setInterpolator(interpolation);
+		mProgressAnimator.setInterpolator(new AccelerateInterpolator());
 		mProgressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
@@ -359,6 +360,7 @@ public class LoaderView extends FrameLayout {
 				}
 			}
 		});
+		mProgressBar.setTag(R.id.canceled, false);
 		mProgressAnimator.start();
 		return mProgressAnimator;
 	}

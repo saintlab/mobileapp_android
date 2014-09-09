@@ -256,35 +256,40 @@ public class ValidationActivity extends BaseActivity {
 		loader.updateProgressMax(new Runnable() {
 			@Override
 			public void run() {
-				if(mRestaurants == null) {
-					showToastLong(loader, R.string.error_server_unavailable_please_try_again);
-					finish();
-					return;
-				}
-				final List<Restaurant> items = mRestaurants.getItems();
-				int size = items.size();
-				if(items.isEmpty()) {
-					showToastLong(loader, R.string.error_no_restaurants_please_try_again_later);
-					finish();
-					return;
-				}
-
-				if(size == 1) {
-					BindActivity.start(getActivity(), items.get(0), false);
-					finish();
-				} else {
-					loader.animateColor(Color.WHITE, getResources().getInteger(R.integer.default_animation_duration_long));
-					loader.scaleUp(new Runnable() {
-						@Override
-						public void run() {
-							ViewUtils.setVisible(panelBottom, false);
-							RestaurantsListActivity.start(getActivity(), items);
-							finish();
-						}
-					});
-				}
+				startNextActivity();
 			}
 		});
+	}
+
+	@DebugLog
+	private void startNextActivity() {
+		if(mRestaurants == null) {
+			showToastLong(loader, R.string.error_server_unavailable_please_try_again);
+			finish();
+			return;
+		}
+		final List<Restaurant> items = mRestaurants.getItems();
+		int size = items.size();
+		if(items.isEmpty()) {
+			showToastLong(loader, R.string.error_no_restaurants_please_try_again_later);
+			finish();
+			return;
+		}
+
+		if(size == 1) {
+			BindActivity.start(getActivity(), items.get(0), false);
+			finish();
+		} else {
+			loader.animateColor(Color.WHITE, getResources().getInteger(R.integer.default_animation_duration_long));
+			loader.scaleUp(new Runnable() {
+				@Override
+				public void run() {
+					ViewUtils.setVisible(panelBottom, false);
+					RestaurantsListActivity.start(getActivity(), items);
+					finish();
+				}
+			});
+		}
 	}
 
 	private void authenticateAndGetData() {
@@ -316,7 +321,7 @@ public class ValidationActivity extends BaseActivity {
 							})).subscribe(new Action1<RestaurantsResponse>() {
 						@Override
 						public void call(RestaurantsResponse result) {
-							onRestaurantLoaded(result);
+							onRestaurantsLoaded(result);
 						}
 					}, onError);
 		} else {
@@ -324,17 +329,26 @@ public class ValidationActivity extends BaseActivity {
 					<RestaurantsResponse>() {
 				@Override
 				public void call(RestaurantsResponse response) {
-					onRestaurantLoaded(response);
+					onRestaurantsLoaded(response);
 				}
 			}, onError);
 		}
 	}
 
-	private void onRestaurantLoaded(RestaurantsResponse result) {
+	@DebugLog
+	private void onRestaurantsLoaded(RestaurantsResponse result) {
 		mRestaurants = result;
 		mDataLoaded = true;
 		if(mAnimationFinished) {
 			onTasksFinished();
+		} else {
+			loader.stopProgressAnimation();
+			loader.updateProgressMax(new Runnable() {
+				@Override
+				public void run() {
+					startNextActivity();
+				}
+			});
 		}
 	}
 }
