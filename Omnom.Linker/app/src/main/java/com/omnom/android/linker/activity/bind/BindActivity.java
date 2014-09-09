@@ -29,6 +29,7 @@ import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.ResponseBase;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
+import com.omnom.android.linker.model.restaurant.RestaurantHelper;
 import com.omnom.android.linker.model.table.TableDataResponse;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
@@ -201,7 +202,7 @@ public class BindActivity extends BaseActivity {
 						mLoader.postDelayed(new Runnable() {
 							@Override
 							public void run() {
-								mLoader.animateLogo(R.drawable.ic_fork_n_knife);
+								mLoader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
 							}
 						}, getResources().getInteger(R.integer.binding_done_icon_delay));
 						mLoader.showProgress(false, true);
@@ -351,7 +352,7 @@ public class BindActivity extends BaseActivity {
 			mLoader.animateColor(Color.WHITE,
 			                     getResources().getColor(R.color.loader_bg),
 			                     getResources().getInteger(R.integer.default_animation_duration_long));
-			mLoader.setLogo(R.drawable.ic_mexico_logo);
+			// mLoader.setLogo(R.drawable.ic_mexico_logo);
 			AnimationUtils.animateAlpha(mPanelBottom, true);
 			AnimationUtils.animateAlpha(mBtnProfile, true);
 			mLoader.post(new Runnable() {
@@ -367,7 +368,7 @@ public class BindActivity extends BaseActivity {
 			});
 		} else {
 			mLoader.scaleDown();
-			mLoader.animateLogo(R.drawable.ic_mexico_logo);
+			// mLoader.animateLogo(R.drawable.ic_mexico_logo);
 			mLoader.postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -381,6 +382,7 @@ public class BindActivity extends BaseActivity {
 
 	private void initRestaurantUi(Restaurant restaurant) {
 		mRestaurant = restaurant;
+		mLoader.animateLogo(RestaurantHelper.getLogo(restaurant), R.drawable.ic_fork_n_knife);
 		mBtnBottom.setText(R.string.bind_table);
 		mBtnBottom.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -440,7 +442,7 @@ public class BindActivity extends BaseActivity {
 	}
 
 	private void bindTable() {
-		mLoader.animateLogoFast(R.drawable.ic_mexico_logo);
+		mLoader.animateLogoFast(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
 		mLoader.animateColorDefault();
 		clearErrors();
 		mApiBindComplete = false;

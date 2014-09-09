@@ -7,7 +7,7 @@
     <integer name="loader_progress_max">5000</integer>
     <integer name="ble_scan_duration">2000</integer>
     <integer name="validation_duration">2000</integer>
-    <integer name="binding_done_icon_delay">2000</integer>
+    <integer name="binding_done_icon_delay">3000</integer>
     <integer name="user_profile_animation_duration">500</integer>
     <integer name="bind_beacon_writing_duration">10000</integer>
     <integer name="login_animation_timeout">1000</integer>

@@ -10,8 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.model.restaurant.Decoration;
 import com.omnom.android.linker.model.restaurant.Restaurant;
+import com.omnom.android.linker.model.restaurant.RestaurantHelper;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -74,12 +74,12 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 
 	private void bindView(Restaurant item, final ViewHolder holder) {
 		holder.name.setText(item.getTitle());
-		holder.location.setText(item.getAddress(getContext()));
+		holder.location.setText(RestaurantHelper.getAddress(getContext(), item));
 		holder.type.setText(item.getDescription());
 		final ImageView logo = holder.logo;
-		final Decoration decoration = item.getDecoration();
-		if(decoration != null && !TextUtils.isEmpty(decoration.getLogo())) {
-			Picasso.with(getContext()).load(decoration.getLogo()).error(R.drawable.ic_app)
+		final String logoUrl = RestaurantHelper.getLogo(item);
+		if(!TextUtils.isEmpty(logoUrl)) {
+			Picasso.with(getContext()).load(logoUrl).error(R.drawable.ic_app)
 			       .into(holder.logo, new Callback() {
 				       @Override
 				       public void onSuccess() {
@@ -91,7 +91,6 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 
 				       @Override
 				       public void onError() {
-
 				       }
 			       });
 		} else {
