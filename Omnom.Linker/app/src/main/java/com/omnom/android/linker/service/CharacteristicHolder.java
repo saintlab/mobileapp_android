@@ -41,6 +41,12 @@ public class CharacteristicHolder implements Parcelable {
 		                                major);
 	}
 
+	public static CharacteristicHolder createUuid(String uuid) {
+		return new CharacteristicHolder(BeaconAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
+		                                BeaconAttributes.UUID_BLE_REDBEAR_BEACON_UUID,
+		                                uuid.getBytes());
+	}
+
 	public static CharacteristicHolder createPassword(byte[] data) {
 		return new CharacteristicHolder(BeaconAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE,
 		                                BeaconAttributes.UUID_BLE_REDBEAR_PASSWORD,

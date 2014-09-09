@@ -677,6 +677,7 @@ public class BindActivity extends BaseActivity {
 	@DebugLog
 	public void writeBeaconData() {
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createPassword(BeaconAttributes.RBL_DEFAULT_PASSKEY.getBytes()));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createUuid(mBeaconData.getUuid()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createTx(BeaconAttributes.RBL_DEFAULT_TX));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMajorId(mBeaconData.getMajor()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMinorId(mBeaconData.getMinor()));
