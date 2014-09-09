@@ -45,6 +45,7 @@ import com.omnom.android.linker.widget.loader.LoaderController;
 import com.omnom.android.linker.widget.loader.LoaderView;
 import com.squareup.otto.Subscribe;
 
+import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,6 +63,8 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 import hugo.weaving.DebugLog;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -86,7 +89,7 @@ public class BindActivity extends BaseActivity {
 	}
 
 	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
-		BeaconFilter mFilter = new BeaconFilter();
+		BeaconFilter mFilter = new BeaconFilter(getActivity());
 
 		@Override
 		@DebugLog
@@ -684,7 +687,7 @@ public class BindActivity extends BaseActivity {
 					@Override
 					public void run() {
 						mApiBindingSubscription = AndroidObservable.bindActivity(getActivity(), Observable.merge(
-								api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon),
+								api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeaconData, mBeacon),
 								api.bindQrCode(mRestaurant.getId(), mLoader.getTableNumber(), mQrData)))
 						                                           .subscribe(new Action1<ResponseBase>() {
 							                                           @Override
@@ -694,6 +697,14 @@ public class BindActivity extends BaseActivity {
 						                                           }, new BaseErrorHandler(BindActivity.this) {
 							                                           @Override
 							                                           protected void onThrowable(Throwable throwable) {
+								                                           if(throwable instanceof RetrofitError) {
+									                                           final RetrofitError cause = (RetrofitError) throwable;
+									                                           final Response response = cause.getResponse();
+									                                           if(response != null
+											                                           && response.getStatus() == HttpStatus.SC_CONFLICT) {
+										                                           // TODO: Implement error handling
+									                                           }
+								                                           }
 								                                           mErrorHelper.showError(R.drawable.ic_no_connection,
 								                                                                  R.string.error_unknown_server_error,
 								                                                                  R.string.bind_table,
