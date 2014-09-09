@@ -198,6 +198,12 @@ public class BindActivity extends BaseActivity {
 					@Override
 					public void run() {
 						mLoader.animateLogo(R.drawable.ic_done_white);
+						mLoader.postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								mLoader.animateLogo(R.drawable.ic_fork_n_knife);
+							}
+						}, getResources().getInteger(R.integer.binding_done_icon_delay));
 						mLoader.showProgress(false, true);
 						AnimationUtils.animateAlpha(mPanelBottom, true);
 						mBtnBottom.setText(R.string.bind_table);
