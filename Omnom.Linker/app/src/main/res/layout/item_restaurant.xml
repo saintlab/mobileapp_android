@@ -13,6 +13,7 @@
         android:id="@+id/img_logo"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
+        android:padding="@dimen/activity_horizontal_margin_xsmall"
         android:layout_marginEnd="@dimen/activity_horizontal_margin_small"
         android:layout_width="@dimen/restaurant_logo_size"
         android:layout_height="@dimen/restaurant_logo_size"
