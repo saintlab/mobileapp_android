@@ -6,6 +6,8 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +16,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -24,6 +27,8 @@ import com.omnom.android.linker.R;
 import com.omnom.android.linker.animation.BezierCubicInterpolation;
 import com.omnom.android.linker.utils.AnimationUtils;
 import com.omnom.android.linker.utils.ViewUtils;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -212,6 +217,7 @@ public class LoaderView extends FrameLayout {
 			return;
 		}
 		mImgLogo.setTag(R.id.img_loader, resId);
+		mImgLogo.setTag(R.id.logo_url, null);
 		AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
 			@Override
 			public void run() {
@@ -219,6 +225,44 @@ public class LoaderView extends FrameLayout {
 				AnimationUtils.animateAlpha(mImgLogo, true);
 			}
 		});
+	}
+
+	public void animateLogoFast(final int resId) {
+		animateLogo(resId, getResources().getInteger(R.integer.default_animation_duration_quick));
+	}
+
+	public void animateLogo(final int resId, final long duration) {
+		final Object tag = mImgLogo.getTag(R.id.img_loader);
+		if(tag != null && resId == (Integer) tag) {
+			// skip
+			return;
+		}
+		mImgLogo.setTag(R.id.img_loader, resId);
+		mImgLogo.setTag(R.id.logo_url, null);
+		AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
+			@Override
+			public void run() {
+				mImgLogo.setImageResource(resId);
+				AnimationUtils.animateAlpha(mImgLogo, true, duration);
+			}
+		}, duration);
+	}
+
+	public void animateLogo2(final int resId) {
+		mImgLogo.setTag(R.id.img_loader, resId);
+		mImgLogo.setTag(R.id.logo_url, null);
+		if(mImgLogo.getVisibility() == GONE || mImgLogo.getAlpha() == 0) {
+			mImgLogo.setImageResource(resId);
+			AnimationUtils.animateAlpha(mImgLogo, true);
+		} else {
+			AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
+				@Override
+				public void run() {
+					mImgLogo.setImageResource(resId);
+					AnimationUtils.animateAlpha(mImgLogo, true);
+				}
+			});
+		}
 	}
 
 	public void setLogo(int resId) {
@@ -229,6 +273,7 @@ public class LoaderView extends FrameLayout {
 		}
 		mImgLogo.setImageResource(resId);
 		mImgLogo.setTag(R.id.img_loader, resId);
+		mImgLogo.setTag(R.id.logo_url, null);
 	}
 
 	public void updateProgress(final int progress) {
@@ -247,11 +292,11 @@ public class LoaderView extends FrameLayout {
 		mImgLoader.requestLayout();
 	}
 
-	@DebugLog
 	public void stopProgressAnimation() {
 		stopProgressAnimation(false);
 	}
 
+	@DebugLog
 	public void stopProgressAnimation(boolean hideProgress) {
 		showProgress(!hideProgress, true);
 		if(mProgressAnimator != null && mProgressAnimator.isRunning()) {
@@ -285,8 +330,8 @@ public class LoaderView extends FrameLayout {
 				}
 			}
 		});
-		mProgressBar.setTag(R.id.canceled, false);
 		showProgress(true, true);
+		mProgressBar.setTag(R.id.canceled, false);
 		mProgressAnimator.start();
 		return mProgressAnimator;
 	}
@@ -294,7 +339,7 @@ public class LoaderView extends FrameLayout {
 	public ValueAnimator updateProgressMax(final Runnable callback) {
 		mProgressAnimator = ValueAnimator.ofInt(mProgressBar.getProgress(), mProgressBar.getMax());
 		mProgressAnimator.setDuration(getResources().getInteger(R.integer.default_animation_duration_short));
-		mProgressAnimator.setInterpolator(interpolation);
+		mProgressAnimator.setInterpolator(new AccelerateInterpolator());
 		mProgressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
@@ -315,6 +360,7 @@ public class LoaderView extends FrameLayout {
 				}
 			}
 		});
+		mProgressBar.setTag(R.id.canceled, false);
 		mProgressAnimator.start();
 		return mProgressAnimator;
 	}
@@ -341,5 +387,54 @@ public class LoaderView extends FrameLayout {
 
 	public int getSize() {
 		return mImgLoader.getLayoutParams().width;
+	}
+
+	public void animateLogo(final Bitmap bitmap) {
+		animateLogo(bitmap, getResources().getInteger(R.integer.default_animation_duration_short));
+	}
+
+	public void animateLogo(final Bitmap bitmap, long duration) {
+		mImgLogo.setTag(R.id.img_loader, 0);
+		AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
+			@Override
+			public void run() {
+				mImgLogo.setImageBitmap(bitmap);
+				AnimationUtils.animateAlpha(mImgLogo, true);
+			}
+		}, duration);
+	}
+
+	public void animateLogo(final String logo, final int placeholderResId, final long duration) {
+		final Object tag = mImgLogo.getTag(R.id.logo_url);
+		if(tag != null && tag.equals(logo)) {
+			// skip
+			return;
+		}
+		Picasso.with(getContext()).load(logo).placeholder(placeholderResId).into(new Target() {
+			@Override
+			public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+				mImgLogo.setTag(R.id.logo_url, logo);
+				animateLogo(bitmap, duration);
+			}
+
+			@Override
+			public void onBitmapFailed(Drawable errorDrawable) {
+				mImgLogo.setTag(R.id.logo_url, null);
+				animateLogo(placeholderResId, duration);
+			}
+
+			@Override
+			public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+			}
+		});
+	}
+
+	public void animateLogoFast(final String logo, int placeholder) {
+		animateLogo(logo, placeholder, getResources().getInteger(R.integer.default_animation_duration_quick));
+	}
+
+	public void animateLogo(final String logo, int placeholder) {
+		animateLogo(logo, placeholder, getResources().getInteger(R.integer.default_animation_duration_short));
 	}
 }

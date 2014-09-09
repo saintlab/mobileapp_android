@@ -1,15 +1,19 @@
 package com.omnom.android.linker.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.RatingBar;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.model.restaurant.Restaurant;
+import com.omnom.android.linker.model.restaurant.RestaurantHelper;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Random;
@@ -32,8 +36,11 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 		@InjectView(R.id.type)
 		protected TextView type;
 
-		@InjectView(R.id.rating)
-		protected RatingBar ratingBar;
+		@InjectView(R.id.img_logo)
+		protected ImageView logo;
+
+		//		@InjectView(R.id.rating)
+		//		protected RatingBar ratingBar;
 
 		private ViewHolder(View convertView) {
 			ButterKnife.inject(this, convertView);
@@ -41,8 +48,8 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 	}
 
 	private final LayoutInflater inflater;
-	private final Random         mRandom;
-	private       ViewHolder     holder;
+	private final Random mRandom;
+	private ViewHolder holder;
 
 	public MockPlacesAdapter(Context context, List<Restaurant> objects) {
 		super(context, R.layout.item_restaurant, objects);
@@ -56,7 +63,7 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 		if(view == null) {
 			view = inflater.inflate(R.layout.item_restaurant, parent, false);
 			holder = new ViewHolder(view);
-			holder.ratingBar.setProgress(5);
+			// holder.ratingBar.setProgress(5);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
@@ -65,10 +72,29 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 		return view;
 	}
 
-	private void bindView(Restaurant item, ViewHolder holder) {
+	private void bindView(Restaurant item, final ViewHolder holder) {
 		holder.name.setText(item.getTitle());
-		holder.location.setText(item.getDescription());
+		holder.location.setText(RestaurantHelper.getAddress(getContext(), item));
 		holder.type.setText(item.getDescription());
-		holder.ratingBar.setProgress(mRandom.nextInt(10));
+		final ImageView logo = holder.logo;
+		final String logoUrl = RestaurantHelper.getLogo(item);
+		if(!TextUtils.isEmpty(logoUrl)) {
+			Picasso.with(getContext()).load(logoUrl).error(R.drawable.ic_app)
+			       .into(holder.logo, new Callback() {
+				       @Override
+				       public void onSuccess() {
+					       // TODO: uncomment when needed
+					       /*String clr = decoration.getBackgroundColor();
+					       final int color = Color.parseColor(!clr.startsWith("#") ? "#" + clr : clr);*/
+					       logo.setBackgroundColor(getContext().getResources().getColor(R.color.loader_bg));
+				       }
+
+				       @Override
+				       public void onError() {
+				       }
+			       });
+		} else {
+			logo.setImageResource(R.drawable.ic_app);
+		}
 	}
 }

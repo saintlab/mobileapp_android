@@ -37,12 +37,16 @@ public class Restaurant implements Parcelable {
 	@Expose
 	private Decoration decoration;
 
-	public Restaurant(String id, String title, String authCode, String descr, Decoration decoration) {
+	@Expose
+	private Address address;
+
+	public Restaurant(String id, String title, String authCode, String descr, Decoration decoration, Address address) {
 		this.id = id;
 		this.title = title;
 		this.authCode = authCode;
 		this.description = descr;
 		this.decoration = decoration;
+		this.address = address;
 	}
 
 	public Restaurant(Parcel in) {
@@ -51,6 +55,7 @@ public class Restaurant implements Parcelable {
 		authCode = in.readString();
 		description = in.readString();
 		decoration = in.readParcelable(Decoration.class.getClassLoader());
+		address = in.readParcelable(Address.class.getClassLoader());
 	}
 
 	public String getId() {
@@ -105,5 +110,14 @@ public class Restaurant implements Parcelable {
 		dest.writeString(authCode);
 		dest.writeString(description);
 		dest.writeParcelable(decoration, flags);
+		dest.writeParcelable(address, flags);
+	}
+
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
 	}
 }

@@ -1,5 +1,8 @@
 package com.omnom.android.linker.activity;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -25,7 +28,11 @@ public class SimpleSplashActivity extends BaseActivity {
 
 	@Override
 	public void initUi() {
-
+		final BluetoothManager btManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+		final BluetoothAdapter adapter = btManager.getAdapter();
+		if(adapter != null && !adapter.isEnabled()) {
+			adapter.enable();
+		}
 	}
 
 	@Override

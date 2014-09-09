@@ -51,6 +51,24 @@ public class AnimationUtils {
 				}).alpha(visible ? 1 : 0).start();
 	}
 
+	public static void animateAlpha2(final View view, final boolean visible, final Runnable callback, long duration) {
+		view.setAlpha(visible ? 0 : 1);
+		if(visible) {
+			ViewUtils.setVisible(view, visible);
+		}
+		view.setTag(visible);
+		view.animate().setDuration(duration).
+				setInterpolator(new AccelerateDecelerateInterpolator()).
+				setListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationEnd(Animator animation) {
+						if(callback != null) {
+							view.post(callback);
+						}
+					}
+				}).alpha(visible ? 1 : 0).start();
+	}
+
 	public static void translateUp(final Iterable<View> views, final int translation, final Runnable endCallback) {
 		final AnimationBuilder builder = AnimationBuilder.create(views.iterator().next(), 0, -translation);
 		prepareTranslation(views, endCallback, builder).start();

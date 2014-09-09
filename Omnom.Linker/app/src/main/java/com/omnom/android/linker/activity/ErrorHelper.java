@@ -47,7 +47,7 @@ public class ErrorHelper {
 		mLoader.post(new Runnable() {
 			@Override
 			public void run() {
-				mLoader.animateLogo(logoResId);
+				mLoader.animateLogo2(logoResId);
 			}
 		});
 		mTxtError.setText(errTextResId);
