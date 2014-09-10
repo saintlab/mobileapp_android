@@ -65,6 +65,7 @@ import butterknife.OnClick;
 import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.http.HEAD;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -562,7 +563,7 @@ public class BindActivity extends BaseActivity {
 		};
 
 		parser = new BeaconParser();
-		parser.setBeaconLayout(BeaconAttributes.REDBEAR_BEACON_LAYOUT);
+		parser.setBeaconLayout(getResources().getString(R.string.redbear_beacon_layout));
 		final int btnTranslation = (int) (mLoaderTranslation * 1.75);
 		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		ViewTreeObserver.OnGlobalLayoutListener listener = AndroidUtils.createKeyboardListener(activityRootView,
@@ -677,9 +678,10 @@ public class BindActivity extends BaseActivity {
 
 	@DebugLog
 	public void writeBeaconData() {
-		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createPassword(BeaconAttributes.RBL_DEFAULT_PASSKEY.getBytes()));
-		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createUuid(mBeaconData.getUuid()));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createPassword(getString(R.string.redbear_beacon_password)
+				                                                                            .getBytes()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createTx(BeaconAttributes.RBL_DEFAULT_TX));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createUuid(mBeaconData.getUuid()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMajorId(mBeaconData.getMajor()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMinorId(mBeaconData.getMinor()));
 		mBluetoothLeService.startWritingQueue(new Runnable() {
