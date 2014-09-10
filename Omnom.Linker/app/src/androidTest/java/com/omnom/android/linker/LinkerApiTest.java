@@ -6,7 +6,6 @@ import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.table.TableDataResponse;
 
-import altbeacon.beacon.Beacon;
 import rx.functions.Action1;
 
 /**
@@ -20,13 +19,13 @@ public class LinkerApiTest {
 	@SmallTest
 	public void testBind() {
 		// TODO: implement
-		api.bindBeacon("A", 27, new Beacon.Builder().setId1("E2C56DB5-DFFB-48D2-B060-D0F5A7109E0").setId2("1").setId3("27").build())
-		   .subscribe(new Action1<BeaconDataResponse>() {
-			   @Override
-			   public void call(BeaconDataResponse data) {
-				   System.err.println("bind = " + data);
-			   }
-		   });
+//		api.bindBeacon("A", 27, new Beacon.Builder().setId1("E2C56DB5-DFFB-48D2-B060-D0F5A7109E0").setId2("1").setId3("27").build())
+//		   .subscribe(new Action1<BeaconDataResponse>() {
+//			   @Override
+//			   public void call(BeaconDataResponse data) {
+//				   System.err.println("bind = " + data);
+//			   }
+//		   });
 	}
 
 	@SmallTest
