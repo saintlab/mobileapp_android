@@ -24,6 +24,7 @@ import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.observable.ValidationObservable;
+import com.omnom.android.linker.utils.StringUtils;
 import com.omnom.android.linker.utils.UserDataHolder;
 import com.omnom.android.linker.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
@@ -87,6 +88,7 @@ public class ValidationActivity extends BaseActivity {
 			}
 			if(throwable instanceof AuthServiceException) {
 				final AuthServiceException authException = (AuthServiceException) throwable;
+				getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
 				LoginActivity.start(getActivity(), mDataHolder, authException.getCode());
 				return;
 			}
