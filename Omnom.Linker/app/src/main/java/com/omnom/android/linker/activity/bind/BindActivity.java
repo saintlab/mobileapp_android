@@ -180,8 +180,7 @@ public class BindActivity extends BaseActivity {
 				OmnomObservable.unsubscribe(mApiBindingSubscription);
 				mErrorHelper.showError(R.drawable.ic_weak_signal, R.string.error_maintenance_mode_off, R.string.try_once_again,
 				                       mInternetErrorClickListener);
-			}
-			if(!mApiBindComplete) {
+			} else if(!mApiBindComplete) {
 				OmnomObservable.unsubscribe(mApiBindingSubscription);
 				mErrorHelper.showError(R.drawable.ic_no_connection, R.string.error_unknown_server_error, R.string.bind_table,
 				                       mInternetErrorClickListener);
