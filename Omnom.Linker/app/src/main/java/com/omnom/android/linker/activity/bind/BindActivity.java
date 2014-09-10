@@ -34,7 +34,6 @@ import com.omnom.android.linker.model.table.TableDataResponse;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.observable.ValidationObservable;
-import com.omnom.android.linker.service.BeaconAttributes;
 import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.service.CharacteristicHolder;
 import com.omnom.android.linker.utils.AndroidUtils;
@@ -65,7 +64,6 @@ import butterknife.OnClick;
 import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.http.HEAD;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -680,7 +678,8 @@ public class BindActivity extends BaseActivity {
 	public void writeBeaconData() {
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createPassword(getString(R.string.redbear_beacon_password)
 				                                                                            .getBytes()));
-		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createTx(BeaconAttributes.RBL_DEFAULT_TX));
+		final byte txValue = (byte)Integer.parseInt(getString(R.string.redbear_beacon_tx));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createTx(new byte[] {txValue}));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createUuid(mBeaconData.getUuid()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMajorId(mBeaconData.getMajor()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMinorId(mBeaconData.getMinor()));

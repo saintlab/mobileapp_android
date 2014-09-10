@@ -15,6 +15,4 @@ public class BeaconAttributes {
 
 	public static final UUID UUID_BLE_REDBEAR_PASSWORD_SERVICE = UUID.fromString("81dcb1fe-31d2-d293-e311-f58390c8c39d");
 	public static final UUID UUID_BLE_REDBEAR_PASSWORD = UUID.fromString("81dcb1fe-31d2-d293-e311-f583b0cbc39d");
-
-	public static final byte[] RBL_DEFAULT_TX = new byte[]{2};
 }
