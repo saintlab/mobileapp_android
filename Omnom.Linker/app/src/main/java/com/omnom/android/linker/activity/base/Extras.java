@@ -20,10 +20,10 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_CHARACTERISTIC_UUID = "ble.characteristic.uuid";
 	public static final String EXTRA_CHARACTERISTIC_VALUE = "ble.characteristic.value";
 
-	public static final int EXTRA_ERROR_WRONG_PASSWORD = 0;
-	public static final int EXTRA_ERROR_WRONG_USERNAME = 1;
-	public static final int EXTRA_ERROR_AUTHTOKEN_EXPIRED = 2;
-	public static final int EXTRA_ERROR_LOGOUT = 3;
+	public static final int EXTRA_ERROR_WRONG_PASSWORD = 1;
+	public static final int EXTRA_ERROR_WRONG_USERNAME = 2;
+	public static final int EXTRA_ERROR_AUTHTOKEN_EXPIRED = 4;
+	public static final int EXTRA_ERROR_LOGOUT = 8;
 
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_UP = 0;
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_DOWN = 1;

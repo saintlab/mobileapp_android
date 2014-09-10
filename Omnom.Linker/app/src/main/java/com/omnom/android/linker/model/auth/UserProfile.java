@@ -1,15 +1,14 @@
-package com.omnom.android.linker.model;
+package com.omnom.android.linker.model.auth;
 
 import com.google.gson.annotations.Expose;
+import com.omnom.android.linker.model.User;
 
 /**
  * Created by Ch3D on 28.08.2014.
  */
-public class UserProfile {
+public class UserProfile extends AuthResponseBase {
 	@Expose
 	private User user;
-	@Expose
-	private String status;
 
 	public User getUser() {
 		return user;
@@ -17,14 +16,6 @@ public class UserProfile {
 
 	public void setUser(User user) {
 		this.user = user;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
 	}
 
 	// TODO:

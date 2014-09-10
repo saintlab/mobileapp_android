@@ -100,7 +100,10 @@ public class AndroidUtils {
 
 	public static void showToastLong(Context context, int resId) {
 		Toast toast = Toast.makeText(context, context.getString(resId), Toast.LENGTH_LONG);
-		toast.setView(LayoutInflater.from(context).inflate(R.layout.transient_notification, null));
+		View view = LayoutInflater.from(context).inflate(R.layout.transient_notification, null);
+		TextView tv = findById(view, android.R.id.message);
+		tv.setText(resId);
+		toast.setView(view);
 		toast.show();
 	}
 

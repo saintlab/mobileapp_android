@@ -7,6 +7,7 @@
 
     <string name="server_do_not_respond">Сервер не отвечает</string>
     <string name="error_invalid_email">Неверный логин</string>
+    <string name="error_token_expired">Ключ аутентификации устарел. Пожалуйста войдите еще раз</string>
     <string name="error_invalid_password">Неверный пароль</string>
     <string name="error_email_and_password_required">Пожалуйста введите логин и пароль</string>
     <string name="remind_password">Вспомнить пароль</string>

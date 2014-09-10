@@ -32,6 +32,7 @@ import butterknife.OnClick;
 import rx.functions.Action1;
 
 import static com.omnom.android.linker.utils.AndroidUtils.showToast;
+import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
 import static com.omnom.android.linker.utils.ViewUtils.getTextValue;
 
 public class LoginActivity extends BaseActivity {
@@ -65,7 +66,7 @@ public class LoginActivity extends BaseActivity {
 		switch(error.getCode()) {
 			// TODO: recognize error code (discuss with Egor)
 			default:
-				intent.putExtra(Extras.EXTRA_ERROR_CODE, EXTRA_ERROR_WRONG_USERNAME);
+				intent.putExtra(Extras.EXTRA_ERROR_CODE, EXTRA_ERROR_AUTHTOKEN_EXPIRED);
 				break;
 		}
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -157,6 +158,11 @@ public class LoginActivity extends BaseActivity {
 	private void onAuthError(int errorCode) {
 		if(errorCode != -1) {
 			switch(errorCode) {
+				case EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD:
+					setError(mEditLogin, mTextLoginError, R.string.error_invalid_email);
+					setError(mEditPassword, mTextPasswordError, R.string.error_invalid_password);
+					break;
+
 				case EXTRA_ERROR_WRONG_PASSWORD:
 					setError(mEditPassword, mTextPasswordError, R.string.error_invalid_password);
 					break;
@@ -166,7 +172,7 @@ public class LoginActivity extends BaseActivity {
 					break;
 
 				case EXTRA_ERROR_AUTHTOKEN_EXPIRED:
-					setError(mEditLogin, mTextLoginError, R.string.error_invalid_email);
+					showToastLong(getActivity(), R.string.error_token_expired);
 					break;
 
 				default:
