@@ -23,17 +23,6 @@
  */
 package altbeacon.beacon;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import altbeacon.beacon.service.BeaconService;
-import altbeacon.beacon.simulator.BeaconSimulator;
-import altbeacon.beacon.service.StartRMData;
-
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothManager;
 import android.content.ComponentName;
@@ -46,6 +35,19 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
+
+import com.omnom.android.altbeacon.BuildConfig;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import altbeacon.beacon.service.BeaconService;
+import altbeacon.beacon.service.StartRMData;
+import altbeacon.beacon.simulator.BeaconSimulator;
 
 /**
  * An class used to set up interaction with beacons from an <code>Activity</code> or <code>Service</code>.
@@ -110,7 +112,7 @@ public class BeaconManager {
     /**
      * set to true if you want to see debug messages associated with this library
      */
-    public static boolean debug = false;
+    public static boolean debug = BuildConfig.DEBUG;
 
     public static void setDebug(boolean debug) {
         BeaconManager.debug = debug;

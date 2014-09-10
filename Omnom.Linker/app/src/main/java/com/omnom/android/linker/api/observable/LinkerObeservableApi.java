@@ -30,9 +30,9 @@ public interface LinkerObeservableApi {
 
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
 
-	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon);
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon, Beacon oldBeacon);
 
-	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, BeaconDataResponse beaconData);
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, BeaconDataResponse beaconData, Beacon oldBeacon);
 
 	public Observable<TableDataResponse> findBeacon(Beacon beacon);
 

@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.omnom.android.linker.BuildConfig;
+import com.omnom.android.linker.utils.StringUtils;
 
 import java.security.InvalidParameterException;
 import java.util.Arrays;
@@ -13,7 +14,6 @@ import java.util.UUID;
  * Created by Ch3D on 16.08.2014.
  */
 public class CharacteristicHolder implements Parcelable {
-
 	public static final Creator<CharacteristicHolder> CREATOR = new Creator<CharacteristicHolder>() {
 		@Override
 		public CharacteristicHolder createFromParcel(Parcel in) {
@@ -41,6 +41,12 @@ public class CharacteristicHolder implements Parcelable {
 		                                major);
 	}
 
+	public static CharacteristicHolder createUuid(String uuid) {
+		return new CharacteristicHolder(BeaconAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
+		                                BeaconAttributes.UUID_BLE_REDBEAR_BEACON_UUID,
+		                                uuid.replace("-", StringUtils.EMPTY_STRING));
+	}
+
 	public static CharacteristicHolder createPassword(byte[] data) {
 		return new CharacteristicHolder(BeaconAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE,
 		                                BeaconAttributes.UUID_BLE_REDBEAR_PASSWORD,
@@ -63,15 +69,12 @@ public class CharacteristicHolder implements Parcelable {
 		parcel.readByteArray(data);
 	}
 
-	public CharacteristicHolder(UUID serviceId, UUID charId, int data) {
-		this.serviceId = serviceId;
-		this.charId = charId;
-		this.data = new byte[2];
+	public CharacteristicHolder(UUID serviceId, UUID charId, int value) {
+		this(serviceId, charId, new byte[]{(byte) ((value / 256) & 0xff), (byte) ((value % 256) & 0xff)});
+	}
 
-		int m1 = data / 256;
-		int m2 = data % 256;
-		this.data[0] = (byte) (m1 & 0xff);
-		this.data[1] = (byte) (m2 & 0xff);
+	public CharacteristicHolder(UUID serviceId, UUID charId, String data) {
+		this(serviceId, charId,  StringUtils.hexStringToByteArray(data));
 	}
 
 	public CharacteristicHolder(UUID serviceId, UUID charId, byte[] data) {

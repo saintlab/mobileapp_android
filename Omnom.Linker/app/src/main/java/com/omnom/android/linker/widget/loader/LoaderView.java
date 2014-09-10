@@ -296,7 +296,6 @@ public class LoaderView extends FrameLayout {
 		stopProgressAnimation(false);
 	}
 
-	@DebugLog
 	public void stopProgressAnimation(boolean hideProgress) {
 		showProgress(!hideProgress, true);
 		if(mProgressAnimator != null && mProgressAnimator.isRunning()) {
@@ -318,7 +317,6 @@ public class LoaderView extends FrameLayout {
 		});
 		mProgressAnimator.addListener(new AnimatorListenerAdapter() {
 			@Override
-			@DebugLog
 			public void onAnimationEnd(Animator animation) {
 				final Object tag = mProgressBar.getTag(R.id.canceled);
 				if(tag != null && (Boolean) tag) {
@@ -348,7 +346,6 @@ public class LoaderView extends FrameLayout {
 		});
 		mProgressAnimator.addListener(new AnimatorListenerAdapter() {
 			@Override
-			@DebugLog
 			public void onAnimationEnd(Animator animation) {
 				final Object tag = mProgressBar.getTag(R.id.canceled);
 				if(tag != null && (Boolean) tag) {

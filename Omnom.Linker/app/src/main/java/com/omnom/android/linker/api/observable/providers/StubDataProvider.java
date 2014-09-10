@@ -1,10 +1,10 @@
 package com.omnom.android.linker.api.observable.providers;
 
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.auth.*;
 import com.omnom.android.linker.model.auth.UserProfile;
 import com.omnom.android.linker.model.auth.AuthResponseBase;
 import com.omnom.android.linker.model.auth.Error;
+import com.omnom.android.linker.model.auth.LoginResponse;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsFactory;
@@ -101,7 +101,7 @@ public class StubDataProvider implements LinkerObeservableApi {
 
 	@Override
 	@DebugLog
-	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon) {
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon, Beacon oldBeacon) {
 		return new Observable<BeaconDataResponse>(new Observable.OnSubscribe<BeaconDataResponse>() {
 			@Override
 			public void call(Subscriber<? super BeaconDataResponse> subscriber) {
@@ -112,8 +112,9 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
-	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, BeaconDataResponse beaconData) {
-		return bindBeacon(restaurantId, tableNumber, (Beacon) null);
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber,
+	                                                 BeaconDataResponse beaconData, Beacon oldBeacon) {
+		return bindBeacon(restaurantId, tableNumber, (Beacon) null, null);
 	}
 
 	@Override

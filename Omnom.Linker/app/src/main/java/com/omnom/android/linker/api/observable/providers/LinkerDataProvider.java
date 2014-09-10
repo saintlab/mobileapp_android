@@ -31,20 +31,21 @@ import rx.schedulers.Schedulers;
  * Created by Ch3D on 11.08.2014.
  */
 public class LinkerDataProvider implements LinkerObeservableApi {
-	private final LinkerDataService mDataService;
-	private final AuthService mAuthService;
-
 	public static LinkerDataProvider create(final String dataEndPoint, final String authEndPoint, final RequestInterceptor interceptor) {
 		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		final GsonConverter converter = new GsonConverter(gson);
 
-		RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(interceptor).setEndpoint(dataEndPoint).setLogLevel(logLevel)
-				.setConverter(converter).build();
+		RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(interceptor).setEndpoint(dataEndPoint).setLogLevel(
+				logLevel)
+		                                                    .setConverter(converter).build();
 		RestAdapter mAuthAdapter = new RestAdapter.Builder().setEndpoint(authEndPoint).setLogLevel(logLevel)
-				.setConverter(converter).build();
+		                                                    .setConverter(converter).build();
 		return new LinkerDataProvider(mRestAdapter.create(LinkerDataService.class), mAuthAdapter.create(AuthService.class));
 	}
+
+	private final LinkerDataService mDataService;
+	private final AuthService mAuthService;
 
 	public LinkerDataProvider(final LinkerDataService dataService, final AuthService authService) {
 		mDataService = dataService;
@@ -78,15 +79,16 @@ public class LinkerDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
-	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon) {
-		final BeaconBindRequest request = new BeaconBindRequest(restaurantId, tableNumber, beacon);
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon, Beacon oldBeacon) {
+		final BeaconBindRequest request = new BeaconBindRequest(restaurantId, tableNumber, beacon, oldBeacon);
 		return mDataService.bindBeacon(request).subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, BeaconDataResponse beaconData) {
-		final BeaconBindRequest request = new BeaconBindRequest(restaurantId, tableNumber, beaconData);
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber,
+	                                                 BeaconDataResponse beaconData, Beacon oldBeacon) {
+		final BeaconBindRequest request = new BeaconBindRequest(restaurantId, tableNumber, beaconData, oldBeacon);
 		return mDataService.bindBeacon(request).subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
