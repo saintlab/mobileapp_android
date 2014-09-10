@@ -2,7 +2,8 @@ package com.omnom.android.linker.api.observable.providers;
 
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.model.auth.*;
-import com.omnom.android.linker.model.UserProfile;
+import com.omnom.android.linker.model.auth.UserProfile;
+import com.omnom.android.linker.model.auth.AuthResponseBase;
 import com.omnom.android.linker.model.auth.Error;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;

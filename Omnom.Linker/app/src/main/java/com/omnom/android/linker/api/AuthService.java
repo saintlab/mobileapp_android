@@ -2,7 +2,7 @@ package com.omnom.android.linker.api;
 
 import com.omnom.android.linker.model.auth.AuthResponseBase;
 import com.omnom.android.linker.model.auth.LoginResponse;
-import com.omnom.android.linker.model.UserProfile;
+import com.omnom.android.linker.model.auth.UserProfile;
 
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;

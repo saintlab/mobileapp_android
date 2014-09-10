@@ -18,8 +18,9 @@ import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.drawable.RoundTransformation;
 import com.omnom.android.linker.drawable.RoundedDrawable;
 import com.omnom.android.linker.model.User;
-import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.auth.AuthResponseBase;
+import com.omnom.android.linker.model.auth.UserProfile;
+import com.omnom.android.linker.model.auth.UserProfileHelper;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.utils.AnimationUtils;
@@ -111,6 +112,20 @@ public class UserProfileActivity extends BaseActivity {
 				@Override
 				@DebugLog
 				public void call(UserProfile userProfile) {
+					if(userProfile.isError() && UserProfileHelper.hasAuthError(userProfile)) {
+						getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
+						ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
+						AnimationUtils.animateAlpha(mPanelBottom, false);
+						findById(getActivity(), R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y).start();
+						AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
+						AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
+							@Override
+							public void run() {
+								LoginActivity.start(getActivity());
+							}
+						});
+						return;
+					}
 					LinkerApplication.get(getActivity()).cacheUserProfile(userProfile);
 					initUserData(userProfile.getUser(), userProfile.getImageUrl());
 				}
@@ -156,98 +171,98 @@ public class UserProfileActivity extends BaseActivity {
 	}
 
 	private RoundedDrawable getPlaceholderDrawable(int dimension) {
-			final Bitmap placeholderBmp = BitmapFactory.decodeResource(getResources(), R.drawable.empty_avatar);
-			return new RoundedDrawable(placeholderBmp, dimension, 0);
-		}
+		final Bitmap placeholderBmp = BitmapFactory.decodeResource(getResources(), R.drawable.empty_avatar);
+		return new RoundedDrawable(placeholderBmp, dimension, 0);
+	}
 
-		@OnClick(R.id.btn_back)
-		public void onBack () {
-			onBackPressed();
-		}
+	@OnClick(R.id.btn_back)
+	public void onBack() {
+		onBackPressed();
+	}
 
-		@Override
-		protected void onStart () {
-			super.onStart();
-			ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY2, false);
-			if(mFirstRun) {
-				if(mAnimate) {
-					findById(this, R.id.btn_back).setTranslationY(TRANSLATION_Y);
-					findById(this, R.id.btn_back).setRotation(ROTATION_VALUE);
-				}
-				mImgUser.getLayoutParams().width = 0;
-				mImgUser.getLayoutParams().height = 0;
-				mImgUser.requestLayout();
-			}
-		}
-
-		@Override
-		protected void onResume () {
-			super.onResume();
-			final int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
-			postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
-				@Override
-				public void run() {
-					if(mAnimate) {
-						findById(getActivity(), R.id.btn_back).animate().rotation(0).translationY(0).start();
-					}
-					AnimationUtils.scale(mImgUser, dimension, mAnimDuration, new Runnable() {
-						@Override
-						public void run() {
-							ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, true);
-						}
-					});
-				}
-			});
-		}
-
-		@Override
-		public void finish () {
+	@Override
+	protected void onStart() {
+		super.onStart();
+		ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY2, false);
+		if(mFirstRun) {
 			if(mAnimate) {
-				findById(this, R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y).start();
+				findById(this, R.id.btn_back).setTranslationY(TRANSLATION_Y);
+				findById(this, R.id.btn_back).setRotation(ROTATION_VALUE);
 			}
-			ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
-			AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
-			AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
-				@Override
-				public void run() {
-					UserProfileActivity.super.finish();
-					overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-				}
-			});
-		}
-
-		@OnClick(R.id.btn_bottom)
-		public void onLogout () {
-			final String token = getPreferences().getAuthToken(this);
-			logoutSubscription = AndroidObservable.bindActivity(this, api.logout(token)).subscribe(new Action1<AuthResponseBase>() {
-				@Override
-				public void call(AuthResponseBase authResponseBase) {
-					if(!authResponseBase.isError()) {
-						getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
-						ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
-						AnimationUtils.animateAlpha(mPanelBottom, false);
-						findById(getActivity(), R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y).start();
-						AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
-						AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
-							@Override
-							public void run() {
-								LoginActivity.start(getActivity(), null, EXTRA_ERROR_LOGOUT);
-							}
-						});
-					} else {
-						showToast(getActivity(), R.string.error_unknown_server_error);
-					}
-				}
-			}, new Action1<Throwable>() {
-				@Override
-				public void call(Throwable throwable) {
-					showToast(getActivity(), R.string.error_unknown_server_error);
-				}
-			});
-		}
-
-		@Override
-		public int getLayoutResource () {
-			return R.layout.activity_user_profile;
+			mImgUser.getLayoutParams().width = 0;
+			mImgUser.getLayoutParams().height = 0;
+			mImgUser.requestLayout();
 		}
 	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		final int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
+		postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
+			@Override
+			public void run() {
+				if(mAnimate) {
+					findById(getActivity(), R.id.btn_back).animate().rotation(0).translationY(0).start();
+				}
+				AnimationUtils.scale(mImgUser, dimension, mAnimDuration, new Runnable() {
+					@Override
+					public void run() {
+						ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, true);
+					}
+				});
+			}
+		});
+	}
+
+	@Override
+	public void finish() {
+		if(mAnimate) {
+			findById(this, R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y).start();
+		}
+		ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
+		AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
+		AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
+			@Override
+			public void run() {
+				UserProfileActivity.super.finish();
+				overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+			}
+		});
+	}
+
+	@OnClick(R.id.btn_bottom)
+	public void onLogout() {
+		final String token = getPreferences().getAuthToken(this);
+		logoutSubscription = AndroidObservable.bindActivity(this, api.logout(token)).subscribe(new Action1<AuthResponseBase>() {
+			@Override
+			public void call(AuthResponseBase authResponseBase) {
+				if(!authResponseBase.isError()) {
+					getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
+					ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
+					AnimationUtils.animateAlpha(mPanelBottom, false);
+					findById(getActivity(), R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y).start();
+					AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
+					AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
+						@Override
+						public void run() {
+							LoginActivity.start(getActivity(), null, EXTRA_ERROR_LOGOUT);
+						}
+					});
+				} else {
+					showToast(getActivity(), R.string.error_unknown_server_error);
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				showToast(getActivity(), R.string.error_unknown_server_error);
+			}
+		});
+	}
+
+	@Override
+	public int getLayoutResource() {
+		return R.layout.activity_user_profile;
+	}
+}

@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.omnom.android.linker.activity.base.OmnomActivity;
-import com.omnom.android.linker.model.UserProfile;
+import com.omnom.android.linker.model.auth.UserProfile;
 import com.omnom.android.linker.modules.AndroidModule;
 import com.omnom.android.linker.modules.ApplicationModule;
 import com.omnom.android.linker.modules.LinkerDataProviderModule;
