@@ -40,4 +40,8 @@ public class BeaconDataResponse extends ResponseBase {
 	public String toString() {
 		return uuid + ":" + major + ":" + minor;
 	}
+
+	public void setUuid(String s) {
+		uuid = s;
+	}
 }

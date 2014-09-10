@@ -37,7 +37,6 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
-import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
@@ -244,7 +243,6 @@ public class ValidationActivity extends BaseActivity {
 						});
 	}
 
-	@DebugLog
 	private void onAnimationEnd() {
 		mAnimationFinished = true;
 		if(mDataLoaded) {
@@ -261,7 +259,6 @@ public class ValidationActivity extends BaseActivity {
 		});
 	}
 
-	@DebugLog
 	private void startNextActivity() {
 		if(mRestaurants == null) {
 			showToastLong(loader, R.string.error_server_unavailable_please_try_again);
@@ -300,7 +297,6 @@ public class ValidationActivity extends BaseActivity {
 					.bindActivity(this, api.authenticate(mUsername, mPassword).flatMap(
 							new Func1<LoginResponse, Observable<RestaurantsResponse>>() {
 								@Override
-								@DebugLog
 								public Observable<RestaurantsResponse> call(LoginResponse response) {
 									if(response.isError()) {
 										throw new AuthServiceException(response.getStatus(), response.getError());
@@ -335,7 +331,6 @@ public class ValidationActivity extends BaseActivity {
 		}
 	}
 
-	@DebugLog
 	private void onRestaurantsLoaded(RestaurantsResponse result) {
 		mRestaurants = result;
 		mDataLoaded = true;

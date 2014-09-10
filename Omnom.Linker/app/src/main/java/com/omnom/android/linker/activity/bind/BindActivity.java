@@ -88,23 +88,6 @@ public class BindActivity extends BaseActivity {
 		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
 	}
 
-	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
-		BeaconFilter mFilter = new BeaconFilter(getActivity());
-
-		@Override
-		@DebugLog
-		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
-					if(mFilter.check(beacon)) {
-						mBeacons.add(beacon);
-					}
-				}
-			});
-		}
-	};
 	private final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -149,8 +132,10 @@ public class BindActivity extends BaseActivity {
 	protected LinkerObeservableApi api;
 
 	protected BluetoothLeService mBluetoothLeService;
+	private BluetoothAdapter.LeScanCallback mLeScanCallback = null;
 	private BeaconParser parser;
 	private boolean mBound = false;
+
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName componentName, IBinder service) {
@@ -168,10 +153,13 @@ public class BindActivity extends BaseActivity {
 			mBound = false;
 		}
 	};
+
 	@NotNull
 	private Restaurant mRestaurant;
+
 	@Nullable
 	private Beacon mBeacon = null;
+
 	private Set<Beacon> mBeacons = new HashSet<Beacon>();
 	private LoaderController mLoaderController;
 	private BluetoothAdapter mBluetoothAdapter;
@@ -349,7 +337,6 @@ public class BindActivity extends BaseActivity {
 		}
 	}
 
-	@DebugLog
 	private void onRestaurantLoaded(Restaurant restaurant) {
 		if(getIntent().getBooleanExtra(EXTRA_SHOW_BACK, false)) {
 			mLoader.animateColor(Color.WHITE,
@@ -398,18 +385,15 @@ public class BindActivity extends BaseActivity {
 		ViewUtils.setVisible(mBtnBottom, true);
 	}
 
-	@DebugLog
 	private void scanQrCode() {
 		startActivityForResult(new Intent(this, CaptureActivity.class), REQUEST_CODE_SCAN_QR);
 	}
 
-	@DebugLog
 	private void clearErrors() {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 	}
 
 	@Override
-	@DebugLog
 	protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
 		if(resultCode == RESULT_OK) {
 			if(requestCode == REQUEST_CODE_ENABLE_BLUETOOTH) {
@@ -482,8 +466,7 @@ public class BindActivity extends BaseActivity {
 														mLoader.updateProgressMax(new Runnable() {
 															@Override
 															public void run() {
-																if(tableData != TableDataResponse.NULL
-																		&& tableData.getRestaurantId().equals(mRestaurant.getId())) {
+																if(tableData != TableDataResponse.NULL) {
 																	onErrorBeaconCheck(tableData.getInternalId());
 																} else {
 																	scanQrCode();
@@ -560,6 +543,25 @@ public class BindActivity extends BaseActivity {
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
 		mLoaderTranslation = ViewUtils.dipToPixels(this, 48);
+
+		mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+			BeaconFilter mFilter = new BeaconFilter(BindActivity.this);
+
+			@Override
+			@DebugLog
+			public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
+						if(mFilter.check(beacon)) {
+							mBeacons.add(beacon);
+						}
+					}
+				});
+			}
+		};
+
 		parser = new BeaconParser();
 		parser.setBeaconLayout(BeaconAttributes.REDBEAR_BEACON_LAYOUT);
 		final int btnTranslation = (int) (mLoaderTranslation * 1.75);

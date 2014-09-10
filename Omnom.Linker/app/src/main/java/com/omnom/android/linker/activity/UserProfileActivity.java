@@ -109,7 +109,6 @@ public class UserProfileActivity extends BaseActivity {
 			}
 			profileSubscription = AndroidObservable.bindActivity(this, api.getUserProfile(token)).subscribe(new Action1<UserProfile>() {
 				@Override
-				@DebugLog
 				public void call(UserProfile userProfile) {
 					LinkerApplication.get(getActivity()).cacheUserProfile(userProfile);
 					initUserData(userProfile.getUser(), userProfile.getImageUrl());

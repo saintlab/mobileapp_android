@@ -8,6 +8,7 @@ import com.omnom.android.linker.service.BeaconAttributes;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.Identifier;
+import hugo.weaving.DebugLog;
 
 /**
  * Created by Ch3D on 25.08.2014.
@@ -22,6 +23,7 @@ public class BeaconFilter {
 		mMinRssi = context.getResources().getInteger(R.integer.rssi_min_value);
 	}
 
+	@DebugLog
 	public boolean check(Beacon beacon) {
 		if(beacon == null || beacon.getId1() == null) {
 			return false;
