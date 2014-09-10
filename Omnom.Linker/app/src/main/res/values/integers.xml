@@ -18,4 +18,6 @@
     <integer name="loader_font_size_large">40</integer>
     <integer name="loader_scale_factor">10</integer>
     <integer name="loader_limit_percentage">99</integer>
+
+    <integer name="rssi_min_value">-68</integer>
 </resources>

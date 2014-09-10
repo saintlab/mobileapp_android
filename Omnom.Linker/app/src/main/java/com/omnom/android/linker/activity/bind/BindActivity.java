@@ -85,23 +85,8 @@ public class BindActivity extends BaseActivity {
 		context.startActivity(intent, ActivityOptions.makeCustomAnimation(context, R.anim.fade_in, R.anim.fake_fade_out).toBundle());
 	}
 
-	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
-		BeaconFilter mFilter = new BeaconFilter();
+	private BluetoothAdapter.LeScanCallback mLeScanCallback;
 
-		@Override
-		@DebugLog
-		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
-					if(mFilter.check(beacon)) {
-						mBeacons.add(beacon);
-					}
-				}
-			});
-		}
-	};
 	private final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -556,8 +541,27 @@ public class BindActivity extends BaseActivity {
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = bluetoothManager.getAdapter();
 		mLoaderTranslation = ViewUtils.dipToPixels(this, 48);
+
+		mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+			BeaconFilter mFilter = new BeaconFilter(BindActivity.this);
+
+			@Override
+			@DebugLog
+			public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
+						if(mFilter.check(beacon)) {
+							mBeacons.add(beacon);
+						}
+					}
+				});
+			}
+		};
+
 		parser = new BeaconParser();
-		parser.setBeaconLayout(BeaconAttributes.REDBEAR_BEACON_LAYOUT);
+		parser.setBeaconLayout(getResources().getString(R.string.redbear_beacon_layout));
 		final int btnTranslation = (int) (mLoaderTranslation * 1.75);
 		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		ViewTreeObserver.OnGlobalLayoutListener listener = AndroidUtils.createKeyboardListener(activityRootView,
@@ -672,7 +676,9 @@ public class BindActivity extends BaseActivity {
 
 	@DebugLog
 	public void writeBeaconData() {
-		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createPassword(BeaconAttributes.RBL_DEFAULT_PASSKEY.getBytes()));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createPassword(getString(R.string.redbear_beacon_password)
+				                                                                            .getBytes()));
+		// mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createUuid(mBeaconData.getUuid()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createTx(BeaconAttributes.RBL_DEFAULT_TX));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMajorId(mBeaconData.getMajor()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMinorId(mBeaconData.getMinor()));
