@@ -33,16 +33,21 @@ public class BluetoothLeService extends Service {
 	public final static String ACTION_GATT_FAILED = "ACTION_GATT_FAILED";
 	public final static String ACTION_GATT_DISCONNECTED = "ACTION_GATT_DISCONNECTED";
 	public final static String ACTION_GATT_SERVICES_DISCOVERED = "ACTION_GATT_SERVICES_DISCOVERED";
+	public static final String ACTION_BEACON_WRITE_FAILED = "ACTION_BEACON_WRITE_FAILED";
 
-	@Inject
-	protected Bus mBus;
+	private static final String TAG = BluetoothLeService.class.getSimpleName();
 
 	private BluetoothGattCallback callback = new BluetoothGattCallback() {
 		@Override
 		@DebugLog
 		public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-			if(status == BluetoothGatt.GATT_SUCCESS) {
-				// broadcastUpdate(characteristic);
+			if(status != BluetoothGatt.GATT_SUCCESS) {
+				final String msg = "onCharacteristicWrite : unable to write characteristic = " + characteristic.getUuid()
+						+ " status = " + status;
+				mWriteQueue.clear();
+				broadcastUpdate(ACTION_BEACON_WRITE_FAILED);
+				Log.d(TAG, msg);
+				throw new RuntimeException(msg);
 			}
 			if(!processQueue()) {
 				mQueueEndCallback.run();
@@ -76,8 +81,6 @@ public class BluetoothLeService extends Service {
 		}
 	};
 
-	private static final String TAG = BluetoothLeService.class.getSimpleName();
-
 	public class LocalBinder extends Binder {
 		public BluetoothLeService getService() {
 			return BluetoothLeService.this;
@@ -86,6 +89,8 @@ public class BluetoothLeService extends Service {
 
 	private final LinkedBlockingQueue<CharacteristicHolder> mWriteQueue = new LinkedBlockingQueue<CharacteristicHolder>();
 	private final IBinder mBinder = new LocalBinder();
+	@Inject
+	protected Bus mBus;
 	private BluetoothManager mBluetoothManager;
 	private BluetoothAdapter mBluetoothAdapter;
 	private String mBluetoothDeviceAddress;
