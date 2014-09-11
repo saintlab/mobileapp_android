@@ -431,7 +431,7 @@ public class BindActivity extends BaseActivity {
 		mLoader.animateColorDefault();
 		clearErrors();
 		mApiBindComplete = false;
-		mLoader.startProgressAnimation(getResources().getInteger(R.integer.validation_duration), null);
+		mLoader.startProgressAnimation(getResources().getInteger(R.integer.bind_validation_duration), null);
 		mErrBindSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this).map(
 				OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickListener)).isEmpty()).subscribe(
 				new Action1<Boolean>() {
@@ -461,6 +461,7 @@ public class BindActivity extends BaseActivity {
 															return;
 														}
 														mBindClicked = false;
+														mLoader.stopProgressAnimation();
 														mLoader.updateProgressMax(new Runnable() {
 															@Override
 															public void run() {
@@ -644,20 +645,31 @@ public class BindActivity extends BaseActivity {
 	}
 
 	@Subscribe
-	public void onGattEvent(GattEvent event) {
-		if(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(event.getAction())) {
-			gattAvailable = true;
-			writeBeaconData();
-		} else if(BluetoothLeService.ACTION_GATT_FAILED.equals(event.getAction())) {
-			gattConnected = false;
-			gattAvailable = false;
-		} else if(BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(event.getAction())) {
-			gattConnected = false;
-			gattAvailable = false;
-		} else if(BluetoothLeService.ACTION_GATT_CONNECTED.equals(event.getAction())) {
-			gattConnected = true;
-			mBluetoothLeService.getDiscoverGattService();
-		}
+	public void onGattEvent(final GattEvent event) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(event.getAction())) {
+					gattAvailable = true;
+					writeBeaconData();
+				} else if(BluetoothLeService.ACTION_GATT_FAILED.equals(event.getAction())) {
+					gattConnected = false;
+					gattAvailable = false;
+				} else if(BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(event.getAction())) {
+					gattConnected = false;
+					gattAvailable = false;
+				} else if(BluetoothLeService.ACTION_GATT_CONNECTED.equals(event.getAction())) {
+					gattConnected = true;
+					mBluetoothLeService.getDiscoverGattService();
+				} else if(BluetoothLeService.ACTION_BEACON_WRITE_FAILED.equals(event.getAction())) {
+					gattConnected = false;
+					mErrorHelper.showError(R.drawable.ic_no_connection,
+					                       R.string.error_writing_beacon_data,
+					                       R.string.bind_table,
+					                       mInternetErrorClickListener);
+				}
+			}
+		});
 	}
 
 	@Override
@@ -678,8 +690,8 @@ public class BindActivity extends BaseActivity {
 	public void writeBeaconData() {
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createPassword(getString(R.string.redbear_beacon_password)
 				                                                                            .getBytes()));
-		final byte txValue = (byte)Integer.parseInt(getString(R.string.redbear_beacon_tx));
-		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createTx(new byte[] {txValue}));
+		final byte txValue = (byte) Integer.parseInt(getString(R.string.redbear_beacon_tx));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createTx(new byte[]{txValue}));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createUuid(mBeaconData.getUuid()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMajorId(mBeaconData.getMajor()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMinorId(mBeaconData.getMinor()));
@@ -712,12 +724,17 @@ public class BindActivity extends BaseActivity {
 								                                                                  R.string.error_unknown_server_error,
 								                                                                  R.string.bind_table,
 								                                                                  mInternetErrorClickListener);
+								                                           beaconTimeoutCallback.run();
 								                                           resetActivityState();
 							                                           }
 						                                           }, new Action0() {
 							                                           @Override
 							                                           public void call() {
 								                                           mApiBindComplete = true;
+								                                           if(mApiBindComplete && gattConnected && gattAvailable) {
+									                                           mLoader.stopProgressAnimation();
+								                                           }
+								                                           beaconTimeoutCallback.run();
 							                                           }
 						                                           });
 					}
