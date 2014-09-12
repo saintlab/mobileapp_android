@@ -1,0 +1,2 @@
+include ':libraries:Omnom.Altbeacon', ':libraries:Omnom.Zxing', ':libraries:Omnom.Utils', 'Linker', 'Omnom', ':Omnom.Altbeacon'
+project(':Omnom.Altbeacon').projectDir = new File('libraries/Omnom.Altbeacon')

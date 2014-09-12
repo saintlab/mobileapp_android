@@ -1,0 +1,84 @@
+apply plugin: 'com.android.application'
+apply plugin: 'hugo'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '20.0.0'
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'LICENSE.txt'
+    }
+
+    defaultConfig {
+        applicationId "com.omnom.android.linker"
+        minSdkVersion 18
+        targetSdkVersion 19
+        versionCode 17
+        versionName "0.1.17"
+        testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    productFlavors {
+        stand {
+        }
+
+        laaaab {
+        }
+    }
+
+    signingConfigs {
+        release {
+            def projectDir = project.projectDir.toString()
+            Properties releaseProps = new Properties()
+            releaseProps.load(new FileInputStream(projectDir + '/release.properties'))
+            storeFile file(projectDir + '/release-key.jks')
+            storePassword releaseProps['keystore.password']
+            keyAlias releaseProps['keyAlias']
+            keyPassword releaseProps['keyPassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            runProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                def file = variant.outputFile
+                variant.outputFile = new File(file.parent, file.name.replace(".apk", "-" + defaultConfig.versionName + ".apk"))
+            }
+            signingConfig signingConfigs.release
+        }
+        debug {
+            runProguard false
+            applicationIdSuffix '.debug'
+        }
+    }
+
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.squareup.dagger:dagger:1.2.2'
+    provided 'com.squareup.dagger:dagger-compiler:1.2.2'
+    compile 'com.squareup.retrofit:retrofit:1.6.1'
+    compile 'com.squareup.picasso:picasso:2.3.4'
+    compile 'com.squareup:otto:1.3.5'
+    compile 'com.jakewharton:butterknife:5.1.1'
+    compile 'com.netflix.rxjava:rxjava-core:0.19.6'
+    compile 'com.netflix.rxjava:rxjava-android:0.19.6'
+    compile 'uk.co.chrisjenx:calligraphy:1.1.+'
+    compile project(':libraries:Omnom.Altbeacon')
+    compile project(':libraries:Omnom.Zxing')
+    compile project(':libraries:Omnom.Utils')
+
+    androidTestCompile('com.jakewharton.espresso:espresso:1.1-r3') {
+        exclude group: 'com.squareup.dagger'
+    }
+}
