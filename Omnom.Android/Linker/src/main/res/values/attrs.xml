@@ -8,5 +8,4 @@
         <attr name="metaButtonBarButtonStyle" format="reference"/>
         <attr name="fontPath" format="string"/>
     </declare-styleable>
-    
 </resources>
