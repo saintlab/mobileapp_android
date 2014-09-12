@@ -4,6 +4,11 @@ android {
     compileSdkVersion 20
     buildToolsVersion "20.0.0"
 
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'LICENSE.txt'
+    }
+
     defaultConfig {
         applicationId "com.omnom.android"
         minSdkVersion 18
