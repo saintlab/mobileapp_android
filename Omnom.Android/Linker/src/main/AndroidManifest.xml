@@ -24,26 +24,34 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
 
+    <android:uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <android:uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
     <application
-        android:name=".LinkerApplication"
+        android:name="com.omnom.android.linker.LinkerApplication"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
         android:theme="@style/Theme.Wood.Blue" >
         <activity
-            android:name=".activity.ValidationActivity"
+            android:name="com.omnom.android.linker.activity.ValidationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden" >
         </activity>
         <activity
-            android:name=".activity.bind.BindActivity"
+            android:name="com.omnom.android.linker.activity.bind.BindActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden" >
         </activity>
         <activity
-            android:name=".activity.LoginActivity"
+            android:name="com.omnom.android.linker.activity.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden" >
@@ -54,7 +62,7 @@
             android:theme="@style/Theme.Wood" >
         </activity>
         <activity
-            android:name=".activity.SimpleSplashActivity"
+            android:name="com.omnom.android.linker.activity.SimpleSplashActivity"
             android:icon="@drawable/ic_app"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
@@ -67,28 +75,40 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.restaurant.RestaurantsListActivity"
+            android:name="com.omnom.android.linker.activity.restaurant.RestaurantsListActivity"
             android:label="@string/title_activity_places_list"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White"
             android:windowSoftInputMode="stateAlwaysHidden" >
         </activity>
         <activity
-            android:name=".activity.restaurant.RestaurantActivity"
+            android:name="com.omnom.android.linker.activity.restaurant.RestaurantActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood" >
         </activity>
 
         <service
-            android:name=".service.BluetoothLeService"
+            android:name="com.omnom.android.linker.service.BluetoothLeService"
             android:enabled="true"
             android:exported="false" />
 
         <activity
-            android:name=".activity.UserProfileActivity"
+            android:name="com.omnom.android.linker.activity.UserProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden" >
+        </activity>
+        <activity
+            android:name="com.omnom.android.linker.activity.restaurant.BeaconsChartActivity"
+            android:label="@string/title_activity_beacons_chart"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.Simple" >
+        </activity>
+        <activity
+            android:name="com.omnom.android.linker.activity.restaurant.BeaconsListActivity"
+            android:label="@string/title_activity_beacons_list"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.White">
         </activity>
     </application>
 

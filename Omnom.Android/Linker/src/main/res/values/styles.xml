@@ -25,6 +25,10 @@
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 
+    <style name="Theme.Simple" parent="android:Theme.Holo.Light">
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
     <style name="RatingBar" parent="android:Widget.Holo.RatingBar.Small">
         <item name="android:progressDrawable">@drawable/ratingbar_small</item>
         <item name="android:indeterminateDrawable">@drawable/ratingbar_small</item>
