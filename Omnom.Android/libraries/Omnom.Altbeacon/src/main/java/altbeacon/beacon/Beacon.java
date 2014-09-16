@@ -375,6 +375,7 @@ public class Beacon implements Parcelable {
             sb.append(" ");
             i++;
         }
+	    sb.append("rssi: " + getRssi());
         return sb.toString();
     }
 
