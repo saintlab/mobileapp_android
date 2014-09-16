@@ -57,33 +57,7 @@ public class BeaconsChartActivity extends Activity {
 			rssiList.add((int) record.getRssi());
 		}
 
-		public int getMaxRssi() {
-			int result = Integer.MIN_VALUE;
-			for(int i : rssiList) {
-				if(i > result) {
-					result = i;
-				}
-			}
-			return result;
-		}
 
-		public int getMinRssi() {
-			int result = Integer.MAX_VALUE;
-			for(int i : rssiList) {
-				if(i < result) {
-					result = i;
-				}
-			}
-			return result;
-		}
-
-		public int getAvgRssi() {
-			int result = 0;
-			for(int i : rssiList) {
-				result += i;
-			}
-			return result / rssiList.size();
-		}
 
 		public int size() {
 			return rssiList.size();
