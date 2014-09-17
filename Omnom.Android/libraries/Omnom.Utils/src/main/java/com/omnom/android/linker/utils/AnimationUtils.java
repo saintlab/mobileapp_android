@@ -8,6 +8,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.omnom.android.utils.R;
 
+import hugo.weaving.DebugLog;
+
 /**
  * Created by Ch3D on 29.07.2014.
  */
@@ -150,6 +152,7 @@ public class AnimationUtils {
 		scaleWidth(view, size, null, endCallback);
 	}
 
+	@DebugLog
 	public static void scale(final View view, int size, long duration, Runnable endCallback) {
 		scaleHeight(view, size, duration);
 		scaleWidth(view, size, duration, endCallback);

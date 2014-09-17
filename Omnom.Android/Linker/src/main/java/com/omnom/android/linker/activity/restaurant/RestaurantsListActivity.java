@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Parcelable;
 
 import com.omnom.android.linker.R;
+import com.omnom.android.linker.activity.UserProfileActivity;
 import com.omnom.android.linker.activity.base.BaseListActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.adapter.MockPlacesAdapter;
@@ -27,9 +28,9 @@ public class RestaurantsListActivity extends BaseListActivity {
 
 	@OnClick(R.id.btn_profile)
 	public void onProfile() {
-		startActivity(new Intent(this, BeaconsChartActivity.class), false);
+		//		startActivity(new Intent(this, BeaconsChartActivity.class), false);
 		// TODO:
-		// UserProfileActivity.start(this, true);
+		UserProfileActivity.start(this, true);
 	}
 
 	@Override
