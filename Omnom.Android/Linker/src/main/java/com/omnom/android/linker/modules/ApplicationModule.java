@@ -8,6 +8,7 @@ import com.omnom.android.linker.activity.ValidationActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
+import com.omnom.android.linker.beacon.BeaconFilter;
 import com.omnom.android.linker.service.BluetoothLeService;
 
 import dagger.Module;

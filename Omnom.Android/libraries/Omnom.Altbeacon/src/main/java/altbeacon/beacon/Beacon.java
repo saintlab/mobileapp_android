@@ -375,6 +375,7 @@ public class Beacon implements Parcelable {
             sb.append(" ");
             i++;
         }
+	    sb.append("rssi: " + getRssi());
         return sb.toString();
     }
 
@@ -585,6 +586,19 @@ public class Beacon implements Parcelable {
 
     }
 
-
-
+	public String toDebugString() {
+		StringBuilder sb = new StringBuilder();
+		int i = 1;
+		for(Identifier identifier : mIdentifiers) {
+			sb.append("id");
+			sb.append(i);
+			sb.append(": ");
+			sb.append(identifier.toString());
+			sb.append(" ");
+			i++;
+		}
+		sb.append("tx: " + getTxPower());
+		sb.append("rssi: " + getRssi());
+		return sb.toString();
+	}
 }
