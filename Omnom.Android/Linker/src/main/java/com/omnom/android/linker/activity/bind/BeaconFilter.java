@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.Identifier;
@@ -82,6 +84,7 @@ public class BeaconFilter {
 		return result;
 	}
 
+	@DebugLog
 	public static int getAvgRssi(List<Integer> rssiList) {
 		int result = 0;
 		for(int i : rssiList) {
@@ -130,12 +133,13 @@ public class BeaconFilter {
 		}
 	};
 
+	@DebugLog
 	public List<Beacon> findNearestBeacons(ArrayList<Beacon> mBeacons) {
 		if(mBeacons.size() < 1) {
 			return Collections.emptyList();
 		}
-		final SparseArray<List<Integer>> minor2rssi = new SparseArray<List<Integer>>();
-		final SparseArray<Beacon> minor2beacon = new SparseArray<Beacon>();
+		final HashMap<Integer, List<Integer>> minor2rssi = new HashMap<Integer, List<Integer>>();
+		final HashMap<Integer, Beacon> minor2beacon = new HashMap<Integer, Beacon>();
 
 		// associate minor -> rssi[] and minor -> beacon
 		for(final Beacon b : mBeacons) {
@@ -150,12 +154,13 @@ public class BeaconFilter {
 		}
 
 		final ArrayList<BData> datas = new ArrayList<BData>();
-		for(int i = 0; i < minor2rssi.size(); i++) {
-			final List<Integer> rssiValues = minor2rssi.get(i);
+		for (final Map.Entry<Integer, List<Integer>> entry : minor2rssi.entrySet()) {
+			final List<Integer> rssiValues = entry.getValue();
 			if(rssiValues != null) {
-				final Beacon beacon = minor2beacon.get(i);
+				final Integer key = entry.getKey();
+				final Beacon beacon = minor2beacon.get(key);
 				final BData d = new BData(beacon);
-				d.minor = i;
+				d.minor = key;
 				d.avgRssi = getAvgRssi(clearFluctuation(rssiValues));
 				d.values = rssiValues;
 				datas.add(d);
@@ -189,13 +194,16 @@ public class BeaconFilter {
 		return rssiValues;
 	}
 
+	@DebugLog
 	private ArrayList<Beacon> getLinkedElements(ArrayList<BData> datas) {
 		final ArrayList<Beacon> result = new ArrayList<Beacon>();
 		BData current = datas.get(0);
+		if(current.avgRssi >= mMinRssi) {
+			result.add(current.getBeacon());
+		}
 		while(current.link != null) {
 			if(current.avgRssi >= mMinRssi) {
-				final Beacon beacon = current.getBeacon();
-				result.add(beacon);
+				result.add(current.getBeacon());
 			}
 			current = current.link.p2;
 		}
@@ -211,6 +219,7 @@ public class BeaconFilter {
 		}
 	}
 
+	@DebugLog
 	private Link getMaxLink(ArrayList<BData> datas) {
 		Link maxLink = null;
 		for(int i = 0; i < datas.size() - 1; i++) {

@@ -28,6 +28,8 @@ import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
 import hugo.weaving.DebugLog;
 
+import static com.omnom.android.linker.utils.AndroidUtils.showToast;
+
 public class BeaconsChartActivity extends Activity {
 
 	public class BeaconDataSerie extends XYSeries {
@@ -154,6 +156,7 @@ public class BeaconsChartActivity extends Activity {
 
 			case R.id.action_start:
 				if(!mScanning) {
+					showToast(this, R.string.started);
 					mAdapter.startLeScan(mLeScanCallback);
 					beaconsData.clear();
 					mDataset.clear();
@@ -163,6 +166,7 @@ public class BeaconsChartActivity extends Activity {
 
 			case R.id.action_stop:
 				if(mScanning) {
+					showToast(this, R.string.stopped);
 					mAdapter.stopLeScan(mLeScanCallback);
 					onScanStopped();
 					mScanning = false;

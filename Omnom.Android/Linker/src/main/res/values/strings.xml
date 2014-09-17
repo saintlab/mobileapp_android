@@ -34,5 +34,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_beacons_list">BeaconsListActivity</string>
+    <string name="started">Started</string>
+    <string name="stopped">Stopped</string>
 
 </resources>
