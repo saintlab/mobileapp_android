@@ -1,9 +1,7 @@
-package com.omnom.android.linker.activity.bind;
+package com.omnom.android.linker.beacon;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.Log;
-import android.util.SparseArray;
 
 import com.omnom.android.linker.R;
 
@@ -16,13 +14,14 @@ import java.util.List;
 import java.util.Map;
 
 import altbeacon.beacon.Beacon;
-import altbeacon.beacon.Identifier;
 import hugo.weaving.DebugLog;
 
 /**
- * Created by Ch3D on 25.08.2014.
+ * Created by xCh3Dx on 17.09.2014.
  */
-public class BeaconFilter {
+public class BeaconFilterAlgorithmSimple implements BeaconFilterAlgorithm {
+
+	private final int mMinRssi;
 
 	public class Link {
 		public BData p1;
@@ -64,88 +63,24 @@ public class BeaconFilter {
 		}
 	}
 
-	public static int getMaxRssi(List<Integer> rssiList) {
-		int result = Integer.MIN_VALUE;
-		for(int i : rssiList) {
-			if(i > result) {
-				result = i;
-			}
-		}
-		return result;
-	}
 
-	public static int getMinRssi(List<Integer> rssiList) {
-		int result = Integer.MAX_VALUE;
-		for(int i : rssiList) {
-			if(i < result) {
-				result = i;
-			}
-		}
-		return result;
-	}
-
-	@DebugLog
-	public static int getAvgRssi(List<Integer> rssiList) {
-		int result = 0;
-		for(int i : rssiList) {
-			result += i;
-		}
-		return result / rssiList.size();
-	}
-
-	private final int mMinRssi;
-	private final String[] mBeaconIds;
-	private Context mContext;
-
-	public BeaconFilter(Context context) {
-		mContext = context;
+	public BeaconFilterAlgorithmSimple(Context context) {
 		mMinRssi = context.getResources().getInteger(R.integer.rssi_min_value);
-		mBeaconIds = context.getResources().getStringArray(R.array.redbear_beacon_ids);
 	}
 
-	@DebugLog
-	public boolean check(Beacon beacon) {
-		if(beacon == null || beacon.getId1() == null) {
-			return false;
-		}
-		final Identifier id1 = beacon.getId1();
-		final String beaconId = id1.toString().toLowerCase();
-		return isValidUuid(beaconId)/* && beacon.getRssi() >= mMinRssi*/;
-	}
-
-	private boolean isValidUuid(final String beaconId) {
-		if(TextUtils.isEmpty(beaconId)) {
-			return false;
-		}
-		final String bid = beaconId.toLowerCase();
-		for(final String item : mBeaconIds) {
-			if(item.equals(bid)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private final Comparator<BData> mBDataComparator = new Comparator<BData>() {
-		@Override
-		public int compare(BData lhs, BData rhs) {
-			return lhs.avgRssi > rhs.avgRssi ? -1 : 1;
-		}
-	};
-
-	@DebugLog
-	public List<Beacon> findNearestBeacons(ArrayList<Beacon> mBeacons) {
-		if(mBeacons.size() < 1) {
+	@Override
+	public List<Beacon> filter(List<Beacon> beacons) {
+		if (beacons.size() < 1) {
 			return Collections.emptyList();
 		}
 		final HashMap<Integer, List<Integer>> minor2rssi = new HashMap<Integer, List<Integer>>();
 		final HashMap<Integer, Beacon> minor2beacon = new HashMap<Integer, Beacon>();
 
 		// associate minor -> rssi[] and minor -> beacon
-		for(final Beacon b : mBeacons) {
+		for (final Beacon b : beacons) {
 			int minor = Integer.parseInt(b.getIdValue(2));
 			List<Integer> rssiList = minor2rssi.get(minor);
-			if(rssiList == null) {
+			if (rssiList == null) {
 				rssiList = new ArrayList<Integer>();
 				minor2rssi.put(minor, rssiList);
 			}
@@ -156,19 +91,19 @@ public class BeaconFilter {
 		final ArrayList<BData> datas = new ArrayList<BData>();
 		for (final Map.Entry<Integer, List<Integer>> entry : minor2rssi.entrySet()) {
 			final List<Integer> rssiValues = entry.getValue();
-			if(rssiValues != null) {
+			if (rssiValues != null) {
 				final Integer key = entry.getKey();
 				final Beacon beacon = minor2beacon.get(key);
 				final BData d = new BData(beacon);
 				d.minor = key;
-				d.avgRssi = getAvgRssi(clearFluctuation(rssiValues));
+				d.avgRssi = BeaconUtils.getAvgRssi(clearFluctuation(rssiValues));
 				d.values = rssiValues;
 				datas.add(d);
 			}
 		}
 
 		Collections.sort(datas, mBDataComparator);
-		for(int i = 0; i < datas.size() - 1; i++) {
+		for (int i = 0; i < datas.size() - 1; i++) {
 			datas.get(i).link = new Link(datas.get(i), datas.get(i + 1));
 		}
 		logLinks(datas);
@@ -180,14 +115,13 @@ public class BeaconFilter {
 		return getLinkedElements(datas);
 	}
 
-	@DebugLog
 	public List<Integer> clearFluctuation(List<Integer> rssiValues) {
-		if(rssiValues.size() < 4) {
+		if (rssiValues.size() < 4) {
 			return rssiValues;
 		}
-		final Integer minRssi = getMinRssi(rssiValues);
-		final Integer maxRssi = getMaxRssi(rssiValues);
-		if(!maxRssi.equals(minRssi)) {
+		final Integer minRssi = BeaconUtils.getMinRssi(rssiValues);
+		final Integer maxRssi = BeaconUtils.getMaxRssi(rssiValues);
+		if (!maxRssi.equals(minRssi)) {
 			rssiValues.remove(minRssi);
 			rssiValues.remove(maxRssi);
 		}
@@ -198,11 +132,11 @@ public class BeaconFilter {
 	private ArrayList<Beacon> getLinkedElements(ArrayList<BData> datas) {
 		final ArrayList<Beacon> result = new ArrayList<Beacon>();
 		BData current = datas.get(0);
-		if(current.avgRssi >= mMinRssi) {
+		if (current.avgRssi >= mMinRssi) {
 			result.add(current.getBeacon());
 		}
-		while(current.link != null) {
-			if(current.avgRssi >= mMinRssi) {
+		while (current.link != null) {
+			if (current.avgRssi >= mMinRssi) {
 				result.add(current.getBeacon());
 			}
 			current = current.link.p2;
@@ -211,20 +145,28 @@ public class BeaconFilter {
 	}
 
 	private void logLinks(ArrayList<BData> datas) {
-		for(int i = 0; i < datas.size(); i++) {
+		for (int i = 0; i < datas.size(); i++) {
 			Link link = datas.get(i).link;
-			if(link != null) {
+			if (link != null) {
 				Log.d("BEACONS", link.toString());
 			}
 		}
 	}
 
+	private final Comparator<BData> mBDataComparator = new Comparator<BData>() {
+		@Override
+		public int compare(BData lhs, BData rhs) {
+			return lhs.avgRssi > rhs.avgRssi ? -1 : 1;
+		}
+	};
+
+
 	@DebugLog
 	private Link getMaxLink(ArrayList<BData> datas) {
 		Link maxLink = null;
-		for(int i = 0; i < datas.size() - 1; i++) {
+		for (int i = 0; i < datas.size() - 1; i++) {
 			int length1 = datas.get(i).link.getLength();
-			if(maxLink == null || maxLink.getLength() < length1) {
+			if (maxLink == null || maxLink.getLength() < length1) {
 				maxLink = datas.get(i).link;
 			}
 		}

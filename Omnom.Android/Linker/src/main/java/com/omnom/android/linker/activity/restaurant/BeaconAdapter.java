@@ -8,7 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.activity.bind.BeaconFilter;
+import com.omnom.android.linker.beacon.BeaconFilter;
+import com.omnom.android.linker.beacon.BeaconUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,9 +68,9 @@ public class BeaconAdapter extends BaseAdapter {
 		items = new ArrayList<Item>();
 		for(final BeaconsChartActivity.BeaconDataSerie v : values) {
 			if(v.size() > 0) {
-				final int maxRssi = BeaconFilter.getMaxRssi(v.rssiList);
-				final int minRssi = BeaconFilter.getMinRssi(v.rssiList);
-				final int avgRssi = BeaconFilter.getAvgRssi(v.rssiList);
+				final int maxRssi = BeaconUtils.getMaxRssi(v.rssiList);
+				final int minRssi = BeaconUtils.getMinRssi(v.rssiList);
+				final int avgRssi = BeaconUtils.getAvgRssi(v.rssiList);
 				final int txPower = v.getTxPower();
 				items.add(new Item(v.getTitle(), minRssi, maxRssi, avgRssi, txPower, v.getColor()));
 			}

@@ -26,6 +26,7 @@ import com.omnom.android.linker.activity.ErrorHelper;
 import com.omnom.android.linker.activity.UserProfileActivity;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
+import com.omnom.android.linker.beacon.BeaconFilter;
 import com.omnom.android.linker.model.ResponseBase;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
@@ -448,7 +449,7 @@ public class BindActivity extends BaseActivity {
 							                                        Log.d(TAG_BEACONS, "finded beacons size = " + mBeacons.size());
 							                                        Log.d(TAG_BEACONS, "beacons = " + Arrays.toString(mBeacons.toArray()));
 							                                        BeaconFilter filter = new BeaconFilter(BindActivity.this);
-							                                        final List<Beacon> nearBeacons = filter.findNearestBeacons(mBeacons);
+							                                        final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 							                                        final int size = nearBeacons.size();
 							                                        if(size == 0) {
 								                                        mErrorHelper.showError(R.drawable.ic_weak_signal,

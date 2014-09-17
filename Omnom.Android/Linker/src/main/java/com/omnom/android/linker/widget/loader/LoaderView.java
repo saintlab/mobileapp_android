@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -402,6 +403,9 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void animateLogo(final String logo, final int placeholderResId, final long duration) {
+		if(TextUtils.isEmpty(logo)) {
+			return;
+		}
 		final Object tag = mImgLogo.getTag(R.id.logo_url);
 		if(tag != null && tag.equals(logo)) {
 			// skip
