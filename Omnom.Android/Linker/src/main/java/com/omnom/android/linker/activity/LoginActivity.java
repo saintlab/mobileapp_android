@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
@@ -131,6 +132,11 @@ public class LoginActivity extends BaseActivity {
 			mEditPassword.setText(getIntent().getStringExtra(EXTRA_PASSWORD));
 			int errorCode = getIntent().getIntExtra(EXTRA_ERROR_CODE, -1);
 			onAuthError(errorCode);
+		}
+
+		if(BuildConfig.DEBUG && !getIntent().hasExtra(EXTRA_USERNAME) && !getIntent().hasExtra(EXTRA_PASSWORD)) {
+			mEditLogin.setText("linker@saintlab.com");
+			mEditPassword.setText("1234");
 		}
 
 		mEditLogin.addTextChangedListener(new ErrorTextWatcher(this, mEditLogin, mTextLoginError));

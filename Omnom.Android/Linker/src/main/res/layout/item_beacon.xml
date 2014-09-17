@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="RtlSymmetry"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:paddingLeft="@dimen/activity_vertical_margin_small"
+    android:layout_height="?android:attr/listPreferredItemHeightLarge"
+    android:layout_margin="@dimen/activity_horizontal_margin_small">
+
+    <TextView
+        android:id="@+id/txt_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:text="Place Name"
+        style="@style/TextView.Restaurant.Title"/>
+
+    <TextView
+        android:id="@+id/txt_rssi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/txt_title"
+        android:layout_below="@+id/txt_title"
+        android:gravity="center_vertical"
+        android:text="Location"
+        style="@style/TextView.Restaurant.Data.Location"/>
+
+    <TextView
+        android:id="@+id/txt_tx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/txt_title"
+        android:layout_below="@+id/txt_rssi"
+        android:text="Type Type Type Type Type Type Type"
+        style="@style/TextView.Restaurant.Data"/>
+
+</RelativeLayout>

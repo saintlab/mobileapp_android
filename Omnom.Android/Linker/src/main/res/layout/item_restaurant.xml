@@ -47,9 +47,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@+id/type"
-        android:layout_alignTop="@+id/type"
-        android:layout_below="@+id/location"/>-->
+        android:layout_alignBottom="@+id/tx"
+        android:layout_alignTop="@+id/tx"
+        android:layout_below="@+id/rssi"/>-->
 
     <TextView
         android:id="@+id/type"
