@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.activity.LoginActivity;
 import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.api.observable.providers.LinkerDataProvider;
@@ -18,7 +17,7 @@ import retrofit.RequestInterceptor;
 /**
  * Created by Ch3D on 11.08.2014.
  */
-@Module(injects = {LoginActivity.class}, complete = false, library = true)
+@Module(complete = false, library = true)
 public class LinkerDataProviderModule {
 	public interface AuthTokenProvider {
 		public String getAuthToken();

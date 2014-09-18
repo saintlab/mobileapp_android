@@ -27,6 +27,7 @@ import com.omnom.android.linker.activity.UserProfileActivity;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.beacon.BeaconFilter;
+import com.omnom.android.linker.beacon.BeaconRssiProvider;
 import com.omnom.android.linker.model.ResponseBase;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
@@ -70,7 +71,6 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action0;
 import rx.functions.Action1;
-import rx.functions.Func1;
 
 import static butterknife.ButterKnife.findById;
 
@@ -132,6 +132,9 @@ public class BindActivity extends BaseActivity {
 
 	@Inject
 	protected LinkerObeservableApi api;
+
+	@Inject
+	protected BeaconRssiProvider rssiProvider;
 
 	protected BluetoothLeService mBluetoothLeService;
 	private BluetoothAdapter.LeScanCallback mLeScanCallback = null;
@@ -384,7 +387,7 @@ public class BindActivity extends BaseActivity {
 		});
 		ViewUtils.setVisible(mPanelBottom, true);
 		ViewUtils.setVisible(mBtnBottom, true);
-		checkRssiThreshold(restaurant, -70);
+		rssiProvider.updateRssiThreshold(restaurant);
 	}
 
 	private void scanQrCode() {
@@ -550,31 +553,6 @@ public class BindActivity extends BaseActivity {
 						resetActivityState();
 					}
 				});
-	}
-
-	public void checkRssiThreshold(final Restaurant restaurant, final int rssiThreshold) {
-		api.getRestaurant(restaurant.getId()).flatMap(new Func1<Restaurant, Observable<Restaurant>>() {
-			@Override
-			public Observable<Restaurant> call(Restaurant restaurant) {
-				if(restaurant.getRssiThreshold() != rssiThreshold) {
-					return api.setRssiThreshold(restaurant.getId(), rssiThreshold);
-				} else {
-					return Observable.empty();
-				}
-			}
-		}).subscribe(new Action1<Restaurant>() {
-			@Override
-			public void call(final Restaurant updatedRestaurant) {
-				if(updatedRestaurant == null || updatedRestaurant.getRssiThreshold() != rssiThreshold) {
-					Log.d(TAG, "Unable to change rssi threshold : " + updatedRestaurant);
-				}
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				Log.e(TAG, "checkRssiThreshold : unable to change rssi threshold", throwable);
-			}
-		});
 	}
 
 	@Override
