@@ -40,6 +40,9 @@ public class Restaurant implements Parcelable {
 	@Expose
 	private Address address;
 
+	@Expose
+	private int rssiThreshold;
+
 	public Restaurant(String id, String title, String authCode, String descr, Decoration decoration, Address address) {
 		this.id = id;
 		this.title = title;
@@ -119,5 +122,14 @@ public class Restaurant implements Parcelable {
 
 	public void setAddress(Address address) {
 		this.address = address;
+	}
+
+	public int getRssiThreshold() {
+		return rssiThreshold;
+	}
+
+	@Override
+	public String toString() {
+		return "id: " +  id + " title: " + title + " rssiThreshold: " + rssiThreshold;
 	}
 }

@@ -100,6 +100,17 @@ public class StubDataProvider implements LinkerObeservableApi {
 	}
 
 	@Override
+	public Observable<Restaurant> setRssiThreshold(String restaurantId, int rssi) {
+		return new Observable<Restaurant>(new Observable.OnSubscribe<Restaurant>() {
+			@Override
+			public void call(Subscriber<? super Restaurant> subscriber) {
+				subscriber.onNext(RestaurantsFactory.createFake("test"));
+				subscriber.onCompleted();
+			}
+		}) {};
+	}
+
+	@Override
 	@DebugLog
 	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon, Beacon oldBeacon) {
 		return new Observable<BeaconDataResponse>(new Observable.OnSubscribe<BeaconDataResponse>() {
