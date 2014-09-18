@@ -7,9 +7,9 @@ import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.api.AuthService;
 import com.omnom.android.linker.api.LinkerDataService;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.auth.UserProfile;
 import com.omnom.android.linker.model.auth.AuthResponseBase;
 import com.omnom.android.linker.model.auth.LoginResponse;
+import com.omnom.android.linker.model.auth.UserProfile;
 import com.omnom.android.linker.model.beacon.BeaconBindRequest;
 import com.omnom.android.linker.model.beacon.BeaconBuildRequest;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
@@ -81,7 +81,9 @@ public class LinkerDataProvider implements LinkerObeservableApi {
 
 	@Override
 	public Observable<Restaurant> setRssiThreshold(String restaurantId, int rssi) {
-		return mDataService.setRssiThreshold(restaurantId, new RssiThresholdRequest(rssi));
+		return mDataService.setRssiThreshold(restaurantId, new RssiThresholdRequest(rssi))
+		                   .subscribeOn(Schedulers.io())
+		                   .observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

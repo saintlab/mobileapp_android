@@ -128,7 +128,8 @@ public class Restaurant implements Parcelable {
 		return rssiThreshold;
 	}
 
-	public void setRssiThreshold(int rssiThreshold) {
-		this.rssiThreshold = rssiThreshold;
+	@Override
+	public String toString() {
+		return "id: " +  id + " title: " + title + " rssiThreshold: " + rssiThreshold;
 	}
 }

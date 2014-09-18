@@ -70,6 +70,7 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action0;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 import static butterknife.ButterKnife.findById;
 
@@ -383,6 +384,7 @@ public class BindActivity extends BaseActivity {
 		});
 		ViewUtils.setVisible(mPanelBottom, true);
 		ViewUtils.setVisible(mBtnBottom, true);
+		checkRssiThreshold(restaurant, -70);
 	}
 
 	private void scanQrCode() {
@@ -548,6 +550,31 @@ public class BindActivity extends BaseActivity {
 						resetActivityState();
 					}
 				});
+	}
+
+	public void checkRssiThreshold(final Restaurant restaurant, final int rssiThreshold) {
+		api.getRestaurant(restaurant.getId()).flatMap(new Func1<Restaurant, Observable<Restaurant>>() {
+			@Override
+			public Observable<Restaurant> call(Restaurant restaurant) {
+				if(restaurant.getRssiThreshold() != rssiThreshold) {
+					return api.setRssiThreshold(restaurant.getId(), rssiThreshold);
+				} else {
+					return Observable.empty();
+				}
+			}
+		}).subscribe(new Action1<Restaurant>() {
+			@Override
+			public void call(final Restaurant updatedRestaurant) {
+				if(updatedRestaurant == null || updatedRestaurant.getRssiThreshold() != rssiThreshold) {
+					Log.d(TAG, "Unable to change rssi threshold : " + updatedRestaurant);
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				Log.e(TAG, "checkRssiThreshold : unable to change rssi threshold", throwable);
+			}
+		});
 	}
 
 	@Override
