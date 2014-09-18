@@ -36,6 +36,8 @@ public interface LinkerObeservableApi {
 
 	public Observable<TableDataResponse> findBeacon(Beacon beacon);
 
+	public Observable<Restaurant> setRssiThreshold(String restaurantId, int rssi);
+
 	public Observable<TableDataResponse> checkQrCode(String qrData);
 
 	public Observable<TableDataResponse> bindQrCode(String restaurantId, int tableNumber, String qrData);

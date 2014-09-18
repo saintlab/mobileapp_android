@@ -7,9 +7,9 @@ import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.api.AuthService;
 import com.omnom.android.linker.api.LinkerDataService;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.auth.UserProfile;
 import com.omnom.android.linker.model.auth.AuthResponseBase;
 import com.omnom.android.linker.model.auth.LoginResponse;
+import com.omnom.android.linker.model.auth.UserProfile;
 import com.omnom.android.linker.model.beacon.BeaconBindRequest;
 import com.omnom.android.linker.model.beacon.BeaconBuildRequest;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
@@ -17,6 +17,7 @@ import com.omnom.android.linker.model.beacon.BeaconFindRequest;
 import com.omnom.android.linker.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
+import com.omnom.android.linker.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.linker.model.table.TableDataResponse;
 
 import altbeacon.beacon.Beacon;
@@ -76,6 +77,13 @@ public class LinkerDataProvider implements LinkerObeservableApi {
 	public Observable<TableDataResponse> findBeacon(Beacon beacon) {
 		return mDataService.findBeacon(new BeaconFindRequest(beacon)).subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<Restaurant> setRssiThreshold(String restaurantId, int rssi) {
+		return mDataService.setRssiThreshold(restaurantId, new RssiThresholdRequest(rssi))
+		                   .subscribeOn(Schedulers.io())
+		                   .observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

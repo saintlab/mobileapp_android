@@ -27,6 +27,7 @@ import com.omnom.android.linker.activity.UserProfileActivity;
 import com.omnom.android.linker.activity.base.BaseActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.beacon.BeaconFilter;
+import com.omnom.android.linker.beacon.BeaconRssiProvider;
 import com.omnom.android.linker.model.ResponseBase;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
@@ -131,6 +132,9 @@ public class BindActivity extends BaseActivity {
 
 	@Inject
 	protected LinkerObeservableApi api;
+
+	@Inject
+	protected BeaconRssiProvider rssiProvider;
 
 	protected BluetoothLeService mBluetoothLeService;
 	private BluetoothAdapter.LeScanCallback mLeScanCallback = null;
@@ -383,6 +387,7 @@ public class BindActivity extends BaseActivity {
 		});
 		ViewUtils.setVisible(mPanelBottom, true);
 		ViewUtils.setVisible(mBtnBottom, true);
+		rssiProvider.updateRssiThreshold(restaurant);
 	}
 
 	private void scanQrCode() {
