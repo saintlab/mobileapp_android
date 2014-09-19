@@ -3,6 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <gradient
-        android:startColor="@color/loader_bg"
-        android:endColor="@color/loader_bg" />
+        android:startColor="@color/loader_bg_transparent"
+        android:endColor="@color/loader_bg_transparent" />
 </shape>
