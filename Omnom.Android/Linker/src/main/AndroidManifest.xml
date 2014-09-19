@@ -42,6 +42,7 @@
             android:name="com.omnom.android.linker.activity.ValidationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
+            android:excludeFromRecents="true"
             android:windowSoftInputMode="stateAlwaysHidden" >
         </activity>
         <activity
@@ -70,7 +71,6 @@
             android:windowSoftInputMode="stateAlwaysHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

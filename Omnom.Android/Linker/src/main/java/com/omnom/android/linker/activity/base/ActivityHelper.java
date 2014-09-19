@@ -79,17 +79,10 @@ public class ActivityHelper {
 	}
 
 	public void startActivity(Intent intent, int animIn, int aninOut, boolean finish) {
-		if(Build.VERSION.SDK_INT >= 16) {
-			ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(mActivity.getActivity(), animIn, aninOut);
-			mActivity.getActivity().startActivity(intent, activityOptions.toBundle());
-			if(finish) {
-				mActivity.getActivity().finish();
-			}
-		} else {
-			if(finish) {
-				mActivity.getActivity().finish();
-			}
-			mActivity.getActivity().startActivity(intent);
+		ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(mActivity.getActivity(), animIn, aninOut);
+		mActivity.getActivity().startActivity(intent, activityOptions.toBundle());
+		if(finish) {
+			mActivity.getActivity().finish();
 		}
 	}
 
