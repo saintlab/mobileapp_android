@@ -4,14 +4,6 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:scaleType="fitCenter"
-        android:visibility="gone"
-        android:src="@drawable/ic_splash_logo_zone"/>
-
-    <ImageView
         android:id="@+id/img_bg"
         android:layout_marginTop="@dimen/loader_margin_top"
         android:layout_gravity="center"
@@ -21,7 +13,6 @@
 
     <RelativeLayout
         android:layout_gravity="center"
-        android:layout_marginTop="-6dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

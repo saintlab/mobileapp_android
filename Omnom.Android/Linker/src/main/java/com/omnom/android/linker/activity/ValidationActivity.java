@@ -129,7 +129,7 @@ public class ValidationActivity extends BaseActivity {
 	@Override
 	protected void onPostResume() {
 		super.onPostResume();
-		postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
+		postDelayed(getResources().getInteger(R.integer.default_animation_duration_quick), new Runnable() {
 			@Override
 			public void run() {
 				validate();

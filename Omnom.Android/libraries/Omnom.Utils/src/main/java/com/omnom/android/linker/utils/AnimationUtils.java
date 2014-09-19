@@ -74,6 +74,12 @@ public class AnimationUtils {
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
+	public static void translateUp(final Iterable<View> views, final int translation, final Runnable endCallback, final long duration) {
+		final AnimationBuilder builder = AnimationBuilder.create(views.iterator().next(), 0, -translation);
+		builder.setDuration(duration);
+		prepareTranslation(views, endCallback, builder).start();
+	}
+
 	public static void translateDown(final Iterable<View> views, final int translation, final Runnable endCallback) {
 		final AnimationBuilder builder = AnimationBuilder.create(views.iterator().next(), -translation, 0);
 		prepareTranslation(views, endCallback, builder).start();
