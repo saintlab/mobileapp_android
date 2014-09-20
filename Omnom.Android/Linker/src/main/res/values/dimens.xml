@@ -36,5 +36,6 @@
     <dimen name="font_large">22sp</dimen>
     <dimen name="error_text_padding">24dp</dimen>
     <dimen name="restaurant_logo_size">72dp</dimen>
+    <dimen name="loader_logo_size">220dp</dimen>
 
 </resources>

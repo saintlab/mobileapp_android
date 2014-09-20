@@ -8,6 +8,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.omnom.android.utils.R;
 
+import hugo.weaving.DebugLog;
+
 /**
  * Created by Ch3D on 29.07.2014.
  */
@@ -69,6 +71,12 @@ public class AnimationUtils {
 
 	public static void translateUp(final Iterable<View> views, final int translation, final Runnable endCallback) {
 		final AnimationBuilder builder = AnimationBuilder.create(views.iterator().next(), 0, -translation);
+		prepareTranslation(views, endCallback, builder).start();
+	}
+
+	public static void translateUp(final Iterable<View> views, final int translation, final Runnable endCallback, final long duration) {
+		final AnimationBuilder builder = AnimationBuilder.create(views.iterator().next(), 0, -translation);
+		builder.setDuration(duration);
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
@@ -150,6 +158,7 @@ public class AnimationUtils {
 		scaleWidth(view, size, null, endCallback);
 	}
 
+	@DebugLog
 	public static void scale(final View view, int size, long duration, Runnable endCallback) {
 		scaleHeight(view, size, duration);
 		scaleWidth(view, size, duration, endCallback);

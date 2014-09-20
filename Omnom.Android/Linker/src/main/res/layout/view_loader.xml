@@ -7,7 +7,7 @@
         android:layout_gravity="center"
         android:layout_width="@dimen/loader_size_huge"
         android:layout_height="@dimen/loader_size_huge"
-        android:src="@drawable/bg_loader_rounded"/>
+        android:src="@drawable/bg_loader_rounded_transparent"/>
 
     <ProgressBar
         android:id="@+id/progress"
@@ -26,7 +26,7 @@
         android:id="@+id/img_logo"
         android:layout_marginTop="@dimen/loader_margin_top"
         android:layout_gravity="center"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/loader_logo_size"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_fork_n_knife"/>
 

@@ -7,12 +7,14 @@ import com.omnom.android.linker.model.beacon.BeaconFindRequest;
 import com.omnom.android.linker.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
+import com.omnom.android.linker.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.linker.model.table.RestaurantTablesResponse;
 import com.omnom.android.linker.model.table.TableDataResponse;
 
 import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;
+import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
@@ -44,6 +46,9 @@ public interface LinkerDataService {
 
 	@POST("/ibeacons/find")
 	Observable<TableDataResponse> findBeacon(@Body BeaconFindRequest request);
+
+	@PUT("/restaurants/{id}")
+	Observable<Restaurant> setRssiThreshold(@Path(Protocol.FIELD_ID) String restaurantId, @Body RssiThresholdRequest request);
 
 	@GET("/ibeacons/decode")
 	Observable<Integer> checkBeacon(@Query(Protocol.FIELD_BEACON_UUID) String beaconUuid,

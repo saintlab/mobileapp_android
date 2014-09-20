@@ -8,7 +8,7 @@ import com.omnom.android.linker.activity.ValidationActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
-import com.omnom.android.linker.beacon.BeaconFilter;
+import com.omnom.android.linker.beacon.BeaconRssiProviderSimple;
 import com.omnom.android.linker.service.BluetoothLeService;
 
 import dagger.Module;
@@ -17,6 +17,7 @@ import dagger.Module;
  * Created by Ch3D on 11.08.2014.
  */
 @Module(injects = {LinkerApplication.class, LoginActivity.class, SimpleSplashActivity.class, ValidationActivity.class, BindActivity.class,
-		RestaurantActivity.class, RestaurantsListActivity.class, UserProfileActivity.class, BluetoothLeService.class},
+		RestaurantActivity.class, RestaurantsListActivity.class, UserProfileActivity.class, BluetoothLeService.class,
+		BeaconRssiProviderSimple.class},
         complete = false)
 public class ApplicationModule {}
