@@ -12,8 +12,8 @@
     <integer name="user_profile_animation_duration">500</integer>
     <integer name="bind_beacon_writing_duration">10000</integer>
     <integer name="login_animation_timeout">1000</integer>
-    <integer name="splash_screen_timeout">1000</integer>
-    <integer name="splash_animation_duration">650</integer>
+    <integer name="splash_screen_timeout">2000</integer>
+    <integer name="splash_animation_duration">850</integer>
 
     <integer name="loader_data_max_length">5</integer>
     <integer name="loader_font_size_normal">24</integer>
