@@ -108,7 +108,10 @@ public class BeaconFilterAlgorithmSimple implements BeaconFilterAlgorithm {
 		}
 		logLinks(datas);
 		// remove max link
-		getMaxLink(datas).p1.link = null;
+		final Link maxLink = getMaxLink(datas);
+		if(maxLink != null && maxLink.p1 != null) {
+			maxLink.p1.link = null;
+		}
 		Log.d("BEACONS", "============remove max=========");
 		logLinks(datas);
 		Log.d("BEACONS", Arrays.toString(datas.toArray()));
