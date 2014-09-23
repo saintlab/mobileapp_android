@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="acquiring_mailru_acquiring_base_url">https://test-cpg.money.mail.ru/api/</string>
+    <string name="acquiring_mailru_acquiring_base_url">https://test-cpg.money.mail.ru/api</string>
     <string name="acquiring_mailru_certificate_name">test-cpg.money.mail.ru.cer</string>
     <string name="acquiring_mailru_merch_id">DGIS</string>
     <string name="acquiring_mailru_vterm_id">DGISMobile</string>
