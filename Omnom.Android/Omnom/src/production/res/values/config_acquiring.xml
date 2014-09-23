@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="OMNMailRuAcquiringBaseURL">https://cpg.money.mail.ru/api/</string>
+    <string name="OMNMailRuCertificateName">cpg.money.mail.ru.cer</string>
+    <string name="OMNMailRu_merch_id">DGIS</string>
+    <string name="OMNMailRu_vterm_id">DGISMobile</string>
+    <string name="OMNMailRu_cardholder">Omnom</string>
+    <string name="OMNMailRu_secret_key">qmluSZ1HkWQRWkUtcDOM</string>
+    <string name="OMNMailRuTestCVV"></string>
+</resources>
