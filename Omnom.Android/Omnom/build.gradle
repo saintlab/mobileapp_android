@@ -9,6 +9,15 @@ android {
         exclude 'LICENSE.txt'
     }
 
+    productFlavors {
+        production {
+        }
+
+        laaaab {
+        }
+    }
+
+
     defaultConfig {
         applicationId "com.omnom.android"
         minSdkVersion 18
