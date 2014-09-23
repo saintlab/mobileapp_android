@@ -3,8 +3,10 @@ package com.omnom.android.acquiring.mailru;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringTransactionExtendedResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringTransactionResponse;
+import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import retrofit.http.FieldMap;
 import retrofit.http.FormUrlEncoded;
@@ -21,7 +23,7 @@ public interface AcquiringServiceMailRu {
 
 	@FormUrlEncoded
 	@POST("/card/register")
-	public Observable<AcquiringResponse> registerCard(@FieldMap HashMap<String, String> params);
+	public Observable<RegisterCardResponse> registerCard(@FieldMap Map<String, String> params);
 
 	@FormUrlEncoded
 	@POST("/card/verify")

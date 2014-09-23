@@ -12,10 +12,6 @@ public class AcquiringResponse {
 	@Expose
 	private AcquiringResponseError error;
 
-	public AcquiringResponse(String url) {
-		this.url = url;
-	}
-
 	public String getUrl() {
 		return url;
 	}

@@ -6,7 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.omnom.android.acquiring.mailru.AcquiringMailRu;
-import com.omnom.android.acquiring.mailru.MailRuCardInfo;
+import com.omnom.android.acquiring.mailru.RegisterCardRequest;
 
 public class MainActivity extends Activity {
 
@@ -15,8 +15,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 	    AcquiringMailRu acquiring = new AcquiringMailRu(this);
-	    MailRuCardInfo cardInfo = MailRuCardInfo.create("4111111111111111", "12/18", getString(R.string.acquiring_mailru_test_cvv));
-	    acquiring.registerCard(cardInfo.getCardInfo(), "test@omnom.menu", "+7-913-913-1313");
+	    acquiring.registerCard(new RegisterCardRequest());
     }
 
 

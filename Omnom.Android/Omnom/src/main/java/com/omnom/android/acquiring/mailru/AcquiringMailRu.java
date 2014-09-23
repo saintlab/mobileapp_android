@@ -9,14 +9,21 @@ import com.google.gson.GsonBuilder;
 import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
-import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
+import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.TreeSet;
 
+import hugo.weaving.DebugLog;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
+import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Created by Ch3D on 23.09.2014.
@@ -24,72 +31,33 @@ import rx.functions.Action1;
 public class AcquiringMailRu implements Acquiring {
 	private static final String TAG = AcquiringMailRu.class.getSimpleName();
 
+	private static String encryptPassword(String password) {
+		String sha1 = "";
+		try {
+			MessageDigest crypt = MessageDigest.getInstance("SHA-1");
+			crypt.reset();
+			crypt.update(password.getBytes("UTF-8"));
+			sha1 = byteToHex(crypt.digest());
+		} catch(NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch(UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return sha1;
+	}
+
+	private static String byteToHex(final byte[] hash) {
+		Formatter formatter = new Formatter();
+		for(byte b : hash) {
+			formatter.format("%02x", b);
+		}
+		String result = formatter.toString();
+		formatter.close();
+		return result;
+	}
+
 	private final AcquiringServiceMailRu mAcquiringService;
 	private Context mContext;
-
-	public AcquiringMailRu(final Context context) {
-		mContext = context;
-
-		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
-		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-		final GsonConverter converter = new GsonConverter(gson);
-
-		RestAdapter mRestAdapter = new RestAdapter.Builder().setEndpoint(context.getString(R.string.acquiring_mailru_acquiring_base_url))
-		                                                    .setLogLevel(
-				                                                    logLevel)
-		                                                    .setConverter(converter).build();
-		mAcquiringService = mRestAdapter.create(AcquiringServiceMailRu.class);
-	}
-
-	@Override
-	public void registerCard(HashMap<String, String> cardInfo, String user_login, String user_phone) {
-		HashMap<String, String> reqiredSignatureParams = new HashMap<String, String>();
-		reqiredSignatureParams.put("merch_id", mContext.getString(R.string.acquiring_mailru_merch_id));
-		reqiredSignatureParams.put("vterm_id", mContext.getString(R.string.acquiring_mailru_vterm_id));
-		reqiredSignatureParams.put("user_login", user_login);
-
-		HashMap<String, String> parameters = reqiredSignatureParams;
-
-		parameters.put("signature", getSignature(reqiredSignatureParams));
-		parameters.put("cardholder", mContext.getString(R.string.acquiring_mailru_cardholder));
-		parameters.put("user_phone", user_phone);
-
-		parameters.putAll(cardInfo);
-		mAcquiringService.registerCard(parameters)
-		                 .subscribe(new Action1<AcquiringResponse>() {
-			                 @Override
-			                 public void call(AcquiringResponse acquiringResponse) {
-				                 Log.d(TAG, acquiringResponse.toString());
-			                 }
-		                 }, new Action1<Throwable>() {
-			                 @Override
-			                 public void call(Throwable throwable) {
-				                 Log.e(TAG, "registerCard", throwable);
-			                 }
-		                 });
-
-		// TODO: Call REST
-		//		__weak typeof (self) weakSelf = self;
-		//		[self POST:@ "card/register" parameters:
-		//		parameters success:^(AFHTTPRequestOperation * operation, id responseObject){
-		//
-		//			if(responseObject[ @ "url"]){
-		//
-		//				[weakSelf checkRegisterForResponse:responseObject withCompletion:completionBlock];
-		//
-		//			}
-		//			else{
-		//
-		//				completionBlock(responseObject, nil);
-		//
-		//			}
-		//
-		//		} failure:^(AFHTTPRequestOperation * operation, NSError * error){
-		//
-		//			completionBlock([operation omn_errorResponse],nil);
-		//
-		//		}];
-	}
 
 	// TODO: Implement
 	//	-(void)checkRegisterForResponse:(id)
@@ -311,12 +279,99 @@ public class AcquiringMailRu implements Acquiring {
 	//
 	//	}
 
+	public AcquiringMailRu(final Context context) {
+		mContext = context;
+
+		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
+		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+		final GsonConverter converter = new GsonConverter(gson);
+
+		RestAdapter mRestAdapter = new RestAdapter.Builder().setEndpoint(context.getString(R.string.acquiring_mailru_acquiring_base_url))
+		                                                    .setLogLevel(
+				                                                    logLevel)
+		                                                    .setConverter(converter).build();
+		mAcquiringService = mRestAdapter.create(AcquiringServiceMailRu.class);
+	}
+
+	@Override
+	public void registerCard(RegisterCardRequest request) {
+		HashMap<String, String> reqiredSignatureParams = new HashMap<String, String>();
+		reqiredSignatureParams.put("merch_id", request.getMerch_id());
+		reqiredSignatureParams.put("vterm_id", request.getVterm_id());
+		reqiredSignatureParams.put("user_login", request.getUser_login());
+		final String signature = getSignature(reqiredSignatureParams);
+		request.setSignature(signature);
+
+		final HashMap<String, String> parameters = reqiredSignatureParams;
+
+		parameters.put("user_phone", request.getUser_phone());
+		parameters.put("cardholder", mContext.getString(R.string.acquiring_mailru_cardholder));
+		parameters.put("pan", request.getPan());
+		parameters.put("cvv", request.getCvv());
+		parameters.put("exp_date", request.getExp_date());
+		parameters.put("signature", signature);
+
+		mAcquiringService.registerCard(parameters)
+//		                 .map(new Func1<RegisterCardResponse, Pair<String, String>>() {
+//			                 @Override
+//			                 public Pair<String, String> call(RegisterCardResponse acquiringResponse) {
+//				                 return Pair.create(acquiringResponse.getCardId(), acquiringResponse.getUrl());
+//			                 }
+//		                 })
+		                 .concatMap(new Func1<RegisterCardResponse, Observable<CardRegisterPollingResponse>>() {
+			                 @Override
+			                 public Observable<CardRegisterPollingResponse> call(RegisterCardResponse response) {
+				                 return new PollingObservable(response);
+			                 }
+		                 })
+		                 .subscribe(new Action1<CardRegisterPollingResponse>() {
+			                 @Override
+			                 public void call(CardRegisterPollingResponse response) {
+				                 final String status = response.getStatus();
+				                 final String cardId = response.getCardId();
+				                 System.err.println("status = " + status + " cardId = " + cardId);
+			                 }
+		                 }, new Action1<Throwable>() {
+			                 @Override
+			                 public void call(Throwable throwable) {
+				                 Log.e(TAG, "registerCard", throwable);
+			                 }
+		                 });
+
+		// TODO: Call REST
+		//		__weak typeof (self) weakSelf = self;
+		//		[self POST:@ "card/register" parameters:
+		//		parameters success:^(AFHTTPRequestOperation * operation, id responseObject){
+		//
+		//			if(responseObject[ @ "url"]){
+		//
+		//				[weakSelf checkRegisterForResponse:responseObject withCompletion:completionBlock];
+		//
+		//			}
+		//			else{
+		//
+		//				completionBlock(responseObject, nil);
+		//
+		//			}
+		//
+		//		} failure:^(AFHTTPRequestOperation * operation, NSError * error){
+		//
+		//			completionBlock([operation omn_errorResponse],nil);
+		//
+		//		}];
+	}
+
+	@DebugLog
 	private String getSignature(final HashMap<String, String> params) {
 		final TreeSet<String> keys = new TreeSet<String>(params.keySet());
 		final StringBuilder builder = new StringBuilder();
+		System.err.println(">>> " + keys);
 		for(final String key : keys) {
 			builder.append(params.get(key));
 		}
-		return builder.toString();
+		final String s = builder.toString();
+		System.err.println(">>> " + s);
+		System.err.println(">>> " + s + mContext.getString(R.string.acquiring_mailru_secret_key));
+		return encryptPassword(s + mContext.getString(R.string.acquiring_mailru_secret_key));
 	}
 }
