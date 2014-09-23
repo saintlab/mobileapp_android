@@ -1,26 +1,48 @@
 package com.omnom.android.acquiring.mailru;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
+import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 
 import java.util.HashMap;
 import java.util.TreeSet;
+
+import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
+import rx.functions.Action1;
 
 /**
  * Created by Ch3D on 23.09.2014.
  */
 public class AcquiringMailRu implements Acquiring {
+	private static final String TAG = AcquiringMailRu.class.getSimpleName();
 
+	private final AcquiringServiceMailRu mAcquiringService;
 	private Context mContext;
 
 	public AcquiringMailRu(final Context context) {
 		mContext = context;
+
+		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
+		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+		final GsonConverter converter = new GsonConverter(gson);
+
+		RestAdapter mRestAdapter = new RestAdapter.Builder().setEndpoint(context.getString(R.string.acquiring_mailru_acquiring_base_url))
+		                                                    .setLogLevel(
+				                                                    logLevel)
+		                                                    .setConverter(converter).build();
+		mAcquiringService = mRestAdapter.create(AcquiringServiceMailRu.class);
 	}
 
 	@Override
-	public void registerCard(HashMap<String, String> cardInfo, String user_login, String user_phone, RegisterCardCallback callback) {
+	public void registerCard(HashMap<String, String> cardInfo, String user_login, String user_phone) {
 		HashMap<String, String> reqiredSignatureParams = new HashMap<String, String>();
 		reqiredSignatureParams.put("merch_id", mContext.getString(R.string.acquiring_mailru_merch_id));
 		reqiredSignatureParams.put("vterm_id", mContext.getString(R.string.acquiring_mailru_vterm_id));
@@ -29,10 +51,22 @@ public class AcquiringMailRu implements Acquiring {
 		HashMap<String, String> parameters = reqiredSignatureParams;
 
 		parameters.put("signature", getSignature(reqiredSignatureParams));
-		parameters.put("cardholder", "OMNMailRu_cardholder");
+		parameters.put("cardholder", mContext.getString(R.string.acquiring_mailru_cardholder));
 		parameters.put("user_phone", user_phone);
 
 		parameters.putAll(cardInfo);
+		mAcquiringService.registerCard(parameters)
+		                 .subscribe(new Action1<AcquiringResponse>() {
+			                 @Override
+			                 public void call(AcquiringResponse acquiringResponse) {
+				                 Log.d(TAG, acquiringResponse.toString());
+			                 }
+		                 }, new Action1<Throwable>() {
+			                 @Override
+			                 public void call(Throwable throwable) {
+				                 Log.e(TAG, "registerCard", throwable);
+			                 }
+		                 });
 
 		// TODO: Call REST
 		//		__weak typeof (self) weakSelf = self;

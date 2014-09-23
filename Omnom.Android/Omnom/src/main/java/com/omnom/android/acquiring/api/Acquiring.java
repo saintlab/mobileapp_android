@@ -10,6 +10,6 @@ public interface Acquiring {
 		public void onCardRegistered(int response, String cardId);
 	}
 
-	public void registerCard(HashMap<String, String> cardInfo, String user_login, String user_phone, RegisterCardCallback callback);
+	public void registerCard(HashMap<String, String> cardInfo, String user_login, String user_phone);
 }
 

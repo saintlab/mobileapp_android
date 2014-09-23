@@ -12,14 +12,14 @@ import java.util.HashMap;
  * Created by Ch3D on 23.09.2014.
  */
 public class MailRuCardInfo {
-	public static MailRuCardInfo getCardInfoWithCardId(final Context context, final String id) {
+	public static MailRuCardInfo create(final Context context, final String id) {
 		final MailRuCardInfo cardInfo = new MailRuCardInfo();
 		cardInfo.setCardId(id);
 		cardInfo.cvv = context.getString(R.string.acquiring_mailru_test_cvv);
 		return cardInfo;
 	}
 
-	public static MailRuCardInfo getCardInfoWithCardPan(final String pan, final String expirationDate, final String cvv) {
+	public static MailRuCardInfo create(final String pan, final String expirationDate, final String cvv) {
 		final MailRuCardInfo cardInfo = new MailRuCardInfo();
 		cardInfo.pan = pan;
 		cardInfo.expDate = expirationDate;
@@ -73,7 +73,7 @@ public class MailRuCardInfo {
 		this.addCard = addCard;
 	}
 
-	private HashMap<String, String> getCardInfo() {
+	public HashMap<String, String> getCardInfo() {
 		final HashMap<String, String> cardInfo = new HashMap<String, String>();
 
 		if(!TextUtils.isEmpty(cardId)) {
