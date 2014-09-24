@@ -5,9 +5,9 @@ import com.omnom.android.acquiring.api.PaymentInfo;
 /**
  * Created by Ch3D on 23.09.2014.
  */
-public class PaymentInfoMailRu implements PaymentInfo {
-	public static PaymentInfoMailRu create(UserData user, CardInfo cardInfo, MailRuExtra extra, long amount, String orderId,
-	                                 String orderMessage) {
+public class PaymentInfoMailRu implements PaymentInfo<MailRuExtra> {
+	public static PaymentInfoMailRu create(UserData user, CardInfo cardInfo, MailRuExtra extra, double amount, String orderId,
+	                                       String orderMessage) {
 		final PaymentInfoMailRu paymentInfo = new PaymentInfoMailRu();
 		paymentInfo.setUser(user);
 		paymentInfo.setCardInfo(cardInfo);
@@ -22,56 +22,68 @@ public class PaymentInfoMailRu implements PaymentInfo {
 	private CardInfo cardInfo;
 	private UserData user;
 	private String orderId;
-	private long orderAmount;
+	private double orderAmount;
 	private String orderMessage;
 
 	private PaymentInfoMailRu() {
 	}
 
+	@Override
 	public MailRuExtra getExtra() {
 		return extra;
 	}
 
+	@Override
 	public void setExtra(MailRuExtra extra) {
 		this.extra = extra;
 	}
 
+	@Override
 	public String getOrderId() {
 		return orderId;
 	}
 
+	@Override
 	public void setOrderId(String order_id) {
 		this.orderId = order_id;
 	}
 
+	@Override
 	public double getOrderAmount() {
 		return orderAmount;
 	}
 
-	public void setOrderAmount(long orderAmount) {
+	@Override
+	public void setOrderAmount(double orderAmount) {
 		this.orderAmount = orderAmount;
 	}
 
+	@Override
 	public String getOrderMessage() {
 		return orderMessage;
 	}
 
+	@Override
 	public void setOrderMessage(String orderMessage) {
 		this.orderMessage = orderMessage;
 	}
 
+	@Override
 	public UserData getUser() {
 		return user;
 	}
 
+	@Override
 	public void setUser(UserData user) {
 		this.user = user;
 	}
 
+	@Override
 	public CardInfo getCardInfo() {
 		return cardInfo;
 	}
 
+	@Override
 	public void setCardInfo(CardInfo cardInfo) {
 		this.cardInfo = cardInfo;
 	}

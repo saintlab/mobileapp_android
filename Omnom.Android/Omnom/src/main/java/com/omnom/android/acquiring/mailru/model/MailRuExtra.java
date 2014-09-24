@@ -3,12 +3,13 @@ package com.omnom.android.acquiring.mailru.model;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.omnom.android.acquiring.ExtraData;
 import com.omnom.android.linker.utils.StringUtils;
 
 /**
  * Created by Ch3D on 23.09.2014.
  */
-public class MailRuExtra {
+public class MailRuExtra extends ExtraData {
 	public static MailRuExtra create(long tip, String restaurant_id) {
 		return new MailRuExtra(tip, restaurant_id);
 	}

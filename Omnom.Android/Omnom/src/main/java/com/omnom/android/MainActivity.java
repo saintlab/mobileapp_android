@@ -4,11 +4,16 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.omnom.android.acquiring.AcquiringType;
+import com.omnom.android.acquiring.ExtraData;
+import com.omnom.android.acquiring.OrderInfo;
+import com.omnom.android.acquiring.PaymentInfoFactory;
 import com.omnom.android.acquiring.api.Acquiring;
+import com.omnom.android.acquiring.api.PaymentInfo;
+import com.omnom.android.acquiring.mailru.OrderInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.MailRuExtra;
 import com.omnom.android.acquiring.mailru.model.MerchantData;
-import com.omnom.android.acquiring.mailru.model.PaymentInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
@@ -51,9 +56,11 @@ public class MainActivity extends Activity {
 	}
 
 	private void pay(final CardInfo cardInfo) {
-		final PaymentInfoMailRu paymentInfo = PaymentInfoMailRu.create(UserData.createTestUser(),
-		                                                               cardInfo, MailRuExtra.create(10, "test_rest_id"),
-		                                                               100, "999", "message");
+		final ExtraData extra = MailRuExtra.create(10, "test_rest_id");
+		final OrderInfo order = OrderInfoMailRu.create(100, "999", "message");
+		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU,
+		                                                          UserData.createTestUser(), cardInfo, extra, order);
+
 		acquiring.pay(new MerchantData(MainActivity.this), paymentInfo, new Acquiring.PaymentListener<AcquiringPollingResponse>() {
 			@Override
 			public void onPaymentSettled(AcquiringPollingResponse response) {
