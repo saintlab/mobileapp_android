@@ -1,4 +1,4 @@
-package com.omnom.android.acquiring.mailru;
+package com.omnom.android.acquiring.mailru.model;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -11,26 +11,41 @@ import java.util.HashMap;
 /**
  * Created by Ch3D on 23.09.2014.
  */
-public class MailRuCardInfo {
-	public static MailRuCardInfo create(final Context context, final String id) {
-		final MailRuCardInfo cardInfo = new MailRuCardInfo();
+public class CardInfo {
+	public static CardInfo create(final Context context, final String id) {
+		final CardInfo cardInfo = new CardInfo();
 		cardInfo.setCardId(id);
 		cardInfo.cvv = context.getString(R.string.acquiring_mailru_test_cvv);
 		return cardInfo;
 	}
 
-	public static MailRuCardInfo create(final String pan, final String expirationDate, final String cvv) {
-		final MailRuCardInfo cardInfo = new MailRuCardInfo();
+	public static CardInfo create(final String pan, final String expirationDate, final String cvv) {
+		final CardInfo cardInfo = new CardInfo();
 		cardInfo.pan = pan;
 		cardInfo.expDate = expirationDate;
 		cardInfo.cvv = cvv;
 		return cardInfo;
 	}
 
+	public static CardInfo create(String pan, String exp_date, String cvv, String holder) {
+		CardInfo info = create(pan, exp_date, cvv);
+		info.holder = holder;
+		return info;
+	}
+
+	public static CardInfo createTestCard(Context context) {
+		String holder = context.getString(R.string.acquiring_mailru_cardholder);
+		String pan = "6011000000000004";
+		String expDate = "12.2015";
+		String cvv = "123";
+		return create(pan, expDate, cvv, holder);
+	}
+
 	private String pan = StringUtils.EMPTY_STRING;
 	private String expDate = StringUtils.EMPTY_STRING;
 	private String cvv = StringUtils.EMPTY_STRING;
 	private String cardId = StringUtils.EMPTY_STRING;
+	private String holder = StringUtils.EMPTY_STRING;
 	private boolean addCard = false;
 
 	public String getPan() {
@@ -89,5 +104,13 @@ public class MailRuCardInfo {
 		}
 
 		return cardInfo;
+	}
+
+	public String getHolder() {
+		return holder;
+	}
+
+	public void setHolder(String holder) {
+		this.holder = holder;
 	}
 }

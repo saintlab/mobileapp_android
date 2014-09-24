@@ -9,6 +9,9 @@ import com.google.gson.GsonBuilder;
 import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
+import com.omnom.android.acquiring.mailru.model.CardInfo;
+import com.omnom.android.acquiring.mailru.model.MerchantData;
+import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
 
 import java.io.UnsupportedEncodingException;
@@ -59,40 +62,6 @@ public class AcquiringMailRu implements Acquiring {
 	private final AcquiringServiceMailRu mAcquiringService;
 	private Context mContext;
 
-	// TODO: Implement
-	//	-(void)checkRegisterForResponse:(id)
-	//	response withCompletion
-	//	:(void(^)(
-	//	id response, NSString
-	//	*cardId))completionBlock
-	//
-	//	{
-	//
-	//		__weak typeof (self) weakSelf = self;
-	//		NSString * url = response[ @ "url"];
-	//		[self GET:url parameters:nil success:^(AFHTTPRequestOperation * operation, id responseObject){
-	//
-	//		NSString * status = responseObject[ @ "status"];
-	//		if([status isEqualToString:@ "OK_CONTINUE"]){
-	//			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^ {
-	//					[weakSelf checkRegisterForResponse:
-	//			response withCompletion:completionBlock];
-	//			});
-	//		}
-	//		else{
-	//
-	//			completionBlock(responseObject, response[ @ "card_id"]);
-	//
-	//		}
-	//
-	//	} failure:^(AFHTTPRequestOperation * operation, NSError * error){
-	//
-	//		completionBlock([operation omn_errorResponse],response[ @ "card_id"]);
-	//
-	//	}];
-	//
-	//	}
-	//
 	//	-(void)cardVerify:(double)
 	//	amount user_login
 	//	:(NSString*)
@@ -294,34 +263,31 @@ public class AcquiringMailRu implements Acquiring {
 	}
 
 	@Override
-	public void registerCard(RegisterCardRequest request) {
+	public void registerCard(final MerchantData merchant, UserData user, final CardInfo cardInfo) {
 		HashMap<String, String> reqiredSignatureParams = new HashMap<String, String>();
-		reqiredSignatureParams.put("merch_id", request.getMerch_id());
-		reqiredSignatureParams.put("vterm_id", request.getVterm_id());
-		reqiredSignatureParams.put("user_login", request.getUser_login());
+		reqiredSignatureParams.put("merch_id", merchant.getMerchId());
+		reqiredSignatureParams.put("vterm_id", merchant.getVtermId());
+		reqiredSignatureParams.put("user_login", user.getId());
 		final String signature = getSignature(reqiredSignatureParams);
-		request.setSignature(signature);
 
 		final HashMap<String, String> parameters = reqiredSignatureParams;
 
-		parameters.put("user_phone", request.getUser_phone());
-		parameters.put("cardholder", mContext.getString(R.string.acquiring_mailru_cardholder));
-		parameters.put("pan", request.getPan());
-		parameters.put("cvv", request.getCvv());
-		parameters.put("exp_date", request.getExp_date());
+		parameters.put("user_phone", user.getPhone());
+		parameters.put("cardholder", cardInfo.getHolder());
+		parameters.put("pan", cardInfo.getPan());
+		parameters.put("cvv", cardInfo.getCvv());
+		parameters.put("exp_date", cardInfo.getExpDate());
 		parameters.put("signature", signature);
 
 		mAcquiringService.registerCard(parameters)
-//		                 .map(new Func1<RegisterCardResponse, Pair<String, String>>() {
-//			                 @Override
-//			                 public Pair<String, String> call(RegisterCardResponse acquiringResponse) {
-//				                 return Pair.create(acquiringResponse.getCardId(), acquiringResponse.getUrl());
-//			                 }
-//		                 })
 		                 .concatMap(new Func1<RegisterCardResponse, Observable<CardRegisterPollingResponse>>() {
 			                 @Override
 			                 public Observable<CardRegisterPollingResponse> call(RegisterCardResponse response) {
-				                 return new PollingObservable(response);
+				                 if(response.getError() == null) {
+					                 return new PollingObservable(response);
+				                 } else {
+					                 return Observable.error(new RuntimeException(response.getError().toString()));
+				                 }
 			                 }
 		                 })
 		                 .subscribe(new Action1<CardRegisterPollingResponse>() {
@@ -337,28 +303,6 @@ public class AcquiringMailRu implements Acquiring {
 				                 Log.e(TAG, "registerCard", throwable);
 			                 }
 		                 });
-
-		// TODO: Call REST
-		//		__weak typeof (self) weakSelf = self;
-		//		[self POST:@ "card/register" parameters:
-		//		parameters success:^(AFHTTPRequestOperation * operation, id responseObject){
-		//
-		//			if(responseObject[ @ "url"]){
-		//
-		//				[weakSelf checkRegisterForResponse:responseObject withCompletion:completionBlock];
-		//
-		//			}
-		//			else{
-		//
-		//				completionBlock(responseObject, nil);
-		//
-		//			}
-		//
-		//		} failure:^(AFHTTPRequestOperation * operation, NSError * error){
-		//
-		//			completionBlock([operation omn_errorResponse],nil);
-		//
-		//		}];
 	}
 
 	@DebugLog

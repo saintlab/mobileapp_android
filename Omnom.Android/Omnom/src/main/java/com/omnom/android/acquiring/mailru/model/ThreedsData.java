@@ -1,4 +1,4 @@
-package com.omnom.android.acquiring.mailru;
+package com.omnom.android.acquiring.mailru.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

@@ -1,11 +1,11 @@
-package com.omnom.android.acquiring.mailru;
+package com.omnom.android.acquiring.mailru.model;
 
 /**
  * Created by Ch3D on 23.09.2014.
  */
 public class PaymentInfo {
 	MailRuExtra extra;
-	MailRuCardInfo cardInfo;
+	CardInfo cardInfo;
 
 	String order_id;
 	String user_phone;

@@ -27,4 +27,9 @@ public class AcquiringResponseError {
 	public void setDescr(String descr) {
 		this.descr = descr;
 	}
+
+	@Override
+	public String toString() {
+		return "code: " + code + " descr: " + descr;
+	}
 }

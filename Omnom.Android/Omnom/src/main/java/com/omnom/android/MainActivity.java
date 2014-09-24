@@ -6,38 +6,39 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.omnom.android.acquiring.mailru.AcquiringMailRu;
-import com.omnom.android.acquiring.mailru.RegisterCardRequest;
+import com.omnom.android.acquiring.mailru.model.CardInfo;
+import com.omnom.android.acquiring.mailru.model.MerchantData;
+import com.omnom.android.acquiring.mailru.model.UserData;
 
 public class MainActivity extends Activity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-	    AcquiringMailRu acquiring = new AcquiringMailRu(this);
-	    acquiring.registerCard(new RegisterCardRequest());
-    }
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		AcquiringMailRu acquiring = new AcquiringMailRu(this);
+		acquiring.registerCard(new MerchantData(this), UserData.createTestUser(), CardInfo.createTestCard(this));
+	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+		//noinspection SimplifiableIfStatement
+		if(id == R.id.action_settings) {
+			return true;
+		}
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+		return super.onOptionsItemSelected(item);
+	}
 }

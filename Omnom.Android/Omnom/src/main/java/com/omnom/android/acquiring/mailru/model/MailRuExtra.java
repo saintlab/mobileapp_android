@@ -1,4 +1,4 @@
-package com.omnom.android.acquiring.mailru;
+package com.omnom.android.acquiring.mailru.model;
 
 import android.text.TextUtils;
 
