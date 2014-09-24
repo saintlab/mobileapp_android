@@ -88,6 +88,13 @@ public class CardInfo {
 		this.addCard = addCard;
 	}
 
+	public void toMap(HashMap<String, String> map) {
+		map.put("cardholder", getHolder());
+		map.put("pan", getPan());
+		map.put("cvv", getCvv());
+		map.put("exp_date", getExpDate());
+	}
+
 	public HashMap<String, String> getCardInfo() {
 		final HashMap<String, String> cardInfo = new HashMap<String, String>();
 
@@ -112,5 +119,9 @@ public class CardInfo {
 
 	public void setHolder(String holder) {
 		this.holder = holder;
+	}
+
+	public void storeCardId(HashMap<String, String> params) {
+		params.put("card_id", cardId);
 	}
 }

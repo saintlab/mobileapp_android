@@ -1,12 +1,11 @@
 package com.omnom.android.acquiring.mailru.model;
 
+import java.util.HashMap;
+
 /**
  * Created by Ch3D on 24.09.2014.
  */
 public class UserData {
-	private String phone;
-	private String id;
-
 	public static UserData createTestUser() {
 		return create("5", "89833087335");
 	}
@@ -17,6 +16,9 @@ public class UserData {
 		userData.id = login;
 		return userData;
 	}
+
+	private String phone;
+	private String id;
 
 	public String getPhone() {
 		return phone;
@@ -32,5 +34,13 @@ public class UserData {
 
 	public void setLogin(String user_login) {
 		this.id = user_login;
+	}
+
+	public void storeLogin(HashMap<String, String> params) {
+		params.put("user_login", getId());
+	}
+
+	public void storePhone(HashMap<String, String> params) {
+		params.put("user_phone", getPhone());
 	}
 }

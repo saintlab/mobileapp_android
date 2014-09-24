@@ -9,10 +9,14 @@ import com.omnom.android.linker.utils.StringUtils;
  * Created by Ch3D on 23.09.2014.
  */
 public class MailRuExtra {
+	public static MailRuExtra create(long tip, String restaurant_id) {
+		return new MailRuExtra(tip, restaurant_id);
+	}
+
 	private long tip;
 	private String restaurant_id;
 
-	public MailRuExtra(long tip, String restaurant_id) {
+	private MailRuExtra(long tip, String restaurant_id) {
 		this.tip = tip;
 		this.restaurant_id = restaurant_id;
 	}

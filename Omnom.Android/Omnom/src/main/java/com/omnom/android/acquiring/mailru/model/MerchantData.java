@@ -5,6 +5,8 @@ import android.content.Context;
 import com.google.gson.annotations.Expose;
 import com.omnom.android.R;
 
+import java.util.HashMap;
+
 /**
  * Created by Ch3D on 24.09.2014.
  */
@@ -26,5 +28,10 @@ public class MerchantData {
 
 	public String getVtermId() {
 		return vtermId;
+	}
+
+	public void toMap(HashMap<String, String> reqiredSignatureParams) {
+		reqiredSignatureParams.put("merch_id", getMerchId());
+		reqiredSignatureParams.put("vterm_id", getVtermId());
 	}
 }

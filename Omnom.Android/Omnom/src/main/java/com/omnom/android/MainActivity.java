@@ -2,43 +2,60 @@ package com.omnom.android;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
+import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.AcquiringMailRu;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
+import com.omnom.android.acquiring.mailru.model.MailRuExtra;
 import com.omnom.android.acquiring.mailru.model.MerchantData;
+import com.omnom.android.acquiring.mailru.model.PaymentInfo;
 import com.omnom.android.acquiring.mailru.model.UserData;
+import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
+import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 
 public class MainActivity extends Activity {
 
-	@Override
+	private AcquiringMailRu acquiring;
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		AcquiringMailRu acquiring = new AcquiringMailRu(this);
-		acquiring.registerCard(new MerchantData(this), UserData.createTestUser(), CardInfo.createTestCard(this));
+		acquiring = new AcquiringMailRu(this);
+		final CardInfo testCard = CardInfo.createTestCard(this);
+
+		acquiring.registerCard(new MerchantData(this), UserData.createTestUser(), testCard,
+		                       new Acquiring.CardRegisterListener() {
+			                       @Override
+			                       public void onCardRegistered(String status, String cardId) {
+				                       System.err.println("status = " + status + " cardId = " + cardId);
+				                       testCard.setCardId(cardId);
+				                       verifyCard(testCard);
+			                       }
+		                       });
+
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+	private void verifyCard(final CardInfo cardInfo) {
+		acquiring.verifyCard(new MerchantData(MainActivity.this), UserData.createTestUser(), cardInfo, 1.20,
+		                     new Acquiring.CardVerifyListener() {
+			                     @Override
+			                     public void onCardVerified(AcquiringResponse response) {
+				                     System.err.println("status = " + response.getUrl());
+				                     pay(cardInfo);
+			                     }
+		                     });
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
+	private void pay(final CardInfo cardInfo) {
+		final PaymentInfo paymentInfo = PaymentInfo.create(UserData.createTestUser(),
+		                                                   cardInfo, MailRuExtra.create(10, "test_rest_id"),
+		                                                   100, "999", "message");
 
-		//noinspection SimplifiableIfStatement
-		if(id == R.id.action_settings) {
-			return true;
-		}
-
-		return super.onOptionsItemSelected(item);
+		acquiring.pay(new MerchantData(MainActivity.this), paymentInfo, new Acquiring.PaymentListener() {
+			@Override
+			public void onPaymentSettled(AcquiringPollingResponse response) {
+				System.err.println("status = " + response.getStatus());
+			}
+		});
 	}
 }
