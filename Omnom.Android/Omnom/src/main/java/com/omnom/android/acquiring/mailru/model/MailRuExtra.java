@@ -14,21 +14,25 @@ public class MailRuExtra {
 	}
 
 	private long tip;
-	private String restaurant_id;
+	private String restaurantId;
 
 	private MailRuExtra(long tip, String restaurant_id) {
 		this.tip = tip;
-		this.restaurant_id = restaurant_id;
+		this.restaurantId = restaurant_id;
+	}
+
+	public long getTip() {
+		return tip;
+	}
+
+	public String getRestaurantId() {
+		return restaurantId;
 	}
 
 	public String getExtra(Gson gson) {
-		if(TextUtils.isEmpty(restaurant_id)) {
+		if(TextUtils.isEmpty(restaurantId)) {
 			return StringUtils.EMPTY_STRING;
 		}
-		// TODO:
-		//		GsonBuilder builder = new GsonBuilder();
-		//		builder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-		//		Gson gson = builder.create();
 		return gson.toJson(this, MailRuExtra.class);
 	}
 }

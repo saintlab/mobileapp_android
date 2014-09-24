@@ -1,4 +1,4 @@
-package com.omnom.android.acquiring.mailru;
+package com.omnom.android.utils;
 
 import com.omnom.android.linker.utils.StringUtils;
 

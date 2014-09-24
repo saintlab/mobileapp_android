@@ -1,12 +1,14 @@
 package com.omnom.android.acquiring.mailru.model;
 
+import com.omnom.android.acquiring.api.PaymentInfo;
+
 /**
  * Created by Ch3D on 23.09.2014.
  */
-public class PaymentInfo {
-	public static PaymentInfo create(UserData user, CardInfo cardInfo, MailRuExtra extra, long amount, String orderId,
+public class PaymentInfoMailRu implements PaymentInfo {
+	public static PaymentInfoMailRu create(UserData user, CardInfo cardInfo, MailRuExtra extra, long amount, String orderId,
 	                                 String orderMessage) {
-		final PaymentInfo paymentInfo = new PaymentInfo();
+		final PaymentInfoMailRu paymentInfo = new PaymentInfoMailRu();
 		paymentInfo.setUser(user);
 		paymentInfo.setCardInfo(cardInfo);
 		paymentInfo.setExtra(extra);
@@ -23,7 +25,7 @@ public class PaymentInfo {
 	private long orderAmount;
 	private String orderMessage;
 
-	private PaymentInfo() {
+	private PaymentInfoMailRu() {
 	}
 
 	public MailRuExtra getExtra() {
@@ -42,7 +44,7 @@ public class PaymentInfo {
 		this.orderId = order_id;
 	}
 
-	public long getOrderAmount() {
+	public double getOrderAmount() {
 		return orderAmount;
 	}
 
