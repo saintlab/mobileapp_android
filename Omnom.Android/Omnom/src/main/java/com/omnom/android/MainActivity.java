@@ -3,6 +3,9 @@ package com.omnom.android;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.omnom.android.acquiring.AcquiringType;
 import com.omnom.android.acquiring.ExtraData;
@@ -18,21 +21,59 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
+import com.omnom.android.auth.WicketAuthenticator;
+import com.omnom.android.auth.request.AuthRegisterRequest;
+import com.omnom.android.auth.response.AuthRegisterResponse;
+import com.omnom.android.auth.response.AuthResponse;
 
 import javax.inject.Inject;
 
+import rx.functions.Action1;
+
+import static butterknife.ButterKnife.findById;
+
 public class MainActivity extends Activity {
 	private static final String TAG = MainActivity.class.getSimpleName();
+
 	@Inject
 	protected Acquiring acquiring;
+	private Button btnConfirm;
+	private Button btnAuth;
+	private EditText editCode;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		OmnomApplication.get(this).inject(this);
 
-		final CardInfo testCard = CardInfo.createTestCard(this);
+		btnConfirm = findById(this, android.R.id.button1);
+		btnAuth = findById(this, android.R.id.button2);
+		editCode = findById(this, android.R.id.edit);
 
+		final AuthRegisterRequest request = AuthRegisterRequest.create("1", "Dmitry", "Chertenko", "Ch3D", "ch3dee@gmail.com",
+		                                                               "+79133952320",
+		                                                               "1987-06-14");
+
+		final WicketAuthenticator authenticator = new WicketAuthenticator(this);
+		// register(request, authenticator);
+
+		btnConfirm.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				confirm(request, authenticator);
+			}
+		});
+
+		btnAuth.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				authPhone(request, authenticator);
+			}
+		});
+	}
+
+	private void registerCard() {
+		final CardInfo testCard = CardInfo.createTestCard(this);
 		acquiring.registerCard(new MerchantData(this), UserData.createTestUser(), testCard,
 		                       new Acquiring.CardRegisterListener<CardRegisterPollingResponse>() {
 			                       @Override
@@ -44,8 +85,65 @@ public class MainActivity extends Activity {
 		                       });
 	}
 
+	private void authPhone(AuthRegisterRequest request, WicketAuthenticator authenticator) {
+		authenticator.authorizePhone(request.getPhone(), editCode.getText().toString()).subscribe(new Action1<AuthResponse>() {
+			@Override
+			public void call(AuthResponse response) {
+				Log.d(TAG, ">>> authPhone = " + response.getStatus());
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				Log.d(TAG, "authPhone", throwable);
+			}
+		});
+	}
+
+	private void authEmail(AuthRegisterRequest request, WicketAuthenticator authenticator) {
+		authenticator.authorizeEmail(request.getEmail(), editCode.getText().toString()).subscribe(new Action1<AuthResponse>() {
+			@Override
+			public void call(AuthResponse response) {
+				Log.d(TAG, ">>> authEmail = " + response.getStatus());
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				Log.d(TAG, "authEmail", throwable);
+			}
+		});
+	}
+
+	private void register(AuthRegisterRequest request, WicketAuthenticator authenticator) {
+		authenticator.register(request).subscribe(new Action1<AuthRegisterResponse>() {
+			@Override
+			public void call(AuthRegisterResponse response) {
+				Log.d(TAG, ">>> register = " + response.getStatus());
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				Log.d(TAG, "register", throwable);
+			}
+		});
+	}
+
+	private void confirm(AuthRegisterRequest request, WicketAuthenticator authenticator) {
+		authenticator.confirm(request.getPhone(), editCode.getText().toString())
+		             .subscribe(new Action1<AuthResponse>() {
+			             @Override
+			             public void call(AuthResponse response) {
+				             Log.d(TAG, ">>> confirm = " + response.getStatus());
+			             }
+		             }, new Action1<Throwable>() {
+			             @Override
+			             public void call(Throwable throwable) {
+				             Log.d(TAG, "confirm", throwable);
+			             }
+		             });
+	}
+
 	private void verifyCard(final CardInfo cardInfo) {
-		acquiring.verifyCard(new MerchantData(MainActivity.this), UserData.createTestUser(), cardInfo, 1.20,
+		acquiring.verifyCard(new MerchantData(MainActivity.this), UserData.createTestUser(), cardInfo, 1.4,
 		                     new Acquiring.CardVerifyListener<AcquiringResponse>() {
 			                     @Override
 			                     public void onCardVerified(AcquiringResponse response) {
