@@ -2,42 +2,70 @@ package com.omnom.android;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 
-import com.omnom.android.acquiring.mailru.AcquiringMailRu;
-import com.omnom.android.acquiring.mailru.RegisterCardRequest;
+import com.omnom.android.acquiring.AcquiringType;
+import com.omnom.android.acquiring.ExtraData;
+import com.omnom.android.acquiring.OrderInfo;
+import com.omnom.android.acquiring.PaymentInfoFactory;
+import com.omnom.android.acquiring.api.Acquiring;
+import com.omnom.android.acquiring.api.PaymentInfo;
+import com.omnom.android.acquiring.mailru.OrderInfoMailRu;
+import com.omnom.android.acquiring.mailru.model.CardInfo;
+import com.omnom.android.acquiring.mailru.model.MailRuExtra;
+import com.omnom.android.acquiring.mailru.model.MerchantData;
+import com.omnom.android.acquiring.mailru.model.UserData;
+import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
+import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
+import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
+
+import javax.inject.Inject;
 
 public class MainActivity extends Activity {
+	private static final String TAG = MainActivity.class.getSimpleName();
+	@Inject
+	protected Acquiring acquiring;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-	    AcquiringMailRu acquiring = new AcquiringMailRu(this);
-	    acquiring.registerCard(new RegisterCardRequest());
-    }
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		OmnomApplication.get(this).inject(this);
 
+		final CardInfo testCard = CardInfo.createTestCard(this);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+		acquiring.registerCard(new MerchantData(this), UserData.createTestUser(), testCard,
+		                       new Acquiring.CardRegisterListener<CardRegisterPollingResponse>() {
+			                       @Override
+			                       public void onCardRegistered(CardRegisterPollingResponse response) {
+				                       Log.d(TAG, "status = " + response.getStatus() + " cardId = " + response.getCardId());
+				                       testCard.setCardId(response.getCardId());
+				                       verifyCard(testCard);
+			                       }
+		                       });
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+	private void verifyCard(final CardInfo cardInfo) {
+		acquiring.verifyCard(new MerchantData(MainActivity.this), UserData.createTestUser(), cardInfo, 1.20,
+		                     new Acquiring.CardVerifyListener<AcquiringResponse>() {
+			                     @Override
+			                     public void onCardVerified(AcquiringResponse response) {
+				                     Log.d(TAG, "url = " + response.getUrl());
+				                     pay(cardInfo);
+			                     }
+		                     });
+	}
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+	private void pay(final CardInfo cardInfo) {
+		final ExtraData extra = MailRuExtra.create(10, "test_rest_id");
+		final OrderInfo order = OrderInfoMailRu.create(100, "999", "message");
+		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU,
+		                                                          UserData.createTestUser(), cardInfo, extra, order);
 
-        return super.onOptionsItemSelected(item);
-    }
+		acquiring.pay(new MerchantData(MainActivity.this), paymentInfo, new Acquiring.PaymentListener<AcquiringPollingResponse>() {
+			@Override
+			public void onPaymentSettled(AcquiringPollingResponse response) {
+				Log.d(TAG, "status = " + response.getStatus());
+			}
+		});
+	}
 }

@@ -2,8 +2,7 @@ package com.omnom.android.acquiring.mailru.response;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.omnom.android.acquiring.mailru.ThreedsData;
-import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
+import com.omnom.android.acquiring.mailru.model.ThreedsData;
 
 /**
  * Created by Ch3D on 23.09.2014.

@@ -1,18 +1,16 @@
-package com.omnom.android.acquiring.mailru;
+package com.omnom.android.acquiring.mailru.response;
 
 import com.google.gson.annotations.Expose;
 
 /**
- * Created by Ch3D on 23.09.2014.
+ * Created by Ch3D on 24.09.2014.
  */
-public class CardRegisterPollingResponse {
+public class AcquiringPollingResponse {
 	@Expose
 	private String status;
 
 	@Expose
 	private String url;
-
-	private String cardId;
 
 	public String getStatus() {
 		return status;
@@ -30,11 +28,4 @@ public class CardRegisterPollingResponse {
 		this.url = url;
 	}
 
-	public String getCardId() {
-		return cardId;
-	}
-
-	public void setCardId(String cardId) {
-		this.cardId = cardId;
-	}
 }
