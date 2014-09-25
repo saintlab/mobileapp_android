@@ -4,29 +4,43 @@ package com.omnom.android.auth.request;
  * Created by Ch3D on 25.09.2014.
  */
 public class AuthRegisterRequest {
-	public static AuthRegisterRequest create(String installId, String firstName, String lastName, String nickName, String email,
+	public static AuthRegisterRequest create(String installId, String name, String nick, String email,
 	                                         String phone,
 	                                         String birthDate) {
-		return new AuthRegisterRequest(installId, firstName, lastName, nickName, email, phone, birthDate);
+		return new AuthRegisterRequest(installId, name, nick, email, phone, birthDate);
 	}
 
 	private String installId;
-	private String firstName;
-	private String lastName;
-	private String nickName;
+	private String name;
+	private String nick;
 	private String email;
 	private String phone;
 	private String birthDate;
 
-	private AuthRegisterRequest(String installId, String firstName, String lastName, String nickName, String email, String phone,
+	private AuthRegisterRequest(String installId, String name, String nick, String email, String phone,
 	                            String birthDate) {
 		this.installId = installId;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.nickName = nickName;
+		this.name = name;
+		this.nick = nick;
 		this.email = email;
 		this.phone = phone;
 		this.birthDate = birthDate;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getNick() {
+		return nick;
+	}
+
+	public void setNick(String nick) {
+		this.nick = nick;
 	}
 
 	public String getInstallId() {
@@ -36,30 +50,6 @@ public class AuthRegisterRequest {
 
 	public void setInstallId(String installId) {
 		this.installId = installId;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getNickName() {
-		return nickName;
-	}
-
-	public void setNickName(String nickName) {
-		this.nickName = nickName;
 	}
 
 	public String getEmail() {

@@ -10,6 +10,7 @@ import com.omnom.android.R;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
+import com.omnom.android.auth.response.UserResponse;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
@@ -41,6 +42,11 @@ public class WicketAuthenticator implements AuthService {
 	@Override
 	public Observable<AuthResponse> confirm(final String phone, final String code) {
 		return authService.confirm(phone, code);
+	}
+
+	@Override
+	public Observable<UserResponse> getUser(String token) {
+		return authService.getUser(token);
 	}
 
 	@Override
