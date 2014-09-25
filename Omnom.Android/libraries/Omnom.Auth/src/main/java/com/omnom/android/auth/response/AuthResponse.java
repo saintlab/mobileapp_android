@@ -1,16 +1,17 @@
-package com.omnom.android.linker.model.auth;
+package com.omnom.android.auth.response;
 
 import com.google.gson.annotations.Expose;
+import com.omnom.android.auth.AuthError;
 
 /**
- * Created by Ch3D on 04.09.2014.
+ * Created by Ch3D on 25.09.2014.
  */
-public class AuthResponseBase {
+public class AuthResponse {
 	public static final String STATUS_ERROR = "error";
 	public static final String STATUS_SUCCESS = "success";
 
-	public static AuthResponseBase create(String status, Error error) {
-		AuthResponseBase response = new AuthResponseBase();
+	public static AuthResponse create(String status, AuthError error) {
+		AuthResponse response = new AuthResponse();
 		response.setStatus(status);
 		response.setError(error);
 		return response;
@@ -20,9 +21,12 @@ public class AuthResponseBase {
 	private String status;
 
 	@Expose
-	private Error error;
+	private String token;
 
-	public Error getError() {
+	@Expose
+	private AuthError error;
+
+	public AuthError getError() {
 		return error;
 	}
 
@@ -30,7 +34,7 @@ public class AuthResponseBase {
 		return status.equals(STATUS_ERROR);
 	}
 
-	public void setError(Error error) {
+	public void setError(AuthError error) {
 		this.error = error;
 	}
 
@@ -40,5 +44,13 @@ public class AuthResponseBase {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 }

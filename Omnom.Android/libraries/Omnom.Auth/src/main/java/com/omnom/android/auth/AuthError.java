@@ -1,18 +1,18 @@
-package com.omnom.android.linker.model.auth;
+package com.omnom.android.auth;
 
 import com.google.gson.annotations.Expose;
 
 /**
- * Created by Ch3D on 04.09.2014.
+ * Created by Ch3D on 25.09.2014.
  */
-public class Error {
+public class AuthError {
 	@Expose
 	private int code;
 
 	@Expose
 	private String message;
 
-	public Error(int code, String message) {
+	public AuthError(int code, String message) {
 		this.code = code;
 		this.message = message;
 	}

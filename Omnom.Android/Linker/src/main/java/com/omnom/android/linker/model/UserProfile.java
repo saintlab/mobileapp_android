@@ -1,6 +1,7 @@
-package com.omnom.android.linker.model.auth;
+package com.omnom.android.linker.model;
 
 import com.google.gson.annotations.Expose;
+import com.omnom.android.auth.response.AuthResponseBase;
 import com.omnom.android.linker.model.User;
 
 /**

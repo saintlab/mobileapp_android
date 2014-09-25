@@ -1,4 +1,4 @@
-package com.omnom.android.linker.model;
+package com.omnom.android.auth;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by Ch3D on 03.09.2014.
  */
-public class User {
+public class UserData {
 	@Expose
 	private int id;
 
@@ -25,9 +25,6 @@ public class User {
 	@SerializedName("birth_date")
 	@Expose
 	private String birthDate;
-
-	@Expose
-	private Object groups;
 
 	public int getId() {
 		return id;
@@ -77,11 +74,15 @@ public class User {
 		this.birthDate = birthDate;
 	}
 
-	public Object getGroups() {
-		return groups;
-	}
-
-	public void setGroups(Object groups) {
-		this.groups = groups;
+	@Override
+	public String toString() {
+		return "UserData{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				", nick='" + nick + '\'' +
+				", email='" + email + '\'' +
+				", phone='" + phone + '\'' +
+				", birthDate='" + birthDate + '\'' +
+				'}';
 	}
 }
