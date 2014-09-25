@@ -2,6 +2,7 @@ package com.omnom.android;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,7 @@ import com.omnom.android.auth.WicketAuthenticator;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
+import com.omnom.android.auth.response.UserResponse;
 
 import javax.inject.Inject;
 
@@ -50,11 +52,11 @@ public class MainActivity extends Activity {
 		btnAuth = findById(this, android.R.id.button2);
 		editCode = findById(this, android.R.id.edit);
 
-		final AuthRegisterRequest request = AuthRegisterRequest.create("1", "Dmitry", "Chertenko", "Ch3D", "ch3dee@gmail.com",
+		final AuthRegisterRequest request = AuthRegisterRequest.create("1", "Dmitry Chertenko", "Ch3D", "ch3dee@gmail.com",
 		                                                               "+79133952320",
 		                                                               "1987-06-14");
 
-		final WicketAuthenticator authenticator = new WicketAuthenticator(this);
+		final WicketAuthenticator authenticator = new WicketAuthenticator(this, getString(R.string.endpoint_auth));
 		// register(request, authenticator);
 
 		btnConfirm.setOnClickListener(new View.OnClickListener() {
@@ -85,11 +87,25 @@ public class MainActivity extends Activity {
 		                       });
 	}
 
-	private void authPhone(AuthRegisterRequest request, WicketAuthenticator authenticator) {
+	private void authPhone(AuthRegisterRequest request, final WicketAuthenticator authenticator) {
 		authenticator.authorizePhone(request.getPhone(), editCode.getText().toString()).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
 				Log.d(TAG, ">>> authPhone = " + response.getStatus());
+				String token = response.getToken();
+				if(!TextUtils.isEmpty(token)) {
+					authenticator.getUser(token).subscribe(new Action1<UserResponse>() {
+						@Override
+						public void call(final UserResponse userResponse) {
+							Log.d(TAG, ">>> user = " + userResponse);
+						}
+					}, new Action1<Throwable>() {
+						@Override
+						public void call(Throwable throwable) {
+							Log.d(TAG, "getUser", throwable);
+						}
+					});
+				}
 			}
 		}, new Action1<Throwable>() {
 			@Override
