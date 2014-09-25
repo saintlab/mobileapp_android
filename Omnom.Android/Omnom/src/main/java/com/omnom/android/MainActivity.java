@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
 		                                                               "+79133952320",
 		                                                               "1987-06-14");
 
-		final WicketAuthenticator authenticator = new WicketAuthenticator(this);
+		final WicketAuthenticator authenticator = new WicketAuthenticator(this, getString(R.string.endpoint_auth));
 		// register(request, authenticator);
 
 		btnConfirm.setOnClickListener(new View.OnClickListener() {

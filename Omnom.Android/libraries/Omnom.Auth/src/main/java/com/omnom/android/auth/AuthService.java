@@ -36,8 +36,18 @@ public interface AuthService {
 
 	@FormUrlEncoded
 	@POST("/confirm/phone")
-	public Observable<AuthResponse> confirm(@Field(Protocol.FIELD_PHONE) String phone, @Field(Protocol.FIELD_CODE) String code);
+	public Observable<AuthResponse> confirm(@Field(Protocol.FIELD_PHONE) String phone,
+	                                        @Field(Protocol.FIELD_CODE) String code);
 
 	@GET("/user")
 	public Observable<UserResponse> getUser(@Query(Protocol.FIELD_TOKEN) String token);
+
+	@FormUrlEncoded
+	@POST("/login/simple")
+	Observable<AuthResponse> authenticate(@Field(Protocol.FIELD_LOGIN) String username,
+	                                       @Field(Protocol.FIELD_PASSWORD) String password);
+
+	@FormUrlEncoded
+	@POST("/recover")
+	Observable<AuthResponse> remindPassword(@Field(Protocol.FIELD_EMAIL) String email);
 }
