@@ -9,6 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.omnom.android.auth.AuthService;
+import com.omnom.android.auth.AuthServiceException;
+import com.omnom.android.auth.response.AuthResponse;
+import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
@@ -16,9 +20,7 @@ import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.auth.AuthServiceException;
-import com.omnom.android.linker.model.auth.LoginResponse;
-import com.omnom.android.linker.model.auth.UserProfile;
+import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.observable.BaseErrorHandler;
@@ -69,6 +71,10 @@ public class ValidationActivity extends BaseActivity {
 	protected View panelBottom;
 	@Inject
 	protected LinkerObeservableApi api;
+
+	@Inject
+	protected AuthService mAuthenticator;
+
 	private String mUsername = null;
 	private String mPassword = null;
 
@@ -296,10 +302,10 @@ public class ValidationActivity extends BaseActivity {
 		onError.setDataHolder(UserDataHolder.create(mUsername, mPassword));
 		if(TextUtils.isEmpty(token)) {
 			mAuthDataSubscription = AndroidObservable
-					.bindActivity(this, api.authenticate(mUsername, mPassword).flatMap(
-							new Func1<LoginResponse, Observable<RestaurantsResponse>>() {
+					.bindActivity(this, mAuthenticator.authenticate(mUsername, mPassword).flatMap(
+							new Func1<AuthResponse, Observable<RestaurantsResponse>>() {
 								@Override
-								public Observable<RestaurantsResponse> call(LoginResponse response) {
+								public Observable<RestaurantsResponse> call(AuthResponse response) {
 									if(response.isError()) {
 										throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
 										                               response.getError());
@@ -307,12 +313,13 @@ public class ValidationActivity extends BaseActivity {
 									final String token = response.getToken();
 									getPreferences().setAuthToken(getActivity(), token);
 									return Observable.combineLatest(api.getRestaurants(),
-									                                api.getUserProfile(token),
-									                                new Func2<RestaurantsResponse, UserProfile, RestaurantsResponse>() {
+									                                mAuthenticator.getUser(token),
+									                                new Func2<RestaurantsResponse, UserResponse, RestaurantsResponse>() {
 										                                @Override
 										                                public RestaurantsResponse call(RestaurantsResponse restaurants,
-										                                                                UserProfile profile) {
-											                                LinkerApplication.get(getActivity()).cacheUserProfile(profile);
+										                                                                UserResponse userResponse) {
+											                                LinkerApplication.get(getActivity()).cacheUserProfile(
+													                                new UserProfile(userResponse));
 											                                return restaurants;
 										                                }
 									                                });
@@ -324,10 +331,10 @@ public class ValidationActivity extends BaseActivity {
 						}
 					}, onError);
 		} else {
-			mRestaurantsSubscription = AndroidObservable.bindActivity(this, api.getUserProfile(token))
-			                                            .flatMap(new Func1<UserProfile, Observable<RestaurantsResponse>>() {
+			mRestaurantsSubscription = AndroidObservable.bindActivity(this, mAuthenticator.getUser(token))
+			                                            .flatMap(new Func1<UserResponse, Observable<RestaurantsResponse>>() {
 				                                            @Override
-				                                            public Observable<RestaurantsResponse> call(UserProfile userProfile) {
+				                                            public Observable<RestaurantsResponse> call(UserResponse userProfile) {
 					                                            if(userProfile.isError()) {
 						                                            throw new AuthServiceException(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
 						                                                                           userProfile.getError());

@@ -9,6 +9,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.omnom.android.auth.AuthService;
+import com.omnom.android.auth.UserData;
+import com.omnom.android.auth.UserProfileHelper;
+import com.omnom.android.auth.response.AuthResponse;
+import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.base.BaseActivity;
@@ -17,10 +22,7 @@ import com.omnom.android.linker.activity.base.OmnomActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.drawable.RoundTransformation;
 import com.omnom.android.linker.drawable.RoundedDrawable;
-import com.omnom.android.linker.model.User;
-import com.omnom.android.linker.model.auth.AuthResponseBase;
-import com.omnom.android.linker.model.auth.UserProfile;
-import com.omnom.android.linker.model.auth.UserProfileHelper;
+import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.utils.AnimationUtils;
@@ -36,7 +38,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
-import hugo.weaving.DebugLog;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -84,6 +85,9 @@ public class UserProfileActivity extends BaseActivity {
 	@Inject
 	protected LinkerObeservableApi api;
 
+	@Inject
+	protected AuthService authenticator;
+
 	private boolean mFirstRun = true;
 	private int mAnimDuration;
 	private boolean mAnimate;
@@ -108,10 +112,11 @@ public class UserProfileActivity extends BaseActivity {
 				LoginActivity.start(this);
 				return;
 			}
-			profileSubscription = AndroidObservable.bindActivity(this, api.getUserProfile(token)).subscribe(new Action1<UserProfile>() {
+			profileSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>
+					() {
 				@Override
-				public void call(UserProfile userProfile) {
-					if(userProfile.isError() && UserProfileHelper.hasAuthError(userProfile)) {
+				public void call(UserResponse response) {
+					if(response.isError() && UserProfileHelper.hasAuthError(response)) {
 						getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
 						ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
 						AnimationUtils.animateAlpha(mPanelBottom, false);
@@ -125,8 +130,9 @@ public class UserProfileActivity extends BaseActivity {
 						});
 						return;
 					}
-					LinkerApplication.get(getActivity()).cacheUserProfile(userProfile);
-					initUserData(userProfile.getUser(), userProfile.getImageUrl());
+					UserProfile profile = new UserProfile(response);
+					LinkerApplication.get(getActivity()).cacheUserProfile(profile);
+					initUserData(response.getUser(), profile.getImageUrl());
 				}
 			}, new BaseErrorHandler(getActivity()) {
 				@Override
@@ -146,7 +152,7 @@ public class UserProfileActivity extends BaseActivity {
 		OmnomObservable.unsubscribe(logoutSubscription);
 	}
 
-	private void initUserData(User user, String imgUrl) {
+	private void initUserData(UserData user, String imgUrl) {
 		if(user == null) {
 			showToast(this, R.string.error_user_not_found);
 			finish();
@@ -233,9 +239,9 @@ public class UserProfileActivity extends BaseActivity {
 	@OnClick(R.id.btn_bottom)
 	public void onLogout() {
 		final String token = getPreferences().getAuthToken(this);
-		logoutSubscription = AndroidObservable.bindActivity(this, api.logout(token)).subscribe(new Action1<AuthResponseBase>() {
+		logoutSubscription = AndroidObservable.bindActivity(this, authenticator.logout(token)).subscribe(new Action1<AuthResponse>() {
 			@Override
-			public void call(AuthResponseBase authResponseBase) {
+			public void call(AuthResponse authResponseBase) {
 				if(!authResponseBase.isError()) {
 					getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
 					ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);

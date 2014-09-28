@@ -19,7 +19,7 @@ public class LinkerApiTest {
 	@SmallTest
 	public void testBind() {
 		// TODO: implement
-//		api.bindBeacon("A", 27, new Beacon.Builder().setId1("E2C56DB5-DFFB-48D2-B060-D0F5A7109E0").setId2("1").setId3("27").build())
+//		authenticator.bindBeacon("A", 27, new Beacon.Builder().setId1("E2C56DB5-DFFB-48D2-B060-D0F5A7109E0").setId2("1").setId3("27").build())
 //		   .subscribe(new Action1<BeaconDataResponse>() {
 //			   @Override
 //			   public void call(BeaconDataResponse data) {

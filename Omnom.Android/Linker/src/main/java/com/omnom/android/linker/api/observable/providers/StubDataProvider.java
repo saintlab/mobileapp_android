@@ -1,21 +1,13 @@
 package com.omnom.android.linker.api.observable.providers;
 
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.auth.UserProfile;
-import com.omnom.android.linker.model.auth.AuthResponseBase;
-import com.omnom.android.linker.model.auth.Error;
-import com.omnom.android.linker.model.auth.LoginResponse;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
 import com.omnom.android.linker.model.restaurant.Restaurant;
 import com.omnom.android.linker.model.restaurant.RestaurantsFactory;
 import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.model.table.TableDataResponse;
-import com.omnom.android.linker.utils.StringUtils;
-
-import org.apache.http.auth.AuthenticationException;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import altbeacon.beacon.Beacon;
 import hugo.weaving.DebugLog;
@@ -28,66 +20,6 @@ import rx.schedulers.Schedulers;
  * Created by Ch3D on 11.08.2014.
  */
 public class StubDataProvider implements LinkerObeservableApi {
-
-	private boolean authError = false;
-	private boolean checkBeaconError = false;
-
-	@Override
-	public Observable<UserProfile> getUserProfile(String authToken) {
-		return new Observable<UserProfile>(new Observable.OnSubscribe<UserProfile>() {
-			@Override
-			public void call(Subscriber<? super UserProfile> subscriber) {
-				authError = false;
-				if(authError) {
-					subscriber.onError(new AuthenticationException());
-				} else {
-					subscriber.onNext(new UserProfile());
-					subscriber.onCompleted();
-				}
-			}
-		}) {}.delaySubscription(2000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-	}
-
-	@Override
-	@DebugLog
-	public Observable<LoginResponse> authenticate(String username, String password) {
-		return new Observable<LoginResponse>(new Observable.OnSubscribe<LoginResponse>() {
-			@Override
-			public void call(Subscriber<? super LoginResponse> subscriber) {
-				authError = false;
-				if(authError) {
-					subscriber.onError(new AuthenticationException());
-				} else {
-					subscriber.onNext(new LoginResponse());
-					subscriber.onCompleted();
-				}
-			}
-		}) {}.delaySubscription(2000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-	}
-
-	@Override
-	@DebugLog
-	public Observable<AuthResponseBase> remindPassword(String username) {
-		return new Observable<AuthResponseBase>(new Observable.OnSubscribe<AuthResponseBase>() {
-			@Override
-			public void call(Subscriber<? super AuthResponseBase> subscriber) {
-				subscriber.onNext(AuthResponseBase.create(StringUtils.EMPTY_STRING, new Error(-1, "StubError!")));
-				subscriber.onCompleted();
-			}
-		}) {};
-	}
-
-	@Override
-	public Observable<AuthResponseBase> logout(String token) {
-		return new Observable<AuthResponseBase>(new Observable.OnSubscribe<AuthResponseBase>() {
-			@Override
-			public void call(Subscriber<? super AuthResponseBase> subscriber) {
-				subscriber.onNext(AuthResponseBase.create(StringUtils.EMPTY_STRING, new Error(-1, "StubError!")));
-				subscriber.onCompleted();
-			}
-		}) {};
-	}
-
 	@Override
 	public Observable<TableDataResponse> findBeacon(Beacon beacon) {
 		return new Observable<TableDataResponse>(new Observable.OnSubscribe<TableDataResponse>() {

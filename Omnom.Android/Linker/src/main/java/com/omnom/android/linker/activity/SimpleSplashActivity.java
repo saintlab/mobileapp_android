@@ -93,6 +93,7 @@ public class SimpleSplashActivity extends BaseActivity {
 		sd.invalidateSelf();
 
 		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
+		System.err.println(">>> hasAuthToken = " + hasToken);
 		if(hasToken) {
 			animateValidation();
 		} else {

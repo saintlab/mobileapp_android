@@ -4,9 +4,10 @@ import android.app.Application;
 import android.content.Context;
 
 import com.omnom.android.linker.activity.base.OmnomActivity;
-import com.omnom.android.linker.model.auth.UserProfile;
+import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.modules.AndroidModule;
 import com.omnom.android.linker.modules.ApplicationModule;
+import com.omnom.android.linker.modules.AuthModule;
 import com.omnom.android.linker.modules.BeaconModule;
 import com.omnom.android.linker.modules.LinkerDataProviderModule;
 import com.omnom.android.linker.preferences.PreferenceHelper;
@@ -40,7 +41,7 @@ public class LinkerApplication extends Application implements LinkerDataProvider
 
 	protected List<Object> getModules() {
 		return Arrays.asList(/*new StubDataProviderModule(),*/new LinkerDataProviderModule(this), new AndroidModule(this),
-		                     new ApplicationModule(), new BeaconModule(this));
+		                     new ApplicationModule(), new BeaconModule(this), new AuthModule(this, R.string.config_auth_endpoint));
 	}
 
 	public void inject(final Object object) {

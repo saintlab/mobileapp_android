@@ -37,7 +37,6 @@ public class LinkerDataProviderModule {
 	LinkerObeservableApi providerLinkerApi() {
 		return LinkerDataProvider.create(
 				mContext.getString(R.string.config_data_endpoint),
-				mContext.getString(R.string.config_auth_endpoint),
 				new RequestInterceptor() {
 					@Override
 					public void intercept(RequestFacade request) {

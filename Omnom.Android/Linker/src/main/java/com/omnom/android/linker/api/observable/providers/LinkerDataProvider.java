@@ -4,12 +4,8 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.omnom.android.linker.BuildConfig;
-import com.omnom.android.linker.api.AuthService;
 import com.omnom.android.linker.api.LinkerDataService;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.auth.AuthResponseBase;
-import com.omnom.android.linker.model.auth.LoginResponse;
-import com.omnom.android.linker.model.auth.UserProfile;
 import com.omnom.android.linker.model.beacon.BeaconBindRequest;
 import com.omnom.android.linker.model.beacon.BeaconBuildRequest;
 import com.omnom.android.linker.model.beacon.BeaconDataResponse;
@@ -32,45 +28,21 @@ import rx.schedulers.Schedulers;
  * Created by Ch3D on 11.08.2014.
  */
 public class LinkerDataProvider implements LinkerObeservableApi {
-	public static LinkerDataProvider create(final String dataEndPoint, final String authEndPoint, final RequestInterceptor interceptor) {
+	public static LinkerDataProvider create(final String dataEndPoint, final RequestInterceptor interceptor) {
 		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		final GsonConverter converter = new GsonConverter(gson);
 
-		RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(interceptor).setEndpoint(dataEndPoint).setLogLevel(
+		final RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(interceptor).setEndpoint(dataEndPoint).setLogLevel(
 				logLevel)
 		                                                    .setConverter(converter).build();
-		RestAdapter mAuthAdapter = new RestAdapter.Builder().setEndpoint(authEndPoint).setLogLevel(logLevel)
-		                                                    .setConverter(converter).build();
-		return new LinkerDataProvider(mRestAdapter.create(LinkerDataService.class), mAuthAdapter.create(AuthService.class));
+		return new LinkerDataProvider(mRestAdapter.create(LinkerDataService.class));
 	}
 
 	private final LinkerDataService mDataService;
-	private final AuthService mAuthService;
 
-	public LinkerDataProvider(final LinkerDataService dataService, final AuthService authService) {
+	public LinkerDataProvider(final LinkerDataService dataService) {
 		mDataService = dataService;
-		mAuthService = authService;
-	}
-
-	@Override
-	public Observable<UserProfile> getUserProfile(String authToken) {
-		return mAuthService.getUserProfile(authToken).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-	}
-
-	@Override
-	public Observable<LoginResponse> authenticate(String username, String password) {
-		return mAuthService.authenticate(username, password).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-	}
-
-	@Override
-	public Observable<AuthResponseBase> remindPassword(String email) {
-		return mAuthService.remindPassword(email).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-	}
-
-	@Override
-	public Observable<AuthResponseBase> logout(String token) {
-		return mAuthService.logout(token);
 	}
 
 	@Override

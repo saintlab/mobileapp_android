@@ -36,32 +36,32 @@ public class WicketAuthenticator implements AuthService {
 
 	@Override
 	public Observable<AuthRegisterResponse> register(final AuthRegisterRequest request) {
-		return authService.register(request);
+		return authService.register(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<AuthResponse> confirm(final String phone, final String code) {
-		return authService.confirm(phone, code);
+		return authService.confirm(phone, code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<UserResponse> getUser(String token) {
-		return authService.getUser(token);
+		return authService.getUser(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<AuthResponse> authorizePhone(String phone, String code) {
-		return authService.authorizePhone(phone, code);
+		return authService.authorizePhone(phone, code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<AuthResponse> authorizeEmail(String email, String code) {
-		return authService.authorizePhone(email, code);
+		return authService.authorizePhone(email, code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<AuthResponse> logout(String token) {
-		return authService.logout(token);
+		return authService.logout(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

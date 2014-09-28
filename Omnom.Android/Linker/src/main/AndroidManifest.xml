@@ -55,6 +55,7 @@
             android:name="com.omnom.android.linker.activity.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
+            android:noHistory="true"
             android:windowSoftInputMode="stateAlwaysHidden" >
         </activity>
         <activity
