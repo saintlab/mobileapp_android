@@ -2,10 +2,11 @@ package com.omnom.android;
 
 import android.content.Context;
 
-import com.omnom.util.BaseOmnomApplication;
+import com.omnom.android.auth.AuthModule;
 import com.omnom.android.modules.AcquiringModuleMailRu;
 import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.ApplicationModule;
+import com.omnom.util.BaseOmnomApplication;
 import com.omnom.util.preferences.PreferenceProvider;
 
 import java.util.ArrayList;
@@ -26,7 +27,8 @@ public class OmnomApplication extends BaseOmnomApplication {
 	private ObjectGraph objectGraph;
 
 	protected List<Object> getModules() {
-		return Arrays.asList(new AndroidModule(this), new ApplicationModule(), new AcquiringModuleMailRu(this));
+		return Arrays.asList(new AndroidModule(this), new ApplicationModule(), new AcquiringModuleMailRu(this),
+		                     new AuthModule(this, R.string.endpoint_auth));
 	}
 
 	@Override
