@@ -1,7 +1,5 @@
 package com.omnom.android;
 
-import android.app.Activity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -27,14 +25,15 @@ import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.util.activity.BaseActivity;
 
 import javax.inject.Inject;
 
+import butterknife.InjectView;
+import butterknife.OnClick;
 import rx.functions.Action1;
 
-import static butterknife.ButterKnife.findById;
-
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
 	private static final String TAG = MainActivity.class.getSimpleName();
 
 	@Inject
@@ -42,15 +41,18 @@ public class MainActivity extends Activity {
 
 	@Inject
 	protected AuthService authenticator;
+
+	@InjectView(android.R.id.button1)
 	private Button btnConfirm;
+
+	@InjectView(android.R.id.button2)
 	private Button btnAuth;
+
+	@InjectView(android.R.id.edit)
 	private EditText editCode;
 
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		OmnomApplication.get(this).inject(this);
-
+	@Override
+	public void initUi() {
 		//		final CardInfo testCard = CardInfo.createTestCard(this);
 		//		testCard.setCardId("30008685803965102459");
 		//		acquiring.deleteCard(new MerchantData(this), UserData.createTestUser(), testCard,
@@ -80,10 +82,6 @@ public class MainActivity extends Activity {
 		//		testCard.setCardId("30008685803965102459");
 		//		verifyCard(testCard);
 
-		btnConfirm = findById(this, android.R.id.button1);
-		btnAuth = findById(this, android.R.id.button2);
-		editCode = findById(this, android.R.id.edit);
-
 		final AuthRegisterRequest request = AuthRegisterRequest.create("1", "Dmitry Chertenko", "Ch3D", "ch3dee@gmail.com",
 		                                                               "+79133952320",
 		                                                               "1987-06-14");
@@ -102,6 +100,16 @@ public class MainActivity extends Activity {
 				authPhone(request);
 			}
 		});
+	}
+
+	@OnClick(android.R.id.button3)
+	public void newUser() {
+
+	}
+
+	@Override
+	public int getLayoutResource() {
+		return R.layout.activity_main;
 	}
 
 	private void registerCard() {
