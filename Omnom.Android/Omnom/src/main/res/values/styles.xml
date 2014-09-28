@@ -1,8 +1,148 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light.NoActionBar">
+        <item name="android:textAppearance">@style/TextAppearance</item>
+        <item name="android:textAppearanceSmall">@style/TextAppearance.Small</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance.Large</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance.Medium</item>
+
+        <item name="android:textViewStyle">@style/TextView</item>
+        <item name="android:editTextStyle">@style/EditText</item>
+        <item name="android:autoCompleteTextViewStyle">@style/EditText</item>
+        <item name="android:ratingBarStyle">@style/RatingBar</item>
     </style>
+
+    <style name="Theme.Wood" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/bg_wood</item>
+    </style>
+
+    <style name="Theme.Wood.Red" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/bg_wood_red</item>
+    </style>
+
+    <style name="Theme.White" parent="AppTheme">
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+
+    <style name="Theme.Simple" parent="android:Theme.Holo.Light">
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
+    <style name="RatingBar" parent="android:Widget.Holo.RatingBar.Small">
+        <item name="android:progressDrawable">@drawable/ratingbar_small</item>
+        <item name="android:indeterminateDrawable">@drawable/ratingbar_small</item>
+        <item name="android:minHeight">16dip</item>
+        <item name="android:maxHeight">16dip</item>
+    </style>
+
+    <style name="ButtonBar">
+        <item name="android:paddingLeft">2dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingRight">2dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:background">@android:drawable/bottom_bar</item>
+    </style>
+
+    <style name="TextAppearance" parent="android:TextAppearance">
+        <item name="android:textSize">@dimen/font_normal</item>
+    </style>
+
+    <style name="TextAppearance.Small" parent="android:TextAppearance.Small">
+        <item name="android:textSize">@dimen/font_small</item>
+    </style>
+
+    <style name="TextAppearance.Medium" parent="android:TextAppearance.Medium">
+        <item name="android:textSize">@dimen/font_medium</item>
+    </style>
+
+    <style name="TextAppearance.Large" parent="android:TextAppearance.Large">
+        <item name="android:textSize">@dimen/font_large</item>
+    </style>
+
+    <style name="ButtonBarButton"/>
+
+    <style name="EditText" parent="android:Widget.Holo.Light.EditText">
+        <item name="android:background">@drawable/edit_text</item>
+    </style>
+
+    <style name="EditText.Login">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="TextView" parent="android:Widget.Holo.Light.TextView"/>
+
+    <style name="TextView.User"/>
+
+    <style name="TextView.User.Data">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:textAppearance">?android:textAppearanceLarge</item>
+    </style>
+
+    <style name="TextView.Restaurant">
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="TextView.Restaurant.Data">
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="TextView.Restaurant.Data.Location">
+        <!--<item name="android:drawableLeft">@android:drawable/ic_menu_mylocation</item>
+        <item name="android:drawablePadding">@dimen/activity_horizontal_margin_small</item>-->
+    </style>
+
+    <style name="TextView.Restaurant.Title">
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="TextView.Error">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/error_red</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingLeft">@dimen/activity_horizontal_margin</item>
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+    </style>
+
+    <style name="ImageView"/>
+
+    <style name="ImageView.Place"/>
+
+    <style name="ImageView.Place.ListLogo">
+        <item name="android:layout_width">?android:attr/listPreferredItemHeightLarge</item>
+        <item name="android:layout_height">?android:attr/listPreferredItemHeightLarge</item>
+    </style>
+
+    <style name="Button" parent="android:Widget.Holo.Light.Button"/>
+
+    <style name="Button.Bottom" parent="android:Widget.Holo.Light.Button.Borderless.Small">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/font_large</item>
+        <item name="android:typeface">monospace</item>
+    </style>
+
+    <style name="Button.Rounded"/>
+
+    <style name="Button.Rounded.Blue">
+        <item name="android:layout_width">@dimen/btn_rounded_width</item>
+        <item name="android:layout_height">@dimen/btn_rounded_height</item>
+        <item name="android:typeface">monospace</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+        <item name="android:background">@drawable/btn_login</item>
+    </style>
+
 
 </resources>
