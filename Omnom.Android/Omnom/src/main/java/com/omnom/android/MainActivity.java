@@ -22,7 +22,7 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
-import com.omnom.android.auth.WicketAuthenticator;
+import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
@@ -39,6 +39,8 @@ public class MainActivity extends Activity {
 
 	@Inject
 	protected Acquiring acquiring;
+	@Inject
+	protected AuthService authenticator;
 	private Button btnConfirm;
 	private Button btnAuth;
 	private EditText editCode;
@@ -56,20 +58,18 @@ public class MainActivity extends Activity {
 		                                                               "+79133952320",
 		                                                               "1987-06-14");
 
-		final WicketAuthenticator authenticator = new WicketAuthenticator(this, getString(R.string.endpoint_auth));
 		// register(request, authenticator);
-
 		btnConfirm.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				confirm(request, authenticator);
+				confirm(request);
 			}
 		});
 
 		btnAuth.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				authPhone(request, authenticator);
+				authPhone(request);
 			}
 		});
 	}
@@ -87,7 +87,7 @@ public class MainActivity extends Activity {
 		                       });
 	}
 
-	private void authPhone(AuthRegisterRequest request, final WicketAuthenticator authenticator) {
+	private void authPhone(AuthRegisterRequest request) {
 		authenticator.authorizePhone(request.getPhone(), editCode.getText().toString()).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
 		});
 	}
 
-	private void authEmail(AuthRegisterRequest request, WicketAuthenticator authenticator) {
+	private void authEmail(AuthRegisterRequest request) {
 		authenticator.authorizeEmail(request.getEmail(), editCode.getText().toString()).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
@@ -129,7 +129,7 @@ public class MainActivity extends Activity {
 		});
 	}
 
-	private void register(AuthRegisterRequest request, WicketAuthenticator authenticator) {
+	private void register(AuthRegisterRequest request) {
 		authenticator.register(request).subscribe(new Action1<AuthRegisterResponse>() {
 			@Override
 			public void call(AuthRegisterResponse response) {
@@ -143,7 +143,7 @@ public class MainActivity extends Activity {
 		});
 	}
 
-	private void confirm(AuthRegisterRequest request, WicketAuthenticator authenticator) {
+	private void confirm(AuthRegisterRequest request) {
 		authenticator.confirm(request.getPhone(), editCode.getText().toString())
 		             .subscribe(new Action1<AuthResponse>() {
 			             @Override

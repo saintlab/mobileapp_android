@@ -3,6 +3,7 @@ package com.omnom.android;
 import android.app.Application;
 import android.content.Context;
 
+import com.omnom.android.auth.AuthModule;
 import com.omnom.android.modules.AcquiringModuleMailRu;
 import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.ApplicationModule;
@@ -25,7 +26,8 @@ public class OmnomApplication extends Application {
 	private ObjectGraph objectGraph;
 
 	protected List<Object> getModules() {
-		return Arrays.asList(new AndroidModule(this), new ApplicationModule(), new AcquiringModuleMailRu(this));
+		return Arrays.asList(new AndroidModule(this), new ApplicationModule(), new AcquiringModuleMailRu(this),
+		                     new AuthModule(this, R.string.endpoint_auth));
 	}
 
 	public void inject(final Object object) {
