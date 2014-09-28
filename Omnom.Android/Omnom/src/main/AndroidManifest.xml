@@ -41,6 +41,14 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden"/>
+
+        <activity
+            android:name=".activity.UserRegisterActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            />
+
     </application>
 
 </manifest>

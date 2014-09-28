@@ -20,6 +20,7 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
+import com.omnom.android.activity.UserRegisterActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
@@ -43,13 +44,13 @@ public class MainActivity extends BaseActivity {
 	protected AuthService authenticator;
 
 	@InjectView(android.R.id.button1)
-	private Button btnConfirm;
+	protected Button btnConfirm;
 
 	@InjectView(android.R.id.button2)
-	private Button btnAuth;
+	protected Button btnAuth;
 
 	@InjectView(android.R.id.edit)
-	private EditText editCode;
+	protected EditText editCode;
 
 	@Override
 	public void initUi() {
@@ -104,7 +105,7 @@ public class MainActivity extends BaseActivity {
 
 	@OnClick(android.R.id.button3)
 	public void newUser() {
-
+		startActivity(UserRegisterActivity.class);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.omnom.android.activity;
 
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
@@ -8,7 +9,7 @@ import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.util.activity.BaseActivity;
-import com.omnom.util.utils.StringUtils;
+import com.omnom.util.utils.AndroidUtils;
 
 import javax.inject.Inject;
 
@@ -36,7 +37,7 @@ public class UserRegisterActivity extends BaseActivity {
 	protected EditText editPhone;
 
 	@InjectView(android.R.id.button1)
-	protected EditText btnSubmit;
+	protected Button btnSubmit;
 
 	@InjectView(R.id.picker_birth)
 	protected DatePicker pickerBirth;
@@ -57,9 +58,11 @@ public class UserRegisterActivity extends BaseActivity {
 		}
 		// TODO: Fix
 		final String date = "1987-06-14";
-		AuthRegisterRequest request = AuthRegisterRequest.create(StringUtils.EMPTY_STRING, editName.getText().toString(),
+		AuthRegisterRequest request = AuthRegisterRequest.create(AndroidUtils.getInstallId(this),
+		                                                         editName.getText().toString(),
 		                                                         editNick.getText().toString(),
-		                                                         editEmail.getText().toString(), editPhone.getText().toString(),
+		                                                         editEmail.getText().toString(),
+		                                                         editPhone.getText().toString(),
 		                                                         date);
 		authenticator.register(request).subscribe(new Action1<AuthRegisterResponse>() {
 			@Override
