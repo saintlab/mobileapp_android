@@ -15,7 +15,7 @@ import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.activity.base.BaseActivity;
+import com.omnom.util.activity.BaseActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.Protocol;
@@ -26,9 +26,9 @@ import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.observable.ValidationObservable;
-import com.omnom.android.linker.utils.StringUtils;
-import com.omnom.android.linker.utils.UserDataHolder;
-import com.omnom.android.linker.utils.ViewUtils;
+import com.omnom.util.utils.StringUtils;
+import com.omnom.util.utils.UserDataHolder;
+import com.omnom.util.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +48,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 
-import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
+import static com.omnom.util.utils.AndroidUtils.showToastLong;
 
 public class ValidationActivity extends BaseActivity {
 	@SuppressWarnings("UnusedDeclaration")

@@ -12,8 +12,8 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.activity.base.BaseActivity;
-import com.omnom.android.linker.utils.AnimationUtils;
+import com.omnom.util.activity.BaseActivity;
+import com.omnom.util.utils.AnimationUtils;
 
 import java.util.Collections;
 

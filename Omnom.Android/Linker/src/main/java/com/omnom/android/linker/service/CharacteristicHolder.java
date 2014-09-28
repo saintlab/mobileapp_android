@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.omnom.android.linker.BuildConfig;
-import com.omnom.android.linker.utils.StringUtils;
+import com.omnom.util.utils.StringUtils;
 
 import java.security.InvalidParameterException;
 import java.util.Arrays;

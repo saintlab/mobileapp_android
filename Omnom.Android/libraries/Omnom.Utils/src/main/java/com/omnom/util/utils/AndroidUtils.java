@@ -1,4 +1,4 @@
-package com.omnom.android.linker.utils;
+package com.omnom.util.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;

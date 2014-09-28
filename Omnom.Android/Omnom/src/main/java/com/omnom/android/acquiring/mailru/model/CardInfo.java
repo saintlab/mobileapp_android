@@ -4,7 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.omnom.android.R;
-import com.omnom.android.linker.utils.StringUtils;
+import com.omnom.util.utils.StringUtils;
 
 import java.util.HashMap;
 

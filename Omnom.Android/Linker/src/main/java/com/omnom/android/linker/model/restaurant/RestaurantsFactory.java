@@ -1,6 +1,6 @@
 package com.omnom.android.linker.model.restaurant;
 
-import com.omnom.android.linker.utils.StringUtils;
+import com.omnom.util.utils.StringUtils;
 
 /**
  * Created by Ch3D on 31.07.2014.

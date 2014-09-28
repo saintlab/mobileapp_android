@@ -17,14 +17,14 @@ import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.activity.base.BaseActivity;
-import com.omnom.android.linker.activity.base.Extras;
+import com.omnom.util.activity.BaseActivity;
+import com.omnom.util.Extras;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.utils.AndroidUtils;
-import com.omnom.android.linker.utils.AnimationUtils;
-import com.omnom.android.linker.utils.StringUtils;
-import com.omnom.android.linker.utils.UserDataHolder;
-import com.omnom.android.linker.utils.ViewUtils;
+import com.omnom.util.utils.AndroidUtils;
+import com.omnom.util.utils.AnimationUtils;
+import com.omnom.util.utils.StringUtils;
+import com.omnom.util.utils.UserDataHolder;
+import com.omnom.util.utils.ViewUtils;
 import com.omnom.android.linker.widget.ErrorEditText;
 
 import javax.inject.Inject;
@@ -33,9 +33,9 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
-import static com.omnom.android.linker.utils.AndroidUtils.showToast;
-import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
-import static com.omnom.android.linker.utils.ViewUtils.getTextValue;
+import static com.omnom.util.utils.AndroidUtils.showToast;
+import static com.omnom.util.utils.AndroidUtils.showToastLong;
+import static com.omnom.util.utils.ViewUtils.getTextValue;
 
 public class LoginActivity extends BaseActivity {
 	private static final String TAG = LoginActivity.class.getSimpleName();

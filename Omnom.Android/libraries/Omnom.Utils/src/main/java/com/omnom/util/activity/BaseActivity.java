@@ -1,4 +1,4 @@
-package com.omnom.android.linker.activity.base;
+package com.omnom.util.activity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,7 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.omnom.android.linker.preferences.PreferenceProvider;
+import com.omnom.util.preferences.PreferenceProvider;
+import com.omnom.util.Extras;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;

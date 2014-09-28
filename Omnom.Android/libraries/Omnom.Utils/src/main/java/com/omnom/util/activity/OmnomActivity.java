@@ -1,9 +1,9 @@
-package com.omnom.android.linker.activity.base;
+package com.omnom.util.activity;
 
 import android.app.Activity;
 import android.content.Intent;
 
-import com.omnom.android.linker.preferences.PreferenceProvider;
+import com.omnom.util.preferences.PreferenceProvider;
 
 /**
  * Created by Ch3D on 31.07.2014.

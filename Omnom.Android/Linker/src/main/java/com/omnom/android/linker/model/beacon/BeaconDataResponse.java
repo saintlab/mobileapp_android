@@ -2,7 +2,7 @@ package com.omnom.android.linker.model.beacon;
 
 import com.google.gson.annotations.Expose;
 import com.omnom.android.linker.model.ResponseBase;
-import com.omnom.android.linker.utils.StringUtils;
+import com.omnom.util.utils.StringUtils;
 
 /**
  * Created by Ch3D on 25.08.2014.

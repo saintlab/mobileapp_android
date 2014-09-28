@@ -7,7 +7,7 @@ import android.os.Parcelable;
 
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.UserProfileActivity;
-import com.omnom.android.linker.activity.base.BaseListActivity;
+import com.omnom.util.activity.BaseListActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.adapter.MockPlacesAdapter;
 import com.omnom.android.linker.model.restaurant.Restaurant;

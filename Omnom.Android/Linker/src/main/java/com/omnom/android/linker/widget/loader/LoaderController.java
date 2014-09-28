@@ -3,9 +3,9 @@ package com.omnom.android.linker.widget.loader;
 import android.content.Context;
 
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.utils.AndroidUtils;
-import com.omnom.android.linker.utils.AnimationUtils;
-import com.omnom.android.linker.utils.StringUtils;
+import com.omnom.util.utils.AndroidUtils;
+import com.omnom.util.utils.AnimationUtils;
+import com.omnom.util.utils.StringUtils;
 
 import java.util.concurrent.LinkedBlockingQueue;
 

@@ -16,18 +16,18 @@ import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.activity.base.BaseActivity;
-import com.omnom.android.linker.activity.base.Extras;
-import com.omnom.android.linker.activity.base.OmnomActivity;
+import com.omnom.util.activity.BaseActivity;
+import com.omnom.util.Extras;
+import com.omnom.util.activity.OmnomActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.drawable.RoundTransformation;
 import com.omnom.android.linker.drawable.RoundedDrawable;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
-import com.omnom.android.linker.utils.AnimationUtils;
-import com.omnom.android.linker.utils.StringUtils;
-import com.omnom.android.linker.utils.ViewUtils;
+import com.omnom.util.utils.AnimationUtils;
+import com.omnom.util.utils.StringUtils;
+import com.omnom.util.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -43,8 +43,8 @@ import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
 import static butterknife.ButterKnife.findById;
-import static com.omnom.android.linker.utils.AndroidUtils.showToast;
-import static com.omnom.android.linker.utils.AndroidUtils.showToastLong;
+import static com.omnom.util.utils.AndroidUtils.showToast;
+import static com.omnom.util.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseActivity {
 	public static final int ROTATION_VALUE = 180;

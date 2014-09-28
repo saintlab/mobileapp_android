@@ -1,11 +1,12 @@
 package com.omnom.android;
 
-import android.app.Application;
 import android.content.Context;
 
+import com.omnom.util.BaseOmnomApplication;
 import com.omnom.android.modules.AcquiringModuleMailRu;
 import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.ApplicationModule;
+import com.omnom.util.preferences.PreferenceProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +17,7 @@ import dagger.ObjectGraph;
 /**
  * Created by Ch3D on 24.09.2014.
  */
-public class OmnomApplication extends Application {
+public class OmnomApplication extends BaseOmnomApplication {
 	public static OmnomApplication get(Context context) {
 		return (OmnomApplication) context.getApplicationContext();
 	}
@@ -28,12 +29,19 @@ public class OmnomApplication extends Application {
 		return Arrays.asList(new AndroidModule(this), new ApplicationModule(), new AcquiringModuleMailRu(this));
 	}
 
+	@Override
 	public void inject(final Object object) {
 		if(objectGraph == null) {
 			injectList.add(object);
 		} else {
 			objectGraph.inject(object);
 		}
+	}
+
+	@Override
+	public PreferenceProvider getPreferences() {
+		// TODO:
+		return null;
 	}
 
 	@Override

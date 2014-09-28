@@ -28,7 +28,7 @@ import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
 import hugo.weaving.DebugLog;
 
-import static com.omnom.android.linker.utils.AndroidUtils.showToast;
+import static com.omnom.util.utils.AndroidUtils.showToast;
 
 public class BeaconsChartActivity extends Activity {
 

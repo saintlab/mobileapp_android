@@ -26,8 +26,8 @@ import android.widget.ProgressBar;
 
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.animation.BezierCubicInterpolation;
-import com.omnom.android.linker.utils.AnimationUtils;
-import com.omnom.android.linker.utils.ViewUtils;
+import com.omnom.util.utils.AnimationUtils;
+import com.omnom.util.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -36,7 +36,6 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import hugo.weaving.DebugLog;
 
 /**
  * Created by Ch3D on 30.07.2014.

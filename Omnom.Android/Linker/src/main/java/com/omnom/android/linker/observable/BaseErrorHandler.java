@@ -4,8 +4,8 @@ import android.content.Context;
 
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.activity.LoginActivity;
-import com.omnom.android.linker.utils.StringUtils;
-import com.omnom.android.linker.utils.UserDataHolder;
+import com.omnom.util.utils.StringUtils;
+import com.omnom.util.utils.UserDataHolder;
 
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;

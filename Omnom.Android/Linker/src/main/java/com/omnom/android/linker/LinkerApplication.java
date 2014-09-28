@@ -1,17 +1,17 @@
 package com.omnom.android.linker;
 
-import android.app.Application;
 import android.content.Context;
 
-import com.omnom.android.linker.activity.base.OmnomActivity;
+import com.omnom.util.preferences.PreferenceProvider;
+import com.omnom.android.auth.AuthModule;
+import com.omnom.util.BaseOmnomApplication;
+import com.omnom.util.activity.OmnomActivity;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.modules.AndroidModule;
 import com.omnom.android.linker.modules.ApplicationModule;
-import com.omnom.android.auth.AuthModule;
 import com.omnom.android.linker.modules.BeaconModule;
 import com.omnom.android.linker.modules.LinkerDataProviderModule;
 import com.omnom.android.linker.preferences.PreferenceHelper;
-import com.omnom.android.linker.preferences.PreferenceProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +23,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 /**
  * Created by Ch3D on 10.08.2014.
  */
-public class LinkerApplication extends Application implements LinkerDataProviderModule.AuthTokenProvider {
+public class LinkerApplication extends BaseOmnomApplication implements LinkerDataProviderModule.AuthTokenProvider {
 
 	public static LinkerApplication get(Context context) {
 		return (LinkerApplication) context.getApplicationContext();
@@ -44,6 +44,7 @@ public class LinkerApplication extends Application implements LinkerDataProvider
 		                     new ApplicationModule(), new BeaconModule(this), new AuthModule(this, R.string.config_auth_endpoint));
 	}
 
+	@Override
 	public void inject(final Object object) {
 		if(objectGraph == null) {
 			injectList.add(object);

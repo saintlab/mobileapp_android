@@ -1,4 +1,4 @@
-package com.omnom.android.linker.preferences;
+package com.omnom.util.preferences;
 
 import android.content.Context;
 

@@ -2,8 +2,8 @@ package com.omnom.android.linker.observable;
 
 import android.content.Context;
 
-import com.omnom.android.linker.utils.AndroidUtils;
-import com.omnom.android.linker.utils.BluetoothUtils;
+import com.omnom.util.utils.AndroidUtils;
+import com.omnom.util.utils.BluetoothUtils;
 
 import java.util.concurrent.TimeUnit;
 

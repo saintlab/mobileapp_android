@@ -1,13 +1,13 @@
-package com.omnom.android.linker.activity.base;
+package com.omnom.util.activity;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.omnom.android.linker.LinkerApplication;
-import com.omnom.android.linker.R;
-import com.omnom.android.linker.preferences.PreferenceProvider;
+import com.omnom.util.preferences.PreferenceProvider;
+import com.omnom.util.BaseOmnomApplication;
+import com.omnom.android.utils.R;
 
 /**
  * Created by Ch3D on 31.07.2014.
@@ -17,7 +17,7 @@ public class ActivityHelper {
 
 	public ActivityHelper(OmnomActivity activity) {
 		this.mActivity = activity;
-		LinkerApplication.get(activity).inject(activity);
+		BaseOmnomApplication.get(activity).inject(activity);
 	}
 
 	public void onPostCreate() {
@@ -95,6 +95,6 @@ public class ActivityHelper {
 	}
 
 	public PreferenceProvider getPreferences() {
-		return LinkerApplication.get(mActivity).getPreferences();
+		return BaseOmnomApplication.get(mActivity).getPreferences();
 	}
 }

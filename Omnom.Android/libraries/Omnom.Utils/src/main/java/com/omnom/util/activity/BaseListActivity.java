@@ -1,4 +1,4 @@
-package com.omnom.android.linker.activity.base;
+package com.omnom.util.activity;
 
 import android.app.Activity;
 import android.app.ListActivity;
@@ -6,7 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.omnom.android.linker.preferences.PreferenceProvider;
+import com.omnom.util.preferences.PreferenceProvider;
+import com.omnom.util.Extras;
 
 import butterknife.ButterKnife;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;

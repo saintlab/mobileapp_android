@@ -1,4 +1,4 @@
-package com.omnom.android.linker.utils;
+package com.omnom.util.utils;
 
 /**
 * Created by Ch3D on 02.09.2014.

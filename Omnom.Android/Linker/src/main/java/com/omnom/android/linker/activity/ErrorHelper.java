@@ -9,8 +9,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.utils.AndroidUtils;
-import com.omnom.android.linker.utils.ViewUtils;
+import com.omnom.util.utils.AndroidUtils;
+import com.omnom.util.utils.ViewUtils;
 import com.omnom.android.linker.widget.loader.LoaderView;
 
 import java.util.List;

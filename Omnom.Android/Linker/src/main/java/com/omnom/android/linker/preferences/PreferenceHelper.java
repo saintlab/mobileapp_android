@@ -2,7 +2,8 @@ package com.omnom.android.linker.preferences;
 
 import android.content.Context;
 
-import com.omnom.android.linker.utils.StringUtils;
+import com.omnom.util.preferences.PreferenceProvider;
+import com.omnom.util.utils.StringUtils;
 
 /**
  * Created by Ch3D on 04.09.2014.
