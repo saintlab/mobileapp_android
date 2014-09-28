@@ -7,7 +7,7 @@ import com.omnom.android.linker.activity.base.OmnomActivity;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.modules.AndroidModule;
 import com.omnom.android.linker.modules.ApplicationModule;
-import com.omnom.android.linker.modules.AuthModule;
+import com.omnom.android.auth.AuthModule;
 import com.omnom.android.linker.modules.BeaconModule;
 import com.omnom.android.linker.modules.LinkerDataProviderModule;
 import com.omnom.android.linker.preferences.PreferenceHelper;

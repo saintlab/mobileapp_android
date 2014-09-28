@@ -1,9 +1,6 @@
-package com.omnom.android.linker.modules;
+package com.omnom.android.auth;
 
 import android.content.Context;
-
-import com.omnom.android.auth.AuthService;
-import com.omnom.android.auth.WicketAuthenticator;
 
 import javax.inject.Singleton;
 
