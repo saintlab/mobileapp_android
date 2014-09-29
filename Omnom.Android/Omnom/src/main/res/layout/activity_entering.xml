@@ -29,7 +29,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@android:id/button1"
+            android:id="@+id/btn_register"
             android:text="@string/registration"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -41,7 +41,7 @@
             style="@android:style/Widget.Holo.Button.Borderless"/>
 
         <Button
-            android:id="@android:id/button2"
+            android:id="@+id/btn_enter"
             android:text="@string/enter"
             android:layout_width="0dp"
             android:layout_weight="1"
