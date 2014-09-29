@@ -18,5 +18,9 @@
     <string name="register_agreement">Нажимая \"Далее\" вы принимаете\n
     &lt;a href="http://legal.saintlab.com/omnom/user-agreement/"&gt;Пользовательское соглашение&lt;/a&gt;
     </string>
+    <string name="you_forgot_to_enter_name">Вы забыли ввести имя</string>
+    <string name="you_forgot_to_enter_phone">Вы забыли ввести номер телефона</string>
+    <string name="you_forgot_to_enter_email">Вы забыли ввести e-mail</string>
+    <string name="proceed">Далее</string>
 
 </resources>

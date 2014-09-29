@@ -4,10 +4,31 @@
        android:layout_height="wrap_content"
        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/edit"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-12dp"/>
+        android:orientation="horizontal">
 
+        <com.omnom.util.view.ErrorEditText
+            android:id="@+id/edit"
+            android:singleLine="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:textAppearanceMedium"/>
+
+        <Button
+            android:id="@+id/btn_clear"
+            android:layout_marginLeft="-40dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center"
+        style="@style/ErrorEdit.Error"/>
 </merge>
