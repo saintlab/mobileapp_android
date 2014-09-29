@@ -25,7 +25,7 @@ import com.omnom.util.utils.AnimationUtils;
 import com.omnom.util.utils.StringUtils;
 import com.omnom.util.utils.UserDataHolder;
 import com.omnom.util.utils.ViewUtils;
-import com.omnom.android.linker.widget.ErrorEditText;
+import com.omnom.util.view.ErrorEditText;
 
 import javax.inject.Inject;
 

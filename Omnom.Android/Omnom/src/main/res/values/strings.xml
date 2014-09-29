@@ -11,5 +11,12 @@
     <string name="entering_pay_with_phone">Оплатить счёт через телефон</string>
     <string name="entering_call_waiter">Вызвать официанта в любой момент</string>
     <string name="entering_split_bill">Разделить счёт между друзьями</string>
+    <string name="name">Имя</string>
+    <string name="email">Почта</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="birth_date">День рождения</string>
+    <string name="register_agreement">Нажимая \"Далее\" вы принимаете\n
+    &lt;a href="http://legal.saintlab.com/omnom/user-agreement/"&gt;Пользовательское соглашение&lt;/a&gt;
+    </string>
 
 </resources>
