@@ -16,12 +16,12 @@
         android:layout_centerHorizontal="true"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
-        android:padding="16dp"/>
+        android:padding="@dimen/activity_horizontal_margin"/>
 
     <LinearLayout
         android:id="@+id/panel_bottom"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="@dimen/view_size_default"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:layout_alignParentBottom="true"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:gravity="start|center_vertical"
             android:textColor="@android:color/black"
-            android:drawablePadding="8dp"
+            android:drawablePadding="@dimen/activity_horizontal_margin_small"
             android:drawableStart="@drawable/ic_profile_small"
             style="@android:style/Widget.Holo.Button.Borderless"/>
 
