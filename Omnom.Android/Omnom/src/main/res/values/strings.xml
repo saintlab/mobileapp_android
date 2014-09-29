@@ -4,5 +4,12 @@
     <string name="app_name">Omnom</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_entering">EnteringActivity</string>
+    <string name="registration">Регистрация</string>
+    <string name="enter">Вход</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="entering_pay_with_phone">Оплатить счёт через телефон</string>
+    <string name="entering_call_waiter">Вызвать официанта в любой момент</string>
+    <string name="entering_split_bill">Разделить счёт между друзьями</string>
 
 </resources>

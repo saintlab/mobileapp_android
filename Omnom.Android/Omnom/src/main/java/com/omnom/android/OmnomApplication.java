@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import dagger.ObjectGraph;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
  * Created by Ch3D on 24.09.2014.
@@ -50,6 +51,8 @@ public class OmnomApplication extends BaseOmnomApplication {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		CalligraphyConfig.initDefault("fonts/Futura-OSF-Omnom-Regular.otf", R.attr.fontPath);
+
 		objectGraph = ObjectGraph.create(getModules().toArray());
 		for(final Object obj : injectList) {
 			objectGraph.inject(obj);

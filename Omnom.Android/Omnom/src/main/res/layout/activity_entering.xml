@@ -1,0 +1,54 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/panel_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <com.omnom.android.view.ViewPagerIndicatorCircle
+        android:id="@+id/pager_indicator"
+        android:layout_above="@+id/panel_bottom"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:padding="16dp"/>
+
+    <LinearLayout
+        android:id="@+id/panel_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/white"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@android:id/button1"
+            android:text="@string/registration"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:textColor="@android:color/black"
+            android:drawablePadding="8dp"
+            android:drawableStart="@drawable/ic_profile_small"
+            style="@android:style/Widget.Holo.Button.Borderless"/>
+
+        <Button
+            android:id="@android:id/button2"
+            android:text="@string/enter"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="end|center_vertical"
+            android:textColor="@android:color/black"
+            style="@android:style/Widget.Holo.Button.Borderless"/>
+    </LinearLayout>
+
+</RelativeLayout>
