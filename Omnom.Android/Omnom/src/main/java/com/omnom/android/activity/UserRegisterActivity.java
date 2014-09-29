@@ -85,4 +85,10 @@ public class UserRegisterActivity extends BaseActivity {
 	public int getLayoutResource() {
 		return R.layout.activity_register_user;
 	}
+
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(R.anim.fake_fade_out_long, R.anim.slide_out_down);
+	}
 }

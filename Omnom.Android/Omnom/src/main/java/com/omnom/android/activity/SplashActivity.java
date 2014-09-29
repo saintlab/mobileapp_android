@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.omnom.android.MainActivity;
 import com.omnom.android.R;
 import com.omnom.util.activity.BaseActivity;
 import com.omnom.util.utils.AnimationUtils;
@@ -70,9 +69,9 @@ public class SplashActivity extends BaseActivity {
 					@Override
 					public void run() {
 						if(!isFinishing()) {
-							Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+							Intent intent = new Intent(SplashActivity.this, EnteringActivity.class);
 							intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
-							startActivity(intent, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short, true);
+							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, true);
 						}
 					}
 				});
@@ -109,9 +108,9 @@ public class SplashActivity extends BaseActivity {
 		findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+				Intent intent = new Intent(SplashActivity.this, EnteringActivity.class);
 				intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_UP);
-				startActivity(intent, android.R.anim.fade_in, android.R.anim.fade_out, true);
+				startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, true);
 			}
 		}, getResources().getInteger(R.integer.splash_screen_timeout));
 		getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
