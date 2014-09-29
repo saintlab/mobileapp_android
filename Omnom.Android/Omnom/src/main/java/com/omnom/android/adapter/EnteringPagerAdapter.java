@@ -1,4 +1,4 @@
-package com.omnom.android.activity;
+package com.omnom.android.adapter;
 
 import android.graphics.Color;
 import android.support.v4.app.Fragment;
