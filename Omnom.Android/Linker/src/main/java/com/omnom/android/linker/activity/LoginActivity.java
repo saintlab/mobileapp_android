@@ -202,7 +202,7 @@ public class LoginActivity extends BaseActivity {
 			authenticator.remindPassword(getTextValue(mEditLogin)).subscribe(new Action1<AuthResponse>() {
 				@Override
 				public void call(AuthResponse result) {
-					if(!result.isError()) {
+					if(!result.hasError()) {
 						showToast(LoginActivity.this, R.string.remind_password_sent);
 					} else {
 						setError(mEditLogin, mTextLoginError, R.string.error_invalid_email);

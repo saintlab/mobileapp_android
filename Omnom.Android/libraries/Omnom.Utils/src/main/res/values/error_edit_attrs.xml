@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-   <declare-styleable name="ErrorEdit">
-       <attr name="showClear" format="boolean" />
-       <attr name="iconClear" format="reference" />
-       <attr name="hint" format="reference|string" />
-   </declare-styleable>
+    <declare-styleable name="ErrorEdit">
+        <attr name="showClear" format="boolean"/>
+        <attr name="iconClear" format="reference"/>
+        <attr name="inputType">
+            <flag name="text" value="0x00000000"/>
+            <flag name="phone" value="0x00000001"/>
+            <flag name="email" value="0x00000002"/>
+        </attr>
+        <attr name="font">
+            <flag name="regular" value="0x00000000"/>
+            <flag name="medium" value="0x00000001"/>
+            <flag name="regular_le" value="0x00000002"/>
+        </attr>
+        <attr name="hint" format="reference|string"/>
+    </declare-styleable>
 </resources>

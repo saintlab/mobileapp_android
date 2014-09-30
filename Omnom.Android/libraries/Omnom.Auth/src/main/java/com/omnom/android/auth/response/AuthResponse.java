@@ -30,7 +30,7 @@ public class AuthResponse {
 		return error;
 	}
 
-	public boolean isError() {
+	public boolean hasError() {
 		return status.equals(STATUS_ERROR);
 	}
 

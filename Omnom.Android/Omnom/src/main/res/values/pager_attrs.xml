@@ -20,7 +20,7 @@
     <attr name="strokeWidth" format="dimension" />
     <attr name="unselectedColor" format="color" />
 
-    <declare-styleable name="CirclePageIndicator">
+    <declare-styleable name="ViewPagerIndicatorCircle">
         <!-- Whether or not the indicators should be centered. -->
         <attr name="centered" />
         <!-- Color of the filled circle that represents the current page. -->

@@ -10,9 +10,12 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name="com.omnom.android.OmnomApplication"
@@ -47,7 +50,15 @@
         <activity
             android:name="com.omnom.android.activity.EnteringActivity"
             android:label="@string/title_activity_entering"
-            android:theme="@style/Theme.Wood">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood" >
+        </activity>
+        <activity
+            android:name="com.omnom.android.activity.ConfirmPhoneActivity"
+            android:label="@string/title_activity_confirm_phone"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White"
+            android:windowSoftInputMode="stateAlwaysHidden">
         </activity>
     </application>
 

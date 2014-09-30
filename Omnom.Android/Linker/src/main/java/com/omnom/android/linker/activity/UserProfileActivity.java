@@ -116,7 +116,7 @@ public class UserProfileActivity extends BaseActivity {
 					() {
 				@Override
 				public void call(UserResponse response) {
-					if(response.isError() && UserProfileHelper.hasAuthError(response)) {
+					if(response.hasError() && UserProfileHelper.hasAuthError(response)) {
 						getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
 						ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
 						AnimationUtils.animateAlpha(mPanelBottom, false);
@@ -242,7 +242,7 @@ public class UserProfileActivity extends BaseActivity {
 		logoutSubscription = AndroidObservable.bindActivity(this, authenticator.logout(token)).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse authResponseBase) {
-				if(!authResponseBase.isError()) {
+				if(!authResponseBase.hasError()) {
 					getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
 					ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
 					AnimationUtils.animateAlpha(mPanelBottom, false);

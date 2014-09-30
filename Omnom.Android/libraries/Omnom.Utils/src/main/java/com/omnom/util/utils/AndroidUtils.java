@@ -101,6 +101,15 @@ public class AndroidUtils {
 		toast.show();
 	}
 
+	public static void showToast(Context context, String msg) {
+		Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
+		View view = LayoutInflater.from(context).inflate(R.layout.transient_notification, null);
+		TextView tv = findById(view, android.R.id.message);
+		tv.setText(msg);
+		toast.setView(view);
+		toast.show();
+	}
+
 	public static void showToastLong(Context context, int resId) {
 		Toast toast = Toast.makeText(context, context.getString(resId), Toast.LENGTH_LONG);
 		View view = LayoutInflater.from(context).inflate(R.layout.transient_notification, null);

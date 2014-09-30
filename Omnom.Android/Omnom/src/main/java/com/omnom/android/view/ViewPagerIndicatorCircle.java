@@ -74,6 +74,9 @@ public class ViewPagerIndicatorCircle extends View implements ViewPager.OnPageCh
 	private float mLastMotionX = -1;
 	private boolean mIsDragging;
 
+	private boolean mIsFake;
+	private int mFakeCount;
+
 	public ViewPagerIndicatorCircle(Context context) {
 		this(context, null);
 	}
@@ -100,21 +103,21 @@ public class ViewPagerIndicatorCircle extends View implements ViewPager.OnPageCh
 		final boolean defaultSnap = res.getBoolean(R.bool.default_circle_indicator_snap);
 
 		//Retrieve styles attributes
-		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CirclePageIndicator, defStyle, 0);
+		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ViewPagerIndicatorCircle, defStyle, 0);
 
-		mCentered = a.getBoolean(R.styleable.CirclePageIndicator_centered, defaultCentered);
-		mOrientation = a.getInt(R.styleable.CirclePageIndicator_android_orientation, defaultOrientation);
+		mCentered = a.getBoolean(R.styleable.ViewPagerIndicatorCircle_centered, defaultCentered);
+		mOrientation = a.getInt(R.styleable.ViewPagerIndicatorCircle_android_orientation, defaultOrientation);
 		mPaintPageFill.setStyle(Paint.Style.FILL);
-		mPaintPageFill.setColor(a.getColor(R.styleable.CirclePageIndicator_pageColor, defaultPageColor));
+		mPaintPageFill.setColor(a.getColor(R.styleable.ViewPagerIndicatorCircle_pageColor, defaultPageColor));
 		mPaintStroke.setStyle(Paint.Style.STROKE);
-		mPaintStroke.setColor(a.getColor(R.styleable.CirclePageIndicator_strokeColor, defaultStrokeColor));
-		mPaintStroke.setStrokeWidth(a.getDimension(R.styleable.CirclePageIndicator_strokeWidth, defaultStrokeWidth));
+		mPaintStroke.setColor(a.getColor(R.styleable.ViewPagerIndicatorCircle_strokeColor, defaultStrokeColor));
+		mPaintStroke.setStrokeWidth(a.getDimension(R.styleable.ViewPagerIndicatorCircle_strokeWidth, defaultStrokeWidth));
 		mPaintFill.setStyle(Paint.Style.FILL);
-		mPaintFill.setColor(a.getColor(R.styleable.CirclePageIndicator_fillColor, defaultFillColor));
-		mRadius = a.getDimension(R.styleable.CirclePageIndicator_radius, defaultRadius);
-		mSnap = a.getBoolean(R.styleable.CirclePageIndicator_snap, defaultSnap);
+		mPaintFill.setColor(a.getColor(R.styleable.ViewPagerIndicatorCircle_fillColor, defaultFillColor));
+		mRadius = a.getDimension(R.styleable.ViewPagerIndicatorCircle_radius, defaultRadius);
+		mSnap = a.getBoolean(R.styleable.ViewPagerIndicatorCircle_snap, defaultSnap);
 
-		Drawable background = a.getDrawable(R.styleable.CirclePageIndicator_android_background);
+		Drawable background = a.getDrawable(R.styleable.ViewPagerIndicatorCircle_android_background);
 		if(background != null) {
 			setBackgroundDrawable(background);
 		}
@@ -209,10 +212,10 @@ public class ViewPagerIndicatorCircle extends View implements ViewPager.OnPageCh
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 
-		if(mViewPager == null) {
+		if(mViewPager == null && !mIsFake) {
 			return;
 		}
-		final int count = mViewPager.getAdapter().getCount();
+		final int count = mIsFake ? mFakeCount : mViewPager.getAdapter().getCount();
 		if(count == 0) {
 			return;
 		}
@@ -230,7 +233,7 @@ public class ViewPagerIndicatorCircle extends View implements ViewPager.OnPageCh
 			longSize = getWidth();
 			longPaddingBefore = getPaddingLeft();
 			longPaddingAfter = getPaddingRight();
-			shortPaddingBefore = getPaddingTop();
+			shortPaddingBefore = mCentered ? (int) ((getHeight() / 2) - mRadius) : getPaddingTop();
 		} else {
 			longSize = getHeight();
 			longPaddingBefore = getPaddingTop();
@@ -396,9 +399,11 @@ public class ViewPagerIndicatorCircle extends View implements ViewPager.OnPageCh
 
 	public void setCurrentItem(int item) {
 		if(mViewPager == null) {
-			throw new IllegalStateException("ViewPager has not been bound.");
+			// throw new IllegalStateException("ViewPager has not been bound.");
 		}
-		mViewPager.setCurrentItem(item);
+		if(!mIsFake) {
+			mViewPager.setCurrentItem(item);
+		}
 		mCurrentPage = item;
 		invalidate();
 	}
@@ -525,5 +530,10 @@ public class ViewPagerIndicatorCircle extends View implements ViewPager.OnPageCh
 		SavedState savedState = new SavedState(superState);
 		savedState.currentPage = mCurrentPage;
 		return savedState;
+	}
+
+	public void setFake(boolean isFake, int i) {
+		mIsFake = isFake;
+		mFakeCount = i;
 	}
 }

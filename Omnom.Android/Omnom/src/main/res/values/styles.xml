@@ -144,5 +144,13 @@
         <item name="android:background">@drawable/btn_login</item>
     </style>
 
-
+    <style name="EditText.ConfirmCode">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">60dp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:maxLength">1</item>
+        <item name="android:inputType">number</item>
+        <item name="android:textSize">@dimen/font_xlarge</item>
+        <item name="android:gravity">center</item>
+    </style>
 </resources>
