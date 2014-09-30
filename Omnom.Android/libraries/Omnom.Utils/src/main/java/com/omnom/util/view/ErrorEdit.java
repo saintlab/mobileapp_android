@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -146,11 +147,13 @@ public class ErrorEdit extends LinearLayout {
 			case INPUT_TYPE_TEXT:
 				editView.setInputType(InputType.TYPE_CLASS_TEXT);
 				break;
+
 			case INPUT_TYPE_PHONE:
 				editView.setInputType(InputType.TYPE_CLASS_PHONE);
 				break;
+
 			case INPUT_TYPE_EMAIL:
-				editView.setInputType(InputType.TYPE_CLASS_TEXT);
+				editView.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 				break;
 		}
 	}
@@ -160,7 +163,16 @@ public class ErrorEdit extends LinearLayout {
 		editView.setError(true);
 	}
 
+	public void setError(final String msg) {
+		errorTextView.setText(msg);
+		editView.setError(true);
+	}
+
 	public String getText() {
 		return editView.getText().toString();
+	}
+
+	public EditText getEditText() {
+		return editView;
 	}
 }

@@ -6,13 +6,16 @@ import android.content.Intent;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
+import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
 import com.omnom.util.activity.BaseActivity;
 import com.omnom.util.utils.AndroidUtils;
@@ -30,6 +33,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
+import rx.functions.Action1;
 
 /**
  * Created by Ch3D on 28.09.2014.
@@ -41,6 +45,7 @@ public class UserRegisterActivity extends BaseActivity {
 	public static final String DELIMITER_DATE_WICKET = "-";
 
 	private static final String TAG = UserRegisterActivity.class.getSimpleName();
+	public static final int FAKE_PAGE_COUNT = 2;
 
 	@InjectView(R.id.edit_name)
 	protected ErrorEdit editName;
@@ -60,7 +65,13 @@ public class UserRegisterActivity extends BaseActivity {
 	@InjectView(R.id.text_error)
 	protected TextView textError;
 
-	@InjectViews({R.id.title, R.id.page_indicator, R.id.proceed})
+	@InjectView(R.id.btn_right)
+	protected Button btnRight;
+
+	@InjectView(R.id.title)
+	protected TextView textTitle;
+
+	@InjectViews({R.id.title, R.id.page_indicator, R.id.btn_right})
 	protected List<View> topViews;
 
 	@InjectView(R.id.page_indicator)
@@ -77,6 +88,9 @@ public class UserRegisterActivity extends BaseActivity {
 		textAgreement.setMovementMethod(LinkMovementMethod.getInstance());
 		textAgreement.setText(Html.fromHtml(getResources().getString(R.string.register_agreement)));
 
+		btnRight.setText(R.string.proceed);
+		textTitle.setText(R.string.create_account);
+
 		editBirth.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -87,7 +101,7 @@ public class UserRegisterActivity extends BaseActivity {
 
 					}
 				}, calendar.get(Calendar.YEAR) - YEAR_OFFSET, calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-				dialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+				dialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						DatePickerDialog dlg = (DatePickerDialog) dialog;
@@ -97,7 +111,7 @@ public class UserRegisterActivity extends BaseActivity {
 						dialog.dismiss();
 					}
 				});
-				dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена", new DialogInterface.OnClickListener() {
+				dialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.dismiss();
@@ -106,7 +120,7 @@ public class UserRegisterActivity extends BaseActivity {
 				dialog.show();
 			}
 		});
-		pageIndicator.setFake(true, 2);
+		pageIndicator.setFake(true, FAKE_PAGE_COUNT);
 		pageIndicator.setCurrentItem(0);
 	}
 
@@ -126,7 +140,7 @@ public class UserRegisterActivity extends BaseActivity {
 		mFirstStart = false;
 	}
 
-	@OnClick(R.id.proceed)
+	@OnClick(R.id.btn_right)
 	public void performRegister(final View view) {
 		if(!validate()) {
 			return;
@@ -139,32 +153,33 @@ public class UserRegisterActivity extends BaseActivity {
 		                                                               editBirth.getText()
 		                                                                        .toString()
 		                                                                        .replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
-		//		view.setEnabled(false);
-		//		authenticator.register(request).subscribe(new Action1<AuthRegisterResponse>() {
-		//			@Override
-		//			public void call(final AuthRegisterResponse authRegisterResponse) {
-		//				view.setEnabled(true);
-		//				if(!authRegisterResponse.hasError()) {
-		ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, false);
-		postDelayed(350, new Runnable() {
+		view.setEnabled(false);
+		authenticator.register(request).subscribe(new Action1<AuthRegisterResponse>() {
 			@Override
-			public void run() {
-				final Intent intent = new Intent(UserRegisterActivity.this, ConfirmPhoneActivity.class);
-				intent.putExtra(EXTRA_PHONE, request.getPhone());
-				startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
+			public void call(final AuthRegisterResponse authRegisterResponse) {
+				view.setEnabled(true);
+				if(!authRegisterResponse.hasError()) {
+					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, false);
+					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
+						@Override
+						public void run() {
+							final Intent intent = new Intent(UserRegisterActivity.this, ConfirmPhoneActivity.class);
+							intent.putExtra(EXTRA_PHONE, request.getPhone());
+							intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_REGISTER);
+							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
+						}
+					});
+				} else {
+					textError.setText(authRegisterResponse.getError().getMessage());
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				view.setEnabled(true);
+				Log.e(TAG, "performRegister", throwable);
 			}
 		});
-		//				} else {
-		//					textError.setText(authRegisterResponse.getError().getMessage());
-		//				}
-		//			}
-		//		}, new Action1<Throwable>() {
-		//			@Override
-		//			public void call(Throwable throwable) {
-		//				view.setEnabled(true);
-		//				Log.e(TAG, "performRegister", throwable);
-		//			}
-		//		});
 	}
 
 	private boolean validate() {

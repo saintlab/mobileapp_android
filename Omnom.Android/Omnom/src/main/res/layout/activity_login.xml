@@ -1,0 +1,21 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/view_enter_panel_top"/>
+
+    <com.omnom.util.view.ErrorEdit
+        android:id="@+id/edit_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/panel_top"
+        android:padding="@dimen/activity_horizontal_margin"
+        omnom:inputType="email"
+        omnom:font="regular_le"
+        omnom:hint="@string/email_or_phone_number"
+        omnom:showClear="true"
+        omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
+
+</RelativeLayout>

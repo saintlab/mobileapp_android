@@ -4,36 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:id="@+id/panel_top"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/view_size_default"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingEnd="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_horizontal_margin_small"
-        android:paddingBottom="@dimen/activity_horizontal_margin_small"
-        android:background="@color/list_header">
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:text="@string/enter"/>
-
-        <com.omnom.android.view.ViewPagerIndicatorCircle
-            android:id="@+id/page_indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/title"
-            app:radius="2dp"
-            app:centered="true"
-            app:fillColor="@android:color/black"
-            app:pageColor="@android:color/darker_gray"/>
-
-    </RelativeLayout>
+    <include layout="@layout/view_enter_panel_top"/>
 
     <TextView
         android:id="@+id/text"

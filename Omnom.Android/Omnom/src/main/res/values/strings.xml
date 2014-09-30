@@ -25,5 +25,9 @@
     <string name="confirm_code_sms_text">Должна прийти\nSMS с кодом на номер\n%1$s</string>
     <string name="request_new_confirmation_code">Выслать новый код</string>
     <string name="create_account">Создать аккаунт</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Отмена</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="email_or_phone_number">Почта или номер телефона</string>
 
 </resources>

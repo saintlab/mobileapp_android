@@ -27,7 +27,7 @@ public class EnteringActivity extends BaseFragmentActivity {
 
 	@OnClick(R.id.btn_enter)
 	public void doEnter() {
-
+		startActivity(new Intent(this, LoginActivity.class), R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
 	}
 
 	@Override

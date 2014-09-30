@@ -6,6 +6,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
 import com.omnom.util.activity.BaseActivity;
+import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.StringUtils;
 import com.omnom.util.utils.ViewUtils;
 
@@ -25,9 +27,13 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
+import rx.Observable;
 import rx.functions.Action1;
 
 public class ConfirmPhoneActivity extends BaseActivity {
+
+	public static final int TYPE_LOGIN = 0;
+	public static final int TYPE_REGISTER = 1;
 
 	private static final String TAG = ConfirmPhoneActivity.class.getSimpleName();
 
@@ -76,7 +82,13 @@ public class ConfirmPhoneActivity extends BaseActivity {
 	@InjectView(R.id.panel_digits)
 	protected View panelDigits;
 
-	@InjectViews({R.id.title, R.id.page_indicator})
+	@InjectView(R.id.btn_right)
+	protected Button btnRight;
+
+	@InjectView(R.id.title)
+	protected TextView textTitle;
+
+	@InjectViews({R.id.title, R.id.page_indicator, R.id.btn_right})
 	protected List<View> topViews;
 
 	@InjectView(R.id.page_indicator)
@@ -87,9 +99,13 @@ public class ConfirmPhoneActivity extends BaseActivity {
 
 	private String phone;
 	private boolean mFirstStart = true;
+	private int type;
 
 	@Override
 	public void initUi() {
+		ViewUtils.setVisible(btnRight, false);
+		textTitle.setText(R.string.enter);
+
 		ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA_NOW, false);
 		edit1.addTextChangedListener(new Watcher(edit1));
 		edit2.addTextChangedListener(new Watcher(edit2));
@@ -111,12 +127,22 @@ public class ConfirmPhoneActivity extends BaseActivity {
 			}
 		});
 		text.setText(getString(R.string.confirm_code_sms_text, phone));
-		pageIndicator.setFake(true, 2);
+		pageIndicator.setFake(true, UserRegisterActivity.FAKE_PAGE_COUNT);
 		pageIndicator.setCurrentItem(1);
+		AndroidUtils.showKeyboard(edit1);
 	}
 
 	private void doConfirm() {
-		authenticator.confirm(phone, getCode()).subscribe(new Action1<AuthResponse>() {
+		Observable<AuthResponse> observable;
+		if(type == TYPE_REGISTER) {
+			observable = authenticator.confirm(phone, getCode());
+		} else if(type == TYPE_LOGIN) {
+			observable = authenticator.authorizePhone(phone, getCode());
+		} else {
+			throw new RuntimeException("Wrong confirm type = " + type);
+		}
+
+		observable.subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(final AuthResponse authResponse) {
 				if(!authResponse.hasError()) {
@@ -157,6 +183,7 @@ public class ConfirmPhoneActivity extends BaseActivity {
 	protected void handleIntent(Intent intent) {
 		super.handleIntent(intent);
 		phone = intent.getStringExtra(EXTRA_PHONE);
+		type = intent.getIntExtra(EXTRA_CONFIRM_TYPE, TYPE_REGISTER);
 	}
 
 	@Override
