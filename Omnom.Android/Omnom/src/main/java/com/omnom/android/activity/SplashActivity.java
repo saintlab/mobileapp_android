@@ -1,8 +1,6 @@
 package com.omnom.android.activity;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -88,8 +86,7 @@ public class SplashActivity extends BaseActivity {
 
 		// Workaround for white loader circle (reproducable from second app run)
 		final GradientDrawable sd = (GradientDrawable) imgBackground.getDrawable();
-		final int color = getResources().getColor(R.color.loader_bg_transparent);
-		sd.setColors(new int[]{color, color});
+		sd.setColor(getResources().getColor(R.color.loader_bg_transparent));
 		sd.invalidateSelf();
 
 		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
@@ -120,8 +117,7 @@ public class SplashActivity extends BaseActivity {
 
 	@Override
 	public void initUi() {
-		final BluetoothManager btManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-		final BluetoothAdapter adapter = btManager.getAdapter();
+		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if(adapter != null && !adapter.isEnabled()) {
 			adapter.enable();
 		}
