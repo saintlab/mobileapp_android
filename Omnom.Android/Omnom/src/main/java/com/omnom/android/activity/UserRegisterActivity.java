@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.Html;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.omnom.util.view.ErrorEdit;
 import com.omnom.util.view.ErrorEditText;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -43,10 +45,8 @@ public class UserRegisterActivity extends BaseActivity {
 	public static final int YEAR_OFFSET = 30;
 	public static final String DELIMITER_DATE_UI = "/";
 	public static final String DELIMITER_DATE_WICKET = "-";
-
-	private static final String TAG = UserRegisterActivity.class.getSimpleName();
 	public static final int FAKE_PAGE_COUNT = 2;
-
+	private static final String TAG = UserRegisterActivity.class.getSimpleName();
 	@InjectView(R.id.edit_name)
 	protected ErrorEdit editName;
 
@@ -82,8 +82,12 @@ public class UserRegisterActivity extends BaseActivity {
 
 	private boolean mFirstStart = true;
 
+	private GregorianCalendar gc;
+
 	@Override
 	public void initUi() {
+		gc = new GregorianCalendar();
+		gc.add(Calendar.YEAR, -YEAR_OFFSET);
 		ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA_NOW, false);
 		textAgreement.setMovementMethod(LinkMovementMethod.getInstance());
 		textAgreement.setText(Html.fromHtml(getResources().getString(R.string.register_agreement)));
@@ -94,20 +98,18 @@ public class UserRegisterActivity extends BaseActivity {
 		editBirth.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				final Calendar calendar = Calendar.getInstance();
 				DatePickerDialog dialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
 					@Override
 					public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
 					}
-				}, calendar.get(Calendar.YEAR) - YEAR_OFFSET, calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+				}, gc.get(Calendar.YEAR), gc.get(Calendar.MONTH), gc.get(Calendar.DAY_OF_MONTH));
 				dialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						DatePickerDialog dlg = (DatePickerDialog) dialog;
-						editBirth.setText(
-								dlg.getDatePicker().getYear() + DELIMITER_DATE_UI + dlg.getDatePicker().getMonth() + DELIMITER_DATE_UI +
-										dlg.getDatePicker().getDayOfMonth());
+						gc.set(dlg.getDatePicker().getYear(), dlg.getDatePicker().getMonth(), dlg.getDatePicker().getDayOfMonth());
+						CharSequence dateFormatted = DateFormat.format("yyyy/MM/dd", gc);
+						editBirth.setText(dateFormatted);
 						dialog.dismiss();
 					}
 				});
