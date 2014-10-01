@@ -6,7 +6,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -14,19 +13,14 @@ import com.omnom.android.MainActivity;
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
-import com.omnom.android.view.ViewPagerIndicatorCircle;
+import com.omnom.android.view.LoginPanelTop;
 import com.omnom.util.activity.BaseActivity;
 import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.StringUtils;
-import com.omnom.util.utils.ViewUtils;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.InjectViews;
 import rx.Observable;
 import rx.functions.Action1;
 
@@ -82,17 +76,8 @@ public class ConfirmPhoneActivity extends BaseActivity {
 	@InjectView(R.id.panel_digits)
 	protected View panelDigits;
 
-	@InjectView(R.id.btn_right)
-	protected Button btnRight;
-
-	@InjectView(R.id.title)
-	protected TextView textTitle;
-
-	@InjectViews({R.id.title, R.id.page_indicator, R.id.btn_right})
-	protected List<View> topViews;
-
-	@InjectView(R.id.page_indicator)
-	protected ViewPagerIndicatorCircle pageIndicator;
+	@InjectView(R.id.panel_top)
+	protected LoginPanelTop topPanel;
 
 	@Inject
 	protected AuthService authenticator;
@@ -103,10 +88,11 @@ public class ConfirmPhoneActivity extends BaseActivity {
 
 	@Override
 	public void initUi() {
-		ViewUtils.setVisible(btnRight, false);
-		textTitle.setText(R.string.enter);
+		topPanel.setRigthButtonVisibile(false);
+		topPanel.setTitle(R.string.enter);
+		topPanel.setContentVisibility(false, true);
+		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 1);
 
-		ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA_NOW, false);
 		edit1.addTextChangedListener(new Watcher(edit1));
 		edit2.addTextChangedListener(new Watcher(edit2));
 		edit3.addTextChangedListener(new Watcher(edit3));
@@ -127,8 +113,6 @@ public class ConfirmPhoneActivity extends BaseActivity {
 			}
 		});
 		text.setText(getString(R.string.confirm_code_sms_text, phone));
-		pageIndicator.setFake(true, UserRegisterActivity.FAKE_PAGE_COUNT);
-		pageIndicator.setCurrentItem(1);
 		AndroidUtils.showKeyboard(edit1);
 	}
 
@@ -147,7 +131,7 @@ public class ConfirmPhoneActivity extends BaseActivity {
 			public void call(final AuthResponse authResponse) {
 				if(!authResponse.hasError()) {
 					getPreferences().setAuthToken(getActivity(), authResponse.getToken());
-					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, false);
+					topPanel.setContentVisibility(false, false);
 					postDelayed(350, new Runnable() {
 						@Override
 						public void run() {
@@ -189,15 +173,15 @@ public class ConfirmPhoneActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(pageIndicator.getAlpha() == 0) {
-			pageIndicator.postDelayed(new Runnable() {
+		if(topPanel.isAlphaVisible()) {
+			topPanel.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, true);
+					topPanel.setContentVisibility(true, false);
 				}
 
 			}, mFirstStart ? getResources().getInteger(android.R.integer.config_longAnimTime) :
-					                          getResources().getInteger(android.R.integer.config_mediumAnimTime));
+					                     getResources().getInteger(android.R.integer.config_mediumAnimTime));
 		}
 		mFirstStart = false;
 	}

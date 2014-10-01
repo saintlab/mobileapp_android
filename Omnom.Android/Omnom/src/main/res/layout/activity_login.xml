@@ -4,7 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/view_enter_panel_top"/>
+    <com.omnom.android.view.LoginPanelTop
+        android:id="@+id/panel_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:background="@color/list_header"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_horizontal_margin_small"
+        android:paddingBottom="@dimen/activity_horizontal_margin_small"/>
 
     <com.omnom.util.view.ErrorEdit
         android:id="@+id/edit_phone"
