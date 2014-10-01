@@ -2,17 +2,17 @@ package com.omnom.android.linker;
 
 import android.content.Context;
 
-import com.omnom.util.AuthTokenProvider;
-import com.omnom.util.preferences.PreferenceProvider;
 import com.omnom.android.auth.AuthModule;
-import com.omnom.util.BaseOmnomApplication;
-import com.omnom.util.activity.OmnomActivity;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.modules.AndroidModule;
 import com.omnom.android.linker.modules.ApplicationModule;
 import com.omnom.android.linker.modules.BeaconModule;
 import com.omnom.android.linker.modules.LinkerDataProviderModule;
 import com.omnom.android.linker.preferences.PreferenceHelper;
+import com.omnom.util.AuthTokenProvider;
+import com.omnom.util.BaseOmnomApplication;
+import com.omnom.util.activity.OmnomActivity;
+import com.omnom.util.preferences.PreferenceProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;

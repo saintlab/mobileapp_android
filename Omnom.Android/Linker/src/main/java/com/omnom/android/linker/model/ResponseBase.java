@@ -9,6 +9,21 @@ public class ResponseBase {
 	@Expose
 	private String error;
 
+	@Expose
+	private OmnomErrors errors;
+
+	public OmnomErrors getErrors() {
+		return errors;
+	}
+
+	public void setErrors(OmnomErrors errors) {
+		this.errors = errors;
+	}
+
+	public boolean hasAuthError() {
+		return errors != null;
+	}
+
 	public String getError() {
 		return error;
 	}

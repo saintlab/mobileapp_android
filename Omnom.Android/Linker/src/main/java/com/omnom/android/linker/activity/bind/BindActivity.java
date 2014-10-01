@@ -24,7 +24,6 @@ import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.ErrorHelper;
 import com.omnom.android.linker.activity.UserProfileActivity;
-import com.omnom.util.activity.BaseActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.beacon.BeaconFilter;
 import com.omnom.android.linker.beacon.BeaconRssiProvider;
@@ -38,12 +37,13 @@ import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.observable.ValidationObservable;
 import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.service.CharacteristicHolder;
+import com.omnom.android.linker.widget.loader.LoaderController;
+import com.omnom.android.linker.widget.loader.LoaderView;
+import com.omnom.util.activity.BaseActivity;
 import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.AnimationUtils;
 import com.omnom.util.utils.StringUtils;
 import com.omnom.util.utils.ViewUtils;
-import com.omnom.android.linker.widget.loader.LoaderController;
-import com.omnom.android.linker.widget.loader.LoaderView;
 import com.squareup.otto.Subscribe;
 
 import org.apache.http.HttpStatus;
@@ -267,20 +267,21 @@ public class BindActivity extends BaseActivity {
 	public void onBind() {
 		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
-		api.buildBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon.getIdValue(0)).subscribe(new Action1<BeaconDataResponse>() {
-			@Override
-			public void call(final BeaconDataResponse beaconData) {
-				mBeaconData = beaconData;
-				mLoaderController.setMode(LoaderView.Mode.NONE);
-				connectToBeacon();
-			}
-		}, new BaseErrorHandler(this) {
-			@Override
-			protected void onThrowable(Throwable throwable) {
-				mLoaderController.hideEnterData();
-				mErrorHelper.showInternetError(mInternetErrorClickListener);
-			}
-		});
+		api.buildBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon.getIdValue(0)).subscribe(
+				new OmnomObservable.AuthAwareOnNext<BeaconDataResponse>(getActivity()) {
+					@Override
+					public void perform(BeaconDataResponse beaconData) {
+						mBeaconData = beaconData;
+						mLoaderController.setMode(LoaderView.Mode.NONE);
+						connectToBeacon();
+					}
+				}, new BaseErrorHandler(this) {
+					@Override
+					protected void onThrowable(Throwable throwable) {
+						mLoaderController.hideEnterData();
+						mErrorHelper.showInternetError(mInternetErrorClickListener);
+					}
+				});
 	}
 
 	@Override
@@ -470,36 +471,41 @@ public class BindActivity extends BaseActivity {
 								                                        mBeacon = nearBeacons.get(0);
 								                                        api.findBeacon(mBeacon).onErrorReturn(
 										                                        OmnomObservable.getTableOnError())
-								                                           .subscribe(new Action1<TableDataResponse>() {
-									                                           @Override
-									                                           public void call(final TableDataResponse tableData) {
-										                                           if(tableData == null) {
-											                                           mErrorHelper.showInternetError(
-													                                           mInternetErrorClickListener);
-											                                           return;
-										                                           }
-										                                           mBindClicked = false;
-										                                           mLoader.stopProgressAnimation();
-										                                           mLoader.updateProgressMax(new Runnable() {
+
+								                                           .subscribe(
+										                                           new OmnomObservable.AuthAwareOnNext<TableDataResponse>(
+												                                           getActivity()) {
 											                                           @Override
-											                                           public void run() {
-												                                           if(tableData != TableDataResponse.NULL) {
-													                                           onErrorBeaconCheck(
-															                                           tableData.getInternalId());
-												                                           } else {
-													                                           scanQrCode();
+											                                           public void perform(final TableDataResponse
+													                                                               tableData) {
+												                                           if(tableData == null) {
+													                                           mErrorHelper.showInternetError(
+															                                           mInternetErrorClickListener);
+													                                           return;
 												                                           }
+												                                           mBindClicked = false;
+												                                           mLoader.stopProgressAnimation();
+												                                           mLoader.updateProgressMax(new Runnable() {
+													                                           @Override
+													                                           public void run() {
+														                                           if(tableData != TableDataResponse
+																                                           .NULL) {
+															                                           onErrorBeaconCheck(
+																	                                           tableData.getInternalId());
+														                                           } else {
+															                                           scanQrCode();
+														                                           }
+													                                           }
+												                                           });
+											                                           }
+										                                           }, new BaseErrorHandler(getActivity()) {
+											                                           @Override
+											                                           protected void onThrowable(Throwable throwable) {
+												                                           Log.e(TAG, "findBeacon", throwable);
+												                                           mErrorHelper.showInternetError(
+														                                           mInternetErrorClickListener);
 											                                           }
 										                                           });
-									                                           }
-								                                           }, new BaseErrorHandler(getActivity()) {
-									                                           @Override
-									                                           protected void onThrowable(Throwable throwable) {
-										                                           Log.e(TAG, "findBeacon", throwable);
-										                                           mErrorHelper.showInternetError(
-												                                           mInternetErrorClickListener);
-									                                           }
-								                                           });
 							                                        }
 						                                        }
 					                                        });
