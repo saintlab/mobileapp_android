@@ -6,6 +6,8 @@ import android.widget.EditText;
 
 import butterknife.ButterKnife;
 
+import static com.omnom.util.utils.AnimationUtils.animateAlpha;
+
 /**
  * Created by Ch3D on 29.07.2014.
  */
@@ -28,7 +30,7 @@ public class ViewUtils {
 	public static final ButterKnife.Setter<View, Boolean> VISIBLITY_ALPHA = new ButterKnife.Setter<View, Boolean>() {
 		@Override
 		public void set(View view, Boolean value, int index) {
-			AnimationUtils.animateAlpha(view, value);
+			animateAlpha(view, value);
 		}
 	};
 
