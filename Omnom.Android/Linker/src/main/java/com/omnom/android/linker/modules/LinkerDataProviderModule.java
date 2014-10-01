@@ -7,6 +7,7 @@ import com.omnom.android.linker.R;
 import com.omnom.android.linker.api.Protocol;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.api.observable.providers.LinkerDataProvider;
+import com.omnom.util.AuthTokenProvider;
 
 import javax.inject.Singleton;
 
@@ -19,10 +20,6 @@ import retrofit.RequestInterceptor;
  */
 @Module(complete = false, library = true)
 public class LinkerDataProviderModule {
-	public interface AuthTokenProvider {
-		public String getAuthToken();
-		public Context getContext();
-	}
 
 	private AuthTokenProvider tokenProvider;
 	private Context mContext;

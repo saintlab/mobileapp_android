@@ -17,6 +17,6 @@ public class UserProfileHelper {
 
 	public static boolean hasAuthError(UserResponse userProfile) {
 		int errorStatus = getErrorStatus(userProfile);
-		return userProfile.isError() && (errorStatus == HttpStatus.SC_FORBIDDEN || errorStatus == HttpStatus.SC_UNAUTHORIZED);
+		return userProfile.hasError() && (errorStatus == HttpStatus.SC_FORBIDDEN || errorStatus == HttpStatus.SC_UNAUTHORIZED);
 	}
 }

@@ -306,7 +306,7 @@ public class ValidationActivity extends BaseActivity {
 							new Func1<AuthResponse, Observable<RestaurantsResponse>>() {
 								@Override
 								public Observable<RestaurantsResponse> call(AuthResponse response) {
-									if(response.isError()) {
+									if(response.hasError()) {
 										throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
 										                               response.getError());
 									}
@@ -335,7 +335,7 @@ public class ValidationActivity extends BaseActivity {
 			                                            .flatMap(new Func1<UserResponse, Observable<RestaurantsResponse>>() {
 				                                            @Override
 				                                            public Observable<RestaurantsResponse> call(UserResponse userProfile) {
-					                                            if(userProfile.isError()) {
+					                                            if(userProfile.hasError()) {
 						                                            throw new AuthServiceException(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
 						                                                                           userProfile.getError());
 					                                            }

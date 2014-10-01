@@ -32,6 +32,14 @@ public class ViewUtils {
 		}
 	};
 
+	public static final ButterKnife.Setter<View, Boolean> VISIBLITY_ALPHA_NOW = new ButterKnife.Setter<View, Boolean>() {
+		@Override
+		public void set(View view, Boolean value, int index) {
+			view.setAlpha(value ? 1 : 0);
+			setVisible(view, value);
+		}
+	};
+
 	public static final ButterKnife.Setter<View, Boolean> ENABLED = new ButterKnife.Setter<View, Boolean>() {
 		@Override
 		public void set(View view, Boolean value, int index) {

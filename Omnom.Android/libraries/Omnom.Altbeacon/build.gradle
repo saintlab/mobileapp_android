@@ -1,13 +1,13 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 'android-18'
+    compileSdkVersion 20
     buildToolsVersion "20.0.0"
 
     defaultConfig {
         applicationId "com.omnom.android.altbeacon"
-        minSdkVersion 18
-        targetSdkVersion 19
+        minSdkVersion 15
+        targetSdkVersion 20
         versionCode 1
         versionName "1.0"
     }

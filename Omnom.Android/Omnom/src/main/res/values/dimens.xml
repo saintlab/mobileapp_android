@@ -10,6 +10,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="activity_vertical_margin_small">8dp</dimen>
     <dimen name="activity_vertical_margin_large">48dp</dimen>
+    <dimen name="activity_vertical_margin_medium">24dp</dimen>
 
     <dimen name="activity_login_padding_top">96dp</dimen>
 
@@ -34,6 +35,7 @@
     <dimen name="font_normal">18sp</dimen>
     <dimen name="font_medium">20sp</dimen>
     <dimen name="font_large">22sp</dimen>
+    <dimen name="font_xlarge">28sp</dimen>
     <dimen name="error_text_padding">24dp</dimen>
     <dimen name="restaurant_logo_size">72dp</dimen>
     <dimen name="loader_logo_size">220dp</dimen>

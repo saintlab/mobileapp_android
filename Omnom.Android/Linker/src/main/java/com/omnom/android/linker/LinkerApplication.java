@@ -2,6 +2,7 @@ package com.omnom.android.linker;
 
 import android.content.Context;
 
+import com.omnom.util.AuthTokenProvider;
 import com.omnom.util.preferences.PreferenceProvider;
 import com.omnom.android.auth.AuthModule;
 import com.omnom.util.BaseOmnomApplication;
@@ -23,7 +24,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 /**
  * Created by Ch3D on 10.08.2014.
  */
-public class LinkerApplication extends BaseOmnomApplication implements LinkerDataProviderModule.AuthTokenProvider {
+public class LinkerApplication extends BaseOmnomApplication implements AuthTokenProvider {
 
 	public static LinkerApplication get(Context context) {
 		return (LinkerApplication) context.getApplicationContext();
