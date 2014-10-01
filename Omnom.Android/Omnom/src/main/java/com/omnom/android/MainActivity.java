@@ -1,7 +1,5 @@
 package com.omnom.android;
 
-import android.app.Activity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -22,56 +20,97 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
-import com.omnom.android.auth.WicketAuthenticator;
+import com.omnom.android.activity.UserRegisterActivity;
+import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.util.activity.BaseActivity;
 
 import javax.inject.Inject;
 
+import butterknife.InjectView;
+import butterknife.OnClick;
 import rx.functions.Action1;
 
-import static butterknife.ButterKnife.findById;
-
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
 	private static final String TAG = MainActivity.class.getSimpleName();
 
 	@Inject
 	protected Acquiring acquiring;
-	private Button btnConfirm;
-	private Button btnAuth;
-	private EditText editCode;
 
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		OmnomApplication.get(this).inject(this);
+	@Inject
+	protected AuthService authenticator;
 
-		btnConfirm = findById(this, android.R.id.button1);
-		btnAuth = findById(this, android.R.id.button2);
-		editCode = findById(this, android.R.id.edit);
+	@InjectView(android.R.id.button1)
+	protected Button btnConfirm;
+
+	@InjectView(android.R.id.button2)
+	protected Button btnAuth;
+
+	@InjectView(android.R.id.edit)
+	protected EditText editCode;
+
+	@Override
+	public void initUi() {
+		//		final CardInfo testCard = CardInfo.createTestCard(this);
+		//		testCard.setCardId("30008685803965102459");
+		//		acquiring.deleteCard(new MerchantData(this), UserData.createTestUser(), testCard,
+		// new Acquiring.CardDeleteListener<AcquiringResponse>() {
+		//			@Override
+		//			public void onCardDeleted(AcquiringResponse response) {
+		//				Log.d(TAG, ">>> url = " + response.getUrl());
+		//			}
+		//		});
+
+		//				acquiring.registerCard(new MerchantData(this), UserData.createTestUser(), testCard,
+		//				                       new Acquiring.CardRegisterListener<CardRegisterPollingResponse>() {
+		//					                       @Override
+		//					                       public void onCardRegistered(CardRegisterPollingResponse response) {
+		//						                       Log.d(TAG, "status = " + response.getStatus() + " cardId = " + response.getCardId
+		// ());
+		//						                       testCard.setCardId(response.getCardId());
+		//						                       verifyCard(testCard);
+		//					                       }
+		//				                       });
+
+		//		{
+		//			"card_id":"30008685803965102459", "url":
+		//			"https:\/\/test-cpg.money.mail.ru\/api\/transaction\/check\/?card_id=30008685803965102459&id=10004247505708511228
+		// &signature=169f12bc3bd574a607cf17dc850b0075def10119&status=OK_CHECK"
+		//		}
+		//		testCard.setCardId("30008685803965102459");
+		//		verifyCard(testCard);
 
 		final AuthRegisterRequest request = AuthRegisterRequest.create("1", "Dmitry Chertenko", "Ch3D", "ch3dee@gmail.com",
 		                                                               "+79133952320",
 		                                                               "1987-06-14");
 
-		final WicketAuthenticator authenticator = new WicketAuthenticator(this, getString(R.string.endpoint_auth));
 		// register(request, authenticator);
-
 		btnConfirm.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				confirm(request, authenticator);
+				confirm(request);
 			}
 		});
 
 		btnAuth.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				authPhone(request, authenticator);
+				authPhone(request);
 			}
 		});
+	}
+
+	@OnClick(android.R.id.button3)
+	public void newUser() {
+		startActivity(UserRegisterActivity.class);
+	}
+
+	@Override
+	public int getLayoutResource() {
+		return R.layout.activity_main;
 	}
 
 	private void registerCard() {
@@ -87,7 +126,7 @@ public class MainActivity extends Activity {
 		                       });
 	}
 
-	private void authPhone(AuthRegisterRequest request, final WicketAuthenticator authenticator) {
+	private void authPhone(AuthRegisterRequest request) {
 		authenticator.authorizePhone(request.getPhone(), editCode.getText().toString()).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
@@ -115,7 +154,7 @@ public class MainActivity extends Activity {
 		});
 	}
 
-	private void authEmail(AuthRegisterRequest request, WicketAuthenticator authenticator) {
+	private void authEmail(AuthRegisterRequest request) {
 		authenticator.authorizeEmail(request.getEmail(), editCode.getText().toString()).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
@@ -129,7 +168,7 @@ public class MainActivity extends Activity {
 		});
 	}
 
-	private void register(AuthRegisterRequest request, WicketAuthenticator authenticator) {
+	private void register(AuthRegisterRequest request) {
 		authenticator.register(request).subscribe(new Action1<AuthRegisterResponse>() {
 			@Override
 			public void call(AuthRegisterResponse response) {
@@ -143,7 +182,7 @@ public class MainActivity extends Activity {
 		});
 	}
 
-	private void confirm(AuthRegisterRequest request, WicketAuthenticator authenticator) {
+	private void confirm(AuthRegisterRequest request) {
 		authenticator.confirm(request.getPhone(), editCode.getText().toString())
 		             .subscribe(new Action1<AuthResponse>() {
 			             @Override

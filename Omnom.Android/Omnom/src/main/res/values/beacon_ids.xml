@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="redbear_beacon_ids">
+        <item>e2c56db5-dffb-48d2-b060-d0f5a71096e0</item>
+        <item>f93c1af8-ffb2-488a-a952-a250db61dec4</item>
+    </string-array>
+</resources>

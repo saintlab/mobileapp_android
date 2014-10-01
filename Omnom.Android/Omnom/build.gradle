@@ -17,18 +17,43 @@ android {
         }
     }
 
+    lintOptions {
+        abortOnError false
+    }
 
     defaultConfig {
         applicationId "com.omnom.android"
-        minSdkVersion 18
+        minSdkVersion 15
         targetSdkVersion 20
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.1"
     }
+
+    signingConfigs {
+        release {
+            def projectDir = project.projectDir.toString()
+            Properties releaseProps = new Properties()
+            releaseProps.load(new FileInputStream(projectDir + '/release.properties'))
+            storeFile file(projectDir + '/release-key.jks')
+            storePassword releaseProps['keystore.password']
+            keyAlias releaseProps['keyAlias']
+            keyPassword releaseProps['keyPassword']
+        }
+    }
+
     buildTypes {
         release {
-            runProguard false
+            runProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                def file = variant.outputFile
+                variant.outputFile = new File(file.parent, file.name.replace(".apk", "-" + defaultConfig.versionName + ".apk"))
+            }
+            signingConfig signingConfigs.release
+        }
+        debug {
+            runProguard false
+            applicationIdSuffix '.debug'
         }
     }
 }
@@ -36,6 +61,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.android.support:support-v4:20.0.+'
     compile 'com.squareup.dagger:dagger:1.2.2'
     provided 'com.squareup.dagger:dagger-compiler:1.2.2'
     compile 'com.squareup.retrofit:retrofit:1.6.1'

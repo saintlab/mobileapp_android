@@ -1,14 +1,11 @@
-package com.omnom.android.linker.widget;
+package com.omnom.util.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.EditText;
 
-import com.omnom.android.linker.R;
+import com.omnom.android.utils.R;
 
-/**
- * Created by Ch3D on 07.08.2014.
- */
 public class ErrorEditText extends EditText {
 	public ErrorEditText(Context context) {
 		super(context);

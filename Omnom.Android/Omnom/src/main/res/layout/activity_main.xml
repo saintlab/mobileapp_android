@@ -32,10 +32,17 @@
             android:layout_toLeftOf="@android:id/button1"
             android:text="Auth" />
 
+        <Button
+            android:id="@android:id/button3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@android:id/button2"
+            android:text="+User" />
+
         <EditText
             android:layout_alignParentStart="true"
             android:id="@android:id/edit"
-            android:layout_toLeftOf="@android:id/button2"
+            android:layout_toLeftOf="@android:id/button3"
             android:singleLine="true"
             android:inputType="textEmailAddress"
             android:layout_width="match_parent"

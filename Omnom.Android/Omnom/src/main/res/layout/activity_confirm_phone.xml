@@ -1,0 +1,62 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/view_enter_panel_top"/>
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/panel_top"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:text="@string/confirm_code_sms_text"
+        android:gravity="center"
+        android:textColor="?android:attr/textColorHint"
+        android:textAppearance="?android:textAppearanceLarge"/>
+
+    <LinearLayout
+        android:id="@+id/panel_digits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text"
+        android:layout_centerHorizontal="true"
+        android:paddingBottom="@dimen/activity_horizontal_margin"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/digit_1"
+            android:nextFocusForward="@+id/digit_2"
+            app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+            style="@style/EditText.ConfirmCode"/>
+
+        <EditText
+            android:id="@+id/digit_2"
+            android:nextFocusForward="@+id/digit_3"
+            app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+            style="@style/EditText.ConfirmCode"/>
+
+        <EditText
+            android:id="@+id/digit_3"
+            android:nextFocusForward="@+id/digit_4"
+            app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+            style="@style/EditText.ConfirmCode"/>
+
+        <EditText
+            android:id="@+id/digit_4"
+            app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+            style="@style/EditText.ConfirmCode"/>
+    </LinearLayout>
+
+    <Button
+        android:layout_width="@dimen/btn_rounded_width"
+        android:layout_height="@dimen/btn_rounded_height"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/panel_digits"
+        android:text="@string/request_new_confirmation_code"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:background="@drawable/bg_rounded_bordered_black"/>
+
+</RelativeLayout>

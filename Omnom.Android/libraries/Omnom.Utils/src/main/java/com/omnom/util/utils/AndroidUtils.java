@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -18,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.omnom.android.utils.R;
+
+import java.lang.reflect.Method;
 
 import static butterknife.ButterKnife.findById;
 
@@ -98,6 +101,15 @@ public class AndroidUtils {
 		toast.show();
 	}
 
+	public static void showToast(Context context, String msg) {
+		Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
+		View view = LayoutInflater.from(context).inflate(R.layout.transient_notification, null);
+		TextView tv = findById(view, android.R.id.message);
+		tv.setText(msg);
+		toast.setView(view);
+		toast.show();
+	}
+
 	public static void showToastLong(Context context, int resId) {
 		Toast toast = Toast.makeText(context, context.getString(resId), Toast.LENGTH_LONG);
 		View view = LayoutInflater.from(context).inflate(R.layout.transient_notification, null);
@@ -124,5 +136,29 @@ public class AndroidUtils {
 		alertDialog.setCanceledOnTouchOutside(false);
 		alertDialog.show();
 		return alertDialog;
+	}
+
+	public static String getInstallId(Context context) {
+		return getAndroidId(context) + getDeviceId(context) + getSerialNumber();
+	}
+
+	private static String getAndroidId(Context context) {
+		return Settings.Secure.getString(context.getContentResolver(),
+		                                 Settings.Secure.ANDROID_ID);
+	}
+
+	private static String getDeviceId(Context context) {
+		final TelephonyManager systemService = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		return systemService.getDeviceId();
+	}
+
+	public static String getSerialNumber() {
+		try {
+			Class<?> c = Class.forName("android.os.SystemProperties");
+			Method get = c.getMethod("get", String.class, String.class);
+			return (String) (get.invoke(c, "ro.serialno", "unknown"));
+		} catch(Exception ignored) {
+			return StringUtils.EMPTY_STRING;
+		}
 	}
 }
