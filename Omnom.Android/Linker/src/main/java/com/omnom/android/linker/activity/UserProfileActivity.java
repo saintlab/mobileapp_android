@@ -16,15 +16,15 @@ import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
-import com.omnom.util.activity.BaseActivity;
-import com.omnom.util.Extras;
-import com.omnom.util.activity.OmnomActivity;
 import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.drawable.RoundTransformation;
 import com.omnom.android.linker.drawable.RoundedDrawable;
 import com.omnom.android.linker.model.UserProfile;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
+import com.omnom.util.Extras;
+import com.omnom.util.activity.BaseActivity;
+import com.omnom.util.activity.OmnomActivity;
 import com.omnom.util.utils.AnimationUtils;
 import com.omnom.util.utils.StringUtils;
 import com.omnom.util.utils.ViewUtils;
@@ -112,36 +112,37 @@ public class UserProfileActivity extends BaseActivity {
 				LoginActivity.start(this);
 				return;
 			}
-			profileSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>
-					() {
-				@Override
-				public void call(UserResponse response) {
-					if(response.hasError() && UserProfileHelper.hasAuthError(response)) {
-						getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
-						ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
-						AnimationUtils.animateAlpha(mPanelBottom, false);
-						findById(getActivity(), R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y).start();
-						AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
-						AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
-							@Override
-							public void run() {
-								LoginActivity.start(getActivity());
+			profileSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(
+					new Action1<UserResponse>() {
+						@Override
+						public void call(UserResponse response) {
+							if(response.hasError() && UserProfileHelper.hasAuthError(response)) {
+								getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
+								ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
+								AnimationUtils.animateAlpha(mPanelBottom, false);
+								findById(getActivity(), R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y)
+								                                      .start();
+								AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
+								AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
+									@Override
+									public void run() {
+										LoginActivity.start(getActivity());
+									}
+								});
+								return;
 							}
-						});
-						return;
-					}
-					UserProfile profile = new UserProfile(response);
-					LinkerApplication.get(getActivity()).cacheUserProfile(profile);
-					initUserData(response.getUser(), profile.getImageUrl());
-				}
-			}, new BaseErrorHandler(getActivity()) {
-				@Override
-				protected void onThrowable(Throwable throwable) {
-					showToastLong(getActivity(), R.string.error_server_unavailable_please_try_again);
-					Log.e(TAG, "getUserProfile", throwable);
-					finish();
-				}
-			});
+							UserProfile profile = new UserProfile(response);
+							LinkerApplication.get(getActivity()).cacheUserProfile(profile);
+							initUserData(response.getUser(), profile.getImageUrl());
+						}
+					}, new BaseErrorHandler(getActivity()) {
+						@Override
+						protected void onThrowable(Throwable throwable) {
+							showToastLong(getActivity(), R.string.error_server_unavailable_please_try_again);
+							Log.e(TAG, "getUserProfile", throwable);
+							finish();
+						}
+					});
 		}
 	}
 
