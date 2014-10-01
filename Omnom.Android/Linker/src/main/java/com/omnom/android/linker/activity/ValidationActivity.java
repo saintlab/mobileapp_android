@@ -15,7 +15,6 @@ import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
-import com.omnom.util.activity.BaseActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.linker.api.Protocol;
@@ -26,10 +25,11 @@ import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
 import com.omnom.android.linker.observable.BaseErrorHandler;
 import com.omnom.android.linker.observable.OmnomObservable;
 import com.omnom.android.linker.observable.ValidationObservable;
+import com.omnom.android.linker.widget.loader.LoaderView;
+import com.omnom.util.activity.BaseActivity;
 import com.omnom.util.utils.StringUtils;
 import com.omnom.util.utils.UserDataHolder;
 import com.omnom.util.utils.ViewUtils;
-import com.omnom.android.linker.widget.loader.LoaderView;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -324,9 +324,9 @@ public class ValidationActivity extends BaseActivity {
 										                                }
 									                                });
 								}
-							})).subscribe(new Action1<RestaurantsResponse>() {
+							})).subscribe(new OmnomObservable.AuthAwareOnNext<RestaurantsResponse>(getActivity()) {
 						@Override
-						public void call(RestaurantsResponse result) {
+						public void perform(RestaurantsResponse result) {
 							onRestaurantsLoaded(result);
 						}
 					}, onError);
@@ -342,9 +342,10 @@ public class ValidationActivity extends BaseActivity {
 					                                            return api.getRestaurants();
 				                                            }
 			                                            })
-			                                            .subscribe(new Action1<RestaurantsResponse>() {
+			                                            .subscribe(new OmnomObservable.AuthAwareOnNext<RestaurantsResponse>(getActivity
+					                                                                                                                ()) {
 				                                            @Override
-				                                            public void call(RestaurantsResponse response) {
+				                                            public void perform(RestaurantsResponse response) {
 					                                            onRestaurantsLoaded(response);
 				                                            }
 			                                            }, onError);

@@ -47,6 +47,7 @@ public abstract class BaseErrorHandler implements Action1<Throwable> {
 		onThrowable(throwable);
 	}
 
+
 	protected abstract void onThrowable(Throwable throwable);
 
 	public void setDataHolder(UserDataHolder userDataHolder) {
