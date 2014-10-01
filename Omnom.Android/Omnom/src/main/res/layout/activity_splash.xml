@@ -42,7 +42,7 @@
             android:layout_width="38dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/img_logo"
-            android:layout_toEndOf="@+id/img_fork"
+            android:layout_toRightOf="@+id/img_fork"
             android:src="@drawable/ic_splash_bill"/>
 
         <ImageView
@@ -53,7 +53,7 @@
             android:layout_alignTop="@+id/img_fork"
             android:layout_height="wrap_content"
             android:layout_below="@id/img_logo"
-            android:layout_toStartOf="@+id/img_fork"
+            android:layout_toLeftOf="@+id/img_fork"
             android:src="@drawable/ic_splash_bell"/>
 
         <ImageView
