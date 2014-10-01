@@ -37,7 +37,8 @@
             android:gravity="start|center_vertical"
             android:textColor="@android:color/black"
             android:drawablePadding="@dimen/activity_horizontal_margin_small"
-            android:drawableStart="@drawable/ic_profile_small"
+            android:drawableLeft="@drawable/ic_profile_small"
+            android:ellipsize="end"
             style="@android:style/Widget.Holo.Button.Borderless"/>
 
         <Button
@@ -48,6 +49,7 @@
             android:layout_height="wrap_content"
             android:gravity="end|center_vertical"
             android:textColor="@android:color/black"
+            android:ellipsize="end"
             style="@android:style/Widget.Holo.Button.Borderless"/>
     </LinearLayout>
 
