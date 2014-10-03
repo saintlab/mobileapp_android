@@ -63,7 +63,7 @@
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White"
-            android:windowSoftInputMode="stateUnchanged"/>
+            android:windowSoftInputMode="stateVisible"/>
     </application>
 
 </manifest>

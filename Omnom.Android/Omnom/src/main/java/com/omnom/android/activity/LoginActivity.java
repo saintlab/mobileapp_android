@@ -3,27 +3,18 @@ package com.omnom.android.activity;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
-import com.omnom.android.view.ViewPagerIndicatorCircle;
-import com.omnom.util.utils.AndroidUtils;
+import com.omnom.android.view.LoginPanelTop;
 import com.omnom.util.utils.StringUtils;
-import com.omnom.util.utils.ViewUtils;
 import com.omnom.util.view.ErrorEdit;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.InjectViews;
-import butterknife.OnClick;
 import rx.functions.Action1;
 
 public class LoginActivity extends BaseOmnomActivity {
@@ -33,17 +24,8 @@ public class LoginActivity extends BaseOmnomActivity {
 	@InjectView(R.id.edit_phone)
 	protected ErrorEdit editPhone;
 
-	@InjectView(R.id.page_indicator)
-	protected ViewPagerIndicatorCircle pageIndicator;
-
-	@InjectView(R.id.btn_right)
-	protected Button btnRight;
-
-	@InjectView(R.id.title)
-	protected TextView textTitle;
-
-	@InjectViews({R.id.title, R.id.page_indicator, R.id.btn_right})
-	protected List<View> topViews;
+	@InjectView(R.id.panel_top)
+	protected LoginPanelTop topPanel;
 
 	@Inject
 	protected AuthService authenticator;
@@ -52,26 +34,29 @@ public class LoginActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA_NOW, false);
-		btnRight.setText(R.string.proceed);
-		textTitle.setText(R.string.enter);
-		pageIndicator.setFake(true, UserRegisterActivity.FAKE_PAGE_COUNT);
-		pageIndicator.setCurrentItem(0);
+		topPanel.setContentVisibility(false, true);
+		topPanel.setTitle(R.string.enter);
+		topPanel.setButtonRight(R.string.proceed, new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				doProceed(v);
+			}
+		});
+		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 0);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(pageIndicator.getAlpha() == 0) {
-			pageIndicator.postDelayed(new Runnable() {
+		if(topPanel.isAlphaVisible()) {
+			topPanel.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, true);
-					AndroidUtils.showKeyboard(editPhone.getEditText());
+					topPanel.setContentVisibility(true, false);
 				}
 
 			}, mFirstStart ? getResources().getInteger(android.R.integer.config_longAnimTime) :
-					                          getResources().getInteger(android.R.integer.config_mediumAnimTime));
+					                     getResources().getInteger(android.R.integer.config_mediumAnimTime));
 		}
 		mFirstStart = false;
 	}
@@ -80,17 +65,16 @@ public class LoginActivity extends BaseOmnomActivity {
 	protected void handleIntent(Intent intent) {
 	}
 
-	@OnClick(R.id.btn_right)
 	public void doProceed(final View view) {
 		if(!validate()) {
 			return;
 		}
-		view.setEnabled(false);
+		topPanel.showProgress(true);
 		authenticator.authorizePhone(editPhone.getText(), StringUtils.EMPTY_STRING).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse authResponse) {
 				if(!authResponse.hasError()) {
-					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, false);
+					topPanel.setContentVisibility(false, false);
 					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 						@Override
 						public void run() {
@@ -98,17 +82,18 @@ public class LoginActivity extends BaseOmnomActivity {
 							intent.putExtra(EXTRA_PHONE, editPhone.getText());
 							intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_LOGIN);
 							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
+							topPanel.showProgress(false);
 						}
 					});
 				} else {
 					editPhone.setError(authResponse.getError().getMessage());
+					topPanel.showProgress(false);
 				}
-				view.setEnabled(true);
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
-				view.setEnabled(true);
+				topPanel.showProgress(false);
 				Log.e(TAG + ":authorizePhone", "doProceed", throwable);
 			}
 		});

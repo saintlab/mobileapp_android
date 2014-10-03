@@ -1,6 +1,5 @@
 package com.omnom.android.activity;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -116,10 +115,6 @@ public class SplashActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		if(adapter != null && !adapter.isEnabled()) {
-			adapter.enable();
-		}
 		transitionDrawable = new TransitionDrawable(
 				new Drawable[]{getResources().getDrawable(R.drawable.ic_splash_fork_n_knife),
 						getResources().getDrawable(R.drawable.ic_fork_n_knife)});
