@@ -25,7 +25,7 @@
                 android:id="@+id/edit_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:inputType="text"
+                app:inputType="name"
                 app:hint="@string/name"
                 app:showClear="false"
                 app:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>

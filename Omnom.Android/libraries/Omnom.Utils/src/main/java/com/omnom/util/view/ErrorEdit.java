@@ -28,6 +28,7 @@ public class ErrorEdit extends LinearLayout {
 	public static final int INPUT_TYPE_TEXT = 0;
 	public static final int INPUT_TYPE_PHONE = 1;
 	public static final int INPUT_TYPE_EMAIL = 2;
+	public static final int INPUT_TYPE_NAME = 3;
 
 	public static final int FONT_TYPE_REGULAR = 0;
 	public static final int FONT_TYPE_MEDIUM = 1;
@@ -117,7 +118,7 @@ public class ErrorEdit extends LinearLayout {
 		});
 		errorTextView = (TextView) view.findViewById(R.id.error);
 		btnClear = (Button) view.findViewById(R.id.btn_clear);
-		btnClear.setBackground(mClearDrawable);
+		btnClear.setBackgroundDrawable(mClearDrawable);
 		btnClear.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -153,7 +154,15 @@ public class ErrorEdit extends LinearLayout {
 				break;
 
 			case INPUT_TYPE_EMAIL:
-				editView.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+				editView.setInputType(InputType.TYPE_CLASS_TEXT
+						                      | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+						                      | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+				break;
+
+			case INPUT_TYPE_NAME:
+				editView.setInputType(InputType.TYPE_CLASS_TEXT
+						                      | InputType.TYPE_TEXT_VARIATION_PERSON_NAME
+						                      | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 				break;
 		}
 	}
