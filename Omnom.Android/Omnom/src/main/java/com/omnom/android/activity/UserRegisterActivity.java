@@ -18,7 +18,6 @@ import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
-import com.omnom.util.activity.BaseActivity;
 import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.StringUtils;
 import com.omnom.util.utils.ViewUtils;
@@ -154,10 +153,12 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		                                                               editBirth.getText()
 		                                                                        .toString()
 		                                                                        .replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
+		track(TAG + ":register", request);
 		view.setEnabled(false);
 		authenticator.register(request).subscribe(new Action1<AuthRegisterResponse>() {
 			@Override
 			public void call(final AuthRegisterResponse authRegisterResponse) {
+				track(TAG + ":register", authRegisterResponse);
 				view.setEnabled(true);
 				if(!authRegisterResponse.hasError()) {
 					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, false);
@@ -178,6 +179,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 			@Override
 			public void call(Throwable throwable) {
 				view.setEnabled(true);
+				track(TAG + ":register", throwable);
 				Log.e(TAG, "performRegister", throwable);
 			}
 		});

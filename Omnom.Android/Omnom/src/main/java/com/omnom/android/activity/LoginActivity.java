@@ -103,12 +103,14 @@ public class LoginActivity extends BaseOmnomActivity {
 					editPhone.setError(authResponse.getError().getMessage());
 				}
 				view.setEnabled(true);
+				track(TAG + ":authorizePhone", authResponse);
 			}
 		}, new Action1<Throwable>() {
 			@Override
 			public void call(Throwable throwable) {
 				view.setEnabled(true);
-				Log.e(TAG, "doProceed", throwable);
+				Log.e(TAG + ":authorizePhone", "doProceed", throwable);
+				track(TAG + ":authorizePhone", throwable);
 			}
 		});
 	}

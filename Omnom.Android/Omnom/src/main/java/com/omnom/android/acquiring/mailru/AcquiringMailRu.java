@@ -6,7 +6,6 @@ import android.util.Log;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.api.PaymentInfo;
@@ -22,8 +21,8 @@ import com.omnom.android.utils.EncryptionUtils;
 
 import java.util.HashMap;
 
-import retrofit.RestAdapter;
-import retrofit.converter.GsonConverter;
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -34,19 +33,15 @@ import rx.functions.Func1;
 public class AcquiringMailRu implements Acquiring {
 	private static final String TAG = AcquiringMailRu.class.getSimpleName();
 
-	private final AcquiringServiceMailRu mAcquiringService;
+	@Inject
+	protected AcquiringServiceMailRu mApiProxy;
+
 	private final Gson gson;
 	private Context mContext;
 
 	public AcquiringMailRu(final Context context) {
 		mContext = context;
-
-		// TODO: this code must be the same across all the rest services -> refactore it!
-		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-		RestAdapter mRestAdapter = new RestAdapter.Builder().setEndpoint(context.getString(R.string.acquiring_mailru_acquiring_base_url))
-		                                                    .setLogLevel(logLevel).setConverter(new GsonConverter(gson)).build();
-		mAcquiringService = mRestAdapter.create(AcquiringServiceMailRu.class);
 	}
 
 	@Override
@@ -70,28 +65,28 @@ public class AcquiringMailRu implements Acquiring {
 		parameters.put("cardholder", mContext.getString(R.string.acquiring_mailru_cardholder));
 		info.getUser().storePhone(parameters);
 
-		mAcquiringService.pay(parameters)
-		                 .concatMap(new Func1<AcquiringResponse, Observable<AcquiringPollingResponse>>() {
-			                 @Override
-			                 public Observable<AcquiringPollingResponse> call(AcquiringResponse response) {
-				                 if(response.getError() == null) {
-					                 return PollingObservable.create(response);
-				                 } else {
-					                 return Observable.error(new RuntimeException(response.getError().toString()));
-				                 }
-			                 }
-		                 })
-		                 .subscribe(new Action1<AcquiringPollingResponse>() {
-			                 @Override
-			                 public void call(AcquiringPollingResponse acquiringPollingResponse) {
-				                 listener.onPaymentSettled(acquiringPollingResponse);
-			                 }
-		                 }, new Action1<Throwable>() {
-			                 @Override
-			                 public void call(Throwable throwable) {
-				                 Log.e(TAG, "pay", throwable);
-			                 }
-		                 });
+		mApiProxy.pay(parameters)
+		         .concatMap(new Func1<AcquiringResponse, Observable<AcquiringPollingResponse>>() {
+			         @Override
+			         public Observable<AcquiringPollingResponse> call(AcquiringResponse response) {
+				         if(response.getError() == null) {
+					         return PollingObservable.create(response);
+				         } else {
+					         return Observable.error(new RuntimeException(response.getError().toString()));
+				         }
+			         }
+		         })
+		         .subscribe(new Action1<AcquiringPollingResponse>() {
+			         @Override
+			         public void call(AcquiringPollingResponse acquiringPollingResponse) {
+				         listener.onPaymentSettled(acquiringPollingResponse);
+			         }
+		         }, new Action1<Throwable>() {
+			         @Override
+			         public void call(Throwable throwable) {
+				         Log.e(TAG, "pay", throwable);
+			         }
+		         });
 	}
 
 	@Override
@@ -105,18 +100,18 @@ public class AcquiringMailRu implements Acquiring {
 		final HashMap<String, String> parameters = signatureParams;
 		parameters.put("signature", signature);
 
-		mAcquiringService.deleteCard(parameters)
-		                 .subscribe(new Action1<AcquiringResponse>() {
-			                 @Override
-			                 public void call(AcquiringResponse pollingResponse) {
-				                 listener.onCardDeleted(pollingResponse);
-			                 }
-		                 }, new Action1<Throwable>() {
-			                 @Override
-			                 public void call(Throwable throwable) {
-				                 Log.e(TAG, "deleteCard", throwable);
-			                 }
-		                 });
+		mApiProxy.deleteCard(parameters)
+		         .subscribe(new Action1<AcquiringResponse>() {
+			         @Override
+			         public void call(AcquiringResponse pollingResponse) {
+				         listener.onCardDeleted(pollingResponse);
+			         }
+		         }, new Action1<Throwable>() {
+			         @Override
+			         public void call(Throwable throwable) {
+				         Log.e(TAG, "deleteCard", throwable);
+			         }
+		         });
 	}
 
 	@Override
@@ -132,18 +127,18 @@ public class AcquiringMailRu implements Acquiring {
 		parameters.put("signature", signature);
 		parameters.put("amount", Double.toString(amount));
 
-		mAcquiringService.verifyCard(parameters)
-		                 .subscribe(new Action1<AcquiringResponse>() {
-			                 @Override
-			                 public void call(AcquiringResponse response) {
-				                 listener.onCardVerified(response);
-			                 }
-		                 }, new Action1<Throwable>() {
-			                 @Override
-			                 public void call(Throwable throwable) {
-				                 Log.e(TAG, "verifyCard", throwable);
-			                 }
-		                 });
+		mApiProxy.verifyCard(parameters)
+		         .subscribe(new Action1<AcquiringResponse>() {
+			         @Override
+			         public void call(AcquiringResponse response) {
+				         listener.onCardVerified(response);
+			         }
+		         }, new Action1<Throwable>() {
+			         @Override
+			         public void call(Throwable throwable) {
+				         Log.e(TAG, "verifyCard", throwable);
+			         }
+		         });
 	}
 
 	@Override
@@ -158,27 +153,27 @@ public class AcquiringMailRu implements Acquiring {
 		cardInfo.toMap(parameters);
 		parameters.put("signature", signature);
 
-		mAcquiringService.registerCard(parameters)
-		                 .concatMap(new Func1<RegisterCardResponse, Observable<CardRegisterPollingResponse>>() {
-			                 @Override
-			                 public Observable<CardRegisterPollingResponse> call(RegisterCardResponse response) {
-				                 if(response.getError() == null) {
-					                 return PollingObservable.create(response);
-				                 } else {
-					                 return Observable.error(new RuntimeException(response.getError().toString()));
-				                 }
-			                 }
-		                 })
-		                 .subscribe(new Action1<CardRegisterPollingResponse>() {
-			                 @Override
-			                 public void call(CardRegisterPollingResponse response) {
-				                 listener.onCardRegistered(response);
-			                 }
-		                 }, new Action1<Throwable>() {
-			                 @Override
-			                 public void call(Throwable throwable) {
-				                 Log.e(TAG, "registerCard", throwable);
-			                 }
-		                 });
+		mApiProxy.registerCard(parameters)
+		         .concatMap(new Func1<RegisterCardResponse, Observable<CardRegisterPollingResponse>>() {
+			         @Override
+			         public Observable<CardRegisterPollingResponse> call(RegisterCardResponse response) {
+				         if(response.getError() == null) {
+					         return PollingObservable.create(response);
+				         } else {
+					         return Observable.error(new RuntimeException(response.getError().toString()));
+				         }
+			         }
+		         })
+		         .subscribe(new Action1<CardRegisterPollingResponse>() {
+			         @Override
+			         public void call(CardRegisterPollingResponse response) {
+				         listener.onCardRegistered(response);
+			         }
+		         }, new Action1<Throwable>() {
+			         @Override
+			         public void call(Throwable throwable) {
+				         Log.e(TAG, "registerCard", throwable);
+			         }
+		         });
 	}
 }

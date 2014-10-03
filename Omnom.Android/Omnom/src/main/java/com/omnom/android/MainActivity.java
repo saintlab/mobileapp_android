@@ -20,13 +20,13 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
+import com.omnom.android.activity.BaseOmnomActivity;
 import com.omnom.android.activity.UserRegisterActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
-import com.omnom.util.activity.BaseActivity;
 
 import javax.inject.Inject;
 
@@ -34,7 +34,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseOmnomActivity {
 	private static final String TAG = MainActivity.class.getSimpleName();
 
 	@Inject
@@ -101,6 +101,8 @@ public class MainActivity extends BaseActivity {
 				authPhone(request);
 			}
 		});
+
+		track(TAG + ":initUi", request);
 	}
 
 	@OnClick(android.R.id.button3)
