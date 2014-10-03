@@ -17,6 +17,7 @@ import com.omnom.android.R;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
+import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
 import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.StringUtils;
@@ -175,11 +176,10 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 					textError.setText(authRegisterResponse.getError().getMessage());
 				}
 			}
-		}, new Action1<Throwable>() {
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
-			public void call(Throwable throwable) {
+			public void onError(Throwable throwable) {
 				view.setEnabled(true);
-				track(TAG + ":register", throwable);
 				Log.e(TAG, "performRegister", throwable);
 			}
 		});

@@ -2,12 +2,12 @@ package com.omnom.android.modules;
 
 import android.content.Context;
 
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
-import com.omnom.android.MainActivity;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.AcquiringMailRu;
 import com.omnom.android.acquiring.mailru.AcquiringServiceMailRu;
+import com.omnom.android.activity.MainActivity;
 import com.omnom.android.interceptors.mixpanel.AcquiringMailRuMixpanel;
+import com.omnom.android.MixPanelHelper;
 
 import javax.inject.Singleton;
 
@@ -20,11 +20,11 @@ import dagger.Provides;
 @Module(injects = {MainActivity.class}, complete = false, library = true)
 public class AcquiringModuleMailRuMixpanel {
 	private Context mContext;
-	private MixpanelAPI mMixpanelAPI;
+	private MixPanelHelper mHelper;
 
-	public AcquiringModuleMailRuMixpanel(final Context context, MixpanelAPI mixpanelAPI) {
+	public AcquiringModuleMailRuMixpanel(final Context context, MixPanelHelper helper) {
 		mContext = context;
-		mMixpanelAPI = mixpanelAPI;
+		mHelper = helper;
 	}
 
 	@Provides
@@ -36,6 +36,6 @@ public class AcquiringModuleMailRuMixpanel {
 	@Provides
 	@Singleton
 	public AcquiringServiceMailRu provideAcquiringService() {
-		return new AcquiringMailRuMixpanel(mContext, mMixpanelAPI);
+		return new AcquiringMailRuMixpanel(mContext, mHelper);
 	}
 }

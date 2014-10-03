@@ -2,7 +2,7 @@ package com.omnom.android.interceptors.mixpanel;
 
 import android.content.Context;
 
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.MixPanelHelper;
 import com.omnom.android.auth.WicketAuthenticator;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
@@ -21,10 +21,10 @@ public class WicketMixpanelAuthenticator extends WicketAuthenticator {
 	private final HashMap<String, String> mParams;
 	private final MixPanelHelper mMixHelper;
 
-	public WicketMixpanelAuthenticator(Context context, String endpoint, MixpanelAPI mixpanelApi) {
+	public WicketMixpanelAuthenticator(Context context, String endpoint, MixPanelHelper helper) {
 		super(context, endpoint);
 		mParams = new HashMap<String, String>();
-		mMixHelper = new MixPanelHelper(mixpanelApi);
+		mMixHelper = helper;
 	}
 
 	@Override

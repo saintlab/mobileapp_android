@@ -1,4 +1,4 @@
-package com.omnom.android.interceptors.mixpanel;
+package com.omnom.android;
 
 import android.util.Log;
 
@@ -28,7 +28,7 @@ public class MixPanelHelper {
 		mGson = new Gson();
 	}
 
-	protected void track(String event, Object request) {
+	public void track(String event, Object request) {
 		try {
 			final JSONObject json = new JSONObject();
 			json.put(KEY_DATA, mGson.toJson(request));
@@ -38,7 +38,7 @@ public class MixPanelHelper {
 		}
 	}
 
-	protected void track(String event, Map data) {
+	public void track(String event, Map data) {
 		final JSONObject json = new JSONObject(data);
 		try {
 			json.put(KEY_DATA, json.toString());
@@ -48,7 +48,7 @@ public class MixPanelHelper {
 		}
 	}
 
-	protected void track(String event, JSONObject json) {
+	public void track(String event, JSONObject json) {
 		try {
 			json.put(KEY_TIMESTAMP, System.currentTimeMillis());
 			mMixpanelApi.track(event, json);

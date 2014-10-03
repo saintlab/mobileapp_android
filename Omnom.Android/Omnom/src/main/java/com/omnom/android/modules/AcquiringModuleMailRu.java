@@ -2,7 +2,7 @@ package com.omnom.android.modules;
 
 import android.content.Context;
 
-import com.omnom.android.MainActivity;
+import com.omnom.android.activity.MainActivity;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.AcquiringMailRu;
 import com.omnom.android.acquiring.mailru.AcquiringProxyMailRu;

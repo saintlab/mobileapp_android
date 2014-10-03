@@ -36,17 +36,22 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		return OmnomApplication.get(context).mixPanel;
 	}
 
+	public static MixPanelHelper getMixPanelHelper(final Context context) {
+		return OmnomApplication.get(context).mixPanelHelper;
+	}
+
 	private final List<Object> injectList = new ArrayList<Object>();
 	private ObjectGraph objectGraph;
 	private PreferenceHelper preferenceHelper;
 	private MixpanelAPI mixPanel;
 	private Stack<Activity> activityStack = new Stack<Activity>();
+	private MixPanelHelper mixPanelHelper;
 
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
 		                     new ApplicationModule(),
-		                     new AcquiringModuleMailRuMixpanel(this, mixPanel),
-		                     new AuthMixpanelModule(this, R.string.endpoint_auth, mixPanel));
+		                     new AcquiringModuleMailRuMixpanel(this, mixPanelHelper),
+		                     new AuthMixpanelModule(this, R.string.endpoint_auth, mixPanelHelper));
 	}
 
 	@Override
@@ -69,6 +74,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		CalligraphyConfig.initDefault("fonts/Futura-OSF-Omnom-Regular.otf", R.attr.fontPath);
 
 		mixPanel = MixpanelAPI.getInstance(this, MIXPANEL_TOKEN);
+		mixPanelHelper = new MixPanelHelper(mixPanel);
 
 		objectGraph = ObjectGraph.create(getModules().toArray());
 		for(final Object obj : injectList) {

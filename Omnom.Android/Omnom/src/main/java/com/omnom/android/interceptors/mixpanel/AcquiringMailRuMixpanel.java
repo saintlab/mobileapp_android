@@ -2,7 +2,7 @@ package com.omnom.android.interceptors.mixpanel;
 
 import android.content.Context;
 
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.MixPanelHelper;
 import com.omnom.android.acquiring.mailru.AcquiringProxyMailRu;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringTransactionExtendedResponse;
@@ -21,9 +21,9 @@ import rx.functions.Action1;
 public class AcquiringMailRuMixpanel extends AcquiringProxyMailRu {
 	private MixPanelHelper mMixHelper;
 
-	public AcquiringMailRuMixpanel(Context context, MixpanelAPI mixpanelApi) {
+	public AcquiringMailRuMixpanel(Context context, MixPanelHelper helper) {
 		super(context);
-		mMixHelper = new MixPanelHelper(mixpanelApi);
+		mMixHelper = helper;
 	}
 
 	@Override

@@ -10,10 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.omnom.android.MainActivity;
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
+import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
 import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.StringUtils;
@@ -132,42 +132,26 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	}
 
 	private void doConfirm() {
-		Observable<AuthResponse> observable;
-		final String eventType;
-		if(type == TYPE_REGISTER) {
-			observable = authenticator.confirm(phone, getCode());
-			eventType = TAG + ":confirm";
-		} else if(type == TYPE_LOGIN) {
-			observable = authenticator.authorizePhone(phone, getCode());
-			eventType = TAG + ":authorizeCode";
-		} else {
-			throw new RuntimeException("Wrong confirm type = " + type);
-		}
-
-		track(TAG + ":doConfirm", "{\"phone\":\"" + phone + "\"}");
-
-		observable.subscribe(new Action1<AuthResponse>() {
+		getObservable().subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(final AuthResponse authResponse) {
 				if(!authResponse.hasError()) {
-//					if(type == TYPE_REGISTER) {
-//						getMixPanel().alias(phone, null);
-//					} else {
-//						getMixPanel().identify(phone);
-//					}
+					if(type == TYPE_REGISTER) {
+						getMixPanel().alias(phone, null);
+					} else {
+						getMixPanel().identify(phone);
+					}
 					getPreferences().setAuthToken(getActivity(), authResponse.getToken());
 					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, false);
-					postDelayed(350, new Runnable() {
+					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 						@Override
 						public void run() {
-							trackConfirm(authResponse, eventType);
 							final Intent intent = new Intent(ConfirmPhoneActivity.this, MainActivity.class);
 							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
 						}
 					});
 				} else {
-					trackConfirm(authResponse, eventType);
 					edit1.setText(StringUtils.EMPTY_STRING);
 					edit2.setText(StringUtils.EMPTY_STRING);
 					edit3.setText(StringUtils.EMPTY_STRING);
@@ -177,23 +161,25 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 					panelDigits.startAnimation(animation);
 				}
 			}
-		}, new Action1<Throwable>() {
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
-			public void call(Throwable throwable) {
+			public void onError(Throwable throwable) {
 				Log.e(TAG, "doConfirm", throwable);
-				track(eventType, throwable);
 				finish();
 			}
 		});
 	}
 
-	private void trackConfirm(final AuthResponse authResponse, final String eventType) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				track(eventType, authResponse);
-			}
-		});
+	private Observable<AuthResponse> getObservable() {
+		Observable<AuthResponse> observable;
+		if(type == TYPE_REGISTER) {
+			observable = authenticator.confirm(phone, getCode());
+		} else if(type == TYPE_LOGIN) {
+			observable = authenticator.authorizePhone(phone, getCode());
+		} else {
+			throw new RuntimeException("Wrong confirm type = " + type);
+		}
+		return observable;
 	}
 
 	private String getCode() {

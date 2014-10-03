@@ -1,4 +1,4 @@
-package com.omnom.android;
+package com.omnom.android.activity;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.omnom.android.R;
 import com.omnom.android.acquiring.AcquiringType;
 import com.omnom.android.acquiring.ExtraData;
 import com.omnom.android.acquiring.OrderInfo;
@@ -20,8 +21,6 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
-import com.omnom.android.activity.BaseOmnomActivity;
-import com.omnom.android.activity.UserRegisterActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;

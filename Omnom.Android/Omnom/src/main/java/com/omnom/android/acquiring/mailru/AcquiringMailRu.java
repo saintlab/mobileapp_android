@@ -18,6 +18,7 @@ import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
 import com.omnom.android.utils.EncryptionUtils;
+import com.omnom.android.utils.ObservableUtils;
 
 import java.util.HashMap;
 
@@ -81,9 +82,9 @@ public class AcquiringMailRu implements Acquiring {
 			         public void call(AcquiringPollingResponse acquiringPollingResponse) {
 				         listener.onPaymentSettled(acquiringPollingResponse);
 			         }
-		         }, new Action1<Throwable>() {
+		         }, new ObservableUtils.BaseOnErrorHandler(mContext) {
 			         @Override
-			         public void call(Throwable throwable) {
+			         public void onError(Throwable throwable) {
 				         Log.e(TAG, "pay", throwable);
 			         }
 		         });
@@ -106,9 +107,9 @@ public class AcquiringMailRu implements Acquiring {
 			         public void call(AcquiringResponse pollingResponse) {
 				         listener.onCardDeleted(pollingResponse);
 			         }
-		         }, new Action1<Throwable>() {
+		         }, new ObservableUtils.BaseOnErrorHandler(mContext) {
 			         @Override
-			         public void call(Throwable throwable) {
+			         public void onError(Throwable throwable) {
 				         Log.e(TAG, "deleteCard", throwable);
 			         }
 		         });
@@ -133,9 +134,9 @@ public class AcquiringMailRu implements Acquiring {
 			         public void call(AcquiringResponse response) {
 				         listener.onCardVerified(response);
 			         }
-		         }, new Action1<Throwable>() {
+		         }, new ObservableUtils.BaseOnErrorHandler(mContext) {
 			         @Override
-			         public void call(Throwable throwable) {
+			         public void onError(Throwable throwable) {
 				         Log.e(TAG, "verifyCard", throwable);
 			         }
 		         });
@@ -169,9 +170,9 @@ public class AcquiringMailRu implements Acquiring {
 			         public void call(CardRegisterPollingResponse response) {
 				         listener.onCardRegistered(response);
 			         }
-		         }, new Action1<Throwable>() {
+		         }, new ObservableUtils.BaseOnErrorHandler(mContext) {
 			         @Override
-			         public void call(Throwable throwable) {
+			         public void onError(Throwable throwable) {
 				         Log.e(TAG, "registerCard", throwable);
 			         }
 		         });
