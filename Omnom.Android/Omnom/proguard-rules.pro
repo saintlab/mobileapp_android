@@ -147,3 +147,4 @@
 -keep class sun.misc.Unsafe { *; }
 #gson models package
 -keep class com.omnom.android.linker.model.** { *; }
+-keep class com.omnom.android.auth.** { *; }
