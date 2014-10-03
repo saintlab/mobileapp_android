@@ -6,6 +6,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -78,6 +79,9 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	@InjectView(R.id.panel_top)
 	protected LoginPanelTop topPanel;
 
+	@InjectView(R.id.btn_request_code)
+	protected Button btnRequestCode;
+
 	@Inject
 	protected AuthService authenticator;
 
@@ -91,6 +95,10 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		topPanel.setTitle(R.string.enter);
 		topPanel.setContentVisibility(false, true);
 		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 1);
+
+		btnRequestCode.setEnabled(false);
+		btnRequestCode.setFocusable(false);
+		btnRequestCode.setFocusableInTouchMode(false);
 
 		edit1.addTextChangedListener(new Watcher(edit1));
 		edit2.addTextChangedListener(new Watcher(edit2));
@@ -189,6 +197,16 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 			}, mFirstStart ? getResources().getInteger(android.R.integer.config_longAnimTime) :
 					                     getResources().getInteger(android.R.integer.config_mediumAnimTime));
+		}
+		if(mFirstStart) {
+			postDelayed(getResources().getInteger(R.integer.default_sms_request_timeout), new Runnable() {
+				@Override
+				public void run() {
+					btnRequestCode.setEnabled(true);
+					btnRequestCode.setFocusable(true);
+					btnRequestCode.setFocusableInTouchMode(true);
+				}
+			});
 		}
 		mFirstStart = false;
 	}

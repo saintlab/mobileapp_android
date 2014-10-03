@@ -11,6 +11,15 @@
         android:textColor="@android:color/black"
         style="@android:style/Widget.Holo.Button.Borderless"/>
 
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:visibility="gone"/>
+
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"

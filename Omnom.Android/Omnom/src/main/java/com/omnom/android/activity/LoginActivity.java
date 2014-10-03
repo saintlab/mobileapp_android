@@ -69,7 +69,7 @@ public class LoginActivity extends BaseOmnomActivity {
 		if(!validate()) {
 			return;
 		}
-		view.setEnabled(false);
+		topPanel.showProgress(true);
 		authenticator.authorizePhone(editPhone.getText(), StringUtils.EMPTY_STRING).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse authResponse) {
@@ -82,18 +82,18 @@ public class LoginActivity extends BaseOmnomActivity {
 							intent.putExtra(EXTRA_PHONE, editPhone.getText());
 							intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_LOGIN);
 							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
-							view.setEnabled(true);
+							topPanel.showProgress(false);
 						}
 					});
 				} else {
 					editPhone.setError(authResponse.getError().getMessage());
-					view.setEnabled(true);
+					topPanel.showProgress(false);
 				}
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
-				view.setEnabled(true);
+				topPanel.showProgress(false);
 				Log.e(TAG + ":authorizePhone", "doProceed", throwable);
 			}
 		});

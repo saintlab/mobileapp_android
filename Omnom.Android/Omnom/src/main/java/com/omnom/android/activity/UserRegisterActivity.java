@@ -30,6 +30,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.functions.Action0;
 import rx.functions.Action1;
 
 /**
@@ -86,7 +87,6 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		textAgreement.setMovementMethod(LinkMovementMethod.getInstance());
 		textAgreement.setText(Html.fromHtml(getResources().getString(R.string.register_agreement)));
 
-
 		editBirth.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -127,7 +127,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 				}
 
 			}, mFirstStart ? getResources().getInteger(android.R.integer.config_longAnimTime) :
-					                          getResources().getInteger(android.R.integer.config_mediumAnimTime));
+					                     getResources().getInteger(android.R.integer.config_mediumAnimTime));
 		}
 		mFirstStart = false;
 	}
@@ -137,6 +137,8 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		if(!validate()) {
 			return;
 		}
+		AndroidUtils.hideKeyboard(getActivity());
+		topPanel.showProgress(true);
 		final AuthRegisterRequest request = AuthRegisterRequest.create(AndroidUtils.getInstallId(this),
 		                                                               editName.getText(),
 		                                                               StringUtils.EMPTY_STRING,
@@ -145,13 +147,9 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		                                                               editBirth.getText()
 		                                                                        .toString()
 		                                                                        .replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
-		track(TAG + ":register", request);
-		view.setEnabled(false);
 		authenticator.register(request).subscribe(new Action1<AuthRegisterResponse>() {
 			@Override
 			public void call(final AuthRegisterResponse authRegisterResponse) {
-				track(TAG + ":register", authRegisterResponse);
-				view.setEnabled(true);
 				if(!authRegisterResponse.hasError()) {
 					topPanel.setContentVisibility(false, false);
 					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
@@ -161,16 +159,18 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 							intent.putExtra(EXTRA_PHONE, request.getPhone());
 							intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_REGISTER);
 							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
+							topPanel.showProgress(false);
 						}
 					});
 				} else {
+					topPanel.showProgress(false);
 					textError.setText(authRegisterResponse.getError().getMessage());
 				}
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
-				view.setEnabled(true);
+				topPanel.showProgress(false);
 				Log.e(TAG, "doRegister", throwable);
 			}
 		});

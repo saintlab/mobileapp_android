@@ -5,11 +5,11 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.UserRegisterActivity;
 import com.omnom.util.utils.ViewUtils;
 
 import java.util.Arrays;
@@ -24,7 +24,9 @@ import static butterknife.ButterKnife.findById;
 public class LoginPanelTop extends RelativeLayout {
 	private TextView txtTitle;
 	private Button btnRight;
+	private ProgressBar progress;
 	private ViewPagerIndicatorCircle pageIndicator;
+	private int mBtnRightLastVisibility;
 
 	public LoginPanelTop(Context context) {
 		super(context);
@@ -46,6 +48,7 @@ public class LoginPanelTop extends RelativeLayout {
 		txtTitle = findById(view, R.id.title);
 		btnRight = findById(view, R.id.btn_right);
 		pageIndicator = findById(view, R.id.page_indicator);
+		progress = findById(view, R.id.progress);
 	}
 
 	public void setTitle(final int resId) {
@@ -58,8 +61,8 @@ public class LoginPanelTop extends RelativeLayout {
 	}
 
 	public void setPaging(final int count, final int index) {
-		pageIndicator.setFake(true, UserRegisterActivity.FAKE_PAGE_COUNT);
-		pageIndicator.setCurrentItem(0);
+		pageIndicator.setFake(true, count);
+		pageIndicator.setCurrentItem(index);
 	}
 
 	public void setContentVisibility(final boolean visible, final boolean now) {
@@ -77,5 +80,18 @@ public class LoginPanelTop extends RelativeLayout {
 
 	public void setRigthButtonVisibile(boolean visibile) {
 		ViewUtils.setVisible(btnRight, visibile);
+	}
+
+	public void showProgress(final boolean show) {
+		if(show) {
+			mBtnRightLastVisibility = btnRight.getVisibility();
+			ViewUtils.setVisible(btnRight, !show);
+			ViewUtils.setVisible(progress, show);
+		} else {
+			if(mBtnRightLastVisibility == VISIBLE) {
+				ViewUtils.setVisible(btnRight, !show);
+			}
+			ViewUtils.setVisible(progress, show);
+		}
 	}
 }
