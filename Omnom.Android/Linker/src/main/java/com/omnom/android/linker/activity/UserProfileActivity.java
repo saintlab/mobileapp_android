@@ -168,7 +168,11 @@ public class UserProfileActivity extends BaseActivity {
 	private void updateUserImage(String url) {
 		final int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
 		if(TextUtils.isEmpty(url)) {
-			mImgUser.setImageDrawable(getPlaceholderDrawable(dimension));
+			final RoundedDrawable placeholderDrawable = getPlaceholderDrawable(dimension);
+			mImgUser.setBackground(placeholderDrawable);
+			mImgUser.setImageDrawable(getResources().getDrawable(R.drawable.ic_defolt_user));
+			final int padding = ViewUtils.dipToPixels(this, 24);
+			mImgUser.setPadding(padding, padding, padding, padding);
 		} else {
 			Picasso.with(this).load(url).placeholder(getPlaceholderDrawable(dimension))
 			       .resize(dimension, dimension).centerCrop()
