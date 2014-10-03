@@ -14,6 +14,7 @@ import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -42,7 +43,12 @@ public class WicketAuthenticator implements AuthService {
 
 	@Override
 	public Observable<AuthResponse> confirm(final String phone, final String code) {
-		return authService.confirm(phone, code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		return authService.confirm(phone, code).doOnNext(new Action1<AuthResponse>() {
+			@Override
+			public void call(AuthResponse authResponse) {
+				System.err.println(">>>!!!!!>>>>!>!>!>!>!>!");
+			}
+		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
@@ -52,7 +58,12 @@ public class WicketAuthenticator implements AuthService {
 
 	@Override
 	public Observable<AuthResponse> authorizePhone(String phone, String code) {
-		return authService.authorizePhone(phone, code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		return authService.authorizePhone(phone, code).doOnNext(new Action1<AuthResponse>() {
+			@Override
+			public void call(AuthResponse authResponse) {
+				System.err.println(">>>!!!!!>>>>!>!>!>!>!>!");
+			}
+		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

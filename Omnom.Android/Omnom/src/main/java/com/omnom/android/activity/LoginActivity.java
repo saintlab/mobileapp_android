@@ -9,8 +9,8 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
+import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
-import com.omnom.util.activity.BaseActivity;
 import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.StringUtils;
 import com.omnom.util.utils.ViewUtils;
@@ -26,7 +26,7 @@ import butterknife.InjectViews;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends BaseOmnomActivity {
 
 	private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -105,11 +105,11 @@ public class LoginActivity extends BaseActivity {
 				}
 				view.setEnabled(true);
 			}
-		}, new Action1<Throwable>() {
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
-			public void call(Throwable throwable) {
+			public void onError(Throwable throwable) {
 				view.setEnabled(true);
-				Log.e(TAG, "doProceed", throwable);
+				Log.e(TAG + ":authorizePhone", "doProceed", throwable);
 			}
 		});
 	}

@@ -17,8 +17,8 @@ import com.omnom.android.R;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
+import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
-import com.omnom.util.activity.BaseActivity;
 import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.StringUtils;
 import com.omnom.util.utils.ViewUtils;
@@ -40,8 +40,7 @@ import rx.functions.Action1;
 /**
  * Created by Ch3D on 28.09.2014.
  */
-public class UserRegisterActivity extends BaseActivity {
-
+public class UserRegisterActivity extends BaseOmnomActivity {
 	public static final int YEAR_OFFSET = 30;
 	public static final String DELIMITER_DATE_UI = "/";
 	public static final String DELIMITER_DATE_WICKET = "-";
@@ -155,10 +154,12 @@ public class UserRegisterActivity extends BaseActivity {
 		                                                               editBirth.getText()
 		                                                                        .toString()
 		                                                                        .replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
+		track(TAG + ":register", request);
 		view.setEnabled(false);
 		authenticator.register(request).subscribe(new Action1<AuthRegisterResponse>() {
 			@Override
 			public void call(final AuthRegisterResponse authRegisterResponse) {
+				track(TAG + ":register", authRegisterResponse);
 				view.setEnabled(true);
 				if(!authRegisterResponse.hasError()) {
 					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, false);
@@ -175,9 +176,9 @@ public class UserRegisterActivity extends BaseActivity {
 					textError.setText(authRegisterResponse.getError().getMessage());
 				}
 			}
-		}, new Action1<Throwable>() {
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
-			public void call(Throwable throwable) {
+			public void onError(Throwable throwable) {
 				view.setEnabled(true);
 				Log.e(TAG, "performRegister", throwable);
 			}

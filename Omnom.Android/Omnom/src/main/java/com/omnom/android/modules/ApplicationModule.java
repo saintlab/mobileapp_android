@@ -1,6 +1,6 @@
 package com.omnom.android.modules;
 
-import com.omnom.android.MainActivity;
+import com.omnom.android.activity.MainActivity;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.activity.ConfirmPhoneActivity;
 import com.omnom.android.activity.EnteringActivity;
