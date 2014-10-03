@@ -40,8 +40,7 @@ import rx.functions.Action1;
 /**
  * Created by Ch3D on 28.09.2014.
  */
-public class UserRegisterActivity extends BaseActivity {
-
+public class UserRegisterActivity extends BaseOmnomActivity {
 	public static final int YEAR_OFFSET = 30;
 	public static final String DELIMITER_DATE_UI = "/";
 	public static final String DELIMITER_DATE_WICKET = "-";

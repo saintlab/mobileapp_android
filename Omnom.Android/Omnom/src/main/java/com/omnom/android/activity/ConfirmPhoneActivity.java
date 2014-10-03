@@ -15,7 +15,6 @@ import com.omnom.android.R;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
-import com.omnom.util.activity.BaseActivity;
 import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.StringUtils;
 import com.omnom.util.utils.ViewUtils;
@@ -30,7 +29,7 @@ import butterknife.InjectViews;
 import rx.Observable;
 import rx.functions.Action1;
 
-public class ConfirmPhoneActivity extends BaseActivity {
+public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	public static final int TYPE_LOGIN = 0;
 	public static final int TYPE_REGISTER = 1;
@@ -146,6 +145,11 @@ public class ConfirmPhoneActivity extends BaseActivity {
 			@Override
 			public void call(final AuthResponse authResponse) {
 				if(!authResponse.hasError()) {
+					if(type == TYPE_REGISTER) {
+						getMixPanel().alias(phone, null);
+					} else {
+						getMixPanel().identify(phone);
+					}
 					getPreferences().setAuthToken(getActivity(), authResponse.getToken());
 					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, false);
 					postDelayed(350, new Runnable() {
@@ -157,6 +161,7 @@ public class ConfirmPhoneActivity extends BaseActivity {
 						}
 					});
 				} else {
+					getMixPanel().track(authResponse.getError(), null);
 					edit1.setText(StringUtils.EMPTY_STRING);
 					edit2.setText(StringUtils.EMPTY_STRING);
 					edit3.setText(StringUtils.EMPTY_STRING);

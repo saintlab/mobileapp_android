@@ -10,14 +10,13 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.omnom.android.R;
-import com.omnom.util.activity.BaseActivity;
 import com.omnom.util.utils.AnimationUtils;
 
 import java.util.Collections;
 
 import butterknife.InjectView;
 
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.img_logo)
 	protected ImageView imgLogo;
