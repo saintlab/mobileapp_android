@@ -7,6 +7,7 @@
             <flag name="text" value="0x00000000"/>
             <flag name="phone" value="0x00000001"/>
             <flag name="email" value="0x00000002"/>
+            <flag name="name" value="0x00000003"/>
         </attr>
         <attr name="font">
             <flag name="regular" value="0x00000000"/>

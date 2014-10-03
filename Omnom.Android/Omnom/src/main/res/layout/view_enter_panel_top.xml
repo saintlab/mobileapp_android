@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<merge
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/panel_top"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/view_size_default"
-    android:paddingStart="@dimen/activity_horizontal_margin"
-    android:paddingEnd="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_horizontal_margin_small"
-    android:paddingBottom="@dimen/activity_horizontal_margin_small"
-    android:background="@color/list_header"
-    tools:showIn="@layout/activity_register_user">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Button
         android:id="@+id/btn_right"
@@ -20,6 +10,15 @@
         android:layout_alignParentRight="true"
         android:textColor="@android:color/black"
         style="@android:style/Widget.Holo.Button.Borderless"/>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/title"
@@ -39,4 +38,4 @@
         app:fillColor="@android:color/black"
         app:pageColor="@android:color/darker_gray"/>
 
-</RelativeLayout>
+</merge>

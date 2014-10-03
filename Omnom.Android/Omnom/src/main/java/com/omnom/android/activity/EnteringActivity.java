@@ -7,12 +7,11 @@ import android.support.v4.view.ViewPager;
 import com.omnom.android.R;
 import com.omnom.android.adapter.EnteringPagerAdapter;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
-import com.omnom.util.activity.BaseFragmentActivity;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class EnteringActivity extends BaseFragmentActivity {
+public class EnteringActivity extends BaseOmnomFragmentActivity {
 
 	@InjectView(R.id.pager)
 	protected ViewPager mPager;

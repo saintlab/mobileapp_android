@@ -1,6 +1,5 @@
 package com.omnom.android.activity;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -10,14 +9,13 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.omnom.android.R;
-import com.omnom.util.activity.BaseActivity;
 import com.omnom.util.utils.AnimationUtils;
 
 import java.util.Collections;
 
 import butterknife.InjectView;
 
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.img_logo)
 	protected ImageView imgLogo;
@@ -117,10 +115,6 @@ public class SplashActivity extends BaseActivity {
 
 	@Override
 	public void initUi() {
-		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		if(adapter != null && !adapter.isEnabled()) {
-			adapter.enable();
-		}
 		transitionDrawable = new TransitionDrawable(
 				new Drawable[]{getResources().getDrawable(R.drawable.ic_splash_fork_n_knife),
 						getResources().getDrawable(R.drawable.ic_fork_n_knife)});

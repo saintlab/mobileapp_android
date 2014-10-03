@@ -9,7 +9,6 @@ import android.text.format.DateFormat;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
@@ -17,31 +16,27 @@ import com.omnom.android.R;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
-import com.omnom.android.view.ViewPagerIndicatorCircle;
-import com.omnom.util.activity.BaseActivity;
+import com.omnom.android.utils.ObservableUtils;
+import com.omnom.android.view.LoginPanelTop;
 import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.StringUtils;
-import com.omnom.util.utils.ViewUtils;
 import com.omnom.util.view.ErrorEdit;
 import com.omnom.util.view.ErrorEditText;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.InjectViews;
 import butterknife.OnClick;
+import rx.functions.Action0;
 import rx.functions.Action1;
 
 /**
  * Created by Ch3D on 28.09.2014.
  */
-public class UserRegisterActivity extends BaseActivity {
-
+public class UserRegisterActivity extends BaseOmnomActivity {
 	public static final int YEAR_OFFSET = 30;
 	public static final String DELIMITER_DATE_UI = "/";
 	public static final String DELIMITER_DATE_WICKET = "-";
@@ -65,17 +60,8 @@ public class UserRegisterActivity extends BaseActivity {
 	@InjectView(R.id.text_error)
 	protected TextView textError;
 
-	@InjectView(R.id.btn_right)
-	protected Button btnRight;
-
-	@InjectView(R.id.title)
-	protected TextView textTitle;
-
-	@InjectViews({R.id.title, R.id.page_indicator, R.id.btn_right})
-	protected List<View> topViews;
-
-	@InjectView(R.id.page_indicator)
-	protected ViewPagerIndicatorCircle pageIndicator;
+	@InjectView(R.id.panel_top)
+	protected LoginPanelTop topPanel;
 
 	@Inject
 	protected AuthService authenticator;
@@ -88,12 +74,18 @@ public class UserRegisterActivity extends BaseActivity {
 	public void initUi() {
 		gc = new GregorianCalendar();
 		gc.add(Calendar.YEAR, -YEAR_OFFSET);
-		ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA_NOW, false);
+		topPanel.setContentVisibility(false, true);
+		topPanel.setTitle(R.string.create_account);
+		topPanel.setButtonRight(R.string.proceed, new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				doRegister(v);
+			}
+		});
+		topPanel.setPaging(FAKE_PAGE_COUNT, 0);
+
 		textAgreement.setMovementMethod(LinkMovementMethod.getInstance());
 		textAgreement.setText(Html.fromHtml(getResources().getString(R.string.register_agreement)));
-
-		btnRight.setText(R.string.proceed);
-		textTitle.setText(R.string.create_account);
 
 		editBirth.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -122,31 +114,31 @@ public class UserRegisterActivity extends BaseActivity {
 				dialog.show();
 			}
 		});
-		pageIndicator.setFake(true, FAKE_PAGE_COUNT);
-		pageIndicator.setCurrentItem(0);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(pageIndicator.getAlpha() == 0) {
-			pageIndicator.postDelayed(new Runnable() {
+		if(topPanel.isAlphaVisible()) {
+			topPanel.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, true);
+					topPanel.setContentVisibility(true, false);
 				}
 
 			}, mFirstStart ? getResources().getInteger(android.R.integer.config_longAnimTime) :
-					                          getResources().getInteger(android.R.integer.config_mediumAnimTime));
+					                     getResources().getInteger(android.R.integer.config_mediumAnimTime));
 		}
 		mFirstStart = false;
 	}
 
 	@OnClick(R.id.btn_right)
-	public void performRegister(final View view) {
+	public void doRegister(final View view) {
 		if(!validate()) {
 			return;
 		}
+		AndroidUtils.hideKeyboard(getActivity());
+		topPanel.showProgress(true);
 		final AuthRegisterRequest request = AuthRegisterRequest.create(AndroidUtils.getInstallId(this),
 		                                                               editName.getText(),
 		                                                               StringUtils.EMPTY_STRING,
@@ -155,13 +147,11 @@ public class UserRegisterActivity extends BaseActivity {
 		                                                               editBirth.getText()
 		                                                                        .toString()
 		                                                                        .replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
-		view.setEnabled(false);
 		authenticator.register(request).subscribe(new Action1<AuthRegisterResponse>() {
 			@Override
 			public void call(final AuthRegisterResponse authRegisterResponse) {
-				view.setEnabled(true);
 				if(!authRegisterResponse.hasError()) {
-					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, false);
+					topPanel.setContentVisibility(false, false);
 					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 						@Override
 						public void run() {
@@ -169,17 +159,19 @@ public class UserRegisterActivity extends BaseActivity {
 							intent.putExtra(EXTRA_PHONE, request.getPhone());
 							intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_REGISTER);
 							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
+							topPanel.showProgress(false);
 						}
 					});
 				} else {
+					topPanel.showProgress(false);
 					textError.setText(authRegisterResponse.getError().getMessage());
 				}
 			}
-		}, new Action1<Throwable>() {
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
-			public void call(Throwable throwable) {
-				view.setEnabled(true);
-				Log.e(TAG, "performRegister", throwable);
+			public void onError(Throwable throwable) {
+				topPanel.showProgress(false);
+				Log.e(TAG, "doRegister", throwable);
 			}
 		});
 	}

@@ -10,27 +10,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.omnom.android.MainActivity;
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
-import com.omnom.android.view.ViewPagerIndicatorCircle;
-import com.omnom.util.activity.BaseActivity;
+import com.omnom.android.utils.ObservableUtils;
+import com.omnom.android.view.LoginPanelTop;
 import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.StringUtils;
-import com.omnom.util.utils.ViewUtils;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.InjectViews;
 import rx.Observable;
 import rx.functions.Action1;
 
-public class ConfirmPhoneActivity extends BaseActivity {
+public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	public static final int TYPE_LOGIN = 0;
 	public static final int TYPE_REGISTER = 1;
@@ -82,17 +76,11 @@ public class ConfirmPhoneActivity extends BaseActivity {
 	@InjectView(R.id.panel_digits)
 	protected View panelDigits;
 
-	@InjectView(R.id.btn_right)
-	protected Button btnRight;
+	@InjectView(R.id.panel_top)
+	protected LoginPanelTop topPanel;
 
-	@InjectView(R.id.title)
-	protected TextView textTitle;
-
-	@InjectViews({R.id.title, R.id.page_indicator, R.id.btn_right})
-	protected List<View> topViews;
-
-	@InjectView(R.id.page_indicator)
-	protected ViewPagerIndicatorCircle pageIndicator;
+	@InjectView(R.id.btn_request_code)
+	protected Button btnRequestCode;
 
 	@Inject
 	protected AuthService authenticator;
@@ -103,10 +91,15 @@ public class ConfirmPhoneActivity extends BaseActivity {
 
 	@Override
 	public void initUi() {
-		ViewUtils.setVisible(btnRight, false);
-		textTitle.setText(R.string.enter);
+		topPanel.setRigthButtonVisibile(false);
+		topPanel.setTitle(R.string.enter);
+		topPanel.setContentVisibility(false, true);
+		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 1);
 
-		ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA_NOW, false);
+		btnRequestCode.setEnabled(false);
+		btnRequestCode.setFocusable(false);
+		btnRequestCode.setFocusableInTouchMode(false);
+
 		edit1.addTextChangedListener(new Watcher(edit1));
 		edit2.addTextChangedListener(new Watcher(edit2));
 		edit3.addTextChangedListener(new Watcher(edit3));
@@ -127,33 +120,27 @@ public class ConfirmPhoneActivity extends BaseActivity {
 			}
 		});
 		text.setText(getString(R.string.confirm_code_sms_text, phone));
-		pageIndicator.setFake(true, UserRegisterActivity.FAKE_PAGE_COUNT);
-		pageIndicator.setCurrentItem(1);
 		AndroidUtils.showKeyboard(edit1);
 	}
 
 	private void doConfirm() {
-		Observable<AuthResponse> observable;
-		if(type == TYPE_REGISTER) {
-			observable = authenticator.confirm(phone, getCode());
-		} else if(type == TYPE_LOGIN) {
-			observable = authenticator.authorizePhone(phone, getCode());
-		} else {
-			throw new RuntimeException("Wrong confirm type = " + type);
-		}
-
-		observable.subscribe(new Action1<AuthResponse>() {
+		getObservable().subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(final AuthResponse authResponse) {
 				if(!authResponse.hasError()) {
+					if(type == TYPE_REGISTER) {
+						getMixPanel().alias(phone, null);
+					} else {
+						getMixPanel().identify(phone);
+					}
 					getPreferences().setAuthToken(getActivity(), authResponse.getToken());
-					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, false);
-					postDelayed(350, new Runnable() {
+					topPanel.setContentVisibility(false, false);
+					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 						@Override
 						public void run() {
 							final Intent intent = new Intent(ConfirmPhoneActivity.this, MainActivity.class);
 							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, true);
+							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
 						}
 					});
 				} else {
@@ -166,13 +153,25 @@ public class ConfirmPhoneActivity extends BaseActivity {
 					panelDigits.startAnimation(animation);
 				}
 			}
-		}, new Action1<Throwable>() {
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
-			public void call(Throwable throwable) {
+			public void onError(Throwable throwable) {
 				Log.e(TAG, "doConfirm", throwable);
 				finish();
 			}
 		});
+	}
+
+	private Observable<AuthResponse> getObservable() {
+		Observable<AuthResponse> observable;
+		if(type == TYPE_REGISTER) {
+			observable = authenticator.confirm(phone, getCode());
+		} else if(type == TYPE_LOGIN) {
+			observable = authenticator.authorizePhone(phone, getCode());
+		} else {
+			throw new RuntimeException("Wrong confirm type = " + type);
+		}
+		return observable;
 	}
 
 	private String getCode() {
@@ -189,15 +188,25 @@ public class ConfirmPhoneActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(pageIndicator.getAlpha() == 0) {
-			pageIndicator.postDelayed(new Runnable() {
+		if(topPanel.isAlphaVisible()) {
+			topPanel.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, true);
+					topPanel.setContentVisibility(true, false);
 				}
 
 			}, mFirstStart ? getResources().getInteger(android.R.integer.config_longAnimTime) :
-					                          getResources().getInteger(android.R.integer.config_mediumAnimTime));
+					                     getResources().getInteger(android.R.integer.config_mediumAnimTime));
+		}
+		if(mFirstStart) {
+			postDelayed(getResources().getInteger(R.integer.default_sms_request_timeout), new Runnable() {
+				@Override
+				public void run() {
+					btnRequestCode.setEnabled(true);
+					btnRequestCode.setFocusable(true);
+					btnRequestCode.setFocusableInTouchMode(true);
+				}
+			});
 		}
 		mFirstStart = false;
 	}
