@@ -26,6 +26,6 @@ public class UserProfile extends AuthResponse {
 
 	// TODO:
 	public String getImageUrl() {
-		return "http://i.imgur.com/DvpvklR.png";
+		return null;
 	}
 }
