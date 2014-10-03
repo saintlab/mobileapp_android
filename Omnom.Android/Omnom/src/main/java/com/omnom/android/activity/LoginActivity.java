@@ -11,7 +11,6 @@ import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
-import com.omnom.util.utils.AndroidUtils;
 import com.omnom.util.utils.StringUtils;
 import com.omnom.util.utils.ViewUtils;
 import com.omnom.util.view.ErrorEdit;
@@ -67,7 +66,7 @@ public class LoginActivity extends BaseOmnomActivity {
 				@Override
 				public void run() {
 					ButterKnife.apply(topViews, ViewUtils.VISIBLITY_ALPHA, true);
-					AndroidUtils.showKeyboard(editPhone.getEditText());
+					// AndroidUtils.showKeyboard(editPhone.getEditText());
 				}
 
 			}, mFirstStart ? getResources().getInteger(android.R.integer.config_longAnimTime) :
