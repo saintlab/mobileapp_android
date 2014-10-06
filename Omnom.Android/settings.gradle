@@ -1,2 +1,8 @@
-include ':libraries:Omnom.Altbeacon', ':libraries:Omnom.Zxing', ':libraries:Omnom.Utils', ':libraries:Omnom.Restaurateur',
-        'libraries:Omnom.Auth', 'Linker', 'Omnom'
+include ':libraries:Omnom.Altbeacon',
+        ':libraries:Omnom.Beacon',
+        ':libraries:Omnom.Zxing',
+        ':libraries:Omnom.Utils',
+        ':libraries:Omnom.Restaurateur',
+        ':libraries:Omnom.Auth',
+        'Linker',
+        'Omnom'

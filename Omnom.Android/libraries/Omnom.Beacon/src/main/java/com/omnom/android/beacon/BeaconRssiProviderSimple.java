@@ -1,11 +1,10 @@
-package com.omnom.android.linker.beacon;
+package com.omnom.android.beacon;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.utils.BaseOmnomApplication;
 
 import javax.inject.Inject;
 
@@ -23,11 +22,8 @@ public class BeaconRssiProviderSimple implements BeaconRssiProvider {
 	@Inject
 	protected RestaurateurObeservableApi api;
 
-	private Context mContext;
-
-	public BeaconRssiProviderSimple(final Context context) {
-		mContext = context;
-		LinkerApplication.get(context).inject(this);
+	public BeaconRssiProviderSimple(final BaseOmnomApplication app) {
+		app.inject(this);
 	}
 
 	@Override

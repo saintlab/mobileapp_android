@@ -1,4 +1,4 @@
-package com.omnom.android.linker.beacon;
+package com.omnom.android.beacon;
 
 import java.util.List;
 

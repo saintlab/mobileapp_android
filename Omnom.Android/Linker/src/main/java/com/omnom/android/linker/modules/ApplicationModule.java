@@ -6,7 +6,7 @@ import com.omnom.android.linker.activity.SimpleSplashActivity;
 import com.omnom.android.linker.activity.ValidationActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
-import com.omnom.android.linker.beacon.BeaconRssiProviderSimple;
+import com.omnom.android.beacon.BeaconRssiProviderSimple;
 import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.activity.UserProfileActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantActivity;

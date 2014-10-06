@@ -77,11 +77,11 @@ dependencies {
     compile 'com.netflix.rxjava:rxjava-core:0.19.6'
     compile 'com.netflix.rxjava:rxjava-android:0.19.6'
 
-    compile project(':libraries:Omnom.Altbeacon')
     compile project(':libraries:Omnom.Zxing')
     compile project(':libraries:Omnom.Utils')
     compile project(':libraries:Omnom.Auth')
     compile project(':libraries:Omnom.Restaurateur')
+    compile project(':libraries:Omnom.Beacon')
 
     androidTestCompile('com.jakewharton.espresso:espresso:1.1-r3') {
         exclude group: 'com.squareup.dagger'
