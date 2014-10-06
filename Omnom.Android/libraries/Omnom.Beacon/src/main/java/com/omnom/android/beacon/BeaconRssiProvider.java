@@ -1,4 +1,4 @@
-package com.omnom.android.linker.beacon;
+package com.omnom.android.beacon;
 
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 

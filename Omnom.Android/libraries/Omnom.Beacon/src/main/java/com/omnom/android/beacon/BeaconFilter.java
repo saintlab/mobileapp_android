@@ -1,10 +1,8 @@
-package com.omnom.android.linker.beacon;
+package com.omnom.android.beacon;
 
-import android.content.Context;
 import android.text.TextUtils;
 
-import com.omnom.android.linker.LinkerApplication;
-import com.omnom.android.linker.R;
+import com.omnom.android.utils.BaseOmnomApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,21 +17,19 @@ import hugo.weaving.DebugLog;
  * Created by Ch3D on 25.08.2014.
  */
 public class BeaconFilter {
+	private final String[] mBeaconIds;
+
 	@Inject
 	protected BeaconFilterAlgorithm mFilterAlgorithm;
 
-	private final String[] mBeaconIds;
-	private Context mContext;
-
-	public BeaconFilter(Context context) {
-		mContext = context;
-		mBeaconIds = context.getResources().getStringArray(R.array.redbear_beacon_ids);
-		LinkerApplication.get(mContext).inject(this);
+	public BeaconFilter(BaseOmnomApplication app) {
+		mBeaconIds = app.getResources().getStringArray(R.array.redbear_beacon_ids);
+		app.inject(this);
 	}
 
 	@DebugLog
 	public boolean check(Beacon beacon) {
-		if (beacon == null || beacon.getId1() == null) {
+		if(beacon == null || beacon.getId1() == null) {
 			return false;
 		}
 		final Identifier id1 = beacon.getId1();
@@ -42,12 +38,12 @@ public class BeaconFilter {
 	}
 
 	private boolean isValidUuid(final String beaconId) {
-		if (TextUtils.isEmpty(beaconId)) {
+		if(TextUtils.isEmpty(beaconId)) {
 			return false;
 		}
 		final String bid = beaconId.toLowerCase();
-		for (final String item : mBeaconIds) {
-			if (item.equals(bid)) {
+		for(final String item : mBeaconIds) {
+			if(item.equals(bid)) {
 				return true;
 			}
 		}
@@ -57,6 +53,5 @@ public class BeaconFilter {
 	@DebugLog
 	public List<Beacon> filterBeacons(ArrayList<Beacon> mBeacons) {
 		return mFilterAlgorithm.filter(mBeacons);
-
 	}
 }

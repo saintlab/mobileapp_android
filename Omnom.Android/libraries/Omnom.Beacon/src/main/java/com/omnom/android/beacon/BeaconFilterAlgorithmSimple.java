@@ -1,9 +1,7 @@
-package com.omnom.android.linker.beacon;
+package com.omnom.android.beacon;
 
 import android.content.Context;
 import android.util.Log;
-
-import com.omnom.android.linker.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;

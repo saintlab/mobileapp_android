@@ -20,27 +20,28 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.zxing.client.android.CaptureActivity;
+import com.omnom.android.linker.BuildConfig;
+import com.omnom.android.linker.LinkerApplication;
+import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.LinkerBaseErrorHandler;
-import com.omnom.android.linker.beacon.BeaconRssiProvider;
+import com.omnom.android.linker.activity.UserProfileActivity;
+import com.omnom.android.beacon.BeaconFilter;
+import com.omnom.android.beacon.BeaconRssiProvider;
 import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.service.CharacteristicHolder;
-import com.omnom.android.linker.BuildConfig;
-import com.omnom.android.linker.R;
-import com.omnom.android.linker.activity.UserProfileActivity;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
-import com.omnom.android.linker.beacon.BeaconFilter;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.RestaurateurObservable;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
-import com.omnom.android.utils.observable.OmnomObservable;
-import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.loader.LoaderController;
 import com.omnom.android.utils.loader.LoaderView;
+import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -409,20 +410,21 @@ public class BindActivity extends BaseActivity {
 				mPanelBottom.setVisibility(View.GONE);
 				mBtnProfile.setVisibility(View.GONE);
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
-				api.checkQrCode(mQrData).onErrorReturn(RestaurateurObservable.getTableOnError()).subscribe(new Action1<TableDataResponse>() {
-					@Override
-					public void call(TableDataResponse result) {
-						if(result == null) {
-							mErrorHelper.showInternetError(mInternetErrorClickListener);
-							return;
-						}
-						if(result != TableDataResponse.NULL) {
-							onErrorQrCheck(result.getInternalId());
-						} else {
-							swithToEnterDataMode();
-						}
-					}
-				});
+				api.checkQrCode(mQrData).onErrorReturn(RestaurateurObservable.getTableOnError()).subscribe(
+						new Action1<TableDataResponse>() {
+							@Override
+							public void call(TableDataResponse result) {
+								if(result == null) {
+									mErrorHelper.showInternetError(mInternetErrorClickListener);
+									return;
+								}
+								if(result != TableDataResponse.NULL) {
+									onErrorQrCheck(result.getInternalId());
+								} else {
+									swithToEnterDataMode();
+								}
+							}
+						});
 			}
 		} else {
 			ViewUtils.setVisible(mPanelBottom, true);
@@ -455,7 +457,8 @@ public class BindActivity extends BaseActivity {
 						                                        public void run() {
 							                                        Log.d(TAG_BEACONS, "finded beacons size = " + mBeacons.size());
 							                                        Log.d(TAG_BEACONS, "beacons = " + Arrays.toString(mBeacons.toArray()));
-							                                        BeaconFilter filter = new BeaconFilter(BindActivity.this);
+							                                        final BeaconFilter filter = new BeaconFilter(LinkerApplication.get(
+									                                        getActivity()));
 							                                        final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 							                                        final int size = nearBeacons.size();
 							                                        if(size == 0) {
@@ -474,7 +477,8 @@ public class BindActivity extends BaseActivity {
 										                                        RestaurateurObservable.getTableOnError())
 
 								                                           .subscribe(
-										                                           new RestaurateurObservable.AuthAwareOnNext<TableDataResponse>(
+										                                           new RestaurateurObservable
+												                                           .AuthAwareOnNext<TableDataResponse>(
 												                                           getActivity()) {
 											                                           @Override
 											                                           public void perform(final TableDataResponse
@@ -571,7 +575,7 @@ public class BindActivity extends BaseActivity {
 		mLoaderTranslation = ViewUtils.dipToPixels(this, 48);
 
 		mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
-			BeaconFilter mFilter = new BeaconFilter(BindActivity.this);
+			BeaconFilter mFilter = new BeaconFilter(LinkerApplication.get(getActivity()));
 
 			@Override
 			@DebugLog
