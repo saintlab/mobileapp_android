@@ -4,8 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.omnom.android.linker.LinkerApplication;
-import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 
 import javax.inject.Inject;
 
@@ -21,7 +21,7 @@ public class BeaconRssiProviderSimple implements BeaconRssiProvider {
 	private static final String TAG = BeaconRssiProviderSimple.class.getSimpleName();
 
 	@Inject
-	protected LinkerObeservableApi api;
+	protected RestaurateurObeservableApi api;
 
 	private Context mContext;
 

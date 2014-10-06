@@ -9,25 +9,21 @@
     <string name="qr_already_bound">QR код уже связан со столом %1$s. Продолжить всё равно?</string>
     <string name="bind">Привязать</string>
     <string name="bind_table">Привязка столика</string>
-    <string name="hint_table_number">Номер стола</string>
+
     <string name="proceed">Продолжить</string>
     <string name="cancel">Отменить</string>
-    <string name="open_settings">Перейти в настройки</string>
-    <string name="try_once_again">Проверить ещё</string>
-    <string name="floor_suffix"> этаж </string>
-    <string name="restaurant_address_delimiter">, </string>
+
+
     <string name="logout_user">Выход из аккаунта</string>
     <string name="please_enter_username">Пожалуйста введите логин</string>
     <string name="please_check_internet_connection">Пожалуйста проверьте подключение к сети</string>
-    <string name="error_bluetooth_disabled">Чтобы пользоваться Омном, необходимо включить Bluetooth.</string>
-    <string name="error_location_disabled">Чтобы пользоваться Омном, необходимо разрешить использование службы геопозиции.</string>
-    <string name="error_you_have_no_internet_connection">У вас нет доступа к интернету</string>
+
     <string name="error_weak_beacon_signal">Слабый сигнал. Положите телефон в центр стола пожалуйста</string>
     <string name="error_maintenance_mode_off">Режим записи недоступен на маяке. Для включения нажмите круглую кнопку на корпусе</string>
     <string name="error_more_than_one_beacon">Обноружено несколько маячков. Положите телефон в центр стола пожалуйста</string>
     <string name="error_server_unavailable_please_try_again">Невозможно получить данные с сервера. Пожалуйста, попробуйте еще раз</string>
     <string name="error_no_restaurants_please_try_again_later">Не найдено ни одного доступоного ресторана. Пожалуйста, попробуйте позже</string>
-    <string name="error_unknown_server_error">Произошла ошибка соединения с сервером. Пожалуйста, попробуйте позже</string>
+
     <string name="error_writing_beacon_data">Ошибка прошивки маячка. Пожалуйста, попробуйте еще раз</string>
     <string name="error_user_not_found">Невозможно получить данные пользователя. Пожалуйста попробуйте позже</string>
     <string name="title_activity_beacons_chart">BeaconsChartActivity</string>

@@ -10,9 +10,9 @@ import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.ApplicationModule;
 import com.omnom.android.modules.AuthMixpanelModule;
 import com.omnom.android.preferences.PreferenceHelper;
-import com.omnom.util.AuthTokenProvider;
-import com.omnom.util.BaseOmnomApplication;
-import com.omnom.util.preferences.PreferenceProvider;
+import com.omnom.android.utils.AuthTokenProvider;
+import com.omnom.android.utils.BaseOmnomApplication;
+import com.omnom.android.utils.preferences.PreferenceProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;

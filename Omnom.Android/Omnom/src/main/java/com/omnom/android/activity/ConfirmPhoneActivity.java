@@ -11,12 +11,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
+import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.view.LoginPanelTop;
-import com.omnom.util.utils.AndroidUtils;
-import com.omnom.util.utils.StringUtils;
 
 import javax.inject.Inject;
 

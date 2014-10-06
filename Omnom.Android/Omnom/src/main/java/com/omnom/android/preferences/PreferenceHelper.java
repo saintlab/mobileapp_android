@@ -2,8 +2,8 @@ package com.omnom.android.preferences;
 
 import android.content.Context;
 
-import com.omnom.util.preferences.PreferenceProvider;
-import com.omnom.util.utils.StringUtils;
+import com.omnom.android.OmnomApplication;
+import com.omnom.android.utils.preferences.PreferenceProvider;
 
 /**
  * Created by Ch3D on 28.09.2014.
@@ -11,11 +11,11 @@ import com.omnom.util.utils.StringUtils;
 public class PreferenceHelper implements PreferenceProvider {
 	@Override
 	public boolean setAuthToken(Context context, String value) {
-		return false;
+		return OmnomApplication.get(context).getPreferences().setAuthToken(context, value);
 	}
 
 	@Override
 	public String getAuthToken(Context context) {
-		return StringUtils.EMPTY_STRING;
+		return OmnomApplication.get(context).getPreferences().getAuthToken(context);
 	}
 }

@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.omnom.android.acquiring.ExtraData;
-import com.omnom.util.utils.StringUtils;
+import com.omnom.android.utils.utils.StringUtils;
 
 /**
  * Created by Ch3D on 23.09.2014.

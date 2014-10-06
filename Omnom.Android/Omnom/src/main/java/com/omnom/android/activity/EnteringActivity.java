@@ -5,6 +5,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.EnteringPagerAdapter;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
 

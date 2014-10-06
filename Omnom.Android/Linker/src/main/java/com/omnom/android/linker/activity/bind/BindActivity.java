@@ -20,30 +20,31 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.zxing.client.android.CaptureActivity;
-import com.omnom.android.linker.BuildConfig;
-import com.omnom.android.linker.R;
-import com.omnom.android.linker.activity.ErrorHelper;
-import com.omnom.android.linker.activity.UserProfileActivity;
-import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.beacon.BeaconFilter;
+import com.omnom.android.linker.activity.LinkerBaseErrorHandler;
 import com.omnom.android.linker.beacon.BeaconRssiProvider;
-import com.omnom.android.linker.model.ResponseBase;
-import com.omnom.android.linker.model.beacon.BeaconDataResponse;
-import com.omnom.android.linker.model.restaurant.Restaurant;
-import com.omnom.android.linker.model.restaurant.RestaurantHelper;
-import com.omnom.android.linker.model.table.TableDataResponse;
-import com.omnom.android.linker.observable.BaseErrorHandler;
-import com.omnom.android.linker.observable.OmnomObservable;
-import com.omnom.android.linker.observable.ValidationObservable;
 import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.service.CharacteristicHolder;
-import com.omnom.android.linker.widget.loader.LoaderController;
-import com.omnom.android.linker.widget.loader.LoaderView;
-import com.omnom.util.activity.BaseActivity;
-import com.omnom.util.utils.AndroidUtils;
-import com.omnom.util.utils.AnimationUtils;
-import com.omnom.util.utils.StringUtils;
-import com.omnom.util.utils.ViewUtils;
+import com.omnom.android.linker.BuildConfig;
+import com.omnom.android.linker.R;
+import com.omnom.android.linker.activity.UserProfileActivity;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.linker.beacon.BeaconFilter;
+import com.omnom.android.restaurateur.model.ResponseBase;
+import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.table.RestaurateurObservable;
+import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.observable.ValidationObservable;
+import com.omnom.android.utils.ErrorHelper;
+import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.loader.LoaderController;
+import com.omnom.android.utils.loader.LoaderView;
+import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
 
 import org.apache.http.HttpStatus;
@@ -131,7 +132,7 @@ public class BindActivity extends BaseActivity {
 	protected List<View> errorViews;
 
 	@Inject
-	protected LinkerObeservableApi api;
+	protected RestaurateurObeservableApi api;
 
 	@Inject
 	protected BeaconRssiProvider rssiProvider;
@@ -268,14 +269,14 @@ public class BindActivity extends BaseActivity {
 		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
 		api.buildBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon.getIdValue(0)).subscribe(
-				new OmnomObservable.AuthAwareOnNext<BeaconDataResponse>(getActivity()) {
+				new RestaurateurObservable.AuthAwareOnNext<BeaconDataResponse>(getActivity()) {
 					@Override
 					public void perform(BeaconDataResponse beaconData) {
 						mBeaconData = beaconData;
 						mLoaderController.setMode(LoaderView.Mode.NONE);
 						connectToBeacon();
 					}
-				}, new BaseErrorHandler(this) {
+				}, new LinkerBaseErrorHandler(this) {
 					@Override
 					protected void onThrowable(Throwable throwable) {
 						mLoaderController.hideEnterData();
@@ -313,7 +314,7 @@ public class BindActivity extends BaseActivity {
 					                                              }
 				                                              }
 			                                              }
-		                                              }, new BaseErrorHandler(getActivity()) {
+		                                              }, new LinkerBaseErrorHandler(getActivity()) {
 			                                              @Override
 			                                              protected void onThrowable(Throwable throwable) {
 				                                              mErrorHelper.showInternetError(mConnectBeaconClickListener);
@@ -408,7 +409,7 @@ public class BindActivity extends BaseActivity {
 				mPanelBottom.setVisibility(View.GONE);
 				mBtnProfile.setVisibility(View.GONE);
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
-				api.checkQrCode(mQrData).onErrorReturn(OmnomObservable.getTableOnError()).subscribe(new Action1<TableDataResponse>() {
+				api.checkQrCode(mQrData).onErrorReturn(RestaurateurObservable.getTableOnError()).subscribe(new Action1<TableDataResponse>() {
 					@Override
 					public void call(TableDataResponse result) {
 						if(result == null) {
@@ -470,10 +471,10 @@ public class BindActivity extends BaseActivity {
 							                                        } else if(size == 1) {
 								                                        mBeacon = nearBeacons.get(0);
 								                                        api.findBeacon(mBeacon).onErrorReturn(
-										                                        OmnomObservable.getTableOnError())
+										                                        RestaurateurObservable.getTableOnError())
 
 								                                           .subscribe(
-										                                           new OmnomObservable.AuthAwareOnNext<TableDataResponse>(
+										                                           new RestaurateurObservable.AuthAwareOnNext<TableDataResponse>(
 												                                           getActivity()) {
 											                                           @Override
 											                                           public void perform(final TableDataResponse
@@ -498,7 +499,7 @@ public class BindActivity extends BaseActivity {
 													                                           }
 												                                           });
 											                                           }
-										                                           }, new BaseErrorHandler(getActivity()) {
+										                                           }, new LinkerBaseErrorHandler(getActivity()) {
 											                                           @Override
 											                                           protected void onThrowable(Throwable throwable) {
 												                                           Log.e(TAG, "findBeacon", throwable);
@@ -511,7 +512,7 @@ public class BindActivity extends BaseActivity {
 					                                        });
 				                                        }
 			                                        }
-		                                        }, new BaseErrorHandler(getActivity()) {
+		                                        }, new LinkerBaseErrorHandler(getActivity()) {
 			                                        @Override
 			                                        protected void onThrowable(Throwable throwable) {
 				                                        Log.e(TAG, "bindTable", throwable);
@@ -722,7 +723,7 @@ public class BindActivity extends BaseActivity {
 							                                           public void call(ResponseBase responseBase) {
 								                                           // Do nothing
 							                                           }
-						                                           }, new BaseErrorHandler(BindActivity.this) {
+						                                           }, new LinkerBaseErrorHandler(BindActivity.this) {
 							                                           @Override
 							                                           protected void onThrowable(Throwable throwable) {
 								                                           if(throwable instanceof RetrofitError) {

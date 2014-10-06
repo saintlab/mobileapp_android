@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Restaurateur</string>
+    <string name="floor_suffix"> этаж </string>
+    <string name="restaurant_address_delimiter">, </string>
+</resources>

@@ -148,3 +148,5 @@
 #gson models package
 -keep class com.omnom.android.linker.model.** { *; }
 -keep class com.omnom.android.auth.** { *; }
+-keep class com.omnom.android.utils.** { *; }
+-keep class com.omnom.android.restaurateur.** { *; }
