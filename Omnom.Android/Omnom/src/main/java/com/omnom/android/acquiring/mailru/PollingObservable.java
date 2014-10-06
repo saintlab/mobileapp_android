@@ -47,7 +47,6 @@ public class PollingObservable {
 						if(entity != null) {
 							final Reader reader = new InputStreamReader(entity.getContent());
 							final CardRegisterPollingResponse response = gson.fromJson(reader, CardRegisterPollingResponse.class);
-							System.err.println(Thread.currentThread().getName() + " polling status = " + response.getStatus());
 							if(!response.getStatus().equals(STATUS_OK_CONTINUE)) {
 								next = response;
 								next.setCardId(cardResponse.getCardId());
@@ -85,7 +84,6 @@ public class PollingObservable {
 						if(entity != null) {
 							final Reader reader = new InputStreamReader(entity.getContent());
 							final CardRegisterPollingResponse response = gson.fromJson(reader, CardRegisterPollingResponse.class);
-							System.err.println(Thread.currentThread().getName() + " polling status = " + response.getStatus());
 							if(!response.getStatus().equals(STATUS_OK_CONTINUE)) {
 								next = response;
 							} else {

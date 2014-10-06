@@ -31,7 +31,6 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 	protected final void track(final String eventName, final Object o) {
 		final String s = mGson.toJson(o);
 		try {
-			System.err.println(">>> track: " + eventName + " -> " + s);
 			getMixPanel().track(eventName, new JSONObject(s));
 		} catch(JSONException e) {
 			Log.e(TAG_MIXPANEL, "track", e);
@@ -40,7 +39,6 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 
 	protected final void track(final String eventName, final String s) {
 		try {
-			System.err.println(">>> track: " + eventName + " -> " + s);
 			getMixPanel().track(eventName, new JSONObject(s));
 		} catch(JSONException e) {
 			Log.e(TAG_MIXPANEL, "track", e);

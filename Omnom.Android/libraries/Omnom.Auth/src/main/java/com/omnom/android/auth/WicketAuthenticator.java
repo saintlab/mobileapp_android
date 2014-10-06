@@ -14,7 +14,6 @@ import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -27,8 +26,7 @@ public class WicketAuthenticator implements AuthService {
 	public WicketAuthenticator(final Context context, final String endpoint) {
 		mContext = context;
 
-		// final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
-		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
+		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		final RestAdapter mRestAdapter = new RestAdapter.Builder()
 				.setEndpoint(endpoint)
@@ -43,12 +41,7 @@ public class WicketAuthenticator implements AuthService {
 
 	@Override
 	public Observable<AuthResponse> confirm(final String phone, final String code) {
-		return authService.confirm(phone, code).doOnNext(new Action1<AuthResponse>() {
-			@Override
-			public void call(AuthResponse authResponse) {
-				System.err.println(">>>!!!!!>>>>!>!>!>!>!>!");
-			}
-		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		return authService.confirm(phone, code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
@@ -58,12 +51,7 @@ public class WicketAuthenticator implements AuthService {
 
 	@Override
 	public Observable<AuthResponse> authorizePhone(String phone, String code) {
-		return authService.authorizePhone(phone, code).doOnNext(new Action1<AuthResponse>() {
-			@Override
-			public void call(AuthResponse authResponse) {
-				System.err.println(">>>!!!!!>>>>!>!>!>!>!>!");
-			}
-		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		return authService.authorizePhone(phone, code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
