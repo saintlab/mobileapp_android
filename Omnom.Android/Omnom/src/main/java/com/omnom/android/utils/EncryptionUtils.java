@@ -1,6 +1,6 @@
 package com.omnom.android.utils;
 
-import com.omnom.util.utils.StringUtils;
+import com.omnom.android.utils.utils.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;

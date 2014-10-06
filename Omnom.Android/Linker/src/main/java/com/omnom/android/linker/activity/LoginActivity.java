@@ -14,18 +14,18 @@ import android.widget.TextView;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
-import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.LinkerApplication;
+import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.R;
-import com.omnom.util.activity.BaseActivity;
-import com.omnom.util.Extras;
-import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.util.utils.AndroidUtils;
-import com.omnom.util.utils.AnimationUtils;
-import com.omnom.util.utils.StringUtils;
-import com.omnom.util.utils.UserDataHolder;
-import com.omnom.util.utils.ViewUtils;
-import com.omnom.util.view.ErrorEditText;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.UserDataHolder;
+import com.omnom.android.utils.utils.ViewUtils;
+import com.omnom.android.utils.view.ErrorEditText;
 
 import javax.inject.Inject;
 
@@ -33,9 +33,9 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
-import static com.omnom.util.utils.AndroidUtils.showToast;
-import static com.omnom.util.utils.AndroidUtils.showToastLong;
-import static com.omnom.util.utils.ViewUtils.getTextValue;
+import static com.omnom.android.utils.utils.AndroidUtils.showToast;
+import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
+import static com.omnom.android.utils.utils.ViewUtils.getTextValue;
 
 public class LoginActivity extends BaseActivity {
 	private static final String TAG = LoginActivity.class.getSimpleName();
@@ -124,7 +124,7 @@ public class LoginActivity extends BaseActivity {
 	protected LinkerApplication app;
 
 	@Inject
-	protected LinkerObeservableApi api;
+	protected RestaurateurObeservableApi api;
 
 	@Inject
 	protected AuthService authenticator;
@@ -211,6 +211,8 @@ public class LoginActivity extends BaseActivity {
 			});
 		}
 	}
+
+
 
 	@OnClick(R.id.btn_login)
 	protected void doLogin() {

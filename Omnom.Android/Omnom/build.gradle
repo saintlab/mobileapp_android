@@ -77,6 +77,7 @@ dependencies {
     compile project(':libraries:Omnom.Zxing')
     compile project(':libraries:Omnom.Utils')
     compile project(':libraries:Omnom.Auth')
+    compile project(':libraries:Omnom.Restaurateur')
 
     androidTestCompile('com.jakewharton.espresso:espresso:1.1-r3') {
         exclude group: 'com.squareup.dagger'

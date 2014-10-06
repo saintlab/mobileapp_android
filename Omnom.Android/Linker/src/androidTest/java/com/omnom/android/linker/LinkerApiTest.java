@@ -2,9 +2,9 @@ package com.omnom.android.linker;
 
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.beacon.BeaconDataResponse;
-import com.omnom.android.linker.model.table.TableDataResponse;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
+import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
 import rx.functions.Action1;
 
@@ -14,7 +14,7 @@ import rx.functions.Action1;
 public class LinkerApiTest {
 
 	// TODO: Inject
-	LinkerObeservableApi api;
+	RestaurateurObeservableApi api;
 
 	@SmallTest
 	public void testBind() {

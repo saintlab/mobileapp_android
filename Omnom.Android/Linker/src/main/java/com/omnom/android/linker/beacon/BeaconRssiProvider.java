@@ -1,6 +1,6 @@
 package com.omnom.android.linker.beacon;
 
-import com.omnom.android.linker.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 
 /**
  * Created by Ch3D on 18.09.2014.

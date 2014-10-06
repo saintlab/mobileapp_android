@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Utils</string>
+    <string name="hint_table_number">Номер стола</string>
+    <string name="error_you_have_no_internet_connection">У вас нет доступа к интернету</string>
+    <string name="error_bluetooth_disabled">Чтобы пользоваться Омном, необходимо включить Bluetooth.</string>
+    <string name="error_location_disabled">Чтобы пользоваться Омном, необходимо разрешить использование службы геопозиции.</string>
+    <string name="open_settings">Перейти в настройки</string>
+    <string name="try_once_again">Проверить ещё</string>
+    <string name="error_unknown_server_error">Произошла ошибка соединения с сервером. Пожалуйста, попробуйте позже</string>
 </resources>

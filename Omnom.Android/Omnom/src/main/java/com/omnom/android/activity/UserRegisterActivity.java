@@ -13,15 +13,16 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.utils.ObservableUtils;
+import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.view.ErrorEdit;
+import com.omnom.android.utils.view.ErrorEditText;
 import com.omnom.android.view.LoginPanelTop;
-import com.omnom.util.utils.AndroidUtils;
-import com.omnom.util.utils.StringUtils;
-import com.omnom.util.view.ErrorEdit;
-import com.omnom.util.view.ErrorEditText;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -30,7 +31,6 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
-import rx.functions.Action0;
 import rx.functions.Action1;
 
 /**

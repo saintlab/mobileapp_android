@@ -10,7 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.util.utils.ViewUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.Arrays;
 
