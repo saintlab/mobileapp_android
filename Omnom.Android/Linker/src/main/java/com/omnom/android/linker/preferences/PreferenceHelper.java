@@ -14,7 +14,6 @@ public class PreferenceHelper implements PreferenceProvider {
 
 	@Override
 	public boolean setAuthToken(Context context, final String value) {
-		System.err.println(">>> setAuthToken = " + value);
 		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
 		              .edit()
 		              .putString(AUTH_TOKEN, value)
@@ -25,7 +24,6 @@ public class PreferenceHelper implements PreferenceProvider {
 	public String getAuthToken(Context context) {
 		final String string = context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
 		                       .getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
-		System.err.println(">>> getAuthToken = " + string);
 		return string;
 	}
 }

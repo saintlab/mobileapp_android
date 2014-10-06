@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Restaurateur</string>
-    <string name="floor_suffix"> ύςΰζ </string>
+    <string name="floor_suffix"> ΡΡ‚Π°Π¶ </string>
     <string name="restaurant_address_delimiter">, </string>
 </resources>
