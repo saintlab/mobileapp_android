@@ -10,6 +10,7 @@ import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.ApplicationModule;
 import com.omnom.android.modules.AuthMixpanelModule;
 import com.omnom.android.preferences.PreferenceHelper;
+import com.omnom.android.restaurateur.RestaurateurModule;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
 import com.omnom.android.utils.preferences.PreferenceProvider;
@@ -50,6 +51,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
 		                     new ApplicationModule(),
+		                     new RestaurateurModule(this, R.string.endpoint_restaurateur),
 		                     new AcquiringModuleMailRuMixpanel(this, mixPanelHelper),
 		                     new AuthMixpanelModule(this, R.string.endpoint_auth, mixPanelHelper));
 	}

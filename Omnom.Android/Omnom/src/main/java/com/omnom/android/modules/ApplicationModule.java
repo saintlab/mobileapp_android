@@ -7,6 +7,7 @@ import com.omnom.android.activity.EnteringActivity;
 import com.omnom.android.activity.LoginActivity;
 import com.omnom.android.activity.SplashActivity;
 import com.omnom.android.activity.UserRegisterActivity;
+import com.omnom.android.activity.ValidateActivity;
 
 import dagger.Module;
 
@@ -14,6 +15,6 @@ import dagger.Module;
  * Created by Ch3D on 11.08.2014.
  */
 @Module(injects = {OmnomApplication.class, MainActivity.class, SplashActivity.class, UserRegisterActivity.class, EnteringActivity.class,
-		ConfirmPhoneActivity.class, LoginActivity.class},
+		ConfirmPhoneActivity.class, LoginActivity.class, ValidateActivity.class},
         complete = false)
 public class ApplicationModule {}

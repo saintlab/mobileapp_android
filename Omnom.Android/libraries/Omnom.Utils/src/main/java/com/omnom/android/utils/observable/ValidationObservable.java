@@ -1,5 +1,6 @@
 package com.omnom.android.utils.observable;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -76,5 +77,28 @@ public class ValidationObservable {
 				                 return error != Error.OK;
 			                 }
 		                 });
+	}
+
+	public static Observable<? extends ValidationObservable.Error> validateSmart(final Context context) {
+		final Observable<Error> observableChain;
+		if(hasBluetooth()) {
+			observableChain = Observable.concat(hasConnection(context), isLocationEnabled(context), isBluetoothEnabled(context));
+		} else {
+			observableChain = Observable.concat(hasConnection(context), isLocationEnabled(context));
+		}
+		return observableChain
+		                 .timeout(TIMEOUT, TimeUnit.MILLISECONDS)
+		                 .delaySubscription(400, TimeUnit.MILLISECONDS)
+		                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+		                 .takeFirst(new Func1<Error, Boolean>() {
+			                 @Override
+			                 public Boolean call(Error error) {
+				                 return error != Error.OK;
+			                 }
+		                 });
+	}
+
+	private static boolean hasBluetooth() {
+		return BluetoothAdapter.getDefaultAdapter() != null;
 	}
 }

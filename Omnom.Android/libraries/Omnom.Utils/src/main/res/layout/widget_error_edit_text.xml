@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <com.omnom.util.view.ErrorEditText
+        <com.omnom.android.utils.view.ErrorEditText
             android:id="@+id/edit"
             android:singleLine="true"
             android:layout_width="match_parent"

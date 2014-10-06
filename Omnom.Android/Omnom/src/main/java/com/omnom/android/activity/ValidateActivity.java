@@ -19,11 +19,11 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.table.RestaurateurObservable;
+import com.omnom.android.utils.ErrorHelper;
+import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
-import com.omnom.android.utils.ErrorHelper;
-import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.UserDataHolder;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -209,36 +209,34 @@ public class ValidateActivity extends BaseOmnomActivity {
 			}
 		});
 		mErrValidationSubscription = AndroidObservable
-				.bindActivity(this, ValidationObservable.validate(this)
-				                                        .map(OmnomObservable.getValidationFunc(
-						                                             this,
-						                                             mErrorHelper,
-						                                             new View.OnClickListener() {
-							                                             @Override
-							                                             public void onClick(View v) {
-								                                             validate();
-							                                             }
-						                                             })
-				                                            ).isEmpty())
-				.subscribe(
-						new Action1<Boolean>() {
+				.bindActivity(this, ValidationObservable.validateSmart(this)
+				                                        .map(OmnomObservable.getValidationFunc(this,
+				                                                                               mErrorHelper,
+				                                                                               new View.OnClickListener() {
+					                                                                               @Override
+					                                                                               public void onClick(View v) {
+						                                                                               validate();
+					                                                                               }
+				                                                                               }))
+				                                        .isEmpty())
+				.subscribe(new Action1<Boolean>() {
+					@Override
+					public void call(Boolean hasNoErrors) {
+						if(hasNoErrors) {
+							authenticateAndGetData();
+						}
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						mErrorHelper.showInternetError(new View.OnClickListener() {
 							@Override
-							public void call(Boolean hasNoErrors) {
-								if(hasNoErrors) {
-									authenticateAndGetData();
-								}
-							}
-						}, new Action1<Throwable>() {
-							@Override
-							public void call(Throwable throwable) {
-								mErrorHelper.showInternetError(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										validate();
-									}
-								});
+							public void onClick(View v) {
+								validate();
 							}
 						});
+					}
+				});
 	}
 
 	private void onAnimationEnd() {

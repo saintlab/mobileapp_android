@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.omnom.util.view.ErrorEdit
+            <com.omnom.android.utils.view.ErrorEdit
                 android:id="@+id/edit_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                 app:showClear="false"
                 app:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
 
-            <com.omnom.util.view.ErrorEdit
+            <com.omnom.android.utils.view.ErrorEdit
                 android:id="@+id/edit_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
                 app:showClear="true"
                 app:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
 
-            <com.omnom.util.view.ErrorEdit
+            <com.omnom.android.utils.view.ErrorEdit
                 android:id="@+id/edit_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
                 app:showClear="true"
                 app:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
 
-            <com.omnom.util.view.ErrorEditText
+            <com.omnom.android.utils.view.ErrorEditText
                 android:id="@+id/edit_birth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
