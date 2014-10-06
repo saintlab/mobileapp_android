@@ -68,7 +68,7 @@ public class SplashActivity extends BaseOmnomActivity {
 						if(!isFinishing()) {
 							Intent intent = new Intent(SplashActivity.this, ValidateActivity.class);
 							intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
-							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, true);
+							startActivity(intent, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short, true);
 						}
 					}
 				});

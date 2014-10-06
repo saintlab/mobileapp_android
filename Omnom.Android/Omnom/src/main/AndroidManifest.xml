@@ -65,7 +65,10 @@
             android:windowSoftInputMode="stateVisible" />
         <activity
             android:name=".activity.ValidateActivity"
-            android:label="@string/title_activity_validate" >
+            android:label="@string/title_activity_validate"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood"
+            android:windowSoftInputMode="stateAlwaysHidden">
         </activity>
     </application>
 
