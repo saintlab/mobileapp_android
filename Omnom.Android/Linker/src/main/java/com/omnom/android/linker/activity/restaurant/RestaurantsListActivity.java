@@ -5,12 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
 
+import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.UserProfileActivity;
-import com.omnom.util.activity.BaseListActivity;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.adapter.MockPlacesAdapter;
-import com.omnom.android.linker.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.utils.activity.BaseListActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +29,11 @@ public class RestaurantsListActivity extends BaseListActivity {
 
 	@OnClick(R.id.btn_profile)
 	public void onProfile() {
-//		if(BuildConfig.DEBUG) {
-//			startActivity(new Intent(this, BeaconsChartActivity.class), false);
-//		} else {
+		if(BuildConfig.DEBUG) {
+			startActivity(new Intent(this, BeaconsChartActivity.class), false);
+		} else {
 			UserProfileActivity.start(this, true);
-//		}
+		}
 	}
 
 	@Override

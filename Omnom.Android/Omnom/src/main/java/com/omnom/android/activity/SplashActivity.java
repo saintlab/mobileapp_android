@@ -9,7 +9,8 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.omnom.android.R;
-import com.omnom.util.utils.AnimationUtils;
+import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.utils.utils.AnimationUtils;
 
 import java.util.Collections;
 
@@ -65,9 +66,12 @@ public class SplashActivity extends BaseOmnomActivity {
 					@Override
 					public void run() {
 						if(!isFinishing()) {
-							Intent intent = new Intent(SplashActivity.this, EnteringActivity.class);
+							// boolean hasBle = BluetoothUtils.hasBleSupport(getActivity());
+							boolean hasBle = false;
+							final Intent intent = new Intent(SplashActivity.this,
+							                           hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
 							intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
-							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, true);
+							startActivity(intent, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short, true);
 						}
 					}
 				});
@@ -88,7 +92,6 @@ public class SplashActivity extends BaseOmnomActivity {
 		sd.invalidateSelf();
 
 		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
-		System.err.println(">>> hasAuthToken = " + hasToken);
 		if(hasToken) {
 			animateValidation();
 		} else {

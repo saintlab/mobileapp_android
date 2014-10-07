@@ -1,12 +1,11 @@
 package com.omnom.android.linker.modules;
 
-import android.content.Context;
-
-import com.omnom.android.linker.beacon.BeaconFilter;
-import com.omnom.android.linker.beacon.BeaconFilterAlgorithm;
-import com.omnom.android.linker.beacon.BeaconFilterAlgorithmSimple;
-import com.omnom.android.linker.beacon.BeaconRssiProvider;
-import com.omnom.android.linker.beacon.BeaconRssiProviderSimple;
+import com.omnom.android.beacon.BeaconFilter;
+import com.omnom.android.beacon.BeaconFilterAlgorithm;
+import com.omnom.android.beacon.BeaconFilterAlgorithmSimple;
+import com.omnom.android.beacon.BeaconRssiProvider;
+import com.omnom.android.beacon.BeaconRssiProviderSimple;
+import com.omnom.android.utils.BaseOmnomApplication;
 
 import javax.inject.Singleton;
 
@@ -18,22 +17,22 @@ import dagger.Provides;
  */
 @Module(injects = {BeaconFilter.class}, library = true)
 public class BeaconModule {
-	private Context mContext;
+	private BaseOmnomApplication mApp;
 
-	public BeaconModule(Context context) {
-		mContext = context;
+	public BeaconModule(BaseOmnomApplication app) {
+		mApp = app;
 	}
 
 	@Provides
 	@Singleton
 	BeaconRssiProvider provideBeaconHelper() {
-		return new BeaconRssiProviderSimple(mContext);
+		return new BeaconRssiProviderSimple(mApp);
 	}
 
 	@Provides
 	@Singleton
 	BeaconFilterAlgorithm provideFilterAlgorithm() {
-		return new BeaconFilterAlgorithmSimple(mContext);
+		return new BeaconFilterAlgorithmSimple(mApp);
 	}
 
 }

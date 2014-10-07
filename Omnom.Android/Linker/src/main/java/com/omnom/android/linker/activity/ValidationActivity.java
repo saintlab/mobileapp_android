@@ -17,19 +17,21 @@ import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
-import com.omnom.android.linker.api.Protocol;
-import com.omnom.android.linker.api.observable.LinkerObeservableApi;
-import com.omnom.android.linker.model.UserProfile;
-import com.omnom.android.linker.model.restaurant.Restaurant;
-import com.omnom.android.linker.model.restaurant.RestaurantsResponse;
-import com.omnom.android.linker.observable.BaseErrorHandler;
-import com.omnom.android.linker.observable.OmnomObservable;
-import com.omnom.android.linker.observable.ValidationObservable;
-import com.omnom.android.linker.widget.loader.LoaderView;
-import com.omnom.util.activity.BaseActivity;
-import com.omnom.util.utils.StringUtils;
-import com.omnom.util.utils.UserDataHolder;
-import com.omnom.util.utils.ViewUtils;
+import com.omnom.android.restaurateur.api.Protocol;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.UserProfile;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
+import com.omnom.android.restaurateur.model.table.RestaurateurObservable;
+import com.omnom.android.utils.observable.BaseErrorHandler;
+import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.observable.ValidationObservable;
+import com.omnom.android.utils.ErrorHelper;
+import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.loader.LoaderView;
+import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.UserDataHolder;
+import com.omnom.android.utils.utils.ViewUtils;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +50,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 
-import static com.omnom.util.utils.AndroidUtils.showToastLong;
+import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
 public class ValidationActivity extends BaseActivity {
 	@SuppressWarnings("UnusedDeclaration")
@@ -70,7 +72,7 @@ public class ValidationActivity extends BaseActivity {
 	@InjectView(R.id.panel_bottom)
 	protected View panelBottom;
 	@Inject
-	protected LinkerObeservableApi api;
+	protected RestaurateurObeservableApi api;
 
 	@Inject
 	protected AuthService mAuthenticator;
@@ -78,7 +80,7 @@ public class ValidationActivity extends BaseActivity {
 	private String mUsername = null;
 	private String mPassword = null;
 
-	private BaseErrorHandler onError = new BaseErrorHandler(this) {
+	private BaseErrorHandler onError = new LinkerBaseErrorHandler(this) {
 		@Override
 		protected void onThrowable(Throwable throwable) {
 			loader.stopProgressAnimation(true);
@@ -324,7 +326,7 @@ public class ValidationActivity extends BaseActivity {
 										                                }
 									                                });
 								}
-							})).subscribe(new OmnomObservable.AuthAwareOnNext<RestaurantsResponse>(getActivity()) {
+							})).subscribe(new RestaurateurObservable.AuthAwareOnNext<RestaurantsResponse>(getActivity()) {
 						@Override
 						public void perform(RestaurantsResponse result) {
 							onRestaurantsLoaded(result);
@@ -342,7 +344,7 @@ public class ValidationActivity extends BaseActivity {
 					                                            return api.getRestaurants();
 				                                            }
 			                                            })
-			                                            .subscribe(new OmnomObservable.AuthAwareOnNext<RestaurantsResponse>(getActivity
+			                                            .subscribe(new RestaurateurObservable.AuthAwareOnNext<RestaurantsResponse>(getActivity
 					                                                                                                                ()) {
 				                                            @Override
 				                                            public void perform(RestaurantsResponse response) {

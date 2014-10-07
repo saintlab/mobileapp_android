@@ -8,8 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.beacon.BeaconFilter;
-import com.omnom.android.linker.beacon.BeaconUtils;
+import com.omnom.android.beacon.BeaconUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

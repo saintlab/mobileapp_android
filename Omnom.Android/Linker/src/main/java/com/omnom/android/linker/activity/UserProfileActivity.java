@@ -15,19 +15,19 @@ import com.omnom.android.auth.UserProfileHelper;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.linker.LinkerApplication;
-import com.omnom.android.linker.R;
-import com.omnom.android.linker.api.observable.LinkerObeservableApi;
 import com.omnom.android.linker.drawable.RoundTransformation;
 import com.omnom.android.linker.drawable.RoundedDrawable;
-import com.omnom.android.linker.model.UserProfile;
-import com.omnom.android.linker.observable.BaseErrorHandler;
-import com.omnom.android.linker.observable.OmnomObservable;
-import com.omnom.util.Extras;
-import com.omnom.util.activity.BaseActivity;
-import com.omnom.util.activity.OmnomActivity;
-import com.omnom.util.utils.AnimationUtils;
-import com.omnom.util.utils.StringUtils;
-import com.omnom.util.utils.ViewUtils;
+import com.omnom.android.linker.R;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.UserProfile;
+import com.omnom.android.utils.observable.BaseErrorHandler;
+import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.activity.OmnomActivity;
+import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -43,8 +43,8 @@ import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
 import static butterknife.ButterKnife.findById;
-import static com.omnom.util.utils.AndroidUtils.showToast;
-import static com.omnom.util.utils.AndroidUtils.showToastLong;
+import static com.omnom.android.utils.utils.AndroidUtils.showToast;
+import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseActivity {
 	public static final int ROTATION_VALUE = 180;
@@ -83,7 +83,7 @@ public class UserProfileActivity extends BaseActivity {
 	protected List<View> mTxtViews;
 
 	@Inject
-	protected LinkerObeservableApi api;
+	protected RestaurateurObeservableApi api;
 
 	@Inject
 	protected AuthService authenticator;
@@ -136,6 +136,11 @@ public class UserProfileActivity extends BaseActivity {
 							initUserData(response.getUser(), profile.getImageUrl());
 						}
 					}, new BaseErrorHandler(getActivity()) {
+						@Override
+						protected void onTokenExpired() {
+
+						}
+
 						@Override
 						protected void onThrowable(Throwable throwable) {
 							showToastLong(getActivity(), R.string.error_server_unavailable_please_try_again);

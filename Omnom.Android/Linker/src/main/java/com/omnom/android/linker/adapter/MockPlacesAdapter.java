@@ -10,8 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.omnom.android.linker.R;
-import com.omnom.android.linker.model.restaurant.Restaurant;
-import com.omnom.android.linker.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 

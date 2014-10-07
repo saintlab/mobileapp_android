@@ -7,10 +7,10 @@ import android.os.Parcelable;
 import android.view.View;
 
 import com.omnom.android.linker.R;
-import com.omnom.util.activity.BaseActivity;
-import com.omnom.android.linker.model.restaurant.Restaurant;
-import com.omnom.util.utils.ViewUtils;
-import com.omnom.android.linker.widget.loader.LoaderView;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.loader.LoaderView;
+import com.omnom.android.utils.utils.ViewUtils;
 
 import butterknife.InjectView;
 import butterknife.OnClick;

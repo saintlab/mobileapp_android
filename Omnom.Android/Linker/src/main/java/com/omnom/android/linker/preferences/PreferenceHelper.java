@@ -2,8 +2,8 @@ package com.omnom.android.linker.preferences;
 
 import android.content.Context;
 
-import com.omnom.util.preferences.PreferenceProvider;
-import com.omnom.util.utils.StringUtils;
+import com.omnom.android.utils.preferences.PreferenceProvider;
+import com.omnom.android.utils.utils.StringUtils;
 
 /**
  * Created by Ch3D on 04.09.2014.
@@ -14,7 +14,6 @@ public class PreferenceHelper implements PreferenceProvider {
 
 	@Override
 	public boolean setAuthToken(Context context, final String value) {
-		System.err.println(">>> setAuthToken = " + value);
 		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
 		              .edit()
 		              .putString(AUTH_TOKEN, value)
@@ -25,7 +24,6 @@ public class PreferenceHelper implements PreferenceProvider {
 	public String getAuthToken(Context context) {
 		final String string = context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
 		                       .getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
-		System.err.println(">>> getAuthToken = " + string);
 		return string;
 	}
 }

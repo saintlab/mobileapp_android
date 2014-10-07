@@ -12,6 +12,7 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
             runProguard false
@@ -23,8 +24,12 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-v4:20.0.+'
+    compile 'com.squareup.retrofit:retrofit:1.6.1'
     compile 'com.jakewharton:butterknife:5.1.1'
+    compile 'com.squareup.picasso:picasso:2.3.4'
     compile 'com.squareup.dagger:dagger:1.2.2'
+    compile 'com.netflix.rxjava:rxjava-core:0.19.6'
+    compile 'com.netflix.rxjava:rxjava-android:0.19.6'
     provided 'com.squareup.dagger:dagger-compiler:1.2.2'
     compile 'com.squareup:otto:1.3.5'
     compile 'uk.co.chrisjenx:calligraphy:1.1.+'

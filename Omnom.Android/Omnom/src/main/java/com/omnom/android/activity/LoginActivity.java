@@ -1,16 +1,19 @@
 package com.omnom.android.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
+import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.UserDataHolder;
+import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.view.LoginPanelTop;
-import com.omnom.util.utils.StringUtils;
-import com.omnom.util.view.ErrorEdit;
 
 import javax.inject.Inject;
 
@@ -21,15 +24,16 @@ public class LoginActivity extends BaseOmnomActivity {
 
 	private static final String TAG = LoginActivity.class.getSimpleName();
 
+	public static void start(Context context, UserDataHolder dataHolder) {
+		throw new RuntimeException("IMPLEMENT");
+	}
+
 	@InjectView(R.id.edit_phone)
 	protected ErrorEdit editPhone;
-
 	@InjectView(R.id.panel_top)
 	protected LoginPanelTop topPanel;
-
 	@Inject
 	protected AuthService authenticator;
-
 	private boolean mFirstStart = true;
 
 	@Override

@@ -3,16 +3,16 @@ package com.omnom.android.linker;
 import android.content.Context;
 
 import com.omnom.android.auth.AuthModule;
-import com.omnom.android.linker.model.UserProfile;
+import com.omnom.android.restaurateur.RestaurateurModule;
+import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.linker.modules.AndroidModule;
 import com.omnom.android.linker.modules.ApplicationModule;
 import com.omnom.android.linker.modules.BeaconModule;
-import com.omnom.android.linker.modules.LinkerDataProviderModule;
 import com.omnom.android.linker.preferences.PreferenceHelper;
-import com.omnom.util.AuthTokenProvider;
-import com.omnom.util.BaseOmnomApplication;
-import com.omnom.util.activity.OmnomActivity;
-import com.omnom.util.preferences.PreferenceProvider;
+import com.omnom.android.utils.AuthTokenProvider;
+import com.omnom.android.utils.BaseOmnomApplication;
+import com.omnom.android.utils.activity.OmnomActivity;
+import com.omnom.android.utils.preferences.PreferenceProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,7 +41,7 @@ public class LinkerApplication extends BaseOmnomApplication implements AuthToken
 	private PreferenceHelper mPrefsHelper;
 
 	protected List<Object> getModules() {
-		return Arrays.asList(/*new StubDataProviderModule(),*/new LinkerDataProviderModule(this), new AndroidModule(this),
+		return Arrays.asList(/*new StubDataProviderModule(),*/new RestaurateurModule(this, R.string.config_data_endpoint), new AndroidModule(this),
 		                     new ApplicationModule(), new BeaconModule(this), new AuthModule(this, R.string.config_auth_endpoint));
 	}
 

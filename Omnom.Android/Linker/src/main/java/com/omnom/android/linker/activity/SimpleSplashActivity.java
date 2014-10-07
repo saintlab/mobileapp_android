@@ -12,8 +12,8 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.omnom.android.linker.R;
-import com.omnom.util.activity.BaseActivity;
-import com.omnom.util.utils.AnimationUtils;
+import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.utils.AnimationUtils;
 
 import java.util.Collections;
 
@@ -93,7 +93,6 @@ public class SimpleSplashActivity extends BaseActivity {
 		sd.invalidateSelf();
 
 		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
-		System.err.println(">>> hasAuthToken = " + hasToken);
 		if(hasToken) {
 			animateValidation();
 		} else {
