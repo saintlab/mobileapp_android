@@ -64,11 +64,21 @@
             android:theme="@style/Theme.White"
             android:windowSoftInputMode="stateVisible" />
         <activity
-            android:name=".activity.ValidateActivity"
+            android:name=".activity.ValidateActivityBle"
             android:label="@string/title_activity_validate"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
-            android:windowSoftInputMode="stateAlwaysHidden">
+            android:windowSoftInputMode="stateAlwaysHidden"/>
+        <activity
+            android:name=".activity.ValidateActivityCamera"
+            android:label="@string/title_activity_validate"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
+        <activity
+            android:name="com.google.zxing.client.android.CaptureActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood">
         </activity>
     </application>
 

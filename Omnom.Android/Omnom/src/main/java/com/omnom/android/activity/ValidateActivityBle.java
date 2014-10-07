@@ -1,40 +1,52 @@
 package com.omnom.android.activity;
 
+import android.annotation.TargetApi;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.beacon.BeaconFilter;
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.table.RestaurateurObservable;
+import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
+import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.UserDataHolder;
 import com.omnom.android.utils.utils.ViewUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import altbeacon.beacon.Beacon;
+import altbeacon.beacon.BeaconParser;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
+import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
@@ -45,7 +57,7 @@ import rx.functions.Func2;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
-public class ValidateActivity extends BaseOmnomActivity {
+public class ValidateActivityBle extends BaseOmnomActivity {
 	@InjectView(R.id.loader)
 	protected LoaderView loader;
 
@@ -110,6 +122,12 @@ public class ValidateActivity extends BaseOmnomActivity {
 	private boolean mDataLoaded = false;
 	private Subscription mRestaurantsSubscription;
 
+	private BluetoothAdapter.LeScanCallback mLeScanCallback;
+	private BluetoothAdapter mBluetoothAdapter;
+
+	private BeaconParser parser;
+	private ArrayList<Beacon> mBeacons = new ArrayList<Beacon>();
+
 	@Override
 	protected void handleIntent(Intent intent) {
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_UP);
@@ -120,6 +138,33 @@ public class ValidateActivity extends BaseOmnomActivity {
 		mUsername = getIntent().getStringExtra(EXTRA_USERNAME);
 		mPassword = getIntent().getStringExtra(EXTRA_PASSWORD);
 		mErrorHelper = new ErrorHelper(loader, txtError, btnSettings, errorViews);
+
+		initBle();
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+	private void initBle() {
+		if(BluetoothUtils.hasBleSupport(this)) {
+			parser = new BeaconParser();
+			parser.setBeaconLayout(getResources().getString(R.string.redbear_beacon_layout));
+			mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+				BeaconFilter mFilter = new BeaconFilter(OmnomApplication.get(getActivity()));
+
+				@Override
+				@DebugLog
+				public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
+							if(mFilter.check(beacon)) {
+								mBeacons.add(beacon);
+							}
+						}
+					});
+				}
+			};
+		}
 	}
 
 	@Override
@@ -163,7 +208,7 @@ public class ValidateActivity extends BaseOmnomActivity {
 			loader.scaleUp(new Runnable() {
 				@Override
 				public void run() {
-					ValidateActivity.super.finish();
+					ValidateActivityBle.super.finish();
 					overridePendingTransition(android.R.anim.fade_in, R.anim.fake_fade_out);
 				}
 			});
@@ -223,7 +268,7 @@ public class ValidateActivity extends BaseOmnomActivity {
 					@Override
 					public void call(Boolean hasNoErrors) {
 						if(hasNoErrors) {
-							authenticateAndGetData();
+							findTable();
 						}
 					}
 				}, new Action1<Throwable>() {
@@ -237,6 +282,17 @@ public class ValidateActivity extends BaseOmnomActivity {
 						});
 					}
 				});
+	}
+
+	private void onTableFound(TableDataResponse tableResponse) {
+		mDataLoaded = true;
+		loader.stopProgressAnimation();
+		loader.updateProgressMax(new Runnable() {
+			@Override
+			public void run() {
+				startNextActivity();
+			}
+		});
 	}
 
 	private void onAnimationEnd() {
@@ -285,7 +341,29 @@ public class ValidateActivity extends BaseOmnomActivity {
 		}
 	}
 
-	private void authenticateAndGetData() {
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
+		if(enable) {
+			mBeacons.clear();
+			findViewById(android.R.id.content).postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					mBluetoothAdapter.stopLeScan(mLeScanCallback);
+					if(endCallback != null) {
+						endCallback.run();
+					}
+				}
+			}, getResources().getInteger(R.integer.ble_scan_duration));
+			mBluetoothAdapter.startLeScan(mLeScanCallback);
+		} else {
+			mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			if(endCallback != null) {
+				endCallback.run();
+			}
+		}
+	}
+
+	private void findTable() {
 		final String token = getPreferences().getAuthToken(this);
 		onError.setDataHolder(UserDataHolder.create(mUsername, mPassword));
 		if(TextUtils.isEmpty(token)) {

@@ -14,7 +14,6 @@ import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
-import com.omnom.android.restaurateur.BuildConfig;
 
 import altbeacon.beacon.Beacon;
 import retrofit.RequestInterceptor;
@@ -29,13 +28,15 @@ import rx.schedulers.Schedulers;
  */
 public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	public static RestaurateurDataProvider create(final String dataEndPoint, final RequestInterceptor interceptor) {
-		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
+		// final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
+		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
 		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		final GsonConverter converter = new GsonConverter(gson);
 
-		final RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(interceptor).setEndpoint(dataEndPoint).setLogLevel(
-				logLevel)
-		                                                    .setConverter(converter).build();
+		final RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(interceptor).setEndpoint(dataEndPoint)
+		                                                          .setLogLevel(
+				                                                          logLevel)
+		                                                          .setConverter(converter).build();
 		return new RestaurateurDataProvider(mRestAdapter.create(RestaurateurDataService.class));
 	}
 
