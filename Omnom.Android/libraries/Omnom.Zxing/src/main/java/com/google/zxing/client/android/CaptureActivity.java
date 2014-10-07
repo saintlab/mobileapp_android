@@ -76,17 +76,18 @@ import java.util.Map;
  */
 public final class CaptureActivity extends Activity implements SurfaceHolder.Callback {
 
-	public static final  int                            HISTORY_REQUEST_CODE              = 0x0000bacc;
-	private static final String                         TAG                               = CaptureActivity.class.getSimpleName();
-	private static final long                           DEFAULT_INTENT_RESULT_DURATION_MS = 1500L;
-	private static final long                           BULK_MODE_SCAN_DELAY_MS           = 1000L;
-	private static final Collection<ResultMetadataType> DISPLAYABLE_METADATA_TYPES        = EnumSet.of(ResultMetadataType.ISSUE_NUMBER,
-	                                                                                                   ResultMetadataType.SUGGESTED_PRICE,
-	                                                                                                   ResultMetadataType
-			                                                                                                   .ERROR_CORRECTION_LEVEL,
-	                                                                                                   ResultMetadataType
-			                                                                                                   .POSSIBLE_COUNTRY);
-	public static final String                         EXTRA_SCANNED_URI                 = "zxing.scan.result";
+	public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
+	public static final String EXTRA_SCANNED_URI = "zxing.scan.result";
+	public static final String EXTRA_SHOW_BACK = "zxing.capture.show.back";
+	private static final String TAG = CaptureActivity.class.getSimpleName();
+	private static final long DEFAULT_INTENT_RESULT_DURATION_MS = 1500L;
+	private static final long BULK_MODE_SCAN_DELAY_MS = 1000L;
+	private static final Collection<ResultMetadataType> DISPLAYABLE_METADATA_TYPES = EnumSet.of(ResultMetadataType.ISSUE_NUMBER,
+	                                                                                            ResultMetadataType.SUGGESTED_PRICE,
+	                                                                                            ResultMetadataType
+			                                                                                            .ERROR_CORRECTION_LEVEL,
+	                                                                                            ResultMetadataType
+			                                                                                            .POSSIBLE_COUNTRY);
 
 	private static void drawLine(Canvas canvas, Paint paint, ResultPoint a, ResultPoint b, float scaleFactor) {
 		if(a != null && b != null) {
@@ -94,24 +95,24 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		}
 	}
 
-	private CameraManager             cameraManager;
-	private CaptureActivityHandler    handler;
-	private Result                    savedResultToShow;
-	private ViewfinderView            viewfinderView;
-	private TextView                  statusView;
-	private View                      resultView;
-	private Result                    lastResult;
-	private boolean                   hasSurface;
-	private boolean                   copyToClipboard;
-	private IntentSource              source;
-	private String                    sourceUrl;
-	private ScanFromWebPageManager    scanFromWebPageManager;
+	private CameraManager cameraManager;
+	private CaptureActivityHandler handler;
+	private Result savedResultToShow;
+	private ViewfinderView viewfinderView;
+	private TextView statusView;
+	private View resultView;
+	private Result lastResult;
+	private boolean hasSurface;
+	private boolean copyToClipboard;
+	private IntentSource source;
+	private String sourceUrl;
+	private ScanFromWebPageManager scanFromWebPageManager;
 	private Collection<BarcodeFormat> decodeFormats;
-	private Map<DecodeHintType, ?>    decodeHints;
-	private String                    characterSet;
-	private HistoryManager            historyManager;
-	private InactivityTimer           inactivityTimer;
-	private AmbientLightManager       ambientLightManager;
+	private Map<DecodeHintType, ?> decodeHints;
+	private String characterSet;
+	private HistoryManager historyManager;
+	private InactivityTimer inactivityTimer;
+	private AmbientLightManager ambientLightManager;
 
 	ViewfinderView getViewfinderView() {
 		return viewfinderView;
@@ -139,12 +140,15 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		inactivityTimer = new InactivityTimer(this);
 		ambientLightManager = new AmbientLightManager(this);
 
-		findViewById(R.id.btn_back).setOnClickListener(new View.OnClickListener() {
+		final boolean showBack = getIntent().getBooleanExtra(EXTRA_SHOW_BACK, true);
+		final View btnBack = findViewById(R.id.btn_back);
+		btnBack.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onBackPressed();
 			}
 		});
+		btnBack.setVisibility(showBack ? View.VISIBLE : View.GONE);
 
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 	}

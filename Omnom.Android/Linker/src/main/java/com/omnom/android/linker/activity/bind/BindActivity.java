@@ -215,6 +215,8 @@ public class BindActivity extends BaseActivity {
 		}
 	};
 
+
+
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
 		if(enable) {
 			mBeacons.clear();

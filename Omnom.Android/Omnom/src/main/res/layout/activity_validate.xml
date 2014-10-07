@@ -1,5 +1,6 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -12,7 +13,7 @@
             android:id="@+id/txt_error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/panel_bottom"
+            android:layout_above="@+id/panel_errors"
             android:paddingStart="@dimen/error_text_padding"
             android:paddingEnd="@dimen/error_text_padding"
             android:paddingBottom="@dimen/error_text_padding"
@@ -23,7 +24,7 @@
             android:textAppearance="?android:textAppearanceLarge"/>
 
         <LinearLayout
-            android:id="@+id/panel_bottom"
+            android:id="@+id/panel_errors"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,8 +42,58 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/img_holder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/btn_down"
+            android:layout_width="22dp"
+            android:layout_height="13dp"
+            android:layout_above="@+id/panel_bottom"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="48dp"
+            android:background="@drawable/ic_down_button_icon_white"/>
+
+        <LinearLayout
+            android:id="@+id/panel_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/view_size_default"
+            android:layout_alignParentBottom="true"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:background="@android:color/white"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_waiter"
+                android:text="@string/waiter"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:textColor="@android:color/black"
+                android:drawablePadding="@dimen/activity_horizontal_margin_small"
+                android:ellipsize="end"
+                style="@android:style/Widget.Holo.Button.Borderless"/>
+
+            <Button
+                android:id="@+id/btn_bill"
+                android:text="@string/bill"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="end|center_vertical"
+                android:textColor="@android:color/black"
+                android:ellipsize="end"
+                style="@android:style/Widget.Holo.Button.Borderless"/>
+        </LinearLayout>
+    </RelativeLayout>
+
     <com.omnom.android.utils.loader.LoaderView
         android:id="@+id/loader"
+        omnom:progress_color="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

@@ -6,9 +6,12 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.RotateDrawable;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -55,31 +58,46 @@ public class LoaderView extends FrameLayout {
 	private int currentColor = -1;
 	private List<View> translationViews = new LinkedList<View>();
 	private Interpolator interpolation;
+	private int mProgressColor;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public LoaderView(Context context) {
 		super(context);
-		init();
+		init(null);
 	}
 
 	@SuppressWarnings("UnusedDeclaration")
 	public LoaderView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		init();
+		init(attrs);
 	}
 
 	@SuppressWarnings("UnusedDeclaration")
 	public LoaderView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		init();
+		init(attrs);
 	}
 
-	private void init() {
+	private void init(AttributeSet attrs) {
 		LayoutInflater.from(getContext()).inflate(R.layout.view_loader, this);
+
+		if(attrs != null) {
+			TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.LoaderView, 0, 0);
+			final int color = getContext().getResources().getColor(R.color.loader_progress);
+			mProgressColor = a.getColor(R.styleable.LoaderView_progress_color, color);
+			a.recycle();
+		}
 
 		mImgLoader = findById(this, R.id.img_loader);
 		mImgLogo = findById(this, R.id.img_logo);
 		mProgressBar = findById(this, R.id.progress);
+		final LayerDrawable progressDrawable = (LayerDrawable) mProgressBar.getProgressDrawable();
+		if(progressDrawable != null) {
+			final RotateDrawable rotateDrawable = (RotateDrawable) progressDrawable.findDrawableByLayerId(android.R.id.progress);
+			GradientDrawable shape = (GradientDrawable) rotateDrawable.getDrawable();
+			shape.setColor(mProgressColor);
+		}
+
 		mEditTableNumber = findById(this, R.id.edit_table_number);
 
 		currentColor = getDefaultBgColor();
