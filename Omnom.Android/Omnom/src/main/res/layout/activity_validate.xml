@@ -45,7 +45,8 @@
     <RelativeLayout
         android:id="@+id/img_holder"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
         <Button
             android:id="@+id/btn_down"
