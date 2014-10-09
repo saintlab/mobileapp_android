@@ -1,6 +1,7 @@
 package com.omnom.android.restaurateur.model.restaurant;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.TextUtils;
 
 import com.omnom.android.restaurateur.R;
@@ -10,6 +11,8 @@ import com.omnom.android.utils.utils.StringUtils;
  * Created by Ch3D on 09.09.2014.
  */
 public class RestaurantHelper {
+
+	public static final String COLOR_PREFIX = "#";
 
 	public static String getAddress(final Context context, final Restaurant restaurant) {
 		final Address address = restaurant.getAddress();
@@ -30,5 +33,14 @@ public class RestaurantHelper {
 			return restaurant.getDecoration().getLogo();
 		}
 		return StringUtils.EMPTY_STRING;
+	}
+
+	public static int getBackgroundColor(Restaurant restaurant) {
+		final String decorationBg = restaurant.getDecoration().getBackgroundColor();
+		if(!decorationBg.startsWith(COLOR_PREFIX)) {
+			return Color.parseColor(COLOR_PREFIX + decorationBg);
+		} else {
+			return Color.parseColor(decorationBg);
+		}
 	}
 }

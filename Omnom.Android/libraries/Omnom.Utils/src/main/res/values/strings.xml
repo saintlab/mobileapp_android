@@ -7,4 +7,7 @@
     <string name="open_settings">Перейти в настройки</string>
     <string name="try_once_again">Проверить ещё</string>
     <string name="error_unknown_server_error">Произошла ошибка соединения с сервером. Пожалуйста, попробуйте позже</string>
+    <string name="error_weak_beacon_signal">Слабый сигнал. Положите телефон в центр стола пожалуйста</string>
+    <string name="error_more_than_one_beacon">Обноружено несколько маячков. Положите телефон в центр стола пожалуйста</string>
+    <string name="error_server_unavailable_please_try_again">Невозможно получить данные с сервера. Пожалуйста, попробуйте еще раз</string>
 </resources>

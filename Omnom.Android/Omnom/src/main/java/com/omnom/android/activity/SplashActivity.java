@@ -66,12 +66,8 @@ public class SplashActivity extends BaseOmnomActivity {
 					@Override
 					public void run() {
 						if(!isFinishing()) {
-							// boolean hasBle = BluetoothUtils.hasBleSupport(getActivity());
-							boolean hasBle = false;
-							final Intent intent = new Intent(SplashActivity.this,
-							                           hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
-							intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
-							startActivity(intent, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short, true);
+							ValidateActivity.start(SplashActivity.this, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short,
+							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 						}
 					}
 				});
