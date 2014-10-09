@@ -1,6 +1,6 @@
 package com.omnom.android.utils;
 
-import com.omnom.util.preferences.Preferences;
+import com.omnom.android.utils.preferences.Preferences;
 
 /**
  * Created by Ch3D on 14.08.2014.

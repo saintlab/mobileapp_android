@@ -149,6 +149,7 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void animateColor(final int startColor, final int endColor, final long duration) {
+		System.err.println(">>> animateColor " + startColor + " " + endColor);
 		post(new Runnable() {
 			@Override
 			public void run() {
