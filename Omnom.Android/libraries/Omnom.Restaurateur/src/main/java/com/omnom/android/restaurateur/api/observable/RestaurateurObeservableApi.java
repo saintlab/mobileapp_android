@@ -1,5 +1,6 @@
 package com.omnom.android.restaurateur.api.observable;
 
+import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -38,9 +39,9 @@ public interface RestaurateurObeservableApi {
 
 	public Observable<RestaurantsResponse> deleteCard(String cardId);
 
-	public Observable<TableDataResponse> waiterCall(String restaurantId, String tableId);
+	public Observable<WaiterCallResponse> waiterCall(String restaurantId, String tableId);
 
-	public Observable<TableDataResponse> waiterCallStop(String restaurantId, String tableId);
+	public Observable<WaiterCallResponse> waiterCallStop(String restaurantId, String tableId);
 
 	public Observable<Restaurant> getMenu(String restaurantId);
 

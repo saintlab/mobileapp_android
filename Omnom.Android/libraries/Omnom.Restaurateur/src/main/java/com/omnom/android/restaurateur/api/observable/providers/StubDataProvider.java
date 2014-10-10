@@ -1,6 +1,7 @@
 package com.omnom.android.restaurateur.api.observable.providers;
 
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -96,12 +97,12 @@ public class StubDataProvider implements RestaurateurObeservableApi {
 	}
 
 	@Override
-	public Observable<TableDataResponse> waiterCall(String restaurantId, String tableId) {
+	public Observable<WaiterCallResponse> waiterCall(String restaurantId, String tableId) {
 		return null;
 	}
 
 	@Override
-	public Observable<TableDataResponse> waiterCallStop(String restaurantId, String tableId) {
+	public Observable<WaiterCallResponse> waiterCallStop(String restaurantId, String tableId) {
 		return null;
 	}
 

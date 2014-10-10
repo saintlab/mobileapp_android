@@ -1,5 +1,6 @@
 package com.omnom.android.restaurateur.api;
 
+import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
@@ -32,11 +33,11 @@ public interface RestaurateurDataService {
 	Observable<RestaurantsResponse> deleteCard(@Path(Protocol.FIELD_CARD_ID) String cardId);
 
 	@POST("/restaurants/{restaurant_id}/tables/{table_id}/waiter/call")
-	Observable<TableDataResponse> waiterCall(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
+	Observable<WaiterCallResponse> waiterCall(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
 	                                         @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@POST("/restaurants/{restaurant_id}/tables/{table_id}/waiter/call/stop")
-	Observable<TableDataResponse> waiterCallStop(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
+	Observable<WaiterCallResponse> waiterCallStop(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
 	                                             @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@GET("/restaurants")

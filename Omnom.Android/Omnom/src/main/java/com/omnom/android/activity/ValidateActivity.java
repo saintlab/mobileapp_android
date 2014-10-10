@@ -18,6 +18,7 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
@@ -211,16 +212,18 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.btn_waiter)
 	public void onWaiter(final View v) {
-		final Observable<TableDataResponse> observable;
+		final Observable<WaiterCallResponse> observable;
 		if(!mWaiterCalled) {
 			observable = api.waiterCall(mRestaurant.getId(), mTable.getId());
 		} else {
 			observable = api.waiterCallStop(mRestaurant.getId(), mTable.getId());
 		}
-		observable.subscribe(new Action1<TableDataResponse>() {
+		observable.subscribe(new Action1<WaiterCallResponse>() {
 			@Override
-			public void call(TableDataResponse tableDataResponse) {
-				mWaiterCalled = !mWaiterCalled;
+			public void call(WaiterCallResponse tableDataResponse) {
+				if(tableDataResponse.isSuccess()) {
+					mWaiterCalled = !mWaiterCalled;
+				}
 			}
 		}, new Action1<Throwable>() {
 			@Override

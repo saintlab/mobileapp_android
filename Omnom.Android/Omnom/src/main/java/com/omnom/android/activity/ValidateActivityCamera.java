@@ -43,15 +43,17 @@ public class ValidateActivityCamera extends ValidateActivity {
 					}
 				});
 				final String mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
+				final TableDataResponse[] table = new TableDataResponse[1];
 				api.checkQrCode(mQrData).flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
 					@Override
 					public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
+						table[0] = tableDataResponse;
 						return api.getRestaurant(tableDataResponse.getRestaurantId());
 					}
 				}).subscribe(new Action1<Restaurant>() {
 					@Override
 					public void call(final Restaurant restaurant) {
-						onDataLoaded(restaurant, table);
+						onDataLoaded(restaurant, table[0]);
 					}
 				}, new Action1<Throwable>() {
 					@Override
