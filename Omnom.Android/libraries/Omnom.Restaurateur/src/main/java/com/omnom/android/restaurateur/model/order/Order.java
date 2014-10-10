@@ -1,5 +1,8 @@
 package com.omnom.android.restaurateur.model.order;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
@@ -8,9 +11,22 @@ import java.util.List;
 /**
  * Created by Ch3D on 10.10.2014.
  */
-public class Order {
+public class Order implements Parcelable {
+
+	public static final Parcelable.Creator<Order> CREATOR = new Parcelable.Creator<Order>() {
+
+		@Override
+		public Order createFromParcel(Parcel in) {
+			return new Order(in);
+		}
+
+		@Override
+		public Order[] newArray(int size) {
+			return new Order[size];
+		}
+	};
 	@Expose
-	private Integer guests;
+	private int guests;
 	@Expose
 	private String internalId;
 	@Expose
@@ -36,19 +52,60 @@ public class Order {
 	@Expose
 	private List<OrderItem> items = new ArrayList<OrderItem>();
 	@Expose
-	private Boolean isClosed;
+	private boolean isClosed;
 	@Expose
 	private String id;
 	@Expose
 	private OrderTips tips;
 	@Expose
-	private Integer paidAmount;
+	private int paidAmount;
 
-	public Integer getGuests() {
+	public Order(final Parcel parcel) {
+		guests = parcel.readInt();
+		internalId = parcel.readString();
+		internalOpenTime = parcel.readString();
+		internalTableId = parcel.readString();
+		modifiedTime = parcel.readString();
+		openTime = parcel.readString();
+		restaurantId = parcel.readString();
+		revision = parcel.readString();
+		status = parcel.readString();
+		tableId = parcel.readString();
+		waiterId = parcel.readString();
+		waiterName = parcel.readString();
+		parcel.readTypedList(items, OrderItem.CREATOR);
+		isClosed = parcel.readInt() == 1;
+		id = parcel.readString();
+		tips = parcel.readParcelable(OrderTips.class.getClassLoader());
+		paidAmount = parcel.readInt();
+	}
+
+	@Override
+	public void writeToParcel(Parcel parcel, int flags) {
+		parcel.writeInt(guests);
+		parcel.writeString(internalId);
+		parcel.writeString(internalOpenTime);
+		parcel.writeString(internalTableId);
+		parcel.writeString(modifiedTime);
+		parcel.writeString(openTime);
+		parcel.writeString(restaurantId);
+		parcel.writeString(revision);
+		parcel.writeString(status);
+		parcel.writeString(tableId);
+		parcel.writeString(waiterId);
+		parcel.writeString(waiterName);
+		parcel.writeTypedList(items);
+		parcel.writeInt(isClosed ? 1 : 0);
+		parcel.writeString(id);
+		parcel.writeParcelable(tips, flags);
+		parcel.writeInt(paidAmount);
+	}
+
+	public int getGuests() {
 		return guests;
 	}
 
-	public void setGuests(Integer guests) {
+	public void setGuests(int guests) {
 		this.guests = guests;
 	}
 
@@ -148,11 +205,11 @@ public class Order {
 		this.items = items;
 	}
 
-	public Boolean getIsClosed() {
+	public boolean getIsClosed() {
 		return isClosed;
 	}
 
-	public void setIsClosed(Boolean isClosed) {
+	public void setIsClosed(boolean isClosed) {
 		this.isClosed = isClosed;
 	}
 
@@ -172,11 +229,11 @@ public class Order {
 		this.tips = tips;
 	}
 
-	public Integer getPaidAmount() {
+	public int getPaidAmount() {
 		return paidAmount;
 	}
 
-	public void setPaidAmount(Integer paidAmount) {
+	public void setPaidAmount(int paidAmount) {
 		this.paidAmount = paidAmount;
 	}
 
@@ -191,5 +248,10 @@ public class Order {
 				", id='" + id + '\'' +
 				", isClosed=" + isClosed +
 				'}';
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
 	}
 }

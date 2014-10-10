@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -34,6 +35,7 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -216,8 +218,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		api.getOrders(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<List<Order>>() {
 			@Override
 			public void call(List<Order> orders) {
-				for(Order order : orders) {
-					System.err.println(">> order = " + order.toString());
+				if(!orders.isEmpty()) {
+					OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders));
+				} else {
+					showToastLong(getActivity(), R.string.there_are_no_orders_on_this_table);
 				}
 			}
 		}, new Action1<Throwable>() {
@@ -256,8 +260,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		final Rect rect = new Rect();
 		getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
 		final int height = rect.height();
-		imgHolder.animate().translationY(-height).start();
-		loader.animate().translationY(-height).start();
+		final Interpolator interpolator = new DecelerateInterpolator();
+		final int duration = 700;
+		imgHolder.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
+		loader.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
 		AnimationUtils.animateAlpha(btnDown, false);
 	}
 
