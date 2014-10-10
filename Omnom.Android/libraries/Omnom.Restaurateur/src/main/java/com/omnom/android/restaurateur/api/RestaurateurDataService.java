@@ -6,12 +6,15 @@ import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
+import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.table.RestaurantTablesResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+
+import java.util.List;
 
 import retrofit.http.Body;
 import retrofit.http.DELETE;
@@ -34,11 +37,11 @@ public interface RestaurateurDataService {
 
 	@POST("/restaurants/{restaurant_id}/tables/{table_id}/waiter/call")
 	Observable<WaiterCallResponse> waiterCall(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
-	                                         @Path(Protocol.FIELD_TABLE_ID) String tableId);
+	                                          @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@POST("/restaurants/{restaurant_id}/tables/{table_id}/waiter/call/stop")
 	Observable<WaiterCallResponse> waiterCallStop(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
-	                                             @Path(Protocol.FIELD_TABLE_ID) String tableId);
+	                                              @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@GET("/restaurants")
 	Observable<RestaurantsResponse> getRestaurants();
@@ -50,8 +53,8 @@ public interface RestaurateurDataService {
 	Observable<Restaurant> getMenu(@Path(Protocol.FIELD_ID) String restaurantId);
 
 	@GET("/restaurants/{restaurant_id}/tables/{table_id}/orders")
-	Observable<Restaurant> getOrders(@Path(Protocol.FIELD_ID) String restaurantId,
-	                                 @Path(Protocol.FIELD_TABLE_ID) String tableId);
+	Observable<List<Order>> getOrders(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
+	                                      @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@GET("/restaurants/{id}/tables")
 	Observable<RestaurantTablesResponse> getRestaurantTables(@Path(Protocol.FIELD_ID) String restaurantId);

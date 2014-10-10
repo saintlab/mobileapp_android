@@ -4,12 +4,14 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
+import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsFactory;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
 import java.util.Arrays;
+import java.util.List;
 
 import altbeacon.beacon.Beacon;
 import hugo.weaving.DebugLog;
@@ -112,7 +114,7 @@ public class StubDataProvider implements RestaurateurObeservableApi {
 	}
 
 	@Override
-	public Observable<Restaurant> getOrders(String restaurantId, String tableId) {
+	public Observable<List<Order>> getOrders(String restaurantId, String tableId) {
 		return null;
 	}
 

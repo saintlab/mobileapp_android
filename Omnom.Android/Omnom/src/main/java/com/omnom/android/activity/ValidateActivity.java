@@ -19,6 +19,7 @@ import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
+import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
@@ -209,6 +210,23 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	protected abstract void startLoader();
+
+	@OnClick(R.id.btn_bill)
+	public void onBill(final View v) {
+		api.getOrders(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<List<Order>>() {
+			@Override
+			public void call(List<Order> orders) {
+				for(Order order : orders) {
+					System.err.println(">> order = " + order.toString());
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+
+			}
+		});
+	}
 
 	@OnClick(R.id.btn_waiter)
 	public void onWaiter(final View v) {
