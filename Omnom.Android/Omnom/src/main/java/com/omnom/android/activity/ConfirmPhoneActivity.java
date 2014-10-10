@@ -139,6 +139,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 						@Override
 						public void run() {
+							ConfirmPhoneActivity.this.finish();
 							ValidateActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short,
 							                       EXTRA_LOADER_ANIMATION_SCALE_UP);
 						}

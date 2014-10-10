@@ -5,6 +5,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.EnteringPagerAdapter;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
@@ -14,20 +15,27 @@ import butterknife.OnClick;
 
 public class EnteringActivity extends BaseOmnomFragmentActivity {
 
+	public static void start(BaseOmnomActivity activity, int animIn, int animOut) {
+		Intent intent = new Intent(activity, EnteringActivity.class);
+		intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_UP);
+		activity.startActivity(intent, animIn, animOut, true);
+	}
+
 	@InjectView(R.id.pager)
 	protected ViewPager mPager;
-
 	private PagerAdapter mPagerAdapter;
 	private ViewPagerIndicatorCircle mPagerIndicator;
 
 	@OnClick(R.id.btn_register)
 	public void doRegister() {
-		startActivity(new Intent(this, UserRegisterActivity.class), R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
+		final Intent intent = new Intent(this, UserRegisterActivity.class);
+		startActivity(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, true);
 	}
 
 	@OnClick(R.id.btn_enter)
 	public void doEnter() {
-		startActivity(new Intent(this, LoginActivity.class), R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
+		final Intent intent = new Intent(this, LoginActivity.class);
+		startActivity(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, true);
 	}
 
 	@Override

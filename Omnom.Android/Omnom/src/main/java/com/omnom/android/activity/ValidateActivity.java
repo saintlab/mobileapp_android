@@ -51,6 +51,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
 		final Intent intent = new Intent(context, hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
+		if(context instanceof ConfirmPhoneActivity) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		}
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		context.startActivity(intent, enterAnim, exitAnim, true);
 	}
