@@ -9,6 +9,11 @@ public interface Protocol {
 	public static final String FIELD_EMAIL = "email";
 	public static final String FIELD_PASSWORD = "password";
 	public static final String FIELD_RESTAURANT_ID = "restaurant_id";
+	public static final String FIELD_TABLE_ID = "table_id";
+	public static final String FIELD_ORDER_ID = "order_id";
+	public static final String FIELD_AMOUNT = "amount";
+	public static final String FIELD_TIP = "tip";
+	public static final String FIELD_CARD_ID = "card_id";
 	public static final String FIELD_TABLE_NUMBER = " table_num";
 
 	public static final String FIELD_BEACON_UUID = "uuid";

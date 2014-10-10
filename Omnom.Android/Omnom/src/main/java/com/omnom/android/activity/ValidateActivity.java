@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -18,8 +19,11 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.WaiterCallResponse;
+import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.loader.LoaderView;
@@ -31,6 +35,7 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -40,6 +45,8 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 import retrofit.RetrofitError;
+import rx.Observable;
+import rx.functions.Action1;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
@@ -51,6 +58,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
 		final Intent intent = new Intent(context, hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
+		if(context instanceof ConfirmPhoneActivity) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		}
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		context.startActivity(intent, enterAnim, exitAnim, true);
 	}
@@ -111,6 +122,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private int mAnimationType;
 	private Restaurant mRestaurant;
+	private TableDataResponse mTable;
+	private boolean mWaiterCalled;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -200,13 +213,57 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected abstract void startLoader();
 
+	@OnClick(R.id.btn_bill)
+	public void onBill(final View v) {
+		api.getOrders(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<List<Order>>() {
+			@Override
+			public void call(List<Order> orders) {
+				if(!orders.isEmpty()) {
+					OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders));
+				} else {
+					showToastLong(getActivity(), R.string.there_are_no_orders_on_this_table);
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+
+			}
+		});
+	}
+
+	@OnClick(R.id.btn_waiter)
+	public void onWaiter(final View v) {
+		final Observable<WaiterCallResponse> observable;
+		if(!mWaiterCalled) {
+			observable = api.waiterCall(mRestaurant.getId(), mTable.getId());
+		} else {
+			observable = api.waiterCallStop(mRestaurant.getId(), mTable.getId());
+		}
+		observable.subscribe(new Action1<WaiterCallResponse>() {
+			@Override
+			public void call(WaiterCallResponse tableDataResponse) {
+				if(tableDataResponse.isSuccess()) {
+					mWaiterCalled = !mWaiterCalled;
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				// TODO:
+			}
+		});
+	}
+
 	@OnClick(R.id.btn_down)
 	public void onDownPressed(final View v) {
 		final Rect rect = new Rect();
 		getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
 		final int height = rect.height();
-		imgHolder.animate().translationY(-height).start();
-		loader.animate().translationY(-height).start();
+		final Interpolator interpolator = new DecelerateInterpolator();
+		final int duration = 700;
+		imgHolder.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
+		loader.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
 		AnimationUtils.animateAlpha(btnDown, false);
 	}
 
@@ -221,8 +278,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		}
 	}
 
-	protected final void onRestaurantLoaded(final Restaurant restaurant) {
+	protected final void onDataLoaded(final Restaurant restaurant, TableDataResponse table) {
 		mRestaurant = restaurant;
+		mTable = table;
 		loader.post(new Runnable() {
 			@Override
 			public void run() {

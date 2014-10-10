@@ -84,6 +84,10 @@
     public protected *;
 }
 
+-keepclassmembers class * implements android.os.Parcelable {
+    static ** CREATOR;
+}
+
 -keep class * implements android.os.Parcelable {
   public static final android.os.Parcelable$Creator *;
 }
