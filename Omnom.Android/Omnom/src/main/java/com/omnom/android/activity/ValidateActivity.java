@@ -20,6 +20,7 @@ import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.loader.LoaderView;
@@ -40,6 +41,8 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 import retrofit.RetrofitError;
+import rx.Observable;
+import rx.functions.Action1;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
@@ -115,6 +118,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private int mAnimationType;
 	private Restaurant mRestaurant;
+	private TableDataResponse mTable;
+	private boolean mWaiterCalled;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -204,6 +209,27 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected abstract void startLoader();
 
+	@OnClick(R.id.btn_waiter)
+	public void onWaiter(final View v) {
+		final Observable<TableDataResponse> observable;
+		if(!mWaiterCalled) {
+			observable = api.waiterCall(mRestaurant.getId(), mTable.getId());
+		} else {
+			observable = api.waiterCallStop(mRestaurant.getId(), mTable.getId());
+		}
+		observable.subscribe(new Action1<TableDataResponse>() {
+			@Override
+			public void call(TableDataResponse tableDataResponse) {
+				mWaiterCalled = !mWaiterCalled;
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				// TODO:
+			}
+		});
+	}
+
 	@OnClick(R.id.btn_down)
 	public void onDownPressed(final View v) {
 		final Rect rect = new Rect();
@@ -225,8 +251,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		}
 	}
 
-	protected final void onRestaurantLoaded(final Restaurant restaurant) {
+	protected final void onDataLoaded(final Restaurant restaurant, TableDataResponse table) {
 		mRestaurant = restaurant;
+		mTable = table;
 		loader.post(new Runnable() {
 			@Override
 			public void run() {

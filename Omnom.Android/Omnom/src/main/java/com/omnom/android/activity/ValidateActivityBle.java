@@ -115,15 +115,17 @@ public class ValidateActivityBle extends ValidateActivity {
 					                       mInternetErrorClickListener);
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
+					final TableDataResponse[] table = new TableDataResponse[1];
 					api.findBeacon(beacon).flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
 						@Override
 						public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
+							table[0] = tableDataResponse;
 							return api.getRestaurant(tableDataResponse.getRestaurantId());
 						}
 					}).subscribe(new Action1<Restaurant>() {
 						@Override
 						public void call(final Restaurant restaurant) {
-							onRestaurantLoaded(restaurant);
+							onDataLoaded(restaurant, table[0]);
 						}
 					}, new Action1<Throwable>() {
 						@Override

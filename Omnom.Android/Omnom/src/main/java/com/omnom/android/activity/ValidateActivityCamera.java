@@ -51,7 +51,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 				}).subscribe(new Action1<Restaurant>() {
 					@Override
 					public void call(final Restaurant restaurant) {
-						onRestaurantLoaded(restaurant);
+						onDataLoaded(restaurant, table);
 					}
 				}, new Action1<Throwable>() {
 					@Override
