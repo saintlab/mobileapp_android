@@ -154,3 +154,9 @@
 -keep class com.omnom.android.auth.** { *; }
 -keep class com.omnom.android.utils.** { *; }
 -keep class com.omnom.android.restaurateur.** { *; }
+
+#card.io
+-keep class io.card.**
+-keepclassmembers class io.card.** {
+    *;
+}

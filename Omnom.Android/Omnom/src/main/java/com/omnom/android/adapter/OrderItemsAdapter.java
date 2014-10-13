@@ -77,7 +77,7 @@ public class OrderItemsAdapter extends BaseAdapter {
 	}
 
 	private void bindView(View convertView, OrderItem item) {
-		holder.txtTitle.setText(item.getTitle().toString());
-		holder.txtPrice.setText(item.getPricePerItem().toString());
+		holder.txtTitle.setText(item.getTitle());
+		holder.txtPrice.setText(String.valueOf(item.getPricePerItem()));
 	}
 }

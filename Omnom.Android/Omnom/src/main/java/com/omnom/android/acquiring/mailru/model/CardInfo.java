@@ -8,6 +8,8 @@ import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.HashMap;
 
+import io.card.payment.CreditCard;
+
 /**
  * Created by Ch3D on 23.09.2014.
  */
@@ -38,6 +40,14 @@ public class CardInfo {
 		String pan = "6011000000000004";
 		String expDate = "12.2015";
 		String cvv = "123";
+		return create(pan, expDate, cvv, holder);
+	}
+
+	public static CardInfo createTestCard(Context context, final CreditCard card) {
+		String holder = context.getString(R.string.acquiring_mailru_cardholder);
+		String pan = card.cardNumber;
+		String expDate = card.expiryMonth + "." + card.expiryYear;
+		String cvv = card.cvv;
 		return create(pan, expDate, cvv, holder);
 	}
 

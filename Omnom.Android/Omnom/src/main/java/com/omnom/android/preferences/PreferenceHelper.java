@@ -10,6 +10,7 @@ import com.omnom.android.utils.utils.StringUtils;
  */
 public class PreferenceHelper implements PreferenceProvider {
 	private static final String USER_PREFERENCES = "com.omnom.android.linker.user";
+	private static final String CARD_ID = "com.omnom.android.card_id";
 	private static final String AUTH_TOKEN = "com.omnom.android.linker.user.auth_token";
 
 	@Override
@@ -25,5 +26,21 @@ public class PreferenceHelper implements PreferenceProvider {
 		final String string = context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
 		                             .getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
 		return string;
+	}
+
+	@Override
+	public String getCardId(Context context) {
+		final String string = context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
+		                             .getString(CARD_ID, StringUtils.EMPTY_STRING);
+		return string;
+
+	}
+
+	@Override
+	public boolean setCardId(Context context, String cardId) {
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
+		              .edit()
+		              .putString(CARD_ID, cardId)
+		              .commit();
 	}
 }

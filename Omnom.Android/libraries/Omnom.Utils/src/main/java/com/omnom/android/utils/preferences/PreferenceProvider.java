@@ -8,4 +8,7 @@ import android.content.Context;
 public interface PreferenceProvider {
 	public boolean setAuthToken(Context context, String value);
 	public String getAuthToken(Context context);
+
+	public String getCardId(Context context);
+	public boolean setCardId(Context context, String cardId);
 }

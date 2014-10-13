@@ -254,4 +254,16 @@ public class Order implements Parcelable {
 	public int describeContents() {
 		return 0;
 	}
+
+	public int getTotalAmount() {
+		int sum = 0;
+		for(final OrderItem item : items) {
+			sum += item.getPriceTotal();
+		}
+		return sum;
+	}
+
+	public int getTipsAmount(int percent) {
+		return (int) (percent * ((float) getTotalAmount() / 100));
+	}
 }

@@ -34,5 +34,7 @@
     <string name="bill">Счет</string>
     <string name="title_activity_orders">OrdersActivity</string>
     <string name="there_are_no_orders_on_this_table">На данном столе нет заказов</string>
+    <string name="other_tips">Другой</string>
+    <string name="title_activity_add_card">AddCardActivity</string>
 
 </resources>
