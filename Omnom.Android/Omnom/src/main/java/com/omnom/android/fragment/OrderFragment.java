@@ -124,7 +124,8 @@ public class OrderFragment extends Fragment {
 		//
 		//		final UserData user = UserData.create("13", "+79133952320");
 
-		final String cardId = OmnomApplication.get(getActivity()).getPreferences().getCardId(getActivity());
+		// final String cardId = OmnomApplication.get(getActivity()).getPreferences().getCardId(getActivity());
+		final String cardId = "30142837667150364462";
 		if(!TextUtils.isEmpty(cardId)) {
 			tryToPay(cardId);
 		} else {
@@ -133,22 +134,24 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void tryToPay(final String cardId) {
-		final CardInfo card = CardInfo.createTestCard(getActivity());
-		card.setCardId(cardId);
-		final UserData user = UserData.createTestUser();
-		final MerchantData merchant = new MerchantData(getActivity());
+		//		final CardInfo card = CardInfo.createTestCard(getActivity());
+		final CardInfo card = new CardInfo();
+		card.setAddCard(true);
+		card.setPan("4245380000355928");
+		card.setCvv("358");
+		card.setExpDate("07.2015");
+		card.setHolder("DMITRY CHERTENKO");
+		// card.setCardId(cardId);
 
+		final UserData user = UserData.create("13", "89133952320");
+		final MerchantData merchant = new MerchantData(getActivity());
 		pay(card, merchant, user);
 	}
 
-
-
 	private void pay(final CardInfo cardInfo, MerchantData merchant, UserData user) {
-		final ExtraData extra = MailRuExtra.create(10, "");
-		final OrderInfo order = OrderInfoMailRu.create(100, "999", "message");
-		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU,
-		                                                          user, cardInfo, extra, order);
-
+		final ExtraData extra = MailRuExtra.create(0, mOrder.getRestaurantId());
+		final OrderInfo order = OrderInfoMailRu.create(1.0, mOrder.getInternalId(), "message");
+		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
 		mAcquiring.pay(merchant, paymentInfo, new Acquiring.PaymentListener<AcquiringPollingResponse>() {
 			@Override
 			public void onPaymentSettled(AcquiringPollingResponse response) {
