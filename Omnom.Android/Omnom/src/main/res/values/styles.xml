@@ -150,6 +150,7 @@
         <item name="android:singleLine">true</item>
         <item name="android:maxLength">1</item>
         <item name="android:inputType">number</item>
+        <item name="android:imeOptions">actionNone</item>
         <item name="android:textSize">@dimen/font_xlarge</item>
         <item name="android:gravity">center</item>
     </style>
