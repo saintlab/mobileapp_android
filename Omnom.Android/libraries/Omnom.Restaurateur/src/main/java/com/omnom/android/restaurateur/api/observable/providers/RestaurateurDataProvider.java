@@ -11,6 +11,7 @@ import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
+import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -127,7 +128,7 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	}
 
 	@Override
-	public Observable<TableDataResponse> bill(BillRequest request) {
+	public Observable<BillResponse> bill(BillRequest request) {
 		return mDataService.bill(request).subscribeOn(Schedulers.io()).observeOn(
 				AndroidSchedulers.mainThread());
 	}

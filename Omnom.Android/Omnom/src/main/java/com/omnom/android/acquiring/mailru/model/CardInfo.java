@@ -105,7 +105,7 @@ public class CardInfo {
 		map.put("exp_date", getExpDate());
 	}
 
-	public HashMap<String, String> getCardInfo() {
+	public HashMap<String, String> getCardInfoMap() {
 		final HashMap<String, String> cardInfo = new HashMap<String, String>();
 
 		if(!TextUtils.isEmpty(cardId)) {

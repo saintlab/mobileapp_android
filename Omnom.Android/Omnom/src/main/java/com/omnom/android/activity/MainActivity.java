@@ -221,6 +221,10 @@ public class MainActivity extends BaseOmnomActivity {
 			public void onPaymentSettled(AcquiringPollingResponse response) {
 				Log.d(TAG, "status = " + response.getStatus());
 			}
+
+			@Override
+			public void onError(Throwable throwable) {
+			}
 		});
 	}
 }

@@ -60,9 +60,8 @@ public class AcquiringMailRu implements Acquiring {
 
 		final HashMap<String, String> parameters = signatureParams;
 		parameters.put("signature", signature);
-		// info.getCardInfo().storeCardId(parameters);
-		info.getCardInfo().toMap(parameters);
 		parameters.put("cardholder", mContext.getString(R.string.acquiring_mailru_cardholder));
+		parameters.putAll(info.getCardInfo().getCardInfoMap());
 		info.getUser().storePhone(parameters);
 
 		mApiProxy.pay(parameters)

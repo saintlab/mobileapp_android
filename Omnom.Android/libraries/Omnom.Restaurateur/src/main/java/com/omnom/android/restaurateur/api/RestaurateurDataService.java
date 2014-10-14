@@ -6,6 +6,7 @@ import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
+import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -60,7 +61,7 @@ public interface RestaurateurDataService {
 	Observable<RestaurantTablesResponse> getRestaurantTables(@Path(Protocol.FIELD_ID) String restaurantId);
 
 	@POST("/bill")
-	Observable<TableDataResponse> bill(@Body BillRequest request);
+	Observable<BillResponse> bill(@Body BillRequest request);
 
 	@GET("/link/{orderId}/{amount}/{tip}")
 	Observable<Restaurant> link(@Path(Protocol.FIELD_ORDER_ID) long orderId,

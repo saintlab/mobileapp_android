@@ -33,13 +33,18 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.activity.AddCardActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.bill.BillRequest;
+import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import rx.functions.Action1;
 
 import static butterknife.ButterKnife.findById;
+import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 public class OrderFragment extends Fragment {
 	private static final String ARG_ORDER = "param1";
@@ -55,6 +60,10 @@ public class OrderFragment extends Fragment {
 
 	@Inject
 	protected Acquiring mAcquiring;
+
+	@Inject
+	protected RestaurateurObeservableApi api;
+
 	private Order mOrder;
 	private ListView list = null;
 	private RadioGroup radioGroup;
@@ -64,6 +73,8 @@ public class OrderFragment extends Fragment {
 	private RadioButton btnTips3;
 	private RadioButton btnTips4;
 	private EditText editAmount;
+
+	private Button btnPay;
 
 	public OrderFragment() {
 	}
@@ -79,7 +90,8 @@ public class OrderFragment extends Fragment {
 		ButterKnife.inject(view);
 		list = findById(view, android.R.id.list);
 		editAmount = findById(view, R.id.edit_payment_amount);
-		editAmount.setText(String.valueOf(mOrder.getTotalAmount()) + "\uf5fc");
+		// editAmount.setText(String.valueOf(mOrder.getTotalAmount())/* + "\uf5fc"*/);
+		editAmount.setText("1.0");
 
 		radioGroup = findById(view, R.id.radio_tips);
 		final CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener() {
@@ -103,59 +115,80 @@ public class OrderFragment extends Fragment {
 		btnTips4.setOnCheckedChangeListener(listener);
 		btnTips2.setChecked(true);
 
-		final Button btnPay = findById(view, R.id.btn_pay);
+		btnPay = findById(view, R.id.btn_pay);
 		btnPay.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				pay();
+				final double amount = Double.parseDouble(editAmount.getText().toString());
+				pay(amount);
 			}
 		});
 
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
 	}
 
-	private void pay() {
-		//		final CardInfo card = new CardInfo();
-		//		card.setAddCard(true);
-		//		card.setPan("4245380000355928");
-		//		card.setCvv("358");
-		//		card.setExpDate("07.2015");
-		//		card.setHolder("DMITRY CHERTENKO");
-		//
-		//		final UserData user = UserData.create("13", "+79133952320");
-
+	private void pay(final double amount) {
 		// final String cardId = OmnomApplication.get(getActivity()).getPreferences().getCardId(getActivity());
 		final String cardId = "30142837667150364462";
 		if(!TextUtils.isEmpty(cardId)) {
-			tryToPay(cardId);
+			btnPay.setEnabled(false);
+			final BillRequest request = BillRequest.create(Double.toString(amount), mOrder);
+			api.bill(request).subscribe(new Action1<BillResponse>() {
+				@Override
+				public void call(final BillResponse response) {
+					if(!response.hasErrors()) {
+						tryToPay(cardId, amount, response);
+					} else {
+						if(response.getError() != null) {
+							showToast(getActivity(), response.getError());
+						} else if(response.getErrors() != null) {
+							showToast(getActivity(), response.getErrors().toString());
+						}
+						btnPay.setEnabled(true);
+					}
+				}
+			}, new Action1<Throwable>() {
+				@Override
+				public void call(Throwable throwable) {
+					btnPay.setEnabled(true);
+				}
+			});
 		} else {
 			startActivity(new Intent(getActivity(), AddCardActivity.class));
 		}
 	}
 
-	private void tryToPay(final String cardId) {
+	private void tryToPay(final String cardId, final double amount, BillResponse billData) {
 		//		final CardInfo card = CardInfo.createTestCard(getActivity());
 		final CardInfo card = new CardInfo();
-		card.setAddCard(true);
+		card.setAddCard(false);
 		card.setPan("4245380000355928");
 		card.setCvv("358");
 		card.setExpDate("07.2015");
 		card.setHolder("DMITRY CHERTENKO");
-		// card.setCardId(cardId);
+		card.setCardId(cardId);
 
 		final UserData user = UserData.create("13", "89133952320");
 		final MerchantData merchant = new MerchantData(getActivity());
-		pay(card, merchant, user);
+		pay(billData, card, merchant, user, amount);
 	}
 
-	private void pay(final CardInfo cardInfo, MerchantData merchant, UserData user) {
-		final ExtraData extra = MailRuExtra.create(0, mOrder.getRestaurantId());
-		final OrderInfo order = OrderInfoMailRu.create(1.0, mOrder.getInternalId(), "message");
+	private void pay(BillResponse billData, final CardInfo cardInfo, MerchantData merchant, UserData user, double amount) {
+		final ExtraData extra = MailRuExtra.create(0, billData.getMailRestaurantId());
+		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
 		mAcquiring.pay(merchant, paymentInfo, new Acquiring.PaymentListener<AcquiringPollingResponse>() {
 			@Override
 			public void onPaymentSettled(AcquiringPollingResponse response) {
+				showToast(getActivity(), "Оплата произведена");
 				Log.d(TAG, "status = " + response.getStatus());
+				btnPay.setEnabled(true);
+			}
+
+			@Override
+			public void onError(Throwable throwable) {
+				showToast(getActivity(), "Не удалось оплатить счет");
+				btnPay.setEnabled(true);
 			}
 		});
 	}

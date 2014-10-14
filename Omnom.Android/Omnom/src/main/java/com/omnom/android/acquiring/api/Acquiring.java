@@ -22,6 +22,7 @@ public interface Acquiring {
 
 	public interface PaymentListener<T> {
 		public void onPaymentSettled(final T response);
+		public void onError(Throwable throwable);
 	}
 
 	public void pay(final MerchantData merchant, PaymentInfo paymentInfo, PaymentListener listener);
