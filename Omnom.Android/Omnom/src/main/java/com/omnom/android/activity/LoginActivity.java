@@ -2,8 +2,11 @@ package com.omnom.android.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
@@ -38,6 +41,14 @@ public class LoginActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		final TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		final String mPhoneNumber = telephonyManager.getLine1Number();
+		if(!TextUtils.isEmpty(mPhoneNumber)) {
+			final EditText editText = editPhone.getEditText();
+			editText.setText(mPhoneNumber);
+			editText.setSelection(editText.getText().length());
+		}
+
 		topPanel.setContentVisibility(false, true);
 		topPanel.setTitle(R.string.enter);
 		topPanel.setButtonRight(R.string.proceed, new View.OnClickListener() {
