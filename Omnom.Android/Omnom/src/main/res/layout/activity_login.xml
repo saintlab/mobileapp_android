@@ -22,7 +22,7 @@
         android:padding="@dimen/activity_horizontal_margin"
         omnom:inputType="phone"
         omnom:font="regular_le"
-        omnom:hint="@string/email_or_phone_number"
+        omnom:hint="@string/phone_number"
         omnom:showClear="true"
         omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
 
