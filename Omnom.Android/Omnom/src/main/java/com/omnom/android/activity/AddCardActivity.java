@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import butterknife.OnClick;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
+import rx.functions.Action1;
 
 import static butterknife.ButterKnife.findById;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
@@ -50,20 +51,20 @@ public class AddCardActivity extends BaseOmnomActivity {
 		final MerchantData merchant = new MerchantData(getActivity());
 
 		final EditText text = findById(this, R.id.edit_amount);
-		mAcquiring.verifyCard(merchant, user, card, Double.parseDouble(text.getText().toString()),
-		                      new Acquiring.CardVerifyListener() {
-			                      @Override
-			                      public void onCardVerified(AcquiringResponse response) {
-				                      final String cardData = card.toGson(gson);
-				                      getPreferences().setCardData(getActivity(), cardData);
-				                      showToast(getActivity(), "VERIFIED");
-			                      }
-
-			                      @Override
-			                      public void onError(Throwable throwable) {
-				                      showToast(getActivity(), "VERIFICATION ERROR");
-			                      }
-		                      });
+		mAcquiring.verifyCard(merchant, user, card, Double.parseDouble(text.getText().toString()))
+		          .subscribe(new Action1<AcquiringResponse>() {
+			          @Override
+			          public void call(AcquiringResponse response) {
+				          final String cardData = card.toGson(gson);
+				          getPreferences().setCardData(getActivity(), cardData);
+				          showToast(getActivity(), "VERIFIED");
+			          }
+		          }, new Action1<Throwable>() {
+			          @Override
+			          public void call(Throwable throwable) {
+				          showToast(getActivity(), "VERIFICATION ERROR");
+			          }
+		          });
 	}
 
 	@OnClick(R.id.btn_add_card)
@@ -80,14 +81,13 @@ public class AddCardActivity extends BaseOmnomActivity {
 				card = CardInfo.createTestCard(this, scanResult);
 				final MerchantData merchant = new MerchantData(this);
 				final UserData user = UserData.createTestUser();
-				mAcquiring.registerCard(merchant, user, card,
-				                        new Acquiring.CardRegisterListener() {
-					                        @Override
-					                        public void onCardRegistered(CardRegisterPollingResponse response) {
-						                        card.setCardId(response.getCardId());
-						                        // verifyCard(card, user, merchant);
-					                        }
-				                        });
+				mAcquiring.registerCard(merchant, user, card).subscribe(new Action1<CardRegisterPollingResponse>() {
+					@Override
+					public void call(CardRegisterPollingResponse response) {
+						card.setCardId(response.getCardId());
+						// verifyCard(card, user, merchant);
+					}
+				});
 			} else {
 				finish();
 			}
