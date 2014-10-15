@@ -52,7 +52,7 @@
             android:name="com.omnom.android.activity.UserRegisterActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White"
-            android:windowSoftInputMode="stateAlwaysHidden" />
+            android:windowSoftInputMode="stateVisible" />
         <activity
             android:name="com.omnom.android.activity.EnteringActivity"
             android:label="@string/title_activity_entering"

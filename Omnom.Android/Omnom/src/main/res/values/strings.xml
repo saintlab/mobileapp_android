@@ -28,7 +28,6 @@
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
     <string name="title_activity_login">LoginActivity</string>
-    <string name="email_or_phone_number">Почта или номер телефона</string>
     <string name="title_activity_validate">ValidateActivity</string>
     <string name="waiter">Официант</string>
     <string name="bill">Счет</string>
