@@ -32,6 +32,21 @@ public class EncryptionUtils {
 		return sha1;
 	}
 
+	public static String decryptPassword(String password) {
+		String sha1 = StringUtils.EMPTY_STRING;
+		try {
+			MessageDigest crypt = MessageDigest.getInstance(ALGORITHM_SHA_1);
+			crypt.reset();
+			crypt.update(password.getBytes(UTF_8));
+			sha1 = byteToHex(crypt.digest());
+		} catch(NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch(UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return sha1;
+	}
+
 	public static String byteToHex(final byte[] hash) {
 		Formatter formatter = new Formatter();
 		for(byte b : hash) {

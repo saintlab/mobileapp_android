@@ -18,6 +18,8 @@ import java.util.Map;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Ch3D on 03.10.2014.
@@ -41,31 +43,31 @@ public class AcquiringProxyMailRu implements AcquiringServiceMailRu {
 
 	@Override
 	public Observable<AcquiringResponse> pay(HashMap<String, String> params) {
-		return mAcquiringService.pay(params);
+		return mAcquiringService.pay(params).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<RegisterCardResponse> registerCard(Map<String, String> params) {
-		return mAcquiringService.registerCard(params);
+		return mAcquiringService.registerCard(params).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<AcquiringResponse> verifyCard(HashMap<String, String> params) {
-		return mAcquiringService.verifyCard(params);
+		return mAcquiringService.verifyCard(params).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<AcquiringResponse> deleteCard(HashMap<String, String> params) {
-		return mAcquiringService.deleteCard(params);
+		return mAcquiringService.deleteCard(params).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<AcquiringTransactionResponse> checkTransaction(HashMap<String, String> params) {
-		return mAcquiringService.checkTransaction(params);
+		return mAcquiringService.checkTransaction(params).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<AcquiringTransactionExtendedResponse> checkTransactionExtended(HashMap<String, String> params) {
-		return mAcquiringService.checkTransactionExtended(params);
+		return mAcquiringService.checkTransactionExtended(params).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 }

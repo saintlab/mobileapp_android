@@ -26,11 +26,11 @@ public class OrderItem implements Parcelable {
 	@Expose
 	private String guestId;
 	@Expose
-	private Integer quantity;
+	private int quantity;
 	@Expose
-	private Integer priceTotal;
+	private int priceTotal;
 	@Expose
-	private Integer pricePerItem;
+	private int pricePerItem;
 	@Expose
 	private String internalId;
 	@Expose
@@ -73,27 +73,27 @@ public class OrderItem implements Parcelable {
 		this.guestId = guestId;
 	}
 
-	public Integer getQuantity() {
+	public int getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Integer quantity) {
+	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
 
-	public Integer getPriceTotal() {
+	public int getPriceTotal() {
 		return priceTotal;
 	}
 
-	public void setPriceTotal(Integer priceTotal) {
+	public void setPriceTotal(int priceTotal) {
 		this.priceTotal = priceTotal;
 	}
 
-	public Integer getPricePerItem() {
+	public int getPricePerItem() {
 		return pricePerItem;
 	}
 
-	public void setPricePerItem(Integer pricePerItem) {
+	public void setPricePerItem(int pricePerItem) {
 		this.pricePerItem = pricePerItem;
 	}
 

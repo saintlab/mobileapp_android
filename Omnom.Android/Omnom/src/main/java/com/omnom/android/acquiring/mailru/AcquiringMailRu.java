@@ -1,7 +1,6 @@
 package com.omnom.android.acquiring.mailru;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -18,14 +17,10 @@ import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
 import com.omnom.android.utils.EncryptionUtils;
-import com.omnom.android.utils.ObservableUtils;
 
 import java.util.HashMap;
 
-import javax.inject.Inject;
-
 import rx.Observable;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 /**
@@ -33,20 +28,18 @@ import rx.functions.Func1;
  */
 public class AcquiringMailRu implements Acquiring {
 	private static final String TAG = AcquiringMailRu.class.getSimpleName();
-
-	@Inject
-	protected AcquiringServiceMailRu mApiProxy;
-
 	private final Gson gson;
+	protected AcquiringServiceMailRu mApiProxy;
 	private Context mContext;
 
-	public AcquiringMailRu(final Context context) {
+	public AcquiringMailRu(final Context context, AcquiringProxyMailRu acquiringProxyMailRu) {
 		mContext = context;
+		mApiProxy = acquiringProxyMailRu;
 		gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 	}
 
 	@Override
-	public void pay(MerchantData merchant, PaymentInfo paymentInfo, final PaymentListener listener) {
+	public Observable<AcquiringPollingResponse> pay(MerchantData merchant, PaymentInfo paymentInfo) {
 		final PaymentInfoMailRu info = (PaymentInfoMailRu) paymentInfo;
 		if(info == null) {
 			throw new RuntimeException("PaymentInfo is null or not a PaymentInfoMailRu");
@@ -62,11 +55,11 @@ public class AcquiringMailRu implements Acquiring {
 
 		final HashMap<String, String> parameters = signatureParams;
 		parameters.put("signature", signature);
-		info.getCardInfo().storeCardId(parameters);
 		parameters.put("cardholder", mContext.getString(R.string.acquiring_mailru_cardholder));
+		parameters.putAll(info.getCardInfo().getCardInfoMap());
 		info.getUser().storePhone(parameters);
 
-		mApiProxy.pay(parameters)
+		return mApiProxy.pay(parameters)
 		         .concatMap(new Func1<AcquiringResponse, Observable<AcquiringPollingResponse>>() {
 			         @Override
 			         public Observable<AcquiringPollingResponse> call(AcquiringResponse response) {
@@ -76,22 +69,11 @@ public class AcquiringMailRu implements Acquiring {
 					         return Observable.error(new RuntimeException(response.getError().toString()));
 				         }
 			         }
-		         })
-		         .subscribe(new Action1<AcquiringPollingResponse>() {
-			         @Override
-			         public void call(AcquiringPollingResponse acquiringPollingResponse) {
-				         listener.onPaymentSettled(acquiringPollingResponse);
-			         }
-		         }, new ObservableUtils.BaseOnErrorHandler(mContext) {
-			         @Override
-			         public void onError(Throwable throwable) {
-				         Log.e(TAG, "pay", throwable);
-			         }
 		         });
 	}
 
 	@Override
-	public void deleteCard(MerchantData merchant, UserData user, CardInfo cardInfo, final CardDeleteListener listener) {
+	public Observable<AcquiringResponse> deleteCard(MerchantData merchant, UserData user, CardInfo cardInfo) {
 		final HashMap<String, String> signatureParams = new HashMap<String, String>();
 		merchant.toMap(signatureParams);
 		user.storeLogin(signatureParams);
@@ -101,22 +83,11 @@ public class AcquiringMailRu implements Acquiring {
 		final HashMap<String, String> parameters = signatureParams;
 		parameters.put("signature", signature);
 
-		mApiProxy.deleteCard(parameters)
-		         .subscribe(new Action1<AcquiringResponse>() {
-			         @Override
-			         public void call(AcquiringResponse pollingResponse) {
-				         listener.onCardDeleted(pollingResponse);
-			         }
-		         }, new ObservableUtils.BaseOnErrorHandler(mContext) {
-			         @Override
-			         public void onError(Throwable throwable) {
-				         Log.e(TAG, "deleteCard", throwable);
-			         }
-		         });
+		return mApiProxy.deleteCard(parameters);
 	}
 
 	@Override
-	public void verifyCard(MerchantData merchant, UserData user, CardInfo cardInfo, double amount, final CardVerifyListener listener) {
+	public Observable<AcquiringResponse> verifyCard(MerchantData merchant, UserData user, CardInfo cardInfo, double amount) {
 		final HashMap<String, String> signatureParams = new HashMap<String, String>();
 		merchant.toMap(signatureParams);
 		user.storeLogin(signatureParams);
@@ -128,22 +99,11 @@ public class AcquiringMailRu implements Acquiring {
 		parameters.put("signature", signature);
 		parameters.put("amount", Double.toString(amount));
 
-		mApiProxy.verifyCard(parameters)
-		         .subscribe(new Action1<AcquiringResponse>() {
-			         @Override
-			         public void call(AcquiringResponse response) {
-				         listener.onCardVerified(response);
-			         }
-		         }, new ObservableUtils.BaseOnErrorHandler(mContext) {
-			         @Override
-			         public void onError(Throwable throwable) {
-				         Log.e(TAG, "verifyCard", throwable);
-			         }
-		         });
+		return mApiProxy.verifyCard(parameters);
 	}
 
 	@Override
-	public void registerCard(final MerchantData merchant, UserData user, final CardInfo cardInfo, final CardRegisterListener listener) {
+	public Observable<CardRegisterPollingResponse> registerCard(final MerchantData merchant, UserData user, final CardInfo cardInfo) {
 		HashMap<String, String> reqiredSignatureParams = new HashMap<String, String>();
 		merchant.toMap(reqiredSignatureParams);
 		user.storeLogin(reqiredSignatureParams);
@@ -154,27 +114,16 @@ public class AcquiringMailRu implements Acquiring {
 		cardInfo.toMap(parameters);
 		parameters.put("signature", signature);
 
-		mApiProxy.registerCard(parameters)
-		         .concatMap(new Func1<RegisterCardResponse, Observable<CardRegisterPollingResponse>>() {
-			         @Override
-			         public Observable<CardRegisterPollingResponse> call(RegisterCardResponse response) {
-				         if(response.getError() == null) {
-					         return PollingObservable.create(response);
-				         } else {
-					         return Observable.error(new RuntimeException(response.getError().toString()));
-				         }
-			         }
-		         })
-		         .subscribe(new Action1<CardRegisterPollingResponse>() {
-			         @Override
-			         public void call(CardRegisterPollingResponse response) {
-				         listener.onCardRegistered(response);
-			         }
-		         }, new ObservableUtils.BaseOnErrorHandler(mContext) {
-			         @Override
-			         public void onError(Throwable throwable) {
-				         Log.e(TAG, "registerCard", throwable);
-			         }
-		         });
+		return mApiProxy.registerCard(parameters)
+		                .concatMap(new Func1<RegisterCardResponse, Observable<CardRegisterPollingResponse>>() {
+			                @Override
+			                public Observable<CardRegisterPollingResponse> call(RegisterCardResponse response) {
+				                if(response.getError() == null) {
+					                return PollingObservable.create(response);
+				                } else {
+					                return Observable.error(new RuntimeException(response.getError().toString()));
+				                }
+			                }
+		                });
 	}
 }

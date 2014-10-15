@@ -14,11 +14,15 @@ import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
+import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -115,6 +119,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Inject
 	protected RestaurateurObeservableApi api;
+
+	@Inject
+	protected AuthService authenticator;
 
 	protected ErrorHelper mErrorHelper;
 	protected Target mTarget;
@@ -281,6 +288,32 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected final void onDataLoaded(final Restaurant restaurant, TableDataResponse table) {
 		mRestaurant = restaurant;
 		mTable = table;
+
+		final String token = OmnomApplication.get(getActivity()).getAuthToken();
+		authenticator.getUser(token).subscribe(new Action1<UserResponse>() {
+			@Override
+			public void call(UserResponse userResponse) {
+				OmnomApplication.get(getActivity()).cacheUserProfile(userResponse.getUser());
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+
+			}
+		});
+
+		api.newGuest(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<ResponseBase>() {
+			@Override
+			public void call(ResponseBase responseBase) {
+
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+
+			}
+		});
+
 		loader.post(new Runnable() {
 			@Override
 			public void run() {

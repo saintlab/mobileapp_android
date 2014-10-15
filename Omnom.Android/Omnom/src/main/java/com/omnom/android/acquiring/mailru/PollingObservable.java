@@ -19,6 +19,8 @@ import java.io.Reader;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Ch3D on 23.09.2014.
@@ -33,11 +35,12 @@ public class PollingObservable {
 
 	public static Observable<CardRegisterPollingResponse> create(final RegisterCardResponse cardResponse) {
 		return Observable.create(new Observable.OnSubscribe<CardRegisterPollingResponse>() {
-			private final Gson gson = new Gson();
-			private final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
 
 			@Override
 			public void call(Subscriber<? super CardRegisterPollingResponse> subscriber) {
+				Gson gson = new Gson();
+				AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+
 				try {
 					CardRegisterPollingResponse next = null;
 					while(next == null) {
@@ -59,22 +62,23 @@ public class PollingObservable {
 					}
 					subscriber.onNext(next);
 					subscriber.onCompleted();
-					client.close();
 				} catch(IOException e) {
 					subscriber.onError(e);
+				} finally {
 					client.close();
+					client = null;
+					gson = null;
 				}
 			}
-		});
+		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	public static Observable<AcquiringPollingResponse> create(final AcquiringResponse cardResponse) {
 		return Observable.create(new Observable.OnSubscribe<AcquiringPollingResponse>() {
-			private final Gson gson = new Gson();
-			private final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
-
 			@Override
 			public void call(Subscriber<? super AcquiringPollingResponse> subscriber) {
+				Gson gson = new Gson();
+				AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
 				try {
 					CardRegisterPollingResponse next = null;
 					while(next == null) {
@@ -95,12 +99,14 @@ public class PollingObservable {
 					}
 					subscriber.onNext(next);
 					subscriber.onCompleted();
-					client.close();
 				} catch(IOException e) {
 					subscriber.onError(e);
+				} finally {
 					client.close();
+					client = null;
+					gson = null;
 				}
 			}
-		});
+		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 }

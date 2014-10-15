@@ -1,11 +1,13 @@
 package com.omnom.android.restaurateur.api;
 
+import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
+import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -54,13 +56,17 @@ public interface RestaurateurDataService {
 
 	@GET("/restaurants/{restaurant_id}/tables/{table_id}/orders")
 	Observable<List<Order>> getOrders(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
-	                                      @Path(Protocol.FIELD_TABLE_ID) String tableId);
+	                                  @Path(Protocol.FIELD_TABLE_ID) String tableId);
+
+	@POST("/restaurants/{restaurant_id}/tables/{table_id}/new/guest")
+	Observable<ResponseBase> newGuest(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
+	                                  @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@GET("/restaurants/{id}/tables")
 	Observable<RestaurantTablesResponse> getRestaurantTables(@Path(Protocol.FIELD_ID) String restaurantId);
 
 	@POST("/bill")
-	Observable<TableDataResponse> bill(@Body BillRequest request);
+	Observable<BillResponse> bill(@Body BillRequest request);
 
 	@GET("/link/{orderId}/{amount}/{tip}")
 	Observable<Restaurant> link(@Path(Protocol.FIELD_ORDER_ID) long orderId,
