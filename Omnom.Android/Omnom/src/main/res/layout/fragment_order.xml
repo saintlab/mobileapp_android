@@ -1,0 +1,96 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="top"/>
+
+    <RelativeLayout
+        android:id="@+id/panel_order_payment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <Button
+            android:id="@+id/btn_pay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_login"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:text="Оплатить"
+            android:layout_centerHorizontal="true"
+            android:textColor="?android:textColorPrimaryInverse"
+            android:layout_alignParentBottom="true"/>
+
+        <RadioGroup
+            android:id="@+id/radio_tips"
+            android:layout_above="@id/btn_pay"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginTop="@dimen/activity_horizontal_margin">
+            <RadioButton
+                android:id="@+id/radio_tips_1"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="5%"
+                android:tag="5"
+                android:gravity="center"
+                android:button="@null"
+                android:textColor="@drawable/order_payment_tips_color"/>
+            <RadioButton
+                android:id="@+id/radio_tips_2"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="10%"
+                android:tag="10"
+                android:gravity="center"
+                android:button="@null"
+                android:textColor="@drawable/order_payment_tips_color"/>
+            <RadioButton
+                android:id="@+id/radio_tips_3"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="15%"
+                android:tag="15"
+                android:gravity="center"
+                android:button="@null"
+                android:textColor="@drawable/order_payment_tips_color"/>
+            <RadioButton
+                android:id="@+id/radio_tips_4"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/other_tips"
+                android:tag="0"
+                android:gravity="center"
+                android:button="@null"
+                android:textColor="@drawable/order_payment_tips_color"/>
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/edit_payment_amount"
+            android:layout_above="@id/radio_tips"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:inputType="numberDecimal"
+            android:singleLine="true"
+            android:textSize="40sp"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+
+    </RelativeLayout>
+
+</FrameLayout>

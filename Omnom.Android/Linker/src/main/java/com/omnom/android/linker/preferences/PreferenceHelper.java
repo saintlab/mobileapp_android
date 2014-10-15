@@ -26,4 +26,14 @@ public class PreferenceHelper implements PreferenceProvider {
 		                       .getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
 		return string;
 	}
+
+	@Override
+	public String getCardData(Context context) {
+		return null;
+	}
+
+	@Override
+	public boolean setCardData(Context context, String cardId) {
+		return false;
+	}
 }

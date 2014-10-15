@@ -1,8 +1,10 @@
 package com.omnom.android.restaurateur.api.observable;
 
+import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
+import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
@@ -50,7 +52,9 @@ public interface RestaurateurObeservableApi {
 
 	public Observable<List<Order>> getOrders(String restaurantId, String tableId);
 
-	public Observable<TableDataResponse> bill(BillRequest request);
+	public Observable<ResponseBase> newGuest(String restaurantId, String tableId);
+
+	public Observable<BillResponse> bill(BillRequest request);
 
 	public Observable<Restaurant> link(long orderId, double amount, double tip);
 }

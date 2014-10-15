@@ -22,8 +22,6 @@ import com.omnom.android.utils.ObservableUtils;
 
 import java.util.HashMap;
 
-import javax.inject.Inject;
-
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -33,15 +31,13 @@ import rx.functions.Func1;
  */
 public class AcquiringMailRu implements Acquiring {
 	private static final String TAG = AcquiringMailRu.class.getSimpleName();
-
-	@Inject
-	protected AcquiringServiceMailRu mApiProxy;
-
 	private final Gson gson;
+	protected AcquiringServiceMailRu mApiProxy;
 	private Context mContext;
 
-	public AcquiringMailRu(final Context context) {
+	public AcquiringMailRu(final Context context, AcquiringProxyMailRu acquiringProxyMailRu) {
 		mContext = context;
+		mApiProxy = acquiringProxyMailRu;
 		gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 	}
 
@@ -62,8 +58,8 @@ public class AcquiringMailRu implements Acquiring {
 
 		final HashMap<String, String> parameters = signatureParams;
 		parameters.put("signature", signature);
-		info.getCardInfo().storeCardId(parameters);
 		parameters.put("cardholder", mContext.getString(R.string.acquiring_mailru_cardholder));
+		parameters.putAll(info.getCardInfo().getCardInfoMap());
 		info.getUser().storePhone(parameters);
 
 		mApiProxy.pay(parameters)
@@ -80,12 +76,14 @@ public class AcquiringMailRu implements Acquiring {
 		         .subscribe(new Action1<AcquiringPollingResponse>() {
 			         @Override
 			         public void call(AcquiringPollingResponse acquiringPollingResponse) {
+				         Log.d(TAG, "pay complete : " + acquiringPollingResponse.toString());
 				         listener.onPaymentSettled(acquiringPollingResponse);
 			         }
 		         }, new ObservableUtils.BaseOnErrorHandler(mContext) {
 			         @Override
 			         public void onError(Throwable throwable) {
 				         Log.e(TAG, "pay", throwable);
+				         listener.onError(throwable);
 			         }
 		         });
 	}
@@ -138,6 +136,7 @@ public class AcquiringMailRu implements Acquiring {
 			         @Override
 			         public void onError(Throwable throwable) {
 				         Log.e(TAG, "verifyCard", throwable);
+				         listener.onError(throwable);
 			         }
 		         });
 	}

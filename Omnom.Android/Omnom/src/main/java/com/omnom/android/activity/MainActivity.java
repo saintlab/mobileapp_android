@@ -55,7 +55,7 @@ public class MainActivity extends BaseOmnomActivity {
 	@Override
 	public void initUi() {
 		//		final CardInfo testCard = CardInfo.createTestCard(this);
-		//		testCard.setCardId("30008685803965102459");
+		//		testCard.setCardData("30008685803965102459");
 		//		acquiring.deleteCard(new MerchantData(this), UserData.createTestUser(), testCard,
 		// new Acquiring.CardDeleteListener<AcquiringResponse>() {
 		//			@Override
@@ -68,9 +68,9 @@ public class MainActivity extends BaseOmnomActivity {
 		//				                       new Acquiring.CardRegisterListener<CardRegisterPollingResponse>() {
 		//					                       @Override
 		//					                       public void onCardRegistered(CardRegisterPollingResponse response) {
-		//						                       Log.d(TAG, "status = " + response.getStatus() + " cardId = " + response.getCardId
+		//						                       Log.d(TAG, "status = " + response.getStatus() + " cardId = " + response.getCardData
 		// ());
-		//						                       testCard.setCardId(response.getCardId());
+		//						                       testCard.setCardData(response.getCardData());
 		//						                       verifyCard(testCard);
 		//					                       }
 		//				                       });
@@ -80,7 +80,7 @@ public class MainActivity extends BaseOmnomActivity {
 		//			"https:\/\/test-cpg.money.mail.ru\/api\/transaction\/check\/?card_id=30008685803965102459&id=10004247505708511228
 		// &signature=169f12bc3bd574a607cf17dc850b0075def10119&status=OK_CHECK"
 		//		}
-		//		testCard.setCardId("30008685803965102459");
+		//		testCard.setCardData("30008685803965102459");
 		//		verifyCard(testCard);
 
 		final AuthRegisterRequest request = AuthRegisterRequest.create("1", "Dmitry Chertenko", "Ch3D", "ch3dee@gmail.com",
@@ -118,7 +118,7 @@ public class MainActivity extends BaseOmnomActivity {
 	private void registerCard() {
 		final CardInfo testCard = CardInfo.createTestCard(this);
 		acquiring.registerCard(new MerchantData(this), UserData.createTestUser(), testCard,
-		                       new Acquiring.CardRegisterListener<CardRegisterPollingResponse>() {
+		                       new Acquiring.CardRegisterListener() {
 			                       @Override
 			                       public void onCardRegistered(CardRegisterPollingResponse response) {
 				                       Log.d(TAG, "status = " + response.getStatus() + " cardId = " + response.getCardId());
@@ -201,11 +201,16 @@ public class MainActivity extends BaseOmnomActivity {
 
 	private void verifyCard(final CardInfo cardInfo) {
 		acquiring.verifyCard(new MerchantData(MainActivity.this), UserData.createTestUser(), cardInfo, 1.4,
-		                     new Acquiring.CardVerifyListener<AcquiringResponse>() {
+		                     new Acquiring.CardVerifyListener() {
 			                     @Override
 			                     public void onCardVerified(AcquiringResponse response) {
 				                     Log.d(TAG, "url = " + response.getUrl());
 				                     pay(cardInfo);
+			                     }
+
+			                     @Override
+			                     public void onError(Throwable throwable) {
+
 			                     }
 		                     });
 	}
@@ -216,10 +221,14 @@ public class MainActivity extends BaseOmnomActivity {
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU,
 		                                                          UserData.createTestUser(), cardInfo, extra, order);
 
-		acquiring.pay(new MerchantData(MainActivity.this), paymentInfo, new Acquiring.PaymentListener<AcquiringPollingResponse>() {
+		acquiring.pay(new MerchantData(MainActivity.this), paymentInfo, new Acquiring.PaymentListener() {
 			@Override
 			public void onPaymentSettled(AcquiringPollingResponse response) {
 				Log.d(TAG, "status = " + response.getStatus());
+			}
+
+			@Override
+			public void onError(Throwable throwable) {
 			}
 		});
 	}

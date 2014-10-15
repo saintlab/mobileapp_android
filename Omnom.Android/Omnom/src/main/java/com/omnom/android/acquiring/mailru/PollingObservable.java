@@ -33,11 +33,12 @@ public class PollingObservable {
 
 	public static Observable<CardRegisterPollingResponse> create(final RegisterCardResponse cardResponse) {
 		return Observable.create(new Observable.OnSubscribe<CardRegisterPollingResponse>() {
-			private final Gson gson = new Gson();
-			private final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
 
 			@Override
 			public void call(Subscriber<? super CardRegisterPollingResponse> subscriber) {
+				 Gson gson = new Gson();
+				 AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+
 				try {
 					CardRegisterPollingResponse next = null;
 					while(next == null) {
@@ -59,10 +60,12 @@ public class PollingObservable {
 					}
 					subscriber.onNext(next);
 					subscriber.onCompleted();
-					client.close();
 				} catch(IOException e) {
 					subscriber.onError(e);
+				} finally {
 					client.close();
+					client = null;
+					gson = null;
 				}
 			}
 		});
@@ -70,11 +73,10 @@ public class PollingObservable {
 
 	public static Observable<AcquiringPollingResponse> create(final AcquiringResponse cardResponse) {
 		return Observable.create(new Observable.OnSubscribe<AcquiringPollingResponse>() {
-			private final Gson gson = new Gson();
-			private final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
-
 			@Override
 			public void call(Subscriber<? super AcquiringPollingResponse> subscriber) {
+				Gson gson = new Gson();
+				AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
 				try {
 					CardRegisterPollingResponse next = null;
 					while(next == null) {
@@ -95,10 +97,12 @@ public class PollingObservable {
 					}
 					subscriber.onNext(next);
 					subscriber.onCompleted();
-					client.close();
 				} catch(IOException e) {
 					subscriber.onError(e);
+				} finally {
 					client.close();
+					client = null;
+					gson = null;
 				}
 			}
 		});
