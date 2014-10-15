@@ -78,7 +78,6 @@ public class OrderFragment extends Fragment {
 
 	private Button btnPay;
 	private Gson gson;
-	private Acquiring.PaymentListener mPaymentListener;
 
 	public OrderFragment() {
 	}
@@ -189,18 +188,17 @@ public class OrderFragment extends Fragment {
 		final ExtraData extra = MailRuExtra.create(0, billData.getMailRestaurantId());
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
-		mPaymentListener = new Acquiring.PaymentListener() {
+		mAcquiring.pay(merchant, paymentInfo).subscribe(new Action1<AcquiringPollingResponse>() {
 			@Override
-			public void onPaymentSettled(AcquiringPollingResponse response) {
+			public void call(AcquiringPollingResponse response) {
 				onPayOk(response);
 			}
-
+		}, new Action1<Throwable>() {
 			@Override
-			public void onError(Throwable throwable) {
+			public void call(Throwable throwable) {
 				onPayError(throwable);
 			}
-		};
-		mAcquiring.pay(merchant, paymentInfo, mPaymentListener);
+		});
 	}
 
 	private void onPayError(Throwable throwable) {

@@ -19,6 +19,8 @@ import java.io.Reader;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Ch3D on 23.09.2014.
@@ -36,8 +38,8 @@ public class PollingObservable {
 
 			@Override
 			public void call(Subscriber<? super CardRegisterPollingResponse> subscriber) {
-				 Gson gson = new Gson();
-				 AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+				Gson gson = new Gson();
+				AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
 
 				try {
 					CardRegisterPollingResponse next = null;
@@ -68,7 +70,7 @@ public class PollingObservable {
 					gson = null;
 				}
 			}
-		});
+		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	public static Observable<AcquiringPollingResponse> create(final AcquiringResponse cardResponse) {
@@ -105,6 +107,6 @@ public class PollingObservable {
 					gson = null;
 				}
 			}
-		});
+		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 }
