@@ -3,7 +3,10 @@ package com.omnom.android.acquiring.mailru.model;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.annotations.Expose;
 import com.omnom.android.R;
+import com.omnom.android.utils.EncryptionUtils;
 import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.HashMap;
@@ -51,12 +54,19 @@ public class CardInfo {
 		return create(pan, expDate, cvv, holder);
 	}
 
+	@Expose
 	private String pan = StringUtils.EMPTY_STRING;
+	@Expose
 	private String expDate = StringUtils.EMPTY_STRING;
+	@Expose
 	private String cvv = StringUtils.EMPTY_STRING;
+	@Expose
 	private String cardId = StringUtils.EMPTY_STRING;
+	@Expose
 	private String holder = StringUtils.EMPTY_STRING;
 	private boolean addCard = false;
+
+	private final String key = "com.omnom.android";
 
 	public String getPan() {
 		return pan;
@@ -133,5 +143,10 @@ public class CardInfo {
 
 	public void storeCardId(HashMap<String, String> params) {
 		params.put("card_id", cardId);
+	}
+
+	@Deprecated
+	public String toGson(Gson gson) {
+		return gson.toJson(this);
 	}
 }

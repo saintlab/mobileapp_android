@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.modules.AcquiringModuleMailRuMixpanel;
 import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.OmnomApplicationModule;
@@ -48,6 +49,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	private MixpanelAPI mixPanel;
 	private Stack<Activity> activityStack = new Stack<Activity>();
 	private MixPanelHelper mixPanelHelper;
+	private UserData cachedUser;
 
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
@@ -137,5 +139,13 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	@Override
 	public Context getContext() {
 		return this;
+	}
+
+	public void cacheUserProfile(UserData user) {
+		cachedUser = user;
+	}
+
+	public UserData getCachedUser() {
+		return cachedUser;
 	}
 }

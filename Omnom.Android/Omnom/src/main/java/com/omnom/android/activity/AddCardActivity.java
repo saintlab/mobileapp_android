@@ -3,11 +3,13 @@ package com.omnom.android.activity;
 import android.content.Intent;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.MerchantData;
 import com.omnom.android.acquiring.mailru.model.UserData;
+import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 
@@ -26,10 +28,11 @@ public class AddCardActivity extends BaseOmnomActivity {
 	@Inject
 	protected Acquiring mAcquiring;
 	private CardInfo card;
+	private Gson gson;
 
 	@Override
 	public void initUi() {
-
+		gson = new Gson();
 	}
 
 	@Override
@@ -39,16 +42,28 @@ public class AddCardActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.btn_verify)
 	public void verifyCard() {
+		if(card == null) {
+			showToast(getActivity(), "Scan card");
+			return;
+		}
 		final UserData user = UserData.createTestUser();
 		final MerchantData merchant = new MerchantData(getActivity());
 
-  		final EditText text = findById(this, R.id.edit_amount);
-		mAcquiring.verifyCard(merchant, user, card, Double.parseDouble(text.getText().toString()), new Acquiring.CardVerifyListener() {
-			@Override
-			public void onCardVerified(Object response) {
-				showToast(getActivity(), "VERIFIED");
-			}
-		});
+		final EditText text = findById(this, R.id.edit_amount);
+		mAcquiring.verifyCard(merchant, user, card, Double.parseDouble(text.getText().toString()),
+		                      new Acquiring.CardVerifyListener() {
+			                      @Override
+			                      public void onCardVerified(AcquiringResponse response) {
+				                      final String cardData = card.toGson(gson);
+				                      getPreferences().setCardData(getActivity(), cardData);
+				                      showToast(getActivity(), "VERIFIED");
+			                      }
+
+			                      @Override
+			                      public void onError(Throwable throwable) {
+				                      showToast(getActivity(), "VERIFICATION ERROR");
+			                      }
+		                      });
 	}
 
 	@OnClick(R.id.btn_add_card)
@@ -66,7 +81,7 @@ public class AddCardActivity extends BaseOmnomActivity {
 				final MerchantData merchant = new MerchantData(this);
 				final UserData user = UserData.createTestUser();
 				mAcquiring.registerCard(merchant, user, card,
-				                        new Acquiring.CardRegisterListener<CardRegisterPollingResponse>() {
+				                        new Acquiring.CardRegisterListener() {
 					                        @Override
 					                        public void onCardRegistered(CardRegisterPollingResponse response) {
 						                        card.setCardId(response.getCardId());
@@ -78,24 +93,6 @@ public class AddCardActivity extends BaseOmnomActivity {
 			}
 		}
 	}
-
-//	private void verifyCard(final CardInfo cardInfo, UserData user, final MerchantData merchant) {
-//		mAcquiring.verifyCard(merchant, user, cardInfo, 1.4,
-//		                      new Acquiring.CardVerifyListener<AcquiringResponse>() {
-//			                      @Override
-//			                      public void onCardVerified(AcquiringResponse response) {
-//				                      if(response.getError() == null) {
-//					                      OmnomApplication.get(getActivity()).getPreferences().setCardId(getActivity(),
-//					                                                                                     cardInfo.getCardId());
-//					                      showToast(getActivity(), "Card verified");
-//					                      finish();
-//				                      } else {
-//					                      showToast(getActivity(), "Cannot verify card");
-//					                      finish();
-//				                      }
-//			                      }
-//		                      });
-//	}
 
 	public void onScanPress() {
 		Intent scanIntent = new Intent(this, CardIOActivity.class);

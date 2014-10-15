@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import com.google.gson.Gson;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.AcquiringType;
@@ -37,6 +38,7 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.utils.utils.StringUtils;
 
 import javax.inject.Inject;
 
@@ -75,6 +77,8 @@ public class OrderFragment extends Fragment {
 	private EditText editAmount;
 
 	private Button btnPay;
+	private Gson gson;
+	private Acquiring.PaymentListener mPaymentListener;
 
 	public OrderFragment() {
 	}
@@ -128,16 +132,32 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void pay(final double amount) {
-		// final String cardId = OmnomApplication.get(getActivity()).getPreferences().getCardId(getActivity());
-		final String cardId = "30142837667150364462";
-		if(!TextUtils.isEmpty(cardId)) {
+		//		if(true) {
+		//			final UserData user = UserData.create("13", "89133952320");
+		//			final MerchantData merchant = new MerchantData(getActivity());
+		//			final CardInfo card = new CardInfo();
+		//			card.setCardId("30142837667150364462");
+		//			mAcquiring.deleteCard(merchant, user, card, new Acquiring.CardDeleteListener<AcquiringResponse>() {
+		//				@Override
+		//				public void onCardDeleted(AcquiringResponse response) {
+		//					showToast(getActivity(), response.getUrl());
+		//				}
+		//			});
+		//			return;
+		//		}
+
+		final String cardSaved = OmnomApplication.get(getActivity()).getPreferences().getCardData(getActivity());
+		// final String cardId = "30142837667150364462";
+		if(!TextUtils.isEmpty(cardSaved)) {
+			final CardInfo cardData = gson.fromJson(cardSaved, CardInfo.class);
+			cardData.setCardId(StringUtils.EMPTY_STRING);
 			btnPay.setEnabled(false);
 			final BillRequest request = BillRequest.create(Double.toString(amount), mOrder);
 			api.bill(request).subscribe(new Action1<BillResponse>() {
 				@Override
 				public void call(final BillResponse response) {
 					if(!response.hasErrors()) {
-						tryToPay(cardId, amount, response);
+						tryToPay(cardData, amount, response);
 					} else {
 						if(response.getError() != null) {
 							showToast(getActivity(), response.getError());
@@ -158,17 +178,9 @@ public class OrderFragment extends Fragment {
 		}
 	}
 
-	private void tryToPay(final String cardId, final double amount, BillResponse billData) {
-		//		final CardInfo card = CardInfo.createTestCard(getActivity());
-		final CardInfo card = new CardInfo();
-		card.setAddCard(false);
-		card.setPan("4245380000355928");
-		card.setCvv("358");
-		card.setExpDate("07.2015");
-		card.setHolder("DMITRY CHERTENKO");
-		card.setCardId(cardId);
-
-		final UserData user = UserData.create("13", "89133952320");
+	private void tryToPay(final CardInfo card, final double amount, BillResponse billData) {
+		final com.omnom.android.auth.UserData cachedUser = OmnomApplication.get(getActivity()).getCachedUser();
+		final UserData user = UserData.create(String.valueOf(cachedUser.getId()), cachedUser.getPhone());
 		final MerchantData merchant = new MerchantData(getActivity());
 		pay(billData, card, merchant, user, amount);
 	}
@@ -177,25 +189,36 @@ public class OrderFragment extends Fragment {
 		final ExtraData extra = MailRuExtra.create(0, billData.getMailRestaurantId());
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
-		mAcquiring.pay(merchant, paymentInfo, new Acquiring.PaymentListener<AcquiringPollingResponse>() {
+		mPaymentListener = new Acquiring.PaymentListener() {
 			@Override
 			public void onPaymentSettled(AcquiringPollingResponse response) {
-				showToast(getActivity(), "Оплата произведена");
-				Log.d(TAG, "status = " + response.getStatus());
-				btnPay.setEnabled(true);
+				onPayOk(response);
 			}
 
 			@Override
 			public void onError(Throwable throwable) {
-				showToast(getActivity(), "Не удалось оплатить счет");
-				btnPay.setEnabled(true);
+				onPayError(throwable);
 			}
-		});
+		};
+		mAcquiring.pay(merchant, paymentInfo, mPaymentListener);
+	}
+
+	private void onPayError(Throwable throwable) {
+		Log.d(TAG, "status = " + throwable);
+		btnPay.setEnabled(true);
+		showToast(getActivity(), "Unable to pay");
+	}
+
+	private void onPayOk(AcquiringPollingResponse response) {
+		Log.d(TAG, "status = " + response.getStatus());
+		btnPay.setEnabled(true);
+		showToast(getActivity(), "Payment complete");
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		gson = new Gson();
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 		}

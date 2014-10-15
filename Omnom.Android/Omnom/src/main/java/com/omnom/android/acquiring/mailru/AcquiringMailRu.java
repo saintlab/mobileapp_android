@@ -31,10 +31,8 @@ import rx.functions.Func1;
  */
 public class AcquiringMailRu implements Acquiring {
 	private static final String TAG = AcquiringMailRu.class.getSimpleName();
-
-	protected AcquiringServiceMailRu mApiProxy;
-
 	private final Gson gson;
+	protected AcquiringServiceMailRu mApiProxy;
 	private Context mContext;
 
 	public AcquiringMailRu(final Context context, AcquiringProxyMailRu acquiringProxyMailRu) {
@@ -78,12 +76,14 @@ public class AcquiringMailRu implements Acquiring {
 		         .subscribe(new Action1<AcquiringPollingResponse>() {
 			         @Override
 			         public void call(AcquiringPollingResponse acquiringPollingResponse) {
+				         Log.d(TAG, "pay complete : " + acquiringPollingResponse.toString());
 				         listener.onPaymentSettled(acquiringPollingResponse);
 			         }
 		         }, new ObservableUtils.BaseOnErrorHandler(mContext) {
 			         @Override
 			         public void onError(Throwable throwable) {
 				         Log.e(TAG, "pay", throwable);
+				         listener.onError(throwable);
 			         }
 		         });
 	}
@@ -136,6 +136,7 @@ public class AcquiringMailRu implements Acquiring {
 			         @Override
 			         public void onError(Throwable throwable) {
 				         Log.e(TAG, "verifyCard", throwable);
+				         listener.onError(throwable);
 			         }
 		         });
 	}

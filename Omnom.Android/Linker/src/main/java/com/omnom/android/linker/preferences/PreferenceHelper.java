@@ -28,12 +28,12 @@ public class PreferenceHelper implements PreferenceProvider {
 	}
 
 	@Override
-	public String getCardId(Context context) {
+	public String getCardData(Context context) {
 		return null;
 	}
 
 	@Override
-	public boolean setCardId(Context context, String cardId) {
+	public boolean setCardData(Context context, String cardId) {
 		return false;
 	}
 }

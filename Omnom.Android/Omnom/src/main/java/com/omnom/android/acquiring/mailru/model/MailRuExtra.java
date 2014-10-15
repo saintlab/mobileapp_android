@@ -15,11 +15,11 @@ public class MailRuExtra extends ExtraData {
 	}
 
 	private long tip;
-	private String mailRestaurantId;
+	private String restaurantId;
 
 	private MailRuExtra(long tip, String restaurant_id) {
 		this.tip = tip;
-		this.mailRestaurantId = restaurant_id;
+		this.restaurantId = restaurant_id;
 	}
 
 	public long getTip() {
@@ -27,11 +27,11 @@ public class MailRuExtra extends ExtraData {
 	}
 
 	public String getRestaurantId() {
-		return mailRestaurantId;
+		return restaurantId;
 	}
 
 	public String getExtra(Gson gson) {
-		if(TextUtils.isEmpty(mailRestaurantId)) {
+		if(TextUtils.isEmpty(restaurantId)) {
 			return StringUtils.EMPTY_STRING;
 		}
 		return gson.toJson(this, MailRuExtra.class);

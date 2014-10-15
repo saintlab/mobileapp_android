@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.omnom.android.restaurateur.api.RestaurateurDataService;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
@@ -124,6 +125,12 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	@Override
 	public Observable<List<Order>> getOrders(String restaurantId, String tableId) {
 		return mDataService.getOrders(restaurantId, tableId).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<ResponseBase> newGuest(String restaurantId, String tableId) {
+		return mDataService.newGuest(restaurantId, tableId).subscribeOn(Schedulers.io()).observeOn(
 				AndroidSchedulers.mainThread());
 	}
 

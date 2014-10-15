@@ -1,5 +1,6 @@
 package com.omnom.android.restaurateur.api;
 
+import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
@@ -55,7 +56,11 @@ public interface RestaurateurDataService {
 
 	@GET("/restaurants/{restaurant_id}/tables/{table_id}/orders")
 	Observable<List<Order>> getOrders(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
-	                                      @Path(Protocol.FIELD_TABLE_ID) String tableId);
+	                                  @Path(Protocol.FIELD_TABLE_ID) String tableId);
+
+	@POST("/restaurants/{restaurant_id}/tables/{table_id}/new/guest")
+	Observable<ResponseBase> newGuest(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
+	                                  @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@GET("/restaurants/{id}/tables")
 	Observable<RestaurantTablesResponse> getRestaurantTables(@Path(Protocol.FIELD_ID) String restaurantId);
