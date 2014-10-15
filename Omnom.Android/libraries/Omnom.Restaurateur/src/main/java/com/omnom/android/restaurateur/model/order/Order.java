@@ -59,6 +59,8 @@ public class Order implements Parcelable {
 	private OrderTips tips;
 	@Expose
 	private int paidAmount;
+	@Expose
+	private int paidTip;
 
 	public Order(final Parcel parcel) {
 		guests = parcel.readInt();
@@ -78,6 +80,7 @@ public class Order implements Parcelable {
 		id = parcel.readString();
 		tips = parcel.readParcelable(OrderTips.class.getClassLoader());
 		paidAmount = parcel.readInt();
+		paidTip = parcel.readInt();
 	}
 
 	@Override
@@ -99,6 +102,7 @@ public class Order implements Parcelable {
 		parcel.writeString(id);
 		parcel.writeParcelable(tips, flags);
 		parcel.writeInt(paidAmount);
+		parcel.writeInt(paidTip);
 	}
 
 	public int getGuests() {
@@ -255,7 +259,7 @@ public class Order implements Parcelable {
 		return 0;
 	}
 
-	public int getTotalAmount() {
+	public double getTotalAmount() {
 		int sum = 0;
 		for(final OrderItem item : items) {
 			sum += item.getPriceTotal();
@@ -263,7 +267,19 @@ public class Order implements Parcelable {
 		return sum;
 	}
 
+	public double getAmountToPay() {
+		return getTotalAmount() - ((double)(getPaidAmount() - getPaidTip()) / 100);
+	}
+
 	public int getTipsAmount(int percent) {
-		return (int) (percent * ((float) getTotalAmount() / 100));
+		return (int) Math.round(percent * (getAmountToPay() / 100));
+	}
+
+	public int getPaidTip() {
+		return paidTip;
+	}
+
+	public void setPaidTip(int paidTip) {
+		this.paidTip = paidTip;
 	}
 }

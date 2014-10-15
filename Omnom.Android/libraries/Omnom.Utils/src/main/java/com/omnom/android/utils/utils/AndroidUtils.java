@@ -148,12 +148,12 @@ public class AndroidUtils {
 		return getAndroidId(context) + getDeviceId(context) + getSerialNumber();
 	}
 
-	private static String getAndroidId(Context context) {
+	public static String getAndroidId(Context context) {
 		return Settings.Secure.getString(context.getContentResolver(),
 		                                 Settings.Secure.ANDROID_ID);
 	}
 
-	private static String getDeviceId(Context context) {
+	public static String getDeviceId(Context context) {
 		final TelephonyManager systemService = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 		return systemService.getDeviceId();
 	}
