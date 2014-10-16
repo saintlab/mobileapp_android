@@ -11,6 +11,7 @@ import com.omnom.android.R;
 import com.omnom.android.beacon.BeaconFilter;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.utils.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 
@@ -104,15 +105,9 @@ public class ValidateActivityBle extends ValidateActivity {
 				final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 				final int size = nearBeacons.size();
 				if(size == 0) {
-					mErrorHelper.showError(R.drawable.ic_weak_signal,
-					                       R.string.error_weak_beacon_signal,
-					                       R.string.try_once_again,
-					                       mInternetErrorClickListener);
+					mErrorHelper.showError(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
 				} else if(size > 1) {
-					mErrorHelper.showError(R.drawable.ic_weak_signal,
-					                       R.string.error_more_than_one_beacon,
-					                       R.string.try_once_again,
-					                       mInternetErrorClickListener);
+					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
 					final TableDataResponse[] table = new TableDataResponse[1];

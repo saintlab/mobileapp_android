@@ -26,6 +26,7 @@ import com.omnom.android.beacon.BeaconFilter;
 import com.omnom.android.beacon.BeaconRssiProvider;
 import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.LinkerApplication;
+import com.omnom.android.linker.LinkerLoaderError;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.LinkerBaseErrorHandler;
 import com.omnom.android.linker.activity.UserProfileActivity;
@@ -185,12 +186,10 @@ public class BindActivity extends BaseActivity {
 		public void run() {
 			if(!gattAvailable || !gattConnected) {
 				OmnomObservable.unsubscribe(mApiBindingSubscription);
-				mErrorHelper.showError(R.drawable.ic_maintenance_disabled, R.string.error_maintenance_mode_off, R.string.try_once_again,
-				                       mInternetErrorClickListener);
+				mErrorHelper.showError(LinkerLoaderError.MAINTENANCE_DISABLED, mInternetErrorClickListener);
 			} else if(!mApiBindComplete) {
 				OmnomObservable.unsubscribe(mApiBindingSubscription);
-				mErrorHelper.showError(R.drawable.ic_no_connection, R.string.error_unknown_server_error, R.string.bind_table,
-				                       mInternetErrorClickListener);
+				mErrorHelper.showError(LinkerLoaderError.NO_CONNECTION_BIND, mInternetErrorClickListener);
 			} else {
 				mLoader.updateProgressMax(new Runnable() {
 					@Override
@@ -466,14 +465,10 @@ public class BindActivity extends BaseActivity {
 							                                        final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 							                                        final int size = nearBeacons.size();
 							                                        if(size == 0) {
-								                                        mErrorHelper.showError(R.drawable.ic_weak_signal,
-								                                                               R.string.error_weak_beacon_signal,
-								                                                               R.string.try_once_again,
+								                                        mErrorHelper.showError(LinkerLoaderError.WEAK_SIGNAL,
 								                                                               mInternetErrorClickListener);
 							                                        } else if(size > 1) {
-								                                        mErrorHelper.showError(R.drawable.ic_weak_signal,
-								                                                               R.string.error_more_than_one_beacon,
-								                                                               R.string.try_once_again,
+								                                        mErrorHelper.showError(LinkerLoaderError.TWO_BEACONS,
 								                                                               mInternetErrorClickListener);
 							                                        } else if(size == 1) {
 								                                        mBeacon = nearBeacons.get(0);
@@ -700,8 +695,7 @@ public class BindActivity extends BaseActivity {
 					mBluetoothLeService.getDiscoverGattService();
 				} else if(BluetoothLeService.ACTION_BEACON_WRITE_FAILED.equals(event.getAction())) {
 					gattConnected = false;
-					mErrorHelper.showError(R.drawable.ic_no_connection, R.string.error_writing_beacon_data, R.string.bind_table,
-					                       mInternetErrorClickListener);
+					mErrorHelper.showError(LinkerLoaderError.NO_CONNECTION_BIND, mInternetErrorClickListener);
 				}
 			}
 		});
@@ -755,9 +749,7 @@ public class BindActivity extends BaseActivity {
 										                                           // TODO: Implement error handling
 									                                           }
 								                                           }
-								                                           mErrorHelper.showError(R.drawable.ic_no_connection,
-								                                                                  R.string.error_unknown_server_error,
-								                                                                  R.string.bind_table,
+								                                           mErrorHelper.showError(LinkerLoaderError.NO_CONNECTION_BIND,
 								                                                                  mInternetErrorClickListener);
 								                                           beaconTimeoutCallback.run();
 								                                           resetActivityState();

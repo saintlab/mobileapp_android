@@ -40,27 +40,26 @@ public class ErrorHelper {
 		mErrorViews = errorViews;
 	}
 
-	public void showError(final int logoResId, int errTextResId, int btnTextResId, View.OnClickListener onClickListener) {
+	public void showError(final LoaderError error, View.OnClickListener onClickListener) {
 		mLoader.stopProgressAnimation(true);
 		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, true);
 		mLoader.post(new Runnable() {
 			@Override
 			public void run() {
-				mLoader.animateLogo2(logoResId);
+				mLoader.animateLogo2(error.mDrawableResId);
 			}
 		});
-		mTxtError.setText(errTextResId);
-		mBtnBottom.setText(btnTextResId);
+		mTxtError.setText(error.mErrResId);
+		mBtnBottom.setText(error.mBtnResId);
 		mBtnBottom.setOnClickListener(onClickListener);
 	}
 
 	public void showInternetError(View.OnClickListener onClickListener) {
-		showError(R.drawable.ic_no_connection, R.string.error_you_have_no_internet_connection, R.string.try_once_again,
-		          onClickListener);
+		showError(LoaderError.NO_CONNECTION_TRY, onClickListener);
 	}
 
 	public void showErrorBluetoothDisabled(final Activity activity, final int requestCode) {
-		showError(R.drawable.ic_bluetooth_white, R.string.error_bluetooth_disabled, R.string.open_settings, new View.OnClickListener() {
+		showError(LoaderError.BLE_DISABLED, new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mLoader.scaleDown(null);
@@ -71,7 +70,7 @@ public class ErrorHelper {
 	}
 
 	public void showLocationError() {
-		showError(R.drawable.ic_geolocation_white, R.string.error_location_disabled, R.string.open_settings, new View.OnClickListener() {
+		showError(LoaderError.LOCATION_DISABLED, new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mLoader.scaleDown(null);
