@@ -1,5 +1,6 @@
 package com.omnom.android.linker.activity.bind;
 
+import android.app.Activity;
 import android.app.ActivityOptions;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -12,6 +13,7 @@ import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +22,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.zxing.client.android.CaptureActivity;
+import com.omnom.android.beacon.BeaconFilter;
+import com.omnom.android.beacon.BeaconRssiProvider;
 import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.LinkerBaseErrorHandler;
 import com.omnom.android.linker.activity.UserProfileActivity;
-import com.omnom.android.beacon.BeaconFilter;
-import com.omnom.android.beacon.BeaconRssiProvider;
 import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.service.CharacteristicHolder;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
@@ -49,7 +51,6 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
 
 import org.apache.http.HttpStatus;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -161,7 +162,6 @@ public class BindActivity extends BaseActivity {
 		}
 	};
 
-	@NotNull
 	private Restaurant mRestaurant;
 
 	@Nullable
@@ -214,8 +214,6 @@ public class BindActivity extends BaseActivity {
 			mBluetoothLeService.close();
 		}
 	};
-
-
 
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
 		if(enable) {
@@ -420,7 +418,10 @@ public class BindActivity extends BaseActivity {
 									mErrorHelper.showInternetError(mInternetErrorClickListener);
 									return;
 								}
-								if(result != TableDataResponse.NULL) {
+								final boolean sameRest = isSameRestaurant(result);
+								if(result.hasErrors() || !sameRest) {
+									swithToEnterDataMode();
+								} else if(result != TableDataResponse.NULL) {
 									onErrorQrCheck(result.getInternalId());
 								} else {
 									swithToEnterDataMode();
@@ -457,10 +458,11 @@ public class BindActivity extends BaseActivity {
 					                                        scanBleDevices(true, new Runnable() {
 						                                        @Override
 						                                        public void run() {
+							                                        final Activity context = getActivity();
 							                                        Log.d(TAG_BEACONS, "finded beacons size = " + mBeacons.size());
 							                                        Log.d(TAG_BEACONS, "beacons = " + Arrays.toString(mBeacons.toArray()));
 							                                        final BeaconFilter filter = new BeaconFilter(LinkerApplication.get(
-									                                        getActivity()));
+									                                        context));
 							                                        final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 							                                        final int size = nearBeacons.size();
 							                                        if(size == 0) {
@@ -477,11 +479,10 @@ public class BindActivity extends BaseActivity {
 								                                        mBeacon = nearBeacons.get(0);
 								                                        api.findBeacon(mBeacon).onErrorReturn(
 										                                        RestaurateurObservable.getTableOnError())
-
 								                                           .subscribe(
 										                                           new RestaurateurObservable
 												                                           .AuthAwareOnNext<TableDataResponse>(
-												                                           getActivity()) {
+												                                           context) {
 											                                           @Override
 											                                           public void perform(final TableDataResponse
 													                                                               tableData) {
@@ -495,17 +496,22 @@ public class BindActivity extends BaseActivity {
 												                                           mLoader.updateProgressMax(new Runnable() {
 													                                           @Override
 													                                           public void run() {
-														                                           if(tableData != TableDataResponse
-																                                           .NULL) {
-															                                           onErrorBeaconCheck(
-																	                                           tableData.getInternalId());
+														                                           final boolean sameRest =
+																                                           isSameRestaurant(tableData);
+														                                           if(tableData.hasErrors() || !sameRest) {
+															                                           scanQrCode();
+														                                           } else if(tableData
+																                                           != TableDataResponse.NULL) {
+															                                           final int tableId =
+																	                                           tableData.getInternalId();
+															                                           onErrorBeaconCheck(tableId);
 														                                           } else {
 															                                           scanQrCode();
 														                                           }
 													                                           }
 												                                           });
 											                                           }
-										                                           }, new LinkerBaseErrorHandler(getActivity()) {
+										                                           }, new LinkerBaseErrorHandler(context) {
 											                                           @Override
 											                                           protected void onThrowable(Throwable throwable) {
 												                                           Log.e(TAG, "findBeacon", throwable);
@@ -525,6 +531,15 @@ public class BindActivity extends BaseActivity {
 				                                        mErrorHelper.showInternetError(mInternetErrorClickListener);
 			                                        }
 		                                        });
+	}
+
+	private boolean isSameRestaurant(final TableDataResponse tableData) {
+		if(BuildConfig.DEBUG) {
+			if(mRestaurant == null || TextUtils.isEmpty(mRestaurant.getId())) {
+				throw new RuntimeException("Restaurant cannot be null and shall have non-empty id");
+			}
+		}
+		return mRestaurant.getId().equals(tableData.getRestaurantId());
 	}
 
 	private void onErrorQrCheck(final int number) {
