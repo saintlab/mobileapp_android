@@ -6,9 +6,6 @@ import android.view.View;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.OmnomActivity;
 
-import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthenticationException;
-
 import java.util.Collections;
 
 import retrofit.RetrofitError;
@@ -27,10 +24,9 @@ public class OmnomObservable {
 		}
 	}
 
-	public static RetrofitError createRetrofitError(final String url, final String errorText) {
-		final Response response = new Response(url, HttpStatus.SC_NOT_FOUND, errorText, Collections.EMPTY_LIST,
-		                                       new TypedString(errorText));
-		return RetrofitError.httpError(url, response, null, AuthenticationException.class);
+	public static RetrofitError createRetrofitError(final String url, final String errorText, final int statusCode) {
+		final Response response = new Response(url, statusCode, errorText, Collections.EMPTY_LIST, new TypedString(errorText));
+		return RetrofitError.httpError(url, response, null, RetrofitError.class);
 	}
 
 	public static Func1<ValidationObservable.Error, Boolean> getValidationFunc(final Activity activity,

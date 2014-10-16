@@ -38,11 +38,14 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.StringUtils;
 
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import rx.Subscription;
+import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
 import static butterknife.ButterKnife.findById;
@@ -78,6 +81,8 @@ public class OrderFragment extends Fragment {
 
 	private Button btnPay;
 	private Gson gson;
+	private Subscription mBillSubscription;
+	private Subscription mPaySubscription;
 
 	public OrderFragment() {
 	}
@@ -152,26 +157,27 @@ public class OrderFragment extends Fragment {
 			cardData.setCardId(StringUtils.EMPTY_STRING);
 			btnPay.setEnabled(false);
 			final BillRequest request = BillRequest.create(Double.toString(amount), mOrder);
-			api.bill(request).subscribe(new Action1<BillResponse>() {
-				@Override
-				public void call(final BillResponse response) {
-					if(!response.hasErrors()) {
-						tryToPay(cardData, amount, response);
-					} else {
-						if(response.getError() != null) {
-							showToast(getActivity(), response.getError());
-						} else if(response.getErrors() != null) {
-							showToast(getActivity(), response.getErrors().toString());
-						}
-						btnPay.setEnabled(true);
-					}
-				}
-			}, new Action1<Throwable>() {
-				@Override
-				public void call(Throwable throwable) {
-					btnPay.setEnabled(true);
-				}
-			});
+			mBillSubscription = AndroidObservable.bindActivity(getActivity(), api.bill(request))
+			                                     .subscribe(new Action1<BillResponse>() {
+				                                     @Override
+				                                     public void call(final BillResponse response) {
+					                                     if(!response.hasErrors()) {
+						                                     tryToPay(cardData, amount, response);
+					                                     } else {
+						                                     if(response.getError() != null) {
+							                                     showToast(getActivity(), response.getError());
+						                                     } else if(response.getErrors() != null) {
+							                                     showToast(getActivity(), response.getErrors().toString());
+						                                     }
+						                                     btnPay.setEnabled(true);
+					                                     }
+				                                     }
+			                                     }, new Action1<Throwable>() {
+				                                     @Override
+				                                     public void call(Throwable throwable) {
+					                                     btnPay.setEnabled(true);
+				                                     }
+			                                     });
 		} else {
 			startActivity(new Intent(getActivity(), AddCardActivity.class));
 		}
@@ -188,17 +194,18 @@ public class OrderFragment extends Fragment {
 		final ExtraData extra = MailRuExtra.create(0, billData.getMailRestaurantId());
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
-		mAcquiring.pay(merchant, paymentInfo).subscribe(new Action1<AcquiringPollingResponse>() {
-			@Override
-			public void call(AcquiringPollingResponse response) {
-				onPayOk(response);
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				onPayError(throwable);
-			}
-		});
+		mPaySubscription = AndroidObservable.bindActivity(getActivity(), mAcquiring.pay(merchant, paymentInfo))
+		                                    .subscribe(new Action1<AcquiringPollingResponse>() {
+			                                    @Override
+			                                    public void call(AcquiringPollingResponse response) {
+				                                    onPayOk(response);
+			                                    }
+		                                    }, new Action1<Throwable>() {
+			                                    @Override
+			                                    public void call(Throwable throwable) {
+				                                    onPayError(throwable);
+			                                    }
+		                                    });
 	}
 
 	private void onPayError(Throwable throwable) {
@@ -211,6 +218,13 @@ public class OrderFragment extends Fragment {
 		Log.d(TAG, "status = " + response.getStatus());
 		btnPay.setEnabled(true);
 		showToast(getActivity(), "Payment complete");
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		OmnomObservable.unsubscribe(mBillSubscription);
+		OmnomObservable.unsubscribe(mPaySubscription);
 	}
 
 	@Override

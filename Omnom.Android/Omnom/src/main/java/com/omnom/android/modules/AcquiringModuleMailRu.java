@@ -5,7 +5,6 @@ import android.content.Context;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.AcquiringMailRu;
 import com.omnom.android.acquiring.mailru.AcquiringProxyMailRu;
-import com.omnom.android.activity.MainActivity;
 
 import javax.inject.Singleton;
 
@@ -15,7 +14,7 @@ import dagger.Provides;
 /**
  * Created by Ch3D on 24.09.2014.
  */
-@Module(injects = {MainActivity.class}, complete = false, library = true)
+@Module(complete = false, library = true)
 public class AcquiringModuleMailRu {
 	private Context mContext;
 

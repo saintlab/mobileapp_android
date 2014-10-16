@@ -22,6 +22,7 @@ import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
 import hugo.weaving.DebugLog;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -39,6 +40,8 @@ public class ValidateActivityBle extends ValidateActivity {
 	private BluetoothAdapter mBluetoothAdapter;
 	private BeaconParser parser;
 	private ArrayList<Beacon> mBeacons = new ArrayList<Beacon>();
+	private Subscription mValidateSubscribtion;
+	private Subscription mFindBeaconSubscription;
 
 	@Override
 	public void initUi() {
@@ -71,30 +74,37 @@ public class ValidateActivityBle extends ValidateActivity {
 	}
 
 	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		OmnomObservable.unsubscribe(mFindBeaconSubscription);
+		OmnomObservable.unsubscribe(mValidateSubscribtion);
+	}
+
+	@Override
 	protected void startLoader() {
 		loader.startProgressAnimation(getResources().getInteger(R.integer.validation_duration), new Runnable() {
 			@Override
 			public void run() {
 			}
 		});
-		AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this)
-		                                                         .map(OmnomObservable.getValidationFunc(this,
-		                                                                                                mErrorHelper,
-		                                                                                                mInternetErrorClickListener))
-		                                                         .isEmpty())
-		                 .subscribe(new Action1<Boolean>() {
-			                 @Override
-			                 public void call(Boolean hasNoErrors) {
-				                 if(hasNoErrors) {
-					                 readBeacons();
-				                 }
-			                 }
-		                 }, new Action1<Throwable>() {
-			                 @Override
-			                 public void call(Throwable throwable) {
-				                 mErrorHelper.showInternetError(mInternetErrorClickListener);
-			                 }
-		                 });
+		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this)
+		                                                                                 .map(OmnomObservable.getValidationFunc(this,
+		                                                                                                                        mErrorHelper,
+		                                                                                                                        mInternetErrorClickListener))
+		                                                                                 .isEmpty())
+		                                         .subscribe(new Action1<Boolean>() {
+			                                         @Override
+			                                         public void call(Boolean hasNoErrors) {
+				                                         if(hasNoErrors) {
+					                                         readBeacons();
+				                                         }
+			                                         }
+		                                         }, new Action1<Throwable>() {
+			                                         @Override
+			                                         public void call(Throwable throwable) {
+				                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
+			                                         }
+		                                         });
 	}
 
 	private void readBeacons() {
@@ -111,13 +121,14 @@ public class ValidateActivityBle extends ValidateActivity {
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
 					final TableDataResponse[] table = new TableDataResponse[1];
-					api.findBeacon(beacon).flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
-						@Override
-						public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
-							table[0] = tableDataResponse;
-							return api.getRestaurant(tableDataResponse.getRestaurantId());
-						}
-					}).subscribe(new Action1<Restaurant>() {
+					mFindBeaconSubscription = AndroidObservable.bindActivity(getActivity(), api.findBeacon(beacon).flatMap(
+							new Func1<TableDataResponse, Observable<Restaurant>>() {
+								@Override
+								public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
+									table[0] = tableDataResponse;
+									return api.getRestaurant(tableDataResponse.getRestaurantId());
+								}
+							})).subscribe(new Action1<Restaurant>() {
 						@Override
 						public void call(final Restaurant restaurant) {
 							onDataLoaded(restaurant, table[0]);
