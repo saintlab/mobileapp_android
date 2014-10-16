@@ -5,15 +5,22 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.omnom.android.restaurateur.api.RestaurateurDataService;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.ResponseBase;
+import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
+import com.omnom.android.restaurateur.model.bill.BillRequest;
+import com.omnom.android.restaurateur.model.bill.BillResponse;
+import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+
+import java.util.List;
 
 import altbeacon.beacon.Beacon;
 import retrofit.RequestInterceptor;
@@ -82,6 +89,60 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	@Override
 	public Observable<TableDataResponse> bindQrCode(String restaurantId, int tableNumber, String qrData) {
 		return mDataService.bindQrCode(new QRCodeBindRequest(restaurantId, tableNumber, qrData)).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<RestaurantsResponse> getCards() {
+		return mDataService.getCards().subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<RestaurantsResponse> deleteCard(String cardId) {
+		return mDataService.deleteCard(cardId).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<WaiterCallResponse> waiterCall(String restaurantId, String tableId) {
+		return mDataService.waiterCall(restaurantId, tableId).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<WaiterCallResponse> waiterCallStop(String restaurantId, String tableId) {
+		return mDataService.waiterCallStop(restaurantId, tableId).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<Restaurant> getMenu(String restaurantId) {
+		return mDataService.getMenu(restaurantId).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<List<Order>> getOrders(String restaurantId, String tableId) {
+		return mDataService.getOrders(restaurantId, tableId).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<ResponseBase> newGuest(String restaurantId, String tableId) {
+		return mDataService.newGuest(restaurantId, tableId).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<BillResponse> bill(BillRequest request) {
+		return mDataService.bill(request).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<Restaurant> link(long orderId, double amount, double tip) {
+		return mDataService.link(orderId, amount, tip).subscribeOn(Schedulers.io()).observeOn(
 				AndroidSchedulers.mainThread());
 	}
 

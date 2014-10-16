@@ -1,6 +1,5 @@
 package com.omnom.android.activity;
 
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
@@ -66,12 +65,8 @@ public class SplashActivity extends BaseOmnomActivity {
 					@Override
 					public void run() {
 						if(!isFinishing()) {
-							// boolean hasBle = BluetoothUtils.hasBleSupport(getActivity());
-							boolean hasBle = false;
-							final Intent intent = new Intent(SplashActivity.this,
-							                           hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
-							intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
-							startActivity(intent, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short, true);
+							ValidateActivity.start(SplashActivity.this, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short,
+							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 						}
 					}
 				});
@@ -106,9 +101,7 @@ public class SplashActivity extends BaseOmnomActivity {
 		findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				Intent intent = new Intent(SplashActivity.this, EnteringActivity.class);
-				intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_UP);
-				startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, true);
+				EnteringActivity.start(SplashActivity.this, R.anim.slide_in_right, R.anim.slide_out_left);
 			}
 		}, getResources().getInteger(R.integer.splash_screen_timeout));
 		getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);

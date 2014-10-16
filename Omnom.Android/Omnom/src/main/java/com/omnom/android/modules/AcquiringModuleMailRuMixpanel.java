@@ -2,12 +2,13 @@ package com.omnom.android.modules;
 
 import android.content.Context;
 
+import com.omnom.android.MixPanelHelper;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.AcquiringMailRu;
+import com.omnom.android.acquiring.mailru.AcquiringProxyMailRu;
 import com.omnom.android.acquiring.mailru.AcquiringServiceMailRu;
 import com.omnom.android.activity.MainActivity;
 import com.omnom.android.interceptors.mixpanel.AcquiringMailRuMixpanel;
-import com.omnom.android.MixPanelHelper;
 
 import javax.inject.Singleton;
 
@@ -30,7 +31,7 @@ public class AcquiringModuleMailRuMixpanel {
 	@Provides
 	@Singleton
 	public Acquiring provideAcquiring() {
-		return new AcquiringMailRu(mContext);
+		return new AcquiringMailRu(mContext, new AcquiringProxyMailRu(mContext));
 	}
 
 	@Provides

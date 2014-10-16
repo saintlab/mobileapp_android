@@ -1,13 +1,19 @@
 package com.omnom.android.restaurateur.api.observable.providers;
 
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.ResponseBase;
+import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
+import com.omnom.android.restaurateur.model.bill.BillRequest;
+import com.omnom.android.restaurateur.model.bill.BillResponse;
+import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsFactory;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
 import java.util.Arrays;
+import java.util.List;
 
 import altbeacon.beacon.Beacon;
 import hugo.weaving.DebugLog;
@@ -82,6 +88,51 @@ public class StubDataProvider implements RestaurateurObeservableApi {
 				subscriber.onCompleted();
 			}
 		}) {};
+	}
+
+	@Override
+	public Observable<RestaurantsResponse> getCards() {
+		return null;
+	}
+
+	@Override
+	public Observable<RestaurantsResponse> deleteCard(String cardId) {
+		return null;
+	}
+
+	@Override
+	public Observable<WaiterCallResponse> waiterCall(String restaurantId, String tableId) {
+		return null;
+	}
+
+	@Override
+	public Observable<WaiterCallResponse> waiterCallStop(String restaurantId, String tableId) {
+		return null;
+	}
+
+	@Override
+	public Observable<Restaurant> getMenu(String restaurantId) {
+		return null;
+	}
+
+	@Override
+	public Observable<List<Order>> getOrders(String restaurantId, String tableId) {
+		return null;
+	}
+
+	@Override
+	public Observable<ResponseBase> newGuest(String restaurantId, String tableId) {
+		return null;
+	}
+
+	@Override
+	public Observable<BillResponse> bill(BillRequest request) {
+		return null;
+	}
+
+	@Override
+	public Observable<Restaurant> link(long orderId, double amount, double tip) {
+		return null;
 	}
 
 	@Override

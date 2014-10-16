@@ -1,4 +1,4 @@
-package com.omnom.util.preferences;
+package com.omnom.android.utils.preferences;
 
 /**
  * Created by Ch3D on 15.08.2014.

@@ -3,10 +3,15 @@ package com.omnom.android.acquiring.mailru.model;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.annotations.Expose;
 import com.omnom.android.R;
+import com.omnom.android.utils.EncryptionUtils;
 import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.HashMap;
+
+import io.card.payment.CreditCard;
 
 /**
  * Created by Ch3D on 23.09.2014.
@@ -41,12 +46,27 @@ public class CardInfo {
 		return create(pan, expDate, cvv, holder);
 	}
 
+	public static CardInfo createTestCard(Context context, final CreditCard card) {
+		String holder = context.getString(R.string.acquiring_mailru_cardholder);
+		String pan = card.cardNumber;
+		String expDate = card.expiryMonth + "." + card.expiryYear;
+		String cvv = card.cvv;
+		return create(pan, expDate, cvv, holder);
+	}
+
+	@Expose
 	private String pan = StringUtils.EMPTY_STRING;
+	@Expose
 	private String expDate = StringUtils.EMPTY_STRING;
+	@Expose
 	private String cvv = StringUtils.EMPTY_STRING;
+	@Expose
 	private String cardId = StringUtils.EMPTY_STRING;
+	@Expose
 	private String holder = StringUtils.EMPTY_STRING;
 	private boolean addCard = false;
+
+	private final String key = "com.omnom.android";
 
 	public String getPan() {
 		return pan;
@@ -95,7 +115,7 @@ public class CardInfo {
 		map.put("exp_date", getExpDate());
 	}
 
-	public HashMap<String, String> getCardInfo() {
+	public HashMap<String, String> getCardInfoMap() {
 		final HashMap<String, String> cardInfo = new HashMap<String, String>();
 
 		if(!TextUtils.isEmpty(cardId)) {
@@ -123,5 +143,10 @@ public class CardInfo {
 
 	public void storeCardId(HashMap<String, String> params) {
 		params.put("card_id", cardId);
+	}
+
+	@Deprecated
+	public String toGson(Gson gson) {
+		return gson.toJson(this);
 	}
 }

@@ -28,4 +28,11 @@ public class AcquiringPollingResponse {
 		this.url = url;
 	}
 
+	@Override
+	public String toString() {
+		return "AcquiringPollingResponse{" +
+				"status='" + status + '\'' +
+				", url='" + url + '\'' +
+				'}';
+	}
 }

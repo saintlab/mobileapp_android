@@ -1,5 +1,6 @@
 package com.omnom.android.utils.activity;
 
+import android.annotation.TargetApi;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
@@ -78,6 +79,7 @@ public class ActivityHelper {
 		startActivity(intent, animIn, aninOut, false);
 	}
 
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public void startActivity(Intent intent, int animIn, int aninOut, boolean finish) {
 		ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(mActivity.getActivity(), animIn, aninOut);
 		mActivity.getActivity().startActivity(intent, activityOptions.toBundle());

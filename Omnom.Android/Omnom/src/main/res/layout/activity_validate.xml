@@ -5,9 +5,14 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
-        android:layout_gravity="bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/img_holder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/txt_error"
@@ -40,22 +45,6 @@
                 style="@style/Button.Bottom"/>
         </LinearLayout>
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/img_holder"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <Button
-            android:id="@+id/btn_down"
-            android:layout_width="22dp"
-            android:layout_height="13dp"
-            android:layout_above="@+id/panel_bottom"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="48dp"
-            android:background="@drawable/ic_down_button_icon_white"/>
-
         <LinearLayout
             android:id="@+id/panel_bottom"
             android:layout_width="match_parent"
@@ -64,7 +53,8 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:background="@android:color/white"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <Button
                 android:id="@+id/btn_waiter"
@@ -89,6 +79,16 @@
                 android:ellipsize="end"
                 style="@android:style/Widget.Holo.Button.Borderless"/>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_down"
+            android:layout_width="22dp"
+            android:layout_height="13dp"
+            android:layout_above="@+id/panel_bottom"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_large"
+            android:background="@drawable/ic_down_button_icon_white"
+            android:visibility="gone"/>
     </RelativeLayout>
 
     <com.omnom.android.utils.loader.LoaderView
