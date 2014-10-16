@@ -11,7 +11,7 @@ import com.omnom.android.R;
 import com.omnom.android.beacon.BeaconFilter;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
-import com.omnom.android.utils.LoaderError;
+import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -46,11 +47,11 @@ public class ErrorHelper {
 		mLoader.post(new Runnable() {
 			@Override
 			public void run() {
-				mLoader.animateLogo2(error.mDrawableResId);
+				mLoader.animateLogo2(error.getDrawableId());
 			}
 		});
-		mTxtError.setText(error.mErrResId);
-		mBtnBottom.setText(error.mBtnResId);
+		mTxtError.setText(error.getErrorId());
+		mBtnBottom.setText(error.getButtonTextId());
 		mBtnBottom.setOnClickListener(onClickListener);
 	}
 

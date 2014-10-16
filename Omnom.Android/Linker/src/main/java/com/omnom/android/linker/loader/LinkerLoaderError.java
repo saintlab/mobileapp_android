@@ -1,6 +1,7 @@
-package com.omnom.android.linker;
+package com.omnom.android.linker.loader;
 
-import com.omnom.android.utils.LoaderError;
+import com.omnom.android.linker.R;
+import com.omnom.android.utils.loader.LoaderError;
 
 /**
  * Created by Ch3D on 16.10.2014.

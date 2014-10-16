@@ -1,4 +1,6 @@
-package com.omnom.android.utils;
+package com.omnom.android.utils.loader;
+
+import com.omnom.android.utils.R;
 
 /**
  * Created by Ch3D on 16.10.2014.
@@ -24,14 +26,25 @@ public class LoaderError {
 	public static final LoaderError TWO_BEACONS = new LoaderError(R.drawable.ic_weak_signal,
 	                                                              R.string.error_more_than_one_beacon,
 	                                                              R.string.try_once_again);
-
-	final int mDrawableResId;
-	final int mErrResId;
-	final int mBtnResId;
+	private final int mDrawableResId;
+	private final int mErrResId;
+	private final int mBtnResId;
 
 	protected LoaderError(int drawableResId, int errResId, int btnResId) {
 		mDrawableResId = drawableResId;
 		mErrResId = errResId;
 		mBtnResId = btnResId;
+	}
+
+	public int getDrawableId() {
+		return mDrawableResId;
+	}
+
+	public int getErrorId() {
+		return mErrResId;
+	}
+
+	public int getButtonTextId() {
+		return mBtnResId;
 	}
 }

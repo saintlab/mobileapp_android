@@ -26,7 +26,7 @@ import com.omnom.android.beacon.BeaconFilter;
 import com.omnom.android.beacon.BeaconRssiProvider;
 import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.LinkerApplication;
-import com.omnom.android.linker.LinkerLoaderError;
+import com.omnom.android.linker.loader.LinkerLoaderError;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.LinkerBaseErrorHandler;
 import com.omnom.android.linker.activity.UserProfileActivity;
@@ -348,7 +348,6 @@ public class BindActivity extends BaseActivity {
 		if(getIntent().getBooleanExtra(EXTRA_SHOW_BACK, false)) {
 			mLoader.animateColor(Color.WHITE, getResources().getColor(R.color.loader_bg),
 			                     getResources().getInteger(R.integer.default_animation_duration_long));
-			// mLoader.setLogo(R.drawable.ic_mexico_logo);
 			AnimationUtils.animateAlpha(mPanelBottom, true);
 			AnimationUtils.animateAlpha(mBtnProfile, true);
 			mLoader.post(new Runnable() {
@@ -364,7 +363,6 @@ public class BindActivity extends BaseActivity {
 			});
 		} else {
 			mLoader.scaleDown();
-			// mLoader.animateLogo(R.drawable.ic_mexico_logo);
 			mLoader.postDelayed(new Runnable() {
 				@Override
 				public void run() {

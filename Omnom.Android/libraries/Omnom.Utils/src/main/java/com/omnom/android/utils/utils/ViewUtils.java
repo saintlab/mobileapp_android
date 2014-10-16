@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
 
+import java.util.List;
+
 import butterknife.ButterKnife;
 
 import static com.omnom.android.utils.utils.AnimationUtils.animateAlpha;
@@ -62,6 +64,10 @@ public class ViewUtils {
 			view.setVisibility(visible ? View.VISIBLE : View.GONE);
 			view.setTag(visible);
 		}
+	}
+
+	public static void setVisible(List<View> buttonViews, boolean visible) {
+		ButterKnife.apply(buttonViews, VISIBLITY, visible);
 	}
 
 	public static void fixPasswordTypeface(EditText editText, EditText like) {
