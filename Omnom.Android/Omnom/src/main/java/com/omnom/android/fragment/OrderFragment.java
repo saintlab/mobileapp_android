@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -40,6 +39,7 @@ import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.view.OmnomListView;
 
 import javax.inject.Inject;
 
@@ -70,7 +70,7 @@ public class OrderFragment extends Fragment {
 	protected RestaurateurObeservableApi api;
 
 	private Order mOrder;
-	private ListView list = null;
+	private OmnomListView list = null;
 	private RadioGroup radioGroup;
 
 	private RadioButton btnTips1;
@@ -97,9 +97,23 @@ public class OrderFragment extends Fragment {
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		ButterKnife.inject(view);
 		list = findById(view, android.R.id.list);
+		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
+		list.setTranslationY(-600);
+		list.setSelection(mOrder.getItems().size() - 1);
+		//		list.setEnabled(false);
+		//		list.setScrollingEnabled(false);
+
 		editAmount = findById(view, R.id.edit_payment_amount);
-		// editAmount.setText(String.valueOf(mOrder.getTotalAmount())/* + "\uf5fc"*/);
-		editAmount.setText("1.0");
+		editAmount.setText(String.valueOf(mOrder.getAmountToPay())/* + "\uf5fc"*/);
+		// editAmount.setText("1.0");
+		btnPay = findById(view, R.id.btn_pay);
+		btnPay.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				final double amount = Double.parseDouble(editAmount.getText().toString());
+				pay(amount);
+			}
+		});
 
 		radioGroup = findById(view, R.id.radio_tips);
 		final CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener() {
@@ -107,7 +121,9 @@ public class OrderFragment extends Fragment {
 			public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
 				final String tag = (String) btn.getTag();
 				if(isChecked) {
-					btn.setText(tag + "%\n" + mOrder.getTipsAmount(Integer.parseInt(tag)));
+					final int tipsAmount = mOrder.getTipsAmount(Integer.parseInt(tag));
+					btn.setText(tag + "%\n" + tipsAmount);
+					btnPay.setText("Оплатить " + String.valueOf(mOrder.getAmountToPay() + tipsAmount));
 				} else {
 					btn.setText(tag + "%");
 				}
@@ -122,36 +138,10 @@ public class OrderFragment extends Fragment {
 		btnTips4 = findById(view, R.id.radio_tips_4);
 		btnTips4.setOnCheckedChangeListener(listener);
 		btnTips2.setChecked(true);
-
-		btnPay = findById(view, R.id.btn_pay);
-		btnPay.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				final double amount = Double.parseDouble(editAmount.getText().toString());
-				pay(amount);
-			}
-		});
-
-		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
 	}
 
 	private void pay(final double amount) {
-		//		if(true) {
-		//			final UserData user = UserData.create("13", "89133952320");
-		//			final MerchantData merchant = new MerchantData(getActivity());
-		//			final CardInfo card = new CardInfo();
-		//			card.setCardId("30142837667150364462");
-		//			mAcquiring.deleteCard(merchant, user, card, new Acquiring.CardDeleteListener<AcquiringResponse>() {
-		//				@Override
-		//				public void onCardDeleted(AcquiringResponse response) {
-		//					showToast(getActivity(), response.getUrl());
-		//				}
-		//			});
-		//			return;
-		//		}
-
 		final String cardSaved = OmnomApplication.get(getActivity()).getPreferences().getCardData(getActivity());
-		// final String cardId = "30142837667150364462";
 		if(!TextUtils.isEmpty(cardSaved)) {
 			final CardInfo cardData = gson.fromJson(cardSaved, CardInfo.class);
 			cardData.setCardId(StringUtils.EMPTY_STRING);

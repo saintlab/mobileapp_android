@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 
 import java.util.Collections;
@@ -49,6 +50,10 @@ public class SplashActivity extends BaseOmnomActivity {
 		final int dimensionPixelSize = getResources().getDimensionPixelSize(R.dimen.loader_logo_size);
 		final float upperLogoPoint = getResources().getDimension(R.dimen.loader_margin_top);
 		final float loaderBgSize = getResources().getDimension(R.dimen.loader_size);
+
+		System.err.println(">>> " + AndroidUtils.getDeviceId(this));
+		System.err.println(">>> " + AndroidUtils.getInstallId(this));
+		System.err.println(">>> " + AndroidUtils.getAndroidId(this));
 
 		findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
