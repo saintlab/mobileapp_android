@@ -24,6 +24,11 @@ public class StringUtils {
 		return StringUtils.EMPTY_STRING;
 	}
 
+	public static String formatCurrency(double value) {
+		final String s = String.valueOf(value);
+		return s.indexOf(".") < 0 ? s : s.replaceAll("0*$", "").replaceAll("\\.$", "");
+	}
+
 	@DebugLog
 	public static byte[] hexStringToByteArray(String s) {
 		int len = s.length();

@@ -2,14 +2,17 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="view_size_default">48dp</dimen>
 
-    <dimen name="activity_horizontal_margin_xsmall">4dp</dimen>
-    <dimen name="activity_horizontal_margin_small">8dp</dimen>
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_horizontal_margin_large">48dp</dimen>
+    <dimen name="activity_horizontal_margin_xsmall">2dp</dimen>
+    <dimen name="activity_horizontal_margin_small">4dp</dimen>
+    <dimen name="activity_horizontal_margin">8dp</dimen>
+    <dimen name="activity_horizontal_margin_medium">16dp</dimen>
+    <dimen name="activity_horizontal_margin_large">24dp</dimen>
+    <dimen name="activity_horizontal_margin_xlarge">48dp</dimen>
 
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="activity_vertical_margin_small">8dp</dimen>
     <dimen name="activity_vertical_margin_large">48dp</dimen>
+    <dimen name="activity_vertical_margin_medium">24dp</dimen>
 
     <dimen name="activity_login_padding_top">96dp</dimen>
 
@@ -26,6 +29,8 @@
     <dimen name="loader_edit_with">200dp</dimen>
     <dimen name="loader_margin_top">-96dp</dimen>
     <dimen name="loader_progress_size">260dp</dimen>
+    <dimen name="loader_logo_size">220dp</dimen>
+    <dimen name="restaurant_logo_size">72dp</dimen>
 
     <dimen name="profile_margin_top">-48dp</dimen>
     <dimen name="profile_avatar_size">156dp</dimen>
@@ -34,8 +39,7 @@
     <dimen name="font_normal">18sp</dimen>
     <dimen name="font_medium">20sp</dimen>
     <dimen name="font_large">22sp</dimen>
-    <dimen name="error_text_padding">24dp</dimen>
-    <dimen name="restaurant_logo_size">72dp</dimen>
-    <dimen name="loader_logo_size">220dp</dimen>
+    <dimen name="font_xlarge">40sp</dimen>
 
+    <dimen name="error_text_padding">24dp</dimen>
 </resources>

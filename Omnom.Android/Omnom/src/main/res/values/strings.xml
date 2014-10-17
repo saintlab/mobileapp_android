@@ -36,4 +36,7 @@
     <string name="other_tips">Другой</string>
     <string name="title_activity_add_card">AddCardActivity</string>
 
+    <string name="order_overall">Итого: %1$s</string>
+    <string name="order_paid">Оплачено: %1$s</string>
+    <string name="I_m_going_to_pay">я оплачу</string>
 </resources>

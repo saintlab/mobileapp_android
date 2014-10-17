@@ -15,6 +15,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.omnom.android.OmnomApplication;
@@ -38,12 +39,16 @@ import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.view.OmnomListView;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import butterknife.InjectViews;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -69,20 +74,24 @@ public class OrderFragment extends Fragment {
 	@Inject
 	protected RestaurateurObeservableApi api;
 
+	@InjectViews({R.id.btn_pay, R.id.radio_tips})
+	protected List<View> viewsAmountHide;
+
 	private Order mOrder;
 	private OmnomListView list = null;
 	private RadioGroup radioGroup;
-
 	private RadioButton btnTips1;
 	private RadioButton btnTips2;
 	private RadioButton btnTips3;
 	private RadioButton btnTips4;
 	private EditText editAmount;
-
 	private Button btnPay;
 	private Gson gson;
 	private Subscription mBillSubscription;
 	private Subscription mPaySubscription;
+	private TextView txtFooterAmount;
+	private TextView txtFooterToPay;
+	private boolean mCurrentKeyboardVisility = false;
 
 	public OrderFragment() {
 	}
@@ -94,17 +103,47 @@ public class OrderFragment extends Fragment {
 	}
 
 	@Override
-	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 		ButterKnife.inject(view);
 		list = findById(view, android.R.id.list);
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
-		list.setTranslationY(-600);
+		// list.setTranslationY(-600);
 		list.setSelection(mOrder.getItems().size() - 1);
 		//		list.setEnabled(false);
 		//		list.setScrollingEnabled(false);
 
+		final View footerView = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
+		list.addFooterView(footerView);
+		txtFooterAmount = (TextView) footerView.findViewById(R.id.txt_overall);
+		txtFooterAmount.setText(getString(R.string.order_overall, StringUtils.formatCurrency(mOrder.getTotalAmount())));
+
+		txtFooterToPay = (TextView) footerView.findViewById(R.id.txt_to_pay);
+		txtFooterToPay.setText(getString(R.string.order_paid, StringUtils.formatCurrency(mOrder.getPaidAmount())));
+
+		final View activityRootView = ((ViewGroup) getActivity().findViewById(android.R.id.content)).getChildAt(0);
+		activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(
+				AndroidUtils.createKeyboardListener(activityRootView, new AndroidUtils.KeyboardVisibilityListener() {
+					@Override
+					public void onVisibilityChanged(boolean isVisible) {
+						System.err.println("!!!!!!!!!!!!!!!!!!!!" + isVisible);
+						if(!isVisible) {
+							editAmount.clearFocus();
+							findById(getActivity(), R.id.panel_order_payment).requestFocus();
+						}
+						if(mCurrentKeyboardVisility != isVisible) {
+							//							AnimationUtils.animateAlpha(radioGroup, !isVisible);
+							//							AnimationUtils.animateAlpha(btnPay, !isVisible);
+							//							final View byId = findById(view, R.id.panel_order_payment);
+							//							list.animate().translationYBy(isVisible ? -600 : 600).start();
+							//							// byId.animate().yBy(isVisible ? -200 : 200).start();
+							//							mCurrentKeyboardVisility = isVisible;
+						}
+					}
+				}));
+
 		editAmount = findById(view, R.id.edit_payment_amount);
-		editAmount.setText(String.valueOf(mOrder.getAmountToPay())/* + "\uf5fc"*/);
+		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay())/* + "\uf5fc"*/);
+
 		// editAmount.setText("1.0");
 		btnPay = findById(view, R.id.btn_pay);
 		btnPay.setOnClickListener(new View.OnClickListener() {

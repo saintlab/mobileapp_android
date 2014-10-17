@@ -10,11 +10,13 @@
         android:id="@android:id/list"
         android:background="@android:color/white"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="300dp"
         android:layout_gravity="top"/>
 
     <RelativeLayout
         android:id="@+id/panel_order_payment"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/activity_horizontal_margin_medium"
@@ -32,7 +34,9 @@
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             android:textColor="?android:textColorPrimaryInverse"
             android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"/>
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"
+            />
 
         <RadioGroup
             android:id="@+id/radio_tips"
@@ -40,7 +44,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:layout_marginTop="@dimen/activity_horizontal_margin">
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:visibility="gone">
             <RadioButton
                 android:id="@+id/radio_tips_1"
                 android:layout_width="0dp"
@@ -86,15 +91,26 @@
         <EditText
             android:id="@+id/edit_payment_amount"
             android:layout_above="@id/radio_tips"
-            android:layout_width="200dp"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin_xlarge"
+            android:layout_marginRight="@dimen/activity_horizontal_margin_xlarge"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:gravity="center"
             android:inputType="numberDecimal"
             android:singleLine="true"
-            android:textSize="40sp"
+            android:textSize="48sp"
             android:textColor="?android:textColorPrimaryInverse"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/edit_payment_amount"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@drawable/order_payment_tips_color"
+            android:text="@string/I_m_going_to_pay"/>
 
     </RelativeLayout>
 

@@ -233,8 +233,8 @@ public class Order implements Parcelable {
 		this.tips = tips;
 	}
 
-	public int getPaidAmount() {
-		return paidAmount;
+	public double getPaidAmount() {
+		return (double) paidAmount / 100;
 	}
 
 	public void setPaidAmount(int paidAmount) {
@@ -249,8 +249,8 @@ public class Order implements Parcelable {
 				", tableId='" + tableId + '\'' +
 				", status='" + status + '\'' +
 				", restaurantId='" + restaurantId + '\'' +
-				", id='" + id + '\'' +
 				", isClosed=" + isClosed +
+				", id='" + id + '\'' +
 				'}';
 	}
 
@@ -268,15 +268,15 @@ public class Order implements Parcelable {
 	}
 
 	public double getAmountToPay() {
-		return getTotalAmount() - ((double)(getPaidAmount() - getPaidTip()) / 100);
+		return getTotalAmount() - getPaidAmount() - getPaidTip();
 	}
 
 	public int getTipsAmount(int percent) {
 		return (int) Math.round(percent * (getAmountToPay() / 100));
 	}
 
-	public int getPaidTip() {
-		return paidTip;
+	public double getPaidTip() {
+		return (double) paidTip / 100;
 	}
 
 	public void setPaidTip(int paidTip) {
