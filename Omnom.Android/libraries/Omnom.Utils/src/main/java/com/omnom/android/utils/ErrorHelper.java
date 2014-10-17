@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -40,27 +41,26 @@ public class ErrorHelper {
 		mErrorViews = errorViews;
 	}
 
-	public void showError(final int logoResId, int errTextResId, int btnTextResId, View.OnClickListener onClickListener) {
+	public void showError(final LoaderError error, View.OnClickListener onClickListener) {
 		mLoader.stopProgressAnimation(true);
 		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, true);
 		mLoader.post(new Runnable() {
 			@Override
 			public void run() {
-				mLoader.animateLogo2(logoResId);
+				mLoader.animateLogo2(error.getDrawableId());
 			}
 		});
-		mTxtError.setText(errTextResId);
-		mBtnBottom.setText(btnTextResId);
+		mTxtError.setText(error.getErrorId());
+		mBtnBottom.setText(error.getButtonTextId());
 		mBtnBottom.setOnClickListener(onClickListener);
 	}
 
 	public void showInternetError(View.OnClickListener onClickListener) {
-		showError(R.drawable.ic_no_connection, R.string.error_you_have_no_internet_connection, R.string.try_once_again,
-		          onClickListener);
+		showError(LoaderError.NO_CONNECTION_TRY, onClickListener);
 	}
 
 	public void showErrorBluetoothDisabled(final Activity activity, final int requestCode) {
-		showError(R.drawable.ic_bluetooth_white, R.string.error_bluetooth_disabled, R.string.open_settings, new View.OnClickListener() {
+		showError(LoaderError.BLE_DISABLED, new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mLoader.scaleDown(null);
@@ -71,7 +71,7 @@ public class ErrorHelper {
 	}
 
 	public void showLocationError() {
-		showError(R.drawable.ic_geolocation_white, R.string.error_location_disabled, R.string.open_settings, new View.OnClickListener() {
+		showError(LoaderError.LOCATION_DISABLED, new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mLoader.scaleDown(null);

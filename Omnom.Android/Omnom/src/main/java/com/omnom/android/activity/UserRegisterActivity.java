@@ -18,6 +18,7 @@ import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.utils.ObservableUtils;
+import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.view.ErrorEdit;
@@ -31,6 +32,8 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.Subscription;
+import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
 /**
@@ -71,6 +74,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	private boolean mFirstStart = true;
 
 	private GregorianCalendar gc;
+	private Subscription mRegisterSubscription;
 
 	@Override
 	public void initUi() {
@@ -149,33 +153,44 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		                                                               editBirth.getText()
 		                                                                        .toString()
 		                                                                        .replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
-		authenticator.register(request).subscribe(new Action1<AuthRegisterResponse>() {
-			@Override
-			public void call(final AuthRegisterResponse authRegisterResponse) {
-				if(!authRegisterResponse.hasError()) {
-					topPanel.setContentVisibility(false, false);
-					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
-						@Override
-						public void run() {
-							final Intent intent = new Intent(UserRegisterActivity.this, ConfirmPhoneActivity.class);
-							intent.putExtra(EXTRA_PHONE, request.getPhone());
-							intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_REGISTER);
-							startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
-							topPanel.showProgress(false);
-						}
-					});
-				} else {
-					topPanel.showProgress(false);
-					textError.setText(authRegisterResponse.getError().getMessage());
-				}
-			}
-		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			@Override
-			public void onError(Throwable throwable) {
-				topPanel.showProgress(false);
-				Log.e(TAG, "doRegister", throwable);
-			}
-		});
+		mRegisterSubscription = AndroidObservable.bindActivity(this, authenticator.register(request))
+		                                           .subscribe(new Action1<AuthRegisterResponse>() {
+			                                           @Override
+			                                           public void call(final AuthRegisterResponse authRegisterResponse) {
+				                                           if(!authRegisterResponse.hasError()) {
+					                                           topPanel.setContentVisibility(false, false);
+					                                           postDelayed(getResources().getInteger(
+							                                           R.integer.default_animation_duration_short), new Runnable() {
+						                                           @Override
+						                                           public void run() {
+							                                           final Intent intent = new Intent(UserRegisterActivity.this,
+							                                                                            ConfirmPhoneActivity.class);
+							                                           intent.putExtra(EXTRA_PHONE, request.getPhone());
+							                                           intent.putExtra(EXTRA_CONFIRM_TYPE,
+							                                                           ConfirmPhoneActivity.TYPE_REGISTER);
+							                                           startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left,
+							                                                         false);
+							                                           topPanel.showProgress(false);
+						                                           }
+					                                           });
+				                                           } else {
+					                                           topPanel.showProgress(false);
+					                                           textError.setText(authRegisterResponse.getError().getMessage());
+				                                           }
+			                                           }
+		                                           }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			                                           @Override
+			                                           public void onError(Throwable throwable) {
+				                                           topPanel.showProgress(false);
+				                                           Log.e(TAG, "doRegister", throwable);
+			                                           }
+		                                           });
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		OmnomObservable.unsubscribe(mRegisterSubscription);
 	}
 
 	private boolean validate() {

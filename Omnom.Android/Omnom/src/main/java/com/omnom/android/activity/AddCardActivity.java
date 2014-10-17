@@ -12,12 +12,15 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.utils.observable.OmnomObservable;
 
 import javax.inject.Inject;
 
 import butterknife.OnClick;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
+import rx.Subscription;
+import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
 import static butterknife.ButterKnife.findById;
@@ -30,6 +33,7 @@ public class AddCardActivity extends BaseOmnomActivity {
 	protected Acquiring mAcquiring;
 	private CardInfo card;
 	private Gson gson;
+	private Subscription mCardVerifySubscribtion;
 
 	@Override
 	public void initUi() {
@@ -51,20 +55,27 @@ public class AddCardActivity extends BaseOmnomActivity {
 		final MerchantData merchant = new MerchantData(getActivity());
 
 		final EditText text = findById(this, R.id.edit_amount);
-		mAcquiring.verifyCard(merchant, user, card, Double.parseDouble(text.getText().toString()))
-		          .subscribe(new Action1<AcquiringResponse>() {
-			          @Override
-			          public void call(AcquiringResponse response) {
-				          final String cardData = card.toGson(gson);
-				          getPreferences().setCardData(getActivity(), cardData);
-				          showToast(getActivity(), "VERIFIED");
-			          }
-		          }, new Action1<Throwable>() {
-			          @Override
-			          public void call(Throwable throwable) {
-				          showToast(getActivity(), "VERIFICATION ERROR");
-			          }
-		          });
+		mCardVerifySubscribtion = AndroidObservable
+				.bindActivity(this, mAcquiring.verifyCard(merchant, user, card, Double.parseDouble(text.getText().toString())))
+				.subscribe(new Action1<AcquiringResponse>() {
+					@Override
+					public void call(AcquiringResponse response) {
+						final String cardData = card.toGson(gson);
+						getPreferences().setCardData(getActivity(), cardData);
+						showToast(getActivity(), "VERIFIED");
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						showToast(getActivity(), "VERIFICATION ERROR");
+					}
+				});
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		OmnomObservable.unsubscribe(mCardVerifySubscribtion);
 	}
 
 	@OnClick(R.id.btn_add_card)

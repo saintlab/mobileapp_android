@@ -29,6 +29,7 @@ import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.LinkerBaseErrorHandler;
 import com.omnom.android.linker.activity.UserProfileActivity;
+import com.omnom.android.linker.loader.LinkerLoaderError;
 import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.service.CharacteristicHolder;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
@@ -74,6 +75,7 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action0;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 import static butterknife.ButterKnife.findById;
 
@@ -185,12 +187,10 @@ public class BindActivity extends BaseActivity {
 		public void run() {
 			if(!gattAvailable || !gattConnected) {
 				OmnomObservable.unsubscribe(mApiBindingSubscription);
-				mErrorHelper.showError(R.drawable.ic_maintenance_disabled, R.string.error_maintenance_mode_off, R.string.try_once_again,
-				                       mInternetErrorClickListener);
+				mErrorHelper.showError(LinkerLoaderError.MAINTENANCE_DISABLED, mInternetErrorClickListener);
 			} else if(!mApiBindComplete) {
 				OmnomObservable.unsubscribe(mApiBindingSubscription);
-				mErrorHelper.showError(R.drawable.ic_no_connection, R.string.error_unknown_server_error, R.string.bind_table,
-				                       mInternetErrorClickListener);
+				mErrorHelper.showError(LinkerLoaderError.NO_CONNECTION_BIND, mInternetErrorClickListener);
 			} else {
 				mLoader.updateProgressMax(new Runnable() {
 					@Override
@@ -214,6 +214,8 @@ public class BindActivity extends BaseActivity {
 			mBluetoothLeService.close();
 		}
 	};
+	private Subscription mBuildBeaconsSubscribtion;
+	private Subscription mFindBeaconSubscription;
 
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
 		if(enable) {
@@ -269,7 +271,8 @@ public class BindActivity extends BaseActivity {
 	public void onBind() {
 		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
-		api.buildBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeacon.getIdValue(0)).subscribe(
+		mBuildBeaconsSubscribtion = AndroidObservable.bindActivity(this, api.buildBeacon(mRestaurant.getId(), mLoader.getTableNumber(),
+		                                                                                 mBeacon.getIdValue(0))).subscribe(
 				new RestaurateurObservable.AuthAwareOnNext<BeaconDataResponse>(getActivity()) {
 					@Override
 					public void perform(BeaconDataResponse beaconData) {
@@ -300,17 +303,18 @@ public class BindActivity extends BaseActivity {
 	@DebugLog
 	private void connectToBeacon() {
 		mLoader.startProgressAnimation(getResources().getInteger(R.integer.bind_beacon_writing_duration), beaconTimeoutCallback);
+		final Func1<ValidationObservable.Error, Boolean> validationFunc = OmnomObservable.getValidationFunc(this,
+		                                                                                                    mErrorHelper,
+		                                                                                                    mInternetErrorClickListener);
 		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this)
-		                                                                                      .map(OmnomObservable.getValidationFunc(this,
-		                                                                                                                             mErrorHelper,
-		                                                                                                                             mInternetErrorClickListener))
+		                                                                                      .map(validationFunc)
 		                                                                                      .isEmpty())
 		                                              .subscribe(new Action1<Boolean>() {
 			                                              @Override
 			                                              public void call(Boolean hasNoErrors) {
 				                                              if(hasNoErrors) {
-					                                              if(mBeacon == null || !mBluetoothLeService.connect(
-							                                              mBeacon.getBluetoothAddress())) {
+					                                              if(mBeacon == null
+							                                              || !mBluetoothLeService.connect(mBeacon.getBluetoothAddress())) {
 						                                              mLoader.stopProgressAnimation(true);
 					                                              }
 				                                              }
@@ -349,7 +353,6 @@ public class BindActivity extends BaseActivity {
 		if(getIntent().getBooleanExtra(EXTRA_SHOW_BACK, false)) {
 			mLoader.animateColor(Color.WHITE, getResources().getColor(R.color.loader_bg),
 			                     getResources().getInteger(R.integer.default_animation_duration_long));
-			// mLoader.setLogo(R.drawable.ic_mexico_logo);
 			AnimationUtils.animateAlpha(mPanelBottom, true);
 			AnimationUtils.animateAlpha(mBtnProfile, true);
 			mLoader.post(new Runnable() {
@@ -365,7 +368,6 @@ public class BindActivity extends BaseActivity {
 			});
 		} else {
 			mLoader.scaleDown();
-			// mLoader.animateLogo(R.drawable.ic_mexico_logo);
 			mLoader.postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -466,59 +468,59 @@ public class BindActivity extends BaseActivity {
 							                                        final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 							                                        final int size = nearBeacons.size();
 							                                        if(size == 0) {
-								                                        mErrorHelper.showError(R.drawable.ic_weak_signal,
-								                                                               R.string.error_weak_beacon_signal,
-								                                                               R.string.try_once_again,
+								                                        mErrorHelper.showError(LinkerLoaderError.WEAK_SIGNAL,
 								                                                               mInternetErrorClickListener);
 							                                        } else if(size > 1) {
-								                                        mErrorHelper.showError(R.drawable.ic_weak_signal,
-								                                                               R.string.error_more_than_one_beacon,
-								                                                               R.string.try_once_again,
+								                                        mErrorHelper.showError(LinkerLoaderError.TWO_BEACONS,
 								                                                               mInternetErrorClickListener);
 							                                        } else if(size == 1) {
 								                                        mBeacon = nearBeacons.get(0);
-								                                        api.findBeacon(mBeacon).onErrorReturn(
-										                                        RestaurateurObservable.getTableOnError())
-								                                           .subscribe(
-										                                           new RestaurateurObservable
-												                                           .AuthAwareOnNext<TableDataResponse>(
-												                                           context) {
-											                                           @Override
-											                                           public void perform(final TableDataResponse
-													                                                               tableData) {
-												                                           if(tableData == null) {
-													                                           mErrorHelper.showInternetError(
-															                                           mInternetErrorClickListener);
-													                                           return;
-												                                           }
-												                                           mBindClicked = false;
-												                                           mLoader.stopProgressAnimation();
-												                                           mLoader.updateProgressMax(new Runnable() {
-													                                           @Override
-													                                           public void run() {
-														                                           final boolean sameRest =
-																                                           isSameRestaurant(tableData);
-														                                           if(tableData.hasErrors() || !sameRest) {
-															                                           scanQrCode();
-														                                           } else if(tableData
-																                                           != TableDataResponse.NULL) {
-															                                           final int tableId =
-																	                                           tableData.getInternalId();
-															                                           onErrorBeaconCheck(tableId);
-														                                           } else {
-															                                           scanQrCode();
-														                                           }
-													                                           }
-												                                           });
-											                                           }
-										                                           }, new LinkerBaseErrorHandler(context) {
-											                                           @Override
-											                                           protected void onThrowable(Throwable throwable) {
-												                                           Log.e(TAG, "findBeacon", throwable);
-												                                           mErrorHelper.showInternetError(
-														                                           mInternetErrorClickListener);
-											                                           }
-										                                           });
+								                                        mFindBeaconSubscription = AndroidObservable.bindActivity(
+										                                        context,
+										                                        api.findBeacon(mBeacon).onErrorReturn(
+												                                        RestaurateurObservable
+														                                        .getTableOnError())).subscribe(
+										                                        new RestaurateurObservable
+												                                        .AuthAwareOnNext<TableDataResponse>(
+												                                        context) {
+											                                        @Override
+											                                        public void perform(final TableDataResponse
+													                                                            tableData) {
+												                                        if(tableData == null) {
+													                                        mErrorHelper.showInternetError(
+															                                        mInternetErrorClickListener);
+													                                        return;
+												                                        }
+												                                        mBindClicked = false;
+												                                        mLoader.stopProgressAnimation();
+												                                        mLoader.updateProgressMax(new Runnable() {
+													                                        @Override
+													                                        public void run() {
+														                                        final boolean sameRest =
+																                                        isSameRestaurant(
+																		                                        tableData);
+														                                        if(tableData.hasErrors() || !sameRest) {
+															                                        scanQrCode();
+														                                        } else if(tableData
+																                                        != TableDataResponse.NULL) {
+															                                        final int tableId = tableData
+																	                                        .getInternalId();
+															                                        onErrorBeaconCheck(tableId);
+														                                        } else {
+															                                        scanQrCode();
+														                                        }
+													                                        }
+												                                        });
+											                                        }
+										                                        },
+										                                        new LinkerBaseErrorHandler(context) {
+											                                        @Override
+											                                        protected void onThrowable(Throwable throwable) {
+												                                        Log.e(TAG, "findBeacon", throwable);
+												                                        mErrorHelper.showInternetError(
+														                                        mInternetErrorClickListener);
+											                                        }
+										                                        });
 							                                        }
 						                                        }
 					                                        });
@@ -700,8 +702,7 @@ public class BindActivity extends BaseActivity {
 					mBluetoothLeService.getDiscoverGattService();
 				} else if(BluetoothLeService.ACTION_BEACON_WRITE_FAILED.equals(event.getAction())) {
 					gattConnected = false;
-					mErrorHelper.showError(R.drawable.ic_no_connection, R.string.error_writing_beacon_data, R.string.bind_table,
-					                       mInternetErrorClickListener);
+					mErrorHelper.showError(LinkerLoaderError.NO_CONNECTION_BIND, mInternetErrorClickListener);
 				}
 			}
 		});
@@ -714,6 +715,8 @@ public class BindActivity extends BaseActivity {
 		OmnomObservable.unsubscribe(mErrValidationSubscription);
 		OmnomObservable.unsubscribe(mApiBindingSubscription);
 		OmnomObservable.unsubscribe(mErrBindSubscription);
+		OmnomObservable.unsubscribe(mBuildBeaconsSubscribtion);
+		OmnomObservable.unsubscribe(mFindBeaconSubscription);
 	}
 
 	@Override
@@ -755,9 +758,7 @@ public class BindActivity extends BaseActivity {
 										                                           // TODO: Implement error handling
 									                                           }
 								                                           }
-								                                           mErrorHelper.showError(R.drawable.ic_no_connection,
-								                                                                  R.string.error_unknown_server_error,
-								                                                                  R.string.bind_table,
+								                                           mErrorHelper.showError(LinkerLoaderError.NO_CONNECTION_BIND,
 								                                                                  mInternetErrorClickListener);
 								                                           beaconTimeoutCallback.run();
 								                                           resetActivityState();

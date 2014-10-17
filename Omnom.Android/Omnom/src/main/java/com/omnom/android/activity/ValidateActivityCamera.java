@@ -9,16 +9,20 @@ import com.omnom.android.R;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.utils.observable.OmnomObservable;
 
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.Subscription;
+import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class ValidateActivityCamera extends ValidateActivity {
 	@Inject
 	protected RestaurateurObeservableApi api;
+	private Subscription mCheckQrSubscribtion;
 
 	@Override
 	protected void startLoader() {
@@ -34,6 +38,12 @@ public class ValidateActivityCamera extends ValidateActivity {
 	}
 
 	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		OmnomObservable.unsubscribe(mCheckQrSubscribtion);
+	}
+
+	@Override
 	protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
 		if(resultCode == RESULT_OK) {
 			if(requestCode == REQUEST_CODE_SCAN_QR) {
@@ -44,13 +54,14 @@ public class ValidateActivityCamera extends ValidateActivity {
 				});
 				final String mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
 				final TableDataResponse[] table = new TableDataResponse[1];
-				api.checkQrCode(mQrData).flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
-					@Override
-					public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
-						table[0] = tableDataResponse;
-						return api.getRestaurant(tableDataResponse.getRestaurantId());
-					}
-				}).subscribe(new Action1<Restaurant>() {
+				mCheckQrSubscribtion = AndroidObservable.bindActivity(this, api.checkQrCode(mQrData).flatMap(
+						new Func1<TableDataResponse, Observable<Restaurant>>() {
+							@Override
+							public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
+								table[0] = tableDataResponse;
+								return api.getRestaurant(tableDataResponse.getRestaurantId());
+							}
+						})).subscribe(new Action1<Restaurant>() {
 					@Override
 					public void call(final Restaurant restaurant) {
 						onDataLoaded(restaurant, table[0]);
