@@ -6,6 +6,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:id="@+id/btn_cancel"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="24dp"
+        android:background="@drawable/com_mixpanel_android_close"
+        android:layout_gravity="top|left"/>
+
+    <Button
+        android:id="@+id/btn_apply"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="24dp"
+        android:background="@drawable/com_mixpanel_android_checkmark"
+        android:layout_gravity="top|right"/>
+
     <com.omnom.android.utils.view.OmnomListView
         android:id="@android:id/list"
         android:background="@android:color/white"
@@ -116,24 +132,6 @@
             android:textColor="@drawable/order_payment_tips_color"
             android:layout_marginBottom="-8dp"
             android:text="@string/I_m_going_to_pay"/>
-
-        <Button
-            android:id="@+id/btn_cancel"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_margin="24dp"
-            android:background="@drawable/com_mixpanel_android_close"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"/>
-
-        <Button
-            android:id="@+id/btn_apply"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_margin="24dp"
-            android:background="@drawable/com_mixpanel_android_checkmark"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"/>
 
     </RelativeLayout>
 
