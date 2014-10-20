@@ -42,7 +42,7 @@ public class OrderTips implements Parcelable {
 	}
 
 	public int getThreshold() {
-		return threshold;
+		return threshold / 100;
 	}
 
 	public void setThreshold(int threshold) {

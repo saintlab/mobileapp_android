@@ -25,8 +25,23 @@ public class StringUtils {
 	}
 
 	public static String formatCurrency(double value) {
-		final String s = String.valueOf(value);
+		return formatCurrency(String.valueOf(value));
+	}
+
+	public static String formatCurrency(double value, String currency) {
+		return formatCurrency(String.valueOf(value), currency);
+	}
+
+	public static String formatCurrency(String s) {
 		return s.indexOf(".") < 0 ? s : s.replaceAll("0*$", "").replaceAll("\\.$", "");
+	}
+
+	public static String formatCurrency(String s, String currency) {
+		if(s.endsWith(currency)) {
+			s = s.substring(0, s.length()-1);
+		}
+		String result = s.indexOf(".") < 0 ? s : s.replaceAll("0*$", "").replaceAll("\\.$", "");
+		return result + currency;
 	}
 
 	@DebugLog

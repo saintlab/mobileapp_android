@@ -271,10 +271,6 @@ public class Order implements Parcelable {
 		return getTotalAmount() - getPaidAmount() - getPaidTip();
 	}
 
-	public int getTipsAmount(int percent) {
-		return (int) Math.round(percent * (getAmountToPay() / 100));
-	}
-
 	public double getPaidTip() {
 		return (double) paidTip / 100;
 	}
