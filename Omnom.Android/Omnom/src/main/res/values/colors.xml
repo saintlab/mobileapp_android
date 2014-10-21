@@ -9,6 +9,8 @@
     <color name="list_header">#e5e5e5</color>
     <color name="error_red">#ff0000</color>
 
+    <color name="white_transparent">#ddffffff</color>
+
     <color name="tip_active">#ffffff</color>
     <color name="tip_default">#7affffff</color>
 </resources>
