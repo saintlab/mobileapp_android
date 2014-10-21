@@ -11,7 +11,7 @@
         android:background="@android:color/white"
         android:stackFromBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="240dp"
+        android:layout_height="@dimen/order_items_list_height_collapsed"
         android:layout_gravity="top"/>
 
     <LinearLayout
