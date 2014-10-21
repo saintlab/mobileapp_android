@@ -238,7 +238,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			                                       @Override
 			                                       public void call(List<Order> orders) {
 				                                       if(!orders.isEmpty()) {
-					                                       OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders));
+					                                       OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders),
+					                                                            mRestaurant.getDecoration().getBackgroundColor());
 				                                       } else {
 					                                       showToastLong(getActivity(), R.string.there_are_no_orders_on_this_table);
 				                                       }

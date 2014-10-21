@@ -14,15 +14,17 @@ import java.util.List;
  */
 public class OrdersPagerAdaper extends FragmentStatePagerAdapter {
 	private final List<Order> mOrders;
+	private int mBgColor;
 
-	public OrdersPagerAdaper(FragmentManager fm, List<Order> orders) {
+	public OrdersPagerAdaper(FragmentManager fm, List<Order> orders, final int bgColor) {
 		super(fm);
 		mOrders = orders;
+		mBgColor = bgColor;
 	}
 
 	@Override
 	public Fragment getItem(int i) {
-		return OrderFragment.newInstance(mOrders.get(i));
+		return OrderFragment.newInstance(mOrders.get(i), mBgColor);
 	}
 
 	@Override

@@ -10,19 +10,19 @@ import com.omnom.android.utils.utils.StringUtils;
  * Created by Ch3D on 23.09.2014.
  */
 public class MailRuExtra extends ExtraData {
-	public static MailRuExtra create(long tip, String restaurant_id) {
+	public static MailRuExtra create(double tip, String restaurant_id) {
 		return new MailRuExtra(tip, restaurant_id);
 	}
 
-	private long tip;
+	private double tip;
 	private String restaurantId;
 
-	private MailRuExtra(long tip, String restaurant_id) {
+	private MailRuExtra(double tip, String restaurant_id) {
 		this.tip = tip;
 		this.restaurantId = restaurant_id;
 	}
 
-	public long getTip() {
+	public double getTip() {
 		return tip;
 	}
 

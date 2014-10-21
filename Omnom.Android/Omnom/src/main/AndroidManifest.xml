@@ -92,7 +92,7 @@
             android:name="com.omnom.android.activity.OrdersActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden"
-            android:theme="@style/Theme.Wood" >
+            android:theme="@style/Theme.Wood.Light" >
         </activity>
         <activity
             android:name="io.card.payment.CardIOActivity"

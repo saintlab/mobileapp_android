@@ -43,4 +43,12 @@ public class RestaurantHelper {
 			return Color.parseColor(decorationBg);
 		}
 	}
+
+	public static int getBackgroundColor(String decorationBg) {
+		if(!decorationBg.startsWith(COLOR_PREFIX)) {
+			return Color.parseColor(COLOR_PREFIX + decorationBg);
+		} else {
+			return Color.parseColor(decorationBg);
+		}
+	}
 }

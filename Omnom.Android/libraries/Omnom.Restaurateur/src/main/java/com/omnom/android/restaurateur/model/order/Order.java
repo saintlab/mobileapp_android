@@ -234,7 +234,7 @@ public class Order implements Parcelable {
 	}
 
 	public double getPaidAmount() {
-		return (double) paidAmount / 100;
+		return (double) (paidAmount - paidTip) / 100;
 	}
 
 	public void setPaidAmount(int paidAmount) {
@@ -268,7 +268,7 @@ public class Order implements Parcelable {
 	}
 
 	public double getAmountToPay() {
-		return getTotalAmount() - getPaidAmount() - getPaidTip();
+		return getTotalAmount() - getPaidAmount();
 	}
 
 	public double getPaidTip() {

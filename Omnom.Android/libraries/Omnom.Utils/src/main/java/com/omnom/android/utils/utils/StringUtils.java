@@ -9,6 +9,7 @@ import hugo.weaving.DebugLog;
  */
 public class StringUtils {
 	public static final String EMPTY_STRING = "";
+	public static final String WHITESPACE = " ";
 
 	public static String concat(String delimiter, String... data) {
 		final StringBuilder sb = new StringBuilder();
@@ -38,7 +39,7 @@ public class StringUtils {
 
 	public static String formatCurrency(String s, String currency) {
 		if(s.endsWith(currency)) {
-			s = s.substring(0, s.length()-1);
+			s = s.substring(0, s.length() - 1);
 		}
 		String result = s.indexOf(".") < 0 ? s : s.replaceAll("0*$", "").replaceAll("\\.$", "");
 		return result + currency;
@@ -53,5 +54,16 @@ public class StringUtils {
 					+ Character.digit(s.charAt(i + 1), 16));
 		}
 		return data;
+	}
+
+	public static String filterAmount(final String s) {
+		StringBuilder result = new StringBuilder();
+		for(int i = 0; i < s.length() - 1; i++) {
+			final char c = s.charAt(i);
+			if(Character.isDigit(c) || c == ',' || c == '.') {
+				result.append(c);
+			}
+		}
+		return result.toString();
 	}
 }
