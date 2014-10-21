@@ -18,7 +18,7 @@
         android:layout_width="fill_parent"
         android:padding="@dimen/activity_horizontal_margin"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/panel_bottom"
         android:layout_width="match_parent"
         android:layout_height="@dimen/view_size_default"
@@ -31,11 +31,11 @@
         <Button
             android:id="@+id/btn_register"
             android:text="@string/registration"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="start|center_vertical"
             android:textColor="@android:color/black"
+            android:layout_alignParentLeft="true"
             android:drawablePadding="@dimen/activity_horizontal_margin_small"
             android:drawableLeft="@drawable/ic_profile_small"
             android:ellipsize="end"
@@ -44,13 +44,15 @@
         <Button
             android:id="@+id/btn_enter"
             android:text="@string/enter"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end|center_vertical"
             android:textColor="@android:color/black"
+            android:layout_alignParentRight="true"
+            android:drawablePadding="@dimen/activity_horizontal_margin_small"
+            android:drawableLeft="@drawable/ic_login"
             android:ellipsize="end"
             style="@android:style/Widget.Holo.Button.Borderless"/>
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

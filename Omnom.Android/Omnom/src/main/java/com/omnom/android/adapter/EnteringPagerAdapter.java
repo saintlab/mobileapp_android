@@ -21,7 +21,7 @@ public class EnteringPagerAdapter extends FragmentStatePagerAdapter {
 	};
 
 	private int[] icons = new int[]{
-			R.drawable.ic_credit_cards_icon_big,
+			R.drawable.ic_credit_cards,
 			R.drawable.ic_bell_ringing_icon_big,
 			R.drawable.ic_split_bill_icon_big
 	};
