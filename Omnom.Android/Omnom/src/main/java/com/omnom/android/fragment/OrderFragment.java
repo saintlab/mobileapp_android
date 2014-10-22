@@ -166,6 +166,9 @@ public class OrderFragment extends Fragment {
 	@InjectView(R.id.txt_tips_title)
 	protected TextView txtTipsTitle;
 
+	@InjectView(R.id.txt_tips_amount_hint)
+	protected TextView txtTipsAmountHint;
+
 	private Order mOrder;
 
 	private Gson gson;
@@ -207,8 +210,7 @@ public class OrderFragment extends Fragment {
 
 	@Override
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
-
-		mFontNormal = getResources().getDimension(R.dimen.font_normal);
+		mFontNormal = getResources().getDimension(R.dimen.font_small);
 		mFontSmall = getResources().getDimension(R.dimen.font_xsmall);
 
 		rootView.setBackgroundColor(mRestaurantColor);
@@ -252,7 +254,7 @@ public class OrderFragment extends Fragment {
 		editAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-				if(actionId == EditorInfo.IME_ACTION_DONE) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					doApply(v);
 					return true;
 				}
@@ -271,7 +273,7 @@ public class OrderFragment extends Fragment {
 			@Override
 			public void afterTextChanged(Editable s) {
 				final String str = s.toString();
-				if(!str.endsWith(getCurrencySuffix())) {
+				if (!str.endsWith(getCurrencySuffix())) {
 					final String text = editAmount.getText() + getCurrencySuffix();
 					editAmount.setText(text);
 					editAmount.setSelection(text.length() - 1);
@@ -285,9 +287,9 @@ public class OrderFragment extends Fragment {
 		editAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
-				if(hasFocus) {
+				if (hasFocus) {
 					int length = editAmount.getText().length();
-					if(length >= 2) {
+					if (length >= 2) {
 						editAmount.setSelection(length - 2);
 					}
 				}
@@ -301,7 +303,7 @@ public class OrderFragment extends Fragment {
 				AndroidUtils.createKeyboardListener(activityRootView, new AndroidUtils.KeyboardVisibilityListener() {
 					@Override
 					public void onVisibilityChanged(boolean isVisible) {
-						if(mCurrentKeyboardVisility != isVisible) {
+						if (mCurrentKeyboardVisility != isVisible) {
 							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
 
@@ -311,12 +313,12 @@ public class OrderFragment extends Fragment {
 							mCurrentKeyboardVisility = isVisible;
 							editAmount.setCursorVisible(isVisible);
 
-							if(isVisible) {
+							if (isVisible) {
 								mMode = MODE_AMOUNT;
 								mLastAmount = getEnteredAmount();
 								txtPaymentTitle.setText(R.string.i_m_going_to_pay);
 							} else {
-								if(!mApply) {
+								if (!mApply) {
 									editAmount.setText(StringUtils.formatCurrency(mLastAmount, getCurrencySuffix()));
 								} else {
 									editAmount.setText(StringUtils.formatCurrency(editAmount.getText().toString(), getCurrencySuffix()));
@@ -349,7 +351,7 @@ public class OrderFragment extends Fragment {
 		final CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(final CompoundButton btn, final boolean isChecked) {
-				if(isChecked) {
+				if (isChecked) {
 					mCheckedId = btn.getId();
 					final double amount = getEnteredAmount();
 					updatePaymentTipsAmount(btn, amount);
@@ -389,6 +391,9 @@ public class OrderFragment extends Fragment {
 
 	private void updateCustomTipsText(final int newVal) {
 		txtCustomTips.setText(getString(R.string.tip_percent, String.valueOf(newVal)));
+		final double tips = OrderHelper.getTipsAmount(getEnteredAmount(), newVal);
+		final String tipsFormatted = StringUtils.formatCurrency(tips, getCurrencySuffix());
+		txtTipsAmountHint.setText("или " + tipsFormatted);
 	}
 
 	private void showCustomTips(boolean visible) {
@@ -402,6 +407,7 @@ public class OrderFragment extends Fragment {
 		radioGroup.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
 		txtPaymentTitle.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
 		txtTipsTitle.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
+		txtTipsAmountHint.setVisibility(visible ? View.VISIBLE : View.GONE);
 
 		btnApply.setAlpha(1);
 		btnApply.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
@@ -412,19 +418,22 @@ public class OrderFragment extends Fragment {
 
 	private double getEnteredAmount() {
 		final String filtered = StringUtils.filterAmount(editAmount.getText().toString());
+		if (TextUtils.isEmpty(filtered)) {
+			return 0;
+		}
 		return Double.parseDouble(filtered);
 	}
 
 	@OnClick(R.id.btn_apply)
 	protected void doApply(View v) {
-		if(mMode == MODE_AMOUNT) {
+		if (mMode == MODE_AMOUNT) {
 			mApply = true;
 			AndroidUtils.hideKeyboard(getActivity());
 			mPaymentTitleChanged = true;
 			txtPaymentTitle.setText(R.string.i_m_going_to_pay);
 			mMode = WRONG_VALUE;
 		}
-		if(mMode == MODE_TIPS) {
+		if (mMode == MODE_TIPS) {
 			showCustomTips(false);
 
 			btnTips4.setChecked(true);
@@ -438,17 +447,17 @@ public class OrderFragment extends Fragment {
 
 	@OnClick(R.id.btn_cancel)
 	protected void doCancel(View v) {
-		if(mMode == MODE_AMOUNT) {
+		if (mMode == MODE_AMOUNT) {
 			mApply = false;
 			AndroidUtils.hideKeyboard(getActivity());
-			if(!mPaymentTitleChanged) {
+			if (!mPaymentTitleChanged) {
 				txtPaymentTitle.setText(R.string.to_be_paid);
 			}
 			mMode = WRONG_VALUE;
 		}
-		if(mMode == MODE_TIPS) {
+		if (mMode == MODE_TIPS) {
 			showCustomTips(false);
-			if(!btnTips4.getTag().equals(String.valueOf(WRONG_VALUE))) {
+			if (!btnTips4.getTag().equals(String.valueOf(WRONG_VALUE))) {
 				return;
 			}
 			radioGroup.check(mCheckedId);
@@ -461,10 +470,10 @@ public class OrderFragment extends Fragment {
 
 	private double getSelectedTips(final double amount) {
 		final CompoundButton btn = findById(getActivity(), radioGroup.getCheckedRadioButtonId());
-		if(btn == null) {
+		if (btn == null) {
 			return 0;
 		}
-		if(OrderHelper.isPercentTips(mOrder, amount)) {
+		if (OrderHelper.isPercentTips(mOrder, amount)) {
 			final String tag = (String) btn.getTag();
 			final int percent = Integer.parseInt(tag);
 			return OrderHelper.getTipsAmount(amount, percent);
@@ -474,10 +483,10 @@ public class OrderFragment extends Fragment {
 	}
 
 	private double getSelectedTips(final CompoundButton btn, final double amount) {
-		if(btn == null) {
+		if (btn == null) {
 			return 0;
 		}
-		if(OrderHelper.isPercentTips(mOrder, amount)) {
+		if (OrderHelper.isPercentTips(mOrder, amount)) {
 			final String tag = (String) btn.getTag();
 			final int percent = Integer.parseInt(tag);
 			return OrderHelper.getTipsAmount(amount, percent);
@@ -487,7 +496,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private double getOtherTips(final double amount) {
-		if(btnTips4 == null) {
+		if (btnTips4 == null) {
 			return 0;
 		}
 		final String tag = (String) btnTips4.getTag();
@@ -505,23 +514,23 @@ public class OrderFragment extends Fragment {
 	private void updatePaymentTipsAmount(final CompoundButton btn, final double amount) {
 		final boolean percentTips = OrderHelper.isPercentTips(mOrder, amount);
 		final boolean isOther = btn.getId() == R.id.radio_tips_4;
-		if(percentTips && !isOther) {
+		if (percentTips && !isOther) {
 			final String tag = (String) btn.getTag();
 			final int percent = Integer.parseInt(tag);
-			if(percent == WRONG_VALUE) {
+			if (percent == WRONG_VALUE) {
 				btn.setTextSize(mFontSmall);
 				btn.setText(getString(R.string.tips_another));
 				return;
 			}
 			btn.setText(getString(R.string.tip_percent, tag));
-			if(btn.isChecked()) {
+			if (btn.isChecked()) {
 				btn.setTextSize(mFontNormal);
 			} else {
 				btn.setTextSize(mFontSmall);
 			}
 		} else {
-			if(isOther) {
-				if(btn.isChecked()) {
+			if (isOther) {
+				if (btn.isChecked()) {
 					btn.setText(getString(R.string.tip_percent, btn.getTag()));
 					btn.setTextSize(mFontNormal);
 				} else {
@@ -530,7 +539,7 @@ public class OrderFragment extends Fragment {
 				}
 			} else {
 				final int fixedTip = (Integer) btn.getTag(R.id.tip);
-				if(fixedTip == WRONG_VALUE) {
+				if (fixedTip == WRONG_VALUE) {
 					btn.setText(getString(R.string.tips_another));
 					btn.setTextSize(mFontSmall);
 					return;
@@ -543,32 +552,31 @@ public class OrderFragment extends Fragment {
 
 	private void pay(final double amount, final double tip) {
 		final String cardSaved = OmnomApplication.get(getActivity()).getPreferences().getCardData(getActivity());
-		if(!TextUtils.isEmpty(cardSaved)) {
+		if (!TextUtils.isEmpty(cardSaved)) {
 			final CardInfo cardData = gson.fromJson(cardSaved, CardInfo.class);
 			cardData.setCardId(StringUtils.EMPTY_STRING);
 			btnPay.setEnabled(false);
 			final BillRequest request = BillRequest.create(amount, mOrder);
-			mBillSubscription = AndroidObservable.bindActivity(getActivity(), api.bill(request))
-			                                     .subscribe(new Action1<BillResponse>() {
-				                                     @Override
-				                                     public void call(final BillResponse response) {
-					                                     if(!response.hasErrors()) {
-						                                     tryToPay(cardData, response, amount, tip);
-					                                     } else {
-						                                     if(response.getError() != null) {
-							                                     showToast(getActivity(), response.getError());
-						                                     } else if(response.getErrors() != null) {
-							                                     showToast(getActivity(), response.getErrors().toString());
-						                                     }
-						                                     btnPay.setEnabled(true);
-					                                     }
-				                                     }
-			                                     }, new Action1<Throwable>() {
-				                                     @Override
-				                                     public void call(Throwable throwable) {
-					                                     btnPay.setEnabled(true);
-				                                     }
-			                                     });
+			mBillSubscription = AndroidObservable.bindActivity(getActivity(), api.bill(request)).subscribe(new Action1<BillResponse>() {
+				@Override
+				public void call(final BillResponse response) {
+					if (!response.hasErrors()) {
+						tryToPay(cardData, response, amount, tip);
+					} else {
+						if (response.getError() != null) {
+							showToast(getActivity(), response.getError());
+						} else if (response.getErrors() != null) {
+							showToast(getActivity(), response.getErrors().toString());
+						}
+						btnPay.setEnabled(true);
+					}
+				}
+			}, new Action1<Throwable>() {
+				@Override
+				public void call(Throwable throwable) {
+					btnPay.setEnabled(true);
+				}
+			});
 		} else {
 			startActivity(new Intent(getActivity(), AddCardActivity.class));
 		}
@@ -586,17 +594,17 @@ public class OrderFragment extends Fragment {
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
 		mPaySubscription = AndroidObservable.bindActivity(getActivity(), mAcquiring.pay(merchant, paymentInfo))
-		                                    .subscribe(new Action1<AcquiringPollingResponse>() {
-			                                    @Override
-			                                    public void call(AcquiringPollingResponse response) {
-				                                    onPayOk(response);
-			                                    }
-		                                    }, new Action1<Throwable>() {
-			                                    @Override
-			                                    public void call(Throwable throwable) {
-				                                    onPayError(throwable);
-			                                    }
-		                                    });
+				.subscribe(new Action1<AcquiringPollingResponse>() {
+					@Override
+					public void call(AcquiringPollingResponse response) {
+						onPayOk(response);
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						onPayError(throwable);
+					}
+				});
 	}
 
 	private void onPayError(Throwable throwable) {
@@ -622,7 +630,7 @@ public class OrderFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		gson = new Gson();
-		if(getArguments() != null) {
+		if (getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mRestaurantColor = getArguments().getInt(ARG_COLOR);
 		}

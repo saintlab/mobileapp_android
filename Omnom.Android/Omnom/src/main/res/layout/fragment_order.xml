@@ -153,8 +153,6 @@
                 android:layout_height="22dp"
                 android:layout_margin="28dp"
                 android:background="@drawable/ic_cancel_editing_button"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/txt_payment_title"
                 android:visibility="invisible"/>
 
             <EditText
@@ -177,7 +175,8 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:singleLine="true"
-                android:textSize="40sp"
+                android:ellipsize="end"
+                android:textSize="@dimen/font_xlarge"
                 android:textColor="?android:textColorPrimaryInverse"
                 omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
                 android:background="@drawable/textfield_default_mtrl_white"
@@ -189,27 +188,23 @@
                 android:layout_height="34dp"
                 android:layout_margin="28dp"
                 android:background="@drawable/ic_done_editing_button"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/txt_payment_title"
                 android:visibility="invisible"/>
 
         </LinearLayout>
 
-        <!--<TextView
-            android:id="@+id/edit_custom_tips"
-            android:layout_above="@id/txt_tips_title"
-            android:layout_width="match_parent"
-            android:layout_marginBottom="@dimen/activity_vertical_margin_medium_large"
-            android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/txt_tips_amount_hint"
             android:layout_centerHorizontal="true"
-            android:gravity="center"
-            android:inputType="numberDecimal"
+            android:layout_below="@id/panel_linear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-40dp"
             android:singleLine="true"
-            android:textSize="40sp"
+            android:ellipsize="end"
+            android:textSize="@dimen/font_medium"
             android:textColor="?android:textColorPrimaryInverse"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-            android:background="@drawable/textfield_default_mtrl_white"
-            android:visibility="gone"/>-->
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/txt_payment_title"
