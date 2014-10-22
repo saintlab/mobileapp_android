@@ -39,6 +39,7 @@
     <string name="order_paid">Оплачено: %1$s</string>
     <string name="pay_amount">Оплатить %1$s</string>
     <string name="tip_percent">%1$s%%</string>
+    <string name="tip_hint_or">или %1$s</string>
     <string name="i_m_going_to_pay">Я оплачу</string>
     <string name="to_be_paid">К оплате</string>
     <string name="tips_another">другой</string>
