@@ -9,9 +9,11 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -184,13 +186,11 @@ public class OrderFragment extends Fragment {
 
 	private int mRestaurantColor;
 
-	public OrderFragment() {
-	}
+	private float mFontNormal;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		OmnomApplication.get(getActivity()).inject(this);
-		return inflater.inflate(R.layout.fragment_order, container, false);
+	private float mFontSmall;
+
+	public OrderFragment() {
 	}
 
 	private String getCurrencySuffix() {
@@ -198,29 +198,25 @@ public class OrderFragment extends Fragment {
 	}
 
 	@Override
-	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+		OmnomApplication.get(getActivity()).inject(this);
+		final View view = inflater.inflate(R.layout.fragment_order, container, false);
 		ButterKnife.inject(this, view);
+		return view;
+	}
+
+	@Override
+	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+
+		mFontNormal = getResources().getDimension(R.dimen.font_normal);
+		mFontSmall = getResources().getDimension(R.dimen.font_xsmall);
 
 		rootView.setBackgroundColor(mRestaurantColor);
 		btnPay.setTextColor(mRestaurantColor);
 
-		pickerTips.setMinValue(PICKER_MIN_VALUE);
-		pickerTips.setMaxValue(PICKER_MAX_VALUE);
-		pickerTips.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-		pickerTips.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-			@Override
-			public void onValueChange(final NumberPicker picker, final int oldVal, final int newVal) {
-				updateCustomTipsText(newVal);
-			}
-		});
-		pickerTips.setValue(0);
+		initPicker();
 		updateCustomTipsText(0);
-
-		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
-		list.setSelection(mOrder.getItems().size() - 1);
-		// list.setTranslationY(-600);
-		// list.setEnabled(false);
-		// list.setScrollingEnabled(false);
+		initList();
 
 		btnPay.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -230,47 +226,76 @@ public class OrderFragment extends Fragment {
 			}
 		});
 
-		btnTips4.setOnClickListener(new View.OnClickListener() {
+		initRadioButtons();
+		initFooter();
+		initKeyboardListener();
+		initAmount();
+
+		btnTips2.setChecked(true);
+		final double amount = getEnteredAmount();
+
+		updatePaymentTipsAmount(btnTips1, amount);
+		updatePaymentTipsAmount(btnTips2, amount);
+		updatePaymentTipsAmount(btnTips3, amount);
+		updatePaymentTipsAmount(btnTips4, amount);
+	}
+
+	private void initList() {
+		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
+		AndroidUtils.scrollEnd(list);
+		// list.setTranslationY(-LIST_TRANSLATION_Y);
+		// list.setEnabled(false);
+		// list.setScrollingEnabled(false);
+	}
+
+	private void initAmount() {
+		editAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
-			public void onClick(final View v) {
-				showCustomTips(true);
+			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
+				if(actionId == EditorInfo.IME_ACTION_DONE) {
+					doApply(v);
+					return true;
+				}
+				return false;
 			}
 		});
-
-		final CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener() {
+		editAmount.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void onCheckedChanged(final CompoundButton btn, final boolean isChecked) {
-				if(isChecked) {
-					mCheckedId = btn.getId();
-					final double amount = getEnteredAmount();
-					updatePaymentTipsAmount(btn, amount);
-					btnTips4.setTag(String.valueOf(WRONG_VALUE));
-					btnTips4.setChecked(false);
-					updatePaymentTipsAmount(btnTips4, amount);
-					btnPay.setText("Оплатить " + (amount + getSelectedTips(btn, amount)) + getCurrencySuffix());
-				} else {
-					final double amount = getEnteredAmount();
-					updatePaymentTipsAmount(btn, amount);
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				final String str = s.toString();
+				if(!str.endsWith(getCurrencySuffix())) {
+					final String text = editAmount.getText() + getCurrencySuffix();
+					editAmount.setText(text);
+					editAmount.setSelection(text.length() - 1);
+				}
+				final double amount = getEnteredAmount();
+				updatePaymentTipsAmount(amount);
+				btnPay.setText(getString(R.string.pay_amount, (amount + getSelectedTips(amount)) + getCurrencySuffix()));
+			}
+		});
+		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
+		editAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if(hasFocus) {
+					int length = editAmount.getText().length();
+					if(length >= 2) {
+						editAmount.setSelection(length - 2);
+					}
 				}
 			}
-		};
+		});
+	}
 
-		btnTips1.setOnCheckedChangeListener(listener);
-		btnTips1.setTag(R.id.tip, 30);
-		btnTips2.setOnCheckedChangeListener(listener);
-		btnTips2.setTag(R.id.tip, 50);
-		btnTips3.setOnCheckedChangeListener(listener);
-		btnTips3.setTag(R.id.tip, 100);
-		btnTips4.setTag(R.id.tip, WRONG_VALUE);
-
-		final View footerView = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
-		list.addFooterView(footerView);
-		txtFooterAmount = (TextView) footerView.findViewById(R.id.txt_overall);
-		txtFooterAmount.setText(getString(R.string.order_overall, StringUtils.formatCurrency(mOrder.getTotalAmount())));
-
-		txtFooterToPay = (TextView) footerView.findViewById(R.id.txt_to_pay);
-		txtFooterToPay.setText(getString(R.string.order_paid, StringUtils.formatCurrency(mOrder.getPaidAmount())));
-
+	private void initKeyboardListener() {
 		final View activityRootView = ((ViewGroup) getActivity().findViewById(android.R.id.content)).getChildAt(0);
 		activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(
 				AndroidUtils.createKeyboardListener(activityRootView, new AndroidUtils.KeyboardVisibilityListener() {
@@ -302,52 +327,68 @@ public class OrderFragment extends Fragment {
 						}
 					}
 				}));
-
-		editAmount.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				final String str = s.toString();
-				if(!str.endsWith(getCurrencySuffix())) {
-					final String text = editAmount.getText() + getCurrencySuffix();
-					editAmount.setText(text);
-					editAmount.setSelection(text.length() - 1);
-				}
-				final double amount = getEnteredAmount();
-				updatePaymentTipsAmount(amount);
-				btnPay.setText("Оплатить " + (amount + getSelectedTips(amount)) + getCurrencySuffix());
-			}
-		});
-		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
-		editAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if(hasFocus) {
-					int length = editAmount.getText().length();
-					if(length >= 2) {
-						editAmount.setSelection(length - 2);
-					}
-				}
-			}
-		});
-
-		btnTips2.setChecked(true);
-		final double amount = getEnteredAmount();
-
-		updatePaymentTipsAmount(btnTips1, amount);
-		updatePaymentTipsAmount(btnTips2, amount);
-		updatePaymentTipsAmount(btnTips3, amount);
-		updatePaymentTipsAmount(btnTips4, amount);
 	}
 
-	private void updateCustomTipsText(final int newVal) {txtCustomTips.setText(newVal + "%");}
+	private void initFooter() {
+		final View footerView = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
+		list.addFooterView(footerView);
+		txtFooterAmount = (TextView) footerView.findViewById(R.id.txt_overall);
+		txtFooterAmount.setText(getString(R.string.order_overall, StringUtils.formatCurrency(mOrder.getTotalAmount())));
+
+		txtFooterToPay = (TextView) footerView.findViewById(R.id.txt_to_pay);
+		txtFooterToPay.setText(getString(R.string.order_paid, StringUtils.formatCurrency(mOrder.getPaidAmount())));
+	}
+
+	private void initRadioButtons() {
+		btnTips4.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				showCustomTips(true);
+			}
+		});
+		final CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(final CompoundButton btn, final boolean isChecked) {
+				if(isChecked) {
+					mCheckedId = btn.getId();
+					final double amount = getEnteredAmount();
+					updatePaymentTipsAmount(btn, amount);
+					btnTips4.setTag(String.valueOf(WRONG_VALUE));
+					btnTips4.setChecked(false);
+					updatePaymentTipsAmount(btnTips4, amount);
+					btnPay.setText(getString(R.string.pay_amount, (amount + getSelectedTips(btn, amount)) + getCurrencySuffix()));
+				} else {
+					final double amount = getEnteredAmount();
+					updatePaymentTipsAmount(btn, amount);
+				}
+			}
+		};
+
+		btnTips1.setOnCheckedChangeListener(listener);
+		btnTips1.setTag(R.id.tip, 30);
+		btnTips2.setOnCheckedChangeListener(listener);
+		btnTips2.setTag(R.id.tip, 50);
+		btnTips3.setOnCheckedChangeListener(listener);
+		btnTips3.setTag(R.id.tip, 100);
+		btnTips4.setTag(R.id.tip, WRONG_VALUE);
+	}
+
+	private void initPicker() {
+		pickerTips.setMinValue(PICKER_MIN_VALUE);
+		pickerTips.setMaxValue(PICKER_MAX_VALUE);
+		pickerTips.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+		pickerTips.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+			@Override
+			public void onValueChange(final NumberPicker picker, final int oldVal, final int newVal) {
+				updateCustomTipsText(newVal);
+			}
+		});
+		pickerTips.setValue(0);
+	}
+
+	private void updateCustomTipsText(final int newVal) {
+		txtCustomTips.setText(getString(R.string.tip_percent, newVal));
+	}
 
 	private void showCustomTips(boolean visible) {
 		list.animate().translationYBy(visible ? -LIST_TRANSLATION_Y : LIST_TRANSLATION_Y).start();
@@ -389,7 +430,7 @@ public class OrderFragment extends Fragment {
 			btnTips4.setTag(String.valueOf(pickerTips.getValue()));
 			final double amount = getEnteredAmount();
 			updatePaymentTipsAmount(btnTips4, amount);
-			btnPay.setText("Оплатить " + (amount + getSelectedTips(btnTips4, amount)) + getCurrencySuffix());
+			btnPay.setText(getString(R.string.pay_amount, (amount + getOtherTips(amount)) + getCurrencySuffix()));
 		}
 	}
 
@@ -443,6 +484,15 @@ public class OrderFragment extends Fragment {
 		}
 	}
 
+	private double getOtherTips(final double amount) {
+		if(btnTips4 == null) {
+			return 0;
+		}
+		final String tag = (String) btnTips4.getTag();
+		final int percent = Integer.parseInt(tag);
+		return OrderHelper.getTipsAmount(amount, percent);
+	}
+
 	private void updatePaymentTipsAmount(double amount) {
 		updatePaymentTipsAmount(btnTips1, amount);
 		updatePaymentTipsAmount(btnTips2, amount);
@@ -457,34 +507,34 @@ public class OrderFragment extends Fragment {
 			final String tag = (String) btn.getTag();
 			final int percent = Integer.parseInt(tag);
 			if(percent == WRONG_VALUE) {
-				btn.setTextSize(getResources().getDimension(R.dimen.font_xsmall));
+				btn.setTextSize(mFontSmall);
 				btn.setText(getString(R.string.tips_another));
 				return;
 			}
-			btn.setText(percent + "%");
+			btn.setText(getString(R.string.tip_percent, percent));
 			if(btn.isChecked()) {
-				btn.setTextSize(getResources().getDimension(R.dimen.font_normal));
+				btn.setTextSize(mFontNormal);
 			} else {
-				btn.setTextSize(getResources().getDimension(R.dimen.font_xsmall));
+				btn.setTextSize(mFontSmall);
 			}
 		} else {
 			if(isOther) {
 				if(btn.isChecked()) {
-					btn.setText(btn.getTag() + "%");
-					btn.setTextSize(getResources().getDimension(R.dimen.font_normal));
+					btn.setText(getString(R.string.tip_percent, btn.getTag()));
+					btn.setTextSize(mFontNormal);
 				} else {
 					btn.setText(getString(R.string.tips_another));
-					btn.setTextSize(getResources().getDimension(R.dimen.font_xsmall));
+					btn.setTextSize(mFontSmall);
 				}
 			} else {
 				final int fixedTip = (Integer) btn.getTag(R.id.tip);
 				if(fixedTip == WRONG_VALUE) {
 					btn.setText(getString(R.string.tips_another));
-					btn.setTextSize(getResources().getDimension(R.dimen.font_xsmall));
+					btn.setTextSize(mFontSmall);
 					return;
 				}
-				btn.setText(String.valueOf(fixedTip) + "%");
-				btn.setTextSize(getResources().getDimension(R.dimen.font_normal));
+				btn.setText(String.valueOf(fixedTip));
+				btn.setTextSize(mFontNormal);
 			}
 		}
 	}
