@@ -52,7 +52,7 @@
             android:layout_alignParentBottom="true"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
-            android:background="@android:color/white"
+            android:background="@color/white_transparent"
             android:orientation="horizontal"
             android:visibility="gone">
 

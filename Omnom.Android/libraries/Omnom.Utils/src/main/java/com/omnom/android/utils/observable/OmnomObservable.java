@@ -6,6 +6,11 @@ import android.view.View;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.OmnomActivity;
 
+import java.util.Collections;
+
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.mime.TypedString;
 import rx.Subscription;
 import rx.functions.Func1;
 
@@ -17,6 +22,11 @@ public class OmnomObservable {
 		if(subscription != null && !subscription.isUnsubscribed()) {
 			subscription.unsubscribe();
 		}
+	}
+
+	public static RetrofitError createRetrofitError(final String url, final String errorText, final int statusCode) {
+		final Response response = new Response(url, statusCode, errorText, Collections.EMPTY_LIST, new TypedString(errorText));
+		return RetrofitError.httpError(url, response, null, RetrofitError.class);
 	}
 
 	public static Func1<ValidationObservable.Error, Boolean> getValidationFunc(final Activity activity,

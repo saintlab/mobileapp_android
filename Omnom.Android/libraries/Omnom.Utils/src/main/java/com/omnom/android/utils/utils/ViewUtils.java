@@ -4,9 +4,12 @@ import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
 
+import java.util.List;
+
 import butterknife.ButterKnife;
 
 import static com.omnom.android.utils.utils.AnimationUtils.animateAlpha;
+import static com.omnom.android.utils.utils.AnimationUtils.animateAlpha2;
 
 /**
  * Created by Ch3D on 29.07.2014.
@@ -31,6 +34,13 @@ public class ViewUtils {
 		@Override
 		public void set(View view, Boolean value, int index) {
 			animateAlpha(view, value);
+		}
+	};
+
+	public static final ButterKnife.Setter<View, Boolean> VISIBLITY_ALPHA2 = new ButterKnife.Setter<View, Boolean>() {
+		@Override
+		public void set(View view, Boolean value, int index) {
+			animateAlpha2(view, value);
 		}
 	};
 
@@ -62,6 +72,17 @@ public class ViewUtils {
 			view.setVisibility(visible ? View.VISIBLE : View.GONE);
 			view.setTag(visible);
 		}
+	}
+
+	public static void setVisible2(View view, boolean visible) {
+		if(view != null) {
+			view.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+			view.setTag(visible);
+		}
+	}
+
+	public static void setVisible(List<View> buttonViews, boolean visible) {
+		ButterKnife.apply(buttonViews, VISIBLITY, visible);
 	}
 
 	public static void fixPasswordTypeface(EditText editText, EditText like) {

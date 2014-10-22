@@ -29,13 +29,13 @@ public class EnteringActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.btn_register)
 	public void doRegister() {
 		final Intent intent = new Intent(this, UserRegisterActivity.class);
-		startActivity(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, true);
+		startActivity(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
 	}
 
 	@OnClick(R.id.btn_enter)
 	public void doEnter() {
 		final Intent intent = new Intent(this, LoginActivity.class);
-		startActivity(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, true);
+		startActivity(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.omnom.android.restaurateur.model;
 
+import android.text.TextUtils;
+
 import com.google.gson.annotations.Expose;
 
 /**
@@ -28,7 +30,7 @@ public class ResponseBase {
 	}
 
 	public boolean hasErrors() {
-		return errors != null && errors != null;
+		return !TextUtils.isEmpty(error) || errors != null;
 	}
 
 	public boolean hasAuthError() {

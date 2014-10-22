@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,7 +50,11 @@ public class AndroidUtils {
 
 	public static void hideKeyboard(Activity activity) {
 		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+		imm.hideSoftInputFromWindow(activity.getWindow().peekDecorView().getWindowToken(), 0);
+	}
+
+	public static void scrollEnd(final ListView list) {
+		list.setSelection(list.getCount() - 1);
 	}
 
 	public static ViewTreeObserver.OnGlobalLayoutListener createKeyboardListener(final View view,

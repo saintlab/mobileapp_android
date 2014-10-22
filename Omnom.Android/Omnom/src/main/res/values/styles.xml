@@ -12,7 +12,15 @@
         <item name="android:ratingBarStyle">@style/RatingBar</item>
     </style>
 
+    <style name="AppTheme.Light">
+        <item name="android:editTextStyle">@style/EditText.White</item>
+    </style>
+
     <style name="Theme.Wood" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/bg_wood</item>
+    </style>
+
+    <style name="Theme.Wood.Light" parent="AppTheme.Light">
         <item name="android:windowBackground">@drawable/bg_wood</item>
     </style>
 
@@ -63,6 +71,10 @@
 
     <style name="EditText" parent="android:Widget.Holo.Light.EditText">
         <item name="android:background">@drawable/edit_text</item>
+    </style>
+
+    <style name="EditText.White">
+        <item name="android:background">@drawable/edit_text_white</item>
     </style>
 
     <style name="EditText.Login">

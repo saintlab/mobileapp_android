@@ -32,6 +32,7 @@ import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
+import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -50,6 +51,8 @@ import butterknife.InjectViews;
 import butterknife.OnClick;
 import retrofit.RetrofitError;
 import rx.Observable;
+import rx.Subscription;
+import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
@@ -131,6 +134,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	private Restaurant mRestaurant;
 	private TableDataResponse mTable;
 	private boolean mWaiterCalled;
+	private Subscription mOrdersSubscription;
+	private Subscription mWaiterCallSubscribtion;
+	private Subscription mUserSubscription;
+	private Subscription mGuestSubscribtion;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -160,6 +167,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		loader.onDestroy();
+		OmnomObservable.unsubscribe(mOrdersSubscription);
+		OmnomObservable.unsubscribe(mWaiterCallSubscribtion);
+		OmnomObservable.unsubscribe(mUserSubscription);
+		OmnomObservable.unsubscribe(mGuestSubscribtion);
 	}
 
 	@Override
@@ -222,21 +233,23 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.btn_bill)
 	public void onBill(final View v) {
-		api.getOrders(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<List<Order>>() {
-			@Override
-			public void call(List<Order> orders) {
-				if(!orders.isEmpty()) {
-					OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders));
-				} else {
-					showToastLong(getActivity(), R.string.there_are_no_orders_on_this_table);
-				}
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
+		mOrdersSubscription = AndroidObservable.bindActivity(this, api.getOrders(mTable.getRestaurantId(), mTable.getId()))
+		                                       .subscribe(new Action1<List<Order>>() {
+			                                       @Override
+			                                       public void call(List<Order> orders) {
+				                                       if(!orders.isEmpty()) {
+					                                       OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders),
+					                                                            mRestaurant.getDecoration().getBackgroundColor());
+				                                       } else {
+					                                       showToastLong(getActivity(), R.string.there_are_no_orders_on_this_table);
+				                                       }
+			                                       }
+		                                       }, new Action1<Throwable>() {
+			                                       @Override
+			                                       public void call(Throwable throwable) {
 
-			}
-		});
+			                                       }
+		                                       });
 	}
 
 	@OnClick(R.id.btn_waiter)
@@ -247,19 +260,20 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		} else {
 			observable = api.waiterCallStop(mRestaurant.getId(), mTable.getId());
 		}
-		observable.subscribe(new Action1<WaiterCallResponse>() {
-			@Override
-			public void call(WaiterCallResponse tableDataResponse) {
-				if(tableDataResponse.isSuccess()) {
-					mWaiterCalled = !mWaiterCalled;
-				}
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				// TODO:
-			}
-		});
+		mWaiterCallSubscribtion = AndroidObservable.bindActivity(this, observable)
+		                                           .subscribe(new Action1<WaiterCallResponse>() {
+			                                           @Override
+			                                           public void call(WaiterCallResponse tableDataResponse) {
+				                                           if(tableDataResponse.isSuccess()) {
+					                                           mWaiterCalled = !mWaiterCalled;
+				                                           }
+			                                           }
+		                                           }, new Action1<Throwable>() {
+			                                           @Override
+			                                           public void call(Throwable throwable) {
+				                                           // TODO:
+			                                           }
+		                                           });
 	}
 
 	@OnClick(R.id.btn_down)
@@ -290,29 +304,32 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		mTable = table;
 
 		final String token = OmnomApplication.get(getActivity()).getAuthToken();
-		authenticator.getUser(token).subscribe(new Action1<UserResponse>() {
-			@Override
-			public void call(UserResponse userResponse) {
-				OmnomApplication.get(getActivity()).cacheUserProfile(userResponse.getUser());
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
+		mUserSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token))
+		                                     .subscribe(new Action1<UserResponse>() {
+			                                     @Override
+			                                     public void call(UserResponse userResponse) {
+				                                     OmnomApplication.get(getActivity()).cacheUserProfile(userResponse.getUser());
+			                                     }
+		                                     }, new Action1<Throwable>() {
+			                                     @Override
+			                                     public void call(Throwable throwable) {
 
-			}
-		});
+			                                     }
+		                                     });
 
-		api.newGuest(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<ResponseBase>() {
-			@Override
-			public void call(ResponseBase responseBase) {
+		mGuestSubscribtion = AndroidObservable.bindActivity(this, api.newGuest(mTable.getRestaurantId(), mTable.getId()))
+		                                      .subscribe(
+				                                      new Action1<ResponseBase>() {
+					                                      @Override
+					                                      public void call(ResponseBase responseBase) {
 
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
+					                                      }
+				                                      }, new Action1<Throwable>() {
+					                                      @Override
+					                                      public void call(Throwable throwable) {
 
-			}
-		});
+					                                      }
+				                                      });
 
 		loader.post(new Runnable() {
 			@Override

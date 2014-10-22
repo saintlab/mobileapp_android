@@ -33,7 +33,15 @@
     <string name="bill">Счет</string>
     <string name="title_activity_orders">OrdersActivity</string>
     <string name="there_are_no_orders_on_this_table">На данном столе нет заказов</string>
-    <string name="other_tips">Другой</string>
     <string name="title_activity_add_card">AddCardActivity</string>
 
+    <string name="order_overall">Итого: %1$s</string>
+    <string name="order_paid">Оплачено: %1$s</string>
+    <string name="pay_amount">Оплатить %1$s</string>
+    <string name="tip_percent">%1$s%%</string>
+    <string name="tip_hint_or">или %1$s</string>
+    <string name="i_m_going_to_pay">Я оплачу</string>
+    <string name="to_be_paid">К оплате</string>
+    <string name="tips_another">другой</string>
+    <string name="tips">Чаевые</string>
 </resources>

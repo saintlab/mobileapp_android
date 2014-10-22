@@ -6,6 +6,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
+import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.view.LoginPanelTop;
@@ -23,6 +25,8 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import rx.Observable;
+import rx.Subscription;
+import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
 public class ConfirmPhoneActivity extends BaseOmnomActivity {
@@ -89,6 +93,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	private String phone;
 	private boolean mFirstStart = true;
 	private int type;
+	private Subscription mConfirmSubscription;
 
 	@Override
 	public void initUi() {
@@ -125,42 +130,47 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	}
 
 	private void doConfirm() {
-		getObservable().subscribe(new Action1<AuthResponse>() {
-			@Override
-			public void call(final AuthResponse authResponse) {
-				if(!authResponse.hasError()) {
-					if(type == TYPE_REGISTER) {
-						getMixPanel().alias(phone, null);
-					} else {
-						getMixPanel().identify(phone);
-					}
-					getPreferences().setAuthToken(getActivity(), authResponse.getToken());
-					topPanel.setContentVisibility(false, false);
-					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
-						@Override
-						public void run() {
-							ConfirmPhoneActivity.this.finish();
-							ValidateActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short,
-							                       EXTRA_LOADER_ANIMATION_SCALE_UP);
-						}
-					});
-				} else {
-					edit1.setText(StringUtils.EMPTY_STRING);
-					edit2.setText(StringUtils.EMPTY_STRING);
-					edit3.setText(StringUtils.EMPTY_STRING);
-					edit4.setText(StringUtils.EMPTY_STRING);
-					edit1.requestFocus();
-					final Animation animation = android.view.animation.AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
-					panelDigits.startAnimation(animation);
-				}
-			}
-		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			@Override
-			public void onError(Throwable throwable) {
-				Log.e(TAG, "doConfirm", throwable);
-				finish();
-			}
-		});
+		mConfirmSubscription = AndroidObservable.bindActivity(this, getObservable())
+		                                        .subscribe(new Action1<AuthResponse>() {
+			                                        @Override
+			                                        public void call(final AuthResponse authResponse) {
+				                                        if(!authResponse.hasError()) {
+					                                        if(type == TYPE_REGISTER) {
+						                                        getMixPanel().alias(phone, null);
+					                                        } else {
+						                                        getMixPanel().identify(phone);
+					                                        }
+					                                        getPreferences().setAuthToken(getActivity(), authResponse.getToken());
+					                                        topPanel.setContentVisibility(false, false);
+					                                        postDelayed(getResources().getInteger(
+							                                        R.integer.default_animation_duration_short), new Runnable() {
+						                                        @Override
+						                                        public void run() {
+							                                        ConfirmPhoneActivity.this.finish();
+							                                        ValidateActivity.start(ConfirmPhoneActivity.this,
+							                                                               R.anim.fake_fade_in_short,
+							                                                               R.anim.fake_fade_out_short,
+							                                                               EXTRA_LOADER_ANIMATION_SCALE_UP);
+						                                        }
+					                                        });
+				                                        } else {
+					                                        edit1.setText(StringUtils.EMPTY_STRING);
+					                                        edit2.setText(StringUtils.EMPTY_STRING);
+					                                        edit3.setText(StringUtils.EMPTY_STRING);
+					                                        edit4.setText(StringUtils.EMPTY_STRING);
+					                                        edit1.requestFocus();
+					                                        final Animation animation = AnimationUtils.loadAnimation(getActivity(),
+					                                                                                                 R.anim.shake);
+					                                        panelDigits.startAnimation(animation);
+				                                        }
+			                                        }
+		                                        }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			                                        @Override
+			                                        public void onError(Throwable throwable) {
+				                                        Log.e(TAG, "doConfirm", throwable);
+				                                        finish();
+			                                        }
+		                                        });
 	}
 
 	private Observable<AuthResponse> getObservable() {
@@ -184,6 +194,12 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		super.handleIntent(intent);
 		phone = intent.getStringExtra(EXTRA_PHONE);
 		type = intent.getIntExtra(EXTRA_CONFIRM_TYPE, TYPE_REGISTER);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		OmnomObservable.unsubscribe(mConfirmSubscription);
 	}
 
 	@Override
