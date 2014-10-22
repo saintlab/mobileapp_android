@@ -356,7 +356,8 @@ public class OrderFragment extends Fragment {
 					btnTips4.setTag(String.valueOf(WRONG_VALUE));
 					btnTips4.setChecked(false);
 					updatePaymentTipsAmount(btnTips4, amount);
-					btnPay.setText(getString(R.string.pay_amount, (amount + getSelectedTips(btn, amount)) + getCurrencySuffix()));
+					final String s = String.valueOf((amount + getSelectedTips(btn, amount)) + getCurrencySuffix());
+					btnPay.setText(getString(R.string.pay_amount, s));
 				} else {
 					final double amount = getEnteredAmount();
 					updatePaymentTipsAmount(btn, amount);
@@ -387,7 +388,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void updateCustomTipsText(final int newVal) {
-		txtCustomTips.setText(getString(R.string.tip_percent, newVal));
+		txtCustomTips.setText(getString(R.string.tip_percent, String.valueOf(newVal)));
 	}
 
 	private void showCustomTips(boolean visible) {
@@ -430,7 +431,8 @@ public class OrderFragment extends Fragment {
 			btnTips4.setTag(String.valueOf(pickerTips.getValue()));
 			final double amount = getEnteredAmount();
 			updatePaymentTipsAmount(btnTips4, amount);
-			btnPay.setText(getString(R.string.pay_amount, (amount + getOtherTips(amount)) + getCurrencySuffix()));
+			final String s = String.valueOf((amount + getOtherTips(amount)) + getCurrencySuffix());
+			btnPay.setText(getString(R.string.pay_amount, s));
 		}
 	}
 
@@ -511,7 +513,7 @@ public class OrderFragment extends Fragment {
 				btn.setText(getString(R.string.tips_another));
 				return;
 			}
-			btn.setText(getString(R.string.tip_percent, percent));
+			btn.setText(getString(R.string.tip_percent, tag));
 			if(btn.isChecked()) {
 				btn.setTextSize(mFontNormal);
 			} else {
