@@ -419,6 +419,8 @@ public class OrderFragment extends Fragment {
 		btnCancel.setAlpha(1);
 		btnCancel.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
 		mMode = visible ? MODE_TIPS : WRONG_VALUE;
+
+		updateCustomTipsText(pickerTips.getValue());
 	}
 
 	private BigDecimal getEnteredAmount() {
@@ -478,7 +480,7 @@ public class OrderFragment extends Fragment {
 		if (btn == null) {
 			return BigDecimal.ZERO;
 		}
-		if (OrderHelper.isPercentTips(mOrder, amount)) {
+		if (OrderHelper.isPercentTips(mOrder, amount) || btn.getId() == R.id.radio_tips_4) {
 			final String tag = (String) btn.getTag();
 			final int percent = Integer.parseInt(tag);
 			final int tipsAmount = OrderHelper.getTipsAmount(amount, percent);
