@@ -13,7 +13,6 @@
     <string name="proceed">Продолжить</string>
     <string name="cancel">Отменить</string>
 
-    <string name="logout_user">Выход из аккаунта</string>
     <string name="please_enter_username">Пожалуйста введите логин</string>
     <string name="please_check_internet_connection">Пожалуйста проверьте подключение к сети</string>
 
@@ -21,7 +20,6 @@
     <string name="error_no_restaurants_please_try_again_later">Не найдено ни одного доступоного ресторана. Пожалуйста, попробуйте позже</string>
 
     <string name="error_writing_beacon_data">Ошибка прошивки маячка. Пожалуйста, попробуйте еще раз</string>
-    <string name="error_user_not_found">Невозможно получить данные пользователя. Пожалуйста попробуйте позже</string>
     <string name="title_activity_beacons_chart">BeaconsChartActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

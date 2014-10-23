@@ -1,4 +1,4 @@
-package com.omnom.android.linker.drawable;
+package com.omnom.android.utils.drawable;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;

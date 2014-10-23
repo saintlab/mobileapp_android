@@ -1,4 +1,4 @@
-package com.omnom.android.linker.activity;
+package com.omnom.android.activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,34 +9,30 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.omnom.android.OmnomApplication;
+import com.omnom.android.R;
+import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.UserProfileHelper;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
-import com.omnom.android.linker.LinkerApplication;
-import com.omnom.android.utils.drawable.RoundTransformation;
-import com.omnom.android.utils.drawable.RoundedDrawable;
-import com.omnom.android.linker.R;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
+import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.activity.OmnomActivity;
+import com.omnom.android.utils.drawable.RoundTransformation;
+import com.omnom.android.utils.drawable.RoundedDrawable;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
-import com.omnom.android.utils.Extras;
-import com.omnom.android.utils.activity.BaseActivity;
-import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.InjectViews;
 import butterknife.OnClick;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -46,9 +42,7 @@ import static butterknife.ButterKnife.findById;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
-public class UserProfileActivity extends BaseActivity {
-	public static final int ROTATION_VALUE = 180;
-	public static final int TRANSLATION_Y = -100;
+public class UserProfileActivity extends BaseOmnomActivity {
 	private static final String TAG = UserProfileActivity.class.getSimpleName();
 
 	public static void start(OmnomActivity activity) {
@@ -59,6 +53,12 @@ public class UserProfileActivity extends BaseActivity {
 		final Intent intent = new Intent(activity.getActivity(), UserProfileActivity.class);
 		intent.putExtra(Extras.EXTRA_ANIMATE, animate);
 		activity.startActivity(intent, false);
+	}
+
+	public static void startSliding(OmnomActivity activity) {
+		final Intent intent = new Intent(activity.getActivity(), UserProfileActivity.class);
+		intent.putExtra(Extras.EXTRA_ANIMATE, false);
+		activity.startActivity(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
 	}
 
 	@InjectView(R.id.img_user)
@@ -75,12 +75,6 @@ public class UserProfileActivity extends BaseActivity {
 
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
-
-	@InjectView(R.id.btn_back)
-	protected View mBtnBack;
-
-	@InjectViews({R.id.txt_username, R.id.txt_login, R.id.txt_info})
-	protected List<View> mTxtViews;
 
 	@Inject
 	protected RestaurateurObeservableApi api;
@@ -102,14 +96,15 @@ public class UserProfileActivity extends BaseActivity {
 	@Override
 	public void initUi() {
 		mAnimDuration = getResources().getInteger(R.integer.user_profile_animation_duration);
-		final UserProfile userProfile = LinkerApplication.get(getActivity()).getUserProfile();
+		final UserProfile userProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		if(userProfile != null && userProfile.getUser() != null) {
 			initUserData(userProfile.getUser(), userProfile.getImageUrl());
 		} else {
 			updateUserImage(StringUtils.EMPTY_STRING);
 			final String token = getPreferences().getAuthToken(this);
 			if(TextUtils.isEmpty(token)) {
-				LoginActivity.start(this);
+				// TODO:
+				// LoginActivity.start(this);
 				return;
 			}
 			profileSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(
@@ -118,21 +113,19 @@ public class UserProfileActivity extends BaseActivity {
 						public void call(UserResponse response) {
 							if(response.hasError() && UserProfileHelper.hasAuthError(response)) {
 								getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
-								ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
 								AnimationUtils.animateAlpha(mPanelBottom, false);
-								findById(getActivity(), R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y)
-								                                      .start();
 								AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
 								AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
 									@Override
 									public void run() {
-										LoginActivity.start(getActivity());
+										// TODO:
+										// LoginActivity.start(getActivity());
 									}
 								});
 								return;
 							}
 							UserProfile profile = new UserProfile(response);
-							LinkerApplication.get(getActivity()).cacheUserProfile(profile);
+							OmnomApplication.get(getActivity()).cacheUserProfile(profile);
 							initUserData(response.getUser(), profile.getImageUrl());
 						}
 					}, new BaseErrorHandler(getActivity()) {
@@ -174,7 +167,7 @@ public class UserProfileActivity extends BaseActivity {
 		final int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
 		if(TextUtils.isEmpty(url)) {
 			final RoundedDrawable placeholderDrawable = getPlaceholderDrawable(dimension);
-			mImgUser.setBackground(placeholderDrawable);
+			mImgUser.setBackgroundDrawable(placeholderDrawable);
 			mImgUser.setImageDrawable(getResources().getDrawable(R.drawable.ic_defolt_user));
 			final int padding = ViewUtils.dipToPixels(this, 24);
 			mImgUser.setPadding(padding, padding, padding, padding);
@@ -196,21 +189,6 @@ public class UserProfileActivity extends BaseActivity {
 	}
 
 	@Override
-	protected void onStart() {
-		super.onStart();
-		ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY2, false);
-		if(mFirstRun) {
-			if(mAnimate) {
-				findById(this, R.id.btn_back).setTranslationY(TRANSLATION_Y);
-				findById(this, R.id.btn_back).setRotation(ROTATION_VALUE);
-			}
-			mImgUser.getLayoutParams().width = 0;
-			mImgUser.getLayoutParams().height = 0;
-			mImgUser.requestLayout();
-		}
-	}
-
-	@Override
 	protected void onResume() {
 		super.onResume();
 		final int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
@@ -220,30 +198,15 @@ public class UserProfileActivity extends BaseActivity {
 				if(mAnimate) {
 					findById(getActivity(), R.id.btn_back).animate().rotation(0).translationY(0).start();
 				}
-				AnimationUtils.scale(mImgUser, dimension, mAnimDuration, new Runnable() {
-					@Override
-					public void run() {
-						ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, true);
-					}
-				});
+				AnimationUtils.scale(mImgUser, dimension, mAnimDuration, null);
 			}
 		});
 	}
 
 	@Override
 	public void finish() {
-		if(mAnimate) {
-			findById(this, R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y).start();
-		}
-		ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
-		AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
-		AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
-			@Override
-			public void run() {
-				UserProfileActivity.super.finish();
-				overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-			}
-		});
+		UserProfileActivity.super.finish();
+		overridePendingTransition(R.anim.fake_fade_out_long, R.anim.slide_out_down);
 	}
 
 	@OnClick(R.id.btn_bottom)
@@ -254,14 +217,13 @@ public class UserProfileActivity extends BaseActivity {
 			public void call(AuthResponse authResponseBase) {
 				if(!authResponseBase.hasError()) {
 					getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
-					ButterKnife.apply(mTxtViews, ViewUtils.VISIBLITY_ALPHA, false);
 					AnimationUtils.animateAlpha(mPanelBottom, false);
-					findById(getActivity(), R.id.btn_back).animate().rotation(ROTATION_VALUE).translationY(TRANSLATION_Y).start();
 					AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
 					AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
 						@Override
 						public void run() {
-							LoginActivity.start(getActivity(), null, EXTRA_ERROR_LOGOUT);
+							// TODO:
+							// LoginActivity.start(getActivity(), null, EXTRA_ERROR_LOGOUT);
 						}
 					});
 				} else {

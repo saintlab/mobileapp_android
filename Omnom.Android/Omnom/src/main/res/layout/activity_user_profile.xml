@@ -1,0 +1,63 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/view_btn_back"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/profile_margin_top">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <ImageView
+                android:id="@+id/img_user"
+                android:layout_centerInParent="true"
+                android:layout_width="@dimen/profile_avatar_size"
+                android:layout_height="@dimen/profile_avatar_size"
+                android:src="@drawable/empty_avatar"/>
+
+            <TextView
+                android:id="@+id/txt_username"
+                android:text="Firstname Lastname"
+                style="@style/TextView.User.Data"/>
+
+            <TextView
+                android:id="@+id/txt_login"
+                android:text="firstname.lastname"
+                style="@style/TextView.User.Data"/>
+
+            <TextView
+                android:id="@+id/txt_info"
+                android:text="Restaurant: Admin"
+                style="@style/TextView.User.Data"/>
+
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/panel_bottom"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/delimiter_vertical"/>
+
+        <Button
+            android:id="@+id/btn_bottom"
+            android:text="@string/logout_user"
+            android:textColor="@color/error_red"
+            style="@style/Button.Bottom"/>
+    </LinearLayout>
+
+</FrameLayout>

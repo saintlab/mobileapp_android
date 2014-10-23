@@ -102,8 +102,14 @@
             android:name="com.omnom.android.activity.AddCardActivity"
             android:label="@string/title_activity_add_card"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Wood">
-        </activity>
+            android:theme="@style/Theme.Wood" />
+
+        <activity
+            android:name="com.omnom.android.activity.UserProfileActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
+
     </application>
 
 </manifest>
