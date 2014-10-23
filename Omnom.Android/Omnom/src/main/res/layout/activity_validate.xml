@@ -106,6 +106,7 @@
         android:cropToPadding="true"
         android:scaleType="centerCrop"
         android:layout_gravity="top|right"
-        android:src="@drawable/ic_profile_white"/>
+        android:src="@drawable/ic_profile_white"
+        android:visibility="gone"/>
 
 </FrameLayout>

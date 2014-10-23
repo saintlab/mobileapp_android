@@ -3,9 +3,9 @@ package com.omnom.android.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,7 +25,7 @@ import com.omnom.android.utils.drawable.RoundTransformation;
 import com.omnom.android.utils.drawable.RoundedDrawable;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
-import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
@@ -38,7 +38,6 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
-import static butterknife.ButterKnife.findById;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
@@ -73,8 +72,8 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@InjectView(R.id.txt_info)
 	protected TextView mTxtInfo;
 
-	@InjectView(R.id.panel_bottom)
-	protected View mPanelBottom;
+	@InjectView(R.id.txt_app_info)
+	protected TextView mTxtAppInfo;
 
 	@Inject
 	protected RestaurateurObeservableApi api;
@@ -82,20 +81,28 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@Inject
 	protected AuthService authenticator;
 
-	private boolean mFirstRun = true;
-	private int mAnimDuration;
-	private boolean mAnimate;
 	private Subscription profileSubscription;
+
 	private Subscription logoutSubscription;
 
 	@Override
 	protected void handleIntent(Intent intent) {
-		mAnimate = intent.getBooleanExtra(EXTRA_ANIMATE, false);
+	}
+
+	@OnClick(R.id.btn_feedback)
+	protected void onFeedback() {
+		Intent intent = new Intent(Intent.ACTION_SENDTO);
+		String email = "team@omnom.menu";
+		intent.setData(Uri.parse("mailto:" + email));
+		intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
+		intent.putExtra(Intent.EXTRA_SUBJECT, "Обратная связь");
+		startActivity(Intent.createChooser(intent, "Написать отзыв"));
 	}
 
 	@Override
 	public void initUi() {
-		mAnimDuration = getResources().getInteger(R.integer.user_profile_animation_duration);
+		initAppInfo();
+
 		final UserProfile userProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		if(userProfile != null && userProfile.getUser() != null) {
 			initUserData(userProfile.getUser(), userProfile.getImageUrl());
@@ -103,8 +110,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 			updateUserImage(StringUtils.EMPTY_STRING);
 			final String token = getPreferences().getAuthToken(this);
 			if(TextUtils.isEmpty(token)) {
-				// TODO:
-				// LoginActivity.start(this);
+				forwardToIntro();
 				return;
 			}
 			profileSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(
@@ -113,15 +119,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 						public void call(UserResponse response) {
 							if(response.hasError() && UserProfileHelper.hasAuthError(response)) {
 								getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
-								AnimationUtils.animateAlpha(mPanelBottom, false);
-								AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
-								AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
-									@Override
-									public void run() {
-										// TODO:
-										// LoginActivity.start(getActivity());
-									}
-								});
+								forwardToIntro();
 								return;
 							}
 							UserProfile profile = new UserProfile(response);
@@ -143,6 +141,12 @@ public class UserProfileActivity extends BaseOmnomActivity {
 					});
 		}
 	}
+
+	private void initAppInfo() {
+		mTxtAppInfo.setText(getString(R.string.app_version_build, AndroidUtils.getAppVersion(this)));
+	}
+
+	private void forwardToIntro() {EnteringActivity.start(this);}
 
 	@Override
 	protected void onDestroy() {
@@ -189,21 +193,6 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-		final int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
-		postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
-			@Override
-			public void run() {
-				if(mAnimate) {
-					findById(getActivity(), R.id.btn_back).animate().rotation(0).translationY(0).start();
-				}
-				AnimationUtils.scale(mImgUser, dimension, mAnimDuration, null);
-			}
-		});
-	}
-
-	@Override
 	public void finish() {
 		UserProfileActivity.super.finish();
 		overridePendingTransition(R.anim.fake_fade_out_long, R.anim.slide_out_down);
@@ -217,15 +206,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 			public void call(AuthResponse authResponseBase) {
 				if(!authResponseBase.hasError()) {
 					getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
-					AnimationUtils.animateAlpha(mPanelBottom, false);
-					AnimationUtils.scaleHeight(mImgUser, 0, mAnimDuration);
-					AnimationUtils.scaleWidth(mImgUser, 0, mAnimDuration, new Runnable() {
-						@Override
-						public void run() {
-							// TODO:
-							// LoginActivity.start(getActivity(), null, EXTRA_ERROR_LOGOUT);
-						}
-					});
+					forwardToIntro();
 				} else {
 					showToast(getActivity(), R.string.error_unknown_server_error);
 				}

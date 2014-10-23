@@ -87,7 +87,9 @@
 
     <style name="TextView" parent="android:Widget.Holo.Light.TextView"/>
 
-    <style name="TextView.User"/>
+    <style name="TextView.User">
+        <item name="android:ellipsize">end</item>
+    </style>
 
     <style name="TextView.User.Data">
         <item name="android:layout_width">wrap_content</item>
@@ -95,7 +97,30 @@
         <item name="android:singleLine">true</item>
         <item name="android:paddingTop">8dp</item>
         <item name="android:textAppearance">?android:textAppearanceLarge</item>
-        <item name="fontPath">fonts/Futura-LSF-Omnom-LE-Regular.otf</item>
+        <!--<item name="fontPath">fonts/Futura-LSF-Omnom-LE-Regular.otf</item>-->
+    </style>
+
+    <style name="TextView.User.Data.Hint">
+        <item name="android:textColor">@color/profile_hint</item>
+    </style>
+
+    <style name="TextView.User.Hint">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/profile_hint</item>
+    </style>
+
+    <style name="Button.UserProfile" parent="@android:style/Widget.Holo.Button.Borderless"/>
+
+    <style name="Button.UserProfile.Data">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?android:listPreferredItemHeightSmall</item>
+        <item name="android:paddingLeft">@dimen/activity_horizontal_margin_medium</item>
+        <item name="android:paddingRight">@dimen/activity_horizontal_margin_medium</item>
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:drawableRight">@drawable/ic_arrow_right_icon</item>
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
     </style>
 
     <style name="TextView.Restaurant">

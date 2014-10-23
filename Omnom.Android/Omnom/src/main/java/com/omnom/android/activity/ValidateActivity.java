@@ -116,6 +116,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.panel_bottom)
 	protected View panelBottom;
 
+	@InjectView(R.id.img_profile)
+	protected View imgProfile;
+
 	@InjectView(R.id.img_holder)
 	protected View imgHolder;
 
@@ -363,6 +366,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			public void run() {
 				AnimationUtils.animateAlpha(btnDown, true);
 				ViewUtils.setVisible(imgHolder, true);
+				ViewUtils.setVisible(imgProfile, true);
 				ViewUtils.setVisible(panelBottom, true);
 				panelBottom.animate()
 				           .translationY(0)
