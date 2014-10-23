@@ -46,10 +46,34 @@
 
             <include layout="@layout/delimiter_profile_vertical"/>
 
-            <Button
+
+            <LinearLayout
                 android:id="@+id/btn_table_number"
-                android:text="Столик"
-                style="@style/Button.UserProfile.Data"/>
+                android:layout_width="match_parent"
+                android:layout_height="?android:listPreferredItemHeightSmall"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+                android:paddingRight="@dimen/activity_horizontal_margin_medium"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:text="Столик"
+                    android:drawableRight="@null"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:padding="0dp"
+                    style="@style/Button.UserProfile.Data"/>
+
+                <TextView
+                    android:id="@+id/txt_table_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    android:drawableLeft="@drawable/ic_arrow_right_icon"
+                    android:drawableRight="@drawable/ic_arrow_right_icon"/>
+
+            </LinearLayout>
 
             <include layout="@layout/delimiter_profile_vertical"/>
 

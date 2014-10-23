@@ -315,7 +315,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.img_profile)
 	protected void onProfile(View v) {
-		UserProfileActivity.startSliding(this);
+		UserProfileActivity.startSliding(this, mTable.getInternalId());
 	}
 
 	protected final void onDataLoaded(final Restaurant restaurant, TableDataResponse table) {

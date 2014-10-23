@@ -19,7 +19,6 @@ import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
-import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.drawable.RoundTransformation;
 import com.omnom.android.utils.drawable.RoundedDrawable;
@@ -44,19 +43,10 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 public class UserProfileActivity extends BaseOmnomActivity {
 	private static final String TAG = UserProfileActivity.class.getSimpleName();
 
-	public static void start(OmnomActivity activity) {
-		start(activity, false);
-	}
-
-	public static void start(OmnomActivity activity, boolean animate) {
+	public static void startSliding(OmnomActivity activity, final int tableNumber) {
 		final Intent intent = new Intent(activity.getActivity(), UserProfileActivity.class);
-		intent.putExtra(Extras.EXTRA_ANIMATE, animate);
-		activity.startActivity(intent, false);
-	}
-
-	public static void startSliding(OmnomActivity activity) {
-		final Intent intent = new Intent(activity.getActivity(), UserProfileActivity.class);
-		intent.putExtra(Extras.EXTRA_ANIMATE, false);
+		intent.putExtra(EXTRA_ANIMATE, false);
+		intent.putExtra(EXTRA_TABLE_NUMBER, tableNumber);
 		activity.startActivity(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
 	}
 
@@ -75,6 +65,9 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@InjectView(R.id.txt_app_info)
 	protected TextView mTxtAppInfo;
 
+	@InjectView(R.id.txt_table_number)
+	protected TextView mTxtTableNumber;
+
 	@Inject
 	protected RestaurateurObeservableApi api;
 
@@ -85,8 +78,11 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	private Subscription logoutSubscription;
 
+	private int mTableNumber;
+
 	@Override
 	protected void handleIntent(Intent intent) {
+		mTableNumber = intent.getIntExtra(EXTRA_TABLE_NUMBER, 0);
 	}
 
 	@OnClick(R.id.btn_feedback)
@@ -102,6 +98,8 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@Override
 	public void initUi() {
 		initAppInfo();
+
+		mTxtTableNumber.setText(String.valueOf(mTableNumber));
 
 		final UserProfile userProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		if(userProfile != null && userProfile.getUser() != null) {
