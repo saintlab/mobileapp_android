@@ -23,9 +23,15 @@ import static butterknife.ButterKnife.findById;
  */
 public class LoginPanelTop extends RelativeLayout {
 	private TextView txtTitle;
+
 	private Button btnRight;
+
+	private Button btnLeft;
+
 	private ProgressBar progress;
+
 	private ViewPagerIndicatorCircle pageIndicator;
+
 	private int mBtnRightLastVisibility;
 
 	public LoginPanelTop(Context context) {
@@ -47,8 +53,12 @@ public class LoginPanelTop extends RelativeLayout {
 		final View view = LayoutInflater.from(getContext()).inflate(R.layout.view_enter_panel_top, this);
 		txtTitle = findById(view, R.id.title);
 		btnRight = findById(view, R.id.btn_right);
+		btnLeft = findById(view, R.id.btn_left);
 		pageIndicator = findById(view, R.id.page_indicator);
 		progress = findById(view, R.id.progress);
+
+		btnRight.setVisibility(View.GONE);
+		btnLeft.setVisibility(View.GONE);
 	}
 
 	public void setTitle(final int resId) {
@@ -58,6 +68,13 @@ public class LoginPanelTop extends RelativeLayout {
 	public void setButtonRight(final int resId, OnClickListener listener) {
 		btnRight.setText(resId);
 		btnRight.setOnClickListener(listener);
+		btnRight.setVisibility(View.VISIBLE);
+	}
+
+	public void setButtonLeft(final int resId, OnClickListener listener) {
+		btnLeft.setText(resId);
+		btnLeft.setOnClickListener(listener);
+		btnLeft.setVisibility(View.VISIBLE);
 	}
 
 	public void setPaging(final int count, final int index) {
@@ -66,12 +83,13 @@ public class LoginPanelTop extends RelativeLayout {
 	}
 
 	public void setContentVisibility(final boolean visible, final boolean now) {
-		final View[] views = new View[]{btnRight, txtTitle, pageIndicator};
+		final View[] views = new View[]{btnRight, txtTitle, pageIndicator, btnLeft};
 		ButterKnife.apply(Arrays.asList(views), now ? ViewUtils.VISIBLITY_ALPHA_NOW : ViewUtils.VISIBLITY_ALPHA, visible);
 	}
 
 	public void setEnabled(final boolean enabled) {
 		btnRight.setEnabled(enabled);
+		btnLeft.setEnabled(enabled);
 	}
 
 	public boolean isAlphaVisible() {

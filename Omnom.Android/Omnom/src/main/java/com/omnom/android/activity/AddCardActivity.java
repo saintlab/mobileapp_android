@@ -1,7 +1,7 @@
 package com.omnom.android.activity;
 
 import android.content.Intent;
-import android.widget.EditText;
+import android.view.View;
 
 import com.google.gson.Gson;
 import com.omnom.android.R;
@@ -9,35 +9,50 @@ import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.MerchantData;
 import com.omnom.android.acquiring.mailru.model.UserData;
-import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.view.LoginPanelTop;
 
 import javax.inject.Inject;
 
-import butterknife.OnClick;
+import butterknife.InjectView;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
-
-import static butterknife.ButterKnife.findById;
-import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 public class AddCardActivity extends BaseOmnomActivity {
 	private static final int REQUEST_CODE_CARD_IO = 101;
 
 	@Inject
 	protected Acquiring mAcquiring;
+
+	@InjectView(R.id.panel_top)
+	protected LoginPanelTop mPanelTop;
+
 	private CardInfo card;
+
 	private Gson gson;
+
 	private Subscription mCardVerifySubscribtion;
 
 	@Override
 	public void initUi() {
 		gson = new Gson();
+
+		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+
+			}
+		});
+		mPanelTop.setButtonRight(R.string.add_card, new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				onAdd();
+			}
+		});
 	}
 
 	@Override
@@ -45,42 +60,37 @@ public class AddCardActivity extends BaseOmnomActivity {
 		return R.layout.activity_add_card;
 	}
 
-	@OnClick(R.id.btn_verify)
-	public void verifyCard() {
-		if(card == null) {
-			showToast(getActivity(), "Scan card");
-			return;
-		}
-		final UserData user = UserData.createTestUser();
-		final MerchantData merchant = new MerchantData(getActivity());
-
-		final EditText text = findById(this, R.id.edit_amount);
-		mCardVerifySubscribtion = AndroidObservable
-				.bindActivity(this, mAcquiring.verifyCard(merchant, user, card, Double.parseDouble(text.getText().toString())))
-				.subscribe(new Action1<AcquiringResponse>() {
-					@Override
-					public void call(AcquiringResponse response) {
-						final String cardData = card.toGson(gson);
-						getPreferences().setCardData(getActivity(), cardData);
-						showToast(getActivity(), "VERIFIED");
-					}
-				}, new Action1<Throwable>() {
-					@Override
-					public void call(Throwable throwable) {
-						showToast(getActivity(), "VERIFICATION ERROR");
-					}
-				});
-	}
+	//@OnClick(R.id.btn_verify)
+	//public void verifyCard() {
+	//	if(card == null) {
+	//		showToast(getActivity(), "Scan card");
+	//		return;
+	//	}
+	//	final UserData user = UserData.createTestUser();
+	//	final MerchantData merchant = new MerchantData(getActivity());
+	//
+	//	final EditText text = findById(this, R.id.edit_amount);
+	//	mCardVerifySubscribtion = AndroidObservable
+	//			.bindActivity(this, mAcquiring.verifyCard(merchant, user, card, Double.parseDouble(text.getText().toString())))
+	//			.subscribe(new Action1<AcquiringResponse>() {
+	//				@Override
+	//				public void call(AcquiringResponse response) {
+	//					final String cardData = card.toGson(gson);
+	//					getPreferences().setCardData(getActivity(), cardData);
+	//					showToast(getActivity(), "VERIFIED");
+	//				}
+	//			}, new Action1<Throwable>() {
+	//				@Override
+	//				public void call(Throwable throwable) {
+	//					showToast(getActivity(), "VERIFICATION ERROR");
+	//				}
+	//			});
+	//}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		OmnomObservable.unsubscribe(mCardVerifySubscribtion);
-	}
-
-	@OnClick(R.id.btn_add_card)
-	public void addCard() {
-		onScanPress();
 	}
 
 	@Override
@@ -105,7 +115,7 @@ public class AddCardActivity extends BaseOmnomActivity {
 		}
 	}
 
-	public void onScanPress() {
+	public void onAdd() {
 		Intent scanIntent = new Intent(this, CardIOActivity.class);
 		scanIntent.putExtra(CardIOActivity.EXTRA_APP_TOKEN, "e041fdfc4e9c4c6ba1dbd26969a98d92");
 		scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_EXPIRY, true); // default: true
