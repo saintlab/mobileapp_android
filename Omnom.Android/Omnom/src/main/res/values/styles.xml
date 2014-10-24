@@ -9,7 +9,6 @@
         <item name="android:textViewStyle">@style/TextView</item>
         <item name="android:editTextStyle">@style/EditText</item>
         <item name="android:autoCompleteTextViewStyle">@style/EditText</item>
-        <item name="android:ratingBarStyle">@style/RatingBar</item>
     </style>
 
     <style name="AppTheme.Light">
@@ -34,13 +33,6 @@
 
     <style name="Theme.Simple" parent="android:Theme.Holo.Light">
         <item name="android:windowBackground">@android:color/black</item>
-    </style>
-
-    <style name="RatingBar" parent="android:Widget.Holo.RatingBar.Small">
-        <item name="android:progressDrawable">@drawable/ratingbar_small</item>
-        <item name="android:indeterminateDrawable">@drawable/ratingbar_small</item>
-        <item name="android:minHeight">16dip</item>
-        <item name="android:maxHeight">16dip</item>
     </style>
 
     <style name="ButtonBar">
