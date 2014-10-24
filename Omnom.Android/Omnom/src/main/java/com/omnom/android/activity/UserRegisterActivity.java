@@ -42,11 +42,15 @@ import rx.functions.Action1;
 public class UserRegisterActivity extends BaseOmnomActivity {
 
 	public static final int YEAR_OFFSET = 30;
+
 	public static final String DELIMITER_DATE_UI = "/";
+
 	public static final String DELIMITER_DATE_WICKET = "-";
+
 	public static final int FAKE_PAGE_COUNT = 2;
 
 	private static final String TAG = UserRegisterActivity.class.getSimpleName();
+
 	@InjectView(R.id.edit_name)
 	protected ErrorEdit editName;
 
@@ -74,6 +78,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	private boolean mFirstStart = true;
 
 	private GregorianCalendar gc;
+
 	private Subscription mRegisterSubscription;
 
 	@Override
@@ -96,17 +101,24 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		editBirth.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				DatePickerDialog dialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-					@Override
-					public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-					}
-				}, gc.get(Calendar.YEAR), gc.get(Calendar.MONTH), gc.get(Calendar.DAY_OF_MONTH));
+				DatePickerDialog dialog = new DatePickerDialog(getActivity(),
+				                                               new DatePickerDialog.OnDateSetListener() {
+					                                               @Override
+					                                               public void onDateSet(DatePicker view,
+					                                                                     int year,
+					                                                                     int monthOfYear,
+					                                                                     int dayOfMonth) {
+					                                               }
+				                                               },
+				                                               gc.get(Calendar.YEAR),
+				                                               gc.get(Calendar.MONTH),
+				                                               gc.get(Calendar.DAY_OF_MONTH));
 				dialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						DatePickerDialog dlg = (DatePickerDialog) dialog;
 						gc.set(dlg.getDatePicker().getYear(), dlg.getDatePicker().getMonth(), dlg.getDatePicker().getDayOfMonth());
-						CharSequence dateFormatted = DateFormat.format("yyyy/MM/dd", gc);
+						CharSequence dateFormatted = DateFormat.format("dd/MM/yyyy", gc);
 						editBirth.setText(dateFormatted);
 						dialog.dismiss();
 					}
@@ -117,7 +129,6 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 						dialog.dismiss();
 					}
 				});
-				dialog.show();
 			}
 		});
 	}
@@ -154,37 +165,37 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		                                                                        .toString()
 		                                                                        .replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
 		mRegisterSubscription = AndroidObservable.bindActivity(this, authenticator.register(request))
-		                                           .subscribe(new Action1<AuthRegisterResponse>() {
-			                                           @Override
-			                                           public void call(final AuthRegisterResponse authRegisterResponse) {
-				                                           if(!authRegisterResponse.hasError()) {
-					                                           topPanel.setContentVisibility(false, false);
-					                                           postDelayed(getResources().getInteger(
-							                                           R.integer.default_animation_duration_short), new Runnable() {
-						                                           @Override
-						                                           public void run() {
-							                                           final Intent intent = new Intent(UserRegisterActivity.this,
-							                                                                            ConfirmPhoneActivity.class);
-							                                           intent.putExtra(EXTRA_PHONE, request.getPhone());
-							                                           intent.putExtra(EXTRA_CONFIRM_TYPE,
-							                                                           ConfirmPhoneActivity.TYPE_REGISTER);
-							                                           startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left,
-							                                                         false);
-							                                           topPanel.showProgress(false);
-						                                           }
-					                                           });
-				                                           } else {
-					                                           topPanel.showProgress(false);
-					                                           textError.setText(authRegisterResponse.getError().getMessage());
-				                                           }
-			                                           }
-		                                           }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			                                           @Override
-			                                           public void onError(Throwable throwable) {
-				                                           topPanel.showProgress(false);
-				                                           Log.e(TAG, "doRegister", throwable);
-			                                           }
-		                                           });
+		                                         .subscribe(new Action1<AuthRegisterResponse>() {
+			                                         @Override
+			                                         public void call(final AuthRegisterResponse authRegisterResponse) {
+				                                         if(!authRegisterResponse.hasError()) {
+					                                         topPanel.setContentVisibility(false, false);
+					                                         postDelayed(getResources().getInteger(
+							                                         R.integer.default_animation_duration_short), new Runnable() {
+						                                         @Override
+						                                         public void run() {
+							                                         final Intent intent = new Intent(UserRegisterActivity.this,
+							                                                                          ConfirmPhoneActivity.class);
+							                                         intent.putExtra(EXTRA_PHONE, request.getPhone());
+							                                         intent.putExtra(EXTRA_CONFIRM_TYPE,
+							                                                         ConfirmPhoneActivity.TYPE_REGISTER);
+							                                         startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left,
+							                                                       false);
+							                                         topPanel.showProgress(false);
+						                                         }
+					                                         });
+				                                         } else {
+					                                         topPanel.showProgress(false);
+					                                         textError.setText(authRegisterResponse.getError().getMessage());
+				                                         }
+			                                         }
+		                                         }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			                                         @Override
+			                                         public void onError(Throwable throwable) {
+				                                         topPanel.showProgress(false);
+				                                         Log.e(TAG, "doRegister", throwable);
+			                                         }
+		                                         });
 	}
 
 	@Override

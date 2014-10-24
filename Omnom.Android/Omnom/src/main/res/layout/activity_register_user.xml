@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -33,29 +33,31 @@
                 android:id="@+id/edit_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:inputType="name"
-                app:hint="@string/name"
-                app:showClear="false"
-                app:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
+                omnom:inputType="name"
+                omnom:hint="@string/name"
+                omnom:showClear="true"
+                omnom:font="regular_le"
+                omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
 
             <com.omnom.android.utils.view.ErrorEdit
                 android:id="@+id/edit_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:inputType="email"
-                app:hint="@string/email"
-                app:showClear="true"
-                app:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
+                omnom:inputType="email"
+                omnom:hint="@string/email"
+                omnom:showClear="true"
+                omnom:font="regular_le"
+                omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
 
             <com.omnom.android.utils.view.ErrorEdit
                 android:id="@+id/edit_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:inputType="phone"
-                app:font="regular_le"
-                app:hint="@string/phone_number"
-                app:showClear="true"
-                app:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
+                omnom:inputType="phone"
+                omnom:font="regular_le"
+                omnom:hint="@string/phone_number"
+                omnom:showClear="true"
+                omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
 
             <com.omnom.android.utils.view.ErrorEditText
                 android:id="@+id/edit_birth"
@@ -64,7 +66,8 @@
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:clickable="true"
-                android:hint="@string/birth_date"/>
+                android:hint="@string/birth_date"
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
             <TextView
                 android:id="@+id/text_error"

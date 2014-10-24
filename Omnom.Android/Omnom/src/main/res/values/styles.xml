@@ -9,6 +9,7 @@
         <item name="android:textViewStyle">@style/TextView</item>
         <item name="android:editTextStyle">@style/EditText</item>
         <item name="android:autoCompleteTextViewStyle">@style/EditText</item>
+        <!--<item name="numberPickerStyle">@style/DatePicker</item>-->
     </style>
 
     <style name="AppTheme.Light">
@@ -33,6 +34,11 @@
 
     <style name="Theme.Simple" parent="android:Theme.Holo.Light">
         <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
+    <style name="DatePicker">
+        <item name="fontPath">fonts/Futura-LSF-Omnom-LE-Regular.otf</item>
+        <item name="android:background">#77ff0000</item>
     </style>
 
     <style name="ButtonBar">
