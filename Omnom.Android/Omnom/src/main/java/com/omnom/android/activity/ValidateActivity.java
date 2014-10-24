@@ -23,6 +23,7 @@ import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
+import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -99,6 +100,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			finish();
 		}
 	};
+
 	@InjectView(R.id.loader)
 	protected LoaderView loader;
 
@@ -114,6 +116,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.panel_bottom)
 	protected View panelBottom;
 
+	@InjectView(R.id.img_profile)
+	protected View imgProfile;
+
 	@InjectView(R.id.img_holder)
 	protected View imgHolder;
 
@@ -127,16 +132,25 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected AuthService authenticator;
 
 	protected ErrorHelper mErrorHelper;
+
 	protected Target mTarget;
+
 	protected boolean mFirstRun = true;
 
 	private int mAnimationType;
+
 	private Restaurant mRestaurant;
+
 	private TableDataResponse mTable;
+
 	private boolean mWaiterCalled;
+
 	private Subscription mOrdersSubscription;
+
 	private Subscription mWaiterCallSubscribtion;
+
 	private Subscription mUserSubscription;
+
 	private Subscription mGuestSubscribtion;
 
 	@Override
@@ -299,6 +313,11 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		}
 	}
 
+	@OnClick(R.id.img_profile)
+	protected void onProfile(View v) {
+		UserProfileActivity.startSliding(this, mTable.getInternalId());
+	}
+
 	protected final void onDataLoaded(final Restaurant restaurant, TableDataResponse table) {
 		mRestaurant = restaurant;
 		mTable = table;
@@ -308,7 +327,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		                                     .subscribe(new Action1<UserResponse>() {
 			                                     @Override
 			                                     public void call(UserResponse userResponse) {
-				                                     OmnomApplication.get(getActivity()).cacheUserProfile(userResponse.getUser());
+				                                     OmnomApplication.get(getActivity()).cacheUserProfile(new UserProfile(userResponse));
 			                                     }
 		                                     }, new Action1<Throwable>() {
 			                                     @Override
@@ -347,6 +366,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			public void run() {
 				AnimationUtils.animateAlpha(btnDown, true);
 				ViewUtils.setVisible(imgHolder, true);
+				ViewUtils.setVisible(imgProfile, true);
 				ViewUtils.setVisible(panelBottom, true);
 				panelBottom.animate()
 				           .translationY(0)

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -62,6 +63,7 @@ public class AndroidUtils {
 		return new ViewTreeObserver.OnGlobalLayoutListener() {
 
 			private final Rect r = new Rect();
+
 			private boolean wasOpened;
 
 			@Override
@@ -147,6 +149,14 @@ public class AndroidUtils {
 		alertDialog.setCanceledOnTouchOutside(false);
 		alertDialog.show();
 		return alertDialog;
+	}
+
+	public static String getAppVersion(Context context) {
+		try {
+			return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+		} catch(PackageManager.NameNotFoundException e) {
+			return "0.0";
+		}
 	}
 
 	public static String getInstallId(Context context) {

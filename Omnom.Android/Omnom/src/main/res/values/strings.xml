@@ -44,4 +44,6 @@
     <string name="to_be_paid">К оплате</string>
     <string name="tips_another">другой</string>
     <string name="tips">Чаевые</string>
+
+    <string name="app_version_build">версия %1$s</string>
 </resources>

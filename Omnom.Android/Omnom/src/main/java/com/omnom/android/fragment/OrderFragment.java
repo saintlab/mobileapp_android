@@ -592,7 +592,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final double tip) {
-		final com.omnom.android.auth.UserData cachedUser = OmnomApplication.get(getActivity()).getCachedUser();
+		final com.omnom.android.auth.UserData cachedUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		final UserData user = UserData.create(String.valueOf(cachedUser.getId()), cachedUser.getPhone());
 		final MerchantData merchant = new MerchantData(getActivity());
 		pay(billData, card, merchant, user, amount, tip);

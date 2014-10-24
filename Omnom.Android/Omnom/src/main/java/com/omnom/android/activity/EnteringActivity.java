@@ -16,9 +16,17 @@ import butterknife.OnClick;
 public class EnteringActivity extends BaseOmnomFragmentActivity {
 
 	public static void start(BaseOmnomActivity activity, int animIn, int animOut) {
-		Intent intent = new Intent(activity, EnteringActivity.class);
+		final Intent intent = new Intent(activity, EnteringActivity.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_UP);
 		activity.startActivity(intent, animIn, animOut, true);
+	}
+
+	public static void start(BaseOmnomActivity activity) {
+		final Intent intent = new Intent(activity, EnteringActivity.class);
+		intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_UP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		activity.startActivity(intent);
 	}
 
 	@InjectView(R.id.pager)

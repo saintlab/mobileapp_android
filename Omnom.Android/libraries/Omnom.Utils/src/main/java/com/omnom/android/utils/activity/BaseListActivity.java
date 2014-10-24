@@ -73,6 +73,11 @@ public abstract class BaseListActivity extends ListActivity implements OmnomActi
 	}
 
 	@Override
+	public void startActivity(final Intent intent, final int animIn, final int animOut, final boolean finish) {
+		mHelper.startActivity(intent, animIn, animOut, finish);
+	}
+
+	@Override
 	public Activity getActivity() {
 		return this;
 	}
