@@ -52,7 +52,7 @@
             android:layout_alignParentBottom="true"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
-            android:background="@android:color/white"
+            android:background="@color/white_transparent"
             android:orientation="horizontal"
             android:visibility="gone">
 
@@ -96,5 +96,17 @@
         omnom:progress_color="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
+    <ImageView
+        android:id="@+id/img_profile"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="8dp"
+        android:layout_margin="4dp"
+        android:cropToPadding="true"
+        android:scaleType="centerCrop"
+        android:layout_gravity="top|right"
+        android:src="@drawable/ic_profile_white"
+        android:visibility="gone"/>
 
 </FrameLayout>

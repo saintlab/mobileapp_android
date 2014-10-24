@@ -16,8 +16,10 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_SHOW_BACK = "com.omnom.android.linker.bind.show_back";
 	public static final String EXTRA_LOADER_ANIMATION = "com.omnom.android.linker.loader.animation";
 	public static final String EXTRA_ANIMATE = "com.omnom.android.linker.activity.animate";
+	public static final String EXTRA_TABLE_NUMBER = "com.omnom.android.restaurant.table_number";
 	public static final String EXTRA_PHONE = "com.omnom.android.user.phone";
 	public static final String EXTRA_ORDERS = "com.omnom.android.table.orders";
+	public static final String EXTRA_BG_COLOR = "com.omnom.android.table.orders.bg";
 	public static final String EXTRA_CONFIRM_TYPE = "com.omnom.android.user.phone.confirm_type";
 
 	public static final String EXTRA_CHARACTERISTIC_UUID = "ble.characteristic.uuid";

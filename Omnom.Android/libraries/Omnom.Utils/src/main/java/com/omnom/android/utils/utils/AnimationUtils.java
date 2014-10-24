@@ -19,6 +19,10 @@ public class AnimationUtils {
 		animateAlpha(view, visible, view.getResources().getInteger(R.integer.default_animation_duration_short));
 	}
 
+	public static void animateAlpha2(final View view, final boolean visible) {
+		animateAlpha2(view, visible, null, view.getResources().getInteger(R.integer.default_animation_duration_short));
+	}
+
 	public static void animateAlpha(final View view, final boolean visible, long duration) {
 		animateAlpha(view, visible, null, duration);
 	}
@@ -54,7 +58,7 @@ public class AnimationUtils {
 	public static void animateAlpha2(final View view, final boolean visible, final Runnable callback, long duration) {
 		view.setAlpha(visible ? 0 : 1);
 		if(visible) {
-			ViewUtils.setVisible(view, visible);
+			ViewUtils.setVisible2(view, visible);
 		}
 		view.setTag(visible);
 		view.animate().setDuration(duration).

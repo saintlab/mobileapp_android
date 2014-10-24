@@ -17,8 +17,8 @@ public class BillRequest {
 		return billRequest;
 	}
 
-	public static BillRequest create(String amount, Order order) {
-		return create(amount, order.getRestaurantId(), order.getTableId(), order.getId());
+	public static BillRequest create(double amount, Order order) {
+		return create(Double.toString(amount), order.getRestaurantId(), order.getTableId(), order.getId());
 	}
 
 	@Expose

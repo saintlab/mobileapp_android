@@ -97,8 +97,8 @@
             android:name="com.omnom.android.linker.activity.UserProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
-            android:windowSoftInputMode="stateAlwaysHidden" >
-        </activity>
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
         <activity
             android:name="com.omnom.android.linker.activity.restaurant.BeaconsChartActivity"
             android:label="@string/title_activity_beacons_chart"
