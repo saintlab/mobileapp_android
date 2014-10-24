@@ -15,15 +15,15 @@ public class EnteringPagerAdapter extends FragmentStatePagerAdapter {
 	private static final int COUNT = 3;
 
 	private int[] colors = new int[]{
-			Color.parseColor("#aadf5144"),
-			Color.parseColor("#aa079475"),
-			Color.parseColor("#aa22649d")
+			Color.parseColor("#aaCE1200"),
+			Color.parseColor("#aa089E7D"),
+			Color.parseColor("#aa266BA6")
 	};
 
 	private int[] icons = new int[]{
 			R.drawable.ic_credit_cards,
-			R.drawable.ic_bell_ringing_icon_big,
-			R.drawable.ic_split_bill_icon_big
+			R.drawable.ic_intro_bell_ringing,
+			R.drawable.ic_intro_split_bill
 	};
 
 	private int[] titles = new int[]{

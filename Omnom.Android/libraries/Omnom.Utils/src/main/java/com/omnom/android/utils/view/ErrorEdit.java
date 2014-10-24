@@ -184,4 +184,8 @@ public class ErrorEdit extends LinearLayout {
 	public EditText getEditText() {
 		return editView;
 	}
+
+	public void setText(final CharSequence text) {
+		editView.setText(text);
+	}
 }
