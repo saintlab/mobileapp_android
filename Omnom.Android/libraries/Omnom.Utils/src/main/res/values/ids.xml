@@ -3,4 +3,6 @@
     <item type="id" name="canceled"/>
     <item type="id" name="logo_url"/>
     <item type="id" name="tip"/>
+    <item name="np__increment" type="id" />
+    <item name="np__decrement" type="id" />
 </resources>
