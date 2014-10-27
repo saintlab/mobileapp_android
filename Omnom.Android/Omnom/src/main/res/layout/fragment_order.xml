@@ -231,7 +231,7 @@
 
     </RelativeLayout>
 
-    <NumberPicker
+    <com.omnom.android.utils.view.NumberPicker
         android:id="@+id/tips_picker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
