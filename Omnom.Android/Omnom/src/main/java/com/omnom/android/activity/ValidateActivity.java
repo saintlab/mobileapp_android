@@ -359,7 +359,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			}
 		});
 		loader.animateColor(RestaurantHelper.getBackgroundColor(restaurant));
-		Picasso.with(getActivity()).load(restaurant.getDecoration().getBackgroundImage()).into(mTarget);
+		Picasso picasso = Picasso.with(getActivity());
+		picasso.setIndicatorsEnabled(true);
+		picasso.setLoggingEnabled(true);
+		picasso.load(restaurant.getDecoration().getBackgroundImage()).into(mTarget);
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override

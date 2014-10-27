@@ -4,6 +4,8 @@
     <integer name="default_animation_duration_short">350</integer>
     <integer name="default_animation_duration_quick">150</integer>
 
+    <integer name="listview_animation_delay">1000</integer>
+
     <integer name="default_sms_request_timeout">10000</integer>
 
     <integer name="loader_progress_max">5000</integer>

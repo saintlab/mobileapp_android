@@ -10,9 +10,29 @@ import com.omnom.android.utils.utils.StringUtils;
  */
 public class PreferenceHelper implements PreferenceProvider {
 	private static final String USER_PREFERENCES = "com.omnom.android.linker.user";
-	private static final String CARD_ID = "com.omnom.android.card_id";
+
 	private static final String AUTH_TOKEN = "com.omnom.android.linker.user.auth_token";
+
 	private static final String USER_ID = "com.omnom.android.linker.user.id";
+
+	private static final String CARD_ID = "com.omnom.android.card_id";
+
+	private static final String CARD_DATA = "com.omnom.android.card_data";
+
+	@Override
+	public void setCardId(final Context context, final String externalCardId) {
+		context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
+		       .edit()
+		       .putString(CARD_ID, externalCardId)
+		       .commit();
+	}
+
+	@Override
+	public String getCardId(final Context context) {
+		final String string = context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
+		                             .getString(CARD_ID, StringUtils.EMPTY_STRING);
+		return string;
+	}
 
 	@Override
 	public boolean setAuthToken(Context context, String value) {
@@ -32,7 +52,7 @@ public class PreferenceHelper implements PreferenceProvider {
 	@Override
 	public String getCardData(Context context) {
 		final String string = context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-		                             .getString(CARD_ID, StringUtils.EMPTY_STRING);
+		                             .getString(CARD_DATA, StringUtils.EMPTY_STRING);
 		return string;
 
 	}
@@ -41,7 +61,7 @@ public class PreferenceHelper implements PreferenceProvider {
 	public boolean setCardData(Context context, String cardId) {
 		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
 		              .edit()
-		              .putString(CARD_ID, cardId)
+		              .putString(CARD_DATA, cardId)
 		              .commit();
 	}
 }

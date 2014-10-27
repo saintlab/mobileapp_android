@@ -8,6 +8,7 @@ import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
+import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -32,7 +33,7 @@ import rx.Observable;
  */
 public interface RestaurateurDataService {
 	@GET("/cards")
-	Observable<RestaurantsResponse> getCards();
+	Observable<CardsResponse> getCards();
 
 	@DELETE("/cards/{card_id}")
 	Observable<RestaurantsResponse> deleteCard(@Path(Protocol.FIELD_CARD_ID) String cardId);

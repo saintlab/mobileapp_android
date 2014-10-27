@@ -19,7 +19,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor) {
 		final Intent intent = new Intent(activity, OrdersActivity.class);
 		intent.putParcelableArrayListExtra(OrdersActivity.EXTRA_ORDERS, orders);
-		intent.putExtra(OrdersActivity.EXTRA_BG_COLOR, bgColor);
+		intent.putExtra(OrdersActivity.EXTRA_ACCENT_COLOR, bgColor);
 		activity.startActivity(intent);
 	}
 
@@ -39,7 +39,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 	@Override
 	protected void handleIntent(Intent intent) {
 		orders = intent.getParcelableArrayListExtra(EXTRA_ORDERS);
-		final String colorStr = intent.getStringExtra(EXTRA_BG_COLOR);
+		final String colorStr = intent.getStringExtra(EXTRA_ACCENT_COLOR);
 		bgColor = RestaurantHelper.getBackgroundColor(colorStr);
 	}
 

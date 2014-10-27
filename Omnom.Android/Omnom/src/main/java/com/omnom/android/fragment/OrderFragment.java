@@ -1,10 +1,10 @@
 package com.omnom.android.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -67,8 +67,6 @@ import static butterknife.ButterKnife.findById;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 public class OrderFragment extends Fragment {
-	public static final String CURRENCY_RUBLE = "\uf5fc";
-
 	public static final int MODE_AMOUNT = 0;
 
 	public static final int MODE_TIPS = 1;
@@ -190,7 +188,7 @@ public class OrderFragment extends Fragment {
 
 	private boolean mPaymentTitleChanged;
 
-	private int mRestaurantColor;
+	private int mAccentColor;
 
 	private float mFontNormal;
 
@@ -200,7 +198,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private String getCurrencySuffix() {
-		return CURRENCY_RUBLE;
+		return getString(R.string.currency_ruble);
 	}
 
 	@Override
@@ -216,8 +214,8 @@ public class OrderFragment extends Fragment {
 		mFontNormal = getResources().getDimension(R.dimen.font_small);
 		mFontSmall = getResources().getDimension(R.dimen.font_xsmall);
 
-		rootView.setBackgroundColor(mRestaurantColor);
-		btnPay.setTextColor(mRestaurantColor);
+		rootView.setBackgroundColor(mAccentColor);
+		btnPay.setTextColor(mAccentColor);
 
 		initPicker();
 		updateCustomTipsText(0);
@@ -557,22 +555,23 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void pay(final double amount, final double tip) {
-		final String cardSaved = OmnomApplication.get(getActivity()).getPreferences().getCardData(getActivity());
+		final FragmentActivity activity = getActivity();
+		final String cardSaved = OmnomApplication.get(activity).getPreferences().getCardData(activity);
 		if(!TextUtils.isEmpty(cardSaved)) {
 			final CardInfo cardData = gson.fromJson(cardSaved, CardInfo.class);
 			cardData.setCardId(StringUtils.EMPTY_STRING);
 			btnPay.setEnabled(false);
 			final BillRequest request = BillRequest.create(amount, mOrder);
-			mBillSubscription = AndroidObservable.bindActivity(getActivity(), api.bill(request)).subscribe(new Action1<BillResponse>() {
+			mBillSubscription = AndroidObservable.bindActivity(activity, api.bill(request)).subscribe(new Action1<BillResponse>() {
 				@Override
 				public void call(final BillResponse response) {
 					if(!response.hasErrors()) {
 						tryToPay(cardData, response, amount, tip);
 					} else {
 						if(response.getError() != null) {
-							showToast(getActivity(), response.getError());
+							showToast(activity, response.getError());
 						} else if(response.getErrors() != null) {
-							showToast(getActivity(), response.getErrors().toString());
+							showToast(activity, response.getErrors().toString());
 						}
 						btnPay.setEnabled(true);
 					}
@@ -584,7 +583,7 @@ public class OrderFragment extends Fragment {
 				}
 			});
 		} else {
-			startActivity(new Intent(getActivity(), AddCardActivity.class));
+			AddCardActivity.start(activity, amount, mAccentColor);
 		}
 	}
 
@@ -638,7 +637,7 @@ public class OrderFragment extends Fragment {
 		gson = new Gson();
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
-			mRestaurantColor = getArguments().getInt(ARG_COLOR);
+			mAccentColor = getArguments().getInt(ARG_COLOR);
 		}
 	}
 }
