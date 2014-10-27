@@ -125,8 +125,13 @@ public class ValidateActivityBle extends ValidateActivity {
 							new Func1<TableDataResponse, Observable<Restaurant>>() {
 								@Override
 								public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
-									table[0] = tableDataResponse;
-									return api.getRestaurant(tableDataResponse.getRestaurantId());
+									if(tableDataResponse.hasAuthError()) {
+										EnteringActivity.start(ValidateActivityBle.this);
+										throw new RuntimeException("Wrong auth token");
+									} else {
+										table[0] = tableDataResponse;
+										return api.getRestaurant(tableDataResponse.getRestaurantId());
+									}
 								}
 							})).subscribe(new Action1<Restaurant>() {
 						@Override
