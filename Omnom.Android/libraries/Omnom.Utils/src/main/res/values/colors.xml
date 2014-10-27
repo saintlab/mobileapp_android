@@ -3,4 +3,5 @@
     <color name="loader_bg">#aa16a5d7</color>
     <color name="loader_bg_transparent">#aa16a5d7</color>
     <color name="loader_progress">#40000000</color>
+    <color name="transparent">#00000000</color>
 </resources>

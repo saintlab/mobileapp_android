@@ -9,7 +9,7 @@
         <item name="android:textViewStyle">@style/TextView</item>
         <item name="android:editTextStyle">@style/EditText</item>
         <item name="android:autoCompleteTextViewStyle">@style/EditText</item>
-        <item name="android:ratingBarStyle">@style/RatingBar</item>
+        <item name="numberPickerStyle">@style/NPWidget.Holo.Light.NumberPicker</item>
     </style>
 
     <style name="AppTheme.Light">
@@ -36,11 +36,9 @@
         <item name="android:windowBackground">@android:color/black</item>
     </style>
 
-    <style name="RatingBar" parent="android:Widget.Holo.RatingBar.Small">
-        <item name="android:progressDrawable">@drawable/ratingbar_small</item>
-        <item name="android:indeterminateDrawable">@drawable/ratingbar_small</item>
-        <item name="android:minHeight">16dip</item>
-        <item name="android:maxHeight">16dip</item>
+    <style name="DatePicker">
+        <item name="fontPath">fonts/Futura-LSF-Omnom-LE-Regular.otf</item>
+        <item name="android:background">#77ff0000</item>
     </style>
 
     <style name="ButtonBar">
@@ -189,7 +187,7 @@
         <item name="android:maxLength">1</item>
         <item name="android:inputType">number</item>
         <item name="android:imeOptions">actionNone</item>
-        <item name="android:textSize">@dimen/font_xlarge</item>
+        <item name="android:textSize">@dimen/font_large</item>
         <item name="android:gravity">center</item>
     </style>
 </resources>
