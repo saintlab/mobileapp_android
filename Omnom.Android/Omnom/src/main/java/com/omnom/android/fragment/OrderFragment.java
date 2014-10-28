@@ -37,7 +37,7 @@ import com.omnom.android.acquiring.mailru.model.MailRuExtra;
 import com.omnom.android.acquiring.mailru.model.MerchantData;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
-import com.omnom.android.activity.AddCardActivity;
+import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
@@ -583,7 +583,7 @@ public class OrderFragment extends Fragment {
 				}
 			});
 		} else {
-			AddCardActivity.start(activity, amount, mAccentColor);
+			CardsActivity.start(activity, amount, mAccentColor);
 		}
 	}
 

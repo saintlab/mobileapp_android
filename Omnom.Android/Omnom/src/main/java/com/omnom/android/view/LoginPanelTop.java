@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.Arrays;
@@ -111,5 +112,9 @@ public class LoginPanelTop extends RelativeLayout {
 			}
 			ViewUtils.setVisible(progress, show);
 		}
+	}
+
+	public void showButtonRight(final boolean show) {
+		AnimationUtils.animateAlpha(btnRight, show);
 	}
 }

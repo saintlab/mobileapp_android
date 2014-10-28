@@ -93,7 +93,7 @@
             android:configChanges="keyboardHidden|orientation" />
         <activity android:name="io.card.payment.DataEntryActivity" />
         <activity
-            android:name="com.omnom.android.activity.AddCardActivity"
+            android:name=".activity.CardsActivity"
             android:label="@string/title_activity_add_card"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White" />

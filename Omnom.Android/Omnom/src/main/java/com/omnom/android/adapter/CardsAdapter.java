@@ -57,8 +57,6 @@ public class CardsAdapter extends BaseAdapter {
 
 	private final PreferenceProvider mPreferences;
 
-	private ViewHolder holder;
-
 	private int mLastAnimated = -1;
 
 	public CardsAdapter(final Context context, List<Card> cards) {
@@ -92,16 +90,15 @@ public class CardsAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if(convertView == null) {
 			convertView = mInflater.inflate(R.layout.item_card, parent, false);
-			holder = new ViewHolder(convertView);
+			ViewHolder holder = new ViewHolder(convertView);
 			convertView.setTag(holder);
-		} else {
-			holder = (ViewHolder) convertView.getTag();
 		}
 		bindView(convertView, (Card) getItem(position), position);
 		return convertView;
 	}
 
 	private void bindView(final View convertView, final Card item, final int position) {
+		ViewHolder holder = (ViewHolder) convertView.getTag();
 		boolean isAnimate = position > mLastAnimated;
 		if(isAnimate) {
 			convertView.setAlpha(0);
@@ -137,10 +134,5 @@ public class CardsAdapter extends BaseAdapter {
 			mLastAnimated = position;
 			convertView.animate().alpha(1).translationY(0).setDuration(mAnimDuration).setStartDelay(mAnimDelay).start();
 		}
-	}
-
-	@Override
-	public void notifyDataSetChanged() {
-		super.notifyDataSetChanged();
 	}
 }

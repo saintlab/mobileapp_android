@@ -15,14 +15,6 @@
         android:paddingTop="@dimen/activity_horizontal_margin_small"
         android:paddingBottom="@dimen/activity_horizontal_margin_small"/>
 
-    <ListView
-        android:id="@android:id/list"
-        android:layout_below="@id/panel_top"
-        android:dividerHeight="0dp"
-        android:divider="@color/transparent"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
     <Button
         android:id="@+id/btn_pay"
         android:layout_width="wrap_content"
@@ -37,6 +29,53 @@
         android:textSize="@dimen/font_medium"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"/>
+
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_pay"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:padding="@dimen/activity_horizontal_margin_medium"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/mail_ru_icon"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+            android:src="@drawable/alfa_bank_icon"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+            android:src="@drawable/verified_by_visa_icon"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+            android:src="@drawable/master_card_secure_code_icon"/>
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_below="@+id/panel_top"
+        android:layout_above="@+id/footer"
+        android:divider="@color/transparent"
+        android:dividerHeight="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <!--<EditText
         android:id="@+id/edit_amount"
