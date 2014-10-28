@@ -9,10 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/view_size_default"
         android:background="@color/list_header"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_horizontal_margin_small"
-        android:paddingBottom="@dimen/activity_horizontal_margin_small"/>
+        android:padding="@dimen/activity_horizontal_margin_small"/>
 
     <RelativeLayout
         android:layout_width="@dimen/card_frame_width"
@@ -99,5 +96,12 @@
             android:textCursorDrawable="@null"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
     </RelativeLayout>
+
+    <include
+        layout="@layout/view_cards_footer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

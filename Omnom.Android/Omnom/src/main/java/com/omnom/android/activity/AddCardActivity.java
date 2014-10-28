@@ -24,6 +24,7 @@ import com.omnom.android.view.LoginPanelTop;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
+import butterknife.OnClick;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
 import rx.functions.Action1;
@@ -98,13 +99,12 @@ public class AddCardActivity extends BaseOmnomActivity {
 						// verifyCard(card, user, merchant);
 					}
 				});
-			} else {
-				finish();
 			}
 		}
 	}
 
-	public void startCardIo() {
+	@OnClick(R.id.img_camera)
+	public void startCardIo(View view) {
 		Intent scanIntent = new Intent(this, CardIOActivity.class);
 		scanIntent.putExtra(CardIOActivity.EXTRA_APP_TOKEN, getString(R.string.cardio_app_token));
 		scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_EXPIRY, true);

@@ -10,10 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/view_size_default"
         android:background="@color/list_header"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingEnd="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_horizontal_margin_small"
-        android:paddingBottom="@dimen/activity_horizontal_margin_small"/>
+        android:padding="@dimen/activity_horizontal_margin_small"/>
 
     <Button
         android:id="@+id/btn_pay"
@@ -30,43 +27,12 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"/>
 
-    <LinearLayout
-        android:id="@+id/footer"
+    <include
+        layout="@layout/view_cards_footer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/btn_pay"
-        android:gravity="center"
-        android:layout_centerHorizontal="true"
-        android:padding="@dimen/activity_horizontal_margin_medium"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/mail_ru_icon"/>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingLeft="@dimen/activity_horizontal_margin_medium"
-            android:src="@drawable/alfa_bank_icon"/>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingLeft="@dimen/activity_horizontal_margin_medium"
-            android:src="@drawable/verified_by_visa_icon"/>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingLeft="@dimen/activity_horizontal_margin_medium"
-            android:src="@drawable/master_card_secure_code_icon"/>
-    </LinearLayout>
+        android:layout_centerHorizontal="true"/>
 
     <ListView
         android:id="@+id/list"

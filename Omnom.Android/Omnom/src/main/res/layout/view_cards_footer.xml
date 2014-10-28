@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/footer"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_above="@+id/btn_pay"
+    android:gravity="center"
+    android:layout_centerHorizontal="true"
+    android:padding="@dimen/activity_horizontal_margin_medium"
+    android:orientation="horizontal"
+    tools:showIn="@layout/activity_cards">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:src="@drawable/mail_ru_icon"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+        android:src="@drawable/alfa_bank_icon"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+        android:src="@drawable/verified_by_visa_icon"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+        android:src="@drawable/master_card_secure_code_icon"/>
+</LinearLayout>
