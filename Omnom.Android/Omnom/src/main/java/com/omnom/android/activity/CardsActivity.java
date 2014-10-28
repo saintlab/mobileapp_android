@@ -1,10 +1,12 @@
 package com.omnom.android.activity;
 
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.View;
@@ -31,7 +33,6 @@ import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.view.LoginPanelTop;
 
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -43,7 +44,7 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
-public class CardsActivity extends BaseOmnomActivity {
+public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.AnimationEndListener {
 	private static final int REQUEST_CODE_CARD_IO = 101;
 
 	@SuppressLint("NewApi")
@@ -87,9 +88,13 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	private PreferenceProvider mPreferences;
 
+	private ValueAnimator dividerAnimation;
+
 	@Override
 	public void initUi() {
 		mPreferences = OmnomApplication.get(getActivity()).getPreferences();
+
+		initDividerAnimation();
 
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
 			@Override
@@ -106,13 +111,12 @@ public class CardsActivity extends BaseOmnomActivity {
 
 		mPanelTop.showProgress(true);
 		mPanelTop.showButtonRight(false);
-		mList.setAdapter(new CardsAdapter(this, Collections.EMPTY_LIST));
 
 		mCardsSubscription = AndroidObservable.bindActivity(this, api.getCards().delaySubscription(1000, TimeUnit.MILLISECONDS)).subscribe(
 				new Action1<CardsResponse>() {
 					@Override
 					public void call(final CardsResponse cards) {
-						mList.setAdapter(new CardsAdapter(getActivity(), cards.getCards()));
+						mList.setAdapter(new CardsAdapter(getActivity(), cards.getCards(), CardsActivity.this));
 						mPanelTop.showProgress(false);
 						mPanelTop.showButtonRight(true);
 					}
@@ -140,6 +144,20 @@ public class CardsActivity extends BaseOmnomActivity {
 		GradientDrawable sd = (GradientDrawable) mBtnPay.getBackground();
 		sd.setColor(mAccentColor);
 		sd.invalidateSelf();
+	}
+
+	private void initDividerAnimation() {
+		final ColorDrawable dividerDrawable = new ColorDrawable(getResources().getColor(R.color.profile_hint));
+		mList.setDivider(dividerDrawable);
+		dividerAnimation = ValueAnimator.ofInt(0, 255);
+		dividerAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(final ValueAnimator animation) {
+				Integer animatedValue = (Integer) animation.getAnimatedValue();
+				dividerDrawable.setAlpha(animatedValue);
+				mList.setDividerHeight(1);
+			}
+		});
 	}
 
 	//@OnClick(R.id.btn_verify)
@@ -222,5 +240,11 @@ public class CardsActivity extends BaseOmnomActivity {
 	protected void handleIntent(final Intent intent) {
 		mAmount = intent.getDoubleExtra(Extras.EXTRA_ORDER_AMOUNT_TEXT, 0);
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
+	}
+
+	@Override
+	public void onAnimationEnd() {
+		dividerAnimation.setDuration(1000);
+		dividerAnimation.start();
 	}
 }

@@ -1,11 +1,13 @@
 package com.omnom.android.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -14,6 +16,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.cards.Card;
 import com.omnom.android.utils.preferences.PreferenceProvider;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.List;
@@ -25,6 +28,10 @@ import butterknife.InjectView;
  * Created by Ch3D on 27.10.2014.
  */
 public class CardsAdapter extends BaseAdapter {
+
+	public interface AnimationEndListener {
+		public void onAnimationEnd();
+	}
 
 	static class ViewHolder {
 		@InjectView(R.id.txt_card_number)
@@ -57,10 +64,13 @@ public class CardsAdapter extends BaseAdapter {
 
 	private final PreferenceProvider mPreferences;
 
+	private AnimationEndListener mListener;
+
 	private int mLastAnimated = -1;
 
-	public CardsAdapter(final Context context, List<Card> cards) {
+	public CardsAdapter(final Context context, List<Card> cards, AnimationEndListener listener) {
 		mContext = context;
+		mListener = listener;
 		mInflater = LayoutInflater.from(context);
 		mCards = cards;
 		mAnimDuration = context.getResources().getInteger(R.integer.default_animation_duration_short);
@@ -97,6 +107,7 @@ public class CardsAdapter extends BaseAdapter {
 		return convertView;
 	}
 
+	@SuppressLint("NewApi")
 	private void bindView(final View convertView, final Card item, final int position) {
 		ViewHolder holder = (ViewHolder) convertView.getTag();
 		boolean isAnimate = position > mLastAnimated;
@@ -132,7 +143,18 @@ public class CardsAdapter extends BaseAdapter {
 
 		if(isAnimate) {
 			mLastAnimated = position;
-			convertView.animate().alpha(1).translationY(0).setDuration(mAnimDuration).setStartDelay(mAnimDelay).start();
+			ViewPropertyAnimator viewPropertyAnimator = convertView.animate().alpha(1).translationY(0).setDuration(mAnimDuration)
+			                                                       .setStartDelay(mAnimDelay);
+			if(position == getCount() - 1 && AndroidUtils.isJellyBean()) {
+				viewPropertyAnimator
+						.withEndAction(new Runnable() {
+							@Override
+							public void run() {
+								mListener.onAnimationEnd();
+							}
+						});
+			}
+			viewPropertyAnimator.start();
 		}
 	}
 }
