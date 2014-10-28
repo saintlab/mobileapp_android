@@ -16,11 +16,6 @@ import android.widget.ListView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.acquiring.api.Acquiring;
-import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.MerchantData;
-import com.omnom.android.acquiring.mailru.model.UserData;
-import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
@@ -38,14 +33,11 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
-import io.card.payment.CardIOActivity;
-import io.card.payment.CreditCard;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
 public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.AnimationEndListener {
-	private static final int REQUEST_CODE_CARD_IO = 101;
 
 	@SuppressLint("NewApi")
 	public static void start(final Context activity, final double amount, final int accentColor) {
@@ -64,9 +56,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	}
 
 	@Inject
-	protected Acquiring mAcquiring;
-
-	@Inject
 	protected RestaurateurObeservableApi api;
 
 	@InjectView(R.id.panel_top)
@@ -77,8 +66,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	@InjectView(R.id.list)
 	protected ListView mList;
-
-	private CardInfo card;
 
 	private double mAmount;
 
@@ -204,36 +191,8 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		OmnomObservable.unsubscribe(mCardsSubscription);
 	}
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if(requestCode == REQUEST_CODE_CARD_IO) {
-			if(data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
-				final CreditCard scanResult = data.getParcelableExtra(CardIOActivity.EXTRA_SCAN_RESULT);
-				card = CardInfo.createTestCard(this, scanResult);
-				final MerchantData merchant = new MerchantData(this);
-				final UserData user = UserData.createTestUser();
-				mAcquiring.registerCard(merchant, user, card).subscribe(new Action1<CardRegisterPollingResponse>() {
-					@Override
-					public void call(CardRegisterPollingResponse response) {
-						card.setCardId(response.getCardId());
-						// verifyCard(card, user, merchant);
-					}
-				});
-			} else {
-				finish();
-			}
-		}
-	}
-
 	public void onAdd() {
-		Intent scanIntent = new Intent(this, CardIOActivity.class);
-		scanIntent.putExtra(CardIOActivity.EXTRA_APP_TOKEN, getString(R.string.cardio_app_token));
-		scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_EXPIRY, true);
-		scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_CVV, true);
-		scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_POSTAL_CODE, false);
-		scanIntent.putExtra(CardIOActivity.EXTRA_SUPPRESS_MANUAL_ENTRY, true);
-		startActivityForResult(scanIntent, REQUEST_CODE_CARD_IO);
+		AddCardActivity.start(this);
 	}
 
 	@Override

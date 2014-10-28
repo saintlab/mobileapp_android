@@ -11,6 +11,7 @@
     <color name="profile_hint">#aaa</color>
 
     <color name="white_transparent">#ddffffff</color>
+    <color name="card_data_hint">#7dffffff</color>
 
     <color name="card_number_selected">#ff4A90E2</color>
     <color name="card_type_selected">#7f4A90E2</color>

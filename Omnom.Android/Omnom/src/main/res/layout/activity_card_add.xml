@@ -1,0 +1,103 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.omnom.android.view.LoginPanelTop
+        android:id="@+id/panel_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:background="@color/list_header"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_horizontal_margin_small"
+        android:paddingBottom="@dimen/activity_horizontal_margin_small"/>
+
+    <RelativeLayout
+        android:layout_width="@dimen/card_frame_width"
+        android:layout_height="@dimen/card_frame_height"
+        android:layout_below="@id/panel_top"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/card_area"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin_large">
+
+        <LinearLayout
+            android:id="@+id/img_camera"
+            android:clickable="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/scan_frame"
+                android:scaleType="centerInside"
+                android:src="@drawable/camera_icon_white"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:maxLines="2"
+                android:text="— Отсканируйте\nвашу карту"
+                android:textAppearance="?android:textAppearanceMediumInverse"/>
+        </LinearLayout>
+
+
+        <EditText
+            android:id="@+id/txt_card_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/img_camera"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
+            android:inputType="phone"
+            android:imeOptions="actionNext"
+            android:layout_marginTop="-8dp"
+            android:hint="1234  5678  9123  4567"
+            android:textColorHint="@color/card_data_hint"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@android:color/white"
+            android:textCursorDrawable="@null"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+
+        <EditText
+            android:id="@+id/txt_exp_date"
+            android:layout_below="@id/txt_card_number"
+            android:layout_alignLeft="@id/txt_card_number"
+            android:layout_width="96dp"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:inputType="number"
+            android:imeOptions="actionNext"
+            android:hint="MM/YY"
+            android:textColorHint="@color/card_data_hint"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@android:color/white"
+            android:textCursorDrawable="@null"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+
+        <EditText
+            android:id="@+id/txt_cvv"
+            android:layout_toRightOf="@id/txt_exp_date"
+            android:layout_below="@id/txt_card_number"
+            android:layout_width="96dp"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:inputType="number"
+            android:imeOptions="actionDone"
+            android:hint="CVV"
+            android:maxLength="3"
+            android:textColorHint="@color/card_data_hint"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@android:color/white"
+            android:textCursorDrawable="@null"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+    </RelativeLayout>
+
+</RelativeLayout>

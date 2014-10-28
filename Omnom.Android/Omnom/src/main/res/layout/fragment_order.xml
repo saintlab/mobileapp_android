@@ -166,6 +166,7 @@
                 android:singleLine="true"
                 android:textSize="40sp"
                 android:textColor="?android:textColorPrimaryInverse"
+                android:textCursorDrawable="@null"
                 omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
             <TextView
