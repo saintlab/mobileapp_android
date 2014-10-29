@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
@@ -181,5 +182,9 @@ public class AndroidUtils {
 		} catch(Exception ignored) {
 			return StringUtils.EMPTY_STRING;
 		}
+	}
+
+	public static boolean isJellyBean() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
 	}
 }

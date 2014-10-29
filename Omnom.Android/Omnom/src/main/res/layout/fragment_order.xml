@@ -8,8 +8,14 @@
 
     <com.omnom.android.utils.view.OmnomListView
         android:id="@android:id/list"
-        android:background="@android:color/white"
         android:stackFromBottom="true"
+        android:divider="@color/list_header"
+        android:dividerHeight="1dp"
+        android:overScrollMode="never"
+        android:listSelector="#00000000"
+        android:scrollingCache="false"
+        android:animationCache="false"
+        android:smoothScrollbar="true"
         android:layout_width="match_parent"
         android:layout_height="@dimen/order_items_list_height_collapsed"
         android:layout_gravity="top"/>
@@ -20,6 +26,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/activity_horizontal_margin_medium"
         android:layout_margin="24dp"
+        android:baselineAligned="false"
         android:layout_gravity="bottom|center_horizontal"
         android:gravity="bottom"
         android:orientation="horizontal"
@@ -141,6 +148,7 @@
             android:id="@+id/panel_linear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:layout_centerHorizontal="true"
             android:gravity="center"
@@ -166,6 +174,7 @@
                 android:singleLine="true"
                 android:textSize="40sp"
                 android:textColor="?android:textColorPrimaryInverse"
+                android:textCursorDrawable="@null"
                 omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
             <TextView

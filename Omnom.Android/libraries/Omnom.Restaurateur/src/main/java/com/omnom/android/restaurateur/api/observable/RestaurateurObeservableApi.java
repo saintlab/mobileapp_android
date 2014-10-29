@@ -5,6 +5,7 @@ import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
+import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
@@ -40,7 +41,7 @@ public interface RestaurateurObeservableApi {
 
 	public Observable<TableDataResponse> bindQrCode(String restaurantId, int tableNumber, String qrData);
 
-	public Observable<RestaurantsResponse> getCards();
+	public Observable<CardsResponse> getCards();
 
 	public Observable<RestaurantsResponse> deleteCard(String cardId);
 

@@ -47,7 +47,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	private ObjectGraph objectGraph;
 
-	private PreferenceHelper preferenceHelper;
+	private PreferenceProvider preferenceHelper;
 
 	private MixpanelAPI mixPanel;
 
