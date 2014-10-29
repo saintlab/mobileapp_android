@@ -147,33 +147,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		});
 	}
 
-	//@OnClick(R.id.btn_verify)
-	//public void verifyCard() {
-	//	if(card == null) {
-	//		showToast(getActivity(), "Scan card");
-	//		return;
-	//	}
-	//	final UserData user = UserData.createTestUser();
-	//	final MerchantData merchant = new MerchantData(getActivity());
-	//
-	//	final EditText text = findById(this, R.id.edit_amount);
-	//	mCardVerifySubscribtion = AndroidObservable
-	//			.bindActivity(this, mAcquiring.verifyCard(merchant, user, card, Double.parseDouble(text.getText().toString())))
-	//			.subscribe(new Action1<AcquiringResponse>() {
-	//				@Override
-	//				public void call(AcquiringResponse response) {
-	//					final String cardData = card.toGson(gson);
-	//					getPreferences().setCardData(getActivity(), cardData);
-	//					showToast(getActivity(), "VERIFIED");
-	//				}
-	//			}, new Action1<Throwable>() {
-	//				@Override
-	//				public void call(Throwable throwable) {
-	//					showToast(getActivity(), "VERIFICATION ERROR");
-	//				}
-	//			});
-	//}
-
 	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_cards;

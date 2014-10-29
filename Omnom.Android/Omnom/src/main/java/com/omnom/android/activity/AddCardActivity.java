@@ -210,6 +210,33 @@ public class AddCardActivity extends BaseOmnomActivity implements TextListener {
 		});
 	}
 
+	//@OnClick(R.id.btn_verify)
+	//public void verifyCard() {
+	//	if(card == null) {
+	//		showToast(getActivity(), "Scan card");
+	//		return;
+	//	}
+	//	final UserData user = UserData.createTestUser();
+	//	final MerchantData merchant = new MerchantData(getActivity());
+	//
+	//	final EditText text = findById(this, R.id.edit_amount);
+	//	mCardVerifySubscribtion = AndroidObservable
+	//			.bindActivity(this, mAcquiring.verifyCard(merchant, user, card, Double.parseDouble(text.getText().toString())))
+	//			.subscribe(new Action1<AcquiringResponse>() {
+	//				@Override
+	//				public void call(AcquiringResponse response) {
+	//					final String cardData = card.toGson(gson);
+	//					getPreferences().setCardData(getActivity(), cardData);
+	//					showToast(getActivity(), "VERIFIED");
+	//				}
+	//			}, new Action1<Throwable>() {
+	//				@Override
+	//				public void call(Throwable throwable) {
+	//					showToast(getActivity(), "VERIFICATION ERROR");
+	//				}
+	//			});
+	//}
+
 	@OnClick(R.id.img_camera)
 	public void startCardIo(View view) {
 		Intent scanIntent = new Intent(this, CardIOActivity.class);
