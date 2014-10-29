@@ -193,7 +193,7 @@ public class AddCardActivity extends BaseOmnomActivity implements TextListener {
 		final CardInfo card = CardInfo.create(pan, expDate, cvv);
 
 		final MerchantData merchant = new MerchantData(this);
-		com.omnom.android.auth.UserData wicketUser = OmnomApplication.get(this).getUserProfile().getUser();
+		com.omnom.android.auth.UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		final UserData user = UserData.create(String.valueOf(wicketUser.getId()), wicketUser.getPhone());
 		mAcquiring.registerCard(merchant, user, card).subscribe(new Action1<CardRegisterPollingResponse>() {
 			@Override
