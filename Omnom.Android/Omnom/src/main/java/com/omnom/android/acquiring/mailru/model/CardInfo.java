@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.omnom.android.R;
-import com.omnom.android.utils.EncryptionUtils;
 import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.HashMap;
@@ -56,17 +55,20 @@ public class CardInfo {
 
 	@Expose
 	private String pan = StringUtils.EMPTY_STRING;
+
 	@Expose
 	private String expDate = StringUtils.EMPTY_STRING;
+
 	@Expose
 	private String cvv = StringUtils.EMPTY_STRING;
+
 	@Expose
 	private String cardId = StringUtils.EMPTY_STRING;
+
 	@Expose
 	private String holder = StringUtils.EMPTY_STRING;
-	private boolean addCard = false;
 
-	private final String key = "com.omnom.android";
+	private boolean addCard = false;
 
 	public String getPan() {
 		return pan;
