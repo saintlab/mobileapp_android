@@ -246,6 +246,7 @@ public class OrderFragment extends Fragment {
 
 	private void initList() {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
+		// list.animate().scaleY(0.9f).scaleX(0.9f).start();
 		AndroidUtils.scrollEnd(list);
 		// list.setTranslationY(-LIST_TRANSLATION_Y);
 		// list.setEnabled(false);

@@ -8,8 +8,14 @@
 
     <com.omnom.android.utils.view.OmnomListView
         android:id="@android:id/list"
-        android:background="@android:color/white"
         android:stackFromBottom="true"
+        android:divider="@color/list_header"
+        android:dividerHeight="1dp"
+        android:overScrollMode="never"
+        android:listSelector="#00000000"
+        android:scrollingCache="false"
+        android:animationCache="false"
+        android:smoothScrollbar="true"
         android:layout_width="match_parent"
         android:layout_height="@dimen/order_items_list_height_collapsed"
         android:layout_gravity="top"/>
