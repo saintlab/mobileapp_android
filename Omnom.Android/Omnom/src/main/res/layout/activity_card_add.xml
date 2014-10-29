@@ -1,6 +1,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:animateLayoutChanges="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -12,24 +13,27 @@
         android:padding="@dimen/activity_horizontal_margin_small"/>
 
     <RelativeLayout
+        android:id="@+id/panel_card"
         android:layout_width="@dimen/card_frame_width"
         android:layout_height="@dimen/card_frame_height"
         android:layout_below="@id/panel_top"
         android:layout_centerHorizontal="true"
         android:background="@drawable/card_area"
-        android:padding="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin_large">
 
         <LinearLayout
-            android:id="@+id/img_camera"
+            android:id="@+id/panel_camera"
             android:clickable="true"
+            android:baselineAligned="false"
             android:layout_centerHorizontal="true"
             android:gravity="center"
-            android:layout_width="wrap_content"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <ImageView
+                android:id="@+id/img_camera"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/scan_frame"
@@ -37,6 +41,7 @@
                 android:src="@drawable/camera_icon_white"/>
 
             <TextView
+                android:id="@+id/txt_camera"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -50,8 +55,10 @@
             android:id="@+id/txt_card_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/img_camera"
+            android:layout_below="@id/panel_camera"
             android:layout_alignParentLeft="true"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
             android:singleLine="true"
             android:inputType="phone"
             android:imeOptions="actionNext"
@@ -69,6 +76,7 @@
             android:layout_alignLeft="@id/txt_card_number"
             android:layout_width="96dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="-8dp"
             android:singleLine="true"
             android:inputType="number"
             android:imeOptions="actionNext"
@@ -85,6 +93,7 @@
             android:layout_below="@id/txt_card_number"
             android:layout_width="96dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="-8dp"
             android:singleLine="true"
             android:inputType="number"
             android:imeOptions="actionDone"

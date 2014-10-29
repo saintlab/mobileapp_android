@@ -4,6 +4,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
+import com.omnom.android.activity.TextListener;
 import com.omnom.android.utils.utils.StringUtils;
 
 /**
@@ -17,8 +18,11 @@ public class CardExpirationTextWatcher implements TextWatcher {
 
 	private EditText mView;
 
-	public CardExpirationTextWatcher(EditText view) {
+	private TextListener mListener;
+
+	public CardExpirationTextWatcher(EditText view, TextListener listener) {
 		mView = view;
+		mListener = listener;
 	}
 
 	@Override
@@ -50,6 +54,7 @@ public class CardExpirationTextWatcher implements TextWatcher {
 		}
 		mView.setText(formatted.toString());
 		mView.setSelection(formatted.length());
+		mListener.onTextChanged(s.toString());
 		mView.addTextChangedListener(this);
 	}
 }

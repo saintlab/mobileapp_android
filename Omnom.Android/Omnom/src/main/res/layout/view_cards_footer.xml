@@ -5,6 +5,7 @@
     android:id="@+id/footer"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:baselineAligned="false"
     android:layout_above="@+id/btn_pay"
     android:gravity="center"
     android:layout_centerHorizontal="true"

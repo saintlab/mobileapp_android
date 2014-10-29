@@ -5,9 +5,12 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
@@ -19,6 +22,7 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.view.LoginPanelTop;
 
 import javax.inject.Inject;
@@ -29,7 +33,7 @@ import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
 import rx.functions.Action1;
 
-public class AddCardActivity extends BaseOmnomActivity {
+public class AddCardActivity extends BaseOmnomActivity implements TextListener {
 
 	private static final int REQUEST_CODE_CARD_IO = 101;
 
@@ -61,9 +65,29 @@ public class AddCardActivity extends BaseOmnomActivity {
 	@InjectView(R.id.txt_cvv)
 	protected EditText mEditCardCvv;
 
+	@InjectView(R.id.img_camera)
+	protected ImageView mImgCamera;
+
+	@InjectView(R.id.panel_card)
+	protected View mPanelCard;
+
+	@InjectView(R.id.panel_camera)
+	protected View mPanelCamera;
+
+	@InjectView(R.id.txt_camera)
+	protected TextView mTextCamera;
+
 	private CardInfo card;
 
-	private TextWatcher mCardNumberWatcher;
+	private boolean mMinimized = false;
+
+	private int panelY;
+
+	private int cameraY;
+
+	private int cameraX;
+
+	private int panelX;
 
 	@Override
 	public void initUi() {
@@ -79,8 +103,69 @@ public class AddCardActivity extends BaseOmnomActivity {
 			}
 		});
 
-		mEditCardExpDate.addTextChangedListener(new CardExpirationTextWatcher(mEditCardExpDate));
-		mEditCardNumber.addTextChangedListener(new CardNumberTextWatcher(mEditCardNumber));
+		mEditCardExpDate.addTextChangedListener(new CardExpirationTextWatcher(mEditCardExpDate, this));
+		mEditCardNumber.addTextChangedListener(new CardNumberTextWatcher(mEditCardNumber, this));
+
+		mEditCardCvv.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) {
+			}
+
+			@Override
+			public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
+			}
+
+			@Override
+			public void afterTextChanged(final Editable s) {
+				AddCardActivity.this.onTextChanged(s.toString());
+			}
+		});
+	}
+
+	@Override
+	public void onTextChanged(final CharSequence s) {
+		animteCamera(s.length() > 0);
+	}
+
+	private void animteCamera(final boolean minimize) {
+		int[] sp = new int[2];
+		mPanelCard.getLocationOnScreen(sp);
+		if(panelY == 0) {
+			panelY = sp[1];
+		}
+		if(panelX == 0) {
+			panelX = sp[0];
+		}
+
+		mImgCamera.getLocationOnScreen(sp);
+		if(cameraY == 0) {
+			cameraY = sp[1];
+		}
+		if(cameraX == 0) {
+			cameraX = sp[0];
+		}
+
+		if(mMinimized != minimize) {
+			final int v = (int) ((cameraY - panelY) / 1.5f);
+			if(minimize) {
+				mImgCamera.setBackgroundDrawable(null);
+				AnimationUtils.animateAlpha(mTextCamera, false);
+				mImgCamera.animate().x(mPanelCard.getMeasuredWidth() - mImgCamera.getMeasuredWidth()).start();
+				mImgCamera.animate().translationYBy(-v).start();
+				mEditCardCvv.animate().translationY(-v).start();
+				mEditCardExpDate.animate().translationY(-v).start();
+				mEditCardNumber.animate().translationY(-v).start();
+			} else {
+				AnimationUtils.animateAlpha(mTextCamera, true);
+				mImgCamera.animate().x(cameraX - panelX).start();
+				mImgCamera.animate().translationYBy(v).start();
+				mEditCardCvv.animate().translationY(v).start();
+				mEditCardExpDate.animate().translationY(v).start();
+				mEditCardNumber.animate().translationY(v).start();
+				mImgCamera.setBackgroundDrawable(getResources().getDrawable(R.drawable.scan_frame));
+			}
+			mMinimized = minimize;
+		}
 	}
 
 	@Override
@@ -124,4 +209,5 @@ public class AddCardActivity extends BaseOmnomActivity {
 	public int getLayoutResource() {
 		return R.layout.activity_card_add;
 	}
+
 }
