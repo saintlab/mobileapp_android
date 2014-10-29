@@ -1,0 +1,8 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines.
+    Nexus S
+    -->
+    <dimen name="order_items_list_height_collapsed">140dp</dimen>
+    <dimen name="card_frame_width">280dp</dimen>
+    <dimen name="card_frame_height">160dp</dimen>
+</resources>

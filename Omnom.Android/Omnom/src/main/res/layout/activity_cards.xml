@@ -1,0 +1,59 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:animateLayoutChanges="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.omnom.android.view.LoginPanelTop
+        android:id="@+id/panel_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:background="@color/list_header"
+        android:padding="@dimen/activity_horizontal_margin_small"/>
+
+    <Button
+        android:id="@+id/btn_pay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_pay"
+        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+        android:paddingRight="@dimen/activity_horizontal_margin_medium"
+        android:layout_marginTop="@dimen/activity_horizontal_margin_medium"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin_medium"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/font_medium"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
+
+    <include
+        layout="@layout/view_cards_footer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_pay"
+        android:layout_centerHorizontal="true"/>
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_below="@+id/panel_top"
+        android:layout_above="@+id/footer"
+        android:divider="@color/transparent"
+        android:dividerHeight="1dp"
+        android:footerDividersEnabled="false"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <!--<EditText
+        android:id="@+id/edit_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"/>
+
+    <Button
+        android:id="@+id/btn_verify"
+        android:text="Verify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>-->
+
+</RelativeLayout>

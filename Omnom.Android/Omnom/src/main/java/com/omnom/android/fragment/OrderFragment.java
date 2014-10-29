@@ -1,10 +1,10 @@
 package com.omnom.android.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -37,7 +37,7 @@ import com.omnom.android.acquiring.mailru.model.MailRuExtra;
 import com.omnom.android.acquiring.mailru.model.MerchantData;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
-import com.omnom.android.activity.AddCardActivity;
+import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
@@ -59,6 +59,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
+import retrofit.http.HEAD;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -67,8 +68,6 @@ import static butterknife.ButterKnife.findById;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 public class OrderFragment extends Fragment {
-	public static final String CURRENCY_RUBLE = "\uf5fc";
-
 	public static final int MODE_AMOUNT = 0;
 
 	public static final int MODE_TIPS = 1;
@@ -190,7 +189,7 @@ public class OrderFragment extends Fragment {
 
 	private boolean mPaymentTitleChanged;
 
-	private int mRestaurantColor;
+	private int mAccentColor;
 
 	private float mFontNormal;
 
@@ -200,7 +199,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private String getCurrencySuffix() {
-		return CURRENCY_RUBLE;
+		return getString(R.string.currency_ruble);
 	}
 
 	@Override
@@ -216,20 +215,12 @@ public class OrderFragment extends Fragment {
 		mFontNormal = getResources().getDimension(R.dimen.font_small);
 		mFontSmall = getResources().getDimension(R.dimen.font_xsmall);
 
-		rootView.setBackgroundColor(mRestaurantColor);
-		btnPay.setTextColor(mRestaurantColor);
+		rootView.setBackgroundColor(mAccentColor);
+		btnPay.setTextColor(mAccentColor);
 
 		initPicker();
 		updateCustomTipsText(0);
 		initList();
-
-		btnPay.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				final double amount = getEnteredAmount().doubleValue();
-				pay(amount, 0);
-			}
-		});
 
 		initRadioButtons();
 		initFooter();
@@ -242,6 +233,11 @@ public class OrderFragment extends Fragment {
 		updatePaymentTipsAmount(btnTips2, amount);
 		updatePaymentTipsAmount(btnTips3, amount);
 		updatePaymentTipsAmount(btnTips4, amount);
+	}
+
+	@OnClick(R.id.btn_pay)
+	protected void onPay(View v) {
+		pay(getEnteredAmount().doubleValue(), 0);
 	}
 
 	private void initList() {
@@ -561,22 +557,23 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void pay(final double amount, final double tip) {
-		final String cardSaved = OmnomApplication.get(getActivity()).getPreferences().getCardData(getActivity());
+		final FragmentActivity activity = getActivity();
+		final String cardSaved = OmnomApplication.get(activity).getPreferences().getCardData(activity);
 		if(!TextUtils.isEmpty(cardSaved)) {
 			final CardInfo cardData = gson.fromJson(cardSaved, CardInfo.class);
 			cardData.setCardId(StringUtils.EMPTY_STRING);
 			btnPay.setEnabled(false);
 			final BillRequest request = BillRequest.create(amount, mOrder);
-			mBillSubscription = AndroidObservable.bindActivity(getActivity(), api.bill(request)).subscribe(new Action1<BillResponse>() {
+			mBillSubscription = AndroidObservable.bindActivity(activity, api.bill(request)).subscribe(new Action1<BillResponse>() {
 				@Override
 				public void call(final BillResponse response) {
 					if(!response.hasErrors()) {
 						tryToPay(cardData, response, amount, tip);
 					} else {
 						if(response.getError() != null) {
-							showToast(getActivity(), response.getError());
+							showToast(activity, response.getError());
 						} else if(response.getErrors() != null) {
-							showToast(getActivity(), response.getErrors().toString());
+							showToast(activity, response.getErrors().toString());
 						}
 						btnPay.setEnabled(true);
 					}
@@ -588,7 +585,7 @@ public class OrderFragment extends Fragment {
 				}
 			});
 		} else {
-			startActivity(new Intent(getActivity(), AddCardActivity.class));
+			CardsActivity.start(activity, amount, mAccentColor);
 		}
 	}
 
@@ -642,7 +639,7 @@ public class OrderFragment extends Fragment {
 		gson = new Gson();
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
-			mRestaurantColor = getArguments().getInt(ARG_COLOR);
+			mAccentColor = getArguments().getInt(ARG_COLOR);
 		}
 	}
 }
