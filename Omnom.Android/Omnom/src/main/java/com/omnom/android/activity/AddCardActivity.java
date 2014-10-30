@@ -159,7 +159,7 @@ public class AddCardActivity extends BaseOmnomActivity implements TextListener {
 			} else {
 				AnimationUtils.animateAlpha(mTextCamera, true);
 				mImgCamera.animate().x(cameraX - panelX).start();
-				mImgCamera.animate().translationYBy(v).start();
+				mImgCamera.animate().translationY(0).start();
 				mEditCardCvv.animate().translationY(v).start();
 				mEditCardExpDate.animate().translationY(v).start();
 				mEditCardNumber.animate().translationY(v).start();
