@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -212,8 +213,8 @@ public class OrderFragment extends Fragment {
 	@Override
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 		btnPay.setTextColor(mAccentColor);
-		mFontNormal = getResources().getDimension(R.dimen.font_small);
-		mFontSmall = getResources().getDimension(R.dimen.font_xsmall);
+		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
+		mFontSmall = getResources().getDimension(R.dimen.font_large);
 
 		rootView.setBackgroundColor(mAccentColor);
 
@@ -464,8 +465,6 @@ public class OrderFragment extends Fragment {
 				return;
 			}
 			radioGroup.check(mCheckedId);
-			mCheckedId = WRONG_VALUE;
-
 			btnTips4.setTag(String.valueOf(WRONG_VALUE));
 			updatePaymentTipsAmount(btnTips4, getEnteredAmount());
 		}
@@ -529,28 +528,28 @@ public class OrderFragment extends Fragment {
 			}
 			btn.setText(getString(R.string.tip_percent, tag));
 			if(btn.isChecked()) {
-				btn.setTextSize(mFontNormal);
+				btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontNormal);
 			} else {
-				btn.setTextSize(mFontSmall);
+				btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSmall);
 			}
 		} else {
 			if(isOther) {
 				if(btn.isChecked()) {
 					btn.setText(getString(R.string.tip_percent, btn.getTag()));
-					btn.setTextSize(mFontNormal);
+					btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontNormal);
 				} else {
 					btn.setText(getString(R.string.tips_another));
-					btn.setTextSize(mFontSmall);
+					btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSmall);
 				}
 			} else {
 				final int fixedTip = (Integer) btn.getTag(R.id.tip);
 				if(fixedTip == WRONG_VALUE) {
 					btn.setText(getString(R.string.tips_another));
-					btn.setTextSize(mFontSmall);
+					btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSmall);
 					return;
 				}
 				btn.setText(String.valueOf(fixedTip));
-				btn.setTextSize(mFontNormal);
+				btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontNormal);
 			}
 		}
 	}

@@ -16,6 +16,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.omnom.android.utils.animation.BezierCubicInterpolation;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
 
 import java.util.LinkedList;
@@ -49,16 +51,26 @@ public class LoaderView extends FrameLayout {
 	}
 
 	protected ImageView mImgLoader;
+
 	protected ImageView mImgLogo;
+
 	protected ProgressBar mProgressBar;
+
 	protected EditText mEditTableNumber;
 
 	private ValueAnimator mProgressAnimator;
+
 	private int loaderSize;
+
 	private int currentColor = -1;
+
 	private List<View> translationViews = new LinkedList<View>();
+
 	private Interpolator interpolation;
+
 	private int mProgressColor;
+
+	private Target mTarget;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public LoaderView(Context context) {
@@ -427,7 +439,13 @@ public class LoaderView extends FrameLayout {
 			// skip
 			return;
 		}
-		Picasso.with(getContext()).load(logo).placeholder(placeholderResId).into(new Target() {
+
+		RequestCreator requestCreator = Picasso.with(getContext()).load(logo).placeholder(placeholderResId);
+		if(getContext().getResources().getDisplayMetrics().densityDpi == DisplayMetrics.DENSITY_XXHIGH) {
+			final int size = (int)(220 * 2.5f);
+			requestCreator = requestCreator.resize(size, size).centerInside();
+		}
+		mTarget = new Target() {
 			@Override
 			public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 				mImgLogo.setTag(R.id.logo_url, logo);
@@ -444,7 +462,8 @@ public class LoaderView extends FrameLayout {
 			public void onPrepareLoad(Drawable placeHolderDrawable) {
 
 			}
-		});
+		};
+		requestCreator.into(mTarget);
 	}
 
 	public void animateLogoFast(final String logo, int placeholder) {
