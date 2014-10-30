@@ -8,40 +8,34 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.MerchantData;
-import com.omnom.android.acquiring.mailru.model.UserData;
-import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
 import com.omnom.android.utils.CardUtils;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
-import com.omnom.android.view.LoginPanelTop;
-
-import javax.inject.Inject;
+import com.omnom.android.utils.view.ErrorEditText;
+import com.omnom.android.view.HeaderView;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
-import rx.functions.Action1;
 
-public class AddCardActivity extends BaseOmnomActivity implements TextListener {
+public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	private static final int REQUEST_CODE_CARD_IO = 101;
 
+	private static final int REQUEST_CODE_CARD_REGISTER = 102;
+
 	@SuppressLint("NewApi")
 	public static void start(Activity activity) {
-		final Intent intent = new Intent(activity, AddCardActivity.class);
+		final Intent intent = new Intent(activity, CardAddActivity.class);
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
 			                                                    R.anim.slide_in_right,
@@ -52,20 +46,17 @@ public class AddCardActivity extends BaseOmnomActivity implements TextListener {
 		}
 	}
 
-	@Inject
-	protected Acquiring mAcquiring;
-
 	@InjectView(R.id.panel_top)
-	protected LoginPanelTop mPanelTop;
+	protected HeaderView mPanelTop;
 
 	@InjectView(R.id.txt_card_number)
-	protected EditText mEditCardNumber;
+	protected ErrorEditText mEditCardNumber;
 
 	@InjectView(R.id.txt_exp_date)
-	protected EditText mEditCardExpDate;
+	protected ErrorEditText mEditCardExpDate;
 
 	@InjectView(R.id.txt_cvv)
-	protected EditText mEditCardCvv;
+	protected ErrorEditText mEditCardCvv;
 
 	@InjectView(R.id.img_camera)
 	protected ImageView mImgCamera;
@@ -97,6 +88,7 @@ public class AddCardActivity extends BaseOmnomActivity implements TextListener {
 				doProceed();
 			}
 		});
+		mPanelTop.setButtonRightEnabled(false);
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -106,7 +98,6 @@ public class AddCardActivity extends BaseOmnomActivity implements TextListener {
 
 		mEditCardExpDate.addTextChangedListener(new CardExpirationTextWatcher(mEditCardExpDate, this));
 		mEditCardNumber.addTextChangedListener(new CardNumberTextWatcher(mEditCardNumber, this));
-
 		mEditCardCvv.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) {
@@ -118,7 +109,7 @@ public class AddCardActivity extends BaseOmnomActivity implements TextListener {
 
 			@Override
 			public void afterTextChanged(final Editable s) {
-				AddCardActivity.this.onTextChanged(s.toString());
+				CardAddActivity.this.onTextChanged(s.toString());
 			}
 		});
 	}
@@ -126,6 +117,7 @@ public class AddCardActivity extends BaseOmnomActivity implements TextListener {
 	@Override
 	public void onTextChanged(final CharSequence s) {
 		animteCamera(s.length() > 0);
+		mPanelTop.setButtonRightEnabled(validate(false));
 	}
 
 	private void animteCamera(final boolean minimize) {
@@ -186,56 +178,41 @@ public class AddCardActivity extends BaseOmnomActivity implements TextListener {
 	}
 
 	private void doProceed() {
+		if(!validate(true)) {
+			return;
+		}
 		final String pan = CardUtils.preparePan(mEditCardNumber.getText().toString());
 		final String expDate = CardUtils.prepareExpDare(mEditCardExpDate.getText().toString());
 		final String cvv = mEditCardCvv.getText().toString();
-
-		final CardInfo card = CardInfo.create(pan, expDate, cvv);
-
-		final MerchantData merchant = new MerchantData(this);
-		com.omnom.android.auth.UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		final UserData user = UserData.create(String.valueOf(wicketUser.getId()), wicketUser.getPhone());
-		mAcquiring.registerCard(merchant, user, card).subscribe(new Action1<CardRegisterPollingResponse>() {
-			@Override
-			public void call(CardRegisterPollingResponse response) {
-				card.setCardId(response.getCardId());
-				// verifyCard(card, user, merchant);
-				// TODO: start ConfirmCardActivity(cardInfo)
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(final Throwable throwable) {
-
-			}
-		});
+		CardConfirmActivity.start(this, CardInfo.create(pan, expDate, cvv), REQUEST_CODE_CARD_REGISTER);
 	}
 
-	//@OnClick(R.id.btn_verify)
-	//public void verifyCard() {
-	//	if(card == null) {
-	//		showToast(getActivity(), "Scan card");
-	//		return;
-	//	}
-	//	final UserData user = UserData.createTestUser();
-	//	final MerchantData merchant = new MerchantData(getActivity());
-	//
-	//	final EditText text = findById(this, R.id.edit_amount);
-	//	mCardVerifySubscribtion = AndroidObservable
-	//			.bindActivity(this, mAcquiring.verifyCard(merchant, user, card, Double.parseDouble(text.getText().toString())))
-	//			.subscribe(new Action1<AcquiringResponse>() {
-	//				@Override
-	//				public void call(AcquiringResponse response) {
-	//					final String cardData = card.toGson(gson);
-	//					getPreferences().setCardData(getActivity(), cardData);
-	//					showToast(getActivity(), "VERIFIED");
-	//				}
-	//			}, new Action1<Throwable>() {
-	//				@Override
-	//				public void call(Throwable throwable) {
-	//					showToast(getActivity(), "VERIFICATION ERROR");
-	//				}
-	//			});
-	//}
+	private boolean validate(boolean showErrors) {
+		final String pan = mEditCardNumber.getText().toString();
+		final String expDate = mEditCardExpDate.getText().toString();
+		final String cvv = mEditCardCvv.getText().toString();
+		boolean hasErrors = false;
+
+		if(pan.length() < 13) {
+			if(showErrors) {
+				mEditCardNumber.setError(true);
+			}
+			hasErrors |= true;
+		}
+		if(expDate.length() < 5) {
+			if(showErrors) {
+				mEditCardExpDate.setError(true);
+			}
+			hasErrors |= true;
+		}
+		if(cvv.length() < 3) {
+			if(showErrors) {
+				mEditCardCvv.setError(true);
+			}
+			hasErrors |= true;
+		}
+		return !hasErrors;
+	}
 
 	@OnClick(R.id.img_camera)
 	public void startCardIo(View view) {

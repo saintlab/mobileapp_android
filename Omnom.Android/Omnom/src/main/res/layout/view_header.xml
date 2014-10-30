@@ -8,7 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:textColor="@android:color/black"
+        android:textColor="@drawable/text_color_selector"
         style="@android:style/Widget.Holo.Button.Borderless"/>
 
     <Button
@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:textColor="@android:color/black"
+        android:textColor="@drawable/text_color_selector"
         style="@android:style/Widget.Holo.Button.Borderless"/>
 
     <ProgressBar
@@ -35,6 +35,14 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:textSize="@dimen/font_normal"
+        android:textColor="?android:textColorHint" />
+
+    <TextView
+        android:id="@+id/title_big"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="@dimen/font_large"
         android:textColor="?android:textColorHint" />
 
     <com.omnom.android.view.ViewPagerIndicatorCircle

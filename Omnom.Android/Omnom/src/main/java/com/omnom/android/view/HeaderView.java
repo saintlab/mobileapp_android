@@ -22,8 +22,10 @@ import static butterknife.ButterKnife.findById;
 /**
  * Created by Ch3D on 01.10.2014.
  */
-public class LoginPanelTop extends RelativeLayout {
+public class HeaderView extends RelativeLayout {
 	private TextView txtTitle;
+
+	private TextView txtTitleBig;
 
 	private Button btnRight;
 
@@ -35,24 +37,25 @@ public class LoginPanelTop extends RelativeLayout {
 
 	private int mBtnRightLastVisibility;
 
-	public LoginPanelTop(Context context) {
+	public HeaderView(Context context) {
 		super(context);
 		init();
 	}
 
-	public LoginPanelTop(Context context, AttributeSet attrs) {
+	public HeaderView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
 
-	public LoginPanelTop(Context context, AttributeSet attrs, int defStyle) {
+	public HeaderView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
 	}
 
 	private void init() {
-		final View view = LayoutInflater.from(getContext()).inflate(R.layout.view_enter_panel_top, this);
+		final View view = LayoutInflater.from(getContext()).inflate(R.layout.view_header, this);
 		txtTitle = findById(view, R.id.title);
+		txtTitleBig = findById(view, R.id.title_big);
 		btnRight = findById(view, R.id.btn_right);
 		btnLeft = findById(view, R.id.btn_left);
 		pageIndicator = findById(view, R.id.page_indicator);
@@ -64,6 +67,14 @@ public class LoginPanelTop extends RelativeLayout {
 
 	public void setTitle(final int resId) {
 		txtTitle.setText(resId);
+		ViewUtils.setVisible(txtTitleBig, false);
+		ViewUtils.setVisible(txtTitle, true);
+	}
+
+	public void setTitleBig(final int resId) {
+		txtTitleBig.setText(resId);
+		ViewUtils.setVisible(txtTitleBig, true);
+		ViewUtils.setVisible(txtTitle, false);
 	}
 
 	public void setButtonRight(final int resId, OnClickListener listener) {
@@ -116,5 +127,9 @@ public class LoginPanelTop extends RelativeLayout {
 
 	public void showButtonRight(final boolean show) {
 		AnimationUtils.animateAlpha(btnRight, show);
+	}
+
+	public void setButtonRightEnabled(final boolean enabled) {
+		btnRight.setEnabled(enabled);
 	}
 }

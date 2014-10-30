@@ -2,10 +2,10 @@ package com.omnom.android.utils;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.widget.EditText;
 
 import com.omnom.android.activity.TextListener;
 import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.view.ErrorEditText;
 
 /**
  * Created by Ch3D on 28.10.2014.
@@ -16,11 +16,11 @@ public class CardExpirationTextWatcher implements TextWatcher {
 
 	private static final int MAX_LENGTH = 4;
 
-	private EditText mView;
+	private ErrorEditText mView;
 
 	private TextListener mListener;
 
-	public CardExpirationTextWatcher(EditText view, TextListener listener) {
+	public CardExpirationTextWatcher(ErrorEditText view, TextListener listener) {
 		mView = view;
 		mListener = listener;
 	}

@@ -17,7 +17,7 @@ import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.UserDataHolder;
 import com.omnom.android.utils.view.ErrorEdit;
-import com.omnom.android.view.LoginPanelTop;
+import com.omnom.android.view.HeaderView;
 
 import javax.inject.Inject;
 
@@ -37,7 +37,7 @@ public class LoginActivity extends BaseOmnomActivity {
 	@InjectView(R.id.edit_phone)
 	protected ErrorEdit editPhone;
 	@InjectView(R.id.panel_top)
-	protected LoginPanelTop topPanel;
+	protected HeaderView topPanel;
 	@Inject
 	protected AuthService authenticator;
 	private boolean mFirstStart = true;

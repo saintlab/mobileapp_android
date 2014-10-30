@@ -19,7 +19,7 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
-import com.omnom.android.view.LoginPanelTop;
+import com.omnom.android.view.HeaderView;
 
 import javax.inject.Inject;
 
@@ -82,7 +82,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	protected View panelDigits;
 
 	@InjectView(R.id.panel_top)
-	protected LoginPanelTop topPanel;
+	protected HeaderView topPanel;
 
 	@InjectView(R.id.btn_request_code)
 	protected Button btnRequestCode;

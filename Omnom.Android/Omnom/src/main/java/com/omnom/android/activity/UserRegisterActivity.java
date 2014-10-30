@@ -23,7 +23,7 @@ import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.utils.view.ErrorEditText;
-import com.omnom.android.view.LoginPanelTop;
+import com.omnom.android.view.HeaderView;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -70,7 +70,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	protected TextView textError;
 
 	@InjectView(R.id.panel_top)
-	protected LoginPanelTop topPanel;
+	protected HeaderView topPanel;
 
 	@Inject
 	protected AuthService authenticator;

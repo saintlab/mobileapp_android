@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.omnom.android.view.LoginPanelTop
+    <com.omnom.android.view.HeaderView
         android:id="@+id/panel_top"
         android:layout_width="match_parent"
         android:layout_height="@dimen/view_size_default"
@@ -51,14 +51,14 @@
         </LinearLayout>
 
 
-        <EditText
+        <com.omnom.android.utils.view.ErrorEditText
             android:id="@+id/txt_card_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/panel_camera"
             android:layout_alignParentLeft="true"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:singleLine="true"
             android:inputType="phone"
             android:imeOptions="actionNext"
@@ -70,7 +70,7 @@
             android:textCursorDrawable="@null"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
-        <EditText
+        <com.omnom.android.utils.view.ErrorEditText
             android:id="@+id/txt_exp_date"
             android:layout_below="@id/txt_card_number"
             android:layout_alignLeft="@id/txt_card_number"
@@ -87,7 +87,7 @@
             android:textCursorDrawable="@null"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
-        <EditText
+        <com.omnom.android.utils.view.ErrorEditText
             android:id="@+id/txt_cvv"
             android:layout_toRightOf="@id/txt_exp_date"
             android:layout_below="@id/txt_card_number"
