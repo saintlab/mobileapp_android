@@ -59,7 +59,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
-import retrofit.http.HEAD;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -148,7 +147,7 @@ public class OrderFragment extends Fragment {
 	protected View panelPayment;
 
 	@InjectView(R.id.btn_pay)
-	protected Button btnPay;
+	protected TextView btnPay;
 
 	@InjectView(R.id.btn_apply)
 	protected Button btnApply;
@@ -212,11 +211,11 @@ public class OrderFragment extends Fragment {
 
 	@Override
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+		btnPay.setTextColor(mAccentColor);
 		mFontNormal = getResources().getDimension(R.dimen.font_small);
 		mFontSmall = getResources().getDimension(R.dimen.font_xsmall);
 
 		rootView.setBackgroundColor(mAccentColor);
-		btnPay.setTextColor(mAccentColor);
 
 		initPicker();
 		updateCustomTipsText(0);
