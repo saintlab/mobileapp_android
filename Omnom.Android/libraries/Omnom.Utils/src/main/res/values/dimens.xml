@@ -38,6 +38,7 @@
     <dimen name="profile_margin_top">-48dp</dimen>
     <dimen name="profile_avatar_size">156dp</dimen>
 
+    <dimen name="font_xxsmall">8sp</dimen>
     <dimen name="font_xsmall">12sp</dimen>
     <dimen name="font_small">16sp</dimen>
     <dimen name="font_normal">18sp</dimen>

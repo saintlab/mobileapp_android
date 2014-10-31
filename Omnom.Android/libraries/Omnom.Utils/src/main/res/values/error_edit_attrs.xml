@@ -3,6 +3,8 @@
     <declare-styleable name="ErrorEdit">
         <attr name="showClear" format="boolean"/>
         <attr name="iconClear" format="reference"/>
+        <attr name="textSize" format="reference|dimension"/>
+        <attr name="errorTextSize" format="reference|dimension"/>
         <attr name="textGravity">
             <flag name="left" value="0x00000000"/>
             <flag name="center" value="0x00000001"/>

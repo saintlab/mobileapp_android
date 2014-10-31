@@ -7,6 +7,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,6 +86,10 @@ public class ErrorEdit extends LinearLayout {
 
 	private int mTextGravity;
 
+	private float mTextSize;
+
+	private float mErrorTextSize;
+
 	public ErrorEdit(Context context) {
 		super(context);
 		init();
@@ -115,6 +120,8 @@ public class ErrorEdit extends LinearLayout {
 			mInputType = a.getInt(R.styleable.ErrorEdit_inputType, INPUT_TYPE_TEXT);
 			mFontType = a.getInt(R.styleable.ErrorEdit_font, FONT_TYPE_REGULAR);
 			mTextGravity = a.getInt(R.styleable.ErrorEdit_textGravity, GRAVITY_LEFT);
+			mTextSize = a.getDimension(R.styleable.ErrorEdit_textSize, getResources().getDimension(R.dimen.font_medium));
+			mErrorTextSize = a.getDimension(R.styleable.ErrorEdit_errorTextSize, getResources().getDimension(R.dimen.font_medium));
 		} finally {
 			a.recycle();
 		}
@@ -124,10 +131,11 @@ public class ErrorEdit extends LinearLayout {
 		setOrientation(VERTICAL);
 		final View view = LayoutInflater.from(getContext()).inflate(R.layout.widget_error_edit_text, this);
 		editView = (ErrorEditText) view.findViewById(R.id.edit);
-		initInputType();
-		initGravity();
 		editView.addTextChangedListener(onTextChanged);
 		editView.setHint(mHintText);
+		editView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mTextSize);
+		initInputType();
+		initGravity();
 		initFontType();
 		editView.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override
@@ -141,7 +149,10 @@ public class ErrorEdit extends LinearLayout {
 				}
 			}
 		});
+
 		errorTextView = (TextView) view.findViewById(R.id.error);
+		errorTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mErrorTextSize);
+
 		btnClear = (Button) view.findViewById(R.id.btn_clear);
 		btnClear.setBackgroundDrawable(mClearDrawable);
 		btnClear.setOnClickListener(new OnClickListener() {

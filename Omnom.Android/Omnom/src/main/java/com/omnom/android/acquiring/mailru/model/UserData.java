@@ -17,7 +17,12 @@ public class UserData {
 		return userData;
 	}
 
+	public static UserData create(final com.omnom.android.auth.UserData userData) {
+		return create(String.valueOf(userData.getId()), userData.getPhone());
+	}
+
 	private String phone;
+
 	private String id;
 
 	public String getPhone() {
