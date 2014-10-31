@@ -29,6 +29,7 @@
             android:layout_marginTop="@dimen/activity_vertical_margin_xlarge"
             omnom:inputType="numberDecimal"
             omnom:font="regular_le"
+            omnom:maxLength="6"
             omnom:textSize="@dimen/font_large"
             omnom:errorTextSize="@dimen/font_xxsmall"
             omnom:hint="@string/hint_confirm_amount"

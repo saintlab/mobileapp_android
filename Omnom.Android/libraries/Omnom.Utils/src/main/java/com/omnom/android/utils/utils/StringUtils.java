@@ -12,6 +12,7 @@ import hugo.weaving.DebugLog;
 public class StringUtils {
 	public static final String EMPTY_STRING = "";
 	public static final String WHITESPACE = " ";
+	public static final String COMMA = ",";
 
 	public static String concat(String delimiter, String... data) {
 		final StringBuilder sb = new StringBuilder();

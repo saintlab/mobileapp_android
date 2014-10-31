@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 import com.omnom.android.utils.R;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
+
+import java.util.Arrays;
 
 import hugo.weaving.DebugLog;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
@@ -90,6 +93,8 @@ public class ErrorEdit extends LinearLayout {
 
 	private float mErrorTextSize;
 
+	private int mMaxLen;
+
 	public ErrorEdit(Context context) {
 		super(context);
 		init();
@@ -120,6 +125,7 @@ public class ErrorEdit extends LinearLayout {
 			mInputType = a.getInt(R.styleable.ErrorEdit_inputType, INPUT_TYPE_TEXT);
 			mFontType = a.getInt(R.styleable.ErrorEdit_font, FONT_TYPE_REGULAR);
 			mTextGravity = a.getInt(R.styleable.ErrorEdit_textGravity, GRAVITY_LEFT);
+			mMaxLen = a.getInt(R.styleable.ErrorEdit_maxLength, 0);
 			mTextSize = a.getDimension(R.styleable.ErrorEdit_textSize, getResources().getDimension(R.dimen.font_medium));
 			mErrorTextSize = a.getDimension(R.styleable.ErrorEdit_errorTextSize, getResources().getDimension(R.dimen.font_medium));
 		} finally {
@@ -134,6 +140,13 @@ public class ErrorEdit extends LinearLayout {
 		editView.addTextChangedListener(onTextChanged);
 		editView.setHint(mHintText);
 		editView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mTextSize);
+		if(mMaxLen > 0) {
+			final InputFilter[] filters = editView.getFilters();
+			final InputFilter[] newFilters = Arrays.copyOf(filters, filters.length + 1);
+			newFilters[newFilters.length - 1] = new InputFilter.LengthFilter(mMaxLen);
+			editView.setFilters(newFilters);
+		}
+
 		initInputType();
 		initGravity();
 		initFontType();

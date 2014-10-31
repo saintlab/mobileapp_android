@@ -1,7 +1,11 @@
 package com.omnom.android.activity;
 
 import android.content.Intent;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -96,6 +100,58 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 			}
 		});
 		registerCard();
+		initAmount();
+	}
+
+	private void initAmount() {
+		final EditText editText = mEditError.getEditText();
+		editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
+				if(actionId == EditorInfo.IME_ACTION_DONE) {
+					verifyCard();
+					return true;
+				}
+				return false;
+			}
+		});
+		editText.addTextChangedListener(new TextWatcher() {
+			public boolean mRemove = false;
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				mRemove = after == 0;
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				final String str = s.toString();
+				if(!str.endsWith(getCurrencySuffix())) {
+					final String text = str + getCurrencySuffix();
+					editText.setText(text);
+					editText.setSelection(text.length() - 1);
+				}
+			}
+		});
+		editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if(hasFocus) {
+					int length = editText.getText().length();
+					if(length >= 2) {
+						editText.setSelection(length - 2);
+					}
+				}
+			}
+		});
+	}
+
+	private String getCurrencySuffix() {
+		return getString(R.string.currency_ruble);
 	}
 
 	private void registerCard() {
@@ -104,25 +160,25 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 		com.omnom.android.auth.UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		final UserData user = UserData.create(String.valueOf(wicketUser.getId()), wicketUser.getPhone());
 		mCardRegisterSubscription = AndroidObservable.bindActivity(this,
-		                                                       mAcquiring.registerCard(merchant, user, mCard))
-		                                         .subscribe(
-				                                         new Action1<CardRegisterPollingResponse>() {
-					                                         @Override
-					                                         public void call(CardRegisterPollingResponse response) {
-						                                         mCard.setCardId(response.getCardId());
-						                                         ViewUtils.setVisible(mTextInfo, true);
-						                                         mPanelTop.showProgress(false);
-					                                         }
-				                                         }, new Action1<Throwable>() {
-					                                         @Override
-					                                         public void call(final Throwable throwable) {
-						                                         ViewUtils.setVisible(mTextInfo, false);
-						                                         mPanelTop.showProgress(false);
-						                                         mEditError.setError(R.string.something_went_wrong_try_agint);
-						                                         mPanelTop.setButtonRightEnabled(true);
-						                                         mPanelTop.setButtonRight(R.string.repeat, mRegisterClickListener);
-					                                         }
-				                                         });
+		                                                           mAcquiring.registerCard(merchant, user, mCard))
+		                                             .subscribe(
+				                                             new Action1<CardRegisterPollingResponse>() {
+					                                             @Override
+					                                             public void call(CardRegisterPollingResponse response) {
+						                                             mCard.setCardId(response.getCardId());
+						                                             ViewUtils.setVisible(mTextInfo, true);
+						                                             mPanelTop.showProgress(false);
+					                                             }
+				                                             }, new Action1<Throwable>() {
+					                                             @Override
+					                                             public void call(final Throwable throwable) {
+						                                             ViewUtils.setVisible(mTextInfo, false);
+						                                             mPanelTop.showProgress(false);
+						                                             mEditError.setError(R.string.something_went_wrong_try_agint);
+						                                             mPanelTop.setButtonRightEnabled(true);
+						                                             mPanelTop.setButtonRight(R.string.repeat, mRegisterClickListener);
+					                                             }
+				                                             });
 	}
 
 	public void verifyCard() {
