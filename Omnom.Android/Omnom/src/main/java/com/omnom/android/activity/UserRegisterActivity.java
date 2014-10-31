@@ -129,6 +129,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 						dialog.dismiss();
 					}
 				});
+				dialog.show();
 			}
 		});
 	}

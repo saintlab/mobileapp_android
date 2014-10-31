@@ -1,9 +1,0 @@
-<resources>
-    <!-- Default screen margins, per the Android Design guidelines.
-     Nexus 4
-     Nexus 5
-     Moto X
-     and so on
-     -->
-    <dimen name="view_size_default">48dp</dimen>
-</resources>
