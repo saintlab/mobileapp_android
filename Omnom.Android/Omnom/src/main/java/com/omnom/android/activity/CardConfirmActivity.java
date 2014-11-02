@@ -20,6 +20,7 @@ import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.view.HeaderView;
@@ -116,11 +117,12 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 			}
 		});
 		editText.addTextChangedListener(new TextWatcher() {
-			public boolean mRemove = false;
+			public boolean hadComma = false;
+			public String delimiter = StringUtils.getCurrencyDelimiter();
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				mRemove = after == 0;
+				hadComma = s.toString().contains(delimiter);
 			}
 
 			@Override
@@ -129,12 +131,25 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 
 			@Override
 			public void afterTextChanged(Editable s) {
+				editText.removeTextChangedListener(this);
 				final String str = s.toString();
-				if(!str.endsWith(getCurrencySuffix())) {
-					final String text = str + getCurrencySuffix();
-					editText.setText(text);
-					editText.setSelection(text.length() - 1);
+
+				final int separatorIndex = str.indexOf(delimiter);
+				String amount = StringUtils.filterAmount(str);
+				final int length = amount.length();
+				if(length == 2 && separatorIndex == -1 && !hadComma) {
+					amount += delimiter;
 				}
+
+				if(length == 3 && separatorIndex == -1) {
+					final String last = amount.substring(length - 1, length);
+					amount = amount.replace(last, delimiter + last);
+				}
+
+				final String text = amount + getCurrencySuffix();
+				editText.setText(text);
+				editText.setSelection(text.length() - 1);
+				editText.addTextChangedListener(this);
 			}
 		});
 		editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
