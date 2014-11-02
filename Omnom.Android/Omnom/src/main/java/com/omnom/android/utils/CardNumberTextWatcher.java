@@ -1,7 +1,6 @@
 package com.omnom.android.utils;
 
 import android.text.Editable;
-import android.text.TextWatcher;
 
 import com.omnom.android.activity.TextListener;
 import com.omnom.android.utils.utils.StringUtils;
@@ -10,7 +9,7 @@ import com.omnom.android.utils.view.ErrorEditText;
 /**
  * Created by Ch3D on 28.10.2014.
  */
-public class CardNumberTextWatcher implements TextWatcher {
+public class CardNumberTextWatcher extends CardDataTextWatcher {
 
 	public static final String DELIMITER_CARD_NUMBER = "  ";
 
@@ -21,16 +20,9 @@ public class CardNumberTextWatcher implements TextWatcher {
 	private TextListener mListener;
 
 	public CardNumberTextWatcher(ErrorEditText view, TextListener listener) {
+		super(view);
 		mView = view;
 		mListener = listener;
-	}
-
-	@Override
-	public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) {
-	}
-
-	@Override
-	public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
 	}
 
 	@Override
@@ -52,7 +44,21 @@ public class CardNumberTextWatcher implements TextWatcher {
 		}
 		mView.setText(formatted.toString());
 		mView.setSelection(formatted.length());
+		final int length1 = text.length();
+		if(length1 >= MAX_LENGTH) {
+			focusNextView();
+		}
 		mListener.onTextChanged(s.toString());
 		mView.addTextChangedListener(this);
+	}
+
+	@Override
+	public int getMaxLength() {
+		return MAX_LENGTH;
+	}
+
+	@Override
+	public int getDelimiterLength() {
+		return DELIMITER_CARD_NUMBER.length() * 3;
 	}
 }

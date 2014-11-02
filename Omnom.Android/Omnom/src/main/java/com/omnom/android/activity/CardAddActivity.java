@@ -6,7 +6,6 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +13,7 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.utils.CardDataTextWatcher;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
 import com.omnom.android.utils.CardUtils;
@@ -98,17 +98,22 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 		mEditCardExpDate.addTextChangedListener(new CardExpirationTextWatcher(mEditCardExpDate, this));
 		mEditCardNumber.addTextChangedListener(new CardNumberTextWatcher(mEditCardNumber, this));
-		mEditCardCvv.addTextChangedListener(new TextWatcher() {
+		mEditCardCvv.addTextChangedListener(new CardDataTextWatcher(mEditCardCvv) {
 			@Override
-			public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) {
+			public int getMaxLength() {
+				return 3;
 			}
 
 			@Override
-			public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
+			public int getDelimiterLength() {
+				return 0;
 			}
 
 			@Override
 			public void afterTextChanged(final Editable s) {
+				if(s.length() == 0) {
+					focusPrevView();
+				}
 				CardAddActivity.this.onTextChanged(s.toString());
 			}
 		});
@@ -116,7 +121,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	@Override
 	public void onTextChanged(final CharSequence s) {
-		animteCamera(s.length() > 0);
+		animteCamera(mEditCardCvv.length() > 0 || mEditCardExpDate.length() > 0 || mEditCardNumber.length() > 0);
 		mPanelTop.setButtonRightEnabled(validate(false));
 	}
 
