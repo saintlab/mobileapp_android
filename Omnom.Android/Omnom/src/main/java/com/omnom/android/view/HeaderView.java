@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -37,6 +38,12 @@ public class HeaderView extends RelativeLayout {
 
 	private int mBtnRightLastVisibility;
 
+	private ImageButton btnRightDrawable;
+
+	private ImageButton btnLeftDrawable;
+
+	private int mBtnRightDrawableLastVisibility;
+
 	public HeaderView(Context context) {
 		super(context);
 		init();
@@ -58,6 +65,8 @@ public class HeaderView extends RelativeLayout {
 		txtTitleBig = findById(view, R.id.title_big);
 		btnRight = findById(view, R.id.btn_right);
 		btnLeft = findById(view, R.id.btn_left);
+		btnRightDrawable = findById(view, R.id.btn_right_drawable);
+		btnLeftDrawable = findById(view, R.id.btn_left_drawable);
 		pageIndicator = findById(view, R.id.page_indicator);
 		progress = findById(view, R.id.progress);
 
@@ -78,15 +87,33 @@ public class HeaderView extends RelativeLayout {
 	}
 
 	public void setButtonRight(final int resId, OnClickListener listener) {
-		btnRight.setText(resId);
-		btnRight.setOnClickListener(listener);
-		btnRight.setVisibility(View.VISIBLE);
+		setButton(btnRight, resId, listener);
 	}
 
 	public void setButtonLeft(final int resId, OnClickListener listener) {
-		btnLeft.setText(resId);
-		btnLeft.setOnClickListener(listener);
-		btnLeft.setVisibility(View.VISIBLE);
+		setButton(btnLeft, resId, listener);
+	}
+
+	private void setButton(Button btn, int resId, final OnClickListener listener) {
+		btn.setText(resId);
+		btn.setOnClickListener(listener);
+		btn.setVisibility(View.VISIBLE);
+	}
+
+	public void setButtonRightDrawable(final int resId, OnClickListener listener) {
+		btnRight.setVisibility(View.GONE);
+		setButtonDrawable(btnRightDrawable, resId, listener);
+	}
+
+	public void setButtonLeftDrawable(final int resId, OnClickListener listener) {
+		btnLeft.setVisibility(View.GONE);
+		setButtonDrawable(btnLeftDrawable, resId, listener);
+	}
+
+	private void setButtonDrawable(ImageButton btn, final int resId, final OnClickListener listener) {
+		btn.setBackgroundResource(resId);
+		btn.setOnClickListener(listener);
+		btn.setVisibility(View.VISIBLE);
 	}
 
 	public void setPaging(final int count, final int index) {
@@ -115,11 +142,16 @@ public class HeaderView extends RelativeLayout {
 	public void showProgress(final boolean show) {
 		if(show) {
 			mBtnRightLastVisibility = btnRight.getVisibility();
+			mBtnRightDrawableLastVisibility = btnRightDrawable.getVisibility();
 			ViewUtils.setVisible(btnRight, !show);
+			ViewUtils.setVisible(btnRightDrawable, !show);
 			ViewUtils.setVisible(progress, show);
 		} else {
 			if(mBtnRightLastVisibility == VISIBLE) {
 				ViewUtils.setVisible(btnRight, !show);
+			}
+			if(mBtnRightDrawableLastVisibility == VISIBLE) {
+				ViewUtils.setVisible(btnRightDrawable, !show);
 			}
 			ViewUtils.setVisible(progress, show);
 		}

@@ -25,6 +25,8 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.view.HeaderView;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 
 import butterknife.InjectView;
@@ -87,6 +89,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 	@Override
 	public void initUi() {
 		ViewUtils.setVisible(mTextInfo, false);
+		mEditError.getEditText().setEnabled(false);
 		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		mUser = UserData.create(mUserProfile.getUser());
 		mMerchant = new MerchantData(getActivity());
@@ -100,8 +103,8 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 				finish();
 			}
 		});
-		registerCard();
 		initAmount();
+		registerCard();
 	}
 
 	private void initAmount() {
@@ -118,6 +121,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 		});
 		editText.addTextChangedListener(new TextWatcher() {
 			public boolean hadComma = false;
+
 			public String delimiter = StringUtils.getCurrencyDelimiter();
 
 			@Override
@@ -175,7 +179,9 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 		com.omnom.android.auth.UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		final UserData user = UserData.create(String.valueOf(wicketUser.getId()), wicketUser.getPhone());
 		mCardRegisterSubscription = AndroidObservable.bindActivity(this,
-		                                                           mAcquiring.registerCard(merchant, user, mCard))
+		                                                           mAcquiring.registerCard(merchant, user, mCard)
+		                                                                     .delaySubscription(1000, TimeUnit.MILLISECONDS)
+		                                                          )
 		                                             .subscribe(
 				                                             new Action1<CardRegisterPollingResponse>() {
 					                                             @Override
@@ -183,6 +189,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 						                                             mCard.setCardId(response.getCardId());
 						                                             ViewUtils.setVisible(mTextInfo, true);
 						                                             mPanelTop.showProgress(false);
+						                                             mEditError.getEditText().setEnabled(true);
 					                                             }
 				                                             }, new Action1<Throwable>() {
 					                                             @Override
@@ -191,7 +198,10 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 						                                             mPanelTop.showProgress(false);
 						                                             mEditError.setError(R.string.something_went_wrong_try_agint);
 						                                             mPanelTop.setButtonRightEnabled(true);
-						                                             mPanelTop.setButtonRight(R.string.repeat, mRegisterClickListener);
+						                                             mPanelTop.setButtonRightDrawable(
+								                                             R.drawable.ic_repeat_small,
+								                                             mRegisterClickListener);
+						                                             mEditError.getEditText().setEnabled(false);
 					                                             }
 				                                             });
 	}

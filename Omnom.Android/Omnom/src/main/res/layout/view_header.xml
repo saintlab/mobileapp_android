@@ -11,6 +11,16 @@
         android:textColor="@drawable/text_color_selector"
         style="@android:style/Widget.Holo.Button.Borderless"/>
 
+    <ImageButton
+        android:id="@+id/btn_right_drawable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/header_view_horizontal_margin"
+        android:background="@null"
+        android:visibility="gone"/>
+
     <Button
         android:id="@+id/btn_left"
         android:layout_width="wrap_content"
@@ -19,13 +29,23 @@
         android:textColor="@drawable/text_color_selector"
         style="@android:style/Widget.Holo.Button.Borderless"/>
 
+    <ImageButton
+        android:id="@+id/btn_left_drawable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/header_view_horizontal_margin"
+        android:background="@null"
+        android:visibility="gone"/>
+
     <ProgressBar
         android:id="@+id/progress"
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/header_view_horizontal_margin"
         android:visibility="gone"/>
 
     <TextView
@@ -35,7 +55,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:textSize="@dimen/font_normal"
-        android:textColor="?android:textColorHint" />
+        android:textColor="?android:textColorHint"/>
 
     <TextView
         android:id="@+id/title_big"
@@ -43,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textSize="@dimen/font_large"
-        android:textColor="?android:textColorHint" />
+        android:textColor="?android:textColorHint"/>
 
     <com.omnom.android.view.ViewPagerIndicatorCircle
         android:id="@+id/page_indicator"

@@ -10,6 +10,8 @@
     <dimen name="activity_horizontal_margin_xlarge">48dp</dimen>
     <dimen name="activity_horizontal_margin_xxlarge">72dp</dimen>
 
+    <dimen name="header_view_horizontal_margin">8dp</dimen>
+
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="activity_vertical_margin_small">8dp</dimen>
     <dimen name="activity_vertical_margin_medium">24dp</dimen>
