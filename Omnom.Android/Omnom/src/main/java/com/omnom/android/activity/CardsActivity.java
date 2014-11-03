@@ -26,7 +26,7 @@ import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
-import com.omnom.android.view.LoginPanelTop;
+import com.omnom.android.view.HeaderView;
 
 import java.util.concurrent.TimeUnit;
 
@@ -59,7 +59,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	protected RestaurateurObeservableApi api;
 
 	@InjectView(R.id.panel_top)
-	protected LoginPanelTop mPanelTop;
+	protected HeaderView mPanelTop;
 
 	@InjectView(R.id.btn_pay)
 	protected Button mBtnPay;
@@ -165,7 +165,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	}
 
 	public void onAdd() {
-		AddCardActivity.start(this);
+		CardAddActivity.start(this);
 	}
 
 	@Override

@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +21,8 @@ import com.omnom.android.utils.R;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
+import java.util.Arrays;
+
 import hugo.weaving.DebugLog;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
@@ -25,20 +30,36 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
  * Created by Ch3D on 29.09.2014.
  */
 public class ErrorEdit extends LinearLayout {
+	public static final int GRAVITY_LEFT = 0;
+
+	public static final int GRAVITY_CENTER = 1;
+
+	public static final int GRAVITY_RIGHT = 2;
+
 	public static final int INPUT_TYPE_TEXT = 0;
+
 	public static final int INPUT_TYPE_PHONE = 1;
+
 	public static final int INPUT_TYPE_EMAIL = 2;
+
 	public static final int INPUT_TYPE_NAME = 3;
 
+	public static final int INPUT_TYPE_NUMBER_DECIMAL = 4;
+
 	public static final int FONT_TYPE_REGULAR = 0;
+
 	public static final int FONT_TYPE_MEDIUM = 1;
+
 	public static final int FONT_TYPE_REGULAR_LE = 2;
 
 	private ErrorEditText editView;
+
 	private TextView errorTextView;
+
 	private Button btnClear;
 
 	private boolean mShowClear;
+
 	private final TextWatcher onTextChanged = new TextWatcher() {
 		@Override
 		@DebugLog
@@ -57,10 +78,22 @@ public class ErrorEdit extends LinearLayout {
 		public void onTextChanged(final CharSequence charSequence, final int i, final int i2, final int i3) {
 		}
 	};
+
 	private String mHintText;
+
 	private Drawable mClearDrawable;
+
 	private int mInputType;
+
 	private int mFontType;
+
+	private int mTextGravity;
+
+	private float mTextSize;
+
+	private float mErrorTextSize;
+
+	private int mMaxLen;
 
 	public ErrorEdit(Context context) {
 		super(context);
@@ -91,6 +124,10 @@ public class ErrorEdit extends LinearLayout {
 			mClearDrawable = a.getDrawable(R.styleable.ErrorEdit_iconClear);
 			mInputType = a.getInt(R.styleable.ErrorEdit_inputType, INPUT_TYPE_TEXT);
 			mFontType = a.getInt(R.styleable.ErrorEdit_font, FONT_TYPE_REGULAR);
+			mTextGravity = a.getInt(R.styleable.ErrorEdit_textGravity, GRAVITY_LEFT);
+			mMaxLen = a.getInt(R.styleable.ErrorEdit_maxLength, 0);
+			mTextSize = a.getDimension(R.styleable.ErrorEdit_textSize, getResources().getDimension(R.dimen.font_medium));
+			mErrorTextSize = a.getDimension(R.styleable.ErrorEdit_errorTextSize, getResources().getDimension(R.dimen.font_medium));
 		} finally {
 			a.recycle();
 		}
@@ -100,9 +137,18 @@ public class ErrorEdit extends LinearLayout {
 		setOrientation(VERTICAL);
 		final View view = LayoutInflater.from(getContext()).inflate(R.layout.widget_error_edit_text, this);
 		editView = (ErrorEditText) view.findViewById(R.id.edit);
-		initInputType();
 		editView.addTextChangedListener(onTextChanged);
 		editView.setHint(mHintText);
+		editView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mTextSize);
+		if(mMaxLen > 0) {
+			final InputFilter[] filters = editView.getFilters();
+			final InputFilter[] newFilters = Arrays.copyOf(filters, filters.length + 1);
+			newFilters[newFilters.length - 1] = new InputFilter.LengthFilter(mMaxLen);
+			editView.setFilters(newFilters);
+		}
+
+		initInputType();
+		initGravity();
 		initFontType();
 		editView.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override
@@ -116,7 +162,10 @@ public class ErrorEdit extends LinearLayout {
 				}
 			}
 		});
+
 		errorTextView = (TextView) view.findViewById(R.id.error);
+		errorTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mErrorTextSize);
+
 		btnClear = (Button) view.findViewById(R.id.btn_clear);
 		btnClear.setBackgroundDrawable(mClearDrawable);
 		btnClear.setOnClickListener(new OnClickListener() {
@@ -125,6 +174,20 @@ public class ErrorEdit extends LinearLayout {
 				editView.setText(StringUtils.EMPTY_STRING);
 			}
 		});
+	}
+
+	private void initGravity() {
+		switch(mTextGravity) {
+			case GRAVITY_LEFT:
+				editView.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+				break;
+			case GRAVITY_CENTER:
+				editView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+				break;
+			case GRAVITY_RIGHT:
+				editView.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+				break;
+		}
 	}
 
 	private void initFontType() {
@@ -151,6 +214,10 @@ public class ErrorEdit extends LinearLayout {
 
 			case INPUT_TYPE_PHONE:
 				editView.setInputType(InputType.TYPE_CLASS_PHONE);
+				break;
+
+			case INPUT_TYPE_NUMBER_DECIMAL:
+				editView.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 				break;
 
 			case INPUT_TYPE_EMAIL:
@@ -181,11 +248,11 @@ public class ErrorEdit extends LinearLayout {
 		return editView.getText().toString();
 	}
 
-	public EditText getEditText() {
-		return editView;
-	}
-
 	public void setText(final CharSequence text) {
 		editView.setText(text);
+	}
+
+	public EditText getEditText() {
+		return editView;
 	}
 }

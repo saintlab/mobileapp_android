@@ -22,6 +22,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_ACCENT_COLOR = "com.omnom.android.order.color.accent";
 	public static final String EXTRA_ORDER_AMOUNT_TEXT = "com.omnom.android.order.amount";
 	public static final String EXTRA_CONFIRM_TYPE = "com.omnom.android.user.phone.confirm_type";
+	public static final String EXTRA_CARD_DATA = "com.omnom.android.card.data";
 
 	public static final String EXTRA_CHARACTERISTIC_UUID = "ble.characteristic.uuid";
 	public static final String EXTRA_CHARACTERISTIC_VALUE = "ble.characteristic.value";

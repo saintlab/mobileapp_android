@@ -1,0 +1,11 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines.
+     Nexus 4
+     Nexus 5
+     Moto X
+     and so on
+     -->
+    <dimen name="order_items_list_height_collapsed">240dp</dimen>
+    <dimen name="card_frame_width">320dp</dimen>
+    <dimen name="card_frame_height">184dp</dimen>
+</resources>

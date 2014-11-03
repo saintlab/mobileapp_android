@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.omnom.android.view.LoginPanelTop
+    <com.omnom.android.view.HeaderView
         android:id="@+id/panel_top"
         android:layout_width="match_parent"
         android:layout_height="@dimen/view_size_default"
@@ -16,11 +16,11 @@
         android:id="@+id/btn_pay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/btn_pay"
         android:paddingLeft="@dimen/activity_horizontal_margin_medium"
         android:paddingRight="@dimen/activity_horizontal_margin_medium"
         android:layout_marginTop="@dimen/activity_horizontal_margin_medium"
         android:layout_marginBottom="@dimen/activity_horizontal_margin_medium"
+        android:background="@drawable/btn_pay"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
         android:textColor="@android:color/white"
         android:textSize="@dimen/font_medium"
