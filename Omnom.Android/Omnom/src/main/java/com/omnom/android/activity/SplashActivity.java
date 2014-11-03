@@ -1,5 +1,8 @@
 package com.omnom.android.activity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
@@ -9,6 +12,7 @@ import android.widget.ImageView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.debug.BackgroundBleService;
 import com.omnom.android.utils.utils.AnimationUtils;
 
 import java.util.Collections;
@@ -36,6 +40,7 @@ public class SplashActivity extends BaseOmnomActivity {
 	protected ImageView imgBackground;
 
 	private TransitionDrawable transitionDrawable;
+
 	private boolean mAnimate = true;
 
 	private void animateValidation() {
@@ -111,6 +116,15 @@ public class SplashActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		final AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+		final Intent intent = new Intent(this, BackgroundBleService.class);
+		final PendingIntent alarmIntent = PendingIntent.getService(this, 0, intent, 0);
+		alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+		                          AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+		                          AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+		                          alarmIntent);
+		// startService(intent);
+
 		transitionDrawable = new TransitionDrawable(
 				new Drawable[]{getResources().getDrawable(R.drawable.ic_splash_fork_n_knife),
 						getResources().getDrawable(R.drawable.ic_fork_n_knife)});

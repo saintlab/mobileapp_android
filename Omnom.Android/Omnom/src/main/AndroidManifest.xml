@@ -104,10 +104,16 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name="com.omnom.android.activity.AddCardActivity"
-            android:theme="@style/Theme.White.Light"
+            android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:label="@string/app_name" >
+            android:theme="@style/Theme.White.Light" >
         </activity>
+
+        <service
+            android:name="com.omnom.android.debug.BackgroundBleService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>
