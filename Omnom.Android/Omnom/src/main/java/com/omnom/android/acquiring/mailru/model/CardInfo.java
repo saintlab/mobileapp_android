@@ -1,6 +1,8 @@
 package com.omnom.android.acquiring.mailru.model;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -15,7 +17,21 @@ import io.card.payment.CreditCard;
 /**
  * Created by Ch3D on 23.09.2014.
  */
-public class CardInfo {
+public class CardInfo implements Parcelable {
+
+	public static final Creator<CardInfo> CREATOR = new Creator<CardInfo>() {
+
+		@Override
+		public CardInfo createFromParcel(Parcel in) {
+			return new CardInfo(in);
+		}
+
+		@Override
+		public CardInfo[] newArray(int size) {
+			return new CardInfo[size];
+		}
+	};
+
 	public static CardInfo create(final Context context, final String id) {
 		final CardInfo cardInfo = new CardInfo();
 		cardInfo.setCardId(id);
@@ -69,6 +85,26 @@ public class CardInfo {
 	private String holder = StringUtils.EMPTY_STRING;
 
 	private boolean addCard = false;
+
+	public CardInfo(Parcel parcel) {
+		pan = parcel.readString();
+		holder = parcel.readString();
+		expDate = parcel.readString();
+		cvv = parcel.readString();
+		cardId = parcel.readString();
+	}
+
+	private CardInfo() {
+	}
+
+	@Override
+	public void writeToParcel(final Parcel dest, final int flags) {
+		dest.writeString(pan);
+		dest.writeString(holder);
+		dest.writeString(expDate);
+		dest.writeString(cvv);
+		dest.writeString(cardId);
+	}
 
 	public String getPan() {
 		return pan;
@@ -150,5 +186,10 @@ public class CardInfo {
 	@Deprecated
 	public String toGson(Gson gson) {
 		return gson.toJson(this);
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
 	}
 }

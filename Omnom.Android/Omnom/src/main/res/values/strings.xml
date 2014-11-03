@@ -34,7 +34,6 @@
     <string name="title_activity_orders">OrdersActivity</string>
     <string name="there_are_no_orders_on_this_table">На данном столе нет заказов</string>
     <string name="title_activity_add_card">AddCardActivity</string>
-
     <string name="order_overall">Итого: %1$s</string>
     <string name="order_paid">Оплачено: %1$s</string>
     <string name="pay_amount">Оплатить %1$s</string>
@@ -44,10 +43,19 @@
     <string name="to_be_paid">К оплате</string>
     <string name="tips_another">другой</string>
     <string name="tips">Чаевые</string>
-
     <string name="app_version_build">версия %1$s</string>
     <string name="add_card">Добавить карту</string>
     <string name="currency_ruble"></string>
     <string name="cardio_app_token">e041fdfc4e9c4c6ba1dbd26969a98d92</string>
     <string name="ready">Готово</string>
+    <string name="title_activity_card_confirm">CardConfirmActivity</string>
+    <string name="card_binding">Привязка карты</string>
+    <string name="hint_confirm_amount">00,00 </string>
+    <string name="card_confirmation_text">Для привязки карты вам нужно подтвердить, что вы её владелец.
+        Мы списали с вашей карты секретную сумму (до 50 руб.), о чём вам должна прийти SMS от банка.
+        Посмотрите в сообщении, сколько списано и укажите сумму в поле выше.</string>
+    <string name="something_went_wrong">Что-то пошло не так</string>
+    <string name="something_went_wrong_try_agint">Что-то пошло не так.\nПовторите попытку</string>
+    <string name="repeat">Повторить</string>
+
 </resources>
