@@ -137,12 +137,12 @@ public class CardsAdapter extends BaseAdapter {
 			holder.txtConfirm.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
 		}
 
-		if(item.isRegistered() || !item.getMaskedPan().contains("8481")) {
+		if(item.isRegistered()) {
 			holder.txtConfirm.setText(StringUtils.EMPTY_STRING);
 		} else {
-			holder.root.setBackgroundColor(mContext.getResources().getColor(R.color.profile_hint));
 			holder.txtConfirm.setText("Подтвердить");
 			holder.txtConfirm.setCompoundDrawables(null, null, null, null);
+			holder.root.setBackgroundColor(mContext.getResources().getColor(R.color.profile_hint));
 		}
 
 		if(isAnimate) {
