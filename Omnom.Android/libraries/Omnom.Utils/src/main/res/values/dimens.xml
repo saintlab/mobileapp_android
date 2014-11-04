@@ -42,6 +42,7 @@
 
     <dimen name="font_xxsmall">8sp</dimen>
     <dimen name="font_xsmall">12sp</dimen>
+    <dimen name="font_smaller">14sp</dimen>
     <dimen name="font_small">16sp</dimen>
     <dimen name="font_normal">18sp</dimen>
     <dimen name="font_medium">20sp</dimen>

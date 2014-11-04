@@ -53,7 +53,6 @@ public class LoginActivity extends BaseOmnomActivity {
 			editText.setSelection(editText.getText().length());
 		}
 
-		topPanel.setContentVisibility(false, true);
 		topPanel.setTitle(R.string.enter);
 		topPanel.setButtonRight(R.string.proceed, new View.OnClickListener() {
 			@Override
@@ -62,6 +61,7 @@ public class LoginActivity extends BaseOmnomActivity {
 			}
 		});
 		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 0);
+		topPanel.setContentVisibility(false, true);
 	}
 
 	@Override
