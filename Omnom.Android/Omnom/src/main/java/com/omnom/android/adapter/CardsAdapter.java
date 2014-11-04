@@ -43,6 +43,9 @@ public class CardsAdapter extends BaseAdapter {
 		@InjectView(R.id.txt_confirm)
 		protected TextView txtConfirm;
 
+		@InjectView(R.id.root)
+		protected View root;
+
 		private ViewHolder(View convertView) {
 			ButterKnife.inject(this, convertView);
 		}
@@ -139,6 +142,7 @@ public class CardsAdapter extends BaseAdapter {
 		} else {
 			holder.txtConfirm.setText("Подтвердить");
 			holder.txtConfirm.setCompoundDrawables(null, null, null, null);
+			holder.root.setBackgroundColor(mContext.getResources().getColor(R.color.profile_hint));
 		}
 
 		if(isAnimate) {

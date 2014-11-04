@@ -1,14 +1,13 @@
 package com.omnom.android.fragment;
 
 import android.os.Bundle;
+import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -26,23 +25,11 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.acquiring.AcquiringType;
-import com.omnom.android.acquiring.ExtraData;
-import com.omnom.android.acquiring.OrderInfo;
-import com.omnom.android.acquiring.PaymentInfoFactory;
 import com.omnom.android.acquiring.api.Acquiring;
-import com.omnom.android.acquiring.api.PaymentInfo;
-import com.omnom.android.acquiring.mailru.OrderInfoMailRu;
-import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.MailRuExtra;
-import com.omnom.android.acquiring.mailru.model.MerchantData;
-import com.omnom.android.acquiring.mailru.model.UserData;
-import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.activity.CardsActivity;
+import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
-import com.omnom.android.restaurateur.model.bill.BillRequest;
-import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -61,11 +48,8 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
-import rx.functions.Action1;
 
 import static butterknife.ButterKnife.findById;
-import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 public class OrderFragment extends Fragment {
 	public static final int MODE_AMOUNT = 0;
@@ -89,6 +73,49 @@ public class OrderFragment extends Fragment {
 	public static final int PAYMENT_TRANSLATION_Y = 200;
 
 	public static final int LIST_TRANSLATION_Y = 600;
+
+	public static class PaymentDetails implements Parcelable {
+		public static final Creator<PaymentDetails> CREATOR = new Creator<PaymentDetails>() {
+			@Override
+			public PaymentDetails createFromParcel(Parcel in) {
+				return new PaymentDetails(in);
+			}
+
+			@Override
+			public PaymentDetails[] newArray(int size) {
+				return new PaymentDetails[size];
+			}
+		};
+
+		private double mAmount;
+
+		private double mTip;
+
+		public PaymentDetails(Parcel parcel) {
+			mAmount = parcel.readDouble();
+			mTip = parcel.readDouble();
+		}
+
+		public PaymentDetails(double amount, double tip) {
+			mAmount = amount;
+			mTip = tip;
+		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(final Parcel dest, final int flags) {
+			dest.writeDouble(mAmount);
+			dest.writeDouble(mTip);
+		}
+
+		public double getAmount() {
+			return mAmount;
+		}
+	}
 
 	private static final String ARG_ORDER = "order";
 
@@ -237,12 +264,13 @@ public class OrderFragment extends Fragment {
 
 	@OnClick(R.id.btn_pay)
 	protected void onPay(View v) {
-		pay(getEnteredAmount().doubleValue(), 0);
+		final PaymentDetails paymentDetails = new PaymentDetails(getEnteredAmount().doubleValue(), 0);
+		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS);
 	}
 
 	private void initList() {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
-		// list.animate().scaleY(0.9f).scaleX(0.9f).start();
+		// list.animate().scaleY(0.9f).scaleX(0.9f).startAddConfirm();
 		AndroidUtils.scrollEnd(list);
 		// list.setTranslationY(-LIST_TRANSLATION_Y);
 		// list.setEnabled(false);
@@ -552,76 +580,6 @@ public class OrderFragment extends Fragment {
 				btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontNormal);
 			}
 		}
-	}
-
-	private void pay(final double amount, final double tip) {
-		final FragmentActivity activity = getActivity();
-		final String cardSaved = OmnomApplication.get(activity).getPreferences().getCardData(activity);
-		if(!TextUtils.isEmpty(cardSaved)) {
-			final CardInfo cardData = gson.fromJson(cardSaved, CardInfo.class);
-			cardData.setCardId(StringUtils.EMPTY_STRING);
-			btnPay.setEnabled(false);
-			final BillRequest request = BillRequest.create(amount, mOrder);
-			mBillSubscription = AndroidObservable.bindActivity(activity, api.bill(request)).subscribe(new Action1<BillResponse>() {
-				@Override
-				public void call(final BillResponse response) {
-					if(!response.hasErrors()) {
-						tryToPay(cardData, response, amount, tip);
-					} else {
-						if(response.getError() != null) {
-							showToast(activity, response.getError());
-						} else if(response.getErrors() != null) {
-							showToast(activity, response.getErrors().toString());
-						}
-						btnPay.setEnabled(true);
-					}
-				}
-			}, new Action1<Throwable>() {
-				@Override
-				public void call(Throwable throwable) {
-					btnPay.setEnabled(true);
-				}
-			});
-		} else {
-			CardsActivity.start(activity, amount, mAccentColor);
-		}
-	}
-
-	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final double tip) {
-		final com.omnom.android.auth.UserData cachedUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		final UserData user = UserData.create(String.valueOf(cachedUser.getId()), cachedUser.getPhone());
-		final MerchantData merchant = new MerchantData(getActivity());
-		pay(billData, card, merchant, user, amount, tip);
-	}
-
-	private void pay(BillResponse billData, final CardInfo cardInfo, MerchantData merchant, UserData user, double amount, double tip) {
-		final ExtraData extra = MailRuExtra.create(tip, billData.getMailRestaurantId());
-		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
-		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
-		mPaySubscription = AndroidObservable.bindActivity(getActivity(), mAcquiring.pay(merchant, paymentInfo))
-		                                    .subscribe(new Action1<AcquiringPollingResponse>() {
-			                                    @Override
-			                                    public void call(AcquiringPollingResponse response) {
-				                                    onPayOk(response);
-			                                    }
-		                                    }, new Action1<Throwable>() {
-			                                    @Override
-			                                    public void call(Throwable throwable) {
-				                                    onPayError(throwable);
-			                                    }
-		                                    });
-	}
-
-	private void onPayError(Throwable throwable) {
-		Log.d(TAG, "status = " + throwable);
-		btnPay.setEnabled(true);
-		showToast(getActivity(), "Unable to pay");
-	}
-
-	private void onPayOk(AcquiringPollingResponse response) {
-		Log.d(TAG, "status = " + response.getStatus());
-		btnPay.setEnabled(true);
-		showToast(getActivity(), "Payment complete");
 	}
 
 	@Override

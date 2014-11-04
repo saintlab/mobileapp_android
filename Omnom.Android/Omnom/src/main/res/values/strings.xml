@@ -57,5 +57,6 @@
     <string name="something_went_wrong">Что-то пошло не так</string>
     <string name="something_went_wrong_try_agint">Что-то пошло не так.\nПовторите попытку</string>
     <string name="repeat">Повторить</string>
+    <string name="title_activity_thanks">ThanksActivity</string>
 
 </resources>
