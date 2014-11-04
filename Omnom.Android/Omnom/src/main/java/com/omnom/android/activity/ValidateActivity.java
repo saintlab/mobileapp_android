@@ -84,7 +84,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					// TODO: Refactor this ugly piece of ... code
 					if(cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
 						// TODO:
-						// LoginActivity.start(getActivity(), mDataHolder, EXTRA_ERROR_WRONG_USERNAME);
+						// LoginActivity.startAddConfirm(getActivity(), mDataHolder, EXTRA_ERROR_WRONG_USERNAME);
 						return;
 					}
 				}
@@ -93,7 +93,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				final AuthServiceException authException = (AuthServiceException) throwable;
 				getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
 				// TODO:
-				// LoginActivity.start(getActivity(), mDataHolder, authException.getCode());
+				// LoginActivity.startAddConfirm(getActivity(), mDataHolder, authException.getCode());
 				return;
 			}
 			showToastLong(getActivity(), R.string.error_unknown_server_error);

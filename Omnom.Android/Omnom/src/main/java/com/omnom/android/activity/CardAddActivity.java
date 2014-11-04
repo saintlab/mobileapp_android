@@ -34,15 +34,15 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	private static final int REQUEST_CODE_CARD_REGISTER = 102;
 
 	@SuppressLint("NewApi")
-	public static void start(Activity activity) {
+	public static void start(Activity activity, int code) {
 		final Intent intent = new Intent(activity, CardAddActivity.class);
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
 			                                                    R.anim.slide_in_right,
 			                                                    R.anim.slide_out_left).toBundle();
-			activity.startActivity(intent, extras);
+			activity.startActivityForResult(intent, code, extras);
 		} else {
-			activity.startActivity(intent);
+			activity.startActivityForResult(intent, code);
 		}
 	}
 
@@ -169,6 +169,10 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode== REQUEST_CODE_CARD_REGISTER) {
+			setResult(RESULT_OK);
+			finish();
+		}
 		if(requestCode == REQUEST_CODE_CARD_IO) {
 			if(data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
 				final CreditCard scanResult = data.getParcelableExtra(CardIOActivity.EXTRA_SCAN_RESULT);
@@ -176,6 +180,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 					@Override
 					public void run() {
 						mEditCardNumber.setText(scanResult.cardNumber);
+						AndroidUtils.showKeyboard(mEditCardExpDate);
 					}
 				});
 			}
@@ -189,7 +194,8 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		final String pan = CardUtils.preparePan(mEditCardNumber.getText().toString());
 		final String expDate = CardUtils.prepareExpDare(mEditCardExpDate.getText().toString());
 		final String cvv = mEditCardCvv.getText().toString();
-		CardConfirmActivity.start(this, CardInfo.create(pan, expDate, cvv), REQUEST_CODE_CARD_REGISTER);
+		final String holder = getString(R.string.acquiring_mailru_cardholder);
+		CardConfirmActivity.startAddConfirm(this, CardInfo.create(pan, expDate, cvv, holder), REQUEST_CODE_CARD_REGISTER);
 	}
 
 	private boolean validate(boolean showErrors) {
