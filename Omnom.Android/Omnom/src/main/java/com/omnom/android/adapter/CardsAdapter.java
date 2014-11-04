@@ -43,6 +43,9 @@ public class CardsAdapter extends BaseAdapter {
 		@InjectView(R.id.txt_confirm)
 		protected TextView txtConfirm;
 
+		@InjectView(R.id.root)
+		protected View root;
+
 		private ViewHolder(View convertView) {
 			ButterKnife.inject(this, convertView);
 		}
@@ -134,9 +137,10 @@ public class CardsAdapter extends BaseAdapter {
 			holder.txtConfirm.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
 		}
 
-		if(item.isRegistered()) {
+		if(item.isRegistered() || !item.getMaskedPan().contains("8481")) {
 			holder.txtConfirm.setText(StringUtils.EMPTY_STRING);
 		} else {
+			holder.root.setBackgroundColor(mContext.getResources().getColor(R.color.profile_hint));
 			holder.txtConfirm.setText("Подтвердить");
 			holder.txtConfirm.setCompoundDrawables(null, null, null, null);
 		}
