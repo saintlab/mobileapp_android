@@ -37,6 +37,10 @@
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 
+    <style name="Theme.Transparent" parent="AppTheme">
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
     <style name="Theme.White.Light" parent="AppTheme.Light">
         <item name="android:windowBackground">@android:color/white</item>
     </style>
