@@ -27,6 +27,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.activity.CardsActivity;
+import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
@@ -264,7 +265,7 @@ public class OrderFragment extends Fragment {
 	@OnClick(R.id.btn_pay)
 	protected void onPay(View v) {
 		final PaymentDetails paymentDetails = new PaymentDetails(getEnteredAmount().doubleValue(), 0);
-		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor);
+		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS);
 	}
 
 	private void initList() {

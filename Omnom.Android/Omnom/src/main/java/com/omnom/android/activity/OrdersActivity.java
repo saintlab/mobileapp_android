@@ -16,6 +16,8 @@ import butterknife.InjectView;
 
 public class OrdersActivity extends BaseFragmentActivity {
 
+	public static final int REQUEST_CODE_CARDS = 100;
+
 	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor) {
 		final Intent intent = new Intent(activity, OrdersActivity.class);
 		intent.putParcelableArrayListExtra(OrdersActivity.EXTRA_ORDERS, orders);
@@ -27,7 +29,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 	protected ViewPager mPager;
 
 	private OrdersPagerAdaper mPagerAdapter;
+
 	private ArrayList<Order> orders = null;
+
 	private int bgColor;
 
 	@Override
@@ -41,6 +45,13 @@ public class OrdersActivity extends BaseFragmentActivity {
 		orders = intent.getParcelableArrayListExtra(EXTRA_ORDERS);
 		final String colorStr = intent.getStringExtra(EXTRA_ACCENT_COLOR);
 		bgColor = RestaurantHelper.getBackgroundColor(colorStr);
+	}
+
+	@Override
+	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		if(requestCode == REQUEST_CODE_CARDS && resultCode == RESULT_OK) {
+			getActivity().finish();
+		}
 	}
 
 	@Override

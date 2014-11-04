@@ -80,7 +80,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 	protected HeaderView mPanelTop;
 
 	@InjectView(R.id.edit_amount)
-	protected ErrorEdit mEditError;
+	protected ErrorEdit mEditAmount;
 
 	@InjectView(R.id.txt_info)
 	protected TextView mTextInfo;
@@ -123,7 +123,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 	@Override
 	public void initUi() {
 		ViewUtils.setVisible(mTextInfo, false);
-		mEditError.getEditText().setEnabled(false);
+		mEditAmount.getEditText().setEnabled(false);
 		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		mUser = UserData.create(mUserProfile.getUser());
 		mMerchant = new MerchantData(getActivity());
@@ -142,13 +142,13 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 			registerCard();
 		} else {
 			// skip and wait until user submit verification amount
-			mEditError.getEditText().setEnabled(true);
+			mEditAmount.getEditText().setEnabled(true);
 			mPanelTop.setButtonRightEnabled(true);
 		}
 	}
 
 	private void initAmount() {
-		final EditText editText = mEditError.getEditText();
+		final EditText editText = mEditAmount.getEditText();
 		editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
@@ -230,19 +230,22 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 						                                             ViewUtils.setVisible(mTextInfo, true);
 						                                             mPanelTop.showProgress(false);
 						                                             mPanelTop.setButtonRightEnabled(true);
-						                                             mEditError.getEditText().setEnabled(true);
+						                                             mPanelTop.setButtonRight(R.string.ready, mVerifyClickListener);
+						                                             final EditText editAmount = mEditAmount.getEditText();
+						                                             editAmount.setEnabled(true);
+						                                             AndroidUtils.showKeyboard(editAmount);
 					                                             }
 				                                             }, new Action1<Throwable>() {
 					                                             @Override
 					                                             public void call(final Throwable throwable) {
 						                                             ViewUtils.setVisible(mTextInfo, false);
 						                                             mPanelTop.showProgress(false);
-						                                             mEditError.setError(R.string.something_went_wrong_try_agint);
+						                                             mEditAmount.setError(R.string.something_went_wrong_try_agint);
 						                                             mPanelTop.setButtonRightEnabled(true);
 						                                             mPanelTop.setButtonRightDrawable(
 								                                             R.drawable.ic_repeat_small,
 								                                             mRegisterClickListener);
-						                                             mEditError.getEditText().setEnabled(false);
+						                                             mEditAmount.getEditText().setEnabled(false);
 					                                             }
 				                                             });
 	}

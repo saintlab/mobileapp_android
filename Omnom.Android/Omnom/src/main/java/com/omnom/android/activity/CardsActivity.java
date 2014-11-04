@@ -4,7 +4,6 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -67,11 +66,13 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private static final int REQUEST_CODE_CARD_ADD = 101;
 
+	private static final int REQUEST_CODE_PAYMENT_OK = 102;
+
 	private static final String TAG = CardsActivity.class.getSimpleName();
 
 	@SuppressLint("NewApi")
-	public static void start(final Context activity, final Order order, final OrderFragment.PaymentDetails details,
-	                         final int accentColor) {
+	public static void start(final Activity activity, final Order order, final OrderFragment.PaymentDetails details,
+	                         final int accentColor, final int code) {
 		final Intent intent = new Intent(activity, CardsActivity.class);
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
@@ -81,9 +82,9 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
 			                                                    R.anim.slide_in_up,
 			                                                    R.anim.fake_fade_out_long).toBundle();
-			activity.startActivity(intent, extras);
+			activity.startActivityForResult(intent, code, extras);
 		} else {
-			activity.startActivity(intent);
+			activity.startActivityForResult(intent, code);
 		}
 	}
 
@@ -226,7 +227,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	private void onPayOk(AcquiringPollingResponse response) {
 		Log.d(TAG, "status = " + response.getStatus());
 		mBtnPay.setEnabled(true);
-		showToast(getActivity(), "Payment complete");
+		ThanksActivity.start(this, REQUEST_CODE_PAYMENT_OK);
 	}
 
 	private void pay(final double amount, final int tip) {
@@ -266,6 +267,10 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		if(resultCode == RESULT_OK) {
+			if(requestCode == REQUEST_CODE_PAYMENT_OK) {
+				setResult(RESULT_OK);
+				finish();
+			}
 			if(requestCode == REQUEST_CODE_CARD_CONFIRM || requestCode == REQUEST_CODE_CARD_ADD) {
 				AnimationUtils.animateAlpha(mList, false, new Runnable() {
 					@Override
