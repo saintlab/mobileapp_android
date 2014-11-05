@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.crashlytics.android.Crashlytics;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.modules.AcquiringModuleMailRuMixpanel;
 import com.omnom.android.modules.AndroidModule;
@@ -17,6 +18,7 @@ import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 
+import io.fabric.sdk.android.Fabric;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -83,6 +85,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Fabric.with(this, new Crashlytics());
 		CalligraphyConfig.initDefault("fonts/Futura-OSF-Omnom-Regular.otf", R.attr.fontPath);
 
 		mixPanel = MixpanelAPI.getInstance(this, MIXPANEL_TOKEN);

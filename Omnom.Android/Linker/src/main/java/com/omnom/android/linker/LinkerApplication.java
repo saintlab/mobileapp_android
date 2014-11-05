@@ -2,6 +2,7 @@ package com.omnom.android.linker;
 
 import android.content.Context;
 
+import com.crashlytics.android.Crashlytics;
 import com.omnom.android.auth.AuthModule;
 import com.omnom.android.restaurateur.RestaurateurModule;
 import com.omnom.android.restaurateur.model.UserProfile;
@@ -14,6 +15,7 @@ import com.omnom.android.utils.BaseOmnomApplication;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 
+import io.fabric.sdk.android.Fabric;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,6 +59,7 @@ public class LinkerApplication extends BaseOmnomApplication implements AuthToken
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Fabric.with(this, new Crashlytics());
 		CalligraphyConfig.initDefault("fonts/Futura-OSF-Omnom-Regular.otf", R.attr.fontPath);
 
 		objectGraph = ObjectGraph.create(getModules().toArray());
