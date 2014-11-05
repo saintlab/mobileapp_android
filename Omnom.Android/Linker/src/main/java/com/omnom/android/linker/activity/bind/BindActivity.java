@@ -78,14 +78,18 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 import static butterknife.ButterKnife.findById;
+import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 /**
  * Created by Ch3D on 14.08.2014.
  */
 public class BindActivity extends BaseActivity {
 	private static final String TAG = BindActivity.class.getSimpleName();
+
 	private static final int REQUEST_CODE_ENABLE_BLUETOOTH = 100;
+
 	private static final int REQUEST_CODE_SCAN_QR = 101;
+
 	private static final String TAG_BEACONS = "BEACONS";
 
 	public static void start(final Context context, Restaurant restaurant, final boolean showBack) {
@@ -101,6 +105,7 @@ public class BindActivity extends BaseActivity {
 			bindTable();
 		}
 	};
+
 	private final View.OnClickListener mConnectBeaconClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -109,6 +114,7 @@ public class BindActivity extends BaseActivity {
 	};
 
 	protected volatile boolean gattConnected = false;
+
 	protected volatile boolean gattAvailable = false;
 
 	@InjectView(R.id.loader)
@@ -142,8 +148,11 @@ public class BindActivity extends BaseActivity {
 	protected BeaconRssiProvider rssiProvider;
 
 	protected BluetoothLeService mBluetoothLeService;
+
 	private BluetoothAdapter.LeScanCallback mLeScanCallback = null;
+
 	private BeaconParser parser;
+
 	private boolean mBound = false;
 
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -170,16 +179,27 @@ public class BindActivity extends BaseActivity {
 	private Beacon mBeacon = null;
 
 	private ArrayList<Beacon> mBeacons = new ArrayList<Beacon>();
+
 	private LoaderController mLoaderController;
+
 	private BluetoothAdapter mBluetoothAdapter;
+
 	private int mLoaderTranslation;
+
 	private Subscription mErrValidationSubscription;
+
 	private Subscription mErrBindSubscription;
+
 	private ErrorHelper mErrorHelper;
+
 	private boolean mBindClicked = false;
+
 	private String mQrData = StringUtils.EMPTY_STRING;
+
 	private BeaconDataResponse mBeaconData = BeaconDataResponse.NULL;
+
 	private boolean mApiBindComplete = false;
+
 	private Subscription mApiBindingSubscription;
 
 	final Runnable beaconTimeoutCallback = new Runnable() {
@@ -214,7 +234,9 @@ public class BindActivity extends BaseActivity {
 			mBluetoothLeService.close();
 		}
 	};
+
 	private Subscription mBuildBeaconsSubscribtion;
+
 	private Subscription mFindBeaconSubscription;
 
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
@@ -269,9 +291,14 @@ public class BindActivity extends BaseActivity {
 
 	@OnClick(R.id.btn_bind_table)
 	public void onBind() {
+		final int tableNumber = mLoader.getTableNumber();
+		if(tableNumber == LoaderView.WRONG_TABLE_NUMBER) {
+			showToast(this, R.string.enter_table_number);
+			return;
+		}
 		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
-		mBuildBeaconsSubscribtion = AndroidObservable.bindActivity(this, api.buildBeacon(mRestaurant.getId(), mLoader.getTableNumber(),
+		mBuildBeaconsSubscribtion = AndroidObservable.bindActivity(this, api.buildBeacon(mRestaurant.getId(), tableNumber,
 		                                                                                 mBeacon.getIdValue(0))).subscribe(
 				new RestaurateurObservable.AuthAwareOnNext<BeaconDataResponse>(getActivity()) {
 					@Override
@@ -333,6 +360,7 @@ public class BindActivity extends BaseActivity {
 		AnimationUtils.animateAlpha(mBtnBack, false);
 		AnimationUtils.animateAlpha(mBtnProfile, false);
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
+		mLoader.clearLogo();
 		if(getIntent().getBooleanExtra(EXTRA_SHOW_BACK, false)) {
 			mLoader.animateColor(Color.WHITE);
 			ButterKnife.apply(errorViews, ViewUtils.VISIBLITY_ALPHA, false);
@@ -729,10 +757,12 @@ public class BindActivity extends BaseActivity {
 		mBluetoothLeService
 				.queueCharacteristic(CharacteristicHolder.createPassword(getString(R.string.redbear_beacon_password).getBytes()));
 		final byte txValue = (byte) Integer.parseInt(getString(R.string.redbear_beacon_tx));
+		final byte batteryValue = (byte) Integer.parseInt(getString(R.string.redbear_battery_broadcast_enabled));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createTx(new byte[]{txValue}));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createUuid(mBeaconData.getUuid()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMajorId(mBeaconData.getMajor()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMinorId(mBeaconData.getMinor()));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createBattery(new byte[]{batteryValue}));
 		mBluetoothLeService.startWritingQueue(new Runnable() {
 			@Override
 			public void run() {

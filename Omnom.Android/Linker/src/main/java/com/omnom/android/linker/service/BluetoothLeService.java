@@ -30,9 +30,13 @@ import hugo.weaving.DebugLog;
 
 public class BluetoothLeService extends Service {
 	public final static String ACTION_GATT_CONNECTED = "ACTION_GATT_CONNECTED";
+
 	public final static String ACTION_GATT_FAILED = "ACTION_GATT_FAILED";
+
 	public final static String ACTION_GATT_DISCONNECTED = "ACTION_GATT_DISCONNECTED";
+
 	public final static String ACTION_GATT_SERVICES_DISCOVERED = "ACTION_GATT_SERVICES_DISCOVERED";
+
 	public static final String ACTION_BEACON_WRITE_FAILED = "ACTION_BEACON_WRITE_FAILED";
 
 	private static final String TAG = BluetoothLeService.class.getSimpleName();
@@ -75,6 +79,11 @@ public class BluetoothLeService extends Service {
 		@Override
 		@DebugLog
 		public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+			//final BluetoothGattService service = mBluetoothGatt.getService(BeaconAttributes.UUID_BLE_REDBEAR_BATTERY_SERVICE);
+			//final List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
+			//for(BluetoothGattCharacteristic ch : characteristics) {
+			//	System.err.println(">>> " + ch.getUuid() + " " + ch.getDescriptors());
+			//}
 			if(status == BluetoothGatt.GATT_SUCCESS) {
 				broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
 			}
@@ -88,13 +97,20 @@ public class BluetoothLeService extends Service {
 	}
 
 	private final LinkedBlockingQueue<CharacteristicHolder> mWriteQueue = new LinkedBlockingQueue<CharacteristicHolder>();
+
 	private final IBinder mBinder = new LocalBinder();
+
 	@Inject
 	protected Bus mBus;
+
 	private BluetoothManager mBluetoothManager;
+
 	private BluetoothAdapter mBluetoothAdapter;
+
 	private String mBluetoothDeviceAddress;
+
 	private BluetoothGatt mBluetoothGatt;
+
 	private Runnable mQueueEndCallback;
 
 	@Override
