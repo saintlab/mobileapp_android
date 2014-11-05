@@ -78,6 +78,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 import static butterknife.ButterKnife.findById;
+import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 /**
  * Created by Ch3D on 14.08.2014.
@@ -270,6 +271,10 @@ public class BindActivity extends BaseActivity {
 	@OnClick(R.id.btn_bind_table)
 	public void onBind() {
 		final int tableNumber = mLoader.getTableNumber();
+		if(tableNumber == LoaderView.WRONG_TABLE_NUMBER) {
+			showToast(this, R.string.enter_table_number);
+			return;
+		}
 		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
 		mBuildBeaconsSubscribtion = AndroidObservable.bindActivity(this, api.buildBeacon(mRestaurant.getId(), tableNumber,

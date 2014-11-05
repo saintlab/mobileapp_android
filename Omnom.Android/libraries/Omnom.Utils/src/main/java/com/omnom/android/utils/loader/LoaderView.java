@@ -50,6 +50,8 @@ public class LoaderView extends FrameLayout {
 		NONE, ENTER_DATA
 	}
 
+	public static final int WRONG_TABLE_NUMBER = -1;
+
 	protected ImageView mImgLoader;
 
 	protected ImageView mImgLogo;
@@ -312,7 +314,12 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public int getTableNumber() {
-		return Integer.parseInt(mEditTableNumber.getText().toString());
+		final String string = mEditTableNumber.getText().toString();
+		if(TextUtils.isEmpty(string)) {
+			return WRONG_TABLE_NUMBER;
+		}
+		final int value = Integer.parseInt(string);
+		return value;
 	}
 
 	public void setSize(int width, int height) {
