@@ -40,6 +40,7 @@ public class SimpleSplashActivity extends BaseActivity {
 	protected ImageView imgBackground;
 
 	private TransitionDrawable transitionDrawable;
+
 	private boolean mAnimate = true;
 
 	private void animateValidation() {
