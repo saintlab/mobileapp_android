@@ -47,6 +47,12 @@ public class CharacteristicHolder implements Parcelable {
 		                                uuid.replace("-", StringUtils.EMPTY_STRING));
 	}
 
+	public static CharacteristicHolder createBattery(byte[] value) {
+		return new CharacteristicHolder(BeaconAttributes.UUID_BLE_REDBEAR_BEACON_SERVICE,
+		                                BeaconAttributes.UUID_BLE_REDBEAR_BATTERY_LEVEL,
+		                                value);
+	}
+
 	public static CharacteristicHolder createPassword(byte[] data) {
 		return new CharacteristicHolder(BeaconAttributes.UUID_BLE_REDBEAR_PASSWORD_SERVICE,
 		                                BeaconAttributes.UUID_BLE_REDBEAR_PASSWORD,
@@ -60,7 +66,9 @@ public class CharacteristicHolder implements Parcelable {
 	}
 
 	private final UUID serviceId;
+
 	private final UUID charId;
+
 	private byte[] data;
 
 	public CharacteristicHolder(Parcel parcel) {
@@ -74,7 +82,7 @@ public class CharacteristicHolder implements Parcelable {
 	}
 
 	public CharacteristicHolder(UUID serviceId, UUID charId, String data) {
-		this(serviceId, charId,  StringUtils.hexStringToByteArray(data));
+		this(serviceId, charId, StringUtils.hexStringToByteArray(data));
 	}
 
 	public CharacteristicHolder(UUID serviceId, UUID charId, byte[] data) {

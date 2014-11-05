@@ -26,5 +26,6 @@
     <string name="title_activity_beacons_list">BeaconsListActivity</string>
     <string name="started">Started</string>
     <string name="stopped">Stopped</string>
+    <string name="enter_table_number">Укажите номер стола</string>
 
 </resources>

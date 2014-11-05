@@ -269,9 +269,10 @@ public class BindActivity extends BaseActivity {
 
 	@OnClick(R.id.btn_bind_table)
 	public void onBind() {
+		final int tableNumber = mLoader.getTableNumber();
 		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
-		mBuildBeaconsSubscribtion = AndroidObservable.bindActivity(this, api.buildBeacon(mRestaurant.getId(), mLoader.getTableNumber(),
+		mBuildBeaconsSubscribtion = AndroidObservable.bindActivity(this, api.buildBeacon(mRestaurant.getId(), tableNumber,
 		                                                                                 mBeacon.getIdValue(0))).subscribe(
 				new RestaurateurObservable.AuthAwareOnNext<BeaconDataResponse>(getActivity()) {
 					@Override
@@ -729,10 +730,12 @@ public class BindActivity extends BaseActivity {
 		mBluetoothLeService
 				.queueCharacteristic(CharacteristicHolder.createPassword(getString(R.string.redbear_beacon_password).getBytes()));
 		final byte txValue = (byte) Integer.parseInt(getString(R.string.redbear_beacon_tx));
+		final byte batteryValue = (byte) Integer.parseInt(getString(R.string.redbear_battery_broadcast_enabled));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createTx(new byte[]{txValue}));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createUuid(mBeaconData.getUuid()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMajorId(mBeaconData.getMajor()));
 		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createMinorId(mBeaconData.getMinor()));
+		mBluetoothLeService.queueCharacteristic(CharacteristicHolder.createBattery(new byte[]{batteryValue}));
 		mBluetoothLeService.startWritingQueue(new Runnable() {
 			@Override
 			public void run() {
