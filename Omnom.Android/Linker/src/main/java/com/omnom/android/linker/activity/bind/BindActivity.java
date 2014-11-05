@@ -85,8 +85,11 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToast;
  */
 public class BindActivity extends BaseActivity {
 	private static final String TAG = BindActivity.class.getSimpleName();
+
 	private static final int REQUEST_CODE_ENABLE_BLUETOOTH = 100;
+
 	private static final int REQUEST_CODE_SCAN_QR = 101;
+
 	private static final String TAG_BEACONS = "BEACONS";
 
 	public static void start(final Context context, Restaurant restaurant, final boolean showBack) {
@@ -102,6 +105,7 @@ public class BindActivity extends BaseActivity {
 			bindTable();
 		}
 	};
+
 	private final View.OnClickListener mConnectBeaconClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -110,6 +114,7 @@ public class BindActivity extends BaseActivity {
 	};
 
 	protected volatile boolean gattConnected = false;
+
 	protected volatile boolean gattAvailable = false;
 
 	@InjectView(R.id.loader)
@@ -143,8 +148,11 @@ public class BindActivity extends BaseActivity {
 	protected BeaconRssiProvider rssiProvider;
 
 	protected BluetoothLeService mBluetoothLeService;
+
 	private BluetoothAdapter.LeScanCallback mLeScanCallback = null;
+
 	private BeaconParser parser;
+
 	private boolean mBound = false;
 
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -171,16 +179,27 @@ public class BindActivity extends BaseActivity {
 	private Beacon mBeacon = null;
 
 	private ArrayList<Beacon> mBeacons = new ArrayList<Beacon>();
+
 	private LoaderController mLoaderController;
+
 	private BluetoothAdapter mBluetoothAdapter;
+
 	private int mLoaderTranslation;
+
 	private Subscription mErrValidationSubscription;
+
 	private Subscription mErrBindSubscription;
+
 	private ErrorHelper mErrorHelper;
+
 	private boolean mBindClicked = false;
+
 	private String mQrData = StringUtils.EMPTY_STRING;
+
 	private BeaconDataResponse mBeaconData = BeaconDataResponse.NULL;
+
 	private boolean mApiBindComplete = false;
+
 	private Subscription mApiBindingSubscription;
 
 	final Runnable beaconTimeoutCallback = new Runnable() {
@@ -215,7 +234,9 @@ public class BindActivity extends BaseActivity {
 			mBluetoothLeService.close();
 		}
 	};
+
 	private Subscription mBuildBeaconsSubscribtion;
+
 	private Subscription mFindBeaconSubscription;
 
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
@@ -339,6 +360,7 @@ public class BindActivity extends BaseActivity {
 		AnimationUtils.animateAlpha(mBtnBack, false);
 		AnimationUtils.animateAlpha(mBtnProfile, false);
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
+		mLoader.clearLogo();
 		if(getIntent().getBooleanExtra(EXTRA_SHOW_BACK, false)) {
 			mLoader.animateColor(Color.WHITE);
 			ButterKnife.apply(errorViews, ViewUtils.VISIBLITY_ALPHA, false);

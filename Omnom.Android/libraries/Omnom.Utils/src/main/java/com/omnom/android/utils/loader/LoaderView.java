@@ -39,6 +39,8 @@ import com.squareup.picasso.Target;
 import java.util.LinkedList;
 import java.util.List;
 
+import hugo.weaving.DebugLog;
+
 import static butterknife.ButterKnife.findById;
 
 /**
@@ -92,6 +94,7 @@ public class LoaderView extends FrameLayout {
 		init(attrs);
 	}
 
+	@DebugLog
 	private void init(AttributeSet attrs) {
 		LayoutInflater.from(getContext()).inflate(R.layout.view_loader, this);
 
@@ -241,6 +244,7 @@ public class LoaderView extends FrameLayout {
 		                     endCallback);
 	}
 
+	@DebugLog
 	public void animateLogo(final int resId) {
 		final Object tag = mImgLogo.getTag(R.id.img_loader);
 		if(tag != null && resId == (Integer) tag) {
@@ -262,6 +266,7 @@ public class LoaderView extends FrameLayout {
 		animateLogo(resId, getResources().getInteger(R.integer.default_animation_duration_quick));
 	}
 
+	@DebugLog
 	public void animateLogo(final int resId, final long duration) {
 		final Object tag = mImgLogo.getTag(R.id.img_loader);
 		if(tag != null && resId == (Integer) tag) {
@@ -279,6 +284,7 @@ public class LoaderView extends FrameLayout {
 		}, duration);
 	}
 
+	@DebugLog
 	public void animateLogo2(final int resId) {
 		mImgLogo.setTag(R.id.img_loader, resId);
 		mImgLogo.setTag(R.id.logo_url, null);
@@ -296,6 +302,7 @@ public class LoaderView extends FrameLayout {
 		}
 	}
 
+	@DebugLog
 	public void setLogo(int resId) {
 		final Object tag = mImgLogo.getTag(R.id.img_loader);
 		if(tag != null && resId == (Integer) tag) {
@@ -402,18 +409,22 @@ public class LoaderView extends FrameLayout {
 		stopProgressAnimation(true);
 	}
 
+	@DebugLog
 	public void hideLogo() {
 		AnimationUtils.animateAlpha(mImgLogo, false);
 	}
 
+	@DebugLog
 	public void showLogo() {
 		AnimationUtils.animateAlpha(mImgLogo, true);
 	}
 
+	@DebugLog
 	public void hideLogo(long duration) {
 		AnimationUtils.animateAlpha(mImgLogo, false, duration);
 	}
 
+	@DebugLog
 	public void showLogo(long duration) {
 		AnimationUtils.animateAlpha(mImgLogo, true, duration);
 	}
@@ -426,6 +437,7 @@ public class LoaderView extends FrameLayout {
 		animateLogo(bitmap, getResources().getInteger(R.integer.default_animation_duration_short));
 	}
 
+	@DebugLog
 	public void animateLogo(final Bitmap bitmap, long duration) {
 		mImgLogo.setTag(R.id.img_loader, 0);
 		AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
@@ -437,6 +449,7 @@ public class LoaderView extends FrameLayout {
 		}, duration);
 	}
 
+	@DebugLog
 	public void animateLogo(final String logo, final int placeholderResId, final long duration) {
 		if(TextUtils.isEmpty(logo)) {
 			return;
@@ -479,5 +492,9 @@ public class LoaderView extends FrameLayout {
 
 	public void animateLogo(final String logo, int placeholder) {
 		animateLogo(logo, placeholder, getResources().getInteger(R.integer.default_animation_duration_short));
+	}
+
+	public void clearLogo() {
+		mImgLogo.setImageBitmap(null);
 	}
 }
