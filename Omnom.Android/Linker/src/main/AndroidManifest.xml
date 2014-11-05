@@ -111,6 +111,7 @@
             android:screenOrientation="landscape"
             android:theme="@style/Theme.White">
         </activity>
+        <meta-data android:name="com.crashlytics.ApiKey" android:value="80e157ab6e31985057b3080949fbc7c82e4501a4"/>
     </application>
 
 </manifest>
