@@ -85,8 +85,9 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	public void initUi() {
 		gc = new GregorianCalendar();
 		gc.add(Calendar.YEAR, -YEAR_OFFSET);
-		topPanel.setContentVisibility(false, true);
+
 		topPanel.setTitle(R.string.create_account);
+		topPanel.setContentVisibility(false, true);
 		topPanel.setButtonRight(R.string.proceed, new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

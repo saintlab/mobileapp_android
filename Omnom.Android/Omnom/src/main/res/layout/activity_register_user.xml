@@ -65,6 +65,7 @@
                 android:focusableInTouchMode="false"
                 android:clickable="true"
                 android:hint="@string/birth_date"
+                android:textSize="@dimen/font_medium"
                 omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
             <TextView
