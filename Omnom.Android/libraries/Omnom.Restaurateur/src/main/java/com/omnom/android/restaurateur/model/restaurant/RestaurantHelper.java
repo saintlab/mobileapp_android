@@ -51,4 +51,20 @@ public class RestaurantHelper {
 			return Color.parseColor(decorationBg);
 		}
 	}
+
+	public static boolean isPromoEnabled(final Restaurant restaurant) {
+		if(restaurant == null) {
+			return false;
+		}
+		// TODO: Implement when backend will be ready
+		return true;
+	}
+
+	public static boolean isWaiterEnabled(final Restaurant restaurant) {
+		if(restaurant == null) {
+			return false;
+		}
+		// TODO: Implement when backend will be ready
+		return false;
+	}
 }

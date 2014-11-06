@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.view.View;
+import android.view.ViewStub;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.Button;
@@ -56,6 +57,7 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
+import static butterknife.ButterKnife.findById;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
 /**
@@ -110,20 +112,20 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.btn_bottom)
 	protected Button btnSettings;
 
+	@InjectView(R.id.btn_down)
+	protected Button btnDownPromo;
+
+	@InjectView(R.id.stub_bottom_menu)
+	protected ViewStub stubBottomMenu;
+
 	@InjectViews({R.id.txt_error, R.id.panel_errors})
 	protected List<View> errorViews;
-
-	@InjectView(R.id.panel_bottom)
-	protected View panelBottom;
 
 	@InjectView(R.id.img_profile)
 	protected View imgProfile;
 
 	@InjectView(R.id.img_holder)
 	protected View imgHolder;
-
-	@InjectView(R.id.btn_down)
-	protected Button btnDown;
 
 	@Inject
 	protected RestaurateurObeservableApi api;
@@ -203,7 +205,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@Override
 	public void initUi() {
 		mErrorHelper = new ErrorHelper(loader, txtError, btnSettings, errorViews);
-		panelBottom.setTranslationY(100);
 		mTarget = new Target() {
 			@Override
 			public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
@@ -245,7 +246,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected abstract void startLoader();
 
-	@OnClick(R.id.btn_bill)
 	public void onBill(final View v) {
 		mOrdersSubscription = AndroidObservable.bindActivity(this, api.getOrders(mTable.getRestaurantId(), mTable.getId()))
 		                                       .subscribe(new Action1<List<Order>>() {
@@ -266,7 +266,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		                                       });
 	}
 
-	@OnClick(R.id.btn_waiter)
 	public void onWaiter(final View v) {
 		final Observable<WaiterCallResponse> observable;
 		if(!mWaiterCalled) {
@@ -299,7 +298,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		final int duration = 700;
 		imgHolder.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
 		loader.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
-		AnimationUtils.animateAlpha(btnDown, false);
+		AnimationUtils.animateAlpha(btnDownPromo, false);
 	}
 
 	@Override
@@ -307,7 +306,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		if(imgHolder.getTranslationY() != 0) {
 			imgHolder.animate().translationY(0).start();
 			loader.animate().translationY(0).start();
-			AnimationUtils.animateAlpha(btnDown, true);
+			AnimationUtils.animateAlpha(btnDownPromo, RestaurantHelper.isPromoEnabled(mRestaurant));
 		} else {
 			super.onBackPressed();
 		}
@@ -367,16 +366,49 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		loader.updateProgressMax(new Runnable() {
 			@Override
 			public void run() {
-				AnimationUtils.animateAlpha(btnDown, true);
+				configureScreen(mRestaurant);
 				ViewUtils.setVisible(imgHolder, true);
 				ViewUtils.setVisible(imgProfile, true);
-				ViewUtils.setVisible(panelBottom, true);
-				panelBottom.animate()
-				           .translationY(0)
-				           .setInterpolator(new DecelerateInterpolator())
-				           .setDuration(getResources().getInteger(R.integer.default_animation_duration_short))
-				           .start();
+				ViewUtils.setVisible(getPanelBottom(), true);
+				getPanelBottom().animate()
+				                .translationY(0)
+				                .setInterpolator(new DecelerateInterpolator())
+				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short))
+				                .start();
 			}
 		});
+	}
+
+	private void configureScreen(final Restaurant restaurant) {
+		final boolean promoEnabled = RestaurantHelper.isPromoEnabled(restaurant);
+		final boolean waiterEnabled = RestaurantHelper.isWaiterEnabled(restaurant);
+
+		stubBottomMenu.setLayoutResource(waiterEnabled ? R.layout.layout_bill_waiter : R.layout.layout_bill);
+		final View bottomView = stubBottomMenu.inflate();
+
+		if(waiterEnabled) {
+			final View btnWaiter = findById(bottomView, R.id.btn_waiter);
+			btnWaiter.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(final View v) {
+					onWaiter(v);
+				}
+			});
+		}
+
+		final View btnWaiteBill = findById(bottomView, R.id.btn_bill);
+		btnWaiteBill.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				onBill(v);
+			}
+		});
+
+		ViewUtils.setVisible(btnDownPromo, promoEnabled);
+		getPanelBottom().setTranslationY(100);
+	}
+
+	public View getPanelBottom() {
+		return findById(this, R.id.panel_bottom);
 	}
 }
