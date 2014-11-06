@@ -126,8 +126,8 @@ public class ErrorEdit extends LinearLayout {
 			mFontType = a.getInt(R.styleable.ErrorEdit_font, FONT_TYPE_REGULAR);
 			mTextGravity = a.getInt(R.styleable.ErrorEdit_textGravity, GRAVITY_LEFT);
 			mMaxLen = a.getInt(R.styleable.ErrorEdit_maxLength, 0);
-			mTextSize = a.getDimension(R.styleable.ErrorEdit_textSize, getResources().getDimension(R.dimen.font_medium));
-			mErrorTextSize = a.getDimension(R.styleable.ErrorEdit_errorTextSize, getResources().getDimension(R.dimen.font_medium));
+			mTextSize = a.getDimension(R.styleable.ErrorEdit_textSize, getResources().getDimension(R.dimen.font_normal));
+			mErrorTextSize = a.getDimension(R.styleable.ErrorEdit_errorTextSize, getResources().getDimension(R.dimen.font_xsmall));
 		} finally {
 			a.recycle();
 		}
