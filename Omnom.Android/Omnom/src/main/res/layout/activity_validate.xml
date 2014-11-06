@@ -46,45 +46,14 @@
                 style="@style/Button.Bottom"/>
         </LinearLayout>
 
-        <RelativeLayout
-            android:id="@+id/panel_bottom"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/view_size_default"
+
+        <ViewStub
+            android:id="@+id/stub_bottom_menu"
+            android:inflatedId="@+id/panel_bottom"
+            android:layout_gravity="bottom"
             android:layout_alignParentBottom="true"
-            android:background="@color/white_transparent"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <Button
-                android:id="@+id/btn_waiter"
-                android:text="@string/waiter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_alignParentLeft="true"
-                android:gravity="start|center_vertical"
-                android:textColor="@android:color/black"
-                android:drawablePadding="@dimen/activity_horizontal_margin_small"
-                android:ellipsize="end"
-                style="@android:style/Widget.Holo.Button.Borderless"
-                android:visibility="gone"/>
-
-            <Button
-                android:id="@+id/btn_bill"
-                android:text="@string/bill"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_alignParentRight="true"
-                android:gravity="end|center_vertical"
-                android:drawablePadding="@dimen/activity_horizontal_margin_small"
-                android:drawableLeft="@drawable/ic_bill_black"
-                android:textColor="@android:color/black"
-                android:ellipsize="end"
-                style="@android:style/Widget.Holo.Button.Borderless"/>
-        </RelativeLayout>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
         <Button
             android:id="@+id/btn_down"

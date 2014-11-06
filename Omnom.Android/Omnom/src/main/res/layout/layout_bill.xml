@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/view_size_default"
+    android:background="@color/white_transparent"
+    android:layout_gravity="bottom">
+
+    <LinearLayout
+        android:id="@+id/btn_bill"
+        android:clickable="true"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:orientation="horizontal"
+        android:gravity="center"
+        style="@android:style/Widget.Holo.Button.Borderless">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_bill_black"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:text="@string/bill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_horizontal_margin_small"
+            android:textColor="@android:color/black"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:ellipsize="end"/>
+    </LinearLayout>
+</RelativeLayout>
