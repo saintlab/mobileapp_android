@@ -9,6 +9,7 @@ import com.omnom.android.adapter.OrdersPagerAdaper;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
+import com.omnom.android.view.ViewPagerIndicatorCircle;
 
 import java.util.ArrayList;
 
@@ -28,6 +29,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 	@InjectView(R.id.pager)
 	protected ViewPager mPager;
 
+	@InjectView(R.id.pager_indicator)
+	protected ViewPagerIndicatorCircle mIndicator;
+
 	private OrdersPagerAdaper mPagerAdapter;
 
 	private ArrayList<Order> orders = null;
@@ -38,6 +42,8 @@ public class OrdersActivity extends BaseFragmentActivity {
 	public void initUi() {
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, bgColor);
 		mPager.setAdapter(mPagerAdapter);
+		mIndicator.setViewPager(mPager);
+		mPager.setOnPageChangeListener(mIndicator);
 	}
 
 	@Override

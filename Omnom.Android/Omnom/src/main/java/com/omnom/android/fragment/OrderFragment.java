@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -34,6 +35,7 @@ import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.OmnomListView;
@@ -222,6 +224,8 @@ public class OrderFragment extends Fragment {
 
 	private float mFontSmall;
 
+	private View mFragmentView;
+
 	public OrderFragment() {
 	}
 
@@ -239,11 +243,15 @@ public class OrderFragment extends Fragment {
 
 	@Override
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+		mFragmentView = view;
+		AnimationUtils.animateAlpha(panelPayment, false);
+		view.animate().scaleX(0.8f).scaleY(0.8f)/*.translationYBy(-200)*/.start();
+
 		btnPay.setTextColor(mAccentColor);
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
 		mFontSmall = getResources().getDimension(R.dimen.font_large);
 
-		rootView.setBackgroundColor(mAccentColor);
+		// rootView.setBackgroundColor(mAccentColor);
 
 		initPicker();
 		updateCustomTipsText(0);
@@ -270,8 +278,19 @@ public class OrderFragment extends Fragment {
 
 	private void initList() {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
+		AnimationUtils.scaleHeight(list, 800);
 		// list.animate().scaleY(0.9f).scaleX(0.9f).startAddConfirm();
 		AndroidUtils.scrollEnd(list);
+		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+				final float dimension = getResources().getDimension(R.dimen.order_items_list_height_collapsed);
+				AnimationUtils.scaleHeight(list, (int) dimension, 0);
+				mFragmentView.animate().scaleX(1.0f).scaleY(1.0f)/*.translationYBy(200)*/.start();
+				AnimationUtils.animateAlpha(panelPayment, true);
+				AndroidUtils.scrollEnd(list);
+			}
+		});
 		// list.setTranslationY(-LIST_TRANSLATION_Y);
 		// list.setEnabled(false);
 		// list.setScrollingEnabled(false);

@@ -2,7 +2,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
-    android:background="@color/loader_bg_transparent"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -56,7 +55,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/activity_horizontal_margin_medium"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        android:visibility="gone">
 
         <Button
             android:id="@+id/btn_pay"

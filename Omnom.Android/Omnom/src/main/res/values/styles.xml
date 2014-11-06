@@ -29,8 +29,13 @@
         <item name="android:windowBackground">@drawable/bg_wood</item>
     </style>
 
+
     <style name="Theme.Wood.Red" parent="AppTheme">
         <item name="android:windowBackground">@drawable/bg_wood_red</item>
+    </style>
+
+    <style name="Theme.Wood.Red.Light">
+        <item name="android:editTextStyle">@style/EditText.White</item>
     </style>
 
     <style name="Theme.White" parent="AppTheme">
