@@ -45,6 +45,11 @@ public class WicketAuthenticator implements AuthService {
 	}
 
 	@Override
+	public Observable<AuthResponse> confirmResend(final String phone) {
+		return authService.confirmResend(phone).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
 	public Observable<UserResponse> getUser(String token) {
 		return authService.getUser(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}

@@ -36,11 +36,15 @@ public class LoginActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.edit_phone)
 	protected ErrorEdit editPhone;
+
 	@InjectView(R.id.panel_top)
 	protected HeaderView topPanel;
+
 	@Inject
 	protected AuthService authenticator;
+
 	private boolean mFirstStart = true;
+
 	private Subscription mProceedSubscription;
 
 	@Override

@@ -18,7 +18,7 @@
         android:layout_below="@+id/panel_top"
         android:padding="@dimen/activity_horizontal_margin"
         omnom:inputType="phone"
-        omnom:textSize="@dimen/font_smaller"
+        omnom:textSize="@dimen/font_medium"
         omnom:font="regular_le"
         omnom:hint="@string/phone_number"
         omnom:showClear="true"

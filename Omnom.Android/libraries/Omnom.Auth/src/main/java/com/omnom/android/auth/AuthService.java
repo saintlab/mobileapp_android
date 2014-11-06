@@ -39,6 +39,10 @@ public interface AuthService {
 	public Observable<AuthResponse> confirm(@Field(Protocol.FIELD_PHONE) String phone,
 	                                        @Field(Protocol.FIELD_CODE) String code);
 
+	@FormUrlEncoded
+	@POST("/confirm/phone/resend")
+	public Observable<AuthResponse> confirmResend(@Field(Protocol.FIELD_PHONE) String phone);
+
 	@GET("/user")
 	public Observable<UserResponse> getUser(@Query(Protocol.FIELD_TOKEN) String token);
 

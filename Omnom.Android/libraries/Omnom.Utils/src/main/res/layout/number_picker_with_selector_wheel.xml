@@ -17,7 +17,8 @@
 */
 -->
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:omnom="http://schemas.android.com/apk/res-auto">
 
     <view class="com.omnom.android.utils.view.NumberPicker$CustomEditText"
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -27,6 +28,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:singleLine="true"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
         android:background="@null" />
 
 </merge>
