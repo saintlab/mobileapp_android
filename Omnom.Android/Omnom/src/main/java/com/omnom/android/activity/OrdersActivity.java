@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.support.v4.view.ViewPager;
 import android.widget.TextView;
 
 import com.omnom.android.R;
@@ -15,6 +14,7 @@ import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.view.OrdersViewPager;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 	}
 
 	@InjectView(R.id.pager)
-	protected ViewPager mPager;
+	protected OrdersViewPager mPager;
 
 	@InjectView(R.id.pager_indicator)
 	protected ViewPagerIndicatorCircle mIndicator;
@@ -78,7 +78,8 @@ public class OrdersActivity extends BaseFragmentActivity {
 	public void onBackPressed() {
 		final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
 		if(currentFragment != null) {
-			if(!currentFragment.isDownscaled()) {
+			if(!currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
+				mPager.setEnabled(true);
 				animatePageMargin(PAGE_MARGIN, new Runnable() {
 					@Override
 					public void run() {
@@ -89,7 +90,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 				});
 				return;
 			} else {
-				super.onBackPressed();
+				if(!currentFragment.onBackPressed()) {
+					super.onBackPressed();
+				}
 			}
 		} else {
 			super.onBackPressed();
@@ -105,6 +108,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 		AnimationUtils.animateAlpha(mTextInfo, false);
 		AnimationUtils.animateAlpha(mIndicator, false);
 		animatePageMargin(0, runnable);
+		mPager.setEnabled(false);
 	}
 
 	private void animatePageMargin(int value, final Runnable endCallback) {

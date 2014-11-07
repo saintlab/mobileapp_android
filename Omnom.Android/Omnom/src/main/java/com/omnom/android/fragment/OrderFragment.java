@@ -19,9 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -174,11 +174,14 @@ public class OrderFragment extends Fragment {
 	@InjectView(R.id.edit_payment_amount)
 	protected EditText editAmount;
 
-	@InjectView(R.id.edit_custom_tips)
+	@InjectView(R.id.txt_custom_tips)
 	protected TextView txtCustomTips;
 
 	@InjectView(R.id.txt_title)
 	protected TextView txtTitle;
+
+	@InjectView(R.id.txt_already_paid)
+	protected TextView txtAlreadyPaid;
 
 	@InjectView(R.id.tips_picker)
 	protected com.omnom.android.utils.view.NumberPicker pickerTips;
@@ -190,10 +193,10 @@ public class OrderFragment extends Fragment {
 	protected TextView btnPay;
 
 	@InjectView(R.id.btn_apply)
-	protected Button btnApply;
+	protected ImageButton btnApply;
 
 	@InjectView(R.id.btn_cancel)
-	protected Button btnCancel;
+	protected ImageButton btnCancel;
 
 	@InjectView(R.id.root)
 	protected View rootView;
@@ -281,6 +284,7 @@ public class OrderFragment extends Fragment {
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
 		mFontSmall = getResources().getDimension(R.dimen.font_large);
 
+		txtTitle.setText(getString(R.string.bill_number_, mPosition + 1));
 		// rootView.setBackgroundColor(mAccentColor);
 
 		initPicker();
@@ -309,6 +313,7 @@ public class OrderFragment extends Fragment {
 	private void initList() {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
 		AnimationUtils.scaleHeight(list, 800);
+		list.setScrollingEnabled(false);
 		final OrdersActivity activity = (OrdersActivity) getActivity();
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -329,7 +334,6 @@ public class OrderFragment extends Fragment {
 								as.start();
 								AnimationUtils.animateAlpha(panelPayment, true);
 								AnimationUtils.animateAlpha(txtTitle, false);
-								list.setScrollingEnabled(true);
 								AndroidUtils.scrollEnd(list);
 							}
 						});
@@ -350,14 +354,12 @@ public class OrderFragment extends Fragment {
 						as.start();
 						AnimationUtils.animateAlpha(panelPayment, true);
 						AnimationUtils.animateAlpha(txtTitle, false);
-						list.setScrollingEnabled(true);
 						AndroidUtils.scrollEnd(list);
 						activity.fixMarging(null);
 					}
 				}
 			}
 		});
-		list.setScrollingEnabled(false);
 	}
 
 	public boolean isDownscaled() {return list.getTranslationY() == 0;}
@@ -450,11 +452,12 @@ public class OrderFragment extends Fragment {
 	private void initFooter() {
 		final View footerView = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
 		list.addFooterView(footerView);
-		txtFooterAmount = (TextView) footerView.findViewById(R.id.txt_overall);
-		txtFooterAmount.setText(getString(R.string.order_overall, StringUtils.formatCurrency(mOrder.getTotalAmount())));
 
-		txtFooterToPay = (TextView) footerView.findViewById(R.id.txt_to_pay);
-		txtFooterToPay.setText(getString(R.string.order_paid, StringUtils.formatCurrency(mOrder.getPaidAmount())));
+		// TODO: Fix
+		//txtFooterAmount = (TextView) footerView.findViewById(R.id.txt_overall);
+		//txtFooterAmount.setText(getString(R.string.order_overall, StringUtils.formatCurrency(mOrder.getTotalAmount())));
+
+		txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(mOrder.getPaidAmount(), getCurrencySuffix())));
 	}
 
 	private void initRadioButtons() {
@@ -524,10 +527,14 @@ public class OrderFragment extends Fragment {
 		txtTipsTitle.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
 		txtTipsAmountHint.setVisibility(visible ? View.VISIBLE : View.GONE);
 
-		btnApply.setAlpha(1);
 		btnApply.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
-		btnCancel.setAlpha(1);
+		btnApply.setAlpha(1.0f);
+		btnApply.invalidate();
+		btnApply.invalidateDrawable(btnApply.getDrawable());
 		btnCancel.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+		btnCancel.setAlpha(1.0f);
+		btnCancel.invalidate();
+		btnCancel.invalidateDrawable(btnCancel.getDrawable());
 		mMode = visible ? MODE_TIPS : WRONG_VALUE;
 
 		updateCustomTipsText(pickerTips.getValue());
@@ -683,5 +690,17 @@ public class OrderFragment extends Fragment {
 			mAccentColor = getArguments().getInt(ARG_COLOR);
 			mPosition = getArguments().getInt(ARG_POSITION);
 		}
+	}
+
+	public boolean isInPickerMode() {
+		return mMode == MODE_TIPS;
+	}
+
+	public boolean onBackPressed() {
+		if(isInPickerMode()) {
+			doCancel(null);
+			return true;
+		}
+		return false;
 	}
 }

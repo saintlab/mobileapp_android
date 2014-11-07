@@ -163,7 +163,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		});
 
 		GradientDrawable sd = (GradientDrawable) mBtnPay.getBackground();
-		sd.setColor(mAccentColor);
+		sd.setColor(getResources().getColor(R.color.btn_pay_green));
 		sd.invalidateSelf();
 	}
 

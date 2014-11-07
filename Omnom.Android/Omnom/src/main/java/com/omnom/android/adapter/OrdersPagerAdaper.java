@@ -31,11 +31,6 @@ public class OrdersPagerAdaper extends FragmentStatePagerAdapter {
 	}
 
 	@Override
-	public CharSequence getPageTitle(final int position) {
-		return "Счет " + (position + 1);
-	}
-
-	@Override
 	public void setPrimaryItem(final ViewGroup container, final int position, final Object object) {
 		if(getCurrentFragment() != object) {
 			mCurrentFragment = ((Fragment) object);

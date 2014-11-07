@@ -41,6 +41,7 @@
     <string name="tip_hint_or">или %1$s</string>
     <string name="i_m_going_to_pay">Я оплачу</string>
     <string name="to_be_paid">К оплате</string>
+    <string name="already_paid">Уже оплачено: %1$s</string>
     <string name="tips_another">другой</string>
     <string name="tips">Чаевые</string>
     <string name="app_version_build">версия %1$s</string>
@@ -59,4 +60,7 @@
     <string name="repeat">Повторить</string>
     <string name="title_activity_thanks">ThanksActivity</string>
 
+    <string name="bill_number_">Счёт %1$s</string>
+    <string name="split_the_bill">Разделить счёт</string>
+    <string name="title_plus_tips">+ Чаевые</string>
 </resources>
