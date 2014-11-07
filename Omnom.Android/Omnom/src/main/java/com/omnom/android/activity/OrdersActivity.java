@@ -1,14 +1,20 @@
 package com.omnom.android.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.support.v4.view.ViewPager;
+import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.OrdersPagerAdaper;
+import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
 
 import java.util.ArrayList;
@@ -18,6 +24,8 @@ import butterknife.InjectView;
 public class OrdersActivity extends BaseFragmentActivity {
 
 	public static final int REQUEST_CODE_CARDS = 100;
+
+	public static final int PAGE_MARGIN = -120;
 
 	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor) {
 		final Intent intent = new Intent(activity, OrdersActivity.class);
@@ -32,6 +40,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 	@InjectView(R.id.pager_indicator)
 	protected ViewPagerIndicatorCircle mIndicator;
 
+	@InjectView(R.id.txt_info)
+	protected TextView mTextInfo;
+
 	private OrdersPagerAdaper mPagerAdapter;
 
 	private ArrayList<Order> orders = null;
@@ -42,6 +53,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 	public void initUi() {
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, bgColor);
 		mPager.setAdapter(mPagerAdapter);
+		mPager.setPageMargin(PAGE_MARGIN);
+		mPager.setClipToPadding(true);
+		mPager.setClipChildren(true);
 		mIndicator.setViewPager(mPager);
 		mPager.setOnPageChangeListener(mIndicator);
 	}
@@ -61,7 +75,66 @@ public class OrdersActivity extends BaseFragmentActivity {
 	}
 
 	@Override
+	public void onBackPressed() {
+		final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
+		if(currentFragment != null) {
+			if(!currentFragment.isDownscaled()) {
+				animatePageMargin(PAGE_MARGIN, new Runnable() {
+					@Override
+					public void run() {
+						currentFragment.upscale();
+						AnimationUtils.animateAlpha(mTextInfo, true);
+						AnimationUtils.animateAlpha(mIndicator, true);
+					}
+				});
+				return;
+			} else {
+				super.onBackPressed();
+			}
+		} else {
+			super.onBackPressed();
+		}
+	}
+
+	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_orders;
+	}
+
+	public void fixMarging(Runnable runnable) {
+		AnimationUtils.animateAlpha(mTextInfo, false);
+		AnimationUtils.animateAlpha(mIndicator, false);
+		animatePageMargin(0, runnable);
+	}
+
+	private void animatePageMargin(int value, final Runnable endCallback) {
+		ValueAnimator va = ValueAnimator.ofInt(mPager.getPageMargin(), value);
+		mPager.beginFakeDrag();
+		va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(final ValueAnimator animation) {
+				final Integer animatedValue = (Integer) animation.getAnimatedValue();
+				if(endCallback == null) {
+					mPager.fakeDragBy(animatedValue);
+				}
+				mPager.setPageMargin(animatedValue);
+			}
+		});
+		va.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(final Animator animation) {
+				mPager.endFakeDrag();
+				if(endCallback != null) {
+					endCallback.run();
+				} else {
+					mPager.requestLayout();
+				}
+			}
+		});
+		va.start();
+	}
+
+	public boolean checkFragment(final OrderFragment orderFragment) {
+		return orderFragment != null && orderFragment == mPagerAdapter.getCurrentFragment();
 	}
 }
