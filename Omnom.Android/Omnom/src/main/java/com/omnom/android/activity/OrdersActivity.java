@@ -80,14 +80,14 @@ public class OrdersActivity extends BaseFragmentActivity {
 		if(currentFragment != null) {
 			if(!currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
 				mPager.setEnabled(true);
-				animatePageMargin(PAGE_MARGIN, new Runnable() {
+				currentFragment.upscale(new Runnable() {
 					@Override
 					public void run() {
-						currentFragment.upscale();
-						AnimationUtils.animateAlpha(mTextInfo, true);
-						AnimationUtils.animateAlpha(mIndicator, true);
+						animatePageMargin(PAGE_MARGIN, null, mPager.getCurrentItem() == 0);
 					}
 				});
+				AnimationUtils.animateAlpha(mTextInfo, true);
+				AnimationUtils.animateAlpha(mIndicator, true);
 				return;
 			} else {
 				if(!currentFragment.onBackPressed()) {
@@ -104,13 +104,16 @@ public class OrdersActivity extends BaseFragmentActivity {
 		return R.layout.activity_orders;
 	}
 
+	// TODO: Refactoring!!!
 	public void fixMarging(Runnable runnable) {
 		AnimationUtils.animateAlpha(mTextInfo, false);
 		AnimationUtils.animateAlpha(mIndicator, false);
+		// animatePageMargin(0, runnable, false);
 		animatePageMargin(0, runnable);
 		mPager.setEnabled(false);
 	}
 
+	// TODO: Refactoring!!!
 	private void animatePageMargin(int value, final Runnable endCallback) {
 		ValueAnimator va = ValueAnimator.ofInt(mPager.getPageMargin(), value);
 		mPager.beginFakeDrag();
@@ -122,6 +125,44 @@ public class OrdersActivity extends BaseFragmentActivity {
 					mPager.fakeDragBy(animatedValue);
 				}
 				mPager.setPageMargin(animatedValue);
+			}
+		});
+		va.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(final Animator animation) {
+				mPager.endFakeDrag();
+				if(endCallback != null) {
+					endCallback.run();
+				} else {
+					mPager.requestLayout();
+				}
+			}
+		});
+		va.start();
+	}
+
+	// TODO: Refactoring!!!
+	private void animatePageMargin(int value, final Runnable endCallback, final boolean fakeDrag) {
+		ValueAnimator va = ValueAnimator.ofInt(mPager.getPageMargin(), value);
+		mPager.beginFakeDrag();
+		va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			public int mLastValue = 0;
+
+			@Override
+			public void onAnimationUpdate(final ValueAnimator animation) {
+				final Integer animatedValue = (Integer) animation.getAnimatedValue();
+				if(endCallback == null) {
+					mPager.setPageMargin(animatedValue);
+					if(fakeDrag) {
+						mPager.fakeDragBy(-(animatedValue - mLastValue));
+					} else {
+						mPager.fakeDragBy(animatedValue - mLastValue);
+					}
+				} else {
+					mPager.fakeDragBy(animatedValue);
+					mPager.setPageMargin(animatedValue);
+				}
+				mLastValue = animatedValue;
 			}
 		});
 		va.addListener(new AnimatorListenerAdapter() {

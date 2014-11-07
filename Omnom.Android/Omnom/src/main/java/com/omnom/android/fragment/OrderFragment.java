@@ -180,9 +180,6 @@ public class OrderFragment extends Fragment {
 	@InjectView(R.id.txt_title)
 	protected TextView txtTitle;
 
-	@InjectView(R.id.txt_already_paid)
-	protected TextView txtAlreadyPaid;
-
 	@InjectView(R.id.tips_picker)
 	protected com.omnom.android.utils.view.NumberPicker pickerTips;
 
@@ -203,6 +200,9 @@ public class OrderFragment extends Fragment {
 
 	@InjectView(R.id.txt_payment_title)
 	protected TextView txtPaymentTitle;
+
+	@InjectView(R.id.txt_already_paid)
+	protected TextView txtAlreadyPaid;
 
 	@InjectView(R.id.txt_tips_hint)
 	protected TextView txtTipsHint;
@@ -256,7 +256,8 @@ public class OrderFragment extends Fragment {
 		return view;
 	}
 
-	public void upscale() {
+	// TODO: Refactoring!!!
+	public void upscale(final Runnable runnable) {
 		AnimationUtils.animateAlpha(panelPayment, false);
 
 		final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mFragmentView, "scaleX", mFragmentView.getScaleX(), 0.8f);
@@ -264,6 +265,14 @@ public class OrderFragment extends Fragment {
 		final ObjectAnimator ty = ObjectAnimator.ofFloat(list, "translationY", list.getTranslationY(), 0);
 		final AnimatorSet as = new AnimatorSet();
 		as.playTogether(scaleX, scaleY, ty);
+		as.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(final Animator animation) {
+				if(runnable != null) {
+					runnable.run();
+				}
+			}
+		});
 		as.start();
 
 		AnimationUtils.animateAlpha(txtTitle, true);
@@ -273,7 +282,7 @@ public class OrderFragment extends Fragment {
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 		mFragmentView = view;
 
-		AnimationUtils.animateAlpha(panelPayment, false);
+		ViewUtils.setVisible(panelPayment, false);
 		mFragmentView.setScaleX(0.8f);
 		mFragmentView.setScaleY(0.8f);
 
@@ -524,6 +533,7 @@ public class OrderFragment extends Fragment {
 		txtCustomTips.setVisibility(visible ? View.VISIBLE : View.GONE);
 		radioGroup.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
 		txtPaymentTitle.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
+		txtAlreadyPaid.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
 		txtTipsTitle.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
 		txtTipsAmountHint.setVisibility(visible ? View.VISIBLE : View.GONE);
 
