@@ -18,9 +18,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.HeaderViewListAdapter;
 import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
@@ -249,6 +251,8 @@ public class OrderFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
 		final View view = inflater.inflate(R.layout.fragment_order, container, false);
+		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
+		mFontSmall = getResources().getDimension(R.dimen.font_large);
 		ButterKnife.inject(this, view);
 		return view;
 	}
@@ -271,6 +275,7 @@ public class OrderFragment extends Fragment {
 
 	public void downscale(final Runnable runnable) {
 		AnimationUtils.animateAlpha(panelPayment, false);
+		list.setScrollingEnabled(false);
 		final AnimatorSet as = getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0);
 		as.addListener(new AnimatorListenerAdapter() {
 			@Override
@@ -298,9 +303,6 @@ public class OrderFragment extends Fragment {
 		}
 
 		btnPay.setTextColor(mAccentColor);
-		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
-		mFontSmall = getResources().getDimension(R.dimen.font_large);
-
 		txtTitle.setText(getString(R.string.bill_number_, mPosition + 1));
 		// rootView.setBackgroundColor(mAccentColor);
 
@@ -329,26 +331,49 @@ public class OrderFragment extends Fragment {
 
 	private void initList() {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
+		list.setScrollingEnabled(false);
+		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+		list.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
+			}
+
+			@Override
+			public void onNothingSelected(final AdapterView<?> parent) {
+				// Do nothing
+			}
+		});
 		if(mAnimate) {
 			AnimationUtils.scaleHeight(list, LIST_HEIGHT);
 		} else {
 			ViewUtils.setHeight(list, LIST_HEIGHT);
 		}
-		list.setScrollingEnabled(false);
-		final OrdersActivity activity = (OrdersActivity) getActivity();
+
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-				if(isDownscaled() && activity.checkFragment(OrderFragment.this)) {
-					AnimationUtils.animateAlpha(panelPayment, true);
-					AnimationUtils.animateAlpha(txtTitle, false);
-					AndroidUtils.scrollEnd(list);
-					if(isFirstItem() || isLastItem()) {
-						activity.animatePageMargingFirstOrLast(isFirstItem());
-					} else {
-						activity.animatePageMarginMiddle();
+				final OrdersActivity activity = (OrdersActivity) getActivity();
+				if(isDownscaled()) {
+					if(activity.checkFragment(OrderFragment.this)) {
+						AnimationUtils.animateAlpha(panelPayment, true);
+						AnimationUtils.animateAlpha(txtTitle, false);
+						AndroidUtils.scrollEnd(list);
+						if(isFirstItem() || isLastItem()) {
+							activity.animatePageMargingFirstOrLast(isFirstItem());
+						} else {
+							activity.animatePageMarginMiddle();
+						}
+						getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, LIST_TRASNLATION_ACTIVE).start();
+						list.setScrollingEnabled(true);
 					}
-					getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, LIST_TRASNLATION_ACTIVE).start();
+				} else {
+					final Boolean tagSelected = (Boolean) view.getTag(R.id.selected);
+					final boolean checked = tagSelected != null && tagSelected;
+					final HeaderViewListAdapter adapter = (HeaderViewListAdapter) list.getAdapter();
+					final OrderItemsAdapter wrappedAdapter = (OrderItemsAdapter) adapter.getWrappedAdapter();
+					wrappedAdapter.setSelected(position, !checked);
+					view.setTag(R.id.selected, !checked);
+					wrappedAdapter.notifyDataSetChanged();
 				}
 			}
 		});
