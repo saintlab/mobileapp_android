@@ -85,7 +85,7 @@
         <activity
             android:name="com.omnom.android.activity.OrdersActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Wood.Light"
+            android:theme="@style/Theme.Wood.Red.Light"
             android:windowSoftInputMode="adjustResize|stateHidden">
         </activity>
         <activity

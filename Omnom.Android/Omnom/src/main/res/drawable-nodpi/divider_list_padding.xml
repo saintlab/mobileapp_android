@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <color
+            android:color="@android:color/white"/>
+    </item>
+    <item
+        android:left="@dimen/activity_horizontal_margin_medium"
+        android:right="@dimen/activity_horizontal_margin_medium">
+        <color
+            android:color="@color/list_header"/>
+    </item>
+</layer-list>

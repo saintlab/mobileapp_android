@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:background="@android:color/white"
     android:paddingLeft="@dimen/activity_horizontal_margin_medium"
@@ -14,6 +15,8 @@
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:ellipsize="end"
+        android:textColor="#7d7d7d"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
         android:textAppearance="?android:textAppearanceLarge"/>
 
     <TextView
@@ -25,5 +28,5 @@
         android:layout_toLeftOf="@id/txt_price"
         android:singleLine="true"
         android:ellipsize="end"
-        android:textAppearance="?android:textAppearanceMedium"/>
+        android:textAppearance="?android:textAppearanceLarge"/>
 </RelativeLayout>

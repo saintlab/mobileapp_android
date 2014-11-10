@@ -1,5 +1,9 @@
 package com.omnom.android.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -14,9 +18,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -34,6 +39,7 @@ import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.OmnomListView;
@@ -121,13 +127,16 @@ public class OrderFragment extends Fragment {
 
 	private static final String ARG_COLOR = "color";
 
+	private static final String ARG_POSITION = "position";
+
 	private static final String TAG = OrderFragment.class.getSimpleName();
 
-	public static Fragment newInstance(Parcelable parcelable, final int bgColor) {
+	public static Fragment newInstance(Parcelable parcelable, final int bgColor, final int postition) {
 		final OrderFragment fragment = new OrderFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, parcelable);
 		args.putInt(ARG_COLOR, bgColor);
+		args.putInt(ARG_POSITION, postition);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -165,8 +174,11 @@ public class OrderFragment extends Fragment {
 	@InjectView(R.id.edit_payment_amount)
 	protected EditText editAmount;
 
-	@InjectView(R.id.edit_custom_tips)
+	@InjectView(R.id.txt_custom_tips)
 	protected TextView txtCustomTips;
+
+	@InjectView(R.id.txt_title)
+	protected TextView txtTitle;
 
 	@InjectView(R.id.tips_picker)
 	protected com.omnom.android.utils.view.NumberPicker pickerTips;
@@ -178,16 +190,19 @@ public class OrderFragment extends Fragment {
 	protected TextView btnPay;
 
 	@InjectView(R.id.btn_apply)
-	protected Button btnApply;
+	protected ImageButton btnApply;
 
 	@InjectView(R.id.btn_cancel)
-	protected Button btnCancel;
+	protected ImageButton btnCancel;
 
 	@InjectView(R.id.root)
 	protected View rootView;
 
 	@InjectView(R.id.txt_payment_title)
 	protected TextView txtPaymentTitle;
+
+	@InjectView(R.id.txt_already_paid)
+	protected TextView txtAlreadyPaid;
 
 	@InjectView(R.id.txt_tips_hint)
 	protected TextView txtTipsHint;
@@ -222,6 +237,10 @@ public class OrderFragment extends Fragment {
 
 	private float mFontSmall;
 
+	private View mFragmentView;
+
+	private int mPosition;
+
 	public OrderFragment() {
 	}
 
@@ -237,13 +256,45 @@ public class OrderFragment extends Fragment {
 		return view;
 	}
 
+	// TODO: Refactoring!!!
+	public void upscale(final Runnable runnable) {
+		AnimationUtils.animateAlpha(panelPayment, false);
+
+		final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mFragmentView, "scaleX", mFragmentView.getScaleX(), 0.8f);
+		final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mFragmentView, "scaleY", mFragmentView.getScaleY(), 0.8f);
+		final ObjectAnimator ty = ObjectAnimator.ofFloat(list, "translationY", list.getTranslationY(), 0);
+		final AnimatorSet as = new AnimatorSet();
+		as.playTogether(scaleX, scaleY, ty);
+		as.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(final Animator animation) {
+				if(runnable != null) {
+					runnable.run();
+				}
+			}
+		});
+		as.start();
+
+		AnimationUtils.animateAlpha(txtTitle, true);
+	}
+
 	@Override
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+		mFragmentView = view;
+
+		ViewUtils.setVisible(panelPayment, false);
+		mFragmentView.setScaleX(0.8f);
+		mFragmentView.setScaleY(0.8f);
+
+		mFragmentView.animate().translationYBy(-800).setDuration(0).start();
+		mFragmentView.animate().translationYBy(800).setStartDelay((mPosition + 1) * 350).setDuration(850).start();
+
 		btnPay.setTextColor(mAccentColor);
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
 		mFontSmall = getResources().getDimension(R.dimen.font_large);
 
-		rootView.setBackgroundColor(mAccentColor);
+		txtTitle.setText(getString(R.string.bill_number_, mPosition + 1));
+		// rootView.setBackgroundColor(mAccentColor);
 
 		initPicker();
 		updateCustomTipsText(0);
@@ -270,12 +321,57 @@ public class OrderFragment extends Fragment {
 
 	private void initList() {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
-		// list.animate().scaleY(0.9f).scaleX(0.9f).startAddConfirm();
-		AndroidUtils.scrollEnd(list);
-		// list.setTranslationY(-LIST_TRANSLATION_Y);
-		// list.setEnabled(false);
-		// list.setScrollingEnabled(false);
+		AnimationUtils.scaleHeight(list, 800);
+		list.setScrollingEnabled(false);
+		final OrdersActivity activity = (OrdersActivity) getActivity();
+		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+				// if fragment is downscaled
+				if(isDownscaled() && activity.checkFragment(OrderFragment.this)) {
+					if(mPosition == 0) {
+						activity.fixMarging(new Runnable() {
+							@Override
+							public void run() {
+								final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mFragmentView, "scaleX", mFragmentView.getScaleX(),
+								                                                     1.0f);
+								final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mFragmentView, "scaleY", mFragmentView.getScaleY(),
+								                                                     1.0f);
+								final ObjectAnimator ty = ObjectAnimator.ofFloat(list, "translationY", list.getTranslationY(), -380);
+								final AnimatorSet as = new AnimatorSet();
+								as.playTogether(scaleX, scaleY, ty);
+								as.start();
+								AnimationUtils.animateAlpha(panelPayment, true);
+								AnimationUtils.animateAlpha(txtTitle, false);
+								AndroidUtils.scrollEnd(list);
+							}
+						});
+					} else {
+						final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mFragmentView, "scaleX", mFragmentView.getScaleX(),
+						                                                     1.0f);
+						final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mFragmentView, "scaleY", mFragmentView.getScaleY(),
+						                                                     1.0f);
+						final ObjectAnimator ty = ObjectAnimator.ofFloat(list, "translationY", list.getTranslationY(), -380);
+						final AnimatorSet as = new AnimatorSet();
+						as.playTogether(scaleX, scaleY, ty);
+						as.addListener(new AnimatorListenerAdapter() {
+							@Override
+							public void onAnimationCancel(final Animator animation) {
+
+							}
+						});
+						as.start();
+						AnimationUtils.animateAlpha(panelPayment, true);
+						AnimationUtils.animateAlpha(txtTitle, false);
+						AndroidUtils.scrollEnd(list);
+						activity.fixMarging(null);
+					}
+				}
+			}
+		});
 	}
+
+	public boolean isDownscaled() {return list.getTranslationY() == 0;}
 
 	private void initAmount() {
 		editAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -365,11 +461,12 @@ public class OrderFragment extends Fragment {
 	private void initFooter() {
 		final View footerView = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
 		list.addFooterView(footerView);
-		txtFooterAmount = (TextView) footerView.findViewById(R.id.txt_overall);
-		txtFooterAmount.setText(getString(R.string.order_overall, StringUtils.formatCurrency(mOrder.getTotalAmount())));
 
-		txtFooterToPay = (TextView) footerView.findViewById(R.id.txt_to_pay);
-		txtFooterToPay.setText(getString(R.string.order_paid, StringUtils.formatCurrency(mOrder.getPaidAmount())));
+		// TODO: Fix
+		//txtFooterAmount = (TextView) footerView.findViewById(R.id.txt_overall);
+		//txtFooterAmount.setText(getString(R.string.order_overall, StringUtils.formatCurrency(mOrder.getTotalAmount())));
+
+		txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(mOrder.getPaidAmount(), getCurrencySuffix())));
 	}
 
 	private void initRadioButtons() {
@@ -436,13 +533,18 @@ public class OrderFragment extends Fragment {
 		txtCustomTips.setVisibility(visible ? View.VISIBLE : View.GONE);
 		radioGroup.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
 		txtPaymentTitle.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
+		txtAlreadyPaid.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
 		txtTipsTitle.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
 		txtTipsAmountHint.setVisibility(visible ? View.VISIBLE : View.GONE);
 
-		btnApply.setAlpha(1);
 		btnApply.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
-		btnCancel.setAlpha(1);
+		btnApply.setAlpha(1.0f);
+		btnApply.invalidate();
+		btnApply.invalidateDrawable(btnApply.getDrawable());
 		btnCancel.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+		btnCancel.setAlpha(1.0f);
+		btnCancel.invalidate();
+		btnCancel.invalidateDrawable(btnCancel.getDrawable());
 		mMode = visible ? MODE_TIPS : WRONG_VALUE;
 
 		updateCustomTipsText(pickerTips.getValue());
@@ -596,6 +698,19 @@ public class OrderFragment extends Fragment {
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mAccentColor = getArguments().getInt(ARG_COLOR);
+			mPosition = getArguments().getInt(ARG_POSITION);
 		}
+	}
+
+	public boolean isInPickerMode() {
+		return mMode == MODE_TIPS;
+	}
+
+	public boolean onBackPressed() {
+		if(isInPickerMode()) {
+			doCancel(null);
+			return true;
+		}
+		return false;
 	}
 }
