@@ -149,7 +149,7 @@ public class OrderItemsAdapter extends BaseAdapter {
 		ArrayList<OrderItem> result = new ArrayList<OrderItem>(size);
 		for(int i = 0; i < size; i++) {
 			int key = mCheckedStates.keyAt(i);
-			if(mCheckedStates.get(key)) {
+			if(mCheckedStates.get(key) && key <  getCount() - 1) {
 				result.add(mItems.get(key));
 			}
 		}
