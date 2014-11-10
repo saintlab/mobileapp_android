@@ -139,7 +139,7 @@ public class ErrorEdit extends LinearLayout {
 		editView = (ErrorEditText) view.findViewById(R.id.edit);
 		editView.addTextChangedListener(onTextChanged);
 		editView.setHint(mHintText);
-		editView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mTextSize);
+		editView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
 		if(mMaxLen > 0) {
 			final InputFilter[] filters = editView.getFilters();
 			final InputFilter[] newFilters = Arrays.copyOf(filters, filters.length + 1);
@@ -164,7 +164,7 @@ public class ErrorEdit extends LinearLayout {
 		});
 
 		errorTextView = (TextView) view.findViewById(R.id.error);
-		errorTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mErrorTextSize);
+		errorTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mErrorTextSize);
 
 		btnClear = (Button) view.findViewById(R.id.btn_clear);
 		btnClear.setBackgroundDrawable(mClearDrawable);

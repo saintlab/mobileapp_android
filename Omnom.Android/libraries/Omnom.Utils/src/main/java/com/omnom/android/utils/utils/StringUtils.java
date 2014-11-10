@@ -42,6 +42,10 @@ public class StringUtils {
 		return formatCurrency(value.toPlainString(), currency);
 	}
 
+	public static String formatCurrency(double value, String currency) {
+		return formatCurrency(BigDecimal.valueOf(value)) + currency;
+	}
+
 	public static String formatCurrency(String s) {
 		return s.indexOf(".") < 0 ? s : s.replaceAll("0*$", "").replaceAll("\\.$", "");
 	}
@@ -86,8 +90,6 @@ public class StringUtils {
 		return result.toString();
 	}
 
-	private static String _lazy_currency_delimiter = null;
-
 	public static String getCurrencyDelimiter() {
 		if(_lazy_currency_delimiter == null) {
 			final Locale locale = Locale.getDefault();
@@ -96,4 +98,6 @@ public class StringUtils {
 		}
 		return _lazy_currency_delimiter;
 	}
+
+	private static String _lazy_currency_delimiter = null;
 }

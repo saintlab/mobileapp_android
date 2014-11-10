@@ -1,12 +1,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.omnom.android.activity.OrdersActivity">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.omnom.android.activity.OrdersActivity">
 
-    <android.support.v4.view.ViewPager
+    <com.omnom.android.view.OrdersViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/txt_info"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_vertical_margin_small"
+        android:layout_alignParentBottom="true"
+        android:textColor="@color/profile_hint"
+        android:maxLines="2"
+        android:text="На вашем столике\nраздельных счетов: 2"/>
+
+    <com.omnom.android.view.ViewPagerIndicatorCircle
+        android:id="@+id/pager_indicator"
+        android:layout_above="@+id/txt_info"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"/>
 
 </RelativeLayout>
