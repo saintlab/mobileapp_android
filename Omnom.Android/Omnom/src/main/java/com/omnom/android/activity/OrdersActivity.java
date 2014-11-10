@@ -56,6 +56,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 		mPager.setPageMargin(PAGE_MARGIN);
 		mPager.setClipToPadding(true);
 		mPager.setClipChildren(true);
+		mPager.setOffscreenPageLimit(3);
 		mIndicator.setViewPager(mPager);
 		mPager.setOnPageChangeListener(mIndicator);
 	}

@@ -20,6 +20,8 @@ public class OrdersPagerAdaper extends FragmentStatePagerAdapter {
 
 	private Fragment mCurrentFragment;
 
+	private int mLastAnimated = -1;
+
 	public OrdersPagerAdaper(FragmentManager fm, List<Order> orders, final int bgColor) {
 		super(fm);
 		mOrders = orders;
@@ -31,6 +33,11 @@ public class OrdersPagerAdaper extends FragmentStatePagerAdapter {
 	}
 
 	@Override
+	public int getItemPosition(final Object object) {
+		return super.getItemPosition(object);
+	}
+
+	@Override
 	public void setPrimaryItem(final ViewGroup container, final int position, final Object object) {
 		if(getCurrentFragment() != object) {
 			mCurrentFragment = ((Fragment) object);
@@ -39,8 +46,13 @@ public class OrdersPagerAdaper extends FragmentStatePagerAdapter {
 	}
 
 	@Override
-	public Fragment getItem(int i) {
-		return OrderFragment.newInstance(mOrders.get(i), mBgColor, i);
+	public Fragment getItem(int position) {
+		final boolean isAnimate = (position > mLastAnimated) && (mLastAnimated < 2) && (position < 2);
+		final Fragment fragment = OrderFragment.newInstance(mOrders.get(position), mBgColor, position, isAnimate);
+		if(isAnimate) {
+			mLastAnimated = position;
+		}
+		return fragment;
 	}
 
 	@Override

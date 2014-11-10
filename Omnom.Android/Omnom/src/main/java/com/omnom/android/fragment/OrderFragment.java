@@ -129,14 +129,17 @@ public class OrderFragment extends Fragment {
 
 	private static final String ARG_POSITION = "position";
 
+	private static final String ARG_ANIMATE = "animate";
+
 	private static final String TAG = OrderFragment.class.getSimpleName();
 
-	public static Fragment newInstance(Parcelable parcelable, final int bgColor, final int postition) {
+	public static Fragment newInstance(Parcelable parcelable, final int bgColor, final int postition, final boolean animate) {
 		final OrderFragment fragment = new OrderFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, parcelable);
 		args.putInt(ARG_COLOR, bgColor);
 		args.putInt(ARG_POSITION, postition);
+		args.putBoolean(ARG_ANIMATE, animate);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -241,6 +244,8 @@ public class OrderFragment extends Fragment {
 
 	private int mPosition;
 
+	private boolean mAnimate;
+
 	public OrderFragment() {
 	}
 
@@ -286,8 +291,11 @@ public class OrderFragment extends Fragment {
 		mFragmentView.setScaleX(0.8f);
 		mFragmentView.setScaleY(0.8f);
 
-		mFragmentView.animate().translationYBy(-800).setDuration(0).start();
-		mFragmentView.animate().translationYBy(800).setStartDelay((mPosition + 1) * 350).setDuration(850).start();
+
+		if(mAnimate) {
+			mFragmentView.animate().translationYBy(-800).setDuration(0).start();
+			mFragmentView.animate().translationYBy(800).setStartDelay((mPosition + 1) * 350).setDuration(850).start();
+		}
 
 		btnPay.setTextColor(mAccentColor);
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
@@ -321,7 +329,11 @@ public class OrderFragment extends Fragment {
 
 	private void initList() {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
-		AnimationUtils.scaleHeight(list, 800);
+		if(mAnimate) {
+			AnimationUtils.scaleHeight(list, 800);
+		} else {
+			ViewUtils.setHeight(list, 800);
+		}
 		list.setScrollingEnabled(false);
 		final OrdersActivity activity = (OrdersActivity) getActivity();
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -698,6 +710,7 @@ public class OrderFragment extends Fragment {
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mAccentColor = getArguments().getInt(ARG_COLOR);
+			mAnimate = getArguments().getBoolean(ARG_ANIMATE, false);
 			mPosition = getArguments().getInt(ARG_POSITION);
 		}
 	}
