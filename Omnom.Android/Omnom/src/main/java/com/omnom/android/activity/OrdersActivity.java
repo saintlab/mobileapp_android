@@ -129,7 +129,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 			@Override
 			public void onAnimationUpdate(final ValueAnimator animation) {
 				final Integer animatedValue = (Integer) animation.getAnimatedValue();
-				mPager.fakeDragBy(isFirst ? -animatedValue * 2 : animatedValue * 2);
+				mPager.fakeDragBy(isFirst ? -animatedValue : animatedValue);
 				mPager.setPageMargin(animatedValue);
 			}
 		});
