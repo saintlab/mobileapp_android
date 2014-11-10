@@ -33,6 +33,11 @@ public class OrdersPagerAdaper extends FragmentStatePagerAdapter {
 	}
 
 	@Override
+	public float getPageWidth(final int position) {
+		return super.getPageWidth(position);
+	}
+
+	@Override
 	public int getItemPosition(final Object object) {
 		return super.getItemPosition(object);
 	}
@@ -48,7 +53,7 @@ public class OrdersPagerAdaper extends FragmentStatePagerAdapter {
 	@Override
 	public Fragment getItem(int position) {
 		final boolean isAnimate = (position > mLastAnimated) && (mLastAnimated < 2) && (position < 2);
-		final Fragment fragment = OrderFragment.newInstance(mOrders.get(position), mBgColor, position, isAnimate);
+		final Fragment fragment = OrderFragment.newInstance(mOrders.get(position), mBgColor, position, getCount(), isAnimate);
 		if(isAnimate) {
 			mLastAnimated = position;
 		}
