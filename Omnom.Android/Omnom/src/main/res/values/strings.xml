@@ -63,4 +63,5 @@
     <string name="bill_number_">Счёт %1$s</string>
     <string name="split_the_bill">Разделить счёт</string>
     <string name="title_plus_tips">+ Чаевые</string>
+    <string name="your_has_n_orders">На вашем столике\nраздельных счетов: %1$s</string>
 </resources>
