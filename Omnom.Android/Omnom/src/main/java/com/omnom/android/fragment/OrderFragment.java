@@ -139,11 +139,11 @@ public class OrderFragment extends Fragment {
 
 	private static final String ARG_ANIMATE = "animate";
 
-	public static Fragment newInstance(Parcelable parcelable, final int bgColor, final int postition, final int count,
+	public static Fragment newInstance(Order order, final int bgColor, final int postition, final int count,
 	                                   final boolean animate) {
 		final OrderFragment fragment = new OrderFragment();
 		final Bundle args = new Bundle();
-		args.putParcelable(ARG_ORDER, parcelable);
+		args.putParcelable(ARG_ORDER, order);
 		args.putInt(ARG_COLOR, bgColor);
 		args.putInt(ARG_POSITION, postition);
 		args.putInt(ARG_COUNT, count);
@@ -240,6 +240,8 @@ public class OrderFragment extends Fragment {
 
 	private int mOrdersCount;
 
+	private boolean mInSplitMode;
+
 	public OrderFragment() {
 	}
 
@@ -333,16 +335,6 @@ public class OrderFragment extends Fragment {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-		list.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
-			}
-
-			@Override
-			public void onNothingSelected(final AdapterView<?> parent) {
-				// Do nothing
-			}
-		});
 		if(mAnimate) {
 			AnimationUtils.scaleHeight(list, LIST_HEIGHT);
 		} else {
@@ -355,16 +347,7 @@ public class OrderFragment extends Fragment {
 				final OrdersActivity activity = (OrdersActivity) getActivity();
 				if(isDownscaled()) {
 					if(activity.checkFragment(OrderFragment.this)) {
-						AnimationUtils.animateAlpha(panelPayment, true);
-						AnimationUtils.animateAlpha(txtTitle, false);
-						AndroidUtils.scrollEnd(list);
-						if(isFirstItem() || isLastItem()) {
-							activity.animatePageMargingFirstOrLast(isFirstItem());
-						} else {
-							activity.animatePageMarginMiddle();
-						}
-						getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, LIST_TRASNLATION_ACTIVE).start();
-						list.setScrollingEnabled(true);
+						zoomInFragment(activity);
 					}
 				} else {
 					final Boolean tagSelected = (Boolean) view.getTag(R.id.selected);
@@ -377,6 +360,19 @@ public class OrderFragment extends Fragment {
 				}
 			}
 		});
+	}
+
+	private void zoomInFragment(final OrdersActivity activity) {
+		AnimationUtils.animateAlpha(panelPayment, true);
+		AnimationUtils.animateAlpha(txtTitle, false);
+		AndroidUtils.scrollEnd(list);
+		if(isFirstItem() || isLastItem()) {
+			activity.animatePageMargingFirstOrLast(isFirstItem());
+		} else {
+			activity.animatePageMarginMiddle();
+		}
+		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, LIST_TRASNLATION_ACTIVE).start();
+		list.setScrollingEnabled(true);
 	}
 
 	private boolean isLastItem() {return mPosition == mOrdersCount - 1;}
@@ -418,6 +414,7 @@ public class OrderFragment extends Fragment {
 				updatePayButton(amount.add(getSelectedTips(amount)));
 			}
 		});
+		txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(mOrder.getPaidAmount(), getCurrencySuffix())));
 		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
 		editAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
@@ -473,12 +470,21 @@ public class OrderFragment extends Fragment {
 	private void initFooter() {
 		final View footerView = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
 		list.addFooterView(footerView);
+		footerView.findViewById(R.id.btn_bill_split).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				if(!isDownscaled()) {
+					splitBill();
+				} else {
+					zoomInFragment((OrdersActivity) getActivity());
+				}
+			}
+		});
+	}
 
-		// TODO: Fix
-		//txtFooterAmount = (TextView) footerView.findViewById(R.id.txt_overall);
-		//txtFooterAmount.setText(getString(R.string.order_overall, StringUtils.formatCurrency(mOrder.getTotalAmount())));
-
-		txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(mOrder.getPaidAmount(), getCurrencySuffix())));
+	private void splitBill() {
+		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder);
+		getFragmentManager().beginTransaction().add(android.R.id.content, billSplitFragment, BillSplitFragment.TAG).commit();
 	}
 
 	private void initRadioButtons() {
@@ -717,6 +723,16 @@ public class OrderFragment extends Fragment {
 			doCancel(null);
 			return true;
 		}
+		final Fragment fragmentByTag = getFragmentManager().findFragmentByTag(BillSplitFragment.TAG);
+		if(fragmentByTag != null) {
+			getFragmentManager().beginTransaction().remove(fragmentByTag).commit();
+			return true;
+		}
 		return false;
+	}
+
+	public boolean isInSplitMode() {
+		final Fragment splitFragment = getFragmentManager().findFragmentByTag(BillSplitFragment.TAG);
+		return splitFragment != null;
 	}
 }

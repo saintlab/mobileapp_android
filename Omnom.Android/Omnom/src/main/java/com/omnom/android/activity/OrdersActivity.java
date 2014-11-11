@@ -84,7 +84,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 	public void onBackPressed() {
 		final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
 		if(currentFragment != null) {
-			if(!currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
+			if(!currentFragment.isInSplitMode() && !currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
 				mPager.setEnabled(true);
 				currentFragment.downscale(new Runnable() {
 					@Override
