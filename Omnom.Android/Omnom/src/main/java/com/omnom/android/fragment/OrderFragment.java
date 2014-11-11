@@ -372,7 +372,7 @@ public class OrderFragment extends Fragment {
 			activity.animatePageMarginMiddle();
 		}
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, LIST_TRASNLATION_ACTIVE).start();
-		list.setScrollingEnabled(true);
+		// list.setScrollingEnabled(true);
 	}
 
 	private boolean isLastItem() {return mPosition == mOrdersCount - 1;}

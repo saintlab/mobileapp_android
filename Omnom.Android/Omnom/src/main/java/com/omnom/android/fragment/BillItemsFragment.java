@@ -1,10 +1,14 @@
 package com.omnom.android.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.HeaderViewListAdapter;
 
 import com.omnom.android.R;
 import com.omnom.android.adapter.OrderItemsAdapter;
@@ -46,13 +50,33 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 	}
 
 	@Override
-	public void onViewCreated(final View view, final Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
+	public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		mAdapter = new OrderItemsAdapter(getActivity(), mOrder.getItems());
 		getListView().setDividerHeight(ViewUtils.dipToPixels(getActivity(), 1));
 		getListView().setDivider(getResources().getDrawable(R.drawable.divider_list_padding));
-		mAdapter = new OrderItemsAdapter(getActivity(), mOrder.getItems());
+		final View footerView = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer_empty, null, false);
+		getListView().addFooterView(footerView);
 		setListAdapter(mAdapter);
+		getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+				final Boolean tagSelected = (Boolean) view.getTag(R.id.selected);
+				final boolean checked = tagSelected != null && tagSelected;
+				final HeaderViewListAdapter adapter = (HeaderViewListAdapter) getListView().getAdapter();
+				final OrderItemsAdapter wrappedAdapter = (OrderItemsAdapter) adapter.getWrappedAdapter();
+				wrappedAdapter.setSelected(position, !checked);
+				view.setTag(R.id.selected, !checked);
+				wrappedAdapter.notifyDataSetChanged();
+				updateAmount();
+			}
+		});
 		updateAmount();
+	}
+
+	@Override
+	public void onViewCreated(final View view, final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 	}
 
 	private double getAmount() {
@@ -69,7 +93,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 		final Button btnCommit = (Button) getActivity().findViewById(R.id.btn_commit);
 		final double amount = getAmount();
 		if(amount > 0) {
-			btnCommit.setText(StringUtils.formatCurrency(amount));
+			btnCommit.setText(getString(R.string.bill_split_amount_, StringUtils.formatCurrency(amount)));
 			AnimationUtils.animateAlpha(btnCommit, true);
 		} else {
 			AnimationUtils.animateAlpha(btnCommit, false);

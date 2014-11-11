@@ -44,8 +44,6 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 
 	private Order mOrder;
 
-	private int mAmount;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -81,8 +79,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 
 	private void onValueChanged(final int newVal) {
 		mTxtInfo.setText(String.valueOf(newVal));
-		final Button btnCommit = (Button) getActivity().findViewById(R.id.btn_commit);
-		btnCommit.setText("= " + StringUtils.formatCurrency(getAmount(), getString(R.string.currency_ruble)));
+		updateAmount();
 	}
 
 	private BigDecimal getAmount() {
@@ -96,7 +93,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 	@Override
 	public void updateAmount() {
 		final Button btnCommit = (Button) getActivity().findViewById(R.id.btn_commit);
-		btnCommit.setText(StringUtils.formatCurrency(getAmount(), getString(R.string.currency_ruble)));
+		btnCommit.setText(getString(R.string.bill_split_amount_, StringUtils.formatCurrency(getAmount())));
 		AnimationUtils.animateAlpha(btnCommit, true);
 	}
 }

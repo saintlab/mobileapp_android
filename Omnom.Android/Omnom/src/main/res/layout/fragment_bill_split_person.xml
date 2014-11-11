@@ -9,22 +9,25 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="48dp">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:gravity="center"
             android:text="На сколько гостей делить?"
-            android:textSize="28sp"
+            android:textSize="24sp"
             android:textAppearance="?android:textAppearance"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
         <TextView
             android:id="@+id/txt_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:gravity="center"
             android:text="1"
             android:textSize="@dimen/font_xxlarge"
             android:textAppearance="?android:textAppearance"
@@ -33,7 +36,8 @@
         <com.omnom.android.utils.view.NumberPicker
             android:id="@+id/picker"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="4"
             style="@style/NPWidget.Holo.Light.NumberPicker.Grey"/>
     </LinearLayout>
 

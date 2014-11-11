@@ -113,16 +113,15 @@ public class OrderItemsAdapter extends BaseAdapter {
 					break;
 			}
 		}
-		bindView(convertView, getItem(position));
+		bindView(convertView, position,  getItem(position));
 		return convertView;
 	}
 
-	private void bindView(View convertView, OrderItem item) {
+	private void bindView(View convertView, final int position, OrderItem item) {
 		if(item instanceof FakeOrder) {
 			return;
 		}
-		final Boolean tagSelected = (Boolean) convertView.getTag(R.id.selected);
-		if(tagSelected != null && tagSelected) {
+		if(mCheckedStates.get(position)) {
 			convertView.setBackgroundColor(mContext.getResources().getColor(R.color.btn_pay_green));
 		} else {
 			convertView.setBackgroundColor(mContext.getResources().getColor(android.R.color.white));

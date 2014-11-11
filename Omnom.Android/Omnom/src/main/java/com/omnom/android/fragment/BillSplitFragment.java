@@ -14,6 +14,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.BillSplitPagerAdapter;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.view.HeaderView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -43,6 +44,9 @@ public class BillSplitFragment extends Fragment {
 	@InjectView(R.id.btn_commit)
 	protected Button mBtnCommit;
 
+	@InjectView(R.id.panel_top)
+	protected HeaderView mHeader;
+
 	private Order mOrder;
 
 	private View mFragmentView;
@@ -61,6 +65,14 @@ public class BillSplitFragment extends Fragment {
 		mFragmentView.setTranslationY(-800);
 		mFragmentView.setAlpha(0);
 		mFragmentView.animate().alpha(1).translationY(0).start();
+
+		mHeader.setTitleBig(R.string.split_the_bill);
+		mHeader.setButtonLeftDrawable(R.drawable.com_mixpanel_android_close, new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				getActivity().onBackPressed();
+			}
+		});
 
 		final BillSplitPagerAdapter adapter = new BillSplitPagerAdapter(getChildFragmentManager(), mOrder);
 		mPager.setAdapter(adapter);
