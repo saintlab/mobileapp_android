@@ -37,7 +37,6 @@ import com.omnom.android.adapter.OrderItemsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
-import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -48,7 +47,6 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -299,7 +297,6 @@ public class OrderFragment extends Fragment {
 
 	private boolean hasSelectedItems() {
 		final int size = mCheckedStates.size();
-		final ArrayList<OrderItem> result = new ArrayList<OrderItem>(size);
 		for(int i = 0; i < size; i++) {
 			int key = mCheckedStates.keyAt(i);
 			if(mCheckedStates.get(key) && key < list.getCount() - 1) {
