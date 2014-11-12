@@ -276,20 +276,24 @@ public class OrderFragment extends Fragment {
 
 	@Subscribe
 	public void onSplitCommit(OrderSplitCommitEvent event) {
-		final BigDecimal amount = event.getAmount();
-		final String s = StringUtils.formatCurrency(amount, getCurrencySuffix());
-		editAmount.setText(s);
-		updatePaymentTipsAmount(amount);
-		updatePayButton(amount.add(getSelectedTips(amount)));
+		if(event.getOrderId().equals(mOrder.getId())) {
+			final BigDecimal amount = event.getAmount();
+			final String s = StringUtils.formatCurrency(amount, getCurrencySuffix());
+			editAmount.setText(s);
+			updatePaymentTipsAmount(amount);
+			updatePayButton(amount.add(getSelectedTips(amount)));
+		}
 	}
 
 	@Subscribe
 	public void onOrderItemSelected(OrderItemSelectedEvent event) {
-		mCheckedStates.put(event.getPosition(), event.isSelected());
-		if(hasSelectedItems()) {
-			initFooter2();
-		} else {
-			initFooter(true);
+		if(event.getOrderId().equals(mOrder.getId())) {
+			mCheckedStates.put(event.getPosition(), event.isSelected());
+			if(hasSelectedItems()) {
+				initFooter2();
+			} else {
+				initFooter(true);
+			}
 		}
 	}
 

@@ -102,7 +102,7 @@ public class BillSplitFragment extends Fragment {
 			public void onClick(final View v) {
 				final BigDecimal tag = (BigDecimal) mBtnCommit.getTag(R.id.edit_amount);
 				if(tag != null) {
-					mBus.post(new OrderSplitCommitEvent(tag));
+					mBus.post(new OrderSplitCommitEvent(mOrder.getId(), tag));
 					hide();
 				}
 			}

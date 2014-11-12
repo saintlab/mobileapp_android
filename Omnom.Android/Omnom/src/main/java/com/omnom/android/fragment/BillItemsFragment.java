@@ -95,7 +95,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 				final OrderItemsAdapter wrappedAdapter = (OrderItemsAdapter) adapter.getWrappedAdapter();
 				final boolean selected = !checked;
 				wrappedAdapter.setSelected(position, selected);
-				mBus.post(new OrderItemSelectedEvent(position, selected));
+				mBus.post(new OrderItemSelectedEvent(mOrder.getId(), position, selected));
 				view.setTag(R.id.selected, selected);
 				wrappedAdapter.notifyDataSetChanged();
 				updateAmount();
