@@ -34,6 +34,9 @@ import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
+import com.omnom.android.fragment.events.OrderItemSelectedEvent;
+import com.omnom.android.fragment.events.OrderSplitCommitEvent;
+import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
@@ -270,6 +273,13 @@ public class OrderFragment extends Fragment {
 	public void onDetach() {
 		super.onDetach();
 		mBus.unregister(this);
+	}
+
+	@Subscribe
+	public void onSplitCommit(SplitHideEvent event) {
+		if(event.getOrderId().equals(mOrder.getId())) {
+			list.animate().translationY(LIST_TRASNLATION_ACTIVE).start();
+		}
 	}
 
 	@Subscribe
@@ -584,6 +594,7 @@ public class OrderFragment extends Fragment {
 
 	private void splitBill() {
 		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder, mCheckedStates);
+		list.animate().translationY(400).start();
 		getFragmentManager().beginTransaction().add(android.R.id.content, billSplitFragment, BillSplitFragment.TAG).commit();
 	}
 

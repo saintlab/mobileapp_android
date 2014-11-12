@@ -1,4 +1,4 @@
-package com.omnom.android.fragment;
+package com.omnom.android.fragment.events;
 
 import java.math.BigDecimal;
 

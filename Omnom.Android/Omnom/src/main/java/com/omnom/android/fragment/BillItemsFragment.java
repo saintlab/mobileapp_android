@@ -14,6 +14,7 @@ import android.widget.HeaderViewListAdapter;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.OrderItemsAdapter;
+import com.omnom.android.fragment.events.OrderItemSelectedEvent;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
@@ -101,7 +102,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 				updateAmount();
 			}
 		});
-		updateAmount();
+		// updateAmount();
 	}
 
 	@Override

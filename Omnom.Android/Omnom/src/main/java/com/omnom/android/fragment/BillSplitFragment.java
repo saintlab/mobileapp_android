@@ -17,6 +17,8 @@ import android.widget.Button;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.BillSplitPagerAdapter;
+import com.omnom.android.fragment.events.OrderSplitCommitEvent;
+import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.view.HeaderView;
@@ -146,6 +148,7 @@ public class BillSplitFragment extends Fragment {
 				getFragmentManager().beginTransaction().remove(BillSplitFragment.this).commit();
 			}
 		}).start();
+		mBus.post(new SplitHideEvent(mOrder.getId()));
 	}
 
 	@Override

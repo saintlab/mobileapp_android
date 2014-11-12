@@ -1,4 +1,4 @@
-package com.omnom.android.fragment;
+package com.omnom.android.fragment.events;
 
 /**
  * Created by Ch3D on 12.11.2014.

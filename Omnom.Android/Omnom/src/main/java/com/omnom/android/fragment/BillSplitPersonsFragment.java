@@ -59,8 +59,8 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 		mPicker.setOnValueChangedListener(this);
 		mPicker.setValue(1);
 		mPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-		onValueChanged(1);
-		updateAmount();
+		// onValueChanged(1);
+		// updateAmount();
 	}
 
 	@Override
