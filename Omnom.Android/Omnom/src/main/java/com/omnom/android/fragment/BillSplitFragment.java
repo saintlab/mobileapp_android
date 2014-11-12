@@ -103,13 +103,7 @@ public class BillSplitFragment extends Fragment {
 				final BigDecimal tag = (BigDecimal) mBtnCommit.getTag(R.id.edit_amount);
 				if(tag != null) {
 					mBus.post(new OrderSplitCommitEvent(tag));
-					final ViewPropertyAnimator viewPropertyAnimator = mFragmentView.animate().alpha(0).translationY(-800);
-					viewPropertyAnimator.setListener(new AnimatorListenerAdapter() {
-						@Override
-						public void onAnimationEnd(final Animator animation) {
-							getActivity().onBackPressed();
-						}
-					}).start();
+					hide();
 				}
 			}
 		});
@@ -118,7 +112,7 @@ public class BillSplitFragment extends Fragment {
 		mHeader.setButtonLeftDrawable(R.drawable.ic_cross_black, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				getActivity().onBackPressed();
+				hide();
 			}
 		});
 
@@ -142,6 +136,16 @@ public class BillSplitFragment extends Fragment {
 			public void onPageScrollStateChanged(final int i) {
 			}
 		});
+	}
+
+	public void hide() {
+		final ViewPropertyAnimator viewPropertyAnimator = mFragmentView.animate().alpha(0).translationY(-800);
+		viewPropertyAnimator.setListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(final Animator animation) {
+				getFragmentManager().beginTransaction().remove(BillSplitFragment.this).commit();
+			}
+		}).start();
 	}
 
 	@Override

@@ -824,7 +824,8 @@ public class OrderFragment extends Fragment {
 		}
 		final Fragment fragmentByTag = getFragmentManager().findFragmentByTag(BillSplitFragment.TAG);
 		if(fragmentByTag != null) {
-			getFragmentManager().beginTransaction().remove(fragmentByTag).commit();
+			BillSplitFragment splitFragment = (BillSplitFragment) fragmentByTag;
+			splitFragment.hide();
 			return true;
 		}
 		return false;

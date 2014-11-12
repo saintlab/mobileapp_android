@@ -72,6 +72,7 @@ public class HeaderView extends RelativeLayout {
 
 		btnRight.setVisibility(View.GONE);
 		btnLeft.setVisibility(View.GONE);
+		setClickable(true);
 	}
 
 	public void setTitle(final int resId) {
