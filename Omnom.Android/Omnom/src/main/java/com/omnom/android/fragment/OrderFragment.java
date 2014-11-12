@@ -27,17 +27,14 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
-import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -53,7 +50,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
-import rx.Subscription;
 
 import static butterknife.ButterKnife.findById;
 
@@ -71,6 +67,14 @@ public class OrderFragment extends Fragment {
 	private int mMode = WRONG_VALUE;
 
 	private int mCheckedId = WRONG_VALUE;
+
+	public static final int LIST_TRASNLATION_ACTIVE = -380;
+
+	public static final int LIST_HEIGHT = 800;
+
+	public static final float FRAGMENT_SCALE_RATIO_SMALL = 0.8f;
+
+	public static final float FRAGMENT_SCALE_RATIO_X_NORMAL = 1.0f;
 
 	public static final int PICKER_MAX_VALUE = 200;
 
@@ -129,20 +133,22 @@ public class OrderFragment extends Fragment {
 
 	private static final String ARG_POSITION = "position";
 
-	private static final String TAG = OrderFragment.class.getSimpleName();
+	private static final String ARG_COUNT = "count";
 
-	public static Fragment newInstance(Parcelable parcelable, final int bgColor, final int postition) {
+	private static final String ARG_ANIMATE = "animate";
+
+	public static Fragment newInstance(Parcelable parcelable, final int bgColor, final int postition, final int count,
+	                                   final boolean animate) {
 		final OrderFragment fragment = new OrderFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, parcelable);
 		args.putInt(ARG_COLOR, bgColor);
 		args.putInt(ARG_POSITION, postition);
+		args.putInt(ARG_COUNT, count);
+		args.putBoolean(ARG_ANIMATE, animate);
 		fragment.setArguments(args);
 		return fragment;
 	}
-
-	@Inject
-	protected Acquiring mAcquiring;
 
 	@Inject
 	protected RestaurateurObeservableApi api;
@@ -195,9 +201,6 @@ public class OrderFragment extends Fragment {
 	@InjectView(R.id.btn_cancel)
 	protected ImageButton btnCancel;
 
-	@InjectView(R.id.root)
-	protected View rootView;
-
 	@InjectView(R.id.txt_payment_title)
 	protected TextView txtPaymentTitle;
 
@@ -215,16 +218,6 @@ public class OrderFragment extends Fragment {
 
 	private Order mOrder;
 
-	private Gson gson;
-
-	private Subscription mBillSubscription;
-
-	private Subscription mPaySubscription;
-
-	private TextView txtFooterAmount;
-
-	private TextView txtFooterToPay;
-
 	private boolean mCurrentKeyboardVisility = false;
 
 	private boolean mApply = false;
@@ -241,6 +234,10 @@ public class OrderFragment extends Fragment {
 
 	private int mPosition;
 
+	private boolean mAnimate;
+
+	private int mOrdersCount;
+
 	public OrderFragment() {
 	}
 
@@ -256,15 +253,25 @@ public class OrderFragment extends Fragment {
 		return view;
 	}
 
-	// TODO: Refactoring!!!
-	public void upscale(final Runnable runnable) {
-		AnimationUtils.animateAlpha(panelPayment, false);
+	private AnimatorSet getListClickAnimator(float scaleRation, int listTranslation) {
+		final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mFragmentView,
+		                                                     View.SCALE_X,
+		                                                     mFragmentView.getScaleX(),
+		                                                     scaleRation);
+		final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mFragmentView,
+		                                                     View.SCALE_Y,
+		                                                     mFragmentView.getScaleY(),
+		                                                     scaleRation);
 
-		final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mFragmentView, "scaleX", mFragmentView.getScaleX(), 0.8f);
-		final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mFragmentView, "scaleY", mFragmentView.getScaleY(), 0.8f);
-		final ObjectAnimator ty = ObjectAnimator.ofFloat(list, "translationY", list.getTranslationY(), 0);
+		final ObjectAnimator ty = ObjectAnimator.ofFloat(list, View.TRANSLATION_Y, list.getTranslationY(), listTranslation);
 		final AnimatorSet as = new AnimatorSet();
 		as.playTogether(scaleX, scaleY, ty);
+		return as;
+	}
+
+	public void downscale(final Runnable runnable) {
+		AnimationUtils.animateAlpha(panelPayment, false);
+		final AnimatorSet as = getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0);
 		as.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
@@ -274,7 +281,6 @@ public class OrderFragment extends Fragment {
 			}
 		});
 		as.start();
-
 		AnimationUtils.animateAlpha(txtTitle, true);
 	}
 
@@ -283,11 +289,13 @@ public class OrderFragment extends Fragment {
 		mFragmentView = view;
 
 		ViewUtils.setVisible(panelPayment, false);
-		mFragmentView.setScaleX(0.8f);
-		mFragmentView.setScaleY(0.8f);
+		mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
+		mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
 
-		mFragmentView.animate().translationYBy(-800).setDuration(0).start();
-		mFragmentView.animate().translationYBy(800).setStartDelay((mPosition + 1) * 350).setDuration(850).start();
+		if(mAnimate) {
+			mFragmentView.animate().translationYBy(-LIST_HEIGHT).setDuration(0).start();
+			mFragmentView.animate().translationYBy(LIST_HEIGHT).setStartDelay((mPosition + 1) * 350).setDuration(850).start();
+		}
 
 		btnPay.setTextColor(mAccentColor);
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
@@ -321,55 +329,34 @@ public class OrderFragment extends Fragment {
 
 	private void initList() {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
-		AnimationUtils.scaleHeight(list, 800);
+		if(mAnimate) {
+			AnimationUtils.scaleHeight(list, LIST_HEIGHT);
+		} else {
+			ViewUtils.setHeight(list, LIST_HEIGHT);
+		}
 		list.setScrollingEnabled(false);
 		final OrdersActivity activity = (OrdersActivity) getActivity();
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-				// if fragment is downscaled
 				if(isDownscaled() && activity.checkFragment(OrderFragment.this)) {
-					if(mPosition == 0) {
-						activity.fixMarging(new Runnable() {
-							@Override
-							public void run() {
-								final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mFragmentView, "scaleX", mFragmentView.getScaleX(),
-								                                                     1.0f);
-								final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mFragmentView, "scaleY", mFragmentView.getScaleY(),
-								                                                     1.0f);
-								final ObjectAnimator ty = ObjectAnimator.ofFloat(list, "translationY", list.getTranslationY(), -380);
-								final AnimatorSet as = new AnimatorSet();
-								as.playTogether(scaleX, scaleY, ty);
-								as.start();
-								AnimationUtils.animateAlpha(panelPayment, true);
-								AnimationUtils.animateAlpha(txtTitle, false);
-								AndroidUtils.scrollEnd(list);
-							}
-						});
+					AnimationUtils.animateAlpha(panelPayment, true);
+					AnimationUtils.animateAlpha(txtTitle, false);
+					AndroidUtils.scrollEnd(list);
+					if(isFirstItem() || isLastItem()) {
+						activity.animatePageMargingFirstOrLast(isFirstItem());
 					} else {
-						final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mFragmentView, "scaleX", mFragmentView.getScaleX(),
-						                                                     1.0f);
-						final ObjectAnimator scaleY = ObjectAnimator.ofFloat(mFragmentView, "scaleY", mFragmentView.getScaleY(),
-						                                                     1.0f);
-						final ObjectAnimator ty = ObjectAnimator.ofFloat(list, "translationY", list.getTranslationY(), -380);
-						final AnimatorSet as = new AnimatorSet();
-						as.playTogether(scaleX, scaleY, ty);
-						as.addListener(new AnimatorListenerAdapter() {
-							@Override
-							public void onAnimationCancel(final Animator animation) {
-
-							}
-						});
-						as.start();
-						AnimationUtils.animateAlpha(panelPayment, true);
-						AnimationUtils.animateAlpha(txtTitle, false);
-						AndroidUtils.scrollEnd(list);
-						activity.fixMarging(null);
+						activity.animatePageMarginMiddle();
 					}
+					getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, LIST_TRASNLATION_ACTIVE).start();
 				}
 			}
 		});
 	}
+
+	private boolean isLastItem() {return mPosition == mOrdersCount - 1;}
+
+	private boolean isFirstItem() {return mPosition == 0;}
 
 	public boolean isDownscaled() {return list.getTranslationY() == 0;}
 
@@ -685,20 +672,14 @@ public class OrderFragment extends Fragment {
 	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		OmnomObservable.unsubscribe(mBillSubscription);
-		OmnomObservable.unsubscribe(mPaySubscription);
-	}
-
-	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		gson = new Gson();
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mAccentColor = getArguments().getInt(ARG_COLOR);
+			mAnimate = getArguments().getBoolean(ARG_ANIMATE, false);
 			mPosition = getArguments().getInt(ARG_POSITION);
+			mOrdersCount = getArguments().getInt(ARG_COUNT);
 		}
 	}
 

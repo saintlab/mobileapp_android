@@ -92,4 +92,9 @@ public class ViewUtils {
 	public static String getTextValue(EditText view) {
 		return view.getText().toString().trim();
 	}
+
+	public static void setHeight(final View view, final int value) {
+		view.getLayoutParams().height = value;
+		view.requestLayout();
+	}
 }

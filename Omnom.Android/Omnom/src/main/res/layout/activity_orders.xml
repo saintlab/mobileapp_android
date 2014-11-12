@@ -17,8 +17,7 @@
         android:padding="@dimen/activity_vertical_margin_small"
         android:layout_alignParentBottom="true"
         android:textColor="@color/profile_hint"
-        android:maxLines="2"
-        android:text="На вашем столике\nраздельных счетов: 2"/>
+        android:maxLines="2"/>
 
     <com.omnom.android.view.ViewPagerIndicatorCircle
         android:id="@+id/pager_indicator"

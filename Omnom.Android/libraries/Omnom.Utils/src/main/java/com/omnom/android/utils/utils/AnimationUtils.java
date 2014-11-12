@@ -45,14 +45,14 @@ public class AnimationUtils {
 		view.setTag(visible);
 		view.animate().setDuration(duration).
 				setInterpolator(new AccelerateDecelerateInterpolator()).
-				setListener(new AnimatorListenerAdapter() {
-					@Override
-					public void onAnimationEnd(Animator animation) {
-						if(callback != null) {
-							view.post(callback);
-						}
-					}
-				}).alpha(visible ? 1 : 0).start();
+				    setListener(new AnimatorListenerAdapter() {
+					    @Override
+					    public void onAnimationEnd(Animator animation) {
+						    if(callback != null) {
+							    view.post(callback);
+						    }
+					    }
+				    }).alpha(visible ? 1 : 0).start();
 	}
 
 	public static void animateAlpha2(final View view, final boolean visible, final Runnable callback, long duration) {
@@ -63,14 +63,14 @@ public class AnimationUtils {
 		view.setTag(visible);
 		view.animate().setDuration(duration).
 				setInterpolator(new AccelerateDecelerateInterpolator()).
-				setListener(new AnimatorListenerAdapter() {
-					@Override
-					public void onAnimationEnd(Animator animation) {
-						if(callback != null) {
-							view.post(callback);
-						}
-					}
-				}).alpha(visible ? 1 : 0).start();
+				    setListener(new AnimatorListenerAdapter() {
+					    @Override
+					    public void onAnimationEnd(Animator animation) {
+						    if(callback != null) {
+							    view.post(callback);
+						    }
+					    }
+				    }).alpha(visible ? 1 : 0).start();
 	}
 
 	public static void translateUp(final Iterable<View> views, final int translation, final Runnable endCallback) {
@@ -139,8 +139,7 @@ public class AnimationUtils {
 		AnimationBuilder.create(view, view.getMeasuredHeight(), height).addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
 			public void invoke(ValueAnimator animation) {
-				view.getLayoutParams().height = (Integer) animation.getAnimatedValue();
-				view.requestLayout();
+				ViewUtils.setHeight(view, (Integer) animation.getAnimatedValue());
 			}
 		}).build().start();
 	}
@@ -151,8 +150,7 @@ public class AnimationUtils {
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
 			public void invoke(ValueAnimator animation) {
-				view.getLayoutParams().height = (Integer) animation.getAnimatedValue();
-				view.requestLayout();
+				ViewUtils.setHeight(view, (Integer) animation.getAnimatedValue());
 			}
 		}).build().start();
 	}
