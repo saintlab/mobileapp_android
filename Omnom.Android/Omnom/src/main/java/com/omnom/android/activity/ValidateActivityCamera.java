@@ -3,6 +3,7 @@ package com.omnom.android.activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
+import android.text.TextUtils;
 
 import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.BuildConfig;
@@ -26,6 +27,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 	@Inject
 	protected RestaurateurObeservableApi api;
 	private Subscription mCheckQrSubscribtion;
+
+	private String mQrData;
 
 	@Override
 	protected void startLoader() {
@@ -52,6 +55,13 @@ public class ValidateActivityCamera extends ValidateActivity {
 	}
 
 	@Override
+	protected void validate() {
+		if(TextUtils.isEmpty(mQrData)) {
+			super.validate();
+		}
+	}
+
+	@Override
 	protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
 		if(resultCode == RESULT_OK) {
 			if(requestCode == REQUEST_CODE_SCAN_QR) {
@@ -60,7 +70,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 					public void run() {
 					}
 				});
-				final String mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
+				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
 				findTableForQr(mQrData);
 			}
 		} else {
@@ -85,7 +95,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 		}, new Action1<Throwable>() {
 			@Override
 			public void call(Throwable throwable) {
-				// TODO:
+				throw new RuntimeException("!!!");
 			}
 		});
 	}
