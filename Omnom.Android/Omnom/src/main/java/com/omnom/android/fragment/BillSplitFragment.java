@@ -1,5 +1,8 @@
 package com.omnom.android.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,13 +11,20 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.widget.Button;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.BillSplitPagerAdapter;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.view.HeaderView;
+import com.squareup.otto.Bus;
+
+import java.math.BigDecimal;
+
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -27,13 +37,19 @@ public class BillSplitFragment extends Fragment {
 
 	private static final String ARG_ORDER = "order";
 
-	public static BillSplitFragment newInstance(final Order order) {
+	private static final String ARG_STATES = "states";
+
+	public static BillSplitFragment newInstance(final Order order, final SparseBooleanArrayParcelable checkedStates) {
 		final BillSplitFragment fragment = new BillSplitFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, order);
+		args.putParcelable(ARG_STATES, checkedStates);
 		fragment.setArguments(args);
 		return fragment;
 	}
+
+	@Inject
+	protected Bus mBus;
 
 	@InjectView(R.id.pager)
 	protected ViewPager mPager;
@@ -51,6 +67,8 @@ public class BillSplitFragment extends Fragment {
 
 	private View mFragmentView;
 
+	private SparseBooleanArrayParcelable mStates;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
@@ -60,21 +78,51 @@ public class BillSplitFragment extends Fragment {
 	}
 
 	@Override
+	public void onAttach(final Activity activity) {
+		super.onAttach(activity);
+		OmnomApplication.get(getActivity()).inject(this);
+		mBus.register(this);
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		mBus.unregister(this);
+	}
+
+	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
 		mFragmentView = view;
 		mFragmentView.setTranslationY(-800);
 		mFragmentView.setAlpha(0);
 		mFragmentView.animate().alpha(1).translationY(0).start();
 
+		mBtnCommit.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				final BigDecimal tag = (BigDecimal) mBtnCommit.getTag(R.id.edit_amount);
+				if(tag != null) {
+					mBus.post(new OrderSplitCommitEvent(tag));
+					final ViewPropertyAnimator viewPropertyAnimator = mFragmentView.animate().alpha(0).translationY(-800);
+					viewPropertyAnimator.setListener(new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationEnd(final Animator animation) {
+							getActivity().onBackPressed();
+						}
+					}).start();
+				}
+			}
+		});
+
 		mHeader.setTitleBig(R.string.split_the_bill);
-		mHeader.setButtonLeftDrawable(R.drawable.com_mixpanel_android_close, new View.OnClickListener() {
+		mHeader.setButtonLeftDrawable(R.drawable.ic_cross_black, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				getActivity().onBackPressed();
 			}
 		});
 
-		final BillSplitPagerAdapter adapter = new BillSplitPagerAdapter(getChildFragmentManager(), mOrder);
+		final BillSplitPagerAdapter adapter = new BillSplitPagerAdapter(getChildFragmentManager(), mOrder, mStates);
 		mPager.setAdapter(adapter);
 		mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
@@ -101,6 +149,7 @@ public class BillSplitFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
+			mStates = getArguments().getParcelable(ARG_STATES);
 		}
 	}
 }

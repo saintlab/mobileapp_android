@@ -84,7 +84,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 
 	private BigDecimal getAmount() {
 		final int value = mPicker.getValue();
-		final double amountToPay = mOrder.getAmountToPay();
+		final double amountToPay = mOrder.getTotalAmount();
 		final double v = amountToPay / value;
 		final BigDecimal bigDecimal = new BigDecimal(String.valueOf(v));
 		return bigDecimal.setScale(2, RoundingMode.HALF_UP);
@@ -93,7 +93,9 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 	@Override
 	public void updateAmount() {
 		final Button btnCommit = (Button) getActivity().findViewById(R.id.btn_commit);
-		btnCommit.setText(getString(R.string.bill_split_amount_, StringUtils.formatCurrency(getAmount())));
+		final BigDecimal amount = getAmount();
+		btnCommit.setText(getString(R.string.bill_split_amount_, StringUtils.formatCurrency(amount)));
+		btnCommit.setTag(R.id.edit_amount, amount);
 		AnimationUtils.animateAlpha(btnCommit, true);
 	}
 }

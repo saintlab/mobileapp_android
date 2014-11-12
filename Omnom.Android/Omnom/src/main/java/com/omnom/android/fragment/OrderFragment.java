@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -22,7 +23,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.HeaderViewListAdapter;
 import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
@@ -37,13 +37,18 @@ import com.omnom.android.adapter.OrderItemsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
+import com.omnom.android.restaurateur.model.order.OrderItem;
+import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.OmnomListView;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -153,6 +158,9 @@ public class OrderFragment extends Fragment {
 	}
 
 	@Inject
+	protected Bus mBus;
+
+	@Inject
 	protected RestaurateurObeservableApi api;
 
 	@InjectViews({R.id.btn_pay, R.id.radio_tips, R.id.txt_tips_title})
@@ -240,13 +248,61 @@ public class OrderFragment extends Fragment {
 
 	private int mOrdersCount;
 
-	private boolean mInSplitMode;
+	private SparseBooleanArrayParcelable mCheckedStates = new SparseBooleanArrayParcelable();
+
+	private View mFooterView1;
+
+	private View mFooterView2;
 
 	public OrderFragment() {
 	}
 
 	private String getCurrencySuffix() {
 		return getString(R.string.currency_ruble);
+	}
+
+	@Override
+	public void onAttach(final Activity activity) {
+		super.onAttach(activity);
+		OmnomApplication.get(getActivity()).inject(this);
+		mBus.register(this);
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		mBus.unregister(this);
+	}
+
+	@Subscribe
+	public void onSplitCommit(OrderSplitCommitEvent event) {
+		final BigDecimal amount = event.getAmount();
+		final String s = StringUtils.formatCurrency(amount, getCurrencySuffix());
+		editAmount.setText(s);
+		updatePaymentTipsAmount(amount);
+		updatePayButton(amount.add(getSelectedTips(amount)));
+	}
+
+	@Subscribe
+	public void onOrderItemSelected(OrderItemSelectedEvent event) {
+		mCheckedStates.put(event.getPosition(), event.isSelected());
+		if(hasSelectedItems()) {
+			initFooter2();
+		} else {
+			initFooter(true);
+		}
+	}
+
+	private boolean hasSelectedItems() {
+		final int size = mCheckedStates.size();
+		final ArrayList<OrderItem> result = new ArrayList<OrderItem>(size);
+		for(int i = 0; i < size; i++) {
+			int key = mCheckedStates.keyAt(i);
+			if(mCheckedStates.get(key) && key < list.getCount() - 1) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -276,6 +332,15 @@ public class OrderFragment extends Fragment {
 	}
 
 	public void downscale(final Runnable runnable) {
+		if(mFooterView1 != null) {
+			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
+			ViewUtils.setVisible(billSplit, false);
+		}
+		if(mFooterView2 != null) {
+			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
+			ViewUtils.setVisible(billSplit2, false);
+		}
+
 		AnimationUtils.animateAlpha(panelPayment, false);
 		list.setScrollingEnabled(false);
 		final AnimatorSet as = getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0);
@@ -313,7 +378,7 @@ public class OrderFragment extends Fragment {
 		initList();
 
 		initRadioButtons();
-		initFooter();
+		initFooter(false);
 		initKeyboardListener();
 		initAmount();
 
@@ -332,7 +397,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void initList() {
-		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
+		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems(), true));
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 		if(mAnimate) {
@@ -350,19 +415,21 @@ public class OrderFragment extends Fragment {
 						zoomInFragment(activity);
 					}
 				} else {
-					final Boolean tagSelected = (Boolean) view.getTag(R.id.selected);
-					final boolean checked = tagSelected != null && tagSelected;
-					final HeaderViewListAdapter adapter = (HeaderViewListAdapter) list.getAdapter();
-					final OrderItemsAdapter wrappedAdapter = (OrderItemsAdapter) adapter.getWrappedAdapter();
-					wrappedAdapter.setSelected(position, !checked);
-					view.setTag(R.id.selected, !checked);
-					wrappedAdapter.notifyDataSetChanged();
+					splitBill();
 				}
 			}
 		});
 	}
 
 	private void zoomInFragment(final OrdersActivity activity) {
+		if(mFooterView1 != null) {
+			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
+			ViewUtils.setVisible(billSplit, true);
+		}
+		if(mFooterView2 != null) {
+			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
+			ViewUtils.setVisible(billSplit2, true);
+		}
 		AnimationUtils.animateAlpha(panelPayment, true);
 		AnimationUtils.animateAlpha(txtTitle, false);
 		AndroidUtils.scrollEnd(list);
@@ -467,10 +534,16 @@ public class OrderFragment extends Fragment {
 				}));
 	}
 
-	private void initFooter() {
-		final View footerView = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
-		list.addFooterView(footerView);
-		footerView.findViewById(R.id.btn_bill_split).setOnClickListener(new View.OnClickListener() {
+	private void initFooter(final boolean visible) {
+		if(list.getFooterViewsCount() > 0) {
+			list.removeFooterView(mFooterView1);
+			list.removeFooterView(mFooterView2);
+		}
+		mFooterView1 = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
+		list.addFooterView(mFooterView1);
+		final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
+		ViewUtils.setVisible(billSplit, visible);
+		billSplit.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				if(!isDownscaled()) {
@@ -482,8 +555,34 @@ public class OrderFragment extends Fragment {
 		});
 	}
 
+	private void initFooter2() {
+		if(list.getFooterViewsCount() > 0) {
+			list.removeFooterView(mFooterView1);
+			list.removeFooterView(mFooterView2);
+		}
+		mFooterView2 = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer_cancel, null, false);
+		list.addFooterView(mFooterView2);
+		mFooterView2.findViewById(R.id.txt_edit).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				splitBill();
+			}
+		});
+		mFooterView2.findViewById(R.id.txt_cancel).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				cancelSplit();
+			}
+		});
+	}
+
+	private void cancelSplit() {
+		mCheckedStates.clear();
+		initFooter(true);
+	}
+
 	private void splitBill() {
-		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder);
+		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder, mCheckedStates);
 		getFragmentManager().beginTransaction().add(android.R.id.content, billSplitFragment, BillSplitFragment.TAG).commit();
 	}
 

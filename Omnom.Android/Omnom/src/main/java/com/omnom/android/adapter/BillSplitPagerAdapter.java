@@ -9,6 +9,7 @@ import com.omnom.android.fragment.BillItemsFragment;
 import com.omnom.android.fragment.BillSplitPersonsFragment;
 import com.omnom.android.fragment.SplitFragment;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.utils.SparseBooleanArrayParcelable;
 
 /**
  * Created by Ch3D on 11.11.2014.
@@ -19,11 +20,14 @@ public class BillSplitPagerAdapter extends FragmentStatePagerAdapter {
 
 	private Order mOrder;
 
+	private final SparseBooleanArrayParcelable mStates;
+
 	private Fragment mCurrentFragment;
 
-	public BillSplitPagerAdapter(final FragmentManager fm, final Order order) {
+	public BillSplitPagerAdapter(final FragmentManager fm, final Order order, final SparseBooleanArrayParcelable states) {
 		super(fm);
 		mOrder = order;
+		mStates = states;
 	}
 
 	@Override
@@ -57,7 +61,7 @@ public class BillSplitPagerAdapter extends FragmentStatePagerAdapter {
 	public Fragment getItem(final int position) {
 		switch(position) {
 			case 0:
-				return BillItemsFragment.newInstance(mOrder);
+				return BillItemsFragment.newInstance(mOrder, mStates);
 			case 1:
 				return BillSplitPersonsFragment.newInstance(mOrder);
 		}
