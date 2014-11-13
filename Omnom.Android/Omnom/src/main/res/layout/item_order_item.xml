@@ -28,5 +28,6 @@
         android:layout_toLeftOf="@id/txt_price"
         android:singleLine="true"
         android:ellipsize="end"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
         android:textAppearance="?android:textAppearanceLarge"/>
 </RelativeLayout>

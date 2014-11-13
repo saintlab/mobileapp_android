@@ -10,8 +10,8 @@
         android:layout_height="1dp"
         android:background="@drawable/divider_list_padding"/>
 
-    <LinearLayout
-        android:id="@+id/btn_bill_split"
+    <RelativeLayout
+        android:id="@+id/panel_container"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:gravity="center"
@@ -22,16 +22,37 @@
         android:layout_height="?android:listPreferredItemHeight">
 
         <TextView
+            android:id="@+id/txt_cancel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:drawableLeft="@drawable/ic_split_cancel"
+            android:drawablePadding="@dimen/activity_horizontal_margin"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textColor="#b0b0b0"
+            android:text="Отменить"/>
+
+        <TextView
+            android:id="@+id/txt_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/txt_cancel"
             android:gravity="center"
             android:drawableLeft="@drawable/ic_divide_split_icon"
             android:drawablePadding="@dimen/activity_horizontal_margin"
-            android:textAppearance="?android:textAppearanceLarge"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:textColor="@color/split_bill_red"
-            android:text="@string/split_the_bill"/>
+            android:text="Изменить"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:background="@drawable/bg_bill_footer"

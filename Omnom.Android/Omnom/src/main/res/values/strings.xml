@@ -60,6 +60,7 @@
     <string name="repeat">Повторить</string>
     <string name="title_activity_thanks">ThanksActivity</string>
 
+    <string name="bill_split_amount_">= %1$s</string>
     <string name="bill_number_">Счёт %1$s</string>
     <string name="split_the_bill">Разделить счёт</string>
     <string name="title_plus_tips">+ Чаевые</string>

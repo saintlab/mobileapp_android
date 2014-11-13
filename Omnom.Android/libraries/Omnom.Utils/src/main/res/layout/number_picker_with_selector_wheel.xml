@@ -26,6 +26,8 @@
         android:id="@+id/np__numberpicker_input"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:editable="false"
+        android:textIsSelectable="false"
         android:gravity="center"
         android:singleLine="true"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"

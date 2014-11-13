@@ -85,7 +85,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 	public void onBackPressed() {
 		final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
 		if(currentFragment != null) {
-			if(!currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
+			if(!currentFragment.isInSplitMode() && !currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
 				mPager.setEnabled(true);
 				showOther(mPager.getCurrentItem(), true);
 				currentFragment.downscale(null);
@@ -124,10 +124,12 @@ public class OrdersActivity extends BaseFragmentActivity {
 	}
 
 	public void showOther(int position, final boolean visible) {
-		final AnimatorSet as = new AnimatorSet();
+		AnimationUtils.animateAlpha(mTextInfo, visible);
+		AnimationUtils.animateAlpha(mIndicator, visible);
 		final ObjectAnimator fl = getFragmentAnimation(position - 1, visible);
 		final ObjectAnimator fr = getFragmentAnimation(position + 1, visible);
 		if(fl != null && fr != null) {
+			final AnimatorSet as = new AnimatorSet();
 			as.playTogether(fl, fr);
 			as.start();
 		} else if(fl != null) {

@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -18,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -32,14 +34,20 @@ import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
+import com.omnom.android.fragment.events.OrderItemSelectedEvent;
+import com.omnom.android.fragment.events.OrderSplitCommitEvent;
+import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
+import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.OmnomListView;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -50,6 +58,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
+import retrofit.http.HEAD;
 
 import static butterknife.ButterKnife.findById;
 
@@ -137,11 +146,11 @@ public class OrderFragment extends Fragment {
 
 	private static final String ARG_ANIMATE = "animate";
 
-	public static Fragment newInstance(Parcelable parcelable, final int bgColor, final int postition, final int count,
+	public static Fragment newInstance(Order order, final int bgColor, final int postition, final int count,
 	                                   final boolean animate) {
 		final OrderFragment fragment = new OrderFragment();
 		final Bundle args = new Bundle();
-		args.putParcelable(ARG_ORDER, parcelable);
+		args.putParcelable(ARG_ORDER, order);
 		args.putInt(ARG_COLOR, bgColor);
 		args.putInt(ARG_POSITION, postition);
 		args.putInt(ARG_COUNT, count);
@@ -149,6 +158,9 @@ public class OrderFragment extends Fragment {
 		fragment.setArguments(args);
 		return fragment;
 	}
+
+	@Inject
+	protected Bus mBus;
 
 	@Inject
 	protected RestaurateurObeservableApi api;
@@ -238,6 +250,12 @@ public class OrderFragment extends Fragment {
 
 	private int mOrdersCount;
 
+	private SparseBooleanArrayParcelable mCheckedStates = new SparseBooleanArrayParcelable();
+
+	private View mFooterView1;
+
+	private View mFooterView2;
+
 	public OrderFragment() {
 	}
 
@@ -250,9 +268,65 @@ public class OrderFragment extends Fragment {
 	}
 
 	@Override
+	public void onAttach(final Activity activity) {
+		super.onAttach(activity);
+		OmnomApplication.get(getActivity()).inject(this);
+		mBus.register(this);
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		mBus.unregister(this);
+	}
+
+	@Subscribe
+	public void onSplitCommit(SplitHideEvent event) {
+		if(event.getOrderId().equals(mOrder.getId())) {
+			list.animate().translationY(LIST_TRASNLATION_ACTIVE).start();
+		}
+	}
+
+	@Subscribe
+	public void onSplitCommit(OrderSplitCommitEvent event) {
+		if(event.getOrderId().equals(mOrder.getId())) {
+			final BigDecimal amount = event.getAmount();
+			final String s = StringUtils.formatCurrency(amount, getCurrencySuffix());
+			editAmount.setText(s);
+			updatePaymentTipsAmount(amount);
+			updatePayButton(amount.add(getSelectedTips(amount)));
+		}
+	}
+
+	@Subscribe
+	public void onOrderItemSelected(OrderItemSelectedEvent event) {
+		if(event.getOrderId().equals(mOrder.getId())) {
+			mCheckedStates.put(event.getPosition(), event.isSelected());
+			if(hasSelectedItems()) {
+				initFooter2();
+			} else {
+				initFooter(true);
+			}
+		}
+	}
+
+	private boolean hasSelectedItems() {
+		final int size = mCheckedStates.size();
+		for(int i = 0; i < size; i++) {
+			int key = mCheckedStates.keyAt(i);
+			if(mCheckedStates.get(key) && key < list.getCount() - 1) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
 		final View view = inflater.inflate(R.layout.fragment_order, container, false);
+		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
+		mFontSmall = getResources().getDimension(R.dimen.font_large);
 		ButterKnife.inject(this, view);
 		return view;
 	}
@@ -274,7 +348,16 @@ public class OrderFragment extends Fragment {
 	}
 
 	public void downscale(final @Nullable Runnable runnable) {
+		if(mFooterView1 != null) {
+			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
+			ViewUtils.setVisible(billSplit, false);
+		}
+		if(mFooterView2 != null) {
+			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
+			ViewUtils.setVisible(billSplit2, false);
+		}
 		AnimationUtils.animateAlpha(panelPayment, false);
+		list.setScrollingEnabled(false);
 		final AnimatorSet as = getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0);
 		as.addListener(new AnimatorListenerAdapter() {
 			@Override
@@ -302,9 +385,6 @@ public class OrderFragment extends Fragment {
 		}
 
 		btnPay.setTextColor(mAccentColor);
-		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
-		mFontSmall = getResources().getDimension(R.dimen.font_large);
-
 		txtTitle.setText(getString(R.string.bill_number_, mPosition + 1));
 		// rootView.setBackgroundColor(mAccentColor);
 
@@ -313,7 +393,7 @@ public class OrderFragment extends Fragment {
 		initList();
 
 		initRadioButtons();
-		initFooter();
+		initFooter(false);
 		initKeyboardListener();
 		initAmount();
 
@@ -332,26 +412,45 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void initList() {
-		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems()));
+		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems(), true));
+		list.setScrollingEnabled(false);
+		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 		if(mAnimate) {
 			AnimationUtils.scaleHeight(list, LIST_HEIGHT);
 		} else {
 			ViewUtils.setHeight(list, LIST_HEIGHT);
 		}
-		list.setScrollingEnabled(false);
-		final OrdersActivity activity = (OrdersActivity) getActivity();
+
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-				if(isDownscaled() && activity.checkFragment(OrderFragment.this)) {
-					AnimationUtils.animateAlpha(panelPayment, true);
-					AnimationUtils.animateAlpha(txtTitle, false);
-					AndroidUtils.scrollEnd(list);
-					activity.showOther(mPosition, false);
-					getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, LIST_TRASNLATION_ACTIVE).start();
+				final OrdersActivity activity = (OrdersActivity) getActivity();
+				if(isDownscaled()) {
+					if(activity.checkFragment(OrderFragment.this)) {
+						zoomInFragment(activity);
+					}
+				} else {
+					splitBill();
 				}
 			}
 		});
+	}
+
+	private void zoomInFragment(final OrdersActivity activity) {
+		if(mFooterView1 != null) {
+			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
+			ViewUtils.setVisible(billSplit, true);
+		}
+		if(mFooterView2 != null) {
+			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
+			ViewUtils.setVisible(billSplit2, true);
+		}
+		AnimationUtils.animateAlpha(panelPayment, true);
+		AnimationUtils.animateAlpha(txtTitle, false);
+		AndroidUtils.scrollEnd(list);
+		activity.showOther(mPosition, false);
+		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, LIST_TRASNLATION_ACTIVE).start();
+		// list.setScrollingEnabled(true);
 	}
 
 	public boolean isDownscaled() {return list.getTranslationY() == 0;}
@@ -389,6 +488,7 @@ public class OrderFragment extends Fragment {
 				updatePayButton(amount.add(getSelectedTips(amount)));
 			}
 		});
+		txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(mOrder.getPaidAmount(), getCurrencySuffix())));
 		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
 		editAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
@@ -441,15 +541,57 @@ public class OrderFragment extends Fragment {
 				}));
 	}
 
-	private void initFooter() {
-		final View footerView = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
-		list.addFooterView(footerView);
+	private void initFooter(final boolean visible) {
+		if(list.getFooterViewsCount() > 0) {
+			list.removeFooterView(mFooterView1);
+			list.removeFooterView(mFooterView2);
+		}
+		mFooterView1 = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
+		list.addFooterView(mFooterView1);
+		final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
+		ViewUtils.setVisible(billSplit, visible);
+		billSplit.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				if(!isDownscaled()) {
+					splitBill();
+				} else {
+					zoomInFragment((OrdersActivity) getActivity());
+				}
+			}
+		});
+	}
 
-		// TODO: Fix
-		//txtFooterAmount = (TextView) footerView.findViewById(R.id.txt_overall);
-		//txtFooterAmount.setText(getString(R.string.order_overall, StringUtils.formatCurrency(mOrder.getTotalAmount())));
+	private void initFooter2() {
+		if(list.getFooterViewsCount() > 0) {
+			list.removeFooterView(mFooterView1);
+			list.removeFooterView(mFooterView2);
+		}
+		mFooterView2 = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer_cancel, null, false);
+		list.addFooterView(mFooterView2);
+		mFooterView2.findViewById(R.id.txt_edit).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				splitBill();
+			}
+		});
+		mFooterView2.findViewById(R.id.txt_cancel).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				cancelSplit();
+			}
+		});
+	}
 
-		txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(mOrder.getPaidAmount(), getCurrencySuffix())));
+	private void cancelSplit() {
+		mCheckedStates.clear();
+		initFooter(true);
+	}
+
+	private void splitBill() {
+		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder, mCheckedStates);
+		list.animate().translationY(400).start();
+		getFragmentManager().beginTransaction().add(android.R.id.content, billSplitFragment, BillSplitFragment.TAG).commit();
 	}
 
 	private void initRadioButtons() {
@@ -688,6 +830,17 @@ public class OrderFragment extends Fragment {
 			doCancel(null);
 			return true;
 		}
+		final Fragment fragmentByTag = getFragmentManager().findFragmentByTag(BillSplitFragment.TAG);
+		if(fragmentByTag != null) {
+			BillSplitFragment splitFragment = (BillSplitFragment) fragmentByTag;
+			splitFragment.hide();
+			return true;
+		}
 		return false;
+	}
+
+	public boolean isInSplitMode() {
+		final Fragment splitFragment = getFragmentManager().findFragmentByTag(BillSplitFragment.TAG);
+		return splitFragment != null;
 	}
 }
