@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.os.Parcel;
 import android.view.View;
 import android.view.ViewStub;
 import android.view.animation.DecelerateInterpolator;
@@ -252,6 +253,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			                                       @Override
 			                                       public void call(List<Order> orders) {
 				                                       if(!orders.isEmpty()) {
+					                                       orders.add(new Order(Parcel.obtain()));
+					                                       orders.add(new Order(Parcel.obtain()));
 					                                       OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders),
 					                                                            mRestaurant.getDecoration().getBackgroundColor());
 				                                       } else {

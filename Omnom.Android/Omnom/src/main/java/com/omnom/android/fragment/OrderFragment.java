@@ -241,6 +241,10 @@ public class OrderFragment extends Fragment {
 	public OrderFragment() {
 	}
 
+	public View getFragmentView() {
+		return mFragmentView;
+	}
+
 	private String getCurrencySuffix() {
 		return getString(R.string.currency_ruble);
 	}
@@ -269,7 +273,7 @@ public class OrderFragment extends Fragment {
 		return as;
 	}
 
-	public void downscale(final Runnable runnable) {
+	public void downscale(final @Nullable Runnable runnable) {
 		AnimationUtils.animateAlpha(panelPayment, false);
 		final AnimatorSet as = getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0);
 		as.addListener(new AnimatorListenerAdapter() {
@@ -343,20 +347,12 @@ public class OrderFragment extends Fragment {
 					AnimationUtils.animateAlpha(panelPayment, true);
 					AnimationUtils.animateAlpha(txtTitle, false);
 					AndroidUtils.scrollEnd(list);
-					if(isFirstItem() || isLastItem()) {
-						activity.animatePageMargingFirstOrLast(isFirstItem());
-					} else {
-						activity.animatePageMarginMiddle();
-					}
+					activity.showOther(mPosition, false);
 					getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, LIST_TRASNLATION_ACTIVE).start();
 				}
 			}
 		});
 	}
-
-	private boolean isLastItem() {return mPosition == mOrdersCount - 1;}
-
-	private boolean isFirstItem() {return mPosition == 0;}
 
 	public boolean isDownscaled() {return list.getTranslationY() == 0;}
 

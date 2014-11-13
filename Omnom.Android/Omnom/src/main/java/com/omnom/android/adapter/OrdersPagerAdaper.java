@@ -2,7 +2,7 @@ package com.omnom.android.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
 import com.omnom.android.fragment.OrderFragment;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by Ch3D on 10.10.2014.
  */
-public class OrdersPagerAdaper extends FragmentStatePagerAdapter {
+public class OrdersPagerAdaper extends FragmentPagerAdapter {
 	private final List<Order> mOrders;
 
 	private int mBgColor;
