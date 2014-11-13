@@ -1,9 +1,9 @@
 package com.omnom.android.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.view.View;
 import android.widget.TextView;
 
 import com.omnom.android.R;
@@ -23,15 +23,13 @@ import butterknife.InjectView;
 
 public class OrdersActivity extends BaseFragmentActivity {
 
-	public enum OrderPosition {
-		FIRST, MIDDLE, LAST
-	}
-
 	public static final int REQUEST_CODE_CARDS = 100;
 
-	public static final int PAGE_MARGIN = -120;
-
 	public static final int OFFSCREEN_PAGE_LIMIT = 3;
+
+	public static final String TAG_ANDROID_SWITCHER = "android:switcher:";
+
+	public static final String TAG_SWITCHER_DELIMITER = ":";
 
 	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor) {
 		final Intent intent = new Intent(activity, OrdersActivity.class);
@@ -55,11 +53,14 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	private int bgColor;
 
+	private int margin;
+
 	@Override
 	public void initUi() {
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, bgColor);
 		mPager.setAdapter(mPagerAdapter);
-		mPager.setPageMargin(PAGE_MARGIN);
+		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 6);
+		mPager.setPageMargin(margin);
 		mPager.setOffscreenPageLimit(OFFSCREEN_PAGE_LIMIT);
 		mIndicator.setViewPager(mPager);
 		mPager.setOnPageChangeListener(mIndicator);
@@ -86,18 +87,8 @@ public class OrdersActivity extends BaseFragmentActivity {
 		if(currentFragment != null) {
 			if(!currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
 				mPager.setEnabled(true);
-				currentFragment.downscale(new Runnable() {
-					@Override
-					public void run() {
-						if(isFirstItem()) {
-							restoreMargin(PAGE_MARGIN, OrderPosition.FIRST);
-						} else if(isLastItem()) {
-							restoreMargin(PAGE_MARGIN, OrderPosition.LAST);
-						} else {
-							restoreMargin(PAGE_MARGIN, OrderPosition.MIDDLE);
-						}
-					}
-				});
+				showOther(mPager.getCurrentItem(), true);
+				currentFragment.downscale(null);
 				AnimationUtils.animateAlpha(mTextInfo, true);
 				AnimationUtils.animateAlpha(mIndicator, true);
 				return;
@@ -111,105 +102,38 @@ public class OrdersActivity extends BaseFragmentActivity {
 		}
 	}
 
-	private boolean isLastItem() {return mPager.getCurrentItem() == mPagerAdapter.getCount() - 1;}
-
-	private boolean isFirstItem() {return mPager.getCurrentItem() == 0;}
-
 	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_orders;
-	}
-
-	public void animatePageMargingFirstOrLast(final boolean isFirst) {
-		AnimationUtils.animateAlpha(mTextInfo, false);
-		AnimationUtils.animateAlpha(mIndicator, false);
-		ValueAnimator va = ValueAnimator.ofInt(mPager.getPageMargin(), 0);
-		mPager.beginFakeDrag();
-		va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-			@Override
-			public void onAnimationUpdate(final ValueAnimator animation) {
-				final Integer animatedValue = (Integer) animation.getAnimatedValue();
-				mPager.fakeDragBy(isFirst ? -animatedValue : animatedValue);
-				mPager.setPageMargin(animatedValue);
-			}
-		});
-		va.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(final Animator animation) {
-				mPager.endFakeDrag();
-			}
-		});
-		va.start();
-		mPager.setEnabled(false);
-	}
-
-	public void animatePageMarginMiddle() {
-		AnimationUtils.animateAlpha(mTextInfo, false);
-		AnimationUtils.animateAlpha(mIndicator, false);
-		ValueAnimator va = ValueAnimator.ofInt(mPager.getPageMargin(), 0);
-		mPager.beginFakeDrag();
-		va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-			public int mLastValue = mPager.getPageMargin();
-
-			@Override
-			public void onAnimationUpdate(final ValueAnimator animation) {
-				final Integer animatedValue = (Integer) animation.getAnimatedValue();
-				mPager.setPageMargin(animatedValue);
-				final int xOffset = (animatedValue - mLastValue);
-				mPager.fakeDragBy(xOffset);
-				mLastValue = animatedValue;
-			}
-		});
-		va.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(final Animator animation) {
-				mPager.endFakeDrag();
-			}
-		});
-		va.start();
-		mPager.setEnabled(false);
-	}
-
-	public void restoreMargin(final int value, final OrderPosition pos) {
-		AnimationUtils.animateAlpha(mTextInfo, true);
-		AnimationUtils.animateAlpha(mIndicator, true);
-		ValueAnimator va = ValueAnimator.ofInt(mPager.getPageMargin(), value);
-		mPager.beginFakeDrag();
-		va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-			public int mLastValue = 0;
-
-			@Override
-			public void onAnimationUpdate(final ValueAnimator animation) {
-				final Integer animatedValue = (Integer) animation.getAnimatedValue();
-				mPager.setPageMargin(animatedValue);
-				switch(pos) {
-					case FIRST:
-						mPager.fakeDragBy(-(animatedValue - mLastValue));
-						break;
-
-					case MIDDLE:
-						mPager.fakeDragBy(animatedValue - mLastValue);
-						break;
-
-					case LAST:
-						mPager.fakeDragBy(animatedValue);
-						break;
-				}
-				mLastValue = animatedValue;
-			}
-		});
-		va.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(final Animator animation) {
-				mPager.endFakeDrag();
-			}
-		});
-		va.start();
-		mPager.setEnabled(true);
 	}
 
 	public boolean checkFragment(final OrderFragment orderFragment) {
 		return orderFragment != null && orderFragment == mPagerAdapter.getCurrentFragment();
 	}
 
+	public ObjectAnimator getFragmentAnimation(int pos, boolean show) {
+		final OrderFragment fragment = (OrderFragment) getSupportFragmentManager().findFragmentByTag(
+				TAG_ANDROID_SWITCHER + mPager.getId() + TAG_SWITCHER_DELIMITER + mPagerAdapter.getItemId(pos));
+		if(fragment != null) {
+			final View view = fragment.getFragmentView();
+			final int startAlpha = show ? 0 : 1;
+			final int endAlpha = show ? 1 : 0;
+			return ObjectAnimator.ofFloat(view, View.ALPHA, startAlpha, endAlpha);
+		}
+		return null;
+	}
+
+	public void showOther(int position, final boolean visible) {
+		final AnimatorSet as = new AnimatorSet();
+		final ObjectAnimator fl = getFragmentAnimation(position - 1, visible);
+		final ObjectAnimator fr = getFragmentAnimation(position + 1, visible);
+		if(fl != null && fr != null) {
+			as.playTogether(fl, fr);
+			as.start();
+		} else if(fl != null) {
+			fl.start();
+		} else if(fr != null) {
+			fr.start();
+		}
+	}
 }
