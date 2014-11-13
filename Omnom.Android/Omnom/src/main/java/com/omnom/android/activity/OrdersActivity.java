@@ -88,7 +88,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 			if(!currentFragment.isInSplitMode() && !currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
 				mPager.setEnabled(true);
 				showOther(mPager.getCurrentItem(), true);
-				currentFragment.downscale(null);
+				currentFragment.downscale();
 				AnimationUtils.animateAlpha(mTextInfo, true);
 				AnimationUtils.animateAlpha(mIndicator, true);
 				return;
@@ -124,6 +124,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 	}
 
 	public void showOther(int position, final boolean visible) {
+		mPager.setEnabled(visible);
 		AnimationUtils.animateAlpha(mTextInfo, visible);
 		AnimationUtils.animateAlpha(mIndicator, visible);
 		final ObjectAnimator fl = getFragmentAnimation(position - 1, visible);

@@ -1,5 +1,7 @@
 package com.omnom.android.fragment;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -55,7 +57,11 @@ public class EnteringPageFragment extends Fragment {
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		findById(view, R.id.root).setBackgroundColor(color);
+		final Drawable drawable = getResources().getDrawable(R.drawable.bg_wood);
+		drawable.mutate();
+		drawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+		findById(view, R.id.root).setBackgroundDrawable(drawable);
+		drawable.invalidateSelf();
 		((ImageView) findById(view, R.id.img_icon)).setImageResource(icon);
 		((TextView) findById(view, R.id.text)).setText(strId);
 	}

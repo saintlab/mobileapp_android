@@ -261,7 +261,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		                                       }, new Action1<Throwable>() {
 			                                       @Override
 			                                       public void call(Throwable throwable) {
-
 			                                       }
 		                                       });
 	}
