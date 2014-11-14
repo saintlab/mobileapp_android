@@ -15,7 +15,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 
 	@Override
 	public int getLayoutResource() {
-		return super.getLayoutResource();
+		return R.layout.activity_capture_qr;
 	}
 
 	@Override

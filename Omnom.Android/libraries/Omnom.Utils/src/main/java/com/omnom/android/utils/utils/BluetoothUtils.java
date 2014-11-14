@@ -13,7 +13,7 @@ import hugo.weaving.DebugLog;
 public class BluetoothUtils {
 
 	public static boolean hasBleSupport(Context context) {
-		// return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
+		//return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
 		return false;
 	}
 

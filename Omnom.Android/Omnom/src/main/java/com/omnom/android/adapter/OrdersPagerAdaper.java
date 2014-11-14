@@ -53,7 +53,8 @@ public class OrdersPagerAdaper extends FragmentPagerAdapter {
 	@Override
 	public Fragment getItem(int position) {
 		final boolean isAnimate = (position > mLastAnimated) && (mLastAnimated < 2) && (position < 2);
-		final Fragment fragment = OrderFragment.newInstance(mOrders.get(position), mBgColor, position, getCount(), isAnimate);
+		final boolean isSingle = getCount() == 1;
+		final Fragment fragment = OrderFragment.newInstance(mOrders.get(position), mBgColor, position, isAnimate && !isSingle, isSingle);
 		if(isAnimate) {
 			mLastAnimated = position;
 		}

@@ -109,8 +109,6 @@ public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callb
 
 	private ViewfinderView viewfinderView;
 
-	private TextView statusView;
-
 	private View resultView;
 
 	private Result lastResult;
@@ -198,7 +196,7 @@ public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callb
 		viewfinderView.setCameraManager(cameraManager);
 
 		resultView = findViewById(R.id.result_view);
-		statusView = (TextView) findViewById(R.id.status_view);
+		// statusView = (TextView) findViewById(R.id.status_view);
 
 		handler = null;
 		lastResult = null;
@@ -266,10 +264,10 @@ public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callb
 					}
 				}
 
-				String customPromptMessage = intent.getStringExtra(Intents.Scan.PROMPT_MESSAGE);
-				if(customPromptMessage != null) {
-					statusView.setText(customPromptMessage);
-				}
+				//String customPromptMessage = intent.getStringExtra(Intents.Scan.PROMPT_MESSAGE);
+				//if(customPromptMessage != null) {
+				//	statusView.setText(customPromptMessage);
+				//}
 
 			} else if(dataString != null &&
 					dataString.contains("http://www.google") &&
@@ -546,7 +544,7 @@ public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callb
 			return;
 		}
 
-		statusView.setVisibility(View.GONE);
+		// statusView.setVisibility(View.GONE);
 		viewfinderView.setVisibility(View.GONE);
 		resultView.setVisibility(View.VISIBLE);
 
@@ -634,7 +632,7 @@ public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callb
 			if(rawResultString.length() > 32) {
 				rawResultString = rawResultString.substring(0, 32) + " ...";
 			}
-			statusView.setText(getString(resultHandler.getDisplayTitle()) + " : " + rawResultString);
+			// statusView.setText(getString(resultHandler.getDisplayTitle()) + " : " + rawResultString);
 		}
 
 		if(copyToClipboard && !resultHandler.areContentsSecure()) {
@@ -752,8 +750,8 @@ public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callb
 
 	private void resetStatusView() {
 		resultView.setVisibility(View.GONE);
-		statusView.setText(R.string.msg_default_status);
-		statusView.setVisibility(View.VISIBLE);
+		//statusView.setText(R.string.msg_default_status);
+		//statusView.setVisibility(View.VISIBLE);
 		// viewfinderView.setVisibility(View.VISIBLE);
 		lastResult = null;
 	}

@@ -19,6 +19,7 @@ import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
+import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
 import java.util.List;
@@ -57,6 +58,12 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	@Override
 	public Observable<TableDataResponse> findBeacon(Beacon beacon) {
 		return mDataService.findBeacon(new BeaconFindRequest(beacon)).subscribeOn(
+				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<List<DemoTableData>> getDemoTable() {
+		return mDataService.getDemoTable().subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 

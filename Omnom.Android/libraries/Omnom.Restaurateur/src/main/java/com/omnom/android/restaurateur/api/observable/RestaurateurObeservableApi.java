@@ -9,6 +9,7 @@ import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
+import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
 import java.util.List;
@@ -34,6 +35,8 @@ public interface RestaurateurObeservableApi {
 	                                                 Beacon oldBeacon);
 
 	public Observable<TableDataResponse> findBeacon(Beacon beacon);
+
+	public Observable<List<DemoTableData>> getDemoTable();
 
 	public Observable<Restaurant> setRssiThreshold(String restaurantId, int rssi);
 

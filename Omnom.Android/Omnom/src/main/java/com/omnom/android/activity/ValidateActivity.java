@@ -74,7 +74,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		}
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
-		context.startActivity(intent, enterAnim, exitAnim, true);
+		context.startActivity(intent, enterAnim, exitAnim, !isDemo);
 	}
 
 	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
@@ -142,9 +142,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private int mAnimationType;
 
-	private Restaurant mRestaurant;
+	protected Restaurant mRestaurant;
 
-	private TableDataResponse mTable;
+	protected TableDataResponse mTable;
 
 	private boolean mWaiterCalled;
 

@@ -11,13 +11,15 @@ import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
-import altbeacon.beacon.Beacon;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -28,28 +30,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 	public static final String DEVICE_ID_GENYMOTION = "000000000000000";
 
 	private static final String TAG = ValidateActivityCamera.class.getSimpleName();
-
-	public class DemoBeacon extends Beacon {
-		public DemoBeacon() {
-			super();
-		}
-
-		@Override
-		public String getIdValue(final int i) {
-			switch(i) {
-				case 0:
-					return "E2C56DB5-DFFB-48D2-B060-D0F5A71096E0";
-
-				case 1:
-					return "1";
-
-				case 2:
-					return "A";
-				default:
-					return super.getIdValue(i);
-			}
-		}
-	}
 
 	@Inject
 	protected RestaurateurObeservableApi api;
@@ -67,7 +47,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 			return;
 		}
 
-		final Intent intent = new Intent(this, CaptureActivity.class);
+		final Intent intent = new Intent(this, OmnomQRCaptureActivity.class);
 		intent.putExtra(CaptureActivity.EXTRA_SHOW_BACK, false);
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 			final ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(this, R.anim.slide_in_right,
@@ -86,38 +66,26 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	@Override
 	protected void validate() {
-		if(mIsDemo) {
+		if(mIsDemo && (mRestaurant == null || mTable == null)) {
 			loader.startProgressAnimation(10000, new Runnable() {
 				@Override
 				public void run() {
 				}
 			});
-			Beacon demoBeacon = new DemoBeacon();
-
-			final TableDataResponse[] table = new TableDataResponse[1];
-			mFindBeaconSubscription = AndroidObservable.bindActivity(getActivity(), api.findBeacon(demoBeacon).flatMap(
-					new Func1<TableDataResponse, Observable<Restaurant>>() {
+			mFindBeaconSubscription = AndroidObservable.bindActivity(getActivity(), api.getDemoTable()).subscribe(
+					new Action1<List<DemoTableData>>() {
 						@Override
-						public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
-							if(tableDataResponse.hasAuthError()) {
-								EnteringActivity.start(ValidateActivityCamera.this);
-								throw new RuntimeException("Wrong auth token");
-							} else {
-								table[0] = tableDataResponse;
-								return api.getRestaurant(tableDataResponse.getRestaurantId());
-							}
+						public void call(final List<DemoTableData> response) {
+							final DemoTableData data = response.get(0);
+							onDataLoaded(data.getRestaurant(), data.getTable());
 						}
-					})).subscribe(new Action1<Restaurant>() {
-				@Override
-				public void call(final Restaurant restaurant) {
-					onDataLoaded(restaurant, table[0]);
-				}
-			}, new Action1<Throwable>() {
-				@Override
-				public void call(Throwable throwable) {
-					// TODO:
-				}
-			});
+					}, new Action1<Throwable>() {
+						@Override
+						public void call(Throwable throwable) {
+							Log.e(TAG, "validate", throwable);
+						}
+					});
+			mFirstRun = false;
 			return;
 		}
 		if(TextUtils.isEmpty(mQrData)) {
