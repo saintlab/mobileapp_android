@@ -21,11 +21,11 @@ public class LoaderError {
 
 	public static final LoaderError WEAK_SIGNAL = new LoaderError(R.drawable.ic_weak_signal,
 	                                                              R.string.error_weak_beacon_signal,
-	                                                              R.string.try_once_again);
+	                                                              R.string.repeat);
 
 	public static final LoaderError TWO_BEACONS = new LoaderError(R.drawable.ic_weak_signal,
 	                                                              R.string.error_more_than_one_beacon,
-	                                                              R.string.try_once_again);
+	                                                              R.string.repeat);
 	private final int mDrawableResId;
 	private final int mErrResId;
 	private final int mBtnResId;
