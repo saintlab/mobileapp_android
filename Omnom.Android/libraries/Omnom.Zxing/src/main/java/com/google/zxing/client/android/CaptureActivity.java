@@ -16,7 +16,6 @@
 
 package com.google.zxing.client.android;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -57,6 +56,7 @@ import com.google.zxing.client.android.history.HistoryManager;
 import com.google.zxing.client.android.result.ResultButtonListener;
 import com.google.zxing.client.android.result.ResultHandler;
 import com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever;
+import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.zxing.R;
 
 import java.io.IOException;
@@ -74,14 +74,20 @@ import java.util.Map;
  * @author dswitkin@google.com (Daniel Switkin)
  * @author Sean Owen
  */
-public final class CaptureActivity extends Activity implements SurfaceHolder.Callback {
+public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callback {
 
 	public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
+
 	public static final String EXTRA_SCANNED_URI = "zxing.scan.result";
+
 	public static final String EXTRA_SHOW_BACK = "zxing.capture.show.back";
+
 	private static final String TAG = CaptureActivity.class.getSimpleName();
+
 	private static final long DEFAULT_INTENT_RESULT_DURATION_MS = 1500L;
+
 	private static final long BULK_MODE_SCAN_DELAY_MS = 1000L;
+
 	private static final Collection<ResultMetadataType> DISPLAYABLE_METADATA_TYPES = EnumSet.of(ResultMetadataType.ISSUE_NUMBER,
 	                                                                                            ResultMetadataType.SUGGESTED_PRICE,
 	                                                                                            ResultMetadataType
@@ -96,22 +102,39 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	}
 
 	private CameraManager cameraManager;
+
 	private CaptureActivityHandler handler;
+
 	private Result savedResultToShow;
+
 	private ViewfinderView viewfinderView;
+
 	private TextView statusView;
+
 	private View resultView;
+
 	private Result lastResult;
+
 	private boolean hasSurface;
+
 	private boolean copyToClipboard;
+
 	private IntentSource source;
+
 	private String sourceUrl;
+
 	private ScanFromWebPageManager scanFromWebPageManager;
+
 	private Collection<BarcodeFormat> decodeFormats;
+
 	private Map<DecodeHintType, ?> decodeHints;
+
 	private String characterSet;
+
 	private HistoryManager historyManager;
+
 	private InactivityTimer inactivityTimer;
+
 	private AmbientLightManager ambientLightManager;
 
 	ViewfinderView getViewfinderView() {
@@ -132,7 +155,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 		Window window = getWindow();
 		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		setContentView(R.layout.capture);
 
 		hasSurface = false;
 		historyManager = new HistoryManager(this);
@@ -140,6 +162,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		inactivityTimer = new InactivityTimer(this);
 		ambientLightManager = new AmbientLightManager(this);
 
+		initUI();
+
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+	}
+
+	protected void initUI() {
 		final boolean showBack = getIntent().getBooleanExtra(EXTRA_SHOW_BACK, true);
 		final View btnBack = findViewById(R.id.btn_back);
 		btnBack.setOnClickListener(new View.OnClickListener() {
@@ -149,8 +177,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			}
 		});
 		btnBack.setVisibility(showBack ? View.VISIBLE : View.GONE);
+	}
 
-		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+	@Override
+	public int getLayoutResource() {
+		return R.layout.capture;
 	}
 
 	@Override
@@ -361,6 +392,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		//        return super.onOptionsItemSelected(item);
 		//    }
 		return true;
+	}
+
+	@Override
+	public void initUi() {
+
 	}
 
 	@Override

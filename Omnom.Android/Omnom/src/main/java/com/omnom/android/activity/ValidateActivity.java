@@ -65,7 +65,7 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
  */
 public abstract class ValidateActivity extends BaseOmnomActivity {
 
-	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
+	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
 		final Intent intent = new Intent(context, hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
 		if(context instanceof ConfirmPhoneActivity) {
@@ -73,6 +73,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		}
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
+		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
 		context.startActivity(intent, enterAnim, exitAnim, true);
 	}
 
@@ -155,9 +156,12 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private Subscription mGuestSubscribtion;
 
+	protected boolean mIsDemo = false;
+
 	@Override
 	protected void handleIntent(Intent intent) {
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
+		mIsDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
 	}
 
 	@Override

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="demo_restaurant_json"></string>
+    <string name="demo_table_json"></string>
+
+    <string name="demo_beacon_decode_json"> [
+  {
+  "beacon": {
+  "uuid": "E2C56DB5-DFFB-48D2-B060-D0F5A71096E0",
+  "minor": "1",
+  "major": "A"
+  },
+  "restaurant": {
+  "auth_code": "----",
+  "description": "",
+  "mobile_texts": {
+  "before_cheque": {
+  "category": "",
+  "greeting": "Приятного аппетита!\nКогда потребуется, ваш счёт можно увидеть и оплатить в Omnom",
+  "open_action": "Показать счет"
+  },
+  "at_entrance": {
+  "category": "",
+  "greeting": "Мммм! Â cafe\nЗдесь работает Омном – спецпредложения и оплата с телефона",
+  "open_action": "Показать"
+  }
+  },
+  "system": "rkeeper",
+  "system_api": "http://000.000.000.000",
+  "title": "a cafe",
+  "unique_num": 0,
+  "is_demo": true,
+  "modified": "2014-08-20T09:05:17.515Z",
+  "decoration": {
+  "logo": "http://image.stand.saintlab.com/restaurateur/acafe/logo@2x.png",
+  "background_image": "http://image.stand.saintlab.com/restaurateur/acafe/background@2x.png",
+  "background_color": "000000"
+  },
+  "id": "A"
+  },
+  "table": {
+  "id": "table-1-at-A"
+  }
+  }
+  ]</string>
+</resources>

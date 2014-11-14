@@ -15,6 +15,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_SELECTED_RESTAURANT = "com.omnom.android.linker.selected_restaurant";
 	public static final String EXTRA_SHOW_BACK = "com.omnom.android.linker.bind.show_back";
 	public static final String EXTRA_LOADER_ANIMATION = "com.omnom.android.linker.loader.animation";
+	public static final String EXTRA_DEMO_MODE = "com.omnom.android.mode.demo";
 	public static final String EXTRA_ANIMATE = "com.omnom.android.linker.activity.animate";
 	public static final String EXTRA_TABLE_NUMBER = "com.omnom.android.restaurant.table_number";
 	public static final String EXTRA_PHONE = "com.omnom.android.user.phone";

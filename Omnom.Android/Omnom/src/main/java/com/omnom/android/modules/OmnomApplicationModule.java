@@ -1,5 +1,6 @@
 package com.omnom.android.modules;
 
+import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.activity.CardAddActivity;
 import com.omnom.android.activity.CardConfirmActivity;
@@ -7,6 +8,7 @@ import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.ConfirmPhoneActivity;
 import com.omnom.android.activity.EnteringActivity;
 import com.omnom.android.activity.LoginActivity;
+import com.omnom.android.activity.OmnomQRCaptureActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.activity.SplashActivity;
 import com.omnom.android.activity.ThanksActivity;
@@ -29,7 +31,7 @@ import dagger.Module;
 		/* activities */
 		ConfirmPhoneActivity.class, LoginActivity.class, ValidateActivityBle.class, ValidateActivityCamera.class,
 		ValidateActivityBle.class, OrdersActivity.class, CardsActivity.class, UserProfileActivity.class, CardAddActivity.class,
-		CardConfirmActivity.class, ThanksActivity.class,
+		CardConfirmActivity.class, ThanksActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
 		/* fragments */
 		OrderFragment.class, BillSplitFragment.class, BillItemsFragment.class, BillSplitPersonsFragment.class},
         complete = false)
