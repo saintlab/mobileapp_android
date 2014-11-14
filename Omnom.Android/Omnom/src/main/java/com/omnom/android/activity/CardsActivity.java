@@ -150,7 +150,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 		final String text = StringUtils.formatCurrency(mDetails.getAmount()) + getString(R.string.currency_ruble);
 		mBtnPay.setText(getString(R.string.pay_amount, text));
-		mBtnPay.setEnabled(!mIsDemo);
 
 		mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
