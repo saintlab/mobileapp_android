@@ -89,8 +89,6 @@ public class OrderFragment extends Fragment {
 
 	public static final int PAYMENT_TRANSLATION_Y = 200;
 
-	public static final int LIST_TRANSLATION_Y = 100;
-
 	public static class PaymentDetails implements Parcelable {
 		public static final Creator<PaymentDetails> CREATOR = new Creator<PaymentDetails>() {
 			@Override
@@ -514,7 +512,7 @@ public class OrderFragment extends Fragment {
 							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
 
-							list.animate().translationYBy(isVisible ? -LIST_TRANSLATION_Y : LIST_TRANSLATION_Y).start();
+							list.animate().translationYBy(isVisible ? LIST_TRASNLATION_ACTIVE : -LIST_TRASNLATION_ACTIVE).start();
 							getPanelPayment().animate().yBy(isVisible ? PAYMENT_TRANSLATION_Y : -PAYMENT_TRANSLATION_Y).start();
 
 							mCurrentKeyboardVisility = isVisible;
@@ -647,7 +645,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void showCustomTips(boolean visible) {
-		list.animate().translationYBy(visible ? -LIST_TRANSLATION_Y : LIST_TRANSLATION_Y).start();
+		list.animate().translationYBy(visible ? LIST_TRASNLATION_ACTIVE : -LIST_TRASNLATION_ACTIVE).start();
 		getPanelPayment().animate().yBy(visible ? -PAYMENT_TRANSLATION_Y : PAYMENT_TRANSLATION_Y).start();
 		pickerTips.setVisibility(visible ? View.VISIBLE : View.GONE);
 

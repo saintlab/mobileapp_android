@@ -34,6 +34,7 @@ import javax.inject.Inject;
 public class BillItemsFragment extends ListFragment implements SplitFragment {
 
 	private static final String ARG_ORDER = "order";
+
 	private static final String ARG_STATES = "states";
 
 	public static Fragment newInstance(final Order order, final SparseBooleanArrayParcelable states) {
@@ -102,7 +103,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 				updateAmount();
 			}
 		});
-		// updateAmount();
+		updateAmount();
 	}
 
 	@Override
@@ -124,9 +125,15 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 		final Button btnCommit = (Button) getActivity().findViewById(R.id.btn_commit);
 		final BigDecimal amount = getAmount();
 		if(amount.compareTo(BigDecimal.ZERO) > 0) {
-			btnCommit.setText(getString(R.string.bill_split_amount_, StringUtils.formatCurrency(amount)));
 			btnCommit.setTag(R.id.edit_amount, amount);
-			AnimationUtils.animateAlpha(btnCommit, true);
+			final String text = getString(R.string.bill_split_amount_, StringUtils.formatCurrency(amount));
+			AnimationUtils.animateAlpha(btnCommit, true, new Runnable() {
+				@Override
+				public void run() {
+					btnCommit.invalidate();
+				}
+			});
+			btnCommit.setText(text);
 		} else {
 			AnimationUtils.animateAlpha(btnCommit, false);
 		}

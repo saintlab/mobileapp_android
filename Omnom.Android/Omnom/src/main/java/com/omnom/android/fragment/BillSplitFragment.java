@@ -132,10 +132,20 @@ public class BillSplitFragment extends Fragment {
 
 			@Override
 			public void onPageSelected(final int i) {
+				final Fragment currentFragment = adapter.getCurrentFragment();
+				if(currentFragment instanceof SplitFragment) {
+					final SplitFragment f = (SplitFragment) currentFragment;
+					f.updateAmount();
+				}
 			}
 
 			@Override
 			public void onPageScrollStateChanged(final int i) {
+				final Fragment currentFragment = adapter.getCurrentFragment();
+				if(currentFragment instanceof SplitFragment) {
+					final SplitFragment f = (SplitFragment) currentFragment;
+					f.updateAmount();
+				}
 			}
 		});
 	}

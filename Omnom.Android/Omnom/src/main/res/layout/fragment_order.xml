@@ -28,7 +28,7 @@
         android:layout_gravity="center_horizontal"
         android:textColor="@android:color/white"
         android:textAppearance="?android:textAppearanceLarge"
-        omnom:fontPath="fonts/Futura-LSF-Omnom-Medium.otf"
+        omnom:fontPath="fonts/Futura-OSF-Omnom-Medium.otf"
         android:textSize="@dimen/font_xlarge"/>
 
     <ViewStub
