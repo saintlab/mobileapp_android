@@ -23,8 +23,13 @@ import butterknife.ButterKnife;
 public class ErrorHelper {
 
 	private LoaderView mLoader;
+
 	private TextView mTxtError;
+
 	private Button mBtnBottom;
+
+	private Button mBtnDemo;
+
 	private List<View> mErrorViews;
 
 	public ErrorHelper(LoaderView loader, TextView txtError, Button btnBottom, List<View> errorViews, CountDownTimer timer) {
@@ -41,9 +46,33 @@ public class ErrorHelper {
 		mErrorViews = errorViews;
 	}
 
+	public ErrorHelper(LoaderView loader, TextView txtError, Button btnBottom, Button btnDemo, List<View> errorViews) {
+		mLoader = loader;
+		mTxtError = txtError;
+		mBtnBottom = btnBottom;
+		mBtnDemo = btnDemo;
+		mErrorViews = errorViews;
+	}
+
 	public void showError(final LoaderError error, View.OnClickListener onClickListener) {
 		mLoader.stopProgressAnimation(true);
 		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, true);
+		mLoader.post(new Runnable() {
+			@Override
+			public void run() {
+				mLoader.animateLogo2(error.getDrawableId());
+			}
+		});
+		mTxtError.setText(error.getErrorId());
+		mBtnBottom.setText(error.getButtonTextId());
+		mBtnBottom.setOnClickListener(onClickListener);
+		ViewUtils.setVisible(mBtnDemo, false);
+	}
+
+	public void showErrorDemo(final LoaderError error, View.OnClickListener onClickListener) {
+		mLoader.stopProgressAnimation(true);
+		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, true);
+		ViewUtils.setVisible(mBtnDemo, true);
 		mLoader.post(new Runnable() {
 			@Override
 			public void run() {
@@ -79,5 +108,9 @@ public class ErrorHelper {
 				AndroidUtils.startLocationSettings(v.getContext());
 			}
 		});
+	}
+
+	public void hideError() {
+		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, false);
 	}
 }

@@ -11,12 +11,9 @@ import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
-import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -66,26 +63,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	@Override
 	protected void validate() {
-		if(mIsDemo && (mRestaurant == null || mTable == null)) {
-			loader.startProgressAnimation(10000, new Runnable() {
-				@Override
-				public void run() {
-				}
-			});
-			mFindBeaconSubscription = AndroidObservable.bindActivity(getActivity(), api.getDemoTable()).subscribe(
-					new Action1<List<DemoTableData>>() {
-						@Override
-						public void call(final List<DemoTableData> response) {
-							final DemoTableData data = response.get(0);
-							onDataLoaded(data.getRestaurant(), data.getTable());
-						}
-					}, new Action1<Throwable>() {
-						@Override
-						public void call(Throwable throwable) {
-							Log.e(TAG, "validate", throwable);
-						}
-					});
-			mFirstRun = false;
+		if(validateDemo()) {
 			return;
 		}
 		if(TextUtils.isEmpty(mQrData)) {

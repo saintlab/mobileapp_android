@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
 import android.view.animation.DecelerateInterpolator;
@@ -29,6 +30,7 @@ import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.BaseActivity;
@@ -64,6 +66,8 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
  * Created by Ch3D on 08.10.2014.
  */
 public abstract class ValidateActivity extends BaseOmnomActivity {
+
+	private static final String TAG = ValidateActivity.class.getSimpleName();
 
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
@@ -113,6 +117,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.btn_bottom)
 	protected Button btnSettings;
 
+	@InjectView(R.id.btn_demo)
+	protected Button btnDemo;
+
 	@InjectView(R.id.btn_down)
 	protected Button btnDownPromo;
 
@@ -143,11 +150,13 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected boolean mFirstRun = true;
 
-	private int mAnimationType;
-
 	protected Restaurant mRestaurant;
 
 	protected TableDataResponse mTable;
+
+	protected boolean mIsDemo = false;
+
+	private int mAnimationType;
 
 	private boolean mWaiterCalled;
 
@@ -158,8 +167,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	private Subscription mUserSubscription;
 
 	private Subscription mGuestSubscribtion;
-
-	protected boolean mIsDemo = false;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -216,7 +223,17 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		mErrorHelper = new ErrorHelper(loader, txtError, btnSettings, errorViews);
+		btnDemo.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				mErrorHelper.hideError();
+				ValidateActivity.start(ValidateActivity.this,
+				                       R.anim.fake_fade_in_short,
+				                       R.anim.fake_fade_out_short,
+				                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
+			}
+		});
+		mErrorHelper = new ErrorHelper(loader, txtError, btnSettings, btnDemo, errorViews);
 		mTarget = new Target() {
 			@Override
 			public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
@@ -422,5 +439,33 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	public View getPanelBottom() {
 		return findById(this, R.id.panel_bottom);
+	}
+
+	protected boolean validateDemo() {
+		if(mIsDemo) {
+			if(mRestaurant == null || mTable == null) {
+				loader.startProgressAnimation(10000, new Runnable() {
+					@Override
+					public void run() {
+					}
+				});
+				api.getDemoTable().subscribe(
+						new Action1<List<DemoTableData>>() {
+							@Override
+							public void call(final List<DemoTableData> response) {
+								final DemoTableData data = response.get(0);
+								onDataLoaded(data.getRestaurant(), data.getTable());
+							}
+						}, new Action1<Throwable>() {
+							@Override
+							public void call(Throwable throwable) {
+								Log.e(ValidateActivity.TAG, "validateDemo", throwable);
+							}
+						});
+				mFirstRun = false;
+			}
+			return true;
+		}
+		return false;
 	}
 }

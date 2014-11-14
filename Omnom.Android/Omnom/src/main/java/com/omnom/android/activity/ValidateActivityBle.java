@@ -81,6 +81,14 @@ public class ValidateActivityBle extends ValidateActivity {
 	}
 
 	@Override
+	protected void validate() {
+		if(validateDemo()) {
+			return;
+		}
+		super.validate();
+	}
+
+	@Override
 	protected void startLoader() {
 		loader.startProgressAnimation(getResources().getInteger(R.integer.validation_duration), new Runnable() {
 			@Override
@@ -115,7 +123,7 @@ public class ValidateActivityBle extends ValidateActivity {
 				final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 				final int size = nearBeacons.size();
 				if(size == 0) {
-					mErrorHelper.showError(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
+					mErrorHelper.showErrorDemo(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
 				} else if(size > 1) {
 					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
 				} else if(size == 1) {

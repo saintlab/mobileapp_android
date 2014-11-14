@@ -30,20 +30,29 @@
 
         <LinearLayout
             android:id="@+id/panel_errors"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:baselineAligned="false"
             android:layout_alignParentBottom="true"
             android:layout_gravity="bottom"
+            android:background="@color/white_transparent"
             android:visibility="gone">
-
-            <include layout="@layout/delimiter_vertical"/>
 
             <Button
                 android:id="@+id/btn_bottom"
                 android:text="@string/enter"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 style="@style/Button.Bottom"/>
+
+            <Button
+                android:id="@+id/btn_demo"
+                android:text="Demo"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                style="@style/Button.Bottom"/>
+
         </LinearLayout>
 
 
