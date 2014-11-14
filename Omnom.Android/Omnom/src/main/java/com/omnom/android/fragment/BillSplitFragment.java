@@ -95,8 +95,8 @@ public class BillSplitFragment extends Fragment {
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
 		mFragmentView = view;
-		mFragmentView.setTranslationY(-800);
-		mFragmentView.setAlpha(0);
+		mFragmentView.setTranslationY(-OrderFragment.LIST_HEIGHT);
+		mFragmentView.setAlpha(0.5f);
 		mFragmentView.animate().alpha(1).translationY(0).start();
 
 		mBtnCommit.setOnClickListener(new View.OnClickListener() {
@@ -132,16 +132,29 @@ public class BillSplitFragment extends Fragment {
 
 			@Override
 			public void onPageSelected(final int i) {
+				final Fragment currentFragment = adapter.getCurrentFragment();
+				if(currentFragment instanceof SplitFragment) {
+					final SplitFragment f = (SplitFragment) currentFragment;
+					f.updateAmount();
+				}
 			}
 
 			@Override
 			public void onPageScrollStateChanged(final int i) {
+				final Fragment currentFragment = adapter.getCurrentFragment();
+				if(currentFragment instanceof SplitFragment) {
+					final SplitFragment f = (SplitFragment) currentFragment;
+					f.updateAmount();
+				}
 			}
 		});
 	}
 
 	public void hide() {
-		final ViewPropertyAnimator viewPropertyAnimator = mFragmentView.animate().alpha(0).translationY(-800);
+		final ViewPropertyAnimator viewPropertyAnimator = mFragmentView
+				.animate()
+				.setDuration(getResources().getInteger(R.integer.listview_animation_delay))
+				.alpha(0).translationY(-OrderFragment.LIST_HEIGHT);
 		viewPropertyAnimator.setListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {

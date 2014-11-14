@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Button
@@ -63,7 +63,8 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textSize="@dimen/font_large"
-        android:textColor="?android:textColorHint"/>
+        omnom:fontPath="fonts/Futura-OSF-Omnom-Medium.otf"
+        android:textColor="@android:color/black"/>
 
     <com.omnom.android.view.ViewPagerIndicatorCircle
         android:id="@+id/page_indicator"
@@ -71,9 +72,9 @@
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/title"
-        app:radius="2dp"
-        app:centered="true"
-        app:fillColor="@android:color/black"
-        app:pageColor="@android:color/darker_gray"/>
+        omnom:radius="2dp"
+        omnom:centered="true"
+        omnom:fillColor="@android:color/black"
+        omnom:pageColor="@android:color/darker_gray"/>
 
 </merge>

@@ -45,7 +45,7 @@
         android:background="@drawable/btn_rounded_green"
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
-        android:visibility="gone"
+        android:visibility="invisible"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
 </FrameLayout>

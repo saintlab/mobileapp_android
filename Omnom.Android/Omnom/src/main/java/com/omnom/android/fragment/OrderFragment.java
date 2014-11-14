@@ -1,7 +1,5 @@
 package com.omnom.android.fragment;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
@@ -18,6 +16,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -58,7 +57,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
-import retrofit.http.HEAD;
 
 import static butterknife.ButterKnife.findById;
 
@@ -77,9 +75,9 @@ public class OrderFragment extends Fragment {
 
 	private int mCheckedId = WRONG_VALUE;
 
-	public static final int LIST_TRASNLATION_ACTIVE = -380;
+	public static final int LIST_TRASNLATION_ACTIVE = -480;
 
-	public static final int LIST_HEIGHT = 800;
+	public static final int LIST_HEIGHT = 900;
 
 	public static final float FRAGMENT_SCALE_RATIO_SMALL = 0.8f;
 
@@ -90,8 +88,6 @@ public class OrderFragment extends Fragment {
 	public static final int PICKER_MIN_VALUE = 0;
 
 	public static final int PAYMENT_TRANSLATION_Y = 200;
-
-	public static final int LIST_TRANSLATION_Y = 600;
 
 	public static class PaymentDetails implements Parcelable {
 		public static final Creator<PaymentDetails> CREATOR = new Creator<PaymentDetails>() {
@@ -201,8 +197,8 @@ public class OrderFragment extends Fragment {
 	@InjectView(R.id.tips_picker)
 	protected com.omnom.android.utils.view.NumberPicker pickerTips;
 
-	@InjectView(R.id.panel_order_payment)
-	protected View panelPayment;
+	@InjectView(R.id.stub_payment_options)
+	protected ViewStub stubPaymentOptions;
 
 	@InjectView(R.id.btn_pay)
 	protected TextView btnPay;
@@ -347,7 +343,7 @@ public class OrderFragment extends Fragment {
 		return as;
 	}
 
-	public void downscale(final @Nullable Runnable runnable) {
+	public void downscale() {
 		if(mFooterView1 != null) {
 			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
 			ViewUtils.setVisible(billSplit, false);
@@ -356,26 +352,26 @@ public class OrderFragment extends Fragment {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, false);
 		}
-		AnimationUtils.animateAlpha(panelPayment, false);
+		AnimationUtils.animateAlpha3(getPanelPayment(), false);
 		list.setScrollingEnabled(false);
-		final AnimatorSet as = getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0);
-		as.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(final Animator animation) {
-				if(runnable != null) {
-					runnable.run();
-				}
-			}
-		});
-		as.start();
+		getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0).start();
 		AnimationUtils.animateAlpha(txtTitle, true);
+	}
+
+	public View getPanelPayment() {
+		final View panelPayment = findById(mFragmentView, R.id.panel_order_payment);
+		if(panelPayment == null) {
+			return stubPaymentOptions.inflate();
+		} else {
+			return panelPayment;
+		}
 	}
 
 	@Override
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 		mFragmentView = view;
 
-		ViewUtils.setVisible(panelPayment, false);
+		ViewUtils.setVisible(getPanelPayment(), false);
 		mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
 		mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
 
@@ -445,12 +441,11 @@ public class OrderFragment extends Fragment {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, true);
 		}
-		AnimationUtils.animateAlpha(panelPayment, true);
+		AnimationUtils.animateAlpha(getPanelPayment(), true);
 		AnimationUtils.animateAlpha(txtTitle, false);
 		AndroidUtils.scrollEnd(list);
 		activity.showOther(mPosition, false);
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, LIST_TRASNLATION_ACTIVE).start();
-		// list.setScrollingEnabled(true);
 	}
 
 	public boolean isDownscaled() {return list.getTranslationY() == 0;}
@@ -517,8 +512,8 @@ public class OrderFragment extends Fragment {
 							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
 
-							list.animate().translationYBy(isVisible ? -LIST_TRANSLATION_Y : LIST_TRANSLATION_Y).start();
-							panelPayment.animate().yBy(isVisible ? PAYMENT_TRANSLATION_Y : -PAYMENT_TRANSLATION_Y).start();
+							list.animate().translationYBy(isVisible ? LIST_TRASNLATION_ACTIVE : -LIST_TRASNLATION_ACTIVE).start();
+							getPanelPayment().animate().yBy(isVisible ? PAYMENT_TRANSLATION_Y : -PAYMENT_TRANSLATION_Y).start();
 
 							mCurrentKeyboardVisility = isVisible;
 							editAmount.setCursorVisible(isVisible);
@@ -590,8 +585,9 @@ public class OrderFragment extends Fragment {
 
 	private void splitBill() {
 		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder, mCheckedStates);
-		list.animate().translationY(400).start();
 		getFragmentManager().beginTransaction().add(android.R.id.content, billSplitFragment, BillSplitFragment.TAG).commit();
+		list.animate().translationY(-100).setDuration(getResources().getInteger(R.integer.listview_animation_delay))
+		    .start();
 	}
 
 	private void initRadioButtons() {
@@ -649,8 +645,8 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void showCustomTips(boolean visible) {
-		list.animate().translationYBy(visible ? -LIST_TRANSLATION_Y : LIST_TRANSLATION_Y).start();
-		panelPayment.animate().yBy(visible ? -PAYMENT_TRANSLATION_Y : PAYMENT_TRANSLATION_Y).start();
+		list.animate().translationYBy(visible ? LIST_TRASNLATION_ACTIVE : -LIST_TRASNLATION_ACTIVE).start();
+		getPanelPayment().animate().yBy(visible ? -PAYMENT_TRANSLATION_Y : PAYMENT_TRANSLATION_Y).start();
 		pickerTips.setVisibility(visible ? View.VISIBLE : View.GONE);
 
 		txtTipsHint.setVisibility(visible ? View.VISIBLE : View.GONE);
