@@ -71,6 +71,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 		mPager.setOnPageChangeListener(mIndicator);
 		mTextInfo.setText(getString(R.string.your_has_n_orders, mPagerAdapter.getCount()));
 		final Drawable background = getWindow().getDecorView().getBackground();
+		background.mutate();
 		background.setColorFilter(bgColor, PorterDuff.Mode.MULTIPLY);
 		background.invalidateSelf();
 	}
