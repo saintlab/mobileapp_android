@@ -48,7 +48,7 @@
 
             <Button
                 android:id="@+id/btn_demo"
-                android:text="Demo"
+                android:text="@string/demo_mode"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 style="@style/Button.Bottom"/>

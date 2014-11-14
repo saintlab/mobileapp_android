@@ -244,7 +244,7 @@
             android:textColor="@android:color/black"
             android:textAppearance="?android:textAppearanceMedium"
             android:ellipsize="end"
-            android:text="Демо-режим"
+            android:text="@string/demo_mode"
             style="@android:style/Widget.Holo.Button.Borderless"/>
 
     </RelativeLayout>
