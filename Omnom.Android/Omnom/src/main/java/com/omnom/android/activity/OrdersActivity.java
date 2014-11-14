@@ -3,6 +3,8 @@ package com.omnom.android.activity;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.TextView;
 
@@ -31,10 +33,11 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	public static final String TAG_SWITCHER_DELIMITER = ":";
 
-	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor) {
+	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor, boolean isDemo) {
 		final Intent intent = new Intent(activity, OrdersActivity.class);
 		intent.putParcelableArrayListExtra(OrdersActivity.EXTRA_ORDERS, orders);
 		intent.putExtra(OrdersActivity.EXTRA_ACCENT_COLOR, bgColor);
+		intent.putExtra(OrdersActivity.EXTRA_DEMO_MODE, isDemo);
 		activity.startActivity(intent);
 	}
 
@@ -47,6 +50,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 	@InjectView(R.id.txt_info)
 	protected TextView mTextInfo;
 
+	@InjectView(R.id.root)
+	protected View rootView;
+
 	private OrdersPagerAdaper mPagerAdapter;
 
 	private ArrayList<Order> orders = null;
@@ -54,6 +60,8 @@ public class OrdersActivity extends BaseFragmentActivity {
 	private int bgColor;
 
 	private int margin;
+
+	private boolean mDemo;
 
 	@Override
 	public void initUi() {
@@ -65,6 +73,10 @@ public class OrdersActivity extends BaseFragmentActivity {
 		mIndicator.setViewPager(mPager);
 		mPager.setOnPageChangeListener(mIndicator);
 		mTextInfo.setText(getString(R.string.your_has_n_orders, mPagerAdapter.getCount()));
+		final Drawable background = getWindow().getDecorView().getBackground();
+		background.mutate();
+		background.setColorFilter(bgColor, PorterDuff.Mode.MULTIPLY);
+		background.invalidateSelf();
 	}
 
 	@Override
@@ -72,6 +84,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 		orders = intent.getParcelableArrayListExtra(EXTRA_ORDERS);
 		final String colorStr = intent.getStringExtra(EXTRA_ACCENT_COLOR);
 		bgColor = RestaurantHelper.getBackgroundColor(colorStr);
+		mDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
 	}
 
 	@Override
@@ -86,6 +99,10 @@ public class OrdersActivity extends BaseFragmentActivity {
 		final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
 		if(currentFragment != null) {
 			if(!currentFragment.isInSplitMode() && !currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
+				if(mPagerAdapter.getCount() == 1) {
+					super.onBackPressed();
+					return;
+				}
 				mPager.setEnabled(true);
 				showOther(mPager.getCurrentItem(), true);
 				currentFragment.downscale();
@@ -138,5 +155,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 		} else if(fr != null) {
 			fr.start();
 		}
+	}
+
+	public boolean isDemo() {
+		return mDemo;
 	}
 }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.omnom.android.utils.loader.LoaderError;
@@ -23,8 +24,13 @@ import butterknife.ButterKnife;
 public class ErrorHelper {
 
 	private LoaderView mLoader;
+
 	private TextView mTxtError;
+
 	private Button mBtnBottom;
+
+	private Button mBtnDemo;
+
 	private List<View> mErrorViews;
 
 	public ErrorHelper(LoaderView loader, TextView txtError, Button btnBottom, List<View> errorViews, CountDownTimer timer) {
@@ -41,6 +47,14 @@ public class ErrorHelper {
 		mErrorViews = errorViews;
 	}
 
+	public ErrorHelper(LoaderView loader, TextView txtError, Button btnBottom, Button btnDemo, List<View> errorViews) {
+		mLoader = loader;
+		mTxtError = txtError;
+		mBtnBottom = btnBottom;
+		mBtnDemo = btnDemo;
+		mErrorViews = errorViews;
+	}
+
 	public void showError(final LoaderError error, View.OnClickListener onClickListener) {
 		mLoader.stopProgressAnimation(true);
 		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, true);
@@ -51,6 +65,31 @@ public class ErrorHelper {
 			}
 		});
 		mTxtError.setText(error.getErrorId());
+		final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mBtnBottom.getLayoutParams());
+		params.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		mBtnBottom.setLayoutParams(params);
+		mBtnBottom.setText(error.getButtonTextId());
+		mBtnBottom.setOnClickListener(onClickListener);
+		ViewUtils.setVisible(mBtnDemo, false);
+	}
+
+	public void showErrorDemo(final LoaderError error, View.OnClickListener onClickListener) {
+		mLoader.stopProgressAnimation(true);
+		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, true);
+		mLoader.post(new Runnable() {
+			@Override
+			public void run() {
+				mLoader.animateLogo2(error.getDrawableId());
+			}
+		});
+		mTxtError.setText(error.getErrorId());
+
+		ViewUtils.setVisible(mBtnDemo, true);
+		final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mBtnBottom.getLayoutParams());
+		params.removeRule(RelativeLayout.CENTER_HORIZONTAL);
+		params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		mBtnBottom.setLayoutParams(params);
 		mBtnBottom.setText(error.getButtonTextId());
 		mBtnBottom.setOnClickListener(onClickListener);
 	}
@@ -79,5 +118,9 @@ public class ErrorHelper {
 				AndroidUtils.startLocationSettings(v.getContext());
 			}
 		});
+	}
+
+	public void hideError() {
+		ButterKnife.apply(mErrorViews, ViewUtils.VISIBLITY, false);
 	}
 }

@@ -150,7 +150,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 							                                        ValidateActivity.start(ConfirmPhoneActivity.this,
 							                                                               R.anim.fake_fade_in_short,
 							                                                               R.anim.fake_fade_out_short,
-							                                                               EXTRA_LOADER_ANIMATION_SCALE_UP);
+							                                                               EXTRA_LOADER_ANIMATION_SCALE_UP, false);
 						                                        }
 					                                        });
 				                                        } else {

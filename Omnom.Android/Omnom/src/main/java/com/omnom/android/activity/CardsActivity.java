@@ -23,6 +23,7 @@ import com.omnom.android.acquiring.OrderInfo;
 import com.omnom.android.acquiring.PaymentInfoFactory;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.api.PaymentInfo;
+import com.omnom.android.acquiring.demo.DemoAcquiring;
 import com.omnom.android.acquiring.mailru.OrderInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.MailRuExtra;
@@ -48,6 +49,8 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.HeaderView;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -70,13 +73,31 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private static final String TAG = CardsActivity.class.getSimpleName();
 
+	public class DemoCard extends Card {
+		@Override
+		public boolean isRegistered() {
+			return true;
+		}
+
+		@Override
+		public String getAssociation() {
+			return "visa";
+		}
+
+		@Override
+		public String getMaskedPan() {
+			return "4111 .... .... 1111";
+		}
+	}
+
 	@SuppressLint("NewApi")
 	public static void start(final Activity activity, final Order order, final OrderFragment.PaymentDetails details,
-	                         final int accentColor, final int code) {
+	                         final int accentColor, final int code, boolean isDemo) {
 		final Intent intent = new Intent(activity, CardsActivity.class);
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
 		intent.putExtra(Extras.EXTRA_ORDER, order);
+		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
 
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
@@ -103,6 +124,9 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	@Inject
 	protected Acquiring mAcquiring;
 
+	@Inject
+	protected DemoAcquiring mDemoAcquiring;
+
 	private int mAccentColor;
 
 	private Subscription mCardsSubscription;
@@ -119,6 +143,8 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private OrderFragment.PaymentDetails mDetails;
 
+	private boolean mIsDemo;
+
 	@Override
 	public void initUi() {
 		mPreferences = OmnomApplication.get(getActivity()).getPreferences();
@@ -131,12 +157,14 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 				finish();
 			}
 		});
-		mPanelTop.setButtonRight(R.string.add_card, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				onAdd();
-			}
-		});
+		if(!mIsDemo) {
+			mPanelTop.setButtonRight(R.string.add_card, new View.OnClickListener() {
+				@Override
+				public void onClick(final View v) {
+					onAdd();
+				}
+			});
+		}
 
 		mPanelTop.showProgress(true);
 		mPanelTop.showButtonRight(false);
@@ -153,8 +181,10 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 				final CardsAdapter adapter = (CardsAdapter) mList.getAdapter();
 				final Card card = (Card) adapter.getItem(position);
 				if(card.isRegistered()) {
-					mPreferences.setCardId(activity, card.getExternalCardId());
-					adapter.notifyDataSetChanged();
+					if(!mIsDemo) {
+						mPreferences.setCardId(activity, card.getExternalCardId());
+						adapter.notifyDataSetChanged();
+					}
 				} else {
 					final CardInfo cardInfo = CardInfo.create(activity, card.getExternalCardId());
 					CardConfirmActivity.startConfirm(CardsActivity.this, cardInfo, REQUEST_CODE_CARD_CONFIRM);
@@ -171,21 +201,30 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		if(mCardsSubscription != null) {
 			OmnomObservable.unsubscribe(mCardsSubscription);
 		}
-		mCardsSubscription = AndroidObservable.bindActivity(this, api.getCards().delaySubscription(1000, TimeUnit.MILLISECONDS)).subscribe(
-				new Action1<CardsResponse>() {
-					@Override
-					public void call(final CardsResponse cards) {
-						mList.setAdapter(new CardsAdapter(getActivity(), cards.getCards(), CardsActivity.this));
-						mPanelTop.showProgress(false);
-						mPanelTop.showButtonRight(true);
-					}
-				}, new Action1<Throwable>() {
-					@Override
-					public void call(final Throwable throwable) {
-						mPanelTop.showProgress(false);
-						mPanelTop.showButtonRight(true);
-					}
-				});
+		if(mIsDemo) {
+			final List<DemoCard> demoCards = Arrays.asList(new DemoCard());
+			mList.setAdapter(new CardsAdapter(getActivity(), demoCards, CardsActivity.this, true));
+			mPanelTop.showProgress(false);
+			mPanelTop.showButtonRight(true);
+		} else {
+			mCardsSubscription = AndroidObservable.bindActivity(this, api.getCards().delaySubscription(1000, TimeUnit.MILLISECONDS))
+			                                      .subscribe(
+					                                      new Action1<CardsResponse>() {
+						                                      @Override
+						                                      public void call(final CardsResponse cards) {
+							                                      mList.setAdapter(new CardsAdapter(getActivity(), cards.getCards(),
+							                                                                        CardsActivity.this, false));
+							                                      mPanelTop.showProgress(false);
+							                                      mPanelTop.showButtonRight(true);
+						                                      }
+					                                      }, new Action1<Throwable>() {
+						                                      @Override
+						                                      public void call(final Throwable throwable) {
+							                                      mPanelTop.showProgress(false);
+							                                      mPanelTop.showButtonRight(true);
+						                                      }
+					                                      });
+		}
 	}
 
 	@OnClick(R.id.btn_pay)
@@ -204,7 +243,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		final ExtraData extra = MailRuExtra.create(tip, billData.getMailRestaurantId());
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
-		mPaySubscription = AndroidObservable.bindActivity(getActivity(), mAcquiring.pay(merchant, paymentInfo))
+		mPaySubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().pay(merchant, paymentInfo))
 		                                    .subscribe(new Action1<AcquiringPollingResponse>() {
 			                                    @Override
 			                                    public void call(AcquiringPollingResponse response) {
@@ -216,6 +255,10 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 				                                    onPayError(throwable);
 			                                    }
 		                                    });
+	}
+
+	private Acquiring getAcquiring() {
+		return mIsDemo ? mDemoAcquiring : mAcquiring;
 	}
 
 	private void onPayError(Throwable throwable) {
@@ -328,6 +371,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		}
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
 		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
+		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);
 	}
 
 	@Override

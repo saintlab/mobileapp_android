@@ -66,7 +66,7 @@ public class SplashActivity extends BaseOmnomActivity {
 					public void run() {
 						if(!isFinishing()) {
 							ValidateActivity.start(SplashActivity.this, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short,
-							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN);
+							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, false);
 						}
 					}
 				});

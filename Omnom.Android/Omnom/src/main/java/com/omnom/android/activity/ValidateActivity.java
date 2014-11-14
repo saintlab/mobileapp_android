@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
 import android.view.animation.DecelerateInterpolator;
@@ -29,6 +30,7 @@ import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.BaseActivity;
@@ -65,7 +67,9 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
  */
 public abstract class ValidateActivity extends BaseOmnomActivity {
 
-	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
+	private static final String TAG = ValidateActivity.class.getSimpleName();
+
+	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
 		final Intent intent = new Intent(context, hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
 		if(context instanceof ConfirmPhoneActivity) {
@@ -73,7 +77,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		}
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
-		context.startActivity(intent, enterAnim, exitAnim, true);
+		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
+		context.startActivity(intent, enterAnim, exitAnim, !isDemo);
 	}
 
 	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
@@ -112,6 +117,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.btn_bottom)
 	protected Button btnSettings;
 
+	@InjectView(R.id.btn_demo)
+	protected Button btnDemo;
+
 	@InjectView(R.id.btn_down)
 	protected Button btnDownPromo;
 
@@ -123,6 +131,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.img_profile)
 	protected View imgProfile;
+
+	@InjectView(R.id.txt_demo_leave)
+	protected TextView txtLeave;
 
 	@InjectView(R.id.img_holder)
 	protected View imgHolder;
@@ -139,11 +150,13 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected boolean mFirstRun = true;
 
+	protected Restaurant mRestaurant;
+
+	protected TableDataResponse mTable;
+
+	protected boolean mIsDemo = false;
+
 	private int mAnimationType;
-
-	private Restaurant mRestaurant;
-
-	private TableDataResponse mTable;
 
 	private boolean mWaiterCalled;
 
@@ -158,6 +171,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@Override
 	protected void handleIntent(Intent intent) {
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
+		mIsDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
 	}
 
 	@Override
@@ -177,6 +191,11 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		if(mRestaurant == null) {
 			loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 		}
+	}
+
+	@OnClick(R.id.txt_demo_leave)
+	protected void onLeave() {
+		onBackPressed();
 	}
 
 	@Override
@@ -204,7 +223,17 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		mErrorHelper = new ErrorHelper(loader, txtError, btnSettings, errorViews);
+		btnDemo.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				mErrorHelper.hideError();
+				ValidateActivity.start(ValidateActivity.this,
+				                       R.anim.fake_fade_in_short,
+				                       R.anim.fake_fade_out_short,
+				                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
+			}
+		});
+		mErrorHelper = new ErrorHelper(loader, txtError, btnSettings, btnDemo, errorViews);
 		mTarget = new Target() {
 			@Override
 			public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
@@ -253,7 +282,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			                                       public void call(List<Order> orders) {
 				                                       if(!orders.isEmpty()) {
 					                                       OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders),
-					                                                            mRestaurant.getDecoration().getBackgroundColor());
+					                                                            mRestaurant.getDecoration().getBackgroundColor(), mIsDemo);
 				                                       } else {
 					                                       showToastLong(getActivity(), R.string.there_are_no_orders_on_this_table);
 				                                       }
@@ -367,7 +396,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			public void run() {
 				configureScreen(mRestaurant);
 				ViewUtils.setVisible(imgHolder, true);
-				ViewUtils.setVisible(imgProfile, true);
+				ViewUtils.setVisible(imgProfile, !mIsDemo);
+				ViewUtils.setVisible(txtLeave, mIsDemo);
 				ViewUtils.setVisible(getPanelBottom(), true);
 				getPanelBottom().animate()
 				                .translationY(0)
@@ -409,5 +439,33 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	public View getPanelBottom() {
 		return findById(this, R.id.panel_bottom);
+	}
+
+	protected boolean validateDemo() {
+		if(mIsDemo) {
+			if(mRestaurant == null || mTable == null) {
+				loader.startProgressAnimation(10000, new Runnable() {
+					@Override
+					public void run() {
+					}
+				});
+				api.getDemoTable().subscribe(
+						new Action1<List<DemoTableData>>() {
+							@Override
+							public void call(final List<DemoTableData> response) {
+								final DemoTableData data = response.get(0);
+								onDataLoaded(data.getRestaurant(), data.getTable());
+							}
+						}, new Action1<Throwable>() {
+							@Override
+							public void call(Throwable throwable) {
+								Log.e(ValidateActivity.TAG, "validateDemo", throwable);
+							}
+						});
+				mFirstRun = false;
+			}
+			return true;
+		}
+		return false;
 	}
 }

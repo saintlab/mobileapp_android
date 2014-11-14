@@ -3,11 +3,13 @@ package com.omnom.android.fragment;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -138,19 +140,19 @@ public class OrderFragment extends Fragment {
 
 	private static final String ARG_POSITION = "position";
 
-	private static final String ARG_COUNT = "count";
-
 	private static final String ARG_ANIMATE = "animate";
 
-	public static Fragment newInstance(Order order, final int bgColor, final int postition, final int count,
-	                                   final boolean animate) {
+	private static final String ARG_SINGLE = "single";
+
+	public static Fragment newInstance(Order order, final int bgColor, final int postition,
+	                                   final boolean animate, final boolean isSingle) {
 		final OrderFragment fragment = new OrderFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, order);
 		args.putInt(ARG_COLOR, bgColor);
 		args.putInt(ARG_POSITION, postition);
-		args.putInt(ARG_COUNT, count);
 		args.putBoolean(ARG_ANIMATE, animate);
+		args.putBoolean(ARG_SINGLE, isSingle);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -244,13 +246,13 @@ public class OrderFragment extends Fragment {
 
 	private boolean mAnimate;
 
-	private int mOrdersCount;
-
 	private SparseBooleanArrayParcelable mCheckedStates = new SparseBooleanArrayParcelable();
 
 	private View mFooterView1;
 
 	private View mFooterView2;
+
+	private boolean mSingle;
 
 	public OrderFragment() {
 	}
@@ -371,25 +373,31 @@ public class OrderFragment extends Fragment {
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 		mFragmentView = view;
 
-		ViewUtils.setVisible(getPanelPayment(), false);
-		mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
-		mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
-
 		if(mAnimate) {
+			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
+			mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
+
 			mFragmentView.animate().translationYBy(-LIST_HEIGHT).setDuration(0).start();
 			mFragmentView.animate().translationYBy(LIST_HEIGHT).setStartDelay((mPosition + 1) * 350).setDuration(850).start();
+		} else if(mSingle) {
+			ViewUtils.setVisible(getPanelPayment(), true);
+			list.setTranslationY(LIST_TRASNLATION_ACTIVE);
+			zoomInFragment((OrdersActivity) getActivity());
+		} else {
+			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
+			mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
 		}
 
+		pickerTips.setDividerDrawable(new ColorDrawable(mAccentColor));
 		btnPay.setTextColor(mAccentColor);
 		txtTitle.setText(getString(R.string.bill_number_, mPosition + 1));
-		// rootView.setBackgroundColor(mAccentColor);
 
 		initPicker();
 		updateCustomTipsText(0);
 		initList();
 
 		initRadioButtons();
-		initFooter(false);
+		initFooter(!mAnimate && mSingle);
 		initKeyboardListener();
 		initAmount();
 
@@ -404,7 +412,8 @@ public class OrderFragment extends Fragment {
 	@OnClick(R.id.btn_pay)
 	protected void onPay(View v) {
 		final PaymentDetails paymentDetails = new PaymentDetails(getEnteredAmount().doubleValue(), 0);
-		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS);
+		final OrdersActivity activity = (OrdersActivity) getActivity();
+		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
 	}
 
 	private void initList() {
@@ -812,8 +821,8 @@ public class OrderFragment extends Fragment {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mAccentColor = getArguments().getInt(ARG_COLOR);
 			mAnimate = getArguments().getBoolean(ARG_ANIMATE, false);
+			mSingle = getArguments().getBoolean(ARG_SINGLE, false);
 			mPosition = getArguments().getInt(ARG_POSITION);
-			mOrdersCount = getArguments().getInt(ARG_COUNT);
 		}
 	}
 

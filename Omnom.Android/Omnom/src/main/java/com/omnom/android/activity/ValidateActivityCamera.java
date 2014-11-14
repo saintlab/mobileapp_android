@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.BuildConfig;
@@ -24,11 +25,17 @@ import rx.functions.Func1;
 
 public class ValidateActivityCamera extends ValidateActivity {
 	public static final String DEVICE_ID_GENYMOTION = "000000000000000";
+
+	private static final String TAG = ValidateActivityCamera.class.getSimpleName();
+
 	@Inject
 	protected RestaurateurObeservableApi api;
+
 	private Subscription mCheckQrSubscribtion;
 
 	private String mQrData;
+
+	private Subscription mFindBeaconSubscription;
 
 	@Override
 	protected void startLoader() {
@@ -37,7 +44,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 			return;
 		}
 
-		final Intent intent = new Intent(this, CaptureActivity.class);
+		final Intent intent = new Intent(this, OmnomQRCaptureActivity.class);
 		intent.putExtra(CaptureActivity.EXTRA_SHOW_BACK, false);
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 			final ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(this, R.anim.slide_in_right,
@@ -56,6 +63,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	@Override
 	protected void validate() {
+		if(validateDemo()) {
+			return;
+		}
 		if(TextUtils.isEmpty(mQrData)) {
 			super.validate();
 		}
@@ -78,7 +88,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 		}
 	}
 
-	private void findTableForQr(String mQrData) {
+	private void findTableForQr(final String mQrData) {
 		final TableDataResponse[] table = new TableDataResponse[1];
 		mCheckQrSubscribtion = AndroidObservable.bindActivity(this, api.checkQrCode(mQrData).flatMap(
 				new Func1<TableDataResponse, Observable<Restaurant>>() {
@@ -95,7 +105,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 		}, new Action1<Throwable>() {
 			@Override
 			public void call(Throwable throwable) {
-				throw new RuntimeException("!!!");
+				Log.e(TAG, "findTableFor: qr = " + mQrData, throwable);
 			}
 		});
 	}
