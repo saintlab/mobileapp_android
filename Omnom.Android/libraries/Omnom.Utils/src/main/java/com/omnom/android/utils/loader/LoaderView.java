@@ -166,7 +166,6 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void animateColor(final int startColor, final int endColor, final long duration) {
-		System.err.println(">>> animateColor " + startColor + " " + endColor);
 		post(new Runnable() {
 			@Override
 			public void run() {
@@ -179,7 +178,7 @@ public class LoaderView extends FrameLayout {
 					public void onAnimationUpdate(ValueAnimator animation) {
 						GradientDrawable sd = (GradientDrawable) mImgLoader.getDrawable();
 						currentColor = (Integer) animation.getAnimatedValue();
-						// sd.setColors(new int[]{currentColor, currentColor});
+						sd.mutate();
 						sd.setColor(currentColor);
 						sd.invalidateSelf();
 					}
