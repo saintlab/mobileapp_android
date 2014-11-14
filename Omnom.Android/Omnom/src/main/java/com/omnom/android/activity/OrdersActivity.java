@@ -33,10 +33,11 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	public static final String TAG_SWITCHER_DELIMITER = ":";
 
-	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor) {
+	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor, boolean isDemo) {
 		final Intent intent = new Intent(activity, OrdersActivity.class);
 		intent.putParcelableArrayListExtra(OrdersActivity.EXTRA_ORDERS, orders);
 		intent.putExtra(OrdersActivity.EXTRA_ACCENT_COLOR, bgColor);
+		intent.putExtra(OrdersActivity.EXTRA_DEMO_MODE, isDemo);
 		activity.startActivity(intent);
 	}
 
@@ -60,6 +61,8 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	private int margin;
 
+	private boolean mDemo;
+
 	@Override
 	public void initUi() {
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, bgColor);
@@ -81,6 +84,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 		orders = intent.getParcelableArrayListExtra(EXTRA_ORDERS);
 		final String colorStr = intent.getStringExtra(EXTRA_ACCENT_COLOR);
 		bgColor = RestaurantHelper.getBackgroundColor(colorStr);
+		mDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
 	}
 
 	@Override
@@ -151,5 +155,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 		} else if(fr != null) {
 			fr.start();
 		}
+	}
+
+	public boolean isDemo() {
+		return mDemo;
 	}
 }

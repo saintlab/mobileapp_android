@@ -72,11 +72,12 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	@SuppressLint("NewApi")
 	public static void start(final Activity activity, final Order order, final OrderFragment.PaymentDetails details,
-	                         final int accentColor, final int code) {
+	                         final int accentColor, final int code, boolean isDemo) {
 		final Intent intent = new Intent(activity, CardsActivity.class);
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
 		intent.putExtra(Extras.EXTRA_ORDER, order);
+		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
 
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
@@ -119,6 +120,8 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private OrderFragment.PaymentDetails mDetails;
 
+	private boolean mIsDemo;
+
 	@Override
 	public void initUi() {
 		mPreferences = OmnomApplication.get(getActivity()).getPreferences();
@@ -131,12 +134,14 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 				finish();
 			}
 		});
-		mPanelTop.setButtonRight(R.string.add_card, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				onAdd();
-			}
-		});
+		if(!mIsDemo) {
+			mPanelTop.setButtonRight(R.string.add_card, new View.OnClickListener() {
+				@Override
+				public void onClick(final View v) {
+					onAdd();
+				}
+			});
+		}
 
 		mPanelTop.showProgress(true);
 		mPanelTop.showButtonRight(false);
@@ -145,6 +150,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 		final String text = StringUtils.formatCurrency(mDetails.getAmount()) + getString(R.string.currency_ruble);
 		mBtnPay.setText(getString(R.string.pay_amount, text));
+		mBtnPay.setEnabled(!mIsDemo);
 
 		mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -328,6 +334,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		}
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
 		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
+		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);
 	}
 
 	@Override

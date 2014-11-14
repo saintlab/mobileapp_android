@@ -9,6 +9,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -411,7 +412,8 @@ public class OrderFragment extends Fragment {
 	@OnClick(R.id.btn_pay)
 	protected void onPay(View v) {
 		final PaymentDetails paymentDetails = new PaymentDetails(getEnteredAmount().doubleValue(), 0);
-		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS);
+		final OrdersActivity activity = (OrdersActivity) getActivity();
+		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
 	}
 
 	private void initList() {
