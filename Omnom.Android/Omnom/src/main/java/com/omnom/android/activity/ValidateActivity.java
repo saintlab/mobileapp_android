@@ -125,6 +125,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.img_profile)
 	protected View imgProfile;
 
+	@InjectView(R.id.txt_demo_leave)
+	protected TextView txtLeave;
+
 	@InjectView(R.id.img_holder)
 	protected View imgHolder;
 
@@ -181,6 +184,11 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		if(mRestaurant == null) {
 			loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 		}
+	}
+
+	@OnClick(R.id.txt_demo_leave)
+	protected void onLeave() {
+		onBackPressed();
 	}
 
 	@Override
@@ -372,6 +380,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				configureScreen(mRestaurant);
 				ViewUtils.setVisible(imgHolder, true);
 				ViewUtils.setVisible(imgProfile, !mIsDemo);
+				ViewUtils.setVisible(txtLeave, mIsDemo);
 				ViewUtils.setVisible(getPanelBottom(), true);
 				getPanelBottom().animate()
 				                .translationY(0)
