@@ -371,7 +371,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			public void run() {
 				configureScreen(mRestaurant);
 				ViewUtils.setVisible(imgHolder, true);
-				ViewUtils.setVisible(imgProfile, true);
+				ViewUtils.setVisible(imgProfile, !mIsDemo);
 				ViewUtils.setVisible(getPanelBottom(), true);
 				getPanelBottom().animate()
 				                .translationY(0)
