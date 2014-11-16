@@ -28,7 +28,7 @@
             android:textIsSelectable="true"
             android:textAppearance="?android:textAppearanceLarge"/>
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/panel_errors"
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -41,25 +41,44 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:visibility="gone">
 
-            <Button
+            <LinearLayout
                 android:id="@+id/btn_bottom"
                 android:text="@string/enter"
-                android:layout_width="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:drawablePadding="8dp"
-                android:drawableLeft="@drawable/ic_repeat_small"
-                style="@style/Button.Bottom"/>
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                style="@style/Button.Bottom">
 
-            <Button
+                <TextView
+                    android:id="@+id/txt_error_repeat"
+                    android:text="@string/enter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:drawablePadding="8dp"
+                    android:drawableLeft="@drawable/ic_repeat_small"
+                    android:textAppearance="?android:textAppearanceLarge"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/btn_demo"
                 android:text="@string/demo_mode"
-                android:layout_width="wrap_content"
-                android:drawablePadding="8dp"
-                android:layout_alignParentRight="true"
-                android:drawableLeft="@drawable/ic_demo_mode_small"
-                style="@style/Button.Bottom"/>
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                style="@style/Button.Bottom">
 
-        </RelativeLayout>
+                <TextView
+                    android:text="@string/demo_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    android:gravity="center"
+                    android:drawableLeft="@drawable/ic_demo_mode_small"
+                    android:textAppearance="?android:textAppearanceLarge"/>
+            </LinearLayout>
+
+        </LinearLayout>
 
         <ViewStub
             android:id="@+id/stub_bottom_menu"

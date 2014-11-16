@@ -78,11 +78,6 @@
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden"/>
         <activity
-            android:name="com.google.zxing.client.android.CaptureActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Wood">
-        </activity>
-        <activity
             android:name="com.omnom.android.activity.OrdersActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood.Light"
