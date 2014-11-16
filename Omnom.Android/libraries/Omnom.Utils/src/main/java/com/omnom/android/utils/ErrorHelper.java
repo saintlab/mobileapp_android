@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.omnom.android.utils.loader.LoaderError;
@@ -23,13 +22,15 @@ import butterknife.ButterKnife;
  */
 public class ErrorHelper {
 
+	private TextView mTxtBottom;
+
 	private LoaderView mLoader;
 
 	private TextView mTxtError;
 
-	private Button mBtnBottom;
+	private View mBtnBottom;
 
-	private Button mBtnDemo;
+	private View mBtnDemo;
 
 	private List<View> mErrorViews;
 
@@ -47,10 +48,11 @@ public class ErrorHelper {
 		mErrorViews = errorViews;
 	}
 
-	public ErrorHelper(LoaderView loader, TextView txtError, Button btnBottom, Button btnDemo, List<View> errorViews) {
+	public ErrorHelper(LoaderView loader, TextView txtError, View btnBottom, TextView txtBottom, View btnDemo, List<View> errorViews) {
 		mLoader = loader;
 		mTxtError = txtError;
 		mBtnBottom = btnBottom;
+		mTxtBottom = txtBottom;
 		mBtnDemo = btnDemo;
 		mErrorViews = errorViews;
 	}
@@ -65,11 +67,8 @@ public class ErrorHelper {
 			}
 		});
 		mTxtError.setText(error.getErrorId());
-		final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mBtnBottom.getLayoutParams());
-		params.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		mBtnBottom.setLayoutParams(params);
-		mBtnBottom.setText(error.getButtonTextId());
+		mTxtBottom.setCompoundDrawablesWithIntrinsicBounds(error.getmBtnDrawableId(), 0, 0, 0);
+		mTxtBottom.setText(error.getButtonTextId());
 		mBtnBottom.setOnClickListener(onClickListener);
 		ViewUtils.setVisible(mBtnDemo, false);
 	}
@@ -84,13 +83,9 @@ public class ErrorHelper {
 			}
 		});
 		mTxtError.setText(error.getErrorId());
-
 		ViewUtils.setVisible(mBtnDemo, true);
-		final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mBtnBottom.getLayoutParams());
-		params.removeRule(RelativeLayout.CENTER_HORIZONTAL);
-		params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		mBtnBottom.setLayoutParams(params);
-		mBtnBottom.setText(error.getButtonTextId());
+		mTxtBottom.setCompoundDrawablesWithIntrinsicBounds(error.getmBtnDrawableId(), 0, 0, 0);
+		mTxtBottom.setText(error.getButtonTextId());
 		mBtnBottom.setOnClickListener(onClickListener);
 	}
 

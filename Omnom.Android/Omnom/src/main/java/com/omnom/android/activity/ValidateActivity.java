@@ -115,10 +115,13 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected TextView txtError;
 
 	@InjectView(R.id.btn_bottom)
-	protected Button btnSettings;
+	protected View btnErrorRepeat;
+
+	@InjectView(R.id.txt_error_repeat)
+	protected TextView txtErrorRepeat;
 
 	@InjectView(R.id.btn_demo)
-	protected Button btnDemo;
+	protected View btnDemo;
 
 	@InjectView(R.id.btn_down)
 	protected Button btnDownPromo;
@@ -233,7 +236,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
 			}
 		});
-		mErrorHelper = new ErrorHelper(loader, txtError, btnSettings, btnDemo, errorViews);
+		mErrorHelper = new ErrorHelper(loader, txtError, btnErrorRepeat, txtErrorRepeat, btnDemo, errorViews);
 		mTarget = new Target() {
 			@Override
 			public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
