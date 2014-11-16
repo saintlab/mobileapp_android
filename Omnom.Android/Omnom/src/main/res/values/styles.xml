@@ -46,6 +46,11 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <style name="Theme.Transparent.Light">
+        <item name="android:editTextStyle">@style/EditText.White</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
     <style name="Theme.White.Light" parent="AppTheme.Light">
         <item name="android:windowBackground">@android:color/white</item>
     </style>

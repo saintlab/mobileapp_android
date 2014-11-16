@@ -1,0 +1,51 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.omnom.android.view.HeaderView
+        android:id="@+id/panel_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:background="@color/list_header"
+        android:padding="@dimen/activity_horizontal_margin_small"/>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_marginTop="@dimen/view_size_default"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.omnom.android.view.OrdersViewPager
+            android:id="@+id/pager"
+            android:background="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v4.view.PagerTabStrip
+                android:id="@+id/pager_title"
+                android:gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/list_header"
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+        </com.omnom.android.view.OrdersViewPager>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_commit"
+        android:layout_gravity="center_horizontal|bottom"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:background="@drawable/btn_rounded_green"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textColor="@android:color/white"
+        android:visibility="invisible"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+
+</FrameLayout>

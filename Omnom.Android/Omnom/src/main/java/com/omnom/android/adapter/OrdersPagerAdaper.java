@@ -2,7 +2,7 @@ package com.omnom.android.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
 import com.omnom.android.fragment.OrderFragment;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by Ch3D on 10.10.2014.
  */
-public class OrdersPagerAdaper extends FragmentStatePagerAdapter {
+public class OrdersPagerAdaper extends FragmentPagerAdapter {
 	private final List<Order> mOrders;
 
 	private int mBgColor;
@@ -53,7 +53,8 @@ public class OrdersPagerAdaper extends FragmentStatePagerAdapter {
 	@Override
 	public Fragment getItem(int position) {
 		final boolean isAnimate = (position > mLastAnimated) && (mLastAnimated < 2) && (position < 2);
-		final Fragment fragment = OrderFragment.newInstance(mOrders.get(position), mBgColor, position, getCount(), isAnimate);
+		final boolean isSingle = getCount() == 1;
+		final Fragment fragment = OrderFragment.newInstance(mOrders.get(position), mBgColor, position, isAnimate && !isSingle, isSingle);
 		if(isAnimate) {
 			mLastAnimated = position;
 		}

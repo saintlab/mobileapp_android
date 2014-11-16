@@ -53,7 +53,7 @@ public class CardsAdapter extends BaseAdapter {
 
 	private final Context mContext;
 
-	private final List<Card> mCards;
+	private final List<? extends Card> mCards;
 
 	private final LayoutInflater mInflater;
 
@@ -69,11 +69,14 @@ public class CardsAdapter extends BaseAdapter {
 
 	private AnimationEndListener mListener;
 
+	private boolean mIsDemo;
+
 	private int mLastAnimated = -1;
 
-	public CardsAdapter(final Context context, List<Card> cards, AnimationEndListener listener) {
+	public CardsAdapter(final Context context, List<? extends Card> cards, AnimationEndListener listener, boolean isDemo) {
 		mContext = context;
 		mListener = listener;
+		mIsDemo = isDemo;
 		mInflater = LayoutInflater.from(context);
 		mCards = cards;
 		mAnimDuration = context.getResources().getInteger(R.integer.default_animation_duration_short);
@@ -125,7 +128,7 @@ public class CardsAdapter extends BaseAdapter {
 		final String cardId = mPreferences.getCardId(mContext);
 		final boolean isSelected = !TextUtils.isEmpty(cardId) && cardId.equals(item.getExternalCardId());
 
-		if(isSelected) {
+		if(isSelected || mIsDemo) {
 			holder.txtCardNumber.setTextColor(mContext.getResources().getColor(R.color.card_number_selected));
 			holder.txtType.setTextColor(mContext.getResources().getColor(R.color.card_type_selected));
 			holder.txtConfirm.setText(StringUtils.EMPTY_STRING);

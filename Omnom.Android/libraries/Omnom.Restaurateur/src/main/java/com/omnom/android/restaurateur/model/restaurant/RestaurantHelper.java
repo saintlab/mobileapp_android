@@ -57,7 +57,7 @@ public class RestaurantHelper {
 			return false;
 		}
 		// TODO: Implement when backend will be ready
-		return true;
+		return false;
 	}
 
 	public static boolean isWaiterEnabled(final Restaurant restaurant) {

@@ -1,7 +1,6 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:omnom="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -28,219 +27,18 @@
         android:layout_gravity="center_horizontal"
         android:textColor="@android:color/white"
         android:textAppearance="?android:textAppearanceLarge"
-        omnom:fontPath="fonts/Futura-LSF-Omnom-Medium.otf"
+        omnom:fontPath="fonts/Futura-OSF-Omnom-Medium.otf"
         android:textSize="@dimen/font_xlarge"/>
 
-    <RelativeLayout
-        android:id="@+id/panel_order_payment"
+    <ViewStub
+        android:id="@+id/stub_payment_options"
+        android:inflatedId="@+id/panel_order_payment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/activity_horizontal_margin_medium"
-        android:layout_gravity="bottom"
-        android:visibility="gone">
+        android:layout_gravity="bottom" />
 
-        <Button
-            android:id="@+id/btn_pay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/activity_horizontal_margin_medium"
-            android:paddingRight="@dimen/activity_horizontal_margin_medium"
-            android:background="@drawable/btn_rounded_white"
-            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-            android:textColor="@color/error_red"
-            android:textSize="@dimen/font_medium"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"/>
-
-        <RadioGroup
-            android:id="@+id/radio_tips"
-            android:layout_above="@id/btn_pay"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:layout_marginTop="@dimen/activity_horizontal_margin"
-            android:divider="@drawable/divider_tips"
-            android:dividerPadding="24dp"
-            android:showDividers="middle">
-
-            <RadioButton
-                android:id="@+id/radio_tips_1"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:tag="10"
-                android:gravity="center"
-                android:button="@null"
-                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-                android:textColor="@drawable/order_payment_tips_color"
-                android:textAppearance="?android:textAppearanceSmall"/>
-
-            <RadioButton
-                android:id="@+id/radio_tips_2"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:tag="15"
-                android:gravity="center"
-                android:button="@null"
-                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-                android:textColor="@drawable/order_payment_tips_color"
-                android:textAppearance="?android:textAppearanceSmall"/>
-
-            <RadioButton
-                android:id="@+id/radio_tips_3"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:tag="25"
-                android:gravity="center"
-                android:button="@null"
-                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-                android:textColor="@drawable/order_payment_tips_color"
-                android:textAppearance="?android:textAppearanceSmall"/>
-
-            <RadioButton
-                android:id="@+id/radio_tips_4"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:text="@string/tips_another"
-                android:tag="-1"
-                android:gravity="center"
-                android:button="@null"
-                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-                android:textColor="@drawable/order_payment_tips_color"
-                android:textAppearance="?android:textAppearanceSmall"/>
-        </RadioGroup>
-
-        <TextView
-            android:id="@+id/txt_tips_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/radio_tips"
-            android:layout_centerHorizontal="true"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="-24dp"
-            omnom:fontPath="fonts/Futura-LSF-Omnom-Medium.otf"
-            android:text="@string/title_plus_tips"/>
-
-        <LinearLayout
-            android:id="@+id/panel_linear"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:baselineAligned="false"
-            android:orientation="horizontal"
-            android:layout_centerHorizontal="true"
-            android:layout_above="@id/txt_tips_title"
-            android:layout_marginBottom="@dimen/activity_vertical_margin_large"
-            android:gravity="center">
-
-            <ImageButton
-                android:id="@+id/btn_cancel"
-                android:layout_width="34dp"
-                android:layout_height="34dp"
-                android:layout_marginLeft="24dp"
-                android:scaleType="fitXY"
-                android:padding="8dp"
-                android:cropToPadding="true"
-                android:background="@null"
-                android:src="@drawable/ic_cancel_editing_button"
-                android:visibility="invisible"/>
-
-            <EditText
-                android:id="@+id/edit_payment_amount"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:inputType="numberDecimal"
-                android:imeOptions="actionDone"
-                android:singleLine="true"
-                android:textSize="48sp"
-                android:textColor="?android:textColorPrimaryInverse"
-                android:textCursorDrawable="@null"
-                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
-
-            <TextView
-                android:id="@+id/txt_custom_tips"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:textSize="@dimen/font_xxlarge"
-                android:textColor="?android:textColorPrimaryInverse"
-                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-                android:background="@drawable/textfield_default_mtrl_white"
-                android:visibility="gone"/>
-
-            <ImageButton
-                android:id="@+id/btn_apply"
-                android:layout_width="34dp"
-                android:layout_height="34dp"
-                android:layout_marginRight="24dp"
-                android:scaleType="fitXY"
-                android:background="@null"
-                android:src="@drawable/ic_done_editing_button"
-                android:visibility="invisible"/>
-
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/txt_already_paid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/panel_linear"
-            android:layout_marginTop="-48dp"
-            android:layout_centerHorizontal="true"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textColor="@color/tip_default"
-            android:textAppearance="?android:textAppearance"
-            android:text="Уже оплачено: 5 000 "
-            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
-
-        <TextView
-            android:id="@+id/txt_tips_amount_hint"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/panel_linear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="-48dp"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textSize="@dimen/font_medium"
-            android:textColor="?android:textColorPrimaryInverse"
-            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-            android:visibility="gone"/>
-
-        <TextView
-            android:id="@+id/txt_payment_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/panel_linear"
-            android:layout_centerHorizontal="true"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="@android:color/white"
-            omnom:fontPath="fonts/Futura-LSF-Omnom-Medium.otf"
-            android:layout_marginBottom="-16dp"
-            android:text="@string/to_be_paid"/>
-
-        <TextView
-            android:id="@+id/txt_tips_hint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/panel_linear"
-            android:layout_centerHorizontal="true"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="-16dp"
-            android:text="@string/tips"
-            android:visibility="gone"/>
-
-    </RelativeLayout>
+    <include layout="@layout/view_order_payment_options"/>
 
     <com.omnom.android.utils.view.NumberPicker
         android:id="@+id/tips_picker"

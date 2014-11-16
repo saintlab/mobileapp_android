@@ -55,6 +55,30 @@ public class AnimationUtils {
 				    }).alpha(visible ? 1 : 0).start();
 	}
 
+	public static void animateAlpha3(final View view, final boolean visible) {
+		final Boolean tag = (Boolean) view.getTag();
+		if(tag != null && tag == visible) {
+			// skip
+			return;
+		}
+
+		view.setAlpha(visible ? 0 : 1);
+		if(visible) {
+			ViewUtils.setVisible(view, visible);
+		}
+		view.setTag(visible);
+		view.animate().setDuration(view.getResources().getInteger(R.integer.default_animation_duration_short)).
+				setInterpolator(new AccelerateDecelerateInterpolator()).
+				    setListener(new AnimatorListenerAdapter() {
+					    @Override
+					    public void onAnimationEnd(Animator animation) {
+						    if(!visible) {
+							    ViewUtils.setVisible(view, false);
+						    }
+					    }
+				    }).alpha(visible ? 1 : 0).start();
+	}
+
 	public static void animateAlpha2(final View view, final boolean visible, final Runnable callback, long duration) {
 		view.setAlpha(visible ? 0 : 1);
 		if(visible) {

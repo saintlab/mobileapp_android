@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -12,9 +11,11 @@
         android:background="@drawable/divider_list_padding"/>
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/btn_bill_split"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:gravity="center"
+        android:clickable="true"
         android:background="@android:color/white"
         android:paddingLeft="@dimen/activity_horizontal_margin_medium"
         android:paddingRight="@dimen/activity_horizontal_margin_medium"

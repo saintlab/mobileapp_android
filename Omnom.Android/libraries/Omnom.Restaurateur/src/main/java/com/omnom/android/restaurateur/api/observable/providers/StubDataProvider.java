@@ -11,6 +11,7 @@ import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsFactory;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
+import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
 import java.util.Arrays;
@@ -33,6 +34,17 @@ public class StubDataProvider implements RestaurateurObeservableApi {
 			@Override
 			public void call(Subscriber<? super TableDataResponse> subscriber) {
 				subscriber.onNext(TableDataResponse.NULL);
+				subscriber.onCompleted();
+			}
+		}) {};
+	}
+
+	@Override
+	public Observable<List<DemoTableData>> getDemoTable() {
+		return new Observable<List<DemoTableData>>(new Observable.OnSubscribe<List<DemoTableData>>() {
+			@Override
+			public void call(Subscriber<? super List<DemoTableData>> subscriber) {
+				subscriber.onNext(null);
 				subscriber.onCompleted();
 			}
 		}) {};

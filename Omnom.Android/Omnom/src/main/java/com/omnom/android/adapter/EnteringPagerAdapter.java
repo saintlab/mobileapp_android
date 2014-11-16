@@ -15,9 +15,9 @@ public class EnteringPagerAdapter extends FragmentStatePagerAdapter {
 	private static final int COUNT = 3;
 
 	private int[] colors = new int[]{
-			Color.parseColor("#aaCE1200"),
-			Color.parseColor("#aa089E7D"),
-			Color.parseColor("#aa266BA6")
+			Color.parseColor("#CE1200"),
+			Color.parseColor("#089E7D"),
+			Color.parseColor("#266BA6")
 	};
 
 	private int[] icons = new int[]{

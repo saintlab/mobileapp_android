@@ -22,7 +22,7 @@
         android:layout_marginBottom="@dimen/activity_horizontal_margin_medium"
         android:background="@drawable/btn_pay"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-        android:textColor="@android:color/white"
+        android:textColor="@drawable/text_color_selector_white"
         android:textSize="@dimen/font_medium"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"/>
