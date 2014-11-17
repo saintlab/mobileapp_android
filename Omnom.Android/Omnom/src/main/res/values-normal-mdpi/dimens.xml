@@ -12,5 +12,5 @@
     <dimen name="restaurant_logo_size">72dp</dimen>
 
     <dimen name="profile_avatar_size">100dp</dimen>
-    <dimen name="card_confirm_margin_top">48dp</dimen>
+    <dimen name="card_area_margin_top">24dp</dimen>
 </resources>

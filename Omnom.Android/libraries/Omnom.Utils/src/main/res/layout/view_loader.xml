@@ -28,6 +28,7 @@
         android:layout_gravity="center"
         android:layout_width="@dimen/loader_logo_size"
         android:layout_height="wrap_content"
+        android:scaleType="centerInside"
         android:src="@drawable/ic_fork_n_knife"/>
 
     <EditText
