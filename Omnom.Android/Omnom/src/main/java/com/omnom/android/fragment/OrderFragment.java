@@ -394,10 +394,10 @@ public class OrderFragment extends Fragment {
 
 		initPicker();
 		updateCustomTipsText(0);
+		initFooter(false);
 		initList();
 
 		initRadioButtons();
-		initFooter(!mAnimate && mSingle);
 		initKeyboardListener();
 		initAmount();
 
