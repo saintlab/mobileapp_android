@@ -19,6 +19,8 @@
     <dimen name="activity_vertical_margin_large">48dp</dimen>
     <dimen name="activity_vertical_margin_xlarge">72dp</dimen>
 
+    <dimen name="card_confirm_margin_top">72dp</dimen>
+
     <dimen name="activity_login_padding_top">96dp</dimen>
 
     <dimen name="btn_back_margin">16dp</dimen>

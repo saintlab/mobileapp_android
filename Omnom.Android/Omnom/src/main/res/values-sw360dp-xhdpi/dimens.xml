@@ -18,4 +18,5 @@
     <dimen name="restaurant_logo_size">72dp</dimen>
 
     <dimen name="profile_avatar_size">156dp</dimen>
+    <dimen name="card_confirm_margin_top">72dp</dimen>
 </resources>
