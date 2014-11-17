@@ -4,11 +4,12 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
+import com.omnom.android.auth.AuthError;
+import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
@@ -95,19 +96,19 @@ public class ValidateActivityCamera extends ValidateActivity {
 					@Override
 					public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
 						table[0] = tableDataResponse;
+						if(tableDataResponse.hasAuthError()) {
+							throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
+							                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED, tableDataResponse.getError()));
+						}
 						return api.getRestaurant(tableDataResponse.getRestaurantId());
 					}
 				})).subscribe(new Action1<Restaurant>() {
-			@Override
-			public void call(final Restaurant restaurant) {
-				onDataLoaded(restaurant, table[0]);
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				Log.e(TAG, "findTableFor: qr = " + mQrData, throwable);
-			}
-		});
+					              @Override
+					              public void call(final Restaurant restaurant) {
+						              onDataLoaded(restaurant, table[0]);
+					              }
+				              },
+		                      onError);
 	}
 
 	@Override
