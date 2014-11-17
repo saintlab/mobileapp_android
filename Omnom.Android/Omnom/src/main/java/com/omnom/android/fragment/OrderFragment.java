@@ -386,10 +386,10 @@ public class OrderFragment extends Fragment {
 
 		initPicker();
 		updateCustomTipsText(0);
+		initFooter(false);
 		initList();
 
 		initRadioButtons();
-		initFooter(false);
 		initKeyboardListener();
 		initAmount();
 
