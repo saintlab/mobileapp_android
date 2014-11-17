@@ -47,7 +47,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 		final Intent intent = new Intent(activity.getActivity(), UserProfileActivity.class);
 		intent.putExtra(EXTRA_ANIMATE, false);
 		intent.putExtra(EXTRA_TABLE_NUMBER, tableNumber);
-		activity.startActivity(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
+		activity.start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
 	}
 
 	@InjectView(R.id.img_user)

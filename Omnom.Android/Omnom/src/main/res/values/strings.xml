@@ -65,4 +65,6 @@
     <string name="split_the_bill">Разделить счёт</string>
     <string name="title_plus_tips">+ Чаевые</string>
     <string name="your_has_n_orders">На вашем столике\nраздельных счетов: %1$s</string>
+    <string name="login_havent_account_yet">Ещё нет аккаунта? Прошу сюда -</string>
+    <string name="login_havent_account_registration">регистрация</string>
 </resources>

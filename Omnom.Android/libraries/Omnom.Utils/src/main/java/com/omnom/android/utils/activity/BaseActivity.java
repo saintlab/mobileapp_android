@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.activity.helper.ActivityHelper;
+import com.omnom.android.utils.activity.helper.ActivityHelperBase;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.squareup.otto.Bus;
 
@@ -29,7 +31,7 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 		super.onCreate(savedInstanceState);
 		setContentView(getLayoutResource());
 		ButterKnife.inject(getActivity());
-		mHelper = new ActivityHelper(this);
+		mHelper = ActivityHelperBase.create(this);
 		if(savedInstanceState != null) {
 			handleSavedState(savedInstanceState);
 		}
@@ -83,43 +85,43 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 	}
 
 	public void startActivity(Class<?> cls, int delay) {
-		mHelper.startActivity(cls, delay);
+		mHelper.start(cls, delay);
 	}
 
 	public void startActivity(final Intent intent, int delay) {
-		mHelper.startActivity(intent, delay);
+		mHelper.start(intent, delay);
 	}
 
-	public void startActivity(final Intent intent) {
-		mHelper.startActivity(intent);
+	public void start(final Intent intent) {
+		mHelper.start(intent);
 	}
 
 	public void startActivity(Class<?> cls, int animIn, int animOut) {
-		mHelper.startActivity(cls, animIn, animOut);
+		mHelper.start(cls, animIn, animOut);
 	}
 
 	public void startActivity(Intent intent, int animIn, int animOut) {
-		mHelper.startActivity(intent, animIn, animOut);
+		mHelper.start(intent, animIn, animOut);
 	}
 
 	@Override
-	public void startActivity(Intent intent, int animIn, int animOut, boolean finish) {
-		mHelper.startActivity(intent, animIn, animOut, finish);
+	public void start(Intent intent, int animIn, int animOut, boolean finish) {
+		mHelper.start(intent, animIn, animOut, finish);
 	}
 
 	@Override
-	public void startActivity(Class<?> cls) {
-		mHelper.startActivity(cls);
+	public void start(Class<?> cls) {
+		mHelper.start(cls);
 	}
 
 	@Override
-	public void startActivity(Class<?> cls, boolean finish) {
-		mHelper.startActivity(cls, finish);
+	public void start(Class<?> cls, boolean finish) {
+		mHelper.start(cls, finish);
 	}
 
 	@Override
-	public void startActivity(Intent intent, boolean finish) {
-		mHelper.startActivity(intent, finish);
+	public void start(Intent intent, boolean finish) {
+		mHelper.start(intent, finish);
 	}
 
 	@Override

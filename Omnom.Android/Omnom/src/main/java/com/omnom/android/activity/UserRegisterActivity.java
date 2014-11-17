@@ -82,6 +82,15 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	private Subscription mRegisterSubscription;
 
 	@Override
+	protected void handleIntent(final Intent intent) {
+		final String stringExtra = intent.getStringExtra(EXTRA_PHONE);
+		if(!TextUtils.isEmpty(stringExtra)) {
+			editPhone.setText(stringExtra);
+			editPhone.getEditText().setSelection(editPhone.getText().length());
+		}
+	}
+
+	@Override
 	public void initUi() {
 		gc = new GregorianCalendar();
 		gc.add(Calendar.YEAR, -YEAR_OFFSET);
@@ -138,6 +147,16 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		if(mFirstStart) {
+			postDelayed(getResources().getInteger(android.R.integer.config_longAnimTime) + 200, new Runnable() {
+				@Override
+				public void run() {
+					AndroidUtils.showKeyboard(editName.getEditText());
+				}
+			});
+		}
+
 		if(topPanel.isAlphaVisible()) {
 			topPanel.postDelayed(new Runnable() {
 				@Override
@@ -181,8 +200,8 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 							                                         intent.putExtra(EXTRA_PHONE, request.getPhone());
 							                                         intent.putExtra(EXTRA_CONFIRM_TYPE,
 							                                                         ConfirmPhoneActivity.TYPE_REGISTER);
-							                                         startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left,
-							                                                       false);
+							                                         start(intent, R.anim.slide_in_right, R.anim.slide_out_left,
+							                                               false);
 							                                         topPanel.showProgress(false);
 						                                         }
 					                                         });

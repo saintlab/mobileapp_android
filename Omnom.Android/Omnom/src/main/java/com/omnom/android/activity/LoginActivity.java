@@ -7,21 +7,26 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.UserDataHolder;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.view.HeaderView;
 
 import javax.inject.Inject;
 
 import butterknife.InjectView;
+import butterknife.OnClick;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -29,6 +34,8 @@ import rx.functions.Action1;
 public class LoginActivity extends BaseOmnomActivity {
 
 	private static final String TAG = LoginActivity.class.getSimpleName();
+
+	public static final int ERROR_AUTH_UNKNOWN_USER = 101;
 
 	public static void start(Context context, UserDataHolder dataHolder) {
 		throw new RuntimeException("IMPLEMENT");
@@ -40,6 +47,12 @@ public class LoginActivity extends BaseOmnomActivity {
 	@InjectView(R.id.panel_top)
 	protected HeaderView topPanel;
 
+	@InjectView(R.id.txt_info)
+	protected TextView txtInfo;
+
+	@InjectView(R.id.txt_register)
+	protected TextView txtRegister;
+
 	@Inject
 	protected AuthService authenticator;
 
@@ -49,14 +62,6 @@ public class LoginActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		final TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-		final String mPhoneNumber = telephonyManager.getLine1Number();
-		if(!TextUtils.isEmpty(mPhoneNumber)) {
-			final EditText editText = editPhone.getEditText();
-			editText.setText(mPhoneNumber);
-			editText.setSelection(editText.getText().length());
-		}
-
 		topPanel.setTitle(R.string.enter);
 		topPanel.setButtonRight(R.string.proceed, new View.OnClickListener() {
 			@Override
@@ -71,6 +76,22 @@ public class LoginActivity extends BaseOmnomActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		if(mFirstStart) {
+			postDelayed(getResources().getInteger(android.R.integer.config_longAnimTime) + 200, new Runnable() {
+				@Override
+				public void run() {
+					final TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+					final String mPhoneNumber = telephonyManager.getLine1Number();
+					final EditText editText = editPhone.getEditText();
+					final String value = TextUtils.isEmpty(mPhoneNumber) ? "+7" : mPhoneNumber;
+					editText.setText(value);
+					editText.setSelection(editText.getText().length());
+					AndroidUtils.showKeyboard(editText);
+				}
+			});
+		}
+
 		if(topPanel.isAlphaVisible()) {
 			topPanel.postDelayed(new Runnable() {
 				@Override
@@ -88,11 +109,28 @@ public class LoginActivity extends BaseOmnomActivity {
 	protected void handleIntent(Intent intent) {
 	}
 
+
+	@OnClick(R.id.txt_register)
+	public void doRegister() {
+		AndroidUtils.hideKeyboard(editPhone);
+		final Intent intent = new Intent(this, UserRegisterActivity.class);
+		intent.putExtra(EXTRA_PHONE, editPhone.getText().toString());
+		start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
+		postDelayed(getResources().getInteger(android.R.integer.config_longAnimTime), new Runnable() {
+			@Override
+			public void run() {
+				LoginActivity.this.finish();
+			}
+		});
+	}
+
 	public void doProceed(final View view) {
 		if(!validate()) {
 			return;
 		}
 		topPanel.showProgress(true);
+		ViewUtils.setVisible(txtInfo, false);
+		ViewUtils.setVisible(txtRegister, false);
 		mProceedSubscription = AndroidObservable.bindActivity(this, authenticator.authorizePhone(editPhone.getText(),
 		                                                                                         StringUtils.EMPTY_STRING))
 		                                        .subscribe(new Action1<AuthResponse>() {
@@ -108,13 +146,20 @@ public class LoginActivity extends BaseOmnomActivity {
 							                                                                         ConfirmPhoneActivity.class);
 							                                        intent.putExtra(EXTRA_PHONE, editPhone.getText());
 							                                        intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_LOGIN);
-							                                        startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left,
-							                                                      false);
+							                                        start(intent, R.anim.slide_in_right, R.anim.slide_out_left,
+							                                              false);
 							                                        topPanel.showProgress(false);
 						                                        }
 					                                        });
 				                                        } else {
-					                                        editPhone.setError(authResponse.getError().getMessage());
+					                                        final AuthError error = authResponse.getError();
+					                                        if(error != null) {
+						                                        if(error.getCode() == ERROR_AUTH_UNKNOWN_USER) {
+							                                        ViewUtils.setVisible(txtInfo, true);
+							                                        ViewUtils.setVisible(txtRegister, true);
+						                                        }
+						                                        editPhone.setError(error.getMessage());
+					                                        }
 					                                        topPanel.showProgress(false);
 				                                        }
 			                                        }
