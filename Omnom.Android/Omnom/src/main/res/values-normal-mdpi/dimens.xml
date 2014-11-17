@@ -8,6 +8,8 @@
     <dimen name="loader_edit_with">140dp</dimen>
     <dimen name="loader_margin_top">-72dp</dimen>
     <dimen name="loader_progress_size">190dp</dimen>
-    <dimen name="loader_logo_size">80dp</dimen>
+    <dimen name="loader_logo_size">100dp</dimen>
     <dimen name="restaurant_logo_size">72dp</dimen>
+
+    <dimen name="profile_avatar_size">100dp</dimen>
 </resources>

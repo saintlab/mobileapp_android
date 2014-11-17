@@ -1,11 +1,15 @@
 package com.omnom.android.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -198,6 +202,27 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.btn_bottom)
 	public void onLogout() {
+		final AlertDialog alertDialog = AndroidUtils.showDialog(this, R.string.are_you_to_quit,
+		                                                        R.string.quit, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						quit();
+					}
+				}, R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						dialog.dismiss();
+					}
+				});
+		alertDialog.setCanceledOnTouchOutside(true);
+		final float btnTextSize = getResources().getDimension(R.dimen.font_normal);
+		final Button btn1 = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+		btn1.setTextSize(TypedValue.COMPLEX_UNIT_PX, btnTextSize);
+		final Button btn2 = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+		btn2.setTextSize(TypedValue.COMPLEX_UNIT_PX, btnTextSize);
+	}
+
+	private void quit() {
 		final String token = getPreferences().getAuthToken(this);
 		logoutSubscription = AndroidObservable.bindActivity(this, authenticator.logout(token)).subscribe(new Action1<AuthResponse>() {
 			@Override

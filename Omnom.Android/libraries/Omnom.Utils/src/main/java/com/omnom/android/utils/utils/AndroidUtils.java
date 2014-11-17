@@ -146,7 +146,8 @@ public class AndroidUtils {
 
 	public static AlertDialog showDialog(Context context, String msg, int okResId, DialogInterface.OnClickListener okListener,
 	                                     int cancelResId, DialogInterface.OnClickListener cancelListener) {
-		final AlertDialog alertDialog = new AlertDialog.Builder(context).setMessage(msg).setPositiveButton(okResId, okListener)
+		final AlertDialog alertDialog = new AlertDialog.Builder(context).setMessage(msg).setPositiveButton(okResId,
+		                                                                                                                 okListener)
 		                                                                .setNegativeButton(cancelResId, cancelListener).create();
 		alertDialog.setCancelable(false);
 		alertDialog.setCanceledOnTouchOutside(false);

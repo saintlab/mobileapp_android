@@ -69,4 +69,6 @@
     <string name="login_havent_account_yet">Ещё нет аккаунта? Прошу сюда -</string>
     <string name="login_havent_account_registration">регистрация</string>
     <string name="phone_country_code">+7</string>
+    <string name="are_you_to_quit">Вы действительно хотите выйти?</string>
+    <string name="quit">Выйти</string>
 </resources>

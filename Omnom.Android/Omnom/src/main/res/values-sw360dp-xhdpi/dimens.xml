@@ -16,4 +16,6 @@
     <dimen name="loader_progress_size">260dp</dimen>
     <dimen name="loader_logo_size">220dp</dimen>
     <dimen name="restaurant_logo_size">72dp</dimen>
+
+    <dimen name="profile_avatar_size">156dp</dimen>
 </resources>
