@@ -2,8 +2,6 @@ package com.omnom.android.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.telephony.TelephonyManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -81,12 +79,10 @@ public class LoginActivity extends BaseOmnomActivity {
 			postDelayed(getResources().getInteger(android.R.integer.config_longAnimTime) + 200, new Runnable() {
 				@Override
 				public void run() {
-					final TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-					final String mPhoneNumber = telephonyManager.getLine1Number();
 					final EditText editText = editPhone.getEditText();
-					final String value = TextUtils.isEmpty(mPhoneNumber) ? "+7" : mPhoneNumber;
+					final String value = AndroidUtils.getDevicePhoneNumber(getActivity(), R.string.phone_country_code);
 					editText.setText(value);
-					editText.setSelection(editText.getText().length());
+					AndroidUtils.moveCursorEnd(editText);
 					AndroidUtils.showKeyboard(editText);
 				}
 			});

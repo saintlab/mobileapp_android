@@ -20,6 +20,7 @@
     <string name="you_forgot_to_enter_name">Вы забыли ввести имя</string>
     <string name="you_forgot_to_enter_phone">Вы забыли ввести номер телефона</string>
     <string name="you_forgot_to_enter_email">Вы забыли ввести e-mail</string>
+    <string name="invalid_email">Некорректный e-mail</string>
     <string name="proceed">Далее</string>
     <string name="title_activity_confirm_phone">ConfirmPhoneActivity</string>
     <string name="confirm_code_sms_text">Должна прийти\nSMS с кодом на номер\n%1$s</string>
@@ -67,4 +68,5 @@
     <string name="your_has_n_orders">На вашем столике\nраздельных счетов: %1$s</string>
     <string name="login_havent_account_yet">Ещё нет аккаунта? Прошу сюда -</string>
     <string name="login_havent_account_registration">регистрация</string>
+    <string name="phone_country_code">+7</string>
 </resources>

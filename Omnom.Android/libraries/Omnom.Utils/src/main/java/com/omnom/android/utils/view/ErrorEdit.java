@@ -12,6 +12,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -95,6 +96,8 @@ public class ErrorEdit extends LinearLayout {
 
 	private int mMaxLen;
 
+	private int mImeOptions;
+
 	public ErrorEdit(Context context) {
 		super(context);
 		init();
@@ -124,6 +127,7 @@ public class ErrorEdit extends LinearLayout {
 			mClearDrawable = a.getDrawable(R.styleable.ErrorEdit_iconClear);
 			mInputType = a.getInt(R.styleable.ErrorEdit_inputType, INPUT_TYPE_TEXT);
 			mFontType = a.getInt(R.styleable.ErrorEdit_font, FONT_TYPE_REGULAR);
+			mImeOptions = a.getInt(R.styleable.ErrorEdit_imeOptions, EditorInfo.IME_ACTION_NONE);
 			mTextGravity = a.getInt(R.styleable.ErrorEdit_textGravity, GRAVITY_LEFT);
 			mMaxLen = a.getInt(R.styleable.ErrorEdit_maxLength, 0);
 			mTextSize = a.getDimension(R.styleable.ErrorEdit_textSize, getResources().getDimension(R.dimen.font_medium));
@@ -150,6 +154,7 @@ public class ErrorEdit extends LinearLayout {
 		initInputType();
 		initGravity();
 		initFontType();
+		editView.setImeOptions(mImeOptions);
 		editView.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
