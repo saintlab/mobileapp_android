@@ -42,6 +42,10 @@
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 
+    <style name="Theme.ConfirmPhone" parent="Theme.White">
+        <item name="android:editTextStyle">@style/EditText.Small</item>
+    </style>
+
     <style name="Theme.Transparent" parent="AppTheme">
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
@@ -105,6 +109,10 @@
         <item name="android:background">@drawable/edit_text</item>
         <item name="android:textCursorDrawable">@drawable/cursor_blue</item>
         <item name="android:cursorVisible">true</item>
+    </style>
+
+    <style name="EditText.Small">
+        <item name="android:background">@drawable/edit_text_small</item>
     </style>
 
     <style name="EditText.White">
@@ -216,9 +224,12 @@
         <item name="android:background">@drawable/btn_login</item>
     </style>
 
-    <style name="EditText.ConfirmCode">
-        <item name="android:layout_width">40dp</item>
+    <style name="ConfirmCode">
+        <item name="android:minWidth">24dp</item>
+        <item name="android:layout_width">24dp</item>
         <item name="android:layout_height">60dp</item>
+        <item name="android:paddingLeft">@dimen/activity_horizontal_margin_small</item>
+        <item name="android:paddingRight">@dimen/activity_horizontal_margin_small</item>
         <item name="android:singleLine">true</item>
         <item name="android:maxLength">1</item>
         <item name="android:inputType">number</item>
