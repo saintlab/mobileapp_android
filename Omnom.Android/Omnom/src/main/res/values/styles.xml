@@ -42,6 +42,10 @@
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 
+    <style name="Theme.ConfirmPhone" parent="Theme.White">
+        <item name="android:editTextStyle">@style/EditText.Small</item>
+    </style>
+
     <style name="Theme.Transparent" parent="AppTheme">
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
@@ -62,14 +66,6 @@
     <style name="DatePicker">
         <item name="fontPath">fonts/Futura-LSF-Omnom-LE-Regular.otf</item>
         <item name="android:background">#77ff0000</item>
-    </style>
-
-    <style name="ButtonBar">
-        <item name="android:paddingLeft">2dp</item>
-        <item name="android:paddingTop">5dp</item>
-        <item name="android:paddingRight">2dp</item>
-        <item name="android:paddingBottom">0dp</item>
-        <item name="android:background">@android:drawable/bottom_bar</item>
     </style>
 
     <style name="TextAppearance" parent="android:TextAppearance">
@@ -108,6 +104,12 @@
 
     <style name="EditText" parent="android:Widget.Holo.Light.EditText">
         <item name="android:background">@drawable/edit_text</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_blue</item>
+        <item name="android:cursorVisible">true</item>
+    </style>
+
+    <style name="EditText.Small">
+        <item name="android:background">@drawable/edit_text_small</item>
     </style>
 
     <style name="EditText.White">
@@ -219,9 +221,12 @@
         <item name="android:background">@drawable/btn_login</item>
     </style>
 
-    <style name="EditText.ConfirmCode">
-        <item name="android:layout_width">40dp</item>
+    <style name="ConfirmCode">
+        <item name="android:minWidth">24dp</item>
+        <item name="android:layout_width">24dp</item>
         <item name="android:layout_height">60dp</item>
+        <item name="android:paddingLeft">@dimen/activity_horizontal_margin_small</item>
+        <item name="android:paddingRight">@dimen/activity_horizontal_margin_small</item>
         <item name="android:singleLine">true</item>
         <item name="android:maxLength">1</item>
         <item name="android:inputType">number</item>
@@ -229,4 +234,5 @@
         <item name="android:textSize">@dimen/font_large</item>
         <item name="android:gravity">center</item>
     </style>
+
 </resources>

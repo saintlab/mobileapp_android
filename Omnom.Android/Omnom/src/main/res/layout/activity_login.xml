@@ -24,4 +24,25 @@
         omnom:showClear="true"
         omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
 
+    <TextView
+        android:id="@+id/txt_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_phone"
+        android:gravity="center"
+        android:text="@string/login_havent_account_yet"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/txt_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_info"
+        android:gravity="center"
+        android:text="@string/login_havent_account_registration"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textColor="@color/light_blue"
+        android:visibility="gone" />
+
 </RelativeLayout>

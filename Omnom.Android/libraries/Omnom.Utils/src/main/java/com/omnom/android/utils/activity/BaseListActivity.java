@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.activity.helper.ActivityHelper;
+import com.omnom.android.utils.activity.helper.ActivityHelperBase;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 
 import butterknife.ButterKnife;
@@ -23,7 +25,7 @@ public abstract class BaseListActivity extends ListActivity implements OmnomActi
 		super.onCreate(savedInstanceState);
 		setContentView(getLayoutResource());
 		ButterKnife.inject(getActivity());
-		mHelper = new ActivityHelper(this);
+		mHelper = ActivityHelperBase.create(this);
 		handleIntent(getIntent());
 	}
 
@@ -54,27 +56,27 @@ public abstract class BaseListActivity extends ListActivity implements OmnomActi
 	}
 
 	public void startActivity(Class<?> cls, int delay) {
-		mHelper.startActivity(cls, delay);
+		mHelper.start(cls, delay);
 	}
 
 	@Override
-	public void startActivity(Intent intent, boolean finish) {
-		mHelper.startActivity(intent, finish);
+	public void start(Intent intent, boolean finish) {
+		mHelper.start(intent, finish);
 	}
 
 	@Override
-	public void startActivity(Class<?> cls) {
-		mHelper.startActivity(cls);
+	public void start(Class<?> cls) {
+		mHelper.start(cls);
 	}
 
 	@Override
-	public void startActivity(Class<?> cls, boolean finish) {
-		mHelper.startActivity(cls, finish);
+	public void start(Class<?> cls, boolean finish) {
+		mHelper.start(cls, finish);
 	}
 
 	@Override
-	public void startActivity(final Intent intent, final int animIn, final int animOut, final boolean finish) {
-		mHelper.startActivity(intent, animIn, animOut, finish);
+	public void start(final Intent intent, final int animIn, final int animOut, final boolean finish) {
+		mHelper.start(intent, animIn, animOut, finish);
 	}
 
 	@Override

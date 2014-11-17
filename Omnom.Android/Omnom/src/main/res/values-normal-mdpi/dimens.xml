@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="order_items_list_height_collapsed">240dp</dimen>
+
+    <dimen name="loader_size">160dp</dimen>
+    <dimen name="loader_size_huge">900dp</dimen>
+    <dimen name="loader_edit_with">140dp</dimen>
+    <dimen name="loader_margin_top">-72dp</dimen>
+    <dimen name="loader_progress_size">190dp</dimen>
+    <dimen name="loader_logo_size">100dp</dimen>
+    <dimen name="restaurant_logo_size">72dp</dimen>
+
+    <dimen name="profile_avatar_size">100dp</dimen>
+    <dimen name="card_confirm_margin_top">48dp</dimen>
+</resources>

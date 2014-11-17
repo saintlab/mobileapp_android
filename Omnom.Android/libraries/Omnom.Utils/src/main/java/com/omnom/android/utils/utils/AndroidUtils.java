@@ -13,6 +13,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.omnom.android.utils.R;
+import com.omnom.android.utils.view.ErrorEdit;
 
 import java.lang.reflect.Method;
 
@@ -144,7 +146,8 @@ public class AndroidUtils {
 
 	public static AlertDialog showDialog(Context context, String msg, int okResId, DialogInterface.OnClickListener okListener,
 	                                     int cancelResId, DialogInterface.OnClickListener cancelListener) {
-		final AlertDialog alertDialog = new AlertDialog.Builder(context).setMessage(msg).setPositiveButton(okResId, okListener)
+		final AlertDialog alertDialog = new AlertDialog.Builder(context).setMessage(msg).setPositiveButton(okResId,
+		                                                                                                                 okListener)
 		                                                                .setNegativeButton(cancelResId, cancelListener).create();
 		alertDialog.setCancelable(false);
 		alertDialog.setCanceledOnTouchOutside(false);
@@ -186,5 +189,24 @@ public class AndroidUtils {
 
 	public static boolean isJellyBean() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+	}
+
+	public static void moveCursorEnd(final EditText editText) {
+		editText.setSelection(editText.getText().length());
+	}
+
+	public static void moveCursorEnd(final ErrorEdit edit) {
+		final EditText editText = edit.getEditText();
+		editText.setSelection(edit.getText().length());
+	}
+
+	public static boolean isValidEmail(CharSequence target) {
+		return !TextUtils.isEmpty(target) && android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+	}
+
+	public static String getDevicePhoneNumber(final Context context, final int defaultResId) {
+		final TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		final String mPhoneNumber = telephonyManager.getLine1Number();
+		return TextUtils.isEmpty(mPhoneNumber) ? context.getString(defaultResId) : mPhoneNumber;
 	}
 }

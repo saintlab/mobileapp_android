@@ -12,13 +12,13 @@ public interface OmnomActivity {
 	public static final int REQUEST_CODE_ENABLE_BLUETOOTH = 100;
 	public static final int REQUEST_CODE_SCAN_QR = 101;
 
-	void startActivity(Intent intent, int animIn, int animOut, boolean finish);
+	void start(Intent intent, int animIn, int animOut, boolean finish);
 
-	void startActivity(Class<?> cls);
+	void start(Class<?> cls);
 
-	void startActivity(Class<?> cls, boolean finish);
+	void start(Class<?> cls, boolean finish);
 
-	void startActivity(Intent intent, boolean finish);
+	void start(Intent intent, boolean finish);
 
 	public Activity getActivity();
 

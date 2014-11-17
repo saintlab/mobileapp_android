@@ -72,7 +72,7 @@ public class SimpleSplashActivity extends BaseActivity {
 						if(!isFinishing()) {
 							Intent intent = new Intent(SimpleSplashActivity.this, ValidationActivity.class);
 							intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
-							startActivity(intent, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short, true);
+							start(intent, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short, true);
 						}
 					}
 				});
@@ -110,7 +110,7 @@ public class SimpleSplashActivity extends BaseActivity {
 			public void run() {
 				Intent intent = new Intent(SimpleSplashActivity.this, LoginActivity.class);
 				intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_UP);
-				startActivity(intent, android.R.anim.fade_in, android.R.anim.fade_out, true);
+				start(intent, android.R.anim.fade_in, android.R.anim.fade_out, true);
 			}
 		}, getResources().getInteger(R.integer.splash_screen_timeout));
 		getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);

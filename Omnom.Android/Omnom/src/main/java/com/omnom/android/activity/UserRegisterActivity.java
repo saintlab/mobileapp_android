@@ -8,7 +8,9 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
@@ -82,6 +84,15 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	private Subscription mRegisterSubscription;
 
 	@Override
+	protected void handleIntent(final Intent intent) {
+		final String stringExtra = intent.getStringExtra(EXTRA_PHONE);
+		if(!TextUtils.isEmpty(stringExtra)) {
+			editPhone.setText(stringExtra);
+			editPhone.getEditText().setSelection(editPhone.getText().length());
+		}
+	}
+
+	@Override
 	public void initUi() {
 		gc = new GregorianCalendar();
 		gc.add(Calendar.YEAR, -YEAR_OFFSET);
@@ -96,48 +107,96 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		});
 		topPanel.setPaging(FAKE_PAGE_COUNT, 0);
 
-		textAgreement.setMovementMethod(LinkMovementMethod.getInstance());
-		textAgreement.setText(Html.fromHtml(getResources().getString(R.string.register_agreement)));
+		editPhone.getEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(final View v, final boolean hasFocus) {
+				if(hasFocus && TextUtils.isEmpty(editPhone.getText())) {
+					final String value = AndroidUtils.getDevicePhoneNumber(getActivity(), R.string.phone_country_code);
+					editPhone.setText(value);
+					AndroidUtils.moveCursorEnd(editPhone);
+				}
+			}
+		});
+
+		editBirth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(final View v, final boolean hasFocus) {
+				if(hasFocus) {
+					showDatePickerDialog();
+				}
+			}
+		});
+
+		editPhone.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
+				if(actionId == EditorInfo.IME_ACTION_NEXT) {
+					editBirth.requestFocus();
+					return true;
+				}
+				return false;
+			}
+		});
 
 		editBirth.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) {
-				DatePickerDialog dialog = new DatePickerDialog(getActivity(),
-				                                               new DatePickerDialog.OnDateSetListener() {
-					                                               @Override
-					                                               public void onDateSet(DatePicker view,
-					                                                                     int year,
-					                                                                     int monthOfYear,
-					                                                                     int dayOfMonth) {
-					                                               }
-				                                               },
-				                                               gc.get(Calendar.YEAR),
-				                                               gc.get(Calendar.MONTH),
-				                                               gc.get(Calendar.DAY_OF_MONTH));
-				dialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						DatePickerDialog dlg = (DatePickerDialog) dialog;
-						gc.set(dlg.getDatePicker().getYear(), dlg.getDatePicker().getMonth(), dlg.getDatePicker().getDayOfMonth());
-						CharSequence dateFormatted = DateFormat.format("dd/MM/yyyy", gc);
-						editBirth.setText(dateFormatted);
-						dialog.dismiss();
-					}
-				});
-				dialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
-				dialog.show();
+			public void onClick(final View v) {
+				if(editBirth.isFocused()) {
+					showDatePickerDialog();
+				}
 			}
 		});
+
+		textAgreement.setMovementMethod(LinkMovementMethod.getInstance());
+		textAgreement.setText(Html.fromHtml(getResources().getString(R.string.register_agreement)));
+	}
+
+	private void showDatePickerDialog() {
+		AndroidUtils.hideKeyboard(editBirth);
+		DatePickerDialog dialog = new DatePickerDialog(getActivity(),
+		                                               new DatePickerDialog.OnDateSetListener() {
+			                                               @Override
+			                                               public void onDateSet(DatePicker view,
+			                                                                     int year,
+			                                                                     int monthOfYear,
+			                                                                     int dayOfMonth) {
+			                                               }
+		                                               },
+		                                               gc.get(Calendar.YEAR),
+		                                               gc.get(Calendar.MONTH),
+		                                               gc.get(Calendar.DAY_OF_MONTH));
+		dialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				DatePickerDialog dlg = (DatePickerDialog) dialog;
+				gc.set(dlg.getDatePicker().getYear(), dlg.getDatePicker().getMonth(), dlg.getDatePicker().getDayOfMonth());
+				CharSequence dateFormatted = DateFormat.format("dd/MM/yyyy", gc);
+				editBirth.setText(dateFormatted);
+				dialog.dismiss();
+			}
+		});
+		dialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		dialog.show();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		if(mFirstStart) {
+			postDelayed(getResources().getInteger(android.R.integer.config_longAnimTime) + 200, new Runnable() {
+				@Override
+				public void run() {
+					AndroidUtils.showKeyboard(editName.getEditText());
+				}
+			});
+		}
+
 		if(topPanel.isAlphaVisible()) {
 			topPanel.postDelayed(new Runnable() {
 				@Override
@@ -153,9 +212,12 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.btn_right)
 	public void doRegister(final View view) {
+		textError.setText(StringUtils.EMPTY_STRING);
+
 		if(!validate()) {
 			return;
 		}
+
 		AndroidUtils.hideKeyboard(getActivity());
 		topPanel.showProgress(true);
 		final AuthRegisterRequest request = AuthRegisterRequest.create(AndroidUtils.getInstallId(this),
@@ -181,8 +243,8 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 							                                         intent.putExtra(EXTRA_PHONE, request.getPhone());
 							                                         intent.putExtra(EXTRA_CONFIRM_TYPE,
 							                                                         ConfirmPhoneActivity.TYPE_REGISTER);
-							                                         startActivity(intent, R.anim.slide_in_right, R.anim.slide_out_left,
-							                                                       false);
+							                                         start(intent, R.anim.slide_in_right, R.anim.slide_out_left,
+							                                               false);
 							                                         topPanel.showProgress(false);
 						                                         }
 					                                         });
@@ -213,6 +275,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		final boolean emptyName = TextUtils.isEmpty(name);
 		final boolean emptyPhone = TextUtils.isEmpty(phone);
 		final boolean emptyEmail = TextUtils.isEmpty(email);
+		final boolean correctEmail = AndroidUtils.isValidEmail(email);
 		if(emptyName) {
 			editName.setError(R.string.you_forgot_to_enter_name);
 		}
@@ -221,8 +284,10 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		}
 		if(emptyEmail) {
 			editEmail.setError(R.string.you_forgot_to_enter_email);
+		} else if(!correctEmail) {
+			editEmail.setError(R.string.invalid_email);
 		}
-		return !emptyEmail && !emptyName && !emptyPhone;
+		return !emptyEmail && !emptyName && !emptyPhone && correctEmail;
 	}
 
 	@Override

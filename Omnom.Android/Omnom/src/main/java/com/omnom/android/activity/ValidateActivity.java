@@ -78,7 +78,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		}
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
-		context.startActivity(intent, enterAnim, exitAnim, !isDemo);
+		context.start(intent, enterAnim, exitAnim, !isDemo);
 	}
 
 	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
