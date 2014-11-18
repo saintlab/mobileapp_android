@@ -3,8 +3,6 @@ package com.omnom.android.activity;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,6 +13,7 @@ import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.view.OrdersViewPager;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
@@ -73,10 +72,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 		mIndicator.setViewPager(mPager);
 		mPager.setOnPageChangeListener(mIndicator);
 		mTextInfo.setText(getString(R.string.your_has_n_orders, mPagerAdapter.getCount()));
-		final Drawable background = getWindow().getDecorView().getBackground();
-		background.mutate();
-		background.setColorFilter(bgColor, PorterDuff.Mode.MULTIPLY);
-		background.invalidateSelf();
+		AndroidUtils.setAccentColor(getWindow(), bgColor);
 	}
 
 	@Override

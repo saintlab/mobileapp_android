@@ -270,7 +270,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	private void onPayOk(AcquiringPollingResponse response) {
 		Log.d(TAG, "status = " + response.getStatus());
 		mBtnPay.setEnabled(true);
-		ThanksActivity.start(this, REQUEST_CODE_PAYMENT_OK);
+		ThanksActivity.start(this, REQUEST_CODE_PAYMENT_OK, mAccentColor);
 	}
 
 	private void pay(final double amount, final int tip) {
