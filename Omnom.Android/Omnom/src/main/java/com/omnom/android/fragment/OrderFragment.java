@@ -9,7 +9,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -77,10 +76,6 @@ public class OrderFragment extends Fragment {
 
 	private int mCheckedId = WRONG_VALUE;
 
-	public static final int LIST_TRASNLATION_ACTIVE = -480;
-
-	public static final int LIST_HEIGHT = 900;
-
 	public static final float FRAGMENT_SCALE_RATIO_SMALL = 0.8f;
 
 	public static final float FRAGMENT_SCALE_RATIO_X_NORMAL = 1.0f;
@@ -89,7 +84,6 @@ public class OrderFragment extends Fragment {
 
 	public static final int PICKER_MIN_VALUE = 0;
 
-	public static final int PAYMENT_TRANSLATION_Y = 200;
 
 	public static class PaymentDetails implements Parcelable {
 		public static final Creator<PaymentDetails> CREATOR = new Creator<PaymentDetails>() {
@@ -254,6 +248,12 @@ public class OrderFragment extends Fragment {
 
 	private boolean mSingle;
 
+	private int mListTrasnlationActive;
+
+	private int mPaymentTranslationY;
+
+	private int mListHeight;
+
 	public OrderFragment() {
 	}
 
@@ -281,7 +281,7 @@ public class OrderFragment extends Fragment {
 	@Subscribe
 	public void onSplitCommit(SplitHideEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
-			list.animate().translationY(LIST_TRASNLATION_ACTIVE).start();
+			list.animate().translationY(mListTrasnlationActive).start();
 		}
 	}
 
@@ -325,6 +325,11 @@ public class OrderFragment extends Fragment {
 		final View view = inflater.inflate(R.layout.fragment_order, container, false);
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
 		mFontSmall = getResources().getDimension(R.dimen.font_large);
+
+		mListTrasnlationActive = getResources().getDimensionPixelSize(R.dimen.order_list_trasnlation_active);
+		mPaymentTranslationY = getResources().getDimensionPixelSize(R.dimen.order_payment_translation_y);
+		mListHeight = getResources().getDimensionPixelSize(R.dimen.order_list_height);
+
 		ButterKnife.inject(this, view);
 		return view;
 	}
@@ -377,11 +382,11 @@ public class OrderFragment extends Fragment {
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
 			mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
 
-			mFragmentView.animate().translationYBy(-LIST_HEIGHT).setDuration(0).start();
-			mFragmentView.animate().translationYBy(LIST_HEIGHT).setStartDelay((mPosition + 1) * 350).setDuration(850).start();
+			mFragmentView.animate().translationYBy(-mListHeight).setDuration(0).start();
+			mFragmentView.animate().translationYBy(mListHeight).setStartDelay((mPosition + 1) * 350).setDuration(850).start();
 		} else if(mSingle) {
 			ViewUtils.setVisible(getPanelPayment(), true);
-			list.setTranslationY(LIST_TRASNLATION_ACTIVE);
+			list.setTranslationY(mListTrasnlationActive);
 			zoomInFragment((OrdersActivity) getActivity());
 		} else {
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
@@ -421,9 +426,9 @@ public class OrderFragment extends Fragment {
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 		if(mAnimate) {
-			AnimationUtils.scaleHeight(list, LIST_HEIGHT);
+			AnimationUtils.scaleHeight(list, mListHeight);
 		} else {
-			ViewUtils.setHeight(list, LIST_HEIGHT);
+			ViewUtils.setHeight(list, mListHeight);
 		}
 
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -454,7 +459,7 @@ public class OrderFragment extends Fragment {
 		AnimationUtils.animateAlpha(txtTitle, false);
 		AndroidUtils.scrollEnd(list);
 		activity.showOther(mPosition, false);
-		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, LIST_TRASNLATION_ACTIVE).start();
+		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, mListTrasnlationActive).start();
 	}
 
 	public boolean isDownscaled() {return list.getTranslationY() == 0;}
@@ -521,8 +526,8 @@ public class OrderFragment extends Fragment {
 							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
 
-							list.animate().translationYBy(isVisible ? LIST_TRASNLATION_ACTIVE : -LIST_TRASNLATION_ACTIVE).start();
-							getPanelPayment().animate().yBy(isVisible ? PAYMENT_TRANSLATION_Y : -PAYMENT_TRANSLATION_Y).start();
+							list.animate().translationYBy(isVisible ? mListTrasnlationActive : -mListTrasnlationActive).start();
+							getPanelPayment().animate().yBy(isVisible ? mPaymentTranslationY : -mPaymentTranslationY).start();
 
 							mCurrentKeyboardVisility = isVisible;
 							editAmount.setCursorVisible(isVisible);
@@ -654,8 +659,8 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void showCustomTips(boolean visible) {
-		list.animate().translationYBy(visible ? LIST_TRASNLATION_ACTIVE : -LIST_TRASNLATION_ACTIVE).start();
-		getPanelPayment().animate().yBy(visible ? -PAYMENT_TRANSLATION_Y : PAYMENT_TRANSLATION_Y).start();
+		list.animate().translationYBy(visible ? mListTrasnlationActive : -mListTrasnlationActive).start();
+		getPanelPayment().animate().yBy(visible ? -mPaymentTranslationY : mPaymentTranslationY).start();
 		pickerTips.setVisibility(visible ? View.VISIBLE : View.GONE);
 
 		txtTipsHint.setVisibility(visible ? View.VISIBLE : View.GONE);

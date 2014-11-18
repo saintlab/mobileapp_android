@@ -71,6 +71,8 @@ public class BillSplitFragment extends Fragment {
 
 	private SparseBooleanArrayParcelable mStates;
 
+	private int mListHeight;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
@@ -95,7 +97,8 @@ public class BillSplitFragment extends Fragment {
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
 		mFragmentView = view;
-		mFragmentView.setTranslationY(-OrderFragment.LIST_HEIGHT);
+		mListHeight = getResources().getDimensionPixelSize(R.dimen.order_list_height);
+		mFragmentView.setTranslationY(-mListHeight);
 		mFragmentView.setAlpha(0.5f);
 		mFragmentView.animate().alpha(1).translationY(0).start();
 
@@ -154,7 +157,7 @@ public class BillSplitFragment extends Fragment {
 		final ViewPropertyAnimator viewPropertyAnimator = mFragmentView
 				.animate()
 				.setDuration(getResources().getInteger(R.integer.listview_animation_delay))
-				.alpha(0).translationY(-OrderFragment.LIST_HEIGHT);
+				.alpha(0).translationY(-mListHeight);
 		viewPropertyAnimator.setListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
