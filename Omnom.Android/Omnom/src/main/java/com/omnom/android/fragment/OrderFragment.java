@@ -525,6 +525,7 @@ public class OrderFragment extends Fragment {
 						if(mCurrentKeyboardVisility != isVisible) {
 							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
+							ViewUtils.setVisible(radioGroup, !isVisible);
 
 							list.animate().translationYBy(isVisible ? mListTrasnlationActive : -mListTrasnlationActive).start();
 							getPanelPayment().animate().yBy(isVisible ? mPaymentTranslationY : -mPaymentTranslationY).start();

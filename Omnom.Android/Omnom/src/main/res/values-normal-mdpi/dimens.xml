@@ -13,7 +13,8 @@
     <dimen name="card_area_margin_top">24dp</dimen>
 
     <dimen name="order_list_trasnlation_active">-260dp</dimen>
-    <dimen name="order_payment_translation_y">100dp</dimen>
+    <dimen name="order_payment_translation_y">20dp</dimen>
     <dimen name="order_list_height">360dp</dimen>
     <dimen name="font_order_amont_edit">40sp</dimen>
+    <dimen name="order_edit_title_margin">-16dp</dimen>
 </resources>
