@@ -2,6 +2,7 @@ package com.omnom.android.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -11,7 +12,6 @@ import android.view.ViewPropertyAnimator;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.cards.Card;
@@ -57,15 +57,19 @@ public class CardsAdapter extends BaseAdapter {
 
 	private final LayoutInflater mInflater;
 
-	private final int mAnimDuration;
+	private int mAnimDuration;
 
-	private final int mAnimDelay;
+	private int mAnimDelay;
 
-	private final Drawable mDrawableRight;
+	private Drawable mDrawableRight;
 
-	private final Gson mGson;
+	private PreferenceProvider mPreferences;
 
-	private final PreferenceProvider mPreferences;
+	private int mColorSelected;
+
+	private int mColorPanDefault;
+
+	private int mColorPanUnregistered;
 
 	private AnimationEndListener mListener;
 
@@ -79,12 +83,17 @@ public class CardsAdapter extends BaseAdapter {
 		mIsDemo = isDemo;
 		mInflater = LayoutInflater.from(context);
 		mCards = cards;
+		init(context);
+	}
+
+	private void init(final Context context) {
+		mPreferences = OmnomApplication.get(mContext).getPreferences();
 		mAnimDuration = context.getResources().getInteger(R.integer.default_animation_duration_short);
 		mAnimDelay = context.getResources().getInteger(R.integer.listview_animation_delay);
-		mDrawableRight = mContext.getResources().getDrawable(
-				R.drawable.selected_card_icon_blue);
-		mGson = new Gson();
-		mPreferences = OmnomApplication.get(mContext).getPreferences();
+		mDrawableRight = mContext.getResources().getDrawable(R.drawable.ic_card_active);
+		mColorSelected = mContext.getResources().getColor(R.color.card_selected);
+		mColorPanDefault = mContext.getResources().getColor(R.color.card_number_default);
+		mColorPanUnregistered = mContext.getResources().getColor(R.color.card_unregistered);
 	}
 
 	@Override
@@ -129,13 +138,15 @@ public class CardsAdapter extends BaseAdapter {
 		final boolean isSelected = !TextUtils.isEmpty(cardId) && cardId.equals(item.getExternalCardId());
 
 		if(isSelected || mIsDemo) {
-			holder.txtCardNumber.setTextColor(mContext.getResources().getColor(R.color.card_number_selected));
-			holder.txtType.setTextColor(mContext.getResources().getColor(R.color.card_type_selected));
+			holder.root.setBackgroundColor(mColorSelected);
+			holder.txtCardNumber.setTextColor(Color.WHITE);
+			holder.txtType.setTextColor(Color.WHITE);
 			holder.txtConfirm.setText(StringUtils.EMPTY_STRING);
 			holder.txtConfirm.setCompoundDrawablesWithIntrinsicBounds(null, null, mDrawableRight, null);
 		} else {
-			holder.txtCardNumber.setTextColor(mContext.getResources().getColor(R.color.card_number_default));
-			holder.txtType.setTextColor(mContext.getResources().getColor(R.color.card_type_default));
+			holder.root.setBackgroundColor(Color.TRANSPARENT);
+			holder.txtCardNumber.setTextColor(mColorPanDefault);
+			holder.txtType.setTextColor(mColorPanDefault);
 			holder.txtConfirm.setText(StringUtils.EMPTY_STRING);
 			holder.txtConfirm.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
 		}
@@ -143,9 +154,9 @@ public class CardsAdapter extends BaseAdapter {
 		if(item.isRegistered()) {
 			holder.txtConfirm.setText(StringUtils.EMPTY_STRING);
 		} else {
-			holder.txtConfirm.setText("Подтвердить");
+			holder.txtCardNumber.setTextColor(mColorPanUnregistered);
+			holder.txtConfirm.setText(R.string.confirm);
 			holder.txtConfirm.setCompoundDrawables(null, null, null, null);
-			holder.root.setBackgroundColor(mContext.getResources().getColor(R.color.profile_hint));
 		}
 
 		if(isAnimate) {

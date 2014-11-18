@@ -212,7 +212,12 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 					                                      new Action1<CardsResponse>() {
 						                                      @Override
 						                                      public void call(final CardsResponse cards) {
-							                                      mList.setAdapter(new CardsAdapter(getActivity(), cards.getCards(),
+							                                      final List<Card> cardsList = cards.getCards();
+							                                      if(cardsList.size() == 1) {
+								                                      mPreferences.setCardId(getActivity(), cardsList.get(0)
+								                                                                                     .getExternalCardId());
+							                                      }
+							                                      mList.setAdapter(new CardsAdapter(getActivity(), cardsList,
 							                                                                        CardsActivity.this, false));
 							                                      mPanelTop.showProgress(false);
 							                                      mPanelTop.showButtonRight(true);
@@ -328,7 +333,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	}
 
 	private void initDividerAnimation() {
-		final ColorDrawable dividerDrawable = new ColorDrawable(getResources().getColor(R.color.profile_hint));
+		final ColorDrawable dividerDrawable = new ColorDrawable(getResources().getColor(R.color.card_unregistered));
 		mList.setDivider(dividerDrawable);
 		dividerAnimation = ValueAnimator.ofInt(0, 255);
 		dividerAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
