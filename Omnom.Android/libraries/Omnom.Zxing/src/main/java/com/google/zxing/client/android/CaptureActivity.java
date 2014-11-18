@@ -193,6 +193,7 @@ public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callb
 		cameraManager = new CameraManager(getApplication());
 
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
+		viewfinderView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		viewfinderView.setCameraManager(cameraManager);
 
 		resultView = findViewById(R.id.result_view);
