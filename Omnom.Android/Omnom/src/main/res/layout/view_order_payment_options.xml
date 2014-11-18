@@ -218,7 +218,7 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
         android:layout_marginBottom="-16dp"
-        android:text="@string/tips"
+        android:text="@string/title_plus_tips"
         android:visibility="gone"/>
 
 </RelativeLayout>
