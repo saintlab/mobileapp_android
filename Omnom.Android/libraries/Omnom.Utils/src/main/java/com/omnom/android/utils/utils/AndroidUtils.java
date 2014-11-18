@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,6 +19,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -208,5 +211,12 @@ public class AndroidUtils {
 		final TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 		final String mPhoneNumber = telephonyManager.getLine1Number();
 		return TextUtils.isEmpty(mPhoneNumber) ? context.getString(defaultResId) : mPhoneNumber;
+	}
+
+	public static void setAccentColor(Window window, int color) {
+		final Drawable background = window.getDecorView().getBackground();
+		background.mutate();
+		background.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+		background.invalidateSelf();
 	}
 }

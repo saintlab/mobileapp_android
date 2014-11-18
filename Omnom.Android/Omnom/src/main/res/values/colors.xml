@@ -9,6 +9,8 @@
     <color name="list_header">#e5e5e5</color>
     <color name="profile_hint">#aaa</color>
 
+    <color name="info_hint">#7f000000</color>
+
     <color name="light_blue">#488ee1</color>
 
     <color name="white_transparent">#ddffffff</color>

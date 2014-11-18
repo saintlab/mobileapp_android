@@ -224,7 +224,7 @@
     <style name="ConfirmCode">
         <item name="android:minWidth">24dp</item>
         <item name="android:layout_width">24dp</item>
-        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingLeft">@dimen/activity_horizontal_margin_small</item>
         <item name="android:paddingRight">@dimen/activity_horizontal_margin_small</item>
         <item name="android:singleLine">true</item>

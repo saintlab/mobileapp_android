@@ -19,7 +19,7 @@
         android:layout_below="@id/panel_top"
         android:layout_centerHorizontal="true"
         android:background="@drawable/card_area"
-        android:layout_marginTop="@dimen/activity_vertical_margin_large">
+        android:layout_marginTop="@dimen/card_area_margin_top">
 
         <LinearLayout
             android:id="@+id/panel_camera"
