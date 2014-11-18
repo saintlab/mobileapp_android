@@ -18,7 +18,7 @@ public class EnteringActivity extends BaseOmnomFragmentActivity {
 	public static void start(BaseOmnomActivity activity, int animIn, int animOut) {
 		final Intent intent = new Intent(activity, EnteringActivity.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_UP);
-		activity.startActivity(intent, animIn, animOut, true);
+		activity.start(intent, animIn, animOut, true);
 	}
 
 	public static void start(BaseOmnomActivity activity) {
@@ -37,13 +37,13 @@ public class EnteringActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.btn_register)
 	public void doRegister() {
 		final Intent intent = new Intent(this, UserRegisterActivity.class);
-		startActivity(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
+		start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
 	}
 
 	@OnClick(R.id.btn_enter)
 	public void doEnter() {
 		final Intent intent = new Intent(this, LoginActivity.class);
-		startActivity(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
+		start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
 	}
 
 	@Override

@@ -157,9 +157,9 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 				AnimationUtils.animateAlpha(mTextCamera, true);
 				mImgCamera.animate().x(cameraX - panelX).start();
 				mImgCamera.animate().translationY(0).start();
-				mEditCardCvv.animate().translationY(v).start();
-				mEditCardExpDate.animate().translationY(v).start();
-				mEditCardNumber.animate().translationY(v).start();
+				mEditCardCvv.animate().translationY(0).start();
+				mEditCardExpDate.animate().translationY(0).start();
+				mEditCardNumber.animate().translationY(0).start();
 				mImgCamera.setBackgroundDrawable(getResources().getDrawable(R.drawable.scan_frame));
 			}
 			mMinimized = minimize;

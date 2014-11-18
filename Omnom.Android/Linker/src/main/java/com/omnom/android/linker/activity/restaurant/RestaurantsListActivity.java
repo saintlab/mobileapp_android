@@ -30,7 +30,7 @@ public class RestaurantsListActivity extends BaseListActivity {
 	@OnClick(R.id.btn_profile)
 	public void onProfile() {
 		if(BuildConfig.DEBUG) {
-			startActivity(new Intent(this, BeaconsChartActivity.class), false);
+			start(new Intent(this, BeaconsChartActivity.class), false);
 		} else {
 			UserProfileActivity.start(this, true);
 		}

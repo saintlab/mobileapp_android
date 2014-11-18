@@ -58,7 +58,7 @@ public class UserProfileActivity extends BaseActivity {
 	public static void start(OmnomActivity activity, boolean animate) {
 		final Intent intent = new Intent(activity.getActivity(), UserProfileActivity.class);
 		intent.putExtra(Extras.EXTRA_ANIMATE, animate);
-		activity.startActivity(intent, false);
+		activity.start(intent, false);
 	}
 
 	@InjectView(R.id.img_user)

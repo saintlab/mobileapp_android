@@ -20,9 +20,10 @@
     <string name="you_forgot_to_enter_name">Вы забыли ввести имя</string>
     <string name="you_forgot_to_enter_phone">Вы забыли ввести номер телефона</string>
     <string name="you_forgot_to_enter_email">Вы забыли ввести e-mail</string>
+    <string name="invalid_email">Некорректный e-mail</string>
     <string name="proceed">Далее</string>
     <string name="title_activity_confirm_phone">ConfirmPhoneActivity</string>
-    <string name="confirm_code_sms_text">Должна прийти\nSMS с кодом на номер\n%1$s</string>
+    <string name="confirm_code_sms_text">Введите код из SMS,\nрисланного на номер\n%1$s</string>
     <string name="request_new_confirmation_code">Выслать новый код</string>
     <string name="create_account">Создать аккаунт</string>
     <string name="ok">OK</string>
@@ -30,7 +31,7 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_validate">ValidateActivity</string>
     <string name="waiter">Официант</string>
-    <string name="bill">Счет</string>
+    <string name="bill">Счёт</string>
     <string name="title_activity_orders">OrdersActivity</string>
     <string name="there_are_no_orders_on_this_table">На данном столе нет заказов</string>
     <string name="title_activity_add_card">AddCardActivity</string>
@@ -66,4 +67,9 @@
     <string name="title_plus_tips">+ Чаевые</string>
     <string name="your_has_n_orders">На вашем столике\nраздельных счетов: %1$s</string>
     <string name="demo_mode">Демо-режим</string>
+    <string name="login_havent_account_yet">Ещё нет аккаунта? Прошу сюда -</string>
+    <string name="login_havent_account_registration">регистрация</string>
+    <string name="phone_country_code">+7</string>
+    <string name="are_you_to_quit">Вы действительно хотите выйти?</string>
+    <string name="quit">Выйти</string>
 </resources>

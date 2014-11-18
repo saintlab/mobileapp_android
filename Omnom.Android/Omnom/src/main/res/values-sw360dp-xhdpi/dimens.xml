@@ -8,4 +8,15 @@
     <dimen name="order_items_list_height_collapsed">240dp</dimen>
     <dimen name="card_frame_width">320dp</dimen>
     <dimen name="card_frame_height">184dp</dimen>
+
+    <dimen name="loader_size">230dp</dimen>
+    <dimen name="loader_size_huge">900dp</dimen>
+    <dimen name="loader_edit_with">200dp</dimen>
+    <dimen name="loader_margin_top">-96dp</dimen>
+    <dimen name="loader_progress_size">260dp</dimen>
+    <dimen name="loader_logo_size">220dp</dimen>
+    <dimen name="restaurant_logo_size">72dp</dimen>
+
+    <dimen name="profile_avatar_size">156dp</dimen>
+    <dimen name="card_area_margin_top">48dp</dimen>
 </resources>
