@@ -39,8 +39,6 @@
         android:paddingBottom="@dimen/activity_horizontal_margin_medium"
         android:layout_gravity="bottom" />
 
-    <include layout="@layout/view_order_payment_options"/>
-
     <com.omnom.android.utils.view.NumberPicker
         android:id="@+id/tips_picker"
         android:layout_width="match_parent"

@@ -58,6 +58,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
+import butterknife.Optional;
 
 import static butterknife.ButterKnife.findById;
 
@@ -83,6 +84,17 @@ public class OrderFragment extends Fragment {
 	public static final int PICKER_MAX_VALUE = 200;
 
 	public static final int PICKER_MIN_VALUE = 0;
+
+	@Nullable
+	private RadioButton btnTips1;
+	@Nullable
+	private RadioButton btnTips2;
+	@Nullable
+	private RadioButton btnTips3;
+	@Nullable
+	private RadioButton btnTips4;
+	@Nullable
+	private RadioGroup radioGroup;
 
 	public static class PaymentDetails implements Parcelable {
 		public static final Creator<PaymentDetails> CREATOR = new Creator<PaymentDetails>() {
@@ -165,22 +177,6 @@ public class OrderFragment extends Fragment {
 	@InjectView(android.R.id.list)
 	protected OmnomListView list = null;
 
-	@InjectView(R.id.radio_tips)
-	protected RadioGroup radioGroup;
-
-	@InjectView(R.id.radio_tips_1)
-	protected RadioButton btnTips1;
-
-	@InjectView(R.id.radio_tips_2)
-	protected RadioButton btnTips2;
-
-	@InjectView(R.id.radio_tips_3)
-	protected RadioButton btnTips3;
-
-	@InjectView(R.id.radio_tips_4)
-	protected RadioButton btnTips4;
-
-	@InjectView(R.id.edit_payment_amount)
 	protected EditText editAmount;
 
 	@InjectView(R.id.txt_custom_tips)
@@ -363,7 +359,20 @@ public class OrderFragment extends Fragment {
 	public View getPanelPayment() {
 		final View panelPayment = findById(mFragmentView, R.id.panel_order_payment);
 		if (panelPayment == null) {
-			return stubPaymentOptions.inflate();
+			View inflate = stubPaymentOptions.inflate();
+			editAmount = (EditText) inflate.findViewById(R.id.edit_amount);
+			btnTips1 = (RadioButton) inflate.findViewById(R.id.radio_tips_1);
+			btnTips2 = (RadioButton) inflate.findViewById(R.id.radio_tips_2);
+			btnTips3 = (RadioButton) inflate.findViewById(R.id.radio_tips_3);
+			btnTips4 = (RadioButton) inflate.findViewById(R.id.radio_tips_4);
+			radioGroup = (RadioGroup) inflate.findViewById(R.id.radio_tips);
+			btnTips2.setChecked(true);
+			final BigDecimal amount = getEnteredAmount();
+			updatePaymentTipsAmount(btnTips1, amount);
+			updatePaymentTipsAmount(btnTips2, amount);
+			updatePaymentTipsAmount(btnTips3, amount);
+			updatePaymentTipsAmount(btnTips4, amount);
+			return inflate;
 		} else {
 			return panelPayment;
 		}
@@ -400,13 +409,6 @@ public class OrderFragment extends Fragment {
 		initRadioButtons();
 		initKeyboardListener();
 		initAmount();
-
-		btnTips2.setChecked(true);
-		final BigDecimal amount = getEnteredAmount();
-		updatePaymentTipsAmount(btnTips1, amount);
-		updatePaymentTipsAmount(btnTips2, amount);
-		updatePaymentTipsAmount(btnTips3, amount);
-		updatePaymentTipsAmount(btnTips4, amount);
 	}
 
 	@OnClick(R.id.btn_pay)
@@ -509,7 +511,8 @@ public class OrderFragment extends Fragment {
 		});
 	}
 
-	private void updatePayButton(BigDecimal amount) {
+	private void updatePayButton(final BigDecimal amount) {
+		btnPay.setEnabled(BigDecimal.ZERO.compareTo(amount) != 0);
 		btnPay.setText(getString(R.string.pay_amount, amount + getCurrencySuffix()));
 	}
 
@@ -779,8 +782,18 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void updatePaymentTipsAmount(final CompoundButton btn, final BigDecimal amount) {
-		final boolean percentTips = OrderHelper.isPercentTips(mOrder, amount);
 		final boolean isOther = btn.getId() == R.id.radio_tips_4;
+		if (BigDecimal.ZERO.compareTo(amount) == 0 && mOrder.getPaidAmount() == 0) {
+			updatePayButton(BigDecimal.ZERO);
+			btn.setChecked(false);
+			if (!isOther) {
+				final int percent = Integer.parseInt((String) btn.getTag());
+				btn.setText(getString(R.string.tip_percent, percent));
+				btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSmall);
+			}
+			return;
+		}
+		final boolean percentTips = OrderHelper.isPercentTips(mOrder, amount);
 		if (percentTips && !isOther) {
 			final String tag = (String) btn.getTag();
 			final int percent = Integer.parseInt(tag);
