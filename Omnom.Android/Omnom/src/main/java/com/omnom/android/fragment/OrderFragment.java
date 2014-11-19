@@ -688,7 +688,7 @@ public class OrderFragment extends Fragment {
 
 	private BigDecimal getEnteredAmount() {
 		final String filtered = StringUtils.filterAmount(editAmount.getText().toString());
-		if(TextUtils.isEmpty(filtered)) {
+		if(TextUtils.isEmpty(filtered) || !StringUtils.hasDigits(filtered)) {
 			return BigDecimal.ZERO;
 		}
 		return new BigDecimal(filtered);
