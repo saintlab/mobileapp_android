@@ -390,7 +390,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		Picasso picasso = Picasso.with(getActivity());
 		picasso.setIndicatorsEnabled(true);
 		picasso.setLoggingEnabled(true);
-		picasso.load(restaurant.getDecoration().getBackgroundImage()).into(mTarget);
+		picasso.load(RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics())).into(mTarget);
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override
