@@ -11,6 +11,7 @@ import com.omnom.android.R;
 import com.omnom.android.beacon.BeaconFilter;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
@@ -29,6 +30,8 @@ import rx.functions.Func1;
 
 public class ValidateActivityBle extends ValidateActivity {
 
+	private static final String TAG = ValidateActivityBle.class.getSimpleName();
+
 	private final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -37,10 +40,15 @@ public class ValidateActivityBle extends ValidateActivity {
 	};
 
 	private BluetoothAdapter.LeScanCallback mLeScanCallback;
+
 	private BluetoothAdapter mBluetoothAdapter;
+
 	private BeaconParser parser;
+
 	private ArrayList<Beacon> mBeacons = new ArrayList<Beacon>();
+
 	private Subscription mValidateSubscribtion;
+
 	private Subscription mFindBeaconSubscription;
 
 	@Override
@@ -129,29 +137,43 @@ public class ValidateActivityBle extends ValidateActivity {
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
 					final TableDataResponse[] table = new TableDataResponse[1];
-					mFindBeaconSubscription = AndroidObservable.bindActivity(getActivity(), api.findBeacon(beacon).flatMap(
-							new Func1<TableDataResponse, Observable<Restaurant>>() {
-								@Override
-								public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
-									if(tableDataResponse.hasAuthError()) {
-										EnteringActivity.start(ValidateActivityBle.this);
-										throw new RuntimeException("Wrong auth token");
-									} else {
-										table[0] = tableDataResponse;
-										return api.getRestaurant(tableDataResponse.getRestaurantId());
-									}
-								}
-							})).subscribe(new Action1<Restaurant>() {
-						@Override
-						public void call(final Restaurant restaurant) {
-							onDataLoaded(restaurant, table[0]);
-						}
-					}, new Action1<Throwable>() {
-						@Override
-						public void call(Throwable throwable) {
-							// TODO:
-						}
-					});
+					mFindBeaconSubscription = AndroidObservable.bindActivity(getActivity(),
+					                                                         api.findBeacon(beacon)
+					                                                            .flatMap(
+							                                                            new Func1<TableDataResponse,
+									                                                            Observable<Restaurant>>() {
+								                                                            @Override
+								                                                            public Observable<Restaurant> call
+										                                                            (TableDataResponse tableDataResponse) {
+									                                                            if(tableDataResponse.hasAuthError()) {
+										                                                            EnteringActivity.start(
+												                                                            ValidateActivityBle.this);
+										                                                            throw new RuntimeException(
+												                                                            "Wrong auth token");
+									                                                            } else {
+										                                                            table[0] = tableDataResponse;
+										                                                            return api.getRestaurant(
+												                                                            tableDataResponse
+														                                                            .getRestaurantId(),
+												                                                            mPreloadBackgroundFunction);
+									                                                            }
+								                                                            }
+							                                                            }))
+					                                           .subscribe(
+							                                           new Action1<Restaurant>() {
+								                                           @Override
+								                                           public void call(final Restaurant restaurant) {
+									                                           onDataLoaded(restaurant, table[0]);
+								                                           }
+							                                           },
+							                                           new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+								                                           @Override
+								                                           protected void onError(final Throwable throwable) {
+									                                           mErrorHelper.showErrorDemo(
+											                                           LoaderError.NO_CONNECTION_TRY,
+											                                           mInternetErrorClickListener);
+								                                           }
+							                                           });
 				}
 			}
 		});

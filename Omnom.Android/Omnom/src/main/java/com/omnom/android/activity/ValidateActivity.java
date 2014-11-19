@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
@@ -44,6 +45,7 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +60,7 @@ import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 import static butterknife.ButterKnife.findById;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
@@ -86,6 +89,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		protected void onThrowable(Throwable throwable) {
 			loader.stopProgressAnimation(true);
 			if(throwable instanceof RetrofitError) {
+				throwable.printStackTrace();
 				final RetrofitError cause = (RetrofitError) throwable;
 				if(cause.getResponse() != null) {
 					// TODO: Refactor this ugly piece of ... code
@@ -96,11 +100,11 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				}
 			}
 			if(throwable instanceof AuthServiceException) {
-				final AuthServiceException authException = (AuthServiceException) throwable;
 				getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
 				EnteringActivity.start(ValidateActivity.this);
 				return;
 			}
+			throwable.printStackTrace();
 			showToastLong(getActivity(), R.string.error_unknown_server_error);
 			finish();
 		}
@@ -156,6 +160,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected TableDataResponse mTable;
 
 	protected boolean mIsDemo = false;
+
+	protected Picasso mPicasso;
+
+	protected Func1<Restaurant, Restaurant> mPreloadBackgroundFunction;
 
 	private int mAnimationType;
 
@@ -224,6 +232,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		mPicasso = Picasso.with(getApplicationContext());
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -235,6 +244,22 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			}
 		});
 		mErrorHelper = new ErrorHelper(loader, txtError, btnErrorRepeat, txtErrorRepeat, btnDemo, errorViews);
+
+		mPreloadBackgroundFunction = new Func1<Restaurant, Restaurant>() {
+			@Override
+			public Restaurant call(final Restaurant restaurant) {
+				final String bgImgUrl = RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics());
+				if(!TextUtils.isEmpty(bgImgUrl)) {
+					try {
+						mPicasso.load(bgImgUrl).get();
+					} catch(IOException e) {
+						Log.e(TAG, "unable to load img = " + bgImgUrl);
+					}
+				}
+				return restaurant;
+			}
+		};
+
 		mTarget = new Target() {
 			@Override
 			public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
@@ -387,10 +412,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			}
 		});
 		loader.animateColor(RestaurantHelper.getBackgroundColor(restaurant));
-		Picasso picasso = Picasso.with(getActivity());
-		picasso.setIndicatorsEnabled(true);
-		picasso.setLoggingEnabled(true);
-		picasso.load(RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics())).into(mTarget);
+		mPicasso.setIndicatorsEnabled(true);
+		mPicasso.setLoggingEnabled(true);
+		mPicasso.load(RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics())).into(mTarget);
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override

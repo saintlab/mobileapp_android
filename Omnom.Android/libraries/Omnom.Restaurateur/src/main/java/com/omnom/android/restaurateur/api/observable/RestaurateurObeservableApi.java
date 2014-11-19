@@ -16,12 +16,15 @@ import java.util.List;
 
 import altbeacon.beacon.Beacon;
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * Created by Ch3D on 11.08.2014.
  */
 public interface RestaurateurObeservableApi {
 	public Observable<Restaurant> getRestaurant(String restaurantId);
+
+	Observable<Restaurant> getRestaurant(String restaurantId, Func1<Restaurant, Restaurant> funcMap);
 
 	public Observable<RestaurantsResponse> getRestaurants();
 

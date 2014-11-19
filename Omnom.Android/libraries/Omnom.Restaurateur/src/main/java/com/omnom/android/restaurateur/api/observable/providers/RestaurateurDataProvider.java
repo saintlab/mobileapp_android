@@ -30,6 +30,7 @@ import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -91,6 +92,7 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 
 	@Override
 	public Observable<TableDataResponse> checkQrCode(String qrData) {
+
 		return mDataService.checkQrCode(qrData).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
@@ -157,6 +159,11 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	@Override
 	public Observable<Restaurant> getRestaurant(String restaurantId) {
 		return mDataService.getRestaurant(restaurantId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<Restaurant> getRestaurant(String restaurantId, Func1<Restaurant, Restaurant> funcMap) {
+		return mDataService.getRestaurant(restaurantId).map(funcMap).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

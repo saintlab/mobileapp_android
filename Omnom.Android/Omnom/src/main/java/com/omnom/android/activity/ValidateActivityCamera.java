@@ -92,24 +92,31 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private void findTableForQr(final String mQrData) {
 		final TableDataResponse[] table = new TableDataResponse[1];
-		mCheckQrSubscribtion = AndroidObservable.bindActivity(this, api.checkQrCode(mQrData).flatMap(
-				new Func1<TableDataResponse, Observable<Restaurant>>() {
-					@Override
-					public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
-						table[0] = tableDataResponse;
-						if(tableDataResponse.hasAuthError()) {
-							throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
-							                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED, tableDataResponse.getError()));
-						}
-						return api.getRestaurant(tableDataResponse.getRestaurantId());
-					}
-				})).subscribe(new Action1<Restaurant>() {
-					              @Override
-					              public void call(final Restaurant restaurant) {
-						              onDataLoaded(restaurant, table[0]);
-					              }
-				              },
-		                      onError);
+		mCheckQrSubscribtion = AndroidObservable.bindActivity(this, api.checkQrCode(mQrData)
+		                                                               .flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
+			                                                               @Override
+			                                                               public Observable<Restaurant> call(TableDataResponse
+					                                                                                                  tableDataResponse) {
+				                                                               table[0] = tableDataResponse;
+				                                                               if(tableDataResponse.hasAuthError()) {
+					                                                               throw new AuthServiceException(
+							                                                               EXTRA_ERROR_WRONG_USERNAME
+									                                                               | EXTRA_ERROR_WRONG_PASSWORD,
+							                                                               new AuthError(
+									                                                               EXTRA_ERROR_AUTHTOKEN_EXPIRED,
+									                                                               tableDataResponse.getError()));
+				                                                               }
+				                                                               return api.getRestaurant(
+						                                                               tableDataResponse.getRestaurantId(),
+						                                                               mPreloadBackgroundFunction);
+			                                                               }
+		                                                               }))
+		                                        .subscribe(new Action1<Restaurant>() {
+			                                        @Override
+			                                        public void call(final Restaurant restaurant) {
+				                                        onDataLoaded(restaurant, table[0]);
+			                                        }
+		                                        }, onError);
 	}
 
 	@Override
