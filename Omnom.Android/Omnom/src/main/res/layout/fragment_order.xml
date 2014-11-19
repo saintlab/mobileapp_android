@@ -47,6 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@android:color/white"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        style="@style/NPWidget.Holo.Light.NumberPicker.Grey"/>
 
 </FrameLayout>

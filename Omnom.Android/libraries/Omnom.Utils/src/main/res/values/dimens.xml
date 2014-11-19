@@ -58,4 +58,6 @@
     <dimen name="font_intro_info">30sp</dimen>
 
     <dimen name="error_text_padding">24dp</dimen>
+
+    <dimen name="picker_drawable_height">40dp</dimen>
 </resources>

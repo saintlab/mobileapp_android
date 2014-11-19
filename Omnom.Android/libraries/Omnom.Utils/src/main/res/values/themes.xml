@@ -59,6 +59,8 @@
     <style name="NPWidget.Holo.Light.NumberPicker.Grey">
         <item name="selectionDivider">@drawable/np_numberpicker_selection_divider_grey</item>
         <item name="virtualButtonPressedDrawable">@null</item>
+        <item name="selectionDividersDistance">@dimen/picker_drawable_height</item>
+        <item name="selectionDividerHeight">1dp</item>
     </style>
 
 </resources>

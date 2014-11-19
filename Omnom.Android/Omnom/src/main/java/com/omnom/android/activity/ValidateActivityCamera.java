@@ -41,8 +41,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 	@Override
 	protected void startLoader() {
 		if(BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
-			//findTableForQr("http://m.2gis.ru/os/"); // mehico
-			findTableForQr("http://omnom.menu/qr/00e7232a4d9d2533e7fa503620c4431b"); // shashlikoff
+			findTableForQr("http://m.2gis.ru/os/"); // mehico
+			//findTableForQr("http://omnom.menu/qr/00e7232a4d9d2533e7fa503620c4431b"); // shashlikoff
 			return;
 		}
 
