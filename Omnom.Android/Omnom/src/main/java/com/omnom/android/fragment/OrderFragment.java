@@ -84,7 +84,6 @@ public class OrderFragment extends Fragment {
 
 	public static final int PICKER_MIN_VALUE = 0;
 
-
 	public static class PaymentDetails implements Parcelable {
 		public static final Creator<PaymentDetails> CREATOR = new Creator<PaymentDetails>() {
 			@Override
@@ -251,6 +250,7 @@ public class OrderFragment extends Fragment {
 	private int mListTrasnlationActive;
 
 	private int mPaymentTranslationY;
+	private int mTipsTranslationY;
 
 	private int mListHeight;
 
@@ -328,6 +328,7 @@ public class OrderFragment extends Fragment {
 
 		mListTrasnlationActive = getResources().getDimensionPixelSize(R.dimen.order_list_trasnlation_active);
 		mPaymentTranslationY = getResources().getDimensionPixelSize(R.dimen.order_payment_translation_y);
+		mTipsTranslationY = getResources().getDimensionPixelSize(R.dimen.order_tips_translation_y);
 		mListHeight = getResources().getDimensionPixelSize(R.dimen.order_list_height);
 
 		ButterKnife.inject(this, view);
@@ -661,7 +662,7 @@ public class OrderFragment extends Fragment {
 
 	private void showCustomTips(boolean visible) {
 		list.animate().translationYBy(visible ? mListTrasnlationActive : -mListTrasnlationActive).start();
-		getPanelPayment().animate().yBy(visible ? -mPaymentTranslationY : mPaymentTranslationY).start();
+		getPanelPayment().animate().yBy(visible ? -mTipsTranslationY : mTipsTranslationY).start();
 		pickerTips.setVisibility(visible ? View.VISIBLE : View.GONE);
 
 		txtTipsHint.setVisibility(visible ? View.VISIBLE : View.GONE);
