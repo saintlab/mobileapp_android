@@ -8,6 +8,8 @@
     <dimen name="loader_margin_top">-82dp</dimen>
     <dimen name="loader_progress_size">224dp</dimen>
     <dimen name="loader_logo_size">140dp</dimen>
+    <dimen name="loader_progress_thickness">10dp</dimen>
+    <item type="dimen" format="float" name="loader_progress_inner_radius">2.265</item>
 
     <dimen name="profile_avatar_size">100dp</dimen>
     <dimen name="card_area_margin_top">24dp</dimen>

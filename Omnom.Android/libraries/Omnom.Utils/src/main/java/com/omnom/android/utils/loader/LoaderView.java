@@ -100,7 +100,7 @@ public class LoaderView extends FrameLayout {
 
 		if(attrs != null) {
 			TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.LoaderView, 0, 0);
-			final int color = getContext().getResources().getColor(R.color.loader_progress);
+			final int color = getContext().getResources().getColor(android.R.color.white);
 			mProgressColor = a.getColor(R.styleable.LoaderView_progress_color, color);
 			a.recycle();
 		}
