@@ -21,6 +21,7 @@ import android.view.ViewStub;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -50,6 +51,7 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -57,7 +59,6 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
-import butterknife.OnClick;
 import butterknife.Optional;
 
 import static butterknife.ButterKnife.findById;
@@ -84,17 +85,6 @@ public class OrderFragment extends Fragment {
 	public static final int PICKER_MAX_VALUE = 200;
 
 	public static final int PICKER_MIN_VALUE = 0;
-
-	@Nullable
-	private RadioButton btnTips1;
-	@Nullable
-	private RadioButton btnTips2;
-	@Nullable
-	private RadioButton btnTips3;
-	@Nullable
-	private RadioButton btnTips4;
-	@Nullable
-	private RadioGroup radioGroup;
 
 	public static class PaymentDetails implements Parcelable {
 		public static final Creator<PaymentDetails> CREATOR = new Creator<PaymentDetails>() {
@@ -168,9 +158,11 @@ public class OrderFragment extends Fragment {
 	@Inject
 	protected RestaurateurObeservableApi api;
 
+	@Optional
 	@InjectViews({R.id.btn_pay, R.id.radio_tips, R.id.txt_tips_title})
 	protected List<View> viewsAmountHide;
 
+	@Optional
 	@InjectViews({R.id.btn_apply, R.id.btn_cancel})
 	protected List<View> viewsAmountShow;
 
@@ -179,7 +171,7 @@ public class OrderFragment extends Fragment {
 
 	protected EditText editAmount;
 
-	@InjectView(R.id.txt_custom_tips)
+	@Nullable
 	protected TextView txtCustomTips;
 
 	@InjectView(R.id.txt_title)
@@ -191,29 +183,44 @@ public class OrderFragment extends Fragment {
 	@InjectView(R.id.stub_payment_options)
 	protected ViewStub stubPaymentOptions;
 
-	@InjectView(R.id.btn_pay)
+	@Nullable
 	protected TextView btnPay;
 
-	@InjectView(R.id.btn_apply)
+	@Nullable
 	protected ImageButton btnApply;
 
-	@InjectView(R.id.btn_cancel)
+	@Nullable
 	protected ImageButton btnCancel;
 
-	@InjectView(R.id.txt_payment_title)
+	@Nullable
 	protected TextView txtPaymentTitle;
 
-	@InjectView(R.id.txt_already_paid)
+	@Nullable
 	protected TextView txtAlreadyPaid;
 
-	@InjectView(R.id.txt_tips_hint)
+	@Nullable
 	protected TextView txtTipsHint;
 
-	@InjectView(R.id.txt_tips_title)
+	@Nullable
 	protected TextView txtTipsTitle;
 
-	@InjectView(R.id.txt_tips_amount_hint)
+	@Nullable
 	protected TextView txtTipsAmountHint;
+
+	@Nullable
+	private RadioButton btnTips1;
+
+	@Nullable
+	private RadioButton btnTips2;
+
+	@Nullable
+	private RadioButton btnTips3;
+
+	@Nullable
+	private RadioButton btnTips4;
+
+	@Nullable
+	private RadioGroup radioGroup;
 
 	private Order mOrder;
 
@@ -246,6 +253,7 @@ public class OrderFragment extends Fragment {
 	private int mListTrasnlationActive;
 
 	private int mPaymentTranslationY;
+
 	private int mTipsTranslationY;
 
 	private int mListHeight;
@@ -276,14 +284,14 @@ public class OrderFragment extends Fragment {
 
 	@Subscribe
 	public void onSplitCommit(SplitHideEvent event) {
-		if (event.getOrderId().equals(mOrder.getId())) {
+		if(event.getOrderId().equals(mOrder.getId())) {
 			list.animate().translationY(mListTrasnlationActive).start();
 		}
 	}
 
 	@Subscribe
 	public void onSplitCommit(OrderSplitCommitEvent event) {
-		if (event.getOrderId().equals(mOrder.getId())) {
+		if(event.getOrderId().equals(mOrder.getId())) {
 			final BigDecimal amount = event.getAmount();
 			final String s = StringUtils.formatCurrency(amount, getCurrencySuffix());
 			editAmount.setText(s);
@@ -294,9 +302,9 @@ public class OrderFragment extends Fragment {
 
 	@Subscribe
 	public void onOrderItemSelected(OrderItemSelectedEvent event) {
-		if (event.getOrderId().equals(mOrder.getId())) {
+		if(event.getOrderId().equals(mOrder.getId())) {
 			mCheckedStates.put(event.getPosition(), event.isSelected());
-			if (hasSelectedItems()) {
+			if(hasSelectedItems()) {
 				initFooter2();
 			} else {
 				initFooter(true);
@@ -306,9 +314,9 @@ public class OrderFragment extends Fragment {
 
 	private boolean hasSelectedItems() {
 		final int size = mCheckedStates.size();
-		for (int i = 0; i < size; i++) {
+		for(int i = 0; i < size; i++) {
 			int key = mCheckedStates.keyAt(i);
-			if (mCheckedStates.get(key) && key < list.getCount() - 1) {
+			if(mCheckedStates.get(key) && key < list.getCount() - 1) {
 				return true;
 			}
 		}
@@ -342,11 +350,11 @@ public class OrderFragment extends Fragment {
 	}
 
 	public void downscale() {
-		if (mFooterView1 != null) {
+		if(mFooterView1 != null) {
 			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
 			ViewUtils.setVisible(billSplit, false);
 		}
-		if (mFooterView2 != null) {
+		if(mFooterView2 != null) {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, false);
 		}
@@ -358,20 +366,74 @@ public class OrderFragment extends Fragment {
 
 	public View getPanelPayment() {
 		final View panelPayment = findById(mFragmentView, R.id.panel_order_payment);
-		if (panelPayment == null) {
+		if(panelPayment == null) {
+			stubPaymentOptions.setLayoutResource(R.layout.view_order_payment_options);
 			View inflate = stubPaymentOptions.inflate();
-			editAmount = (EditText) inflate.findViewById(R.id.edit_amount);
+			editAmount = (EditText) inflate.findViewById(R.id.edit_payment_amount);
+			txtCustomTips = (TextView) inflate.findViewById(R.id.txt_custom_tips);
+			txtPaymentTitle = (TextView) inflate.findViewById(R.id.txt_payment_title);
+			txtAlreadyPaid = (TextView) inflate.findViewById(R.id.txt_already_paid);
+
+			txtTipsHint = (TextView) inflate.findViewById(R.id.txt_tips_hint);
+			txtTipsTitle = (TextView) inflate.findViewById(R.id.txt_tips_title);
+			txtTipsAmountHint = (TextView) inflate.findViewById(R.id.txt_tips_amount_hint);
+
+			btnPay = (Button) inflate.findViewById(R.id.btn_pay);
+			btnPay.setTextColor(mAccentColor);
+			btnPay.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(final View v) {
+					final BigDecimal amount = getEnteredAmount();
+					final BigDecimal tips = getSelectedTips(amount);
+					final BigDecimal amountToPay = amount.add(tips);
+					final PaymentDetails paymentDetails = new PaymentDetails(amountToPay.doubleValue(), tips.doubleValue());
+					final OrdersActivity activity = (OrdersActivity) getActivity();
+					CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS,
+					                    activity.isDemo());
+				}
+			});
+
+			btnApply = (ImageButton) inflate.findViewById(R.id.btn_apply);
+			btnApply.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(final View v) {
+					doApply(v);;
+				}
+			});
+			btnCancel = (ImageButton) inflate.findViewById(R.id.btn_cancel);
+			btnCancel.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(final View v) {
+					doCancel(v);
+				}
+			});
 			btnTips1 = (RadioButton) inflate.findViewById(R.id.radio_tips_1);
 			btnTips2 = (RadioButton) inflate.findViewById(R.id.radio_tips_2);
 			btnTips3 = (RadioButton) inflate.findViewById(R.id.radio_tips_3);
 			btnTips4 = (RadioButton) inflate.findViewById(R.id.radio_tips_4);
 			radioGroup = (RadioGroup) inflate.findViewById(R.id.radio_tips);
+
+			viewsAmountHide = new ArrayList<View>();
+			viewsAmountHide.add(btnPay);
+			viewsAmountHide.add(txtTipsTitle);
+			viewsAmountHide.add(radioGroup);
+
+			viewsAmountShow = new ArrayList<View>();
+			viewsAmountShow.add(btnApply);
+			viewsAmountShow.add(btnCancel);
+
+			initRadioButtons();
+			updateCustomTipsText(0);
 			btnTips2.setChecked(true);
+			initKeyboardListener();
+			initAmount();
+
 			final BigDecimal amount = getEnteredAmount();
 			updatePaymentTipsAmount(btnTips1, amount);
 			updatePaymentTipsAmount(btnTips2, amount);
 			updatePaymentTipsAmount(btnTips3, amount);
 			updatePaymentTipsAmount(btnTips4, amount);
+
 			return inflate;
 		} else {
 			return panelPayment;
@@ -382,13 +444,13 @@ public class OrderFragment extends Fragment {
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 		mFragmentView = view;
 
-		if (mAnimate) {
+		if(mAnimate) {
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
 			mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
 
 			mFragmentView.animate().translationYBy(-mListHeight).setDuration(0).start();
 			mFragmentView.animate().translationYBy(mListHeight).setStartDelay((mPosition + 1) * 350).setDuration(850).start();
-		} else if (mSingle) {
+		} else if(mSingle) {
 			ViewUtils.setVisible(getPanelPayment(), true);
 			list.setTranslationY(mListTrasnlationActive);
 			zoomInFragment((OrdersActivity) getActivity());
@@ -398,31 +460,18 @@ public class OrderFragment extends Fragment {
 		}
 
 		pickerTips.setDividerDrawable(new ColorDrawable(mAccentColor));
-		btnPay.setTextColor(mAccentColor);
 		txtTitle.setText(getString(R.string.bill_number_, mPosition + 1));
 
 		initPicker();
-		updateCustomTipsText(0);
 		initFooter(false);
 		initList();
-
-		initRadioButtons();
-		initKeyboardListener();
-		initAmount();
-	}
-
-	@OnClick(R.id.btn_pay)
-	protected void onPay(View v) {
-		final PaymentDetails paymentDetails = new PaymentDetails(getEnteredAmount().doubleValue(), 0);
-		final OrdersActivity activity = (OrdersActivity) getActivity();
-		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
 	}
 
 	private void initList() {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems(), true));
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-		if (mAnimate) {
+		if(mAnimate) {
 			AnimationUtils.scaleHeight(list, mListHeight);
 		} else {
 			ViewUtils.setHeight(list, mListHeight);
@@ -432,8 +481,8 @@ public class OrderFragment extends Fragment {
 			@Override
 			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
 				final OrdersActivity activity = (OrdersActivity) getActivity();
-				if (isDownscaled()) {
-					if (activity.checkFragment(OrderFragment.this)) {
+				if(isDownscaled()) {
+					if(activity.checkFragment(OrderFragment.this)) {
 						zoomInFragment(activity);
 					}
 				} else {
@@ -444,11 +493,11 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void zoomInFragment(final OrdersActivity activity) {
-		if (mFooterView1 != null) {
+		if(mFooterView1 != null) {
 			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
 			ViewUtils.setVisible(billSplit, true);
 		}
-		if (mFooterView2 != null) {
+		if(mFooterView2 != null) {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, true);
 		}
@@ -467,7 +516,7 @@ public class OrderFragment extends Fragment {
 		editAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
+				if(actionId == EditorInfo.IME_ACTION_DONE) {
 					doApply(v);
 					return true;
 				}
@@ -486,7 +535,7 @@ public class OrderFragment extends Fragment {
 			@Override
 			public void afterTextChanged(Editable s) {
 				final String str = s.toString();
-				if (!str.endsWith(getCurrencySuffix())) {
+				if(!str.endsWith(getCurrencySuffix())) {
 					final String text = editAmount.getText() + getCurrencySuffix();
 					editAmount.setText(text);
 					editAmount.setSelection(text.length() - 1);
@@ -501,9 +550,9 @@ public class OrderFragment extends Fragment {
 		editAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
+				if(hasFocus) {
 					int length = editAmount.getText().length();
-					if (length >= 2) {
+					if(length >= 2) {
 						editAmount.setSelection(length - 2);
 					}
 				}
@@ -522,7 +571,7 @@ public class OrderFragment extends Fragment {
 				AndroidUtils.createKeyboardListener(activityRootView, new AndroidUtils.KeyboardVisibilityListener() {
 					@Override
 					public void onVisibilityChanged(boolean isVisible) {
-						if (mCurrentKeyboardVisility != isVisible) {
+						if(mCurrentKeyboardVisility != isVisible) {
 							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
 							ViewUtils.setVisible(radioGroup, !isVisible);
@@ -533,13 +582,13 @@ public class OrderFragment extends Fragment {
 							mCurrentKeyboardVisility = isVisible;
 							editAmount.setCursorVisible(isVisible);
 
-							if (isVisible) {
+							if(isVisible) {
 								mMode = MODE_AMOUNT;
 								mLastAmount = getEnteredAmount();
 								txtPaymentTitle.setText(R.string.i_m_going_to_pay);
 								editAmount.setSelection(editAmount.getText().length() - 1);
 							} else {
-								if (!mApply) {
+								if(!mApply) {
 									editAmount.setText(StringUtils.formatCurrency(mLastAmount, getCurrencySuffix()));
 								} else {
 									editAmount.setText(StringUtils.formatCurrency(editAmount.getText().toString(), getCurrencySuffix()));
@@ -553,7 +602,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void initFooter(final boolean visible) {
-		if (list.getFooterViewsCount() > 0) {
+		if(list.getFooterViewsCount() > 0) {
 			list.removeFooterView(mFooterView1);
 			list.removeFooterView(mFooterView2);
 		}
@@ -564,7 +613,7 @@ public class OrderFragment extends Fragment {
 		billSplit.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				if (!isDownscaled()) {
+				if(!isDownscaled()) {
 					splitBill();
 				} else {
 					zoomInFragment((OrdersActivity) getActivity());
@@ -574,7 +623,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void initFooter2() {
-		if (list.getFooterViewsCount() > 0) {
+		if(list.getFooterViewsCount() > 0) {
 			list.removeFooterView(mFooterView1);
 			list.removeFooterView(mFooterView2);
 		}
@@ -615,7 +664,7 @@ public class OrderFragment extends Fragment {
 		final CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(final CompoundButton btn, final boolean isChecked) {
-				if (isChecked) {
+				if(isChecked) {
 					final BigDecimal amount = getEnteredAmount();
 					mCheckedId = btn.getId();
 					updatePaymentTipsAmount(btn, amount);
@@ -688,22 +737,21 @@ public class OrderFragment extends Fragment {
 
 	private BigDecimal getEnteredAmount() {
 		final String filtered = StringUtils.filterAmount(editAmount.getText().toString());
-		if (TextUtils.isEmpty(filtered) || !StringUtils.hasDigits(filtered)) {
+		if(TextUtils.isEmpty(filtered) || !StringUtils.hasDigits(filtered)) {
 			return BigDecimal.ZERO;
 		}
 		return new BigDecimal(filtered);
 	}
 
-	@OnClick(R.id.btn_apply)
 	protected void doApply(View v) {
-		if (mMode == MODE_AMOUNT) {
+		if(mMode == MODE_AMOUNT) {
 			mApply = true;
 			AndroidUtils.hideKeyboard(getActivity());
 			mPaymentTitleChanged = true;
 			txtPaymentTitle.setText(R.string.i_m_going_to_pay);
 			mMode = WRONG_VALUE;
 		}
-		if (mMode == MODE_TIPS) {
+		if(mMode == MODE_TIPS) {
 			showCustomTips(false);
 
 			btnTips4.setChecked(true);
@@ -715,19 +763,18 @@ public class OrderFragment extends Fragment {
 		}
 	}
 
-	@OnClick(R.id.btn_cancel)
 	protected void doCancel(View v) {
-		if (mMode == MODE_AMOUNT) {
+		if(mMode == MODE_AMOUNT) {
 			mApply = false;
 			AndroidUtils.hideKeyboard(getActivity());
-			if (!mPaymentTitleChanged) {
+			if(!mPaymentTitleChanged) {
 				txtPaymentTitle.setText(R.string.to_be_paid);
 			}
 			mMode = WRONG_VALUE;
 		}
-		if (mMode == MODE_TIPS) {
+		if(mMode == MODE_TIPS) {
 			showCustomTips(false);
-			if (!btnTips4.getTag().equals(String.valueOf(WRONG_VALUE))) {
+			if(!btnTips4.getTag().equals(String.valueOf(WRONG_VALUE))) {
 				return;
 			}
 			radioGroup.check(mCheckedId);
@@ -738,10 +785,10 @@ public class OrderFragment extends Fragment {
 
 	private BigDecimal getSelectedTips(final BigDecimal amount) {
 		final CompoundButton btn = findById(getActivity(), radioGroup.getCheckedRadioButtonId());
-		if (btn == null) {
+		if(btn == null) {
 			return BigDecimal.ZERO;
 		}
-		if (OrderHelper.isPercentTips(mOrder, amount) || btn.getId() == R.id.radio_tips_4) {
+		if(OrderHelper.isPercentTips(mOrder, amount) || btn.getId() == R.id.radio_tips_4) {
 			final String tag = (String) btn.getTag();
 			final int percent = Integer.parseInt(tag);
 			final int tipsAmount = OrderHelper.getTipsAmount(amount, percent);
@@ -753,10 +800,10 @@ public class OrderFragment extends Fragment {
 	}
 
 	private double getSelectedTips(final CompoundButton btn, final BigDecimal amount) {
-		if (btn == null) {
+		if(btn == null) {
 			return 0;
 		}
-		if (OrderHelper.isPercentTips(mOrder, amount)) {
+		if(OrderHelper.isPercentTips(mOrder, amount)) {
 			final String tag = (String) btn.getTag();
 			final int percent = Integer.parseInt(tag);
 			return OrderHelper.getTipsAmount(amount, percent);
@@ -766,7 +813,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private double getOtherTips(final BigDecimal amount) {
-		if (btnTips4 == null) {
+		if(btnTips4 == null) {
 			return 0;
 		}
 		final String tag = (String) btnTips4.getTag();
@@ -783,10 +830,10 @@ public class OrderFragment extends Fragment {
 
 	private void updatePaymentTipsAmount(final CompoundButton btn, final BigDecimal amount) {
 		final boolean isOther = btn.getId() == R.id.radio_tips_4;
-		if (BigDecimal.ZERO.compareTo(amount) == 0 && mOrder.getPaidAmount() == 0) {
+		if(BigDecimal.ZERO.compareTo(amount) == 0 && mOrder.getPaidAmount() == 0) {
 			updatePayButton(BigDecimal.ZERO);
 			btn.setChecked(false);
-			if (!isOther) {
+			if(!isOther) {
 				final int percent = Integer.parseInt((String) btn.getTag());
 				btn.setText(getString(R.string.tip_percent, percent));
 				btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSmall);
@@ -794,23 +841,23 @@ public class OrderFragment extends Fragment {
 			return;
 		}
 		final boolean percentTips = OrderHelper.isPercentTips(mOrder, amount);
-		if (percentTips && !isOther) {
+		if(percentTips && !isOther) {
 			final String tag = (String) btn.getTag();
 			final int percent = Integer.parseInt(tag);
-			if (percent == WRONG_VALUE) {
+			if(percent == WRONG_VALUE) {
 				btn.setTextSize(mFontSmall);
 				btn.setText(getString(R.string.tips_another));
 				return;
 			}
 			btn.setText(getString(R.string.tip_percent, tag));
-			if (btn.isChecked()) {
+			if(btn.isChecked()) {
 				btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontNormal);
 			} else {
 				btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSmall);
 			}
 		} else {
-			if (isOther) {
-				if (btn.isChecked()) {
+			if(isOther) {
+				if(btn.isChecked()) {
 					btn.setText(getString(R.string.tip_percent, btn.getTag()));
 					btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontNormal);
 				} else {
@@ -819,7 +866,7 @@ public class OrderFragment extends Fragment {
 				}
 			} else {
 				final int fixedTip = (Integer) btn.getTag(R.id.tip);
-				if (fixedTip == WRONG_VALUE) {
+				if(fixedTip == WRONG_VALUE) {
 					btn.setText(getString(R.string.tips_another));
 					btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSmall);
 					return;
@@ -833,7 +880,7 @@ public class OrderFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (getArguments() != null) {
+		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mAccentColor = getArguments().getInt(ARG_COLOR);
 			mAnimate = getArguments().getBoolean(ARG_ANIMATE, false);
@@ -847,12 +894,12 @@ public class OrderFragment extends Fragment {
 	}
 
 	public boolean onBackPressed() {
-		if (isInPickerMode()) {
+		if(isInPickerMode()) {
 			doCancel(null);
 			return true;
 		}
 		final Fragment fragmentByTag = getFragmentManager().findFragmentByTag(BillSplitFragment.TAG);
-		if (fragmentByTag != null) {
+		if(fragmentByTag != null) {
 			BillSplitFragment splitFragment = (BillSplitFragment) fragmentByTag;
 			splitFragment.hide();
 			return true;
