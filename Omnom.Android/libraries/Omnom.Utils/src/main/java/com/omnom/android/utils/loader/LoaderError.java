@@ -8,7 +8,7 @@ import com.omnom.android.utils.R;
 public class LoaderError {
 
 	public static final LoaderError NO_CONNECTION_TRY =
-			new LoaderError(R.drawable.ic_no_connection, R.string.error_unknown_server_error, R.string.try_once_again,
+			new LoaderError(R.drawable.ic_no_connection, R.string.error_no_internet_connection, R.string.try_once_again,
 			                R.drawable.ic_repeat_small);
 
 	public static final LoaderError BLE_DISABLED =

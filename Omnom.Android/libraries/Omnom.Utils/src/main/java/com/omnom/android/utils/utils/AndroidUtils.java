@@ -214,9 +214,23 @@ public class AndroidUtils {
 	}
 
 	public static void setAccentColor(Window window, int color) {
-		final Drawable background = window.getDecorView().getBackground();
+		final Drawable background;
+		final Drawable background1 = window.getDecorView().getBackground();
+		//if(background1 instanceof TransitionDrawable) {
+		//	TransitionDrawable td = (TransitionDrawable) background1;
+		//	background = td.getCurrent();
+		//} else {
+			background = background1;
+		//}
 		background.mutate();
 		background.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+		background.invalidateSelf();
+	}
+
+	public static void clearAccentColor(Window window) {
+		final Drawable background = window.getDecorView().getBackground();
+		background.mutate();
+		background.setColorFilter(null);
 		background.invalidateSelf();
 	}
 }

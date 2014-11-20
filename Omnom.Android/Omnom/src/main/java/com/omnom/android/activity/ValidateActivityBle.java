@@ -3,8 +3,8 @@ package com.omnom.android.activity;
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.graphics.Color;
 import android.os.Build;
-import android.view.View;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
@@ -15,6 +15,7 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
+import com.omnom.android.utils.utils.AndroidUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +32,6 @@ import rx.functions.Func1;
 public class ValidateActivityBle extends ValidateActivity {
 
 	private static final String TAG = ValidateActivityBle.class.getSimpleName();
-
-	private final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			validate();
-		}
-	};
 
 	private BluetoothAdapter.LeScanCallback mLeScanCallback;
 
@@ -98,6 +92,8 @@ public class ValidateActivityBle extends ValidateActivity {
 
 	@Override
 	protected void startLoader() {
+		clearErrors();
+
 		loader.startProgressAnimation(getResources().getInteger(R.integer.validation_duration), new Runnable() {
 			@Override
 			public void run() {
@@ -113,6 +109,10 @@ public class ValidateActivityBle extends ValidateActivity {
 			                                         public void call(Boolean hasNoErrors) {
 				                                         if(hasNoErrors) {
 					                                         readBeacons();
+				                                         } else {
+					                                         AndroidUtils.setAccentColor(getWindow(), Color.WHITE);
+					                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
+					                                         findViewById(R.id.panel_bottom).animate().translationY(200).start();
 				                                         }
 			                                         }
 		                                         }, new Action1<Throwable>() {
