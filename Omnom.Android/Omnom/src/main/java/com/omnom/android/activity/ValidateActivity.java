@@ -302,13 +302,17 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected abstract void startLoader();
 
 	public void onBill(final View v) {
+		v.setEnabled(false);
 		mOrdersSubscription = AndroidObservable.bindActivity(this, api.getOrders(mTable.getRestaurantId(), mTable.getId()))
 		                                       .subscribe(new Action1<List<Order>>() {
 			                                       @Override
 			                                       public void call(List<Order> orders) {
+				                                       v.setEnabled(true);
 				                                       if(!orders.isEmpty()) {
-					                                       OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders),
-					                                                            mRestaurant.getDecoration().getBackgroundColor(), mIsDemo);
+					                                       OrdersActivity.start(ValidateActivity.this,
+					                                                            new ArrayList<Order>(orders),
+					                                                            mRestaurant.getDecoration().getBackgroundColor(),
+					                                                            mIsDemo);
 				                                       } else {
 					                                       showToastLong(getActivity(), R.string.there_are_no_orders_on_this_table);
 				                                       }
@@ -316,6 +320,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		                                       }, new Action1<Throwable>() {
 			                                       @Override
 			                                       public void call(Throwable throwable) {
+				                                       v.setEnabled(true);
 			                                       }
 		                                       });
 	}
@@ -450,8 +455,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			});
 		}
 
-		final View btnWaiteBill = findById(bottomView, R.id.btn_bill);
-		btnWaiteBill.setOnClickListener(new View.OnClickListener() {
+		final View btnBill = findById(bottomView, R.id.btn_bill);
+		btnBill.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				onBill(v);
