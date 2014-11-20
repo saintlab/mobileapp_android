@@ -3,6 +3,7 @@ package com.omnom.android.restaurateur.model.restaurant;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 
 import com.omnom.android.restaurateur.R;
 import com.omnom.android.utils.utils.StringUtils;
@@ -66,5 +67,12 @@ public class RestaurantHelper {
 		}
 		// TODO: Implement when backend will be ready
 		return false;
+	}
+
+	public static String getBackground(final Restaurant restaurant, final DisplayMetrics displayMetrics) {
+		if(restaurant != null && restaurant.getDecoration() != null) {
+			return restaurant.getDecoration().getBackgroundImage() + "?w=" + displayMetrics.widthPixels;
+		}
+		return StringUtils.EMPTY_STRING;
 	}
 }

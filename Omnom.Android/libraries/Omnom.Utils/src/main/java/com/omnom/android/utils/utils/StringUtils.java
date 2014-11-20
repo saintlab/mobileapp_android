@@ -90,6 +90,16 @@ public class StringUtils {
 		return result.toString();
 	}
 
+	public static boolean hasDigits(final String s) {
+		for(int i = 0; i < s.length(); i++) {
+			final char c = s.charAt(i);
+			if(Character.isDigit(c)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static String getCurrencyDelimiter() {
 		if(_lazy_currency_delimiter == null) {
 			final Locale locale = Locale.getDefault();

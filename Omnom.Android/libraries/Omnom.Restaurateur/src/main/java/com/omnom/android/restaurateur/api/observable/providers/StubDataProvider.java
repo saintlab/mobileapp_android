@@ -22,6 +22,7 @@ import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -158,6 +159,11 @@ public class StubDataProvider implements RestaurateurObeservableApi {
 				subscriber.onCompleted();
 			}
 		}) {};
+	}
+
+	@Override
+	public Observable<Restaurant> getRestaurant(final String restaurantId, final Func1<Restaurant, Restaurant> funcMap) {
+		return null;
 	}
 
 	@Override

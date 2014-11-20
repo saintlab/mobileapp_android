@@ -8,11 +8,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
@@ -30,6 +32,7 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 /**
  * Created by Ch3D on 11.11.2014.
@@ -71,6 +74,8 @@ public class BillSplitFragment extends Fragment {
 
 	private SparseBooleanArrayParcelable mStates;
 
+	private int mListHeight;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
@@ -95,9 +100,21 @@ public class BillSplitFragment extends Fragment {
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
 		mFragmentView = view;
-		mFragmentView.setTranslationY(-OrderFragment.LIST_HEIGHT);
+		mListHeight = getResources().getDimensionPixelSize(R.dimen.order_list_height);
+		mFragmentView.setTranslationY(-mListHeight);
 		mFragmentView.setAlpha(0.5f);
 		mFragmentView.animate().alpha(1).translationY(0).start();
+
+		final String fontPath = "fonts/Futura-OSF-Omnom-Regular.otf";
+		final float fontSize = getResources().getDimension(R.dimen.font_medium);
+		for(int i = 0; i < mPagerTitle.getChildCount(); ++i) {
+			View nextChild = mPagerTitle.getChildAt(i);
+			if(nextChild instanceof TextView) {
+				TextView textViewToConvert = (TextView) nextChild;
+				CalligraphyUtils.applyFontToTextView(getActivity(), textViewToConvert, fontPath);
+				textViewToConvert.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
+			}
+		}
 
 		mBtnCommit.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -154,7 +171,7 @@ public class BillSplitFragment extends Fragment {
 		final ViewPropertyAnimator viewPropertyAnimator = mFragmentView
 				.animate()
 				.setDuration(getResources().getInteger(R.integer.listview_animation_delay))
-				.alpha(0).translationY(-OrderFragment.LIST_HEIGHT);
+				.alpha(0).translationY(-mListHeight);
 		viewPropertyAnimator.setListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
