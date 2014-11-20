@@ -1,11 +1,14 @@
 package com.omnom.android.activity;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.os.Build;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -114,16 +117,14 @@ public class SplashActivity extends BaseOmnomActivity {
 		mAnimate = false;
 	}
 
+	@TargetApi(Build.VERSION_CODES.KITKAT)
 	@Override
 	public void initUi() {
 		final AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 		final Intent intent = new Intent(this, BackgroundBleService.class);
 		final PendingIntent alarmIntent = PendingIntent.getService(this, 0, intent, 0);
-		alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-		                          AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-		                          AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-		                          alarmIntent);
-		// startService(intent);
+		final long triggerMillis = SystemClock.elapsedRealtime() + (AlarmManager.INTERVAL_FIFTEEN_MINUTES / 15);
+		alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerMillis, alarmIntent);
 
 		transitionDrawable = new TransitionDrawable(
 				new Drawable[]{getResources().getDrawable(R.drawable.ic_splash_fork_n_knife),
