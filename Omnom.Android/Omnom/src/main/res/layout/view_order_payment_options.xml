@@ -31,6 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:gravity="center"
         android:divider="@drawable/divider_tips"
         android:dividerPadding="24dp"
         android:showDividers="middle">
@@ -42,7 +43,9 @@
             android:layout_height="match_parent"
             android:tag="10"
             android:gravity="center"
+            android:layout_gravity="center"
             android:button="@null"
+            android:background="@color/transparent"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             android:textColor="@drawable/order_payment_tips_color"
             android:textAppearance="?android:textAppearanceSmall"/>
@@ -54,7 +57,9 @@
             android:layout_height="match_parent"
             android:tag="15"
             android:gravity="center"
+            android:layout_gravity="center"
             android:button="@null"
+            android:background="@color/transparent"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             android:textColor="@drawable/order_payment_tips_color"
             android:textAppearance="?android:textAppearanceSmall"/>
@@ -66,7 +71,9 @@
             android:layout_height="match_parent"
             android:tag="25"
             android:gravity="center"
+            android:layout_gravity="center"
             android:button="@null"
+            android:background="@color/transparent"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             android:textColor="@drawable/order_payment_tips_color"
             android:textAppearance="?android:textAppearanceSmall"/>
@@ -79,7 +86,9 @@
             android:text="@string/tips_another"
             android:tag="-1"
             android:gravity="center"
+            android:layout_gravity="center"
             android:button="@null"
+            android:background="@color/transparent"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             android:textColor="@drawable/order_payment_tips_color"
             android:textAppearance="?android:textAppearanceSmall"/>
@@ -94,7 +103,7 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
         android:layout_marginBottom="-24dp"
-        omnom:fontPath="fonts/Futura-OSF-Omnom-Medium.otf"
+        omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf"
         android:text="@string/title_plus_tips"/>
 
     <LinearLayout
@@ -129,7 +138,7 @@
             android:inputType="numberDecimal"
             android:imeOptions="actionDone"
             android:singleLine="true"
-            android:textSize="48sp"
+            android:textSize="@dimen/font_order_amont_edit"
             android:textColor="?android:textColorPrimaryInverse"
             android:textCursorDrawable="@null"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
@@ -197,7 +206,7 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-        android:layout_marginBottom="-16dp"
+        android:layout_marginBottom="@dimen/order_edit_title_margin"
         android:text="@string/to_be_paid"/>
 
     <TextView
@@ -209,7 +218,7 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
         android:layout_marginBottom="-16dp"
-        android:text="@string/tips"
+        android:text="@string/title_plus_tips"
         android:visibility="gone"/>
 
 </RelativeLayout>

@@ -64,6 +64,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import uk.co.chrisjenx.calligraphy.TypefaceUtils;
+
 //import android.annotation.Widget;
 
 /**
@@ -100,7 +102,7 @@ public class NumberPicker extends LinearLayout {
 	/**
 	 * The number of items show in the selector wheel.
 	 */
-	private static final int SELECTOR_WHEEL_ITEM_COUNT = 3;
+	private static final int SELECTOR_WHEEL_ITEM_COUNT = 5;
 
 	/**
 	 * The default update interval during long press.
@@ -115,7 +117,7 @@ public class NumberPicker extends LinearLayout {
 	/**
 	 * The coefficient by which to adjust (divide) the max fling velocity.
 	 */
-	private static final int SELECTOR_MAX_FLING_VELOCITY_ADJUSTMENT = 8;
+	private static final int SELECTOR_MAX_FLING_VELOCITY_ADJUSTMENT = 2;
 
 	/**
 	 * The the duration for adjusting the selector wheel.
@@ -135,12 +137,12 @@ public class NumberPicker extends LinearLayout {
 	/**
 	 * The default unscaled height of the selection divider.
 	 */
-	private static final int UNSCALED_DEFAULT_SELECTION_DIVIDER_HEIGHT = 2;
+	private static final int UNSCALED_DEFAULT_SELECTION_DIVIDER_HEIGHT = 1;
 
 	/**
 	 * The default unscaled distance between the selection dividers.
 	 */
-	private static final int UNSCALED_DEFAULT_SELECTION_DIVIDERS_DISTANCE = 48;
+	private static final int UNSCALED_DEFAULT_SELECTION_DIVIDERS_DISTANCE = 40;
 
 	/**
 	 * The resource id for the default layout.
@@ -241,6 +243,8 @@ public class NumberPicker extends LinearLayout {
 	 * The max width of this widget.
 	 */
 	private final int mMinWidth;
+
+	private final Paint mSelectorWheelPaintDefault;
 
 	/**
 	 * The max width of this widget.
@@ -708,16 +712,25 @@ public class NumberPicker extends LinearLayout {
 				/ SELECTOR_MAX_FLING_VELOCITY_ADJUSTMENT;
 		mTextSize = (int) mInputText.getTextSize();
 
-		// create the selector wheel paint
-		Paint paint = new Paint();
-		paint.setAntiAlias(true);
-		paint.setTextAlign(Align.CENTER);
-		paint.setTextSize(mTextSize);
-		paint.setTypeface(mInputText.getTypeface());
+		// create the selector wheel paintSelected
+		Paint paintSelected = new Paint();
+		paintSelected.setAntiAlias(true);
+		paintSelected.setTextAlign(Align.CENTER);
+		paintSelected.setTextSize(mTextSize);
+		paintSelected.setTypeface(TypefaceUtils.load(getResources().getAssets(), "fonts/Futura-LSF-Omnom-Regular.otf"));
 		ColorStateList colors = mInputText.getTextColors();
 		int color = colors.getColorForState(ENABLED_STATE_SET, Color.WHITE);
-		paint.setColor(color);
-		mSelectorWheelPaint = paint;
+		paintSelected.setColor(color);
+		mSelectorWheelPaint = paintSelected;
+
+		// create the selector wheel paintDefault
+		Paint paintDefault = new Paint();
+		paintDefault.setAntiAlias(true);
+		paintDefault.setTextAlign(Align.CENTER);
+		paintDefault.setTextSize(mTextSize);
+		paintDefault.setTypeface(TypefaceUtils.load(getResources().getAssets(), "fonts/Futura-LSF-Omnom-Regular.otf"));
+		paintDefault.setColor(Color.parseColor("#7d000000"));
+		mSelectorWheelPaintDefault = paintDefault;
 
 		// create the fling and adjust scrollers
 		mFlingScroller = new Scroller(getContext(), null, true);
@@ -1484,7 +1497,11 @@ public class NumberPicker extends LinearLayout {
 			// IME he may see a dimmed version of the old value intermixed
 			// with the new one.
 			if(i != SELECTOR_MIDDLE_ITEM_INDEX || mInputText.getVisibility() != VISIBLE) {
-				canvas.drawText(scrollSelectorValue, x, y, mSelectorWheelPaint);
+				if(i == SELECTOR_MIDDLE_ITEM_INDEX) {
+					canvas.drawText(scrollSelectorValue, x, y, mSelectorWheelPaint);
+				} else {
+					canvas.drawText(scrollSelectorValue, x, y, mSelectorWheelPaintDefault);
+				}
 			}
 			y += mSelectorElementHeight;
 		}

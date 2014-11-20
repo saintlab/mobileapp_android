@@ -1,17 +1,18 @@
 <resources>
     <color name="black_overlay">#66000000</color>
+    <color name="transparent_black">#7d000000</color>
     <color name="window_background">#cdcdcd</color>
-    <!--<color name="loader_bg">#dc16a5d7</color>-->
     <color name="loader_bg">#aace1200</color>
     <color name="loader_bg_transparent">#aace1200</color>
     <color name="loader_hint_text_color">#99ffffff</color>
-    <color name="loader_progress">#40000000</color>
     <color name="list_header">#e5e5e5</color>
     <color name="profile_hint">#aaa</color>
 
     <color name="info_hint">#7f000000</color>
 
     <color name="light_blue">#488ee1</color>
+    <color name="card_selected">#4a90e2</color>
+    <color name="card_unregistered">#26000000</color>
 
     <color name="white_transparent">#ddffffff</color>
     <color name="card_data_hint">#7dffffff</color>
@@ -19,8 +20,6 @@
     <color name="split_bill_red">#d90013</color>
     <color name="btn_pay_green">#00c194</color>
 
-    <color name="card_number_selected">#ff4A90E2</color>
-    <color name="card_type_selected">#7f4A90E2</color>
     <color name="card_number_default">#ff000000</color>
     <color name="card_type_default">#7f000000</color>
 

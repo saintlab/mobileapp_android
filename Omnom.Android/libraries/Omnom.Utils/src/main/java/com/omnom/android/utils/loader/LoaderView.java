@@ -35,6 +35,7 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
+import com.squareup.picasso.Transformation;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -76,6 +77,8 @@ public class LoaderView extends FrameLayout {
 
 	private Target mTarget;
 
+	private Transformation mScaleTransformation;
+
 	@SuppressWarnings("UnusedDeclaration")
 	public LoaderView(Context context) {
 		super(context);
@@ -100,7 +103,7 @@ public class LoaderView extends FrameLayout {
 
 		if(attrs != null) {
 			TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.LoaderView, 0, 0);
-			final int color = getContext().getResources().getColor(R.color.loader_progress);
+			final int color = getContext().getResources().getColor(android.R.color.white);
 			mProgressColor = a.getColor(R.styleable.LoaderView_progress_color, color);
 			a.recycle();
 		}
@@ -116,6 +119,27 @@ public class LoaderView extends FrameLayout {
 		}
 
 		mEditTableNumber = findById(this, R.id.edit_table_number);
+
+		mScaleTransformation = new Transformation() {
+			@Override
+			public Bitmap transform(final Bitmap source) {
+				int newWidth, newHeight;
+				newHeight = Math.round(source.getHeight() * 0.5f);
+				newWidth = Math.round(source.getWidth() * 0.5f);
+
+				Bitmap result = Bitmap.createScaledBitmap(source, newWidth, newHeight, false);
+
+				if(result != source) {
+					source.recycle();
+				}
+				return result;
+			}
+
+			@Override
+			public String key() {
+				return "scale 0.5";
+			}
+		};
 
 		currentColor = getDefaultBgColor();
 		mImgLogo.setTag(R.id.img_loader, R.drawable.ic_fork_n_knife);
@@ -461,8 +485,11 @@ public class LoaderView extends FrameLayout {
 
 		RequestCreator requestCreator = Picasso.with(getContext()).load(logo).placeholder(placeholderResId);
 		if(getContext().getResources().getDisplayMetrics().densityDpi == DisplayMetrics.DENSITY_XXHIGH) {
-			final int size = (int)(220 * 2.5f);
+			final int size = (int) (220 * 2.5f);
 			requestCreator = requestCreator.resize(size, size).centerInside();
+		}
+		if(getContext().getResources().getDisplayMetrics().densityDpi == DisplayMetrics.DENSITY_MEDIUM) {
+			requestCreator.transform(mScaleTransformation);
 		}
 		mTarget = new Target() {
 			@Override

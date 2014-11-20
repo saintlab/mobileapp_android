@@ -72,4 +72,6 @@
     <string name="phone_country_code">+7</string>
     <string name="are_you_to_quit">Вы действительно хотите выйти?</string>
     <string name="quit">Выйти</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="how_many_guests_will_pay">На сколько гостей делить</string>
 </resources>
