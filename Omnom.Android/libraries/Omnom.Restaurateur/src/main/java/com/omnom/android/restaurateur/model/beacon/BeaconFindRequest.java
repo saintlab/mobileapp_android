@@ -14,16 +14,20 @@ public class BeaconFindRequest {
 	private int major;
 	@Expose
 	private int minor;
+	@Expose
+	private int batteryLevel;
 
 	public BeaconFindRequest(Beacon beacon) {
 		// FIXME: uppercase vs lowercase
-		this(beacon.getIdValue(0).toUpperCase(), Integer.valueOf(beacon.getIdValue(1)), Integer.valueOf(beacon.getIdValue(2)));
+		this(beacon.getIdValue(0).toUpperCase(), Integer.valueOf(beacon.getIdValue(1)),
+				Integer.valueOf(beacon.getIdValue(2)), Integer.valueOf(beacon.getIdValue(3)));
 	}
 
-	public BeaconFindRequest(String uuid, int major, int minor) {
+	public BeaconFindRequest(String uuid, int major, int minor, int batteryLevel) {
 		this.uuid = uuid;
 		this.major = major;
 		this.minor = minor;
+		this.batteryLevel = batteryLevel;
 	}
 
 	public String getUuid() {
@@ -36,5 +40,9 @@ public class BeaconFindRequest {
 
 	public int getMinor() {
 		return minor;
+	}
+
+	public int getBatteryLevel() {
+		return batteryLevel;
 	}
 }
