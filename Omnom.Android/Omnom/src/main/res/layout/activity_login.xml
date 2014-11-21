@@ -31,7 +31,8 @@
         android:layout_below="@+id/edit_phone"
         android:gravity="center"
         android:text="@string/login_havent_account_yet"
-        android:textAppearance="?android:textAppearanceMedium"
+        android:textAppearance="?android:textAppearance"
+        android:textColor="@color/transparent_black"
         android:visibility="gone"/>
 
     <TextView
@@ -41,7 +42,7 @@
         android:layout_below="@+id/txt_info"
         android:gravity="center"
         android:text="@string/login_havent_account_registration"
-        android:textAppearance="?android:textAppearanceMedium"
+        android:textAppearance="?android:textAppearance"
         android:textColor="@color/light_blue"
         android:visibility="gone" />
 
