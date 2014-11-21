@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.omnom.android.OmnomApplication;
 
+import java.util.Arrays;
+
 import rx.functions.Action1;
 
 /**
@@ -20,7 +22,8 @@ public class ObservableUtils {
 
 		@Override
 		public void call(Throwable throwable) {
-			OmnomApplication.getMixPanelHelper(mContext).track("!Error." + throwable.getMessage(), throwable);
+			OmnomApplication.getMixPanelHelper(mContext).track("!Error." + throwable.getMessage(),
+																Arrays.toString(throwable.getStackTrace()));
 			onError(throwable);
 		}
 
