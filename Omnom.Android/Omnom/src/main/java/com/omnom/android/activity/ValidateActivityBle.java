@@ -8,6 +8,7 @@ import android.os.Build;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.beacon.BeaconFilter;
+import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ObservableUtils;
@@ -130,9 +131,11 @@ public class ValidateActivityBle extends ValidateActivity {
 		scanBleDevices(true, new Runnable() {
 			@Override
 			public void run() {
-				final BeaconFilter filter = new BeaconFilter(OmnomApplication.get(getActivity()));
+				final OmnomApplication application = OmnomApplication.get(getActivity());
+				final BeaconFilter filter = new BeaconFilter(application);
 				final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 				final int size = nearBeacons.size();
+				application.cacheBeacon(null);
 				if(size == 0) {
 					findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(R.color.white_transparent));
 					mErrorHelper.showErrorDemo(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
@@ -141,6 +144,7 @@ public class ValidateActivityBle extends ValidateActivity {
 					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
+					application.cacheBeacon(new BeaconFindRequest(beacon));
 					final TableDataResponse[] table = new TableDataResponse[1];
 					mFindBeaconSubscription = AndroidObservable.bindActivity(getActivity(),
 					                                                         api.findBeacon(beacon)

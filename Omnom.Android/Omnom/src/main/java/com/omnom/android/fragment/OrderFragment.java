@@ -30,15 +30,20 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderItemSelectedEvent;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
+import com.omnom.android.mixpanel.model.BillViewEvent;
+import com.omnom.android.mixpanel.model.Event;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
@@ -52,7 +57,9 @@ import com.squareup.otto.Subscribe;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -493,6 +500,8 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void zoomInFragment(final OrdersActivity activity) {
+		OmnomApplication application = OmnomApplication.get(getActivity());
+		sendBillViewEvent(application.getUserProfile().getUser(), application.getBeacon(), mOrder);
 		if(mFooterView1 != null) {
 			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
 			ViewUtils.setVisible(billSplit, true);
@@ -510,6 +519,12 @@ public class OrderFragment extends Fragment {
 
 	public boolean isDownscaled() {
 		return list.getTranslationY() == 0;
+	}
+
+	private void sendBillViewEvent(UserData user, BeaconFindRequest beacon, Order order) {
+		Event billViewEvent = new BillViewEvent(order.getRestaurantId(), beacon,
+												user, order.getAmountToPay());
+		OmnomApplication.getMixPanelHelper(getActivity()).track(billViewEvent);
 	}
 
 	private void initAmount() {

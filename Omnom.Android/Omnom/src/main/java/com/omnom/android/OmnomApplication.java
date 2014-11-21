@@ -14,6 +14,7 @@ import com.omnom.android.modules.OmnomApplicationModule;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.restaurateur.RestaurateurModule;
 import com.omnom.android.restaurateur.model.UserProfile;
+import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
 import com.omnom.android.utils.preferences.PreferenceProvider;
@@ -58,6 +59,8 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	private MixPanelHelper mixPanelHelper;
 
 	private UserProfile cachedUser;
+
+	private BeaconFindRequest cachedBeacon;
 
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
@@ -156,5 +159,13 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	public UserProfile getUserProfile() {
 		return cachedUser;
+	}
+
+	public void cacheBeacon(BeaconFindRequest beacon) {
+		cachedBeacon = beacon;
+	}
+
+	public BeaconFindRequest getBeacon() {
+		return cachedBeacon;
 	}
 }
