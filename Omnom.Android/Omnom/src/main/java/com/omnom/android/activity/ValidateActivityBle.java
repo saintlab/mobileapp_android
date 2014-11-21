@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
-import android.view.View;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
@@ -28,16 +27,11 @@ import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
+import static butterknife.ButterKnife.findById;
+
 public class ValidateActivityBle extends ValidateActivity {
 
 	private static final String TAG = ValidateActivityBle.class.getSimpleName();
-
-	private final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			validate();
-		}
-	};
 
 	private BluetoothAdapter.LeScanCallback mLeScanCallback;
 
@@ -98,6 +92,8 @@ public class ValidateActivityBle extends ValidateActivity {
 
 	@Override
 	protected void startLoader() {
+		clearErrors();
+
 		loader.startProgressAnimation(getResources().getInteger(R.integer.validation_duration), new Runnable() {
 			@Override
 			public void run() {
@@ -113,11 +109,18 @@ public class ValidateActivityBle extends ValidateActivity {
 			                                         public void call(Boolean hasNoErrors) {
 				                                         if(hasNoErrors) {
 					                                         readBeacons();
+				                                         } else {
+					                                         findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
+							                                         R.color.white_transparent));
+					                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
+					                                         findViewById(R.id.panel_bottom).animate().translationY(200).start();
 				                                         }
 			                                         }
 		                                         }, new Action1<Throwable>() {
 			                                         @Override
 			                                         public void call(Throwable throwable) {
+				                                         findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
+						                                         R.color.white_transparent));
 				                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
 			                                         }
 		                                         });
@@ -131,8 +134,10 @@ public class ValidateActivityBle extends ValidateActivity {
 				final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 				final int size = nearBeacons.size();
 				if(size == 0) {
+					findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(R.color.white_transparent));
 					mErrorHelper.showErrorDemo(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
 				} else if(size > 1) {
+					findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(R.color.white_transparent));
 					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
@@ -169,6 +174,8 @@ public class ValidateActivityBle extends ValidateActivity {
 							                                           new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 								                                           @Override
 								                                           protected void onError(final Throwable throwable) {
+									                                           findById(getActivity(), R.id.root).setBackgroundColor(
+											                                           getResources().getColor(R.color.white_transparent));
 									                                           mErrorHelper.showErrorDemo(
 											                                           LoaderError.NO_CONNECTION_TRY,
 											                                           mInternetErrorClickListener);
