@@ -39,7 +39,6 @@ import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
-import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -90,6 +89,13 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		@Override
 		public void onClick(View v) {
 			startLoader();
+		}
+	};
+
+	protected final View.OnClickListener mInternetErrorClickBillListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			onBill(findViewById(R.id.btn_bill));
 		}
 	};
 
@@ -220,7 +226,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected void clearErrors() {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-		AndroidUtils.clearAccentColor(getWindow());
+		findById(this, R.id.root).setBackgroundColor(getResources().getColor(R.color.transparent));
 	}
 
 	@Override
@@ -327,12 +333,14 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	public void onBill(final View v) {
 		v.setEnabled(false);
 		ValidationObservable.validateSmart(this)
-		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickListener))
+		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickBillListener))
 		                    .isEmpty()
 		                    .subscribe(new Action1<Boolean>() {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
 				                    if(hasNoErrors) {
+					                    clearErrors();
+					                    getPanelBottom().animate().translationY(0).start();
 					                    mOrdersSubscription = AndroidObservable.bindActivity(getActivity(),
 					                                                                         api.getOrders(mTable.getRestaurantId(),
 					                                                                                       mTable.getId()))
@@ -360,12 +368,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 						                                                           }
 					                                                           });
 				                    } else {
-// 					                    AndroidUtils.setAccentColor(getWindow(), getResources().getColor(R.color.error_red));
-					                    final TransitionDrawable background =
-							                    (TransitionDrawable) getWindow().getDecorView().getBackground();
-					                    background.setLevel(0);
-					                    background.invalidateSelf();
-					                    mErrorHelper.showInternetError(mInternetErrorClickListener);
+					                    findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
+							                    R.color.white_transparent));
+					                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
 					                    getPanelBottom().animate().translationY(200).start();
 					                    v.setEnabled(true);
 				                    }
@@ -373,7 +378,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		                    }, new Action1<Throwable>() {
 			                    @Override
 			                    public void call(final Throwable throwable) {
-				                    mErrorHelper.showInternetError(mInternetErrorClickListener);
+				                    findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
+						                    R.color.white_transparent));
+				                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
 				                    v.setEnabled(true);
 			                    }
 		                    });
@@ -421,7 +428,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		//	loader.animate().translationY(0).start();
 		//	AnimationUtils.animateAlpha(btnDownPromo, RestaurantHelper.isPromoEnabled(mRestaurant));
 		//} else {
-			super.onBackPressed();
+		super.onBackPressed();
 		//}
 	}
 

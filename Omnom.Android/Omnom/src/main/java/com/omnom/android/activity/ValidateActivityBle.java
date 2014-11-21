@@ -3,7 +3,6 @@ package com.omnom.android.activity;
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.graphics.Color;
 import android.os.Build;
 
 import com.omnom.android.OmnomApplication;
@@ -15,7 +14,6 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
-import com.omnom.android.utils.utils.AndroidUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +26,8 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+
+import static butterknife.ButterKnife.findById;
 
 public class ValidateActivityBle extends ValidateActivity {
 
@@ -110,7 +110,8 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                         if(hasNoErrors) {
 					                                         readBeacons();
 				                                         } else {
-					                                         AndroidUtils.setAccentColor(getWindow(), Color.WHITE);
+					                                         findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
+							                                         R.color.white_transparent));
 					                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
 					                                         findViewById(R.id.panel_bottom).animate().translationY(200).start();
 				                                         }
@@ -118,6 +119,8 @@ public class ValidateActivityBle extends ValidateActivity {
 		                                         }, new Action1<Throwable>() {
 			                                         @Override
 			                                         public void call(Throwable throwable) {
+				                                         findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
+						                                         R.color.white_transparent));
 				                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
 			                                         }
 		                                         });
@@ -131,8 +134,10 @@ public class ValidateActivityBle extends ValidateActivity {
 				final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 				final int size = nearBeacons.size();
 				if(size == 0) {
+					findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(R.color.white_transparent));
 					mErrorHelper.showErrorDemo(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
 				} else if(size > 1) {
+					findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(R.color.white_transparent));
 					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
@@ -169,6 +174,8 @@ public class ValidateActivityBle extends ValidateActivity {
 							                                           new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 								                                           @Override
 								                                           protected void onError(final Throwable throwable) {
+									                                           findById(getActivity(), R.id.root).setBackgroundColor(
+											                                           getResources().getColor(R.color.white_transparent));
 									                                           mErrorHelper.showErrorDemo(
 											                                           LoaderError.NO_CONNECTION_TRY,
 											                                           mInternetErrorClickListener);

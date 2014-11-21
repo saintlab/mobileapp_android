@@ -214,14 +214,7 @@ public class AndroidUtils {
 	}
 
 	public static void setAccentColor(Window window, int color) {
-		final Drawable background;
-		final Drawable background1 = window.getDecorView().getBackground();
-		//if(background1 instanceof TransitionDrawable) {
-		//	TransitionDrawable td = (TransitionDrawable) background1;
-		//	background = td.getCurrent();
-		//} else {
-			background = background1;
-		//}
+		final Drawable background = window.getDecorView().getBackground();
 		background.mutate();
 		background.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
 		background.invalidateSelf();
