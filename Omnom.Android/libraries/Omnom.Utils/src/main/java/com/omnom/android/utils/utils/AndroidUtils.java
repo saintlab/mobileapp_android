@@ -219,4 +219,11 @@ public class AndroidUtils {
 		background.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
 		background.invalidateSelf();
 	}
+
+	public static void clearAccentColor(Window window) {
+		final Drawable background = window.getDecorView().getBackground();
+		background.mutate();
+		background.setColorFilter(null);
+		background.invalidateSelf();
+	}
 }

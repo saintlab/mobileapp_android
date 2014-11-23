@@ -32,5 +32,6 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:layout_gravity="center"
+        android:visibility="gone"
         style="@style/ErrorEdit.Error"/>
 </merge>

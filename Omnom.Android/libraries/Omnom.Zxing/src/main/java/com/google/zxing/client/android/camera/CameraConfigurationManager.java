@@ -27,6 +27,8 @@ import android.view.WindowManager;
 
 import com.google.zxing.client.android.PreferencesActivity;
 
+import java.util.List;
+
 /**
  * A class which deals with reading, parsing, and setting the camera parameters which are used to
  * configure the camera hardware.
@@ -51,20 +53,17 @@ final class CameraConfigurationManager {
 		WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		Display display = manager.getDefaultDisplay();
 
-		//remove the following
-		// TODO:
-//		if (width < height) {
-//			Log.i(TAG, "Display reports portrait orientation; assuming this is incorrect");
-//			int temp = width;
-//			width = height;
-//			height = temp;
-//		}
-
 		Point theScreenResolution = new Point();
 		display.getSize(theScreenResolution);
 		screenResolution = theScreenResolution;
 		Log.i(TAG, "Screen resolution: " + screenResolution);
-		cameraResolution = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolution);
+		List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
+		if (supportedPreviewSizes != null && supportedPreviewSizes.size() > 0) {
+			Camera.Size size = supportedPreviewSizes.get(0);
+			cameraResolution = new Point(size.width, size.height);
+		} else {
+			cameraResolution = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolution);
+		}
 		Log.i(TAG, "Camera resolution: " + cameraResolution);
 	}
 
@@ -108,6 +107,7 @@ final class CameraConfigurationManager {
 		}
 
 		parameters.setPreviewSize(cameraResolution.x, cameraResolution.y);
+		parameters.set("orientation", "portrait");
 
 		Log.i(TAG, "Final camera parameters: " + parameters.flatten());
 
