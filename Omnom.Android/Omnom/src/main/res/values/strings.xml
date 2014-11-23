@@ -15,7 +15,7 @@
     <string name="email">Почта</string>
     <string name="phone_number">Номер телефона</string>
     <string name="birth_date">День рождения</string>
-    <string name="register_agreement">Нажимая \"Далее\" вы принимаете\n
+    <string name="register_agreement">Нажимая «Далее» вы принимаете\n
     &lt;a href="http://legal.saintlab.com/omnom/user-agreement/">Пользовательское соглашение&lt;/a></string>
     <string name="you_forgot_to_enter_name">Вы забыли ввести имя</string>
     <string name="you_forgot_to_enter_phone">Вы забыли ввести номер телефона</string>

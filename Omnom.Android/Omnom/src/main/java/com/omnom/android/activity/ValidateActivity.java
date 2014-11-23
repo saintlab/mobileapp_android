@@ -155,9 +155,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.txt_demo_leave)
 	protected TextView txtLeave;
 
-	//@InjectView(R.id.img_holder)
-	//protected View imgHolder;
-
 	@Inject
 	protected RestaurateurObeservableApi api;
 
