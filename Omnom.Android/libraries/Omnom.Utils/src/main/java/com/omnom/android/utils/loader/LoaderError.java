@@ -11,6 +11,10 @@ public class LoaderError {
 			new LoaderError(R.drawable.ic_no_connection, R.string.error_no_internet_connection, R.string.try_once_again,
 			                R.drawable.ic_repeat_small);
 
+	public static final LoaderError UNKNOWN_QR_CODE =
+			new LoaderError(R.drawable.ic_no_connection, R.string.error_unknown_qr, R.string.try_once_again,
+			                R.drawable.ic_repeat_small);
+
 	public static final LoaderError BLE_DISABLED =
 			new LoaderError(R.drawable.ic_bluetooth_white, R.string.error_bluetooth_disabled, R.string.open_settings, 0);
 
