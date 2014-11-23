@@ -117,6 +117,7 @@ public class ErrorEdit extends LinearLayout {
 	public void clearError() {
 		editView.setError(false);
 		errorTextView.setText(StringUtils.EMPTY_STRING);
+		ViewUtils.setVisible(errorTextView, false);
 	}
 
 	private void processAttrs(AttributeSet attrs) {
@@ -240,13 +241,13 @@ public class ErrorEdit extends LinearLayout {
 	}
 
 	public void setError(final int strId) {
-		errorTextView.setText(strId);
-		editView.setError(true);
+		setError(getResources().getString(strId));
 	}
 
 	public void setError(final String msg) {
 		errorTextView.setText(msg);
 		editView.setError(true);
+		ViewUtils.setVisible(errorTextView, true);
 	}
 
 	public String getText() {

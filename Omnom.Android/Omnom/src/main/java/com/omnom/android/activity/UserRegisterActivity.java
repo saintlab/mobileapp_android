@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
@@ -86,7 +87,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	@Override
 	protected void handleIntent(final Intent intent) {
 		final String stringExtra = intent.getStringExtra(EXTRA_PHONE);
-		if(!TextUtils.isEmpty(stringExtra)) {
+		if (!TextUtils.isEmpty(stringExtra)) {
 			editPhone.setText(stringExtra);
 			editPhone.getEditText().setSelection(editPhone.getText().length());
 		}
@@ -110,7 +111,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		editPhone.getEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(final View v, final boolean hasFocus) {
-				if(hasFocus && TextUtils.isEmpty(editPhone.getText())) {
+				if (hasFocus && TextUtils.isEmpty(editPhone.getText())) {
 					final String value = AndroidUtils.getDevicePhoneNumber(getActivity(), R.string.phone_country_code);
 					editPhone.setText(value);
 					AndroidUtils.moveCursorEnd(editPhone);
@@ -121,7 +122,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		editBirth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(final View v, final boolean hasFocus) {
-				if(hasFocus) {
+				if (hasFocus) {
 					showDatePickerDialog();
 				}
 			}
@@ -130,7 +131,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		editPhone.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-				if(actionId == EditorInfo.IME_ACTION_NEXT) {
+				if (actionId == EditorInfo.IME_ACTION_NEXT) {
 					editBirth.requestFocus();
 					return true;
 				}
@@ -141,7 +142,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		editBirth.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				if(editBirth.isFocused()) {
+				if (editBirth.isFocused()) {
 					showDatePickerDialog();
 				}
 			}
@@ -153,18 +154,11 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 
 	private void showDatePickerDialog() {
 		AndroidUtils.hideKeyboard(editBirth);
-		DatePickerDialog dialog = new DatePickerDialog(getActivity(),
-		                                               new DatePickerDialog.OnDateSetListener() {
-			                                               @Override
-			                                               public void onDateSet(DatePicker view,
-			                                                                     int year,
-			                                                                     int monthOfYear,
-			                                                                     int dayOfMonth) {
-			                                               }
-		                                               },
-		                                               gc.get(Calendar.YEAR),
-		                                               gc.get(Calendar.MONTH),
-		                                               gc.get(Calendar.DAY_OF_MONTH));
+		DatePickerDialog dialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+			@Override
+			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+			}
+		}, gc.get(Calendar.YEAR), gc.get(Calendar.MONTH), gc.get(Calendar.DAY_OF_MONTH));
 		dialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -188,7 +182,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	protected void onResume() {
 		super.onResume();
 
-		if(mFirstStart) {
+		if (mFirstStart) {
 			postDelayed(getResources().getInteger(android.R.integer.config_longAnimTime) + 200, new Runnable() {
 				@Override
 				public void run() {
@@ -197,7 +191,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 			});
 		}
 
-		if(topPanel.isAlphaVisible()) {
+		if (topPanel.isAlphaVisible()) {
 			topPanel.postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -214,52 +208,58 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	public void doRegister(final View view) {
 		textError.setText(StringUtils.EMPTY_STRING);
 
-		if(!validate()) {
+		if (!validate()) {
 			return;
 		}
 
 		AndroidUtils.hideKeyboard(getActivity());
 		topPanel.showProgress(true);
-		final AuthRegisterRequest request = AuthRegisterRequest.create(AndroidUtils.getInstallId(this),
-		                                                               editName.getText(),
-		                                                               StringUtils.EMPTY_STRING,
-		                                                               editEmail.getText(),
-		                                                               editPhone.getText(),
-		                                                               editBirth.getText()
-		                                                                        .toString()
-		                                                                        .replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
-		mRegisterSubscription = AndroidObservable.bindActivity(this, authenticator.register(request))
-		                                         .subscribe(new Action1<AuthRegisterResponse>() {
-			                                         @Override
-			                                         public void call(final AuthRegisterResponse authRegisterResponse) {
-				                                         if(!authRegisterResponse.hasError()) {
-					                                         topPanel.setContentVisibility(false, false);
-					                                         postDelayed(getResources().getInteger(
-							                                         R.integer.default_animation_duration_short), new Runnable() {
-						                                         @Override
-						                                         public void run() {
-							                                         final Intent intent = new Intent(UserRegisterActivity.this,
-							                                                                          ConfirmPhoneActivity.class);
-							                                         intent.putExtra(EXTRA_PHONE, request.getPhone());
-							                                         intent.putExtra(EXTRA_CONFIRM_TYPE,
-							                                                         ConfirmPhoneActivity.TYPE_REGISTER);
-							                                         start(intent, R.anim.slide_in_right, R.anim.slide_out_left,
-							                                               false);
-							                                         topPanel.showProgress(false);
-						                                         }
-					                                         });
-				                                         } else {
-					                                         topPanel.showProgress(false);
-					                                         textError.setText(authRegisterResponse.getError().getMessage());
-				                                         }
-			                                         }
-		                                         }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			                                         @Override
-			                                         public void onError(Throwable throwable) {
-				                                         topPanel.showProgress(false);
-				                                         Log.e(TAG, "doRegister", throwable);
-			                                         }
-		                                         });
+		final AuthRegisterRequest request = AuthRegisterRequest
+				.create(AndroidUtils.getInstallId(this), editName.getText(), StringUtils.EMPTY_STRING, editEmail.getText(),
+				        editPhone.getText(), editBirth.getText().toString().replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
+		mRegisterSubscription =
+				AndroidObservable.bindActivity(this, authenticator.register(request)).subscribe(new Action1<AuthRegisterResponse>() {
+					@Override
+					public void call(final AuthRegisterResponse authRegisterResponse) {
+						if (!authRegisterResponse.hasError()) {
+							topPanel.setContentVisibility(false, false);
+							postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
+								@Override
+								public void run() {
+									final Intent intent = new Intent(UserRegisterActivity.this, ConfirmPhoneActivity.class);
+									intent.putExtra(EXTRA_PHONE, request.getPhone());
+									intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_REGISTER);
+									start(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
+									topPanel.showProgress(false);
+								}
+							});
+						} else {
+							handleRegisterError(authRegisterResponse);
+						}
+					}
+				}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					@Override
+					public void onError(Throwable throwable) {
+						topPanel.showProgress(false);
+						Log.e(TAG, "doRegister", throwable);
+					}
+				});
+	}
+
+	private void handleRegisterError(AuthRegisterResponse authRegisterResponse) {
+		topPanel.showProgress(false);
+		final AuthError error = authRegisterResponse.getError();
+		switch (error.getCode()) {
+			case 102:
+			case 103:
+			case 107:
+			case 109:
+				editPhone.setError(error.getMessage());
+				break;
+
+			default:
+				textError.setText(error.getMessage());
+		}
 	}
 
 	@Override
@@ -276,15 +276,15 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		final boolean emptyPhone = TextUtils.isEmpty(phone);
 		final boolean emptyEmail = TextUtils.isEmpty(email);
 		final boolean correctEmail = AndroidUtils.isValidEmail(email);
-		if(emptyName) {
+		if (emptyName) {
 			editName.setError(R.string.you_forgot_to_enter_name);
 		}
-		if(emptyPhone) {
+		if (emptyPhone) {
 			editPhone.setError(R.string.you_forgot_to_enter_phone);
 		}
-		if(emptyEmail) {
+		if (emptyEmail) {
 			editEmail.setError(R.string.you_forgot_to_enter_email);
-		} else if(!correctEmail) {
+		} else if (!correctEmail) {
 			editEmail.setError(R.string.invalid_email);
 		}
 		return !emptyEmail && !emptyName && !emptyPhone && correctEmail;
