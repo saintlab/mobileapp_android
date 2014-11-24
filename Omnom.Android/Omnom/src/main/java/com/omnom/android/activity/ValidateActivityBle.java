@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
+import android.view.View;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
@@ -112,8 +113,10 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                         } else {
 					                                         findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
 							                                         R.color.white_transparent));
-					                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
-					                                         findViewById(R.id.panel_bottom).animate().translationY(200).start();
+					                                         final View viewById = findViewById(R.id.panel_bottom);
+					                                         if(viewById != null) {
+						                                         viewById.animate().translationY(200).start();
+					                                         }
 				                                         }
 			                                         }
 		                                         }, new Action1<Throwable>() {
