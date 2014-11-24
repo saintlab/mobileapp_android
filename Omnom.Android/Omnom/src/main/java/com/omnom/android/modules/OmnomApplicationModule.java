@@ -10,6 +10,7 @@ import com.omnom.android.activity.EnteringActivity;
 import com.omnom.android.activity.LoginActivity;
 import com.omnom.android.activity.OmnomQRCaptureActivity;
 import com.omnom.android.activity.OrdersActivity;
+import com.omnom.android.activity.PaymentProcessActivity;
 import com.omnom.android.activity.SplashActivity;
 import com.omnom.android.activity.ThanksActivity;
 import com.omnom.android.activity.UserProfileActivity;
@@ -28,11 +29,12 @@ import dagger.Module;
  * Created by Ch3D on 11.08.2014.
  */
 @Module(injects = {OmnomApplication.class,
-		SplashActivity.class, UserRegisterActivity.class, EnteringActivity.class,
 		/* activities */
+		SplashActivity.class, UserRegisterActivity.class, EnteringActivity.class,
 		ConfirmPhoneActivity.class, LoginActivity.class, ValidateActivityBle.class, ValidateActivityCamera.class,
 		ValidateActivityBle.class, OrdersActivity.class, CardsActivity.class, UserProfileActivity.class, CardAddActivity.class,
 		CardConfirmActivity.class, ThanksActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
+		PaymentProcessActivity.class,
 		/* services */
 		BackgroundBleService.class,
 		/* fragments */

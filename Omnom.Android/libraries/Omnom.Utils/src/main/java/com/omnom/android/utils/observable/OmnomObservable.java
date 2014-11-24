@@ -19,9 +19,13 @@ import rx.functions.Func1;
  */
 public class OmnomObservable {
 	public static void unsubscribe(Subscription subscription) {
-		if(subscription != null && !subscription.isUnsubscribed()) {
+		if(isSubscribed(subscription)) {
 			subscription.unsubscribe();
 		}
+	}
+
+	public static boolean isSubscribed(Subscription subscription) {
+		return subscription != null && !subscription.isUnsubscribed();
 	}
 
 	public static RetrofitError createRetrofitError(final String url, final String errorText, final int statusCode) {

@@ -5,94 +5,107 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/txt_error"
+        <Space
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/panel_errors"
-            android:paddingStart="@dimen/error_text_padding"
-            android:paddingEnd="@dimen/error_text_padding"
-            android:paddingBottom="@dimen/error_text_padding"
-            android:gravity="center"
-            android:textColor="@android:color/secondary_text_light"
-            android:textStyle="bold"
-            android:textIsSelectable="true"
-            android:textAppearance="?android:textAppearanceLarge"/>
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
-        <LinearLayout
-            android:id="@+id/panel_errors"
-            android:orientation="horizontal"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:baselineAligned="false"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="bottom"
-            android:background="@color/white_transparent"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:visibility="gone">
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/txt_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:paddingStart="@dimen/error_text_padding"
+                android:paddingEnd="@dimen/error_text_padding"
+                android:paddingBottom="@dimen/error_text_padding"
+                android:gravity="center"
+                android:textColor="@android:color/secondary_text_light"
+                android:textStyle="bold"
+                android:textIsSelectable="true"
+                android:textAppearance="?android:textAppearanceLarge"/>
 
             <LinearLayout
-                android:id="@+id/btn_bottom"
-                android:text="@string/enter"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                style="@style/Button.Bottom">
+                android:id="@+id/panel_errors"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="bottom"
+                android:background="@color/white_transparent"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:visibility="gone">
 
-                <TextView
-                    android:id="@+id/txt_error_repeat"
+                <LinearLayout
+                    android:id="@+id/btn_bottom"
                     android:text="@string/enter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:drawablePadding="8dp"
-                    android:drawableLeft="@drawable/ic_repeat_small"
-                    android:textAppearance="?android:textAppearanceLarge"/>
-            </LinearLayout>
+                    style="@style/Button.Bottom">
 
-            <LinearLayout
-                android:id="@+id/btn_demo"
-                android:text="@string/demo_mode"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                style="@style/Button.Bottom">
+                    <TextView
+                        android:id="@+id/txt_bottom"
+                        android:text="@string/enter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:drawablePadding="8dp"
+                        android:drawableLeft="@drawable/ic_repeat_small"
+                        android:textAppearance="?android:textAppearanceLarge"/>
+                </LinearLayout>
 
-                <TextView
+                <LinearLayout
+                    android:id="@+id/btn_demo"
                     android:text="@string/demo_mode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="8dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:drawableLeft="@drawable/ic_demo_mode_small"
-                    android:textAppearance="?android:textAppearanceLarge"/>
+                    style="@style/Button.Bottom">
+
+                    <TextView
+                        android:text="@string/demo_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="8dp"
+                        android:gravity="center"
+                        android:drawableLeft="@drawable/ic_demo_mode_small"
+                        android:textAppearance="?android:textAppearanceLarge"/>
+                </LinearLayout>
+
             </LinearLayout>
 
-        </LinearLayout>
+            <ViewStub
+                android:id="@+id/stub_bottom_menu"
+                android:inflatedId="@+id/panel_bottom"
+                android:layout_gravity="bottom"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-        <ViewStub
-            android:id="@+id/stub_bottom_menu"
-            android:inflatedId="@+id/panel_bottom"
-            android:layout_gravity="bottom"
-            android:layout_alignParentBottom="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            <Button
+                android:id="@+id/btn_down"
+                android:layout_width="22dp"
+                android:layout_height="13dp"
+                android:layout_above="@+id/panel_bottom"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/activity_vertical_margin_large"
+                android:background="@drawable/ic_down_button_icon_white"
+                android:visibility="gone"/>
+        </RelativeLayout>
 
-        <Button
-            android:id="@+id/btn_down"
-            android:layout_width="22dp"
-            android:layout_height="13dp"
-            android:layout_above="@+id/panel_bottom"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/activity_vertical_margin_large"
-            android:background="@drawable/ic_down_button_icon_white"
-            android:visibility="gone"/>
-    </RelativeLayout>
+    </LinearLayout>
 
     <com.omnom.android.utils.loader.LoaderView
         android:id="@+id/loader"

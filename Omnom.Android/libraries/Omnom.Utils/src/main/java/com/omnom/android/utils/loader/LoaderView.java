@@ -111,12 +111,7 @@ public class LoaderView extends FrameLayout {
 		mImgLoader = findById(this, R.id.img_loader);
 		mImgLogo = findById(this, R.id.img_logo);
 		mProgressBar = findById(this, R.id.progress);
-		final LayerDrawable progressDrawable = (LayerDrawable) mProgressBar.getProgressDrawable();
-		if(progressDrawable != null) {
-			final RotateDrawable rotateDrawable = (RotateDrawable) progressDrawable.findDrawableByLayerId(android.R.id.progress);
-			GradientDrawable shape = (GradientDrawable) rotateDrawable.getDrawable();
-			shape.setColor(mProgressColor);
-		}
+		setProgressColor(mProgressColor);
 
 		mEditTableNumber = findById(this, R.id.edit_table_number);
 
@@ -217,6 +212,15 @@ public class LoaderView extends FrameLayout {
 		sd.setColor(color);
 		currentColor = color;
 		sd.invalidateSelf();
+	}
+
+	public void setProgressColor(final int color) {
+		final LayerDrawable progressDrawable = (LayerDrawable) mProgressBar.getProgressDrawable();
+		if(progressDrawable != null) {
+			final RotateDrawable rotateDrawable = (RotateDrawable) progressDrawable.findDrawableByLayerId(android.R.id.progress);
+			GradientDrawable shape = (GradientDrawable) rotateDrawable.getDrawable();
+			shape.setColor(color);
+		}
 	}
 
 	public void showProgress(final boolean visible) {

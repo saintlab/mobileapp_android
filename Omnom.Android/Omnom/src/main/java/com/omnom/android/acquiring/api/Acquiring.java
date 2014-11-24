@@ -13,7 +13,9 @@ import rx.Observable;
  * Created by Ch3D on 23.09.2014.
  */
 public interface Acquiring {
-	public Observable<AcquiringPollingResponse> pay(final MerchantData merchant, PaymentInfo paymentInfo);
+	public Observable<AcquiringResponse> pay(final MerchantData merchant, PaymentInfo paymentInfo);
+
+	public Observable<AcquiringPollingResponse> checkResult(final AcquiringResponse acquiringResponse);
 
 	public Observable<AcquiringResponse> deleteCard(MerchantData merchant, UserData user, CardInfo cardInfo);
 

@@ -39,7 +39,7 @@ public class AcquiringMailRu implements Acquiring {
 	}
 
 	@Override
-	public Observable<AcquiringPollingResponse> pay(MerchantData merchant, PaymentInfo paymentInfo) {
+	public Observable<AcquiringResponse> pay(MerchantData merchant, PaymentInfo paymentInfo) {
 		final PaymentInfoMailRu info = (PaymentInfoMailRu) paymentInfo;
 		if(info == null) {
 			throw new RuntimeException("PaymentInfo is null or not a PaymentInfoMailRu");
@@ -59,17 +59,12 @@ public class AcquiringMailRu implements Acquiring {
 		parameters.putAll(info.getCardInfo().getCardInfoMap());
 		info.getUser().storePhone(parameters);
 
-		return mApiProxy.pay(parameters)
-		         .concatMap(new Func1<AcquiringResponse, Observable<AcquiringPollingResponse>>() {
-			         @Override
-			         public Observable<AcquiringPollingResponse> call(AcquiringResponse response) {
-				         if(response.getError() == null) {
-					         return PollingObservable.create(response);
-				         } else {
-					         return Observable.error(new RuntimeException(response.getError().toString()));
-				         }
-			         }
-		         });
+		return mApiProxy.pay(parameters);
+	}
+
+	@Override
+	public Observable<AcquiringPollingResponse> checkResult(final AcquiringResponse acquiringResponse) {
+		return PollingObservable.create(acquiringResponse);
 	}
 
 	@Override

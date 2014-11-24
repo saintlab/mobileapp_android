@@ -41,7 +41,7 @@ public class ErrorHelper {
 		mErrorViews = errorViews;
 	}
 
-	public ErrorHelper(LoaderView loader, TextView txtError, Button btnBottom, List<View> errorViews) {
+	public ErrorHelper(LoaderView loader, TextView txtError, View btnBottom, List<View> errorViews) {
 		mLoader = loader;
 		mTxtError = txtError;
 		mBtnBottom = btnBottom;
@@ -67,8 +67,10 @@ public class ErrorHelper {
 			}
 		});
 		mTxtError.setText(error.getErrorId());
-		mTxtBottom.setCompoundDrawablesWithIntrinsicBounds(error.getmBtnDrawableId(), 0, 0, 0);
-		mTxtBottom.setText(error.getButtonTextId());
+		if (mTxtBottom != null) {
+			mTxtBottom.setCompoundDrawablesWithIntrinsicBounds(error.getmBtnDrawableId(), 0, 0, 0);
+			mTxtBottom.setText(error.getButtonTextId());
+		}
 		mBtnBottom.setOnClickListener(onClickListener);
 		ViewUtils.setVisible(mBtnDemo, false);
 	}
@@ -102,6 +104,10 @@ public class ErrorHelper {
 				activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), requestCode);
 			}
 		});
+	}
+
+	public void showPaymentDeclined(View.OnClickListener onClickListener) {
+		showError(LoaderError.PAYMENT_DECLINED, onClickListener);
 	}
 
 	public void showLocationError() {

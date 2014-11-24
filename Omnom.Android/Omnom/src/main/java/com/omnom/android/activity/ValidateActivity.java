@@ -134,7 +134,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.btn_bottom)
 	protected View btnErrorRepeat;
 
-	@InjectView(R.id.txt_error_repeat)
+	@InjectView(R.id.txt_bottom)
 	protected TextView txtErrorRepeat;
 
 	@InjectView(R.id.btn_demo)

@@ -27,6 +27,9 @@ public class LoaderError {
 	public static final LoaderError TWO_BEACONS =
 			new LoaderError(R.drawable.ic_weak_signal, R.string.error_more_than_one_beacon, R.string.repeat, R.drawable.ic_repeat_small);
 
+	public static final LoaderError PAYMENT_DECLINED =
+			new LoaderError(R.drawable.ic_flying_credit_card, R.string.error_payment_declined, R.string.error_ok, 0);
+
 	private final int mDrawableResId;
 	private final int mErrResId;
 	private final int mBtnResId;

@@ -24,6 +24,8 @@
     <color name="card_number_default">#ff000000</color>
     <color name="card_type_default">#7f000000</color>
 
+    <color name="payment_progress_color">#ffe4e4e4</color>
+
     <color name="tip_active">#ffffff</color>
     <color name="tip_default">#7affffff</color>
 </resources>
