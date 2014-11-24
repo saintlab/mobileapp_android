@@ -463,7 +463,7 @@ public class OrderFragment extends Fragment {
 		txtTitle.setText(getString(R.string.bill_number_, mPosition + 1));
 
 		initPicker();
-		initFooter(false);
+		initFooter(mSingle);
 		initList();
 	}
 
