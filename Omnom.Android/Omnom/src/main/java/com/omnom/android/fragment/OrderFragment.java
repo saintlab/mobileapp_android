@@ -1,5 +1,7 @@
 package com.omnom.android.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
@@ -666,7 +668,14 @@ public class OrderFragment extends Fragment {
 	private void splitBill() {
 		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder, mCheckedStates);
 		getFragmentManager().beginTransaction().add(android.R.id.content, billSplitFragment, BillSplitFragment.TAG).commit();
-		list.animate().translationY(-100).setDuration(getResources().getInteger(R.integer.listview_animation_delay)).start();
+		list.animate().translationY(-100).setListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(final Animator animation) {
+				list.setTranslationY(mListTrasnlationActive);
+			}
+		}).setDuration(getResources().getInteger(
+				R.integer.listview_animation_delay))
+		    .start();
 	}
 
 	private void initRadioButtons() {

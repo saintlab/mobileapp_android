@@ -103,7 +103,10 @@ public class BillSplitFragment extends Fragment {
 		mListHeight = getResources().getDimensionPixelSize(R.dimen.order_list_height);
 		mFragmentView.setTranslationY(-mListHeight);
 		mFragmentView.setAlpha(0.5f);
-		mFragmentView.animate().alpha(1).translationY(0).start();
+		mFragmentView.animate()
+		             .alpha(1)
+		             .translationY(0)
+		             .start();
 
 		final String fontPath = "fonts/Futura-OSF-Omnom-Regular.otf";
 		final float fontSize = getResources().getDimension(R.dimen.font_medium);
@@ -170,8 +173,9 @@ public class BillSplitFragment extends Fragment {
 	public void hide() {
 		final ViewPropertyAnimator viewPropertyAnimator = mFragmentView
 				.animate()
-				.setDuration(getResources().getInteger(R.integer.listview_animation_delay))
-				.alpha(0).translationY(-mListHeight);
+				.setDuration(getResources().getInteger(R.integer.default_animation_duration_short))
+				.translationX(getResources().getDisplayMetrics().widthPixels);
+
 		viewPropertyAnimator.setListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
