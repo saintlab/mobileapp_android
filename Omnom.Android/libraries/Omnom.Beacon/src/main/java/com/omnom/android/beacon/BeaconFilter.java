@@ -27,6 +27,10 @@ public class BeaconFilter {
 		app.inject(this);
 	}
 
+	/**
+	* Returns true if beacon is omnom-beacon
+	*
+	* */
 	@DebugLog
 	public boolean check(Beacon beacon) {
 		if(beacon == null || beacon.getId1() == null) {

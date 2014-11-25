@@ -3,27 +3,44 @@ package com.omnom.android.debug;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.activity.SplashActivity;
+import com.omnom.android.beacon.BeaconFilter;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.ResponseBase;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
 import hugo.weaving.DebugLog;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 import static android.os.Build.VERSION_CODES.KITKAT;
@@ -38,7 +55,11 @@ public class BackgroundBleService extends Service {
 
 	private static final long ALARM_INTERVAL = MINUTE;
 
+	private static final long BEACON_CACHE_INTERVAL = 5 * MINUTE;
+
 	private static final String TAG = BackgroundBleService.class.getSimpleName();
+
+	private static final String BLE_SERVICE_PREFERENCES = TAG;
 
 	@SuppressLint("NewApi")
 	private class Callback implements BluetoothAdapter.LeScanCallback {
@@ -54,12 +75,14 @@ public class BackgroundBleService extends Service {
 		@Override
 		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
 			final Beacon beacon = mParser.fromScanData(scanRecord, rssi, device);
-			Log.d(TAG, "Beacon found:\n" + beacon.toDebugString());
 			mBeacons.add(beacon);
 		}
 	}
 
 	public Callback mLeScanCallback;
+
+	@Inject
+	protected RestaurateurObeservableApi api;
 
 	private BluetoothAdapter mBluetoothAdapter;
 
@@ -86,7 +109,6 @@ public class BackgroundBleService extends Service {
 	@Override
 	@DebugLog
 	public int onStartCommand(final Intent intent, final int flags, final int startId) {
-		Log.d(TAG, "Starting service with : " + intent);
 		this.mStartId = startId;
 		return START_REDELIVER_INTENT;
 	}
@@ -94,8 +116,8 @@ public class BackgroundBleService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		OmnomApplication.get(this).inject(this);
 		if(!AndroidUtils.isJellyBeanMR2() || !BluetoothUtils.hasBleSupport(this)) {
-			Log.d(TAG, "Skipping scan : device doesn't support BLE");
 			stopSelf(mStartId);
 			return;
 		}
@@ -116,21 +138,13 @@ public class BackgroundBleService extends Service {
 		endCallback = new Runnable() {
 			@Override
 			public void run() {
-				if(mBeacons != null) {
-					if(mBeacons.size() == 0) {
-						Log.d(TAG, "BLE Scan finished : no beacons found");
-					} else {
-						Log.d(TAG, "BLE Scan finished : Found " + mBeacons.size() + " advertisings");
-						for(Beacon b : mBeacons) {
-							Log.d(TAG, "BLE Scan : BeaconData = [" + b.toDebugString() + "]");
-						}
-					}
-				} else {
-					Log.d(TAG, "BLE Scan finished : no beacons found");
-				}
 				if(!mBleState) {
 					mBluetoothAdapter.disable();
 				}
+
+				clearCachedBeacons();
+				notifyIfNeeded(mBeacons);
+
 				stopSelf(mStartId);
 				scheduleNextAlarm();
 			}
@@ -147,6 +161,119 @@ public class BackgroundBleService extends Service {
 		} else {
 			scanBleDevices(true, endCallback);
 		}
+	}
+
+	/**
+	 * Clear cached beacons which timestamp
+	 */
+	private void clearCachedBeacons() {
+		final SharedPreferences sharedPreferences = getSharedPreferences(BLE_SERVICE_PREFERENCES, MODE_PRIVATE);
+		final SharedPreferences.Editor editor = sharedPreferences.edit();
+		for(Map.Entry<String, ?> entry : sharedPreferences.getAll().entrySet()) {
+			final Long timestamp = (Long) entry.getValue();
+			if(timestamp + BEACON_CACHE_INTERVAL < SystemClock.elapsedRealtime()) {
+				editor.remove(entry.getKey());
+			}
+		}
+		editor.apply();
+	}
+
+	@DebugLog
+	private void notifyIfNeeded(final ArrayList<Beacon> beacons) {
+		ArrayList<Beacon> omnBeacons = new ArrayList<Beacon>();
+		final BeaconFilter filter = new BeaconFilter(OmnomApplication.get(this));
+		for(final Beacon b : beacons) {
+			if(filter.check(b)) {
+				omnBeacons.add(b);
+			}
+		}
+		if(omnBeacons.size() > 0) {
+			final List<Beacon> filteredBeacons = filter.filterBeacons(omnBeacons);
+			if(filteredBeacons.size() == 1) {
+				final Beacon beacon = filteredBeacons.get(0);
+				final TableDataResponse[] table = new TableDataResponse[1];
+				if(!isHandled(beacon)) {
+					api.findBeacon(beacon)
+					   .flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
+						   @Override
+						   public Observable<Restaurant> call(final TableDataResponse tableDataResponse) {
+							   if(!tableDataResponse.hasErrors()) {
+								   table[0] = tableDataResponse;
+								   return api.getRestaurant(tableDataResponse.getRestaurantId());
+							   }
+							   return Observable.empty();
+						   }
+					   })
+					   .flatMap(new Func1<Restaurant, Observable<ResponseBase>>() {
+						   @Override
+						   public Observable<ResponseBase> call(final Restaurant restaurant) {
+							   if(restaurant != null) {
+								   cacheBeacon(beacon);
+								   showNotification(beacon, restaurant);
+								   return api.newGuest(restaurant.getId(), table[0].getId());
+							   }
+							   return Observable.empty();
+						   }
+					   })
+					   .subscribe(new Action1<ResponseBase>() {
+						   @Override
+						   public void call(final ResponseBase o) {
+							   // Do nothing
+						   }
+					   }, new Action1<Throwable>() {
+						   @Override
+						   public void call(final Throwable throwable) {
+							   Log.e(TAG, "notifyIfNeeded", throwable);
+						   }
+					   });
+				}
+			}
+		}
+	}
+
+	private void cacheBeacon(final Beacon beacon) {
+		final SharedPreferences sharedPreferences = getSharedPreferences(BLE_SERVICE_PREFERENCES, MODE_PRIVATE);
+		sharedPreferences.edit().putLong(beacon.getBluetoothAddress(), SystemClock.elapsedRealtime()).apply();
+	}
+
+	/**
+	 * @return <code>true</code> if beacon is already handled.
+	 * This means that notification for this beacon already shown.
+	 */
+	@DebugLog
+	private boolean isHandled(final Beacon beacon) {
+		final SharedPreferences sharedPreferences = getSharedPreferences(BLE_SERVICE_PREFERENCES, MODE_PRIVATE);
+		final boolean contains = sharedPreferences.contains(beacon.getBluetoothAddress());
+		if(contains) {
+			final long timestamp = sharedPreferences.getLong(beacon.getBluetoothAddress(), 0);
+			return timestamp < SystemClock.elapsedRealtime() + BEACON_CACHE_INTERVAL;
+		}
+		return false;
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	@DebugLog
+	private void showNotification(final Beacon beacon, final Restaurant restaurant) {
+		final Notification notification = new Notification.Builder(this)
+				.setSmallIcon(R.drawable.ic_app)
+				.setContentTitle(getString(R.string.app_name))
+				.setContentText(getString(R.string.welcome_to_, restaurant.getTitle()))
+				.setContentIntent(getNotificationIntent())
+				.setAutoCancel(true)
+				.setDefaults(Notification.DEFAULT_ALL)
+				.setOnlyAlertOnce(true)
+				.setPriority(Notification.PRIORITY_HIGH).build();
+
+		final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		notificationManager.notify(beacon.getId3().toInt(), notification);
+	}
+
+	private PendingIntent getNotificationIntent() {
+		final Intent intent = new Intent(this, SplashActivity.class);
+		intent.setAction(Intent.ACTION_MAIN)
+		      .addCategory(Intent.CATEGORY_LAUNCHER)
+		      .setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		return PendingIntent.getActivity(this, 0, intent, 0);
 	}
 
 	@DebugLog

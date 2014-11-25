@@ -12,6 +12,7 @@ import com.omnom.android.activity.UserProfileActivity;
 import com.omnom.android.activity.UserRegisterActivity;
 import com.omnom.android.activity.ValidateActivityBle;
 import com.omnom.android.activity.ValidateActivityCamera;
+import com.omnom.android.debug.BackgroundBleService;
 import com.omnom.android.fragment.OrderFragment;
 
 import dagger.Module;
@@ -22,6 +23,6 @@ import dagger.Module;
 @Module(injects = {OmnomApplication.class, SplashActivity.class, UserRegisterActivity.class, EnteringActivity.class,
 		ConfirmPhoneActivity.class, LoginActivity.class, ValidateActivityBle.class, ValidateActivityCamera.class,
 		ValidateActivityBle.class, OrdersActivity.class, OrderFragment.class, CardsActivity.class, UserProfileActivity.class,
-		AddCardActivity.class},
+		AddCardActivity.class, BackgroundBleService.class},
         complete = false)
 public class OmnomApplicationModule {}
