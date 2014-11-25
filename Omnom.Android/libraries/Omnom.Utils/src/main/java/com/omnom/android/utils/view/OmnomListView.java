@@ -17,6 +17,9 @@ import android.widget.ListView;
  * Created by Ch3D on 15.10.2014.
  */
 public class OmnomListView extends ListView {
+
+	public static final int DURATION_ANIMATE_TO_START = 300;
+
 	public interface SwipeListener {
 		public void onRefresh();
 	}
@@ -49,9 +52,9 @@ public class OmnomListView extends ListView {
 
 	private boolean mEnabled = true;
 
-	private ViewDragHelper mDragHelper;
-
 	private float mLastMotionY;
+
+	private int mDefaultOverscrollOffset;
 
 	private float mInitialMotionY;
 
@@ -94,19 +97,19 @@ public class OmnomListView extends ListView {
 		@Override
 		public void applyTransformation(float interpolatedTime, Transformation t) {
 			int targetTop = 0;
-			if(mFrom != mOriginalOffsetTop) {
+			if (mFrom != mOriginalOffsetTop) {
 				targetTop = (mFrom + (int) ((mOriginalOffsetTop - mFrom) * interpolatedTime));
+			} else {
+				return;
 			}
 			int offset = targetTop - getTop();
 			final int currentTop = getTop();
-			if(offset + currentTop < 0) {
+			if (offset + currentTop <= 0) {
 				offset = 0 - currentTop;
 			}
 			setTargetOffsetTopAndBottom(offset);
 		}
 	};
-
-	private int mInitialTop;
 
 	public OmnomListView(Context context) {
 		super(context);
@@ -145,20 +148,20 @@ public class OmnomListView extends ListView {
 	@Override
 	public boolean onInterceptTouchEvent(final MotionEvent ev) {
 		ensureTarget();
-		if(mSwipeEnabled) {
+		if (mSwipeEnabled) {
 
 			final int action = MotionEventCompat.getActionMasked(ev);
 
-			if(mReturningToStart && action == MotionEvent.ACTION_DOWN) {
+			if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
 				mReturningToStart = false;
 			}
 
-			if(!isEnabled() || mReturningToStart) {
+			if (!isEnabled() || mReturningToStart) {
 				// Fail fast if we're not in a state where a swipe is possible
 				return false;
 			}
 
-			switch(action) {
+			switch (action) {
 				case MotionEvent.ACTION_DOWN:
 					mLastMotionY = mInitialMotionY = ev.getY();
 					mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
@@ -166,20 +169,20 @@ public class OmnomListView extends ListView {
 					break;
 
 				case MotionEvent.ACTION_MOVE:
-					if(mActivePointerId == INVALID_POINTER) {
+					if (mActivePointerId == INVALID_POINTER) {
 						Log.e(TAG, "Got ACTION_MOVE event but don't have an active pointer id.");
 						return false;
 					}
 
 					final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
-					if(pointerIndex < 0) {
+					if (pointerIndex < 0) {
 						Log.e(TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
 						return false;
 					}
 
 					final float y = MotionEventCompat.getY(ev, pointerIndex);
 					final float yDiff = y - mInitialMotionY;
-					if(yDiff > mTouchSlop) {
+					if (yDiff > mTouchSlop) {
 						mLastMotionY = y;
 						mIsBeingDragged = true;
 					}
@@ -195,7 +198,7 @@ public class OmnomListView extends ListView {
 					mActivePointerId = INVALID_POINTER;
 					break;
 			}
-			if(!mIsBeingDragged) {
+			if (!mIsBeingDragged) {
 				return super.onInterceptTouchEvent(ev);
 			}
 			return mIsBeingDragged;
@@ -205,21 +208,21 @@ public class OmnomListView extends ListView {
 
 	private void ensureTarget() {
 		// Don't bother getting the parent height if the parent hasn't been laid out yet.
-		if(mOriginalOffsetTop == -1) {
+		if (mOriginalOffsetTop == -1) {
 			mOriginalOffsetTop = getTop() + getPaddingTop();
 		}
-		if(mDistanceToTriggerSync == -1) {
-			if(getHeight() > 0) {
+		if (mDistanceToTriggerSync == -1) {
+			if (getHeight() > 0) {
 				final DisplayMetrics metrics = getResources().getDisplayMetrics();
-				mDistanceToTriggerSync = (int) Math.min(getHeight() * MAX_SWIPE_DISTANCE_FACTOR,
-				                                        REFRESH_TRIGGER_DISTANCE * metrics.density);
+				mDistanceToTriggerSync =
+						(int) Math.min(getHeight() * MAX_SWIPE_DISTANCE_FACTOR, REFRESH_TRIGGER_DISTANCE * metrics.density);
 			}
 		}
 	}
 
 	private void init() {
-		mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop() / 4;
-		mInitialTop = getTop();
+		mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop() / 8;
+		mDefaultOverscrollOffset = (int) getResources().getDisplayMetrics().density;
 	}
 
 	public void setScrollingEnabled(boolean enabled) {
@@ -227,23 +230,29 @@ public class OmnomListView extends ListView {
 	}
 
 	private void updateContentOffsetTop(int targetTop) {
-		System.err.println("updateContentOffsetTop");
 		final int currentTop = getTop();
-		System.err.println("targetTop = " + targetTop);
-		System.err.println("currentTop = " + currentTop);
-		if(targetTop > mDistanceToTriggerSync) {
+		if (targetTop > 0 && targetTop + currentTop > mDistanceToTriggerSync) {
+			setTargetOffsetTopAndBottom(mDefaultOverscrollOffset);
+			return;
+		}
+		if (targetTop < 0) {
+			if (targetTop + currentTop > mOriginalOffsetTop) {
+				setTargetOffsetTopAndBottom(targetTop);
+				return;
+			} else {
+				setTargetOffsetTopAndBottom(-mDefaultOverscrollOffset);
+				return;
+			}
+		}
+		if (targetTop > mDistanceToTriggerSync) {
 			targetTop = (int) mDistanceToTriggerSync;
-		} else if(targetTop < 0) {
+		} else if (targetTop < 0) {
 			targetTop = 0;
 		}
-		final int offset = targetTop - currentTop;
-		if(offset > 0) {
-			setTargetOffsetTopAndBottom(offset);
-		}
+		setTargetOffsetTopAndBottom(targetTop);
 	}
 
 	private void setTargetOffsetTopAndBottom(int offset) {
-		System.err.println("setTargetOffsetTopAndBottom(" + offset + ")");
 		offsetTopAndBottom(offset);
 		mCurrentTargetOffsetTop = getTop();
 	}
@@ -252,37 +261,21 @@ public class OmnomListView extends ListView {
 	public boolean dispatchTouchEvent(MotionEvent ev) {
 		final int actionMasked = ev.getActionMasked() & MotionEvent.ACTION_MASK;
 
-		if(actionMasked == MotionEvent.ACTION_DOWN) {
-			// Record the position of the finger is pressed
-			// mPosition = pointToPosition((int) ev.getX(), (int) ev.getY());
+		if (actionMasked == MotionEvent.ACTION_DOWN) {
 			return super.dispatchTouchEvent(ev);
 		}
 
-		if(actionMasked == MotionEvent.ACTION_MOVE) {
-			//The key, ignored MOVE event
-			//ListView onTouch can't get MOVE event, so does not occur scroll event
-			if(!mEnabled && !mSwipeEnabled) {
+		if (actionMasked == MotionEvent.ACTION_MOVE) {
+			if (!mEnabled && !mSwipeEnabled) {
 				return true;
 			} else {
 				return super.dispatchTouchEvent(ev);
 			}
 		}
 
-		// when Lift your finger
-		if(actionMasked == MotionEvent.ACTION_UP
-				|| actionMasked == MotionEvent.ACTION_CANCEL) {
-			//// Finger press and lift all in the same view, to the parent control handle, which is a click event
-			//if(pointToPosition((int) ev.getX(), (int) ev.getY()) == mPosition) {
-			//	super.dispatchTouchEvent(ev);
-			//} else {
-			//	// If the finger has moved Item pressed, indicating that scrolling behavior, cleaning Item pressed state
-			//	setPressed(false);
-			//	invalidate();
-			//	return true;
-			//}
+		if (actionMasked == MotionEvent.ACTION_UP || actionMasked == MotionEvent.ACTION_CANCEL) {
 			return super.dispatchTouchEvent(ev);
 		}
-
 		return super.dispatchTouchEvent(ev);
 	}
 
@@ -290,16 +283,16 @@ public class OmnomListView extends ListView {
 	public boolean onTouchEvent(MotionEvent ev) {
 		final int action = MotionEventCompat.getActionMasked(ev);
 
-		if(mReturningToStart && action == MotionEvent.ACTION_DOWN) {
+		if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
 			mReturningToStart = false;
 		}
 
-		if(!isEnabled() || mReturningToStart/* || canChildScrollUp()*/) {
+		if (!isEnabled() || mReturningToStart) {
 			// Fail fast if we're not in a state where a swipe is possible
 			return false;
 		}
 
-		switch(action) {
+		switch (action) {
 			case MotionEvent.ACTION_DOWN:
 				mPosition = pointToPosition((int) ev.getX(), (int) ev.getY());
 				mLastMotionY = mInitialMotionY = ev.getY();
@@ -309,7 +302,7 @@ public class OmnomListView extends ListView {
 
 			case MotionEvent.ACTION_MOVE:
 				final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
-				if(pointerIndex < 0) {
+				if (pointerIndex < 0) {
 					Log.e(TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
 					return false;
 				}
@@ -317,16 +310,16 @@ public class OmnomListView extends ListView {
 				final float y = MotionEventCompat.getY(ev, pointerIndex);
 				final float yDiff = y - mInitialMotionY;
 
-				if(!mIsBeingDragged && yDiff > mTouchSlop) {
+				if (!mIsBeingDragged && Math.abs(yDiff) > mTouchSlop) {
 					mIsBeingDragged = true;
 				}
 
-				if(mIsBeingDragged) {
-					if(yDiff > mDistanceToTriggerSync) {
+				if (mIsBeingDragged) {
+					if (yDiff > mDistanceToTriggerSync) {
 						startRefresh();
 					} else {
 						updateContentOffsetTop((int) (yDiff));
-						if(mLastMotionY > y && getTop() == getPaddingTop()) {
+						if (mLastMotionY > y && getTop() == getPaddingTop()) {
 							// If the user puts the view back at the top, we
 							// don't need to. This shouldn't be considered
 							// cancelling the gesture as the user can restart from the top.
@@ -352,7 +345,7 @@ public class OmnomListView extends ListView {
 
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
-				if(pointToPosition((int) ev.getX(), (int) ev.getY()) == mPosition) {
+				if (!mIsBeingDragged && pointToPosition((int) ev.getX(), (int) ev.getY()) == mPosition) {
 					super.onTouchEvent(ev);
 				}
 				mIsBeingDragged = false;
@@ -365,13 +358,13 @@ public class OmnomListView extends ListView {
 
 	private void updatePositionTimeout() {
 		removeCallbacks(mCancel);
-		postDelayed(mCancel, 150);
+		postDelayed(mCancel, DURATION_ANIMATE_TO_START / 2);
 	}
 
 	private void onSecondaryPointerUp(MotionEvent ev) {
 		final int pointerIndex = MotionEventCompat.getActionIndex(ev);
 		final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
-		if(pointerId == mActivePointerId) {
+		if (pointerId == mActivePointerId) {
 			final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
 			mLastMotionY = MotionEventCompat.getY(ev, newPointerIndex);
 			mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
@@ -380,7 +373,7 @@ public class OmnomListView extends ListView {
 
 	private void startRefresh() {
 		removeCallbacks(mCancel);
-		if(!mRefreshing) {
+		if (!mRefreshing) {
 			mRefreshing = true;
 			mListener.onRefresh();
 		}
@@ -389,7 +382,7 @@ public class OmnomListView extends ListView {
 	private void animateOffsetToStartPosition(int from, Animation.AnimationListener listener) {
 		mFrom = from;
 		mAnimateToStartPosition.reset();
-		mAnimateToStartPosition.setDuration(350);
+		mAnimateToStartPosition.setDuration(DURATION_ANIMATE_TO_START);
 		mAnimateToStartPosition.setAnimationListener(listener);
 		mAnimateToStartPosition.setInterpolator(new DecelerateInterpolator());
 		startAnimation(mAnimateToStartPosition);
