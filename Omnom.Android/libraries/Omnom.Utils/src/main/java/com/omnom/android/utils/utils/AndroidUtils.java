@@ -187,4 +187,8 @@ public class AndroidUtils {
 	public static boolean isJellyBean() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
 	}
+
+	public static boolean isJellyBeanMR2() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+	}
 }
