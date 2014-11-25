@@ -12,7 +12,7 @@
         android:layout_gravity="top"
         android:layout_alignParentBottom="true"
         android:stackFromBottom="true"
-        android:divider="@drawable/divider_list_padding"
+        android:divider="@android:color/white"
         android:dividerHeight="1dp"
         android:overScrollMode="never"
         android:listSelector="@color/transparent"

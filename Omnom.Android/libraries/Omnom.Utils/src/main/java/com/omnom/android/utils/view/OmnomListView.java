@@ -1,8 +1,11 @@
 package com.omnom.android.utils.view;
 
 import android.content.Context;
+import android.support.v4.view.MotionEventCompat;
+import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ListView;
 
 /**
@@ -10,23 +13,88 @@ import android.widget.ListView;
  */
 public class OmnomListView extends ListView {
 	private int mPosition = -1;
+
 	private boolean mEnabled = true;
+
+	private ViewDragHelper mDragHelper;
 
 	public OmnomListView(Context context) {
 		super(context);
+		init();
 	}
 
 	public OmnomListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		init();
 	}
 
 	public OmnomListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		init();
+	}
+
+	private void init() {
+		mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
+			@Override
+			public boolean tryCaptureView(final View child, final int pointerId) {
+				System.err.println("tryCaptureView >> ");
+				return true;
+			}
+
+			@Override
+			public void onViewPositionChanged(final View changedView, final int left, final int top, final int dx, final int dy) {
+				System.err.println("onViewPositionChanged >> ");
+				super.onViewPositionChanged(changedView, left, top, dx, dy);
+			}
+
+			@Override
+			public void onViewReleased(View releasedChild, float xvel, float yvel) {
+				System.err.println("onViewReleased >> ");
+				//int top = getPaddingTop();
+				//if(yvel > 0 || (yvel == 0 && mDragOffset > 0.5f)) {
+				//	top += mDragRange;
+				//}
+				//mDragHelper.settleCapturedViewAt(releasedChild.getLeft(), top);
+			}
+
+			@Override
+			public int getViewVerticalDragRange(View child) {
+				return OmnomListView.this.getHeight();
+			}
+
+			@Override
+			public int clampViewPositionVertical(View child, int top, int dy) {
+				final int topBound = getPaddingTop();
+				final int bottomBound = getViewVerticalDragRange(null);
+				final int min = Math.min(Math.max(top, topBound), bottomBound);
+				OmnomListView.this.setTranslationY(min);
+				return min;
+			}
+		});
+	}
+
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		final int action = MotionEventCompat.getActionMasked(ev);
+		if(action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
+			mDragHelper.cancel();
+			return false;
+		}
+		return mDragHelper.shouldInterceptTouchEvent(ev);
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		mDragHelper.processTouchEvent(ev);
+		return true;
 	}
 
 	public void setScrollingEnabled(boolean enabled) {
-		mEnabled = enabled;
+		// mEnabled = enabled;
+		mEnabled = true;
 	}
+
+
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {

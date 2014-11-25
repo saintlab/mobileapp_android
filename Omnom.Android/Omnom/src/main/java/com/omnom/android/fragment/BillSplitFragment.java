@@ -2,6 +2,8 @@ package com.omnom.android.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,7 +14,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -171,17 +173,27 @@ public class BillSplitFragment extends Fragment {
 	}
 
 	public void hide() {
-		final ViewPropertyAnimator viewPropertyAnimator = mFragmentView
-				.animate()
-				.setDuration(getResources().getInteger(R.integer.default_animation_duration_short))
-				.translationX(getResources().getDisplayMetrics().widthPixels);
+		final AnimatorSet as = new AnimatorSet();
+		final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mFragmentView, View.TRANSLATION_X, mFragmentView.getTranslationX(),
+		                                                     getResources().getDisplayMetrics().widthPixels);
 
-		viewPropertyAnimator.setListener(new AnimatorListenerAdapter() {
+		final View order_page_0 = getActivity().getWindow().getDecorView().findViewWithTag("order_page_0");
+		if(order_page_0 != null) {
+			order_page_0.setTranslationX(-200);
+			final ObjectAnimator scaleX2 = ObjectAnimator.ofFloat(order_page_0, View.TRANSLATION_X, -200, 0);
+			as.playTogether(scaleX, scaleX2);
+		} else {
+			as.playTogether(scaleX);
+		}
+		as.setInterpolator(new AccelerateDecelerateInterpolator());
+		as.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
 				getFragmentManager().beginTransaction().remove(BillSplitFragment.this).commit();
 			}
-		}).start();
+		});
+		as.start();
+
 		mBus.post(new SplitHideEvent(mOrder.getId()));
 	}
 

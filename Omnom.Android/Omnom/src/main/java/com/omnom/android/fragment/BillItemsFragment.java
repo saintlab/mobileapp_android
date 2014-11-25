@@ -20,7 +20,6 @@ import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
-import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Bus;
 
 import java.math.BigDecimal;
@@ -83,8 +82,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 	public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		mAdapter = new OrderItemsAdapter(getActivity(), mOrder.getItems(), mStates, false);
-		getListView().setDividerHeight(ViewUtils.dipToPixels(getActivity(), 1));
-		getListView().setDivider(getResources().getDrawable(R.drawable.divider_list_padding));
+		getListView().setDividerHeight(0);
 		final View footerView = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer_empty, null, false);
 		getListView().addFooterView(footerView);
 		setListAdapter(mAdapter);

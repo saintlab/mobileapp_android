@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <color
-            android:color="@android:color/white"/>
+            android:color="@android:color/transparent"/>
     </item>
     <item
         android:left="@dimen/activity_horizontal_margin_medium"
