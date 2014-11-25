@@ -150,7 +150,7 @@ public class AndroidUtils {
 	public static AlertDialog showDialog(Context context, String msg, int okResId, DialogInterface.OnClickListener okListener,
 	                                     int cancelResId, DialogInterface.OnClickListener cancelListener) {
 		final AlertDialog alertDialog = new AlertDialog.Builder(context).setMessage(msg).setPositiveButton(okResId,
-		                                                                                                                 okListener)
+		                                                                                                   okListener)
 		                                                                .setNegativeButton(cancelResId, cancelListener).create();
 		alertDialog.setCancelable(false);
 		alertDialog.setCanceledOnTouchOutside(false);
@@ -225,5 +225,9 @@ public class AndroidUtils {
 		background.mutate();
 		background.setColorFilter(null);
 		background.invalidateSelf();
+	}
+
+	public static boolean isJellyBeanMR2() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
 	}
 }

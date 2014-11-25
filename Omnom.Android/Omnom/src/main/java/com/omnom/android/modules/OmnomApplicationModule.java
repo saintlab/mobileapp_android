@@ -16,6 +16,7 @@ import com.omnom.android.activity.UserProfileActivity;
 import com.omnom.android.activity.UserRegisterActivity;
 import com.omnom.android.activity.ValidateActivityBle;
 import com.omnom.android.activity.ValidateActivityCamera;
+import com.omnom.android.debug.BackgroundBleService;
 import com.omnom.android.fragment.BillItemsFragment;
 import com.omnom.android.fragment.BillSplitFragment;
 import com.omnom.android.fragment.BillSplitPersonsFragment;
@@ -32,6 +33,8 @@ import dagger.Module;
 		ConfirmPhoneActivity.class, LoginActivity.class, ValidateActivityBle.class, ValidateActivityCamera.class,
 		ValidateActivityBle.class, OrdersActivity.class, CardsActivity.class, UserProfileActivity.class, CardAddActivity.class,
 		CardConfirmActivity.class, ThanksActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
+		/* services */
+		BackgroundBleService.class,
 		/* fragments */
 		OrderFragment.class, BillSplitFragment.class, BillItemsFragment.class, BillSplitPersonsFragment.class},
         complete = false)
