@@ -368,7 +368,7 @@ public class OrderFragment extends Fragment {
 			ViewUtils.setVisible(billSplit2, false);
 		}
 		AnimationUtils.animateAlpha3(getPanelPayment(), false);
-		list.setScrollingEnabled(false);
+		list.setSwipeEnabled(false);
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0).start();
 		AnimationUtils.animateAlpha(txtTitle, true);
 	}
@@ -482,6 +482,14 @@ public class OrderFragment extends Fragment {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems(), true));
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+
+		list.setSwipeEnabled(false);
+		list.setSwipeListener(new OmnomListView.SwipeListener() {
+			@Override
+			public void onRefresh() {
+				splitBill();
+			}
+		});
 		if(mAnimate) {
 			AnimationUtils.scaleHeight(list, mListHeight);
 		} else {
@@ -517,6 +525,7 @@ public class OrderFragment extends Fragment {
 		AnimationUtils.animateAlpha(getPanelPayment(), true);
 		AnimationUtils.animateAlpha(txtTitle, false);
 		AndroidUtils.scrollEnd(list);
+		list.setSwipeEnabled(true);
 		activity.showOther(mPosition, false);
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, mListTrasnlationActive).start();
 	}
@@ -675,6 +684,7 @@ public class OrderFragment extends Fragment {
 		animator.translationY(-100).setListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
+				list.cancelRefreshing();
 				list.setTranslationY(mListTrasnlationActive);
 				animator.setListener(null);
 			}
@@ -930,8 +940,10 @@ public class OrderFragment extends Fragment {
 		if(fragmentByTag != null) {
 			BillSplitFragment splitFragment = (BillSplitFragment) fragmentByTag;
 			splitFragment.hide();
+			list.setSwipeEnabled(true);
 			return true;
 		}
+		list.setSwipeEnabled(false);
 		return false;
 	}
 

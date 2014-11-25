@@ -4,19 +4,109 @@ import android.content.Context;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Transformation;
 import android.widget.ListView;
 
 /**
  * Created by Ch3D on 15.10.2014.
  */
 public class OmnomListView extends ListView {
+	public interface SwipeListener {
+		public void onRefresh();
+	}
+
+	private static final String TAG = OmnomListView.class.getSimpleName();
+
+	private static final int INVALID_POINTER = -1;
+
+	private int mActivePointerId = INVALID_POINTER;
+
+	private static final float MAX_SWIPE_DISTANCE_FACTOR = .6f;
+
+	private static final int REFRESH_TRIGGER_DISTANCE = 120;
+
+	private class BaseAnimationListener implements Animation.AnimationListener {
+		@Override
+		public void onAnimationStart(Animation animation) {
+		}
+
+		@Override
+		public void onAnimationEnd(Animation animation) {
+		}
+
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+		}
+	}
+
 	private int mPosition = -1;
 
 	private boolean mEnabled = true;
 
 	private ViewDragHelper mDragHelper;
+
+	private float mLastMotionY;
+
+	private float mInitialMotionY;
+
+	private boolean mIsBeingDragged;
+
+	private boolean mReturningToStart;
+
+	private float mTouchSlop;
+
+	private float mDistanceToTriggerSync = -1;
+
+	private int mCurrentTargetOffsetTop;
+
+	private final Animation.AnimationListener mReturnToStartPositionListener = new BaseAnimationListener() {
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			mCurrentTargetOffsetTop = 0;
+		}
+	};
+
+	private final Runnable mCancel = new Runnable() {
+		@Override
+		public void run() {
+			mReturningToStart = true;
+			animateOffsetToStartPosition(mCurrentTargetOffsetTop + getPaddingTop(), mReturnToStartPositionListener);
+		}
+	};
+
+	private int mOriginalOffsetTop = -1;
+
+	private SwipeListener mListener;
+
+	private boolean mRefreshing = false;
+
+	private boolean mSwipeEnabled;
+
+	private int mFrom;
+
+	private final Animation mAnimateToStartPosition = new Animation() {
+		@Override
+		public void applyTransformation(float interpolatedTime, Transformation t) {
+			int targetTop = 0;
+			if(mFrom != mOriginalOffsetTop) {
+				targetTop = (mFrom + (int) ((mOriginalOffsetTop - mFrom) * interpolatedTime));
+			}
+			int offset = targetTop - getTop();
+			final int currentTop = getTop();
+			if(offset + currentTop < 0) {
+				offset = 0 - currentTop;
+			}
+			setTargetOffsetTopAndBottom(offset);
+		}
+	};
+
+	private int mInitialTop;
 
 	public OmnomListView(Context context) {
 		super(context);
@@ -33,68 +123,130 @@ public class OmnomListView extends ListView {
 		init();
 	}
 
-	private void init() {
-		mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
-			@Override
-			public boolean tryCaptureView(final View child, final int pointerId) {
-				System.err.println("tryCaptureView >> ");
-				return true;
-			}
+	public void setSwipeEnabled(boolean swipeEnabled) {
+		mSwipeEnabled = swipeEnabled;
+	}
 
-			@Override
-			public void onViewPositionChanged(final View changedView, final int left, final int top, final int dx, final int dy) {
-				System.err.println("onViewPositionChanged >> ");
-				super.onViewPositionChanged(changedView, left, top, dx, dy);
-			}
-
-			@Override
-			public void onViewReleased(View releasedChild, float xvel, float yvel) {
-				System.err.println("onViewReleased >> ");
-				//int top = getPaddingTop();
-				//if(yvel > 0 || (yvel == 0 && mDragOffset > 0.5f)) {
-				//	top += mDragRange;
-				//}
-				//mDragHelper.settleCapturedViewAt(releasedChild.getLeft(), top);
-			}
-
-			@Override
-			public int getViewVerticalDragRange(View child) {
-				return OmnomListView.this.getHeight();
-			}
-
-			@Override
-			public int clampViewPositionVertical(View child, int top, int dy) {
-				final int topBound = getPaddingTop();
-				final int bottomBound = getViewVerticalDragRange(null);
-				final int min = Math.min(Math.max(top, topBound), bottomBound);
-				OmnomListView.this.setTranslationY(min);
-				return min;
-			}
-		});
+	public void setSwipeListener(SwipeListener listener) {
+		mListener = listener;
 	}
 
 	@Override
-	public boolean onInterceptTouchEvent(MotionEvent ev) {
-		final int action = MotionEventCompat.getActionMasked(ev);
-		if(action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
-			mDragHelper.cancel();
-			return false;
+	protected void onLayout(final boolean changed, final int l, final int t, final int r, final int b) {
+		final int width = getMeasuredWidth();
+		final int height = getMeasuredHeight();
+		final int childLeft = getPaddingLeft();
+		final int childTop = mCurrentTargetOffsetTop + getPaddingTop();
+		final int childWidth = width - getPaddingLeft() - getPaddingRight();
+		final int childHeight = height - getPaddingTop() - getPaddingBottom();
+		super.onLayout(changed, childLeft, childTop, childLeft + childWidth, childTop + childHeight);
+	}
+
+	@Override
+	public boolean onInterceptTouchEvent(final MotionEvent ev) {
+		ensureTarget();
+		if(mSwipeEnabled) {
+
+			final int action = MotionEventCompat.getActionMasked(ev);
+
+			if(mReturningToStart && action == MotionEvent.ACTION_DOWN) {
+				mReturningToStart = false;
+			}
+
+			if(!isEnabled() || mReturningToStart) {
+				// Fail fast if we're not in a state where a swipe is possible
+				return false;
+			}
+
+			switch(action) {
+				case MotionEvent.ACTION_DOWN:
+					mLastMotionY = mInitialMotionY = ev.getY();
+					mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+					mIsBeingDragged = false;
+					break;
+
+				case MotionEvent.ACTION_MOVE:
+					if(mActivePointerId == INVALID_POINTER) {
+						Log.e(TAG, "Got ACTION_MOVE event but don't have an active pointer id.");
+						return false;
+					}
+
+					final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+					if(pointerIndex < 0) {
+						Log.e(TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
+						return false;
+					}
+
+					final float y = MotionEventCompat.getY(ev, pointerIndex);
+					final float yDiff = y - mInitialMotionY;
+					if(yDiff > mTouchSlop) {
+						mLastMotionY = y;
+						mIsBeingDragged = true;
+					}
+					break;
+
+				case MotionEventCompat.ACTION_POINTER_UP:
+					onSecondaryPointerUp(ev);
+					break;
+
+				case MotionEvent.ACTION_UP:
+				case MotionEvent.ACTION_CANCEL:
+					mIsBeingDragged = false;
+					mActivePointerId = INVALID_POINTER;
+					break;
+			}
+			if(!mIsBeingDragged) {
+				return super.onInterceptTouchEvent(ev);
+			}
+			return mIsBeingDragged;
 		}
-		return mDragHelper.shouldInterceptTouchEvent(ev);
+		return super.onInterceptTouchEvent(ev);
 	}
 
-	@Override
-	public boolean onTouchEvent(MotionEvent ev) {
-		mDragHelper.processTouchEvent(ev);
-		return true;
+	private void ensureTarget() {
+		// Don't bother getting the parent height if the parent hasn't been laid out yet.
+		if(mOriginalOffsetTop == -1) {
+			mOriginalOffsetTop = getTop() + getPaddingTop();
+		}
+		if(mDistanceToTriggerSync == -1) {
+			if(getHeight() > 0) {
+				final DisplayMetrics metrics = getResources().getDisplayMetrics();
+				mDistanceToTriggerSync = (int) Math.min(getHeight() * MAX_SWIPE_DISTANCE_FACTOR,
+				                                        REFRESH_TRIGGER_DISTANCE * metrics.density);
+			}
+		}
+	}
+
+	private void init() {
+		mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop() / 4;
+		mInitialTop = getTop();
 	}
 
 	public void setScrollingEnabled(boolean enabled) {
-		// mEnabled = enabled;
-		mEnabled = true;
+		mEnabled = enabled;
 	}
 
+	private void updateContentOffsetTop(int targetTop) {
+		System.err.println("updateContentOffsetTop");
+		final int currentTop = getTop();
+		System.err.println("targetTop = " + targetTop);
+		System.err.println("currentTop = " + currentTop);
+		if(targetTop > mDistanceToTriggerSync) {
+			targetTop = (int) mDistanceToTriggerSync;
+		} else if(targetTop < 0) {
+			targetTop = 0;
+		}
+		final int offset = targetTop - currentTop;
+		if(offset > 0) {
+			setTargetOffsetTopAndBottom(offset);
+		}
+	}
 
+	private void setTargetOffsetTopAndBottom(int offset) {
+		System.err.println("setTargetOffsetTopAndBottom(" + offset + ")");
+		offsetTopAndBottom(offset);
+		mCurrentTargetOffsetTop = getTop();
+	}
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -102,14 +254,14 @@ public class OmnomListView extends ListView {
 
 		if(actionMasked == MotionEvent.ACTION_DOWN) {
 			// Record the position of the finger is pressed
-			mPosition = pointToPosition((int) ev.getX(), (int) ev.getY());
+			// mPosition = pointToPosition((int) ev.getX(), (int) ev.getY());
 			return super.dispatchTouchEvent(ev);
 		}
 
 		if(actionMasked == MotionEvent.ACTION_MOVE) {
-			// The key, ignored MOVE event
-			// ListView onTouch can't get MOVE event, so does not occur scroll event
-			if(!mEnabled) {
+			//The key, ignored MOVE event
+			//ListView onTouch can't get MOVE event, so does not occur scroll event
+			if(!mEnabled && !mSwipeEnabled) {
 				return true;
 			} else {
 				return super.dispatchTouchEvent(ev);
@@ -119,17 +271,132 @@ public class OmnomListView extends ListView {
 		// when Lift your finger
 		if(actionMasked == MotionEvent.ACTION_UP
 				|| actionMasked == MotionEvent.ACTION_CANCEL) {
-			// Finger press and lift all in the same view, to the parent control handle, which is a click event
-			if(pointToPosition((int) ev.getX(), (int) ev.getY()) == mPosition) {
-				super.dispatchTouchEvent(ev);
-			} else {
-				// If the finger has moved Item pressed, indicating that scrolling behavior, cleaning Item pressed state
-				setPressed(false);
-				invalidate();
-				return true;
-			}
+			//// Finger press and lift all in the same view, to the parent control handle, which is a click event
+			//if(pointToPosition((int) ev.getX(), (int) ev.getY()) == mPosition) {
+			//	super.dispatchTouchEvent(ev);
+			//} else {
+			//	// If the finger has moved Item pressed, indicating that scrolling behavior, cleaning Item pressed state
+			//	setPressed(false);
+			//	invalidate();
+			//	return true;
+			//}
+			return super.dispatchTouchEvent(ev);
 		}
 
 		return super.dispatchTouchEvent(ev);
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		final int action = MotionEventCompat.getActionMasked(ev);
+
+		if(mReturningToStart && action == MotionEvent.ACTION_DOWN) {
+			mReturningToStart = false;
+		}
+
+		if(!isEnabled() || mReturningToStart/* || canChildScrollUp()*/) {
+			// Fail fast if we're not in a state where a swipe is possible
+			return false;
+		}
+
+		switch(action) {
+			case MotionEvent.ACTION_DOWN:
+				mPosition = pointToPosition((int) ev.getX(), (int) ev.getY());
+				mLastMotionY = mInitialMotionY = ev.getY();
+				mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+				mIsBeingDragged = false;
+				break;
+
+			case MotionEvent.ACTION_MOVE:
+				final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+				if(pointerIndex < 0) {
+					Log.e(TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
+					return false;
+				}
+
+				final float y = MotionEventCompat.getY(ev, pointerIndex);
+				final float yDiff = y - mInitialMotionY;
+
+				if(!mIsBeingDragged && yDiff > mTouchSlop) {
+					mIsBeingDragged = true;
+				}
+
+				if(mIsBeingDragged) {
+					if(yDiff > mDistanceToTriggerSync) {
+						startRefresh();
+					} else {
+						updateContentOffsetTop((int) (yDiff));
+						if(mLastMotionY > y && getTop() == getPaddingTop()) {
+							// If the user puts the view back at the top, we
+							// don't need to. This shouldn't be considered
+							// cancelling the gesture as the user can restart from the top.
+							removeCallbacks(mCancel);
+						} else {
+							updatePositionTimeout();
+						}
+					}
+					mLastMotionY = y;
+				}
+				break;
+
+			case MotionEventCompat.ACTION_POINTER_DOWN: {
+				final int index = MotionEventCompat.getActionIndex(ev);
+				mLastMotionY = MotionEventCompat.getY(ev, index);
+				mActivePointerId = MotionEventCompat.getPointerId(ev, index);
+				break;
+			}
+
+			case MotionEventCompat.ACTION_POINTER_UP:
+				onSecondaryPointerUp(ev);
+				break;
+
+			case MotionEvent.ACTION_UP:
+			case MotionEvent.ACTION_CANCEL:
+				if(pointToPosition((int) ev.getX(), (int) ev.getY()) == mPosition) {
+					super.onTouchEvent(ev);
+				}
+				mIsBeingDragged = false;
+				mActivePointerId = INVALID_POINTER;
+				return true;
+		}
+
+		return true;
+	}
+
+	private void updatePositionTimeout() {
+		removeCallbacks(mCancel);
+		postDelayed(mCancel, 150);
+	}
+
+	private void onSecondaryPointerUp(MotionEvent ev) {
+		final int pointerIndex = MotionEventCompat.getActionIndex(ev);
+		final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
+		if(pointerId == mActivePointerId) {
+			final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+			mLastMotionY = MotionEventCompat.getY(ev, newPointerIndex);
+			mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
+		}
+	}
+
+	private void startRefresh() {
+		removeCallbacks(mCancel);
+		if(!mRefreshing) {
+			mRefreshing = true;
+			mListener.onRefresh();
+		}
+	}
+
+	private void animateOffsetToStartPosition(int from, Animation.AnimationListener listener) {
+		mFrom = from;
+		mAnimateToStartPosition.reset();
+		mAnimateToStartPosition.setDuration(350);
+		mAnimateToStartPosition.setAnimationListener(listener);
+		mAnimateToStartPosition.setInterpolator(new DecelerateInterpolator());
+		startAnimation(mAnimateToStartPosition);
+	}
+
+	public void cancelRefreshing() {
+		mRefreshing = false;
+		mCancel.run();
 	}
 }
