@@ -2,7 +2,6 @@ package com.omnom.android.utils.view;
 
 import android.content.Context;
 import android.support.v4.view.MotionEventCompat;
-import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -222,7 +221,7 @@ public class OmnomListView extends ListView {
 
 	private void init() {
 		mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop() / 8;
-		mDefaultOverscrollOffset = (int) getResources().getDisplayMetrics().density;
+		mDefaultOverscrollOffset = (int) (getResources().getDisplayMetrics().density * 2);
 	}
 
 	public void setScrollingEnabled(boolean enabled) {
