@@ -1,7 +1,10 @@
 package com.omnom.android.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -17,6 +20,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.view.ViewStub;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
@@ -30,7 +34,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
@@ -57,9 +60,7 @@ import com.squareup.otto.Subscribe;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -292,7 +293,7 @@ public class OrderFragment extends Fragment {
 	@Subscribe
 	public void onSplitCommit(SplitHideEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
-			list.animate().translationY(mListTrasnlationActive).start();
+			// list.animate().translationY(mListTrasnlationActive).start();
 		}
 	}
 
@@ -333,7 +334,8 @@ public class OrderFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
-		final View view = inflater.inflate(R.layout.fragment_order, container, false);
+		final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_order, container, false);
+
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
 		mFontSmall = getResources().getDimension(R.dimen.font_large);
 
@@ -366,7 +368,7 @@ public class OrderFragment extends Fragment {
 			ViewUtils.setVisible(billSplit2, false);
 		}
 		AnimationUtils.animateAlpha3(getPanelPayment(), false);
-		list.setScrollingEnabled(false);
+		list.setSwipeEnabled(false);
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0).start();
 		AnimationUtils.animateAlpha(txtTitle, true);
 	}
@@ -404,7 +406,8 @@ public class OrderFragment extends Fragment {
 			btnApply.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(final View v) {
-					doApply(v);;
+					doApply(v);
+					;
 				}
 			});
 			btnCancel = (ImageButton) inflate.findViewById(R.id.btn_cancel);
@@ -450,6 +453,7 @@ public class OrderFragment extends Fragment {
 	@Override
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 		mFragmentView = view;
+		mFragmentView.setTag("order_page_" + mPosition);
 
 		if(mAnimate) {
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
@@ -478,6 +482,14 @@ public class OrderFragment extends Fragment {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems(), true));
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+
+		list.setSwipeEnabled(false);
+		list.setSwipeListener(new OmnomListView.SwipeListener() {
+			@Override
+			public void onRefresh() {
+				splitBill();
+			}
+		});
 		if(mAnimate) {
 			AnimationUtils.scaleHeight(list, mListHeight);
 		} else {
@@ -513,6 +525,7 @@ public class OrderFragment extends Fragment {
 		AnimationUtils.animateAlpha(getPanelPayment(), true);
 		AnimationUtils.animateAlpha(txtTitle, false);
 		AndroidUtils.scrollEnd(list);
+		list.setSwipeEnabled(true);
 		activity.showOther(mPosition, false);
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, mListTrasnlationActive).start();
 	}
@@ -523,7 +536,7 @@ public class OrderFragment extends Fragment {
 
 	private void sendBillViewEvent(UserData user, BeaconFindRequest beacon, Order order) {
 		Event billViewEvent = new BillViewEvent(order.getRestaurantId(), beacon,
-												user, order.getAmountToPay());
+		                                        user, order.getAmountToPay());
 		OmnomApplication.getMixPanelHelper(getActivity()).track(billViewEvent);
 	}
 
@@ -663,10 +676,20 @@ public class OrderFragment extends Fragment {
 		initFooter(true);
 	}
 
+	@SuppressLint("NewApi")
 	private void splitBill() {
 		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder, mCheckedStates);
 		getFragmentManager().beginTransaction().add(android.R.id.content, billSplitFragment, BillSplitFragment.TAG).commit();
-		list.animate().translationY(-100).setDuration(getResources().getInteger(R.integer.listview_animation_delay)).start();
+		final ViewPropertyAnimator animator = list.animate();
+		animator.translationY(-100).setListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(final Animator animation) {
+				list.cancelRefreshing();
+				list.setTranslationY(mListTrasnlationActive);
+				animator.setListener(null);
+			}
+		}).setDuration(getResources().getInteger(
+				R.integer.listview_animation_delay)).start();
 	}
 
 	private void initRadioButtons() {
@@ -917,8 +940,10 @@ public class OrderFragment extends Fragment {
 		if(fragmentByTag != null) {
 			BillSplitFragment splitFragment = (BillSplitFragment) fragmentByTag;
 			splitFragment.hide();
+			list.setSwipeEnabled(true);
 			return true;
 		}
+		list.setSwipeEnabled(false);
 		return false;
 	}
 

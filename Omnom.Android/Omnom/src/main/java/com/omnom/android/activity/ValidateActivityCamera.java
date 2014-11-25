@@ -25,8 +25,6 @@ import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
-import static com.omnom.android.utils.utils.AndroidUtils.showToast;
-
 public class ValidateActivityCamera extends ValidateActivity {
 	public static final String DEVICE_ID_GENYMOTION = "000000000000000";
 
@@ -47,7 +45,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 		if (BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
 			//findTableForQr("http://m.2gis.ru/os/"); // mehico
-			findTableForQr("http://omnom.menu/qr/00e7232a4d9d2533e7fa503620c4431b"); // shashlikoff
+			findTableForQr("http://www.riston.ru/wishes"); // mehico
+			// findTableForQr("http://omnom.menu/qr/00e7232a4d9d2533e7fa503620c4431b"); // shashlikoff
 			return;
 		}
 
