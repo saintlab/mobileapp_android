@@ -130,11 +130,15 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 			@Override
 			public void onActivityDestroyed(Activity activity) {
 				activityStack.pop();
-				if(activityStack.isEmpty()) {
+				if(!hasActivities()) {
 					mixPanel.flush();
 				}
 			}
 		});
+	}
+
+	public boolean hasActivities() {
+		return !activityStack.isEmpty();
 	}
 
 	@Override

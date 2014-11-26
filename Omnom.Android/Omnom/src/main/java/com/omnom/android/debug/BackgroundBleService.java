@@ -179,6 +179,11 @@ public class BackgroundBleService extends Service {
 
 	@DebugLog
 	private void notifyIfNeeded(final ArrayList<Beacon> beacons) {
+		if(OmnomApplication.get(this).hasActivities()) {
+			// fail fast if omnom is already running
+			return;
+		}
+
 		ArrayList<Beacon> omnBeacons = new ArrayList<Beacon>();
 		final BeaconFilter filter = new BeaconFilter(OmnomApplication.get(this));
 		for(final Beacon b : beacons) {
