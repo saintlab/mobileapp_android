@@ -9,6 +9,7 @@ import android.view.View;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.beacon.BeaconFilter;
+import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.loader.LoaderError;
@@ -137,6 +138,7 @@ public class ValidateActivityBle extends ValidateActivity {
 						@Override
 						public void call(final Restaurant restaurant) {
 							onDataLoaded(restaurant, table[0]);
+							((PreferenceHelper) getPreferences()).saveBeacon(getActivity(), beacon);
 						}
 					}, new Action1<Throwable>() {
 						@Override
