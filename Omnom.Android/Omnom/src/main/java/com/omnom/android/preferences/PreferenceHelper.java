@@ -1,15 +1,20 @@
 package com.omnom.android.preferences;
 
 import android.content.Context;
+import android.os.SystemClock;
 
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.StringUtils;
+
+import altbeacon.beacon.Beacon;
 
 /**
  * Created by Ch3D on 28.09.2014.
  */
 public class PreferenceHelper implements PreferenceProvider {
-	private static final String USER_PREFERENCES = "com.omnom.android.linker.user";
+	public static final String USER_PREFERENCES = "com.omnom.android.prefs.user";
+
+	public static final String BEACONS_PREFERENCES = "com.omnom.android.prefs.beacons";
 
 	private static final String AUTH_TOKEN = "com.omnom.android.linker.user.auth_token";
 
@@ -24,7 +29,22 @@ public class PreferenceHelper implements PreferenceProvider {
 		context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
 		       .edit()
 		       .putString(CARD_ID, externalCardId)
-		       .commit();
+		       .apply();
+	}
+
+	public void saveBeacon(final Context context, final Beacon beacon) {
+		context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE)
+		       .edit()
+		       .putLong(beacon.getBluetoothAddress(), SystemClock.elapsedRealtime())
+		       .apply();
+	}
+
+	public boolean hasBeacon(final Context context, final Beacon beacon) {
+		return context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).contains(beacon.getBluetoothAddress());
+	}
+
+	public long getBeaconTimestamp(final Context context, final Beacon beacon) {
+		return context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).getLong(beacon.getBluetoothAddress(), -1);
 	}
 
 	@Override

@@ -34,7 +34,7 @@
         android:theme="@style/Theme.Wood.Red">
 
         <service
-            android:name="com.omnom.android.debug.BackgroundBleService"
+            android:name=".service.bluetooth.BackgroundBleService"
             android:enabled="true"
             android:exported="true" />
 

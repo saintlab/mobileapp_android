@@ -1,4 +1,4 @@
-package com.omnom.android.debug;
+package com.omnom.android.service.bluetooth;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -22,6 +22,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.SplashActivity;
 import com.omnom.android.beacon.BeaconFilter;
+import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -58,8 +59,6 @@ public class BackgroundBleService extends Service {
 	private static final long BEACON_CACHE_INTERVAL = 60 * MINUTE;
 
 	private static final String TAG = BackgroundBleService.class.getSimpleName();
-
-	private static final String BLE_SERVICE_PREFERENCES = TAG;
 
 	@SuppressLint("NewApi")
 	private class Callback implements BluetoothAdapter.LeScanCallback {
@@ -167,7 +166,7 @@ public class BackgroundBleService extends Service {
 	 * Clear cached beacons which timestamp
 	 */
 	private void clearCachedBeacons() {
-		final SharedPreferences sharedPreferences = getSharedPreferences(BLE_SERVICE_PREFERENCES, MODE_PRIVATE);
+		final SharedPreferences sharedPreferences = getSharedPreferences(PreferenceHelper.BEACONS_PREFERENCES, MODE_PRIVATE);
 		final SharedPreferences.Editor editor = sharedPreferences.edit();
 		for(Map.Entry<String, ?> entry : sharedPreferences.getAll().entrySet()) {
 			final Long timestamp = (Long) entry.getValue();
@@ -180,6 +179,11 @@ public class BackgroundBleService extends Service {
 
 	@DebugLog
 	private void notifyIfNeeded(final ArrayList<Beacon> beacons) {
+		if(OmnomApplication.get(this).hasActivities()) {
+			// fail fast if omnom is already running
+			return;
+		}
+
 		ArrayList<Beacon> omnBeacons = new ArrayList<Beacon>();
 		final BeaconFilter filter = new BeaconFilter(OmnomApplication.get(this));
 		for(final Beacon b : beacons) {
@@ -232,8 +236,8 @@ public class BackgroundBleService extends Service {
 	}
 
 	private void cacheBeacon(final Beacon beacon) {
-		final SharedPreferences sharedPreferences = getSharedPreferences(BLE_SERVICE_PREFERENCES, MODE_PRIVATE);
-		sharedPreferences.edit().putLong(beacon.getBluetoothAddress(), SystemClock.elapsedRealtime()).apply();
+		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
+		preferences.saveBeacon(this, beacon);
 	}
 
 	/**
@@ -242,10 +246,10 @@ public class BackgroundBleService extends Service {
 	 */
 	@DebugLog
 	private boolean isHandled(final Beacon beacon) {
-		final SharedPreferences sharedPreferences = getSharedPreferences(BLE_SERVICE_PREFERENCES, MODE_PRIVATE);
-		final boolean contains = sharedPreferences.contains(beacon.getBluetoothAddress());
+		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
+		final boolean contains = preferences.hasBeacon(this, beacon);
 		if(contains) {
-			final long timestamp = sharedPreferences.getLong(beacon.getBluetoothAddress(), 0);
+			final long timestamp = preferences.getBeaconTimestamp(this, beacon);
 			return timestamp < SystemClock.elapsedRealtime() + BEACON_CACHE_INTERVAL;
 		}
 		return false;

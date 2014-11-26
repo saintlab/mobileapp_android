@@ -214,10 +214,15 @@ public class AndroidUtils {
 	}
 
 	public static void setAccentColor(Window window, int color) {
-		final Drawable background = window.getDecorView().getBackground();
-		background.mutate();
-		background.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
-		background.invalidateSelf();
+		if(window == null || window.getDecorView() == null) {
+			return;
+		}
+		if(window.getDecorView().getBackground() != null) {
+			final Drawable background = window.getDecorView().getBackground();
+			background.mutate();
+			background.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+			background.invalidateSelf();
+		}
 	}
 
 	public static void clearAccentColor(Window window) {
@@ -229,5 +234,9 @@ public class AndroidUtils {
 
 	public static boolean isJellyBeanMR2() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+	}
+
+	public static boolean isKitKat() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 	}
 }
