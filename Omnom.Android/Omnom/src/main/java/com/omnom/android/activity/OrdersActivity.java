@@ -12,12 +12,16 @@ import com.omnom.android.adapter.OrdersPagerAdaper;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.socket.OmnomSocketBase;
+import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.view.OrdersViewPager;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
+import com.squareup.otto.Subscribe;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import butterknife.InjectView;
@@ -31,6 +35,8 @@ public class OrdersActivity extends BaseFragmentActivity {
 	public static final String TAG_ANDROID_SWITCHER = "android:switcher:";
 
 	public static final String TAG_SWITCHER_DELIMITER = ":";
+
+	private static final String TAG = OrdersActivity.class.getSimpleName();
 
 	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor, boolean isDemo) {
 		final Intent intent = new Intent(activity, OrdersActivity.class);
@@ -62,8 +68,21 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	private boolean mDemo;
 
+	@Subscribe
+	public void onPayment(PaymentSocketEvent event) {
+		// payment handling logic
+	}
+
 	@Override
 	public void initUi() {
+		try {
+			final OmnomSocketBase socket = OmnomSocketBase.init(this, orders.get(0), getString(R.string.endpoint_restaurateur));
+			socket.connect();
+			socket.subscribe(this);
+		} catch(URISyntaxException e) {
+			e.printStackTrace();
+		}
+
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 6);
