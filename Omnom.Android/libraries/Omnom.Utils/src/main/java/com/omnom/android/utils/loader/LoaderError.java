@@ -30,6 +30,9 @@ public class LoaderError {
 	public static final LoaderError PAYMENT_DECLINED =
 			new LoaderError(R.drawable.ic_flying_credit_card, R.string.error_payment_declined, R.string.error_ok, 0);
 
+	public static final LoaderError NO_ORDERS =
+			new LoaderError(R.drawable.ic_bill_white, R.string.there_are_no_orders_on_this_table, R.string.error_ok, 0);
+
 	private final int mDrawableResId;
 	private final int mErrResId;
 	private final int mBtnResId;

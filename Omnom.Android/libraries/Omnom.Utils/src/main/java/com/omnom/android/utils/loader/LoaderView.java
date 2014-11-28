@@ -240,8 +240,11 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void scaleDown(final Runnable scaleDownUpdate, final Runnable endAction) {
-		AnimationUtils.scaleHeight(mImgLoader, loaderSize);
-		AnimationUtils.scaleWidth(mImgLoader, loaderSize, scaleDownUpdate, endAction);
+		scaleDown(loaderSize, scaleDownUpdate, endAction);
+	}
+
+	public void scaleDown(final long duration, final Runnable endAction) {
+		scaleDown(loaderSize, duration, endAction);
 	}
 
 	public void scaleDown(int size, final Runnable scaleDownUpdate, final Runnable endAction) {
@@ -267,8 +270,8 @@ public class LoaderView extends FrameLayout {
 
 	public void scaleUp(final Runnable endCallback) {
 		AnimationUtils.scale(mImgLoader,
-		                     mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
-		                     endCallback);
+							 mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
+							 endCallback);
 	}
 
 	@DebugLog

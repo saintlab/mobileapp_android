@@ -15,12 +15,14 @@ import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.OrdersViewPager;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
 
 import java.util.ArrayList;
 
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 public class OrdersActivity extends BaseFragmentActivity {
 
@@ -32,12 +34,12 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	public static final String TAG_SWITCHER_DELIMITER = ":";
 
-	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor, boolean isDemo) {
+	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor, int code, boolean isDemo) {
 		final Intent intent = new Intent(activity, OrdersActivity.class);
 		intent.putParcelableArrayListExtra(OrdersActivity.EXTRA_ORDERS, orders);
 		intent.putExtra(OrdersActivity.EXTRA_ACCENT_COLOR, bgColor);
 		intent.putExtra(OrdersActivity.EXTRA_DEMO_MODE, isDemo);
-		activity.startActivity(intent);
+		activity.startActivityForResult(intent, code);
 	}
 
 	@InjectView(R.id.pager)
@@ -48,6 +50,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	@InjectView(R.id.txt_info)
 	protected TextView mTextInfo;
+
+	@InjectView(R.id.btn_close)
+	protected TextView mBtnClose;
 
 	@InjectView(R.id.root)
 	protected View rootView;
@@ -86,8 +91,15 @@ public class OrdersActivity extends BaseFragmentActivity {
 	@Override
 	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		if(requestCode == REQUEST_CODE_CARDS && resultCode == RESULT_OK) {
-			getActivity().finish();
+			setResult(RESULT_OK);
+			finish();
+			overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
 		}
+	}
+
+	@OnClick(R.id.btn_close)
+	public void onClose() {
+		onBackPressed();
 	}
 
 	@Override
@@ -96,7 +108,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 		if(currentFragment != null) {
 			if(!currentFragment.isInSplitMode() && !currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
 				if(mPagerAdapter.getCount() == 1) {
-					super.onBackPressed();
+					close();
 					return;
 				}
 				mPager.setEnabled(true);
@@ -104,15 +116,26 @@ public class OrdersActivity extends BaseFragmentActivity {
 				currentFragment.downscale();
 				AnimationUtils.animateAlpha(mTextInfo, true);
 				AnimationUtils.animateAlpha(mIndicator, true);
+				ViewUtils.setVisible(mBtnClose, true);
 				return;
 			} else {
 				if(!currentFragment.onBackPressed()) {
-					super.onBackPressed();
+					close();
 				}
 			}
 		} else {
-			super.onBackPressed();
+			close();
 		}
+	}
+
+	public int getOrdersCount() {
+		return mPagerAdapter.getCount();
+	}
+
+	public void close() {
+		setResult(RESULT_OK);
+		finish();
+		overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
 	}
 
 	@Override
@@ -140,6 +163,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 		mPager.setEnabled(visible);
 		AnimationUtils.animateAlpha(mTextInfo, visible);
 		AnimationUtils.animateAlpha(mIndicator, visible);
+		ViewUtils.setVisible(mBtnClose, visible);
 		final ObjectAnimator fl = getFragmentAnimation(position - 1, visible);
 		final ObjectAnimator fr = getFragmentAnimation(position + 1, visible);
 		if(fl != null && fr != null) {

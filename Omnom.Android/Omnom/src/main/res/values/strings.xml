@@ -33,7 +33,6 @@
     <string name="waiter">Официант</string>
     <string name="bill">Счёт</string>
     <string name="title_activity_orders">OrdersActivity</string>
-    <string name="there_are_no_orders_on_this_table">На данном столе нет заказов</string>
     <string name="title_activity_add_card">AddCardActivity</string>
     <string name="order_overall">Итого: %1$s</string>
     <string name="order_paid">Оплачено: %1$s</string>
@@ -64,6 +63,7 @@
     <string name="bill_split_amount_">= %1$s</string>
     <string name="bill_number_">Счёт %1$s</string>
     <string name="split_the_bill">Разделить счёт</string>
+    <string name="close">Закрыть</string>
     <string name="title_plus_tips">+ Чаевые</string>
     <string name="your_has_n_orders">На вашем столике\nраздельных счетов: %1$s</string>
     <string name="demo_mode">Демо-режим</string>

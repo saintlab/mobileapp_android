@@ -69,6 +69,8 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
  */
 public abstract class ValidateActivity extends BaseOmnomActivity {
 
+	public static final int REQUEST_CODE_ORDERS = 100;
+
 	private static final String TAG = ValidateActivity.class.getSimpleName();
 
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo) {
@@ -333,6 +335,15 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	public void onBill(final View v) {
 		v.setEnabled(false);
+		ViewUtils.setVisible(getPanelBottom(), false);
+		ViewUtils.setVisible(imgProfile, false);
+		ViewUtils.setVisible(txtLeave, false);
+		loader.setLogo(R.drawable.ic_bill_white);
+		loader.startProgressAnimation(10000, new Runnable() {
+			@Override
+			public void run() {
+			}
+		});
 		ValidationObservable.validateSmart(this)
 		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickBillListener))
 		                    .isEmpty()
@@ -340,34 +351,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
 				                    if(hasNoErrors) {
-					                    clearErrors();
-					                    getPanelBottom().animate().translationY(0).start();
-					                    mOrdersSubscription = AndroidObservable.bindActivity(getActivity(),
-					                                                                         api.getOrders(mTable.getRestaurantId(),
-					                                                                                       mTable.getId()))
-					                                                           .subscribe(new Action1<List<Order>>() {
-						                                                           @Override
-						                                                           public void call(List<Order> orders) {
-							                                                           v.setEnabled(true);
-							                                                           if(!orders.isEmpty()) {
-								                                                           OrdersActivity.start(ValidateActivity.this,
-								                                                                                new ArrayList<Order>(
-										                                                                                orders),
-								                                                                                mRestaurant.getDecoration()
-								                                                                                           .getBackgroundColor(),
-								                                                                                mIsDemo);
-							                                                           } else {
-								                                                           showToastLong(getActivity(),
-								                                                                         R.string
-										                                                                         .there_are_no_orders_on_this_table);
-							                                                           }
-						                                                           }
-					                                                           }, new Action1<Throwable>() {
-						                                                           @Override
-						                                                           public void call(Throwable throwable) {
-							                                                           v.setEnabled(true);
-						                                                           }
-					                                                           });
+					                    loadOrders(v);
 				                    } else {
 					                    ((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
 					                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
@@ -383,6 +367,66 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				                    v.setEnabled(true);
 			                    }
 		                    });
+	}
+
+	private void loadOrders(final View v) {
+		clearErrors();
+		getPanelBottom().animate().translationY(0).start();
+		mOrdersSubscription = AndroidObservable.bindActivity(getActivity(), api.getOrders(mTable.getRestaurantId(),
+															 mTable.getId()))
+				.subscribe(new Action1<List<Order>>() {
+					@Override
+					public void call(final List<Order> orders) {
+						loader.stopProgressAnimation();
+						loader.updateProgressMax(new Runnable() {
+							@Override
+							public void run() {
+								loader.showProgress(false);
+								v.setEnabled(true);
+								if(!orders.isEmpty()) {
+									showOrders(orders);
+								} else {
+									findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
+											 R.color.white_transparent));
+									mErrorHelper.showNoOrders(new View.OnClickListener() {
+										@Override
+										public void onClick(View v) {
+											clearErrors();
+											loader.animateLogoFast(mRestaurant.getDecoration().getLogo(),
+																   R.drawable.ic_bill_white);
+											loader.showProgress(false);
+											configureScreen(mRestaurant);
+											ViewUtils.setVisible(imgProfile, !mIsDemo);
+											ViewUtils.setVisible(txtLeave, mIsDemo);
+											ViewUtils.setVisible(getPanelBottom(), true);
+										}
+									});
+								}
+							}
+						});
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						v.setEnabled(true);
+					}
+				});
+	}
+
+	private void showOrders(final List<Order> orders) {
+		loader.showProgress(false);
+		loader.hideLogo();
+		loader.scaleUp(new Runnable() {
+			@Override
+			public void run() {
+				OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders),
+									 mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS,
+									 mIsDemo);
+				if (orders.size() == 1) {
+					overridePendingTransition(R.anim.slide_in_down, R.anim.nothing);
+				}
+			}
+		});
 	}
 
 	public void onWaiter(final View v) {
@@ -418,6 +462,22 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		// imgHolder.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
 		loader.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
 		AnimationUtils.animateAlpha(btnDownPromo, false);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == REQUEST_CODE_ORDERS && resultCode == RESULT_OK) {
+			loader.scaleDown(null, new Runnable() {
+				@Override
+				public void run() {
+					ViewUtils.setVisible(getPanelBottom(), true);
+					ViewUtils.setVisible(imgProfile, !mIsDemo);
+					ViewUtils.setVisible(txtLeave, mIsDemo);
+					loader.animateLogoFast(mRestaurant.getDecoration().getLogo(),
+										   R.drawable.ic_bill_white);
+				}
+			});
+		}
 	}
 
 	@Override

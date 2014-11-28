@@ -34,7 +34,7 @@ public class AnimationUtils {
 	public static void animateAlpha(final View view, final boolean visible, final Runnable callback, long duration) {
 		final Boolean tag = (Boolean) view.getTag();
 		if(tag != null && tag == visible) {
-			// skip
+			view.post(callback);
 			return;
 		}
 

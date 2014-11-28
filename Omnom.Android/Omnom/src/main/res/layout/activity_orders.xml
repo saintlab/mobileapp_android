@@ -21,6 +21,18 @@
         android:textColor="@color/profile_hint"
         android:maxLines="2"/>
 
+    <TextView
+        android:id="@+id/btn_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textColor="@android:color/white"
+        android:padding="@dimen/activity_vertical_margin"
+        android:text="@string/close"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"/>
+
     <com.omnom.android.view.ViewPagerIndicatorCircle
         android:id="@+id/pager_indicator"
         android:layout_above="@+id/txt_info"

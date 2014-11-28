@@ -23,7 +23,7 @@
     <integer name="loader_data_max_length">5</integer>
     <integer name="loader_font_size_normal">24</integer>
     <integer name="loader_font_size_large">40</integer>
-    <integer name="loader_scale_factor">10</integer>
+    <integer name="loader_scale_factor">6</integer>
     <integer name="loader_limit_percentage">99</integer>
 
     <integer name="rssi_min_value">-88</integer>

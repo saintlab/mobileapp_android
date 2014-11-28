@@ -110,6 +110,10 @@ public class ErrorHelper {
 		showError(LoaderError.PAYMENT_DECLINED, onClickListener);
 	}
 
+	public void showNoOrders(View.OnClickListener onClickListener) {
+		showError(LoaderError.NO_ORDERS, onClickListener);
+	}
+
 	public void showLocationError() {
 		showError(LoaderError.LOCATION_DISABLED, new View.OnClickListener() {
 			@Override

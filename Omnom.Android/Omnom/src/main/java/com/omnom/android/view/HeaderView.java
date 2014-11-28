@@ -87,6 +87,13 @@ public class HeaderView extends RelativeLayout {
 		ViewUtils.setVisible(txtTitle, false);
 	}
 
+	public void setTitleBig(final String title, OnClickListener listener) {
+		txtTitleBig.setText(title);
+		txtTitleBig.setOnClickListener(listener);
+		ViewUtils.setVisible(txtTitleBig, true);
+		ViewUtils.setVisible(txtTitle, false);
+	}
+
 	public void setButtonRight(final int resId, OnClickListener listener) {
 		setButton(btnRight, resId, listener);
 	}

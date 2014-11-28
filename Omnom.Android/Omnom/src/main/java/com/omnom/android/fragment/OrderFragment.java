@@ -55,6 +55,7 @@ import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.OmnomListView;
+import com.omnom.android.view.HeaderView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -181,6 +182,9 @@ public class OrderFragment extends Fragment {
 
 	@Nullable
 	protected TextView txtCustomTips;
+
+	@InjectView(R.id.panel_top)
+	protected HeaderView mHeader;
 
 	@InjectView(R.id.txt_title)
 	protected TextView txtTitle;
@@ -367,6 +371,7 @@ public class OrderFragment extends Fragment {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, false);
 		}
+		ViewUtils.setVisible(mHeader, false);
 		AnimationUtils.animateAlpha3(getPanelPayment(), false);
 		list.setSwipeEnabled(false);
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0).start();
@@ -407,7 +412,6 @@ public class OrderFragment extends Fragment {
 				@Override
 				public void onClick(final View v) {
 					doApply(v);
-					;
 				}
 			});
 			btnCancel = (ImageButton) inflate.findViewById(R.id.btn_cancel);
@@ -455,12 +459,28 @@ public class OrderFragment extends Fragment {
 		mFragmentView = view;
 		mFragmentView.setTag("order_page_" + mPosition);
 
+		final String billText = getString(R.string.bill_number_, mPosition + 1);
+		if (((OrdersActivity) getActivity()).getOrdersCount() > 1) {
+			mHeader.setTitleBig(billText, new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					getActivity().onBackPressed();
+				}
+			});
+		}
+		mHeader.setButtonLeft(R.string.close, new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				((OrdersActivity) getActivity()).close();
+			}
+		});
+		ViewUtils.setVisible(mHeader, false);
+
 		if(mAnimate) {
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
 			mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
-
 			mFragmentView.animate().translationYBy(-mListHeight).setDuration(0).start();
-			mFragmentView.animate().translationYBy(mListHeight).setStartDelay((mPosition + 1) * 350).setDuration(850).start();
+			mFragmentView.animate().translationYBy(mListHeight).setStartDelay((mPosition + 1) * 200).setDuration(500).start();
 		} else if(mSingle) {
 			ViewUtils.setVisible(getPanelPayment(), true);
 			list.setTranslationY(mListTrasnlationActive);
@@ -471,7 +491,7 @@ public class OrderFragment extends Fragment {
 		}
 
 		pickerTips.setDividerDrawable(new ColorDrawable(mAccentColor));
-		txtTitle.setText(getString(R.string.bill_number_, mPosition + 1));
+		txtTitle.setText(billText);
 
 		initPicker();
 		initFooter(mSingle);
@@ -522,6 +542,7 @@ public class OrderFragment extends Fragment {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, true);
 		}
+		ViewUtils.setVisible(mHeader, true);
 		AnimationUtils.animateAlpha(getPanelPayment(), true);
 		AnimationUtils.animateAlpha(txtTitle, false);
 		AndroidUtils.scrollEnd(list);
