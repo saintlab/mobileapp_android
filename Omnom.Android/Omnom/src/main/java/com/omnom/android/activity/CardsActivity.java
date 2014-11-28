@@ -214,6 +214,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 			if(requestCode == REQUEST_PAYMENT) {
 				setResult(RESULT_OK);
 				finish();
+				overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
 			}
 			if(requestCode == REQUEST_CODE_CARD_CONFIRM || requestCode == REQUEST_CODE_CARD_ADD) {
 				AnimationUtils.animateAlpha(mList, false, new Runnable() {

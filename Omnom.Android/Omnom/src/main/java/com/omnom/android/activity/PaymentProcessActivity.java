@@ -258,7 +258,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 			@Override
 			public void run() {
 				ThanksActivity.start(getActivity(), REQUEST_THANKS, mAccentColor);
-				getActivity().overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_down);
+				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 			}
 		});
 	}
@@ -270,7 +270,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 			public void onClick(View v) {
 				setResult(RESULT_CANCELED);
 				finish();
-				getActivity().overridePendingTransition(R.anim.nothing, R.anim.fade_out);
+				overridePendingTransition(R.anim.nothing, R.anim.fade_out);
 			}
 		});
 	}
