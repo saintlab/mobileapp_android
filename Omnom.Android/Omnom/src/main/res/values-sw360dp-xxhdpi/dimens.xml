@@ -5,7 +5,26 @@
      Moto X
      and so on
      -->
-    <dimen name="order_items_list_height_collapsed">240dp</dimen>
+
     <dimen name="card_frame_width">320dp</dimen>
     <dimen name="card_frame_height">184dp</dimen>
+
+    <dimen name="order_list_trasnlation_active">-350dp</dimen>
+    <dimen name="order_payment_translation_y">0dp</dimen>
+    <dimen name="order_tips_translation_y">100dp</dimen>
+    <dimen name="order_list_height">660dp</dimen>
+    <dimen name="font_order_amont_edit">48sp</dimen>
+    <dimen name="order_edit_title_margin">-16dp</dimen>
+    <dimen name="order_fake_item_height">600dp</dimen>
+    <dimen name="order_payment_padding_bottom">32dp</dimen>
+    <dimen name="order_payment_tips_title_margin">-12dp</dimen>
+    <dimen name="order_payment_tips_radio_padding_bottom">12dp</dimen>
+
+    <dimen name="loader_size">280dp</dimen>
+    <dimen name="loader_size_huge">1080dp</dimen>
+    <dimen name="loader_margin_top">-102dp</dimen>
+    <dimen name="loader_progress_size">318dp</dimen>
+    <dimen name="loader_logo_size">270dp</dimen>
+    <dimen name="loader_progress_thickness">10dp</dimen>
+    <item type="dimen" format="float" name="loader_progress_inner_radius">2.265</item>
 </resources>
