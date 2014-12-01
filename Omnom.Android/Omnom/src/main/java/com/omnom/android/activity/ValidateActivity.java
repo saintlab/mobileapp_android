@@ -565,12 +565,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 								final DemoTableData data = response.get(0);
 								onDataLoaded(data.getRestaurant(), data.getTable());
 							}
-						}, new Action1<Throwable>() {
-							@Override
-							public void call(Throwable throwable) {
-								Log.e(ValidateActivity.TAG, "validateDemo", throwable);
-							}
-						});
+						}, onError);
 				mFirstRun = false;
 			}
 			return true;
