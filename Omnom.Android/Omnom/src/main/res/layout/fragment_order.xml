@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ViewStub
+<!--    <ViewStub
         android:id="@+id/stub_payment_options"
         android:inflatedId="@+id/panel_order_payment"
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
         android:layout_gravity="bottom"
         android:background="@android:color/white"
         android:visibility="gone"
-        style="@style/NPWidget.Holo.Light.NumberPicker.Grey"/>
+        style="@style/NPWidget.Holo.Light.NumberPicker.Grey"/>-->
 
     <com.omnom.android.utils.view.OmnomListView
         android:id="@android:id/list"
@@ -53,6 +53,23 @@
         android:textColor="@android:color/white"
         android:textAppearance="?android:textAppearanceLarge"
         omnom:fontPath="fonts/Futura-OSF-Omnom-Medium.otf"
-        android:textSize="@dimen/font_xlarge"/>
+        android:textSize="@dimen/font_xlarge"/>g
+
+    <ViewStub
+        android:id="@+id/stub_payment_options"
+        android:inflatedId="@+id/panel_order_payment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/order_payment_padding_bottom"
+        android:layout_gravity="bottom" />
+
+    <com.omnom.android.utils.view.NumberPicker
+        android:id="@+id/tips_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@android:color/white"
+        android:visibility="gone"
+        style="@style/NPWidget.Holo.Light.NumberPicker.Grey"/>
 
 </FrameLayout>
