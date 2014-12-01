@@ -3,8 +3,6 @@ package com.omnom.android.utils.utils;
 import android.text.TextUtils;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 
 import hugo.weaving.DebugLog;
 
@@ -13,6 +11,8 @@ import hugo.weaving.DebugLog;
  */
 public class StringUtils {
 	public static final String EMPTY_STRING = "";
+
+	public static final String CURRENCY_DELIMITER = ".";
 
 	public static final String WHITESPACE = " ";
 
@@ -99,15 +99,4 @@ public class StringUtils {
 		}
 		return false;
 	}
-
-	public static String getCurrencyDelimiter() {
-		if(_lazy_currency_delimiter == null) {
-			final Locale locale = Locale.getDefault();
-			final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(locale);
-			_lazy_currency_delimiter = String.valueOf(decimalFormatSymbols.getDecimalSeparator());
-		}
-		return _lazy_currency_delimiter;
-	}
-
-	private static String _lazy_currency_delimiter = null;
 }
