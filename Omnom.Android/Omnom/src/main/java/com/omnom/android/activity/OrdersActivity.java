@@ -13,6 +13,7 @@ import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.socket.OmnomSocketBase;
+import com.omnom.android.socket.OmnomSocketFactory;
 import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -76,10 +77,10 @@ public class OrdersActivity extends BaseFragmentActivity {
 	@Override
 	public void initUi() {
 		try {
-			final OmnomSocketBase socket = OmnomSocketBase.init(this, orders.get(0), getString(R.string.endpoint_restaurateur));
+			final OmnomSocketBase socket = OmnomSocketFactory.init(this, orders.get(0));
 			socket.connect();
 			socket.subscribe(this);
-		} catch(URISyntaxException e) {
+		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
 
@@ -104,7 +105,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	@Override
 	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-		if(requestCode == REQUEST_CODE_CARDS && resultCode == RESULT_OK) {
+		if (requestCode == REQUEST_CODE_CARDS && resultCode == RESULT_OK) {
 			getActivity().finish();
 		}
 	}
@@ -112,9 +113,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 	@Override
 	public void onBackPressed() {
 		final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
-		if(currentFragment != null) {
-			if(!currentFragment.isInSplitMode() && !currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
-				if(mPagerAdapter.getCount() == 1) {
+		if (currentFragment != null) {
+			if (!currentFragment.isInSplitMode() && !currentFragment.isDownscaled() && !currentFragment.isInPickerMode()) {
+				if (mPagerAdapter.getCount() == 1) {
 					super.onBackPressed();
 					return;
 				}
@@ -125,7 +126,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 				AnimationUtils.animateAlpha(mIndicator, true);
 				return;
 			} else {
-				if(!currentFragment.onBackPressed()) {
+				if (!currentFragment.onBackPressed()) {
 					super.onBackPressed();
 				}
 			}
@@ -144,9 +145,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 	}
 
 	public ObjectAnimator getFragmentAnimation(int pos, boolean show) {
-		final OrderFragment fragment = (OrderFragment) getSupportFragmentManager().findFragmentByTag(
-				TAG_ANDROID_SWITCHER + mPager.getId() + TAG_SWITCHER_DELIMITER + mPagerAdapter.getItemId(pos));
-		if(fragment != null) {
+		final OrderFragment fragment = (OrderFragment) getSupportFragmentManager()
+				.findFragmentByTag(TAG_ANDROID_SWITCHER + mPager.getId() + TAG_SWITCHER_DELIMITER + mPagerAdapter.getItemId(pos));
+		if (fragment != null) {
 			final View view = fragment.getFragmentView();
 			final int startAlpha = show ? 0 : 1;
 			final int endAlpha = show ? 1 : 0;
@@ -161,13 +162,13 @@ public class OrdersActivity extends BaseFragmentActivity {
 		AnimationUtils.animateAlpha(mIndicator, visible);
 		final ObjectAnimator fl = getFragmentAnimation(position - 1, visible);
 		final ObjectAnimator fr = getFragmentAnimation(position + 1, visible);
-		if(fl != null && fr != null) {
+		if (fl != null && fr != null) {
 			final AnimatorSet as = new AnimatorSet();
 			as.playTogether(fl, fr);
 			as.start();
-		} else if(fl != null) {
+		} else if (fl != null) {
 			fl.start();
-		} else if(fr != null) {
+		} else if (fr != null) {
 			fr.start();
 		}
 	}

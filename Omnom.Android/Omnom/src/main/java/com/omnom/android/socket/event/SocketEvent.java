@@ -14,4 +14,7 @@ public interface SocketEvent {
 
 	public static final String EVENT_ORDER_CLOSE = "order_close";
 
+	public static final String EVENT_JOIN = "join";
+
+	public static final String EVENT_LEAVE = "leave";
 }
