@@ -76,7 +76,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
 		final Intent intent = new Intent(context, hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
-		if (context instanceof ConfirmPhoneActivity) {
+		if(context instanceof ConfirmPhoneActivity) {
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		}
@@ -103,18 +103,18 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		@Override
 		protected void onThrowable(Throwable throwable) {
 			loader.stopProgressAnimation(true);
-			if (throwable instanceof RetrofitError) {
+			if(throwable instanceof RetrofitError) {
 				throwable.printStackTrace();
 				final RetrofitError cause = (RetrofitError) throwable;
-				if (cause.getResponse() != null) {
+				if(cause.getResponse() != null) {
 					// TODO: Refactor this ugly piece of ... code
-					if (cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
+					if(cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
 						EnteringActivity.start(ValidateActivity.this);
 						return;
 					}
 				}
 			}
-			if (throwable instanceof AuthServiceException) {
+			if(throwable instanceof AuthServiceException) {
 				getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
 				EnteringActivity.start(ValidateActivity.this);
 				return;
@@ -173,8 +173,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected boolean mIsDemo = false;
 
-	protected Picasso mPicasso;
-
 	protected Func1<Restaurant, Restaurant> mPreloadBackgroundFunction;
 
 	private int mAnimationType;
@@ -211,7 +209,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (mRestaurant == null) {
+		if(mRestaurant == null) {
 			loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 		}
 	}
@@ -239,8 +237,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		if (mFirstRun) {
-			if (mAnimationType == EXTRA_LOADER_ANIMATION_SCALE_DOWN) {
+		if(mFirstRun) {
+			if(mAnimationType == EXTRA_LOADER_ANIMATION_SCALE_DOWN) {
 				final int dpSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
 				loader.setSize(dpSize, dpSize);
 			} else {
@@ -251,8 +249,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		// mPicasso = Picasso.with(getApplicationContext());
-		mPicasso = new Picasso.Builder(getApplicationContext()).indicatorsEnabled(true).loggingEnabled(true).debugging(true).build();
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -267,10 +263,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			@Override
 			public Restaurant call(final Restaurant restaurant) {
 				final String bgImgUrl = RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics());
-				if (!TextUtils.isEmpty(bgImgUrl)) {
+				if(!TextUtils.isEmpty(bgImgUrl)) {
 					try {
-						mPicasso.load(bgImgUrl).get();
-					} catch (IOException e) {
+						OmnomApplication.getPicasso(getActivity()).load(bgImgUrl).get();
+					} catch(IOException e) {
 						Log.e(TAG, "unable to load img = " + bgImgUrl);
 					}
 				}
@@ -305,7 +301,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	protected void validate() {
-		if (mFirstRun || mRestaurant == null) {
+		if(mFirstRun || mRestaurant == null) {
 			ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 			loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 			loader.showProgress(false);
@@ -325,31 +321,31 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		v.setEnabled(false);
 		ValidationObservable.validateSmart(this).map(OmnomObservable.getValidationFunc(this, mErrorHelper,
 		                                                                               mInternetErrorClickBillListener))
-				.isEmpty().subscribe(new Action1<Boolean>() {
+		                    .isEmpty().subscribe(new Action1<Boolean>() {
 			@Override
 			public void call(final Boolean hasNoErrors) {
-				if (hasNoErrors) {
+				if(hasNoErrors) {
 					clearErrors();
 					getPanelBottom().animate().translationY(0).start();
 					mOrdersSubscription =
 							AndroidObservable.bindActivity(getActivity(), api.getOrders(mTable.getRestaurantId(), mTable.getId()))
-									.subscribe(new Action1<List<Order>>() {
-										@Override
-										public void call(List<Order> orders) {
-											v.setEnabled(true);
-											if (!orders.isEmpty()) {
-												OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders),
-												                     mRestaurant.getDecoration().getBackgroundColor(), mIsDemo);
-											} else {
-												showToastLong(getActivity(), R.string.there_are_no_orders_on_this_table);
-											}
-										}
-									}, new Action1<Throwable>() {
-										@Override
-										public void call(Throwable throwable) {
-											v.setEnabled(true);
-										}
-									});
+							                 .subscribe(new Action1<List<Order>>() {
+								                 @Override
+								                 public void call(List<Order> orders) {
+									                 v.setEnabled(true);
+									                 if(!orders.isEmpty()) {
+										                 OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders),
+										                                      mRestaurant.getDecoration().getBackgroundColor(), mIsDemo);
+									                 } else {
+										                 showToastLong(getActivity(), R.string.there_are_no_orders_on_this_table);
+									                 }
+								                 }
+							                 }, new Action1<Throwable>() {
+								                 @Override
+								                 public void call(Throwable throwable) {
+									                 v.setEnabled(true);
+								                 }
+							                 });
 				} else {
 					findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(R.color.white_transparent));
 					mErrorHelper.showInternetError(mInternetErrorClickBillListener);
@@ -369,7 +365,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	public void onWaiter(final View v) {
 		final Observable<WaiterCallResponse> observable;
-		if (!mWaiterCalled) {
+		if(!mWaiterCalled) {
 			observable = api.waiterCall(mRestaurant.getId(), mTable.getId());
 		} else {
 			observable = api.waiterCallStop(mRestaurant.getId(), mTable.getId());
@@ -377,7 +373,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		mWaiterCallSubscribtion = AndroidObservable.bindActivity(this, observable).subscribe(new Action1<WaiterCallResponse>() {
 			@Override
 			public void call(WaiterCallResponse tableDataResponse) {
-				if (tableDataResponse.isSuccess()) {
+				if(tableDataResponse.isSuccess()) {
 					mWaiterCalled = !mWaiterCalled;
 				}
 			}
@@ -435,17 +431,17 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		});
 
 		mGuestSubscribtion = AndroidObservable.bindActivity(this, api.newGuest(mTable.getRestaurantId(), mTable.getId()))
-				.subscribe(new Action1<ResponseBase>() {
-					@Override
-					public void call(ResponseBase responseBase) {
+		                                      .subscribe(new Action1<ResponseBase>() {
+			                                      @Override
+			                                      public void call(ResponseBase responseBase) {
 
-					}
-				}, new Action1<Throwable>() {
-					@Override
-					public void call(Throwable throwable) {
+			                                      }
+		                                      }, new Action1<Throwable>() {
+			                                      @Override
+			                                      public void call(Throwable throwable) {
 
-					}
-				});
+			                                      }
+		                                      });
 
 		loader.post(new Runnable() {
 			@Override
@@ -455,9 +451,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			}
 		});
 		loader.animateColor(RestaurantHelper.getBackgroundColor(restaurant));
-		mPicasso.setIndicatorsEnabled(true);
-		mPicasso.setLoggingEnabled(true);
-		mPicasso.load(RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics())).into(mTarget);
+		OmnomApplication.getPicasso(this)
+		                .load(RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics()))
+		                .into(mTarget);
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override
@@ -468,7 +464,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				ViewUtils.setVisible(txtLeave, mIsDemo);
 				ViewUtils.setVisible(getPanelBottom(), true);
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
-						.setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
+				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
 			}
 		});
 	}
@@ -477,12 +473,12 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		final boolean promoEnabled = RestaurantHelper.isPromoEnabled(restaurant);
 		final boolean waiterEnabled = RestaurantHelper.isWaiterEnabled(restaurant);
 
-		if (bottomView == null) {
+		if(bottomView == null) {
 			stubBottomMenu.setLayoutResource(waiterEnabled ? R.layout.layout_bill_waiter : R.layout.layout_bill);
 			bottomView = stubBottomMenu.inflate();
 		}
 
-		if (waiterEnabled) {
+		if(waiterEnabled) {
 			final View btnWaiter = findById(bottomView, R.id.btn_waiter);
 			btnWaiter.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -509,8 +505,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	protected boolean validateDemo() {
-		if (mIsDemo) {
-			if (mRestaurant == null || mTable == null) {
+		if(mIsDemo) {
+			if(mRestaurant == null || mTable == null) {
 				loader.startProgressAnimation(10000, new Runnable() {
 					@Override
 					public void run() {

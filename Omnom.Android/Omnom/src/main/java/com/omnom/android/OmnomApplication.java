@@ -18,14 +18,15 @@ import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
 import com.omnom.android.utils.preferences.PreferenceProvider;
+import com.squareup.picasso.Picasso;
 
-import io.fabric.sdk.android.Fabric;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
 import dagger.ObjectGraph;
+import io.fabric.sdk.android.Fabric;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
@@ -46,6 +47,10 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		return OmnomApplication.get(context).mixPanelHelper;
 	}
 
+	public static Picasso getPicasso(final Context context) {
+		return OmnomApplication.get(context.getApplicationContext()).getOrCreatePicasso();
+	}
+
 	private final List<Object> injectList = new ArrayList<Object>();
 
 	private ObjectGraph objectGraph;
@@ -61,6 +66,8 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	private UserProfile cachedUser;
 
 	private BeaconFindRequest cachedBeacon;
+
+	private Picasso _lazy_Picasso;
 
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
@@ -171,5 +178,14 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	public BeaconFindRequest getBeacon() {
 		return cachedBeacon;
+	}
+
+	public Picasso getOrCreatePicasso() {
+		if(_lazy_Picasso == null) {
+			_lazy_Picasso = new Picasso.Builder(getApplicationContext()).indicatorsEnabled(BuildConfig.DEBUG)
+			                                                       .loggingEnabled(BuildConfig.DEBUG)
+			                                                       .build();
+		}
+		return _lazy_Picasso;
 	}
 }

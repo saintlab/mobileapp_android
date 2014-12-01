@@ -96,8 +96,8 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.3.4'
     compile 'com.squareup:otto:1.3.5'
     compile 'com.jakewharton:butterknife:5.1.1'
-    compile 'com.squareup.okhttp:okhttp:2.1'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.1'
+    compile 'com.squareup.okhttp:okhttp:2.1.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.1.0'
 
     // rx
     compile 'com.netflix.rxjava:rxjava-core:0.19.6'
