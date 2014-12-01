@@ -93,7 +93,7 @@ public class ValidateActivityBle extends ValidateActivity {
 	protected void startLoader() {
 		clearErrors();
 
-		loader.startProgressAnimation(getResources().getInteger(R.integer.validation_duration), new Runnable() {
+		loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration), new Runnable() {
 			@Override
 			public void run() {
 			}
@@ -109,7 +109,7 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                         if(hasNoErrors) {
 					                                         readBeacons();
 				                                         } else {
-					                                         startErrorBackroundTransition();
+					                                         startErrorTransition();
 					                                         final View viewById = findViewById(R.id.panel_bottom);
 					                                         if(viewById != null) {
 						                                         viewById.animate().translationY(200).start();
@@ -119,7 +119,7 @@ public class ValidateActivityBle extends ValidateActivity {
 		                                         }, new Action1<Throwable>() {
 			                                         @Override
 			                                         public void call(Throwable throwable) {
-				                                         startErrorBackroundTransition();
+				                                         startErrorTransition();
 				                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
 			                                         }
 		                                         });
@@ -133,10 +133,10 @@ public class ValidateActivityBle extends ValidateActivity {
 				final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 				final int size = nearBeacons.size();
 				if(size == 0) {
-					startErrorBackroundTransition();
+					startErrorTransition();
 					mErrorHelper.showErrorDemo(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
 				} else if(size > 1) {
-					startErrorBackroundTransition();
+					startErrorTransition();
 					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
@@ -154,6 +154,12 @@ public class ValidateActivityBle extends ValidateActivity {
 												                                                            ValidateActivityBle.this);
 										                                                            throw new RuntimeException(
 												                                                            "Wrong auth token");
+									                                                            } else if(tableDataResponse.hasErrors()) {
+										                                                            startErrorTransition();
+										                                                            mErrorHelper.showErrorDemo(
+												                                                            LoaderError.WEAK_SIGNAL,
+												                                                            mInternetErrorClickListener);
+										                                                            return Observable.empty();
 									                                                            } else {
 										                                                            table[0] = tableDataResponse;
 										                                                            return api.getRestaurant(
@@ -173,7 +179,7 @@ public class ValidateActivityBle extends ValidateActivity {
 							                                           new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 								                                           @Override
 								                                           protected void onError(final Throwable throwable) {
-									                                           startErrorBackroundTransition();
+									                                           startErrorTransition();
 									                                           mErrorHelper.showErrorDemo(
 											                                           LoaderError.NO_CONNECTION_TRY,
 											                                           mInternetErrorClickListener);
