@@ -461,7 +461,7 @@ public class OrderFragment extends Fragment {
 
 		final String billText = getString(R.string.bill_number_, mPosition + 1);
 		if (((OrdersActivity) getActivity()).getOrdersCount() > 1) {
-			mHeader.setTitleBig(billText, new View.OnClickListener() {
+			mHeader.setTitleBig(billText, R.drawable.bg_card_title, new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					getActivity().onBackPressed();

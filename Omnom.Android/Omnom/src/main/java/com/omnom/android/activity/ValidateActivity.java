@@ -370,7 +370,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	private void loadOrders(final View v) {
-		clearErrors();
 		getPanelBottom().animate().translationY(0).start();
 		mOrdersSubscription = AndroidObservable.bindActivity(getActivity(), api.getOrders(mTable.getRestaurantId(),
 															 mTable.getId()))
@@ -386,8 +385,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 								if(!orders.isEmpty()) {
 									showOrders(orders);
 								} else {
-									findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
-											 R.color.white_transparent));
+									((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
 									mErrorHelper.showNoOrders(new View.OnClickListener() {
 										@Override
 										public void onClick(View v) {
