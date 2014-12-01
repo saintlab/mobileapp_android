@@ -382,7 +382,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 						                                                           }
 					                                                           });
 				                    } else {
-					                    startErrorBackroundTransition();
+					                    startErrorTransition();
 					                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
 					                    getPanelBottom().animate().translationY(200).start();
 					                    v.setEnabled(true);
@@ -391,14 +391,14 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		                    }, new Action1<Throwable>() {
 			                    @Override
 			                    public void call(final Throwable throwable) {
-				                    startErrorBackroundTransition();
+				                    startErrorTransition();
 				                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
 				                    v.setEnabled(true);
 			                    }
 		                    });
 	}
 
-	protected void startErrorBackroundTransition() {
+	protected void startErrorTransition() {
 		bgTransitionDrawable.startTransition();
 	}
 

@@ -8,6 +8,7 @@
 
     <integer name="default_sms_request_timeout">10000</integer>
 
+    <integer name="omnom_validate_duration">10000</integer>
     <integer name="loader_progress_max">5000</integer>
     <integer name="ble_scan_duration">2000</integer>
     <integer name="validation_duration">2500</integer>
