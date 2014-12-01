@@ -2,8 +2,6 @@ package com.omnom.android.activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -146,6 +144,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.stub_bottom_menu)
 	protected ViewStub stubBottomMenu;
 
+	@InjectView(R.id.root)
+	protected View rootView;
+
 	@InjectViews({R.id.txt_error, R.id.panel_errors})
 	protected List<View> errorViews;
 
@@ -191,6 +192,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private View bottomView;
 
+	protected int mDefaultAnimDuration;
+
 	@Override
 	protected void handleIntent(Intent intent) {
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
@@ -223,7 +226,12 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected void clearErrors() {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-		findById(this, R.id.root).setBackgroundColor(getResources().getColor(R.color.transparent));
+		if(mRestaurant == null) {
+			loader.animateLogo(R.drawable.ic_fork_n_knife);
+		} else {
+			loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
+		}
+		((TransitionDrawable) rootView.getBackground()).reverseTransition(mDefaultAnimDuration);
 	}
 
 	@Override
@@ -251,6 +259,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		mDefaultAnimDuration = getResources().getInteger(R.integer.default_animation_duration_short);
 		mPicasso = Picasso.with(getApplicationContext());
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -283,15 +292,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			@Override
 			public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
 				final BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
-				final BitmapDrawable drawable2 = new BitmapDrawable(getResources(), bitmap);
-				drawable2.mutate();
-				drawable2.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
-				drawable2.invalidateSelf();
 				final TransitionDrawable td = new TransitionDrawable(
 						new Drawable[]{
 								getResources().getDrawable(R.drawable.bg_wood),
-								drawable,
-								drawable2
+								drawable
 						}
 				);
 				td.setCrossFadeEnabled(true);
@@ -365,8 +369,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 						                                                           }
 					                                                           });
 				                    } else {
-					                    findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
-							                    R.color.white_transparent));
+					                    ((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
 					                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
 					                    getPanelBottom().animate().translationY(200).start();
 					                    v.setEnabled(true);
@@ -375,8 +378,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		                    }, new Action1<Throwable>() {
 			                    @Override
 			                    public void call(final Throwable throwable) {
-				                    findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
-						                    R.color.white_transparent));
+				                    ((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
 				                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
 				                    v.setEnabled(true);
 			                    }

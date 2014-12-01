@@ -3,6 +3,7 @@ package com.omnom.android.activity;
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.view.View;
 
@@ -27,8 +28,6 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
-
-import static butterknife.ButterKnife.findById;
 
 public class ValidateActivityBle extends ValidateActivity {
 
@@ -111,8 +110,8 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                         if(hasNoErrors) {
 					                                         readBeacons();
 				                                         } else {
-					                                         findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
-							                                         R.color.white_transparent));
+					                                         ((TransitionDrawable) rootView.getBackground()).startTransition(
+							                                         mDefaultAnimDuration);
 					                                         final View viewById = findViewById(R.id.panel_bottom);
 					                                         if(viewById != null) {
 						                                         viewById.animate().translationY(200).start();
@@ -122,8 +121,8 @@ public class ValidateActivityBle extends ValidateActivity {
 		                                         }, new Action1<Throwable>() {
 			                                         @Override
 			                                         public void call(Throwable throwable) {
-				                                         findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
-						                                         R.color.white_transparent));
+				                                         ((TransitionDrawable) rootView.getBackground()).startTransition(
+						                                         mDefaultAnimDuration);
 				                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
 			                                         }
 		                                         });
@@ -137,10 +136,10 @@ public class ValidateActivityBle extends ValidateActivity {
 				final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 				final int size = nearBeacons.size();
 				if(size == 0) {
-					findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(R.color.white_transparent));
+					((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
 					mErrorHelper.showErrorDemo(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
 				} else if(size > 1) {
-					findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(R.color.white_transparent));
+					((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
 					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
@@ -177,8 +176,8 @@ public class ValidateActivityBle extends ValidateActivity {
 							                                           new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 								                                           @Override
 								                                           protected void onError(final Throwable throwable) {
-									                                           findById(getActivity(), R.id.root).setBackgroundColor(
-											                                           getResources().getColor(R.color.white_transparent));
+									                                           ((TransitionDrawable) rootView.getBackground())
+											                                           .startTransition(mDefaultAnimDuration);
 									                                           mErrorHelper.showErrorDemo(
 											                                           LoaderError.NO_CONNECTION_TRY,
 											                                           mInternetErrorClickListener);
