@@ -215,13 +215,15 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 						if (response.getError() != null) {
 							Log.w(TAG, response.getError().toString());
 							onPayError();
+						} else {
+							mTransactionUrl = response.getUrl();
+							checkResult(response);
 						}
-						mTransactionUrl = response.getUrl();
-						checkResult(response);
 					}
 				}, new Action1<Throwable>() {
 					@Override
 					public void call(Throwable throwable) {
+						Log.w(TAG, throwable.getMessage());
 						onInternetError();
 					}
 				});
@@ -237,6 +239,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 				}, new Action1<Throwable>() {
 					@Override
 					public void call(Throwable throwable) {
+						Log.w(TAG, throwable.getMessage());
 						onInternetError();
 					}
 				});
