@@ -3,7 +3,6 @@ package com.omnom.android.activity;
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.view.View;
 
@@ -110,8 +109,7 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                         if(hasNoErrors) {
 					                                         readBeacons();
 				                                         } else {
-					                                         ((TransitionDrawable) rootView.getBackground()).startTransition(
-							                                         mDefaultAnimDuration);
+					                                         startErrorBackroundTransition();
 					                                         final View viewById = findViewById(R.id.panel_bottom);
 					                                         if(viewById != null) {
 						                                         viewById.animate().translationY(200).start();
@@ -121,8 +119,7 @@ public class ValidateActivityBle extends ValidateActivity {
 		                                         }, new Action1<Throwable>() {
 			                                         @Override
 			                                         public void call(Throwable throwable) {
-				                                         ((TransitionDrawable) rootView.getBackground()).startTransition(
-						                                         mDefaultAnimDuration);
+				                                         startErrorBackroundTransition();
 				                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
 			                                         }
 		                                         });
@@ -136,10 +133,10 @@ public class ValidateActivityBle extends ValidateActivity {
 				final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 				final int size = nearBeacons.size();
 				if(size == 0) {
-					((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
+					startErrorBackroundTransition();
 					mErrorHelper.showErrorDemo(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
 				} else if(size > 1) {
-					((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
+					startErrorBackroundTransition();
 					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
@@ -176,8 +173,7 @@ public class ValidateActivityBle extends ValidateActivity {
 							                                           new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 								                                           @Override
 								                                           protected void onError(final Throwable throwable) {
-									                                           ((TransitionDrawable) rootView.getBackground())
-											                                           .startTransition(mDefaultAnimDuration);
+									                                           startErrorBackroundTransition();
 									                                           mErrorHelper.showErrorDemo(
 											                                           LoaderError.NO_CONNECTION_TRY,
 											                                           mInternetErrorClickListener);
