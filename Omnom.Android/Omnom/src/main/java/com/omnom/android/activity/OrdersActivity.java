@@ -12,13 +12,18 @@ import com.omnom.android.adapter.OrdersPagerAdaper;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.socket.OmnomSocketBase;
+import com.omnom.android.socket.OmnomSocketFactory;
+import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.OrdersViewPager;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
+import com.squareup.otto.Subscribe;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import butterknife.InjectView;
@@ -67,8 +72,21 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	private boolean mDemo;
 
+	@Subscribe
+	public void onPayment(PaymentSocketEvent event) {
+		// payment handling logic
+	}
+
 	@Override
 	public void initUi() {
+		try {
+			final OmnomSocketBase socket = OmnomSocketFactory.init(this, orders.get(0));
+			socket.connect();
+			socket.subscribe(this);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 6);
@@ -148,9 +166,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 	}
 
 	public ObjectAnimator getFragmentAnimation(int pos, boolean show) {
-		final OrderFragment fragment = (OrderFragment) getSupportFragmentManager().findFragmentByTag(
-				TAG_ANDROID_SWITCHER + mPager.getId() + TAG_SWITCHER_DELIMITER + mPagerAdapter.getItemId(pos));
-		if(fragment != null) {
+		final OrderFragment fragment = (OrderFragment) getSupportFragmentManager()
+				.findFragmentByTag(TAG_ANDROID_SWITCHER + mPager.getId() + TAG_SWITCHER_DELIMITER + mPagerAdapter.getItemId(pos));
+		if (fragment != null) {
 			final View view = fragment.getFragmentView();
 			final int startAlpha = show ? 0 : 1;
 			final int endAlpha = show ? 1 : 0;
@@ -166,13 +184,13 @@ public class OrdersActivity extends BaseFragmentActivity {
 		ViewUtils.setVisible(mBtnClose, visible);
 		final ObjectAnimator fl = getFragmentAnimation(position - 1, visible);
 		final ObjectAnimator fr = getFragmentAnimation(position + 1, visible);
-		if(fl != null && fr != null) {
+		if (fl != null && fr != null) {
 			final AnimatorSet as = new AnimatorSet();
 			as.playTogether(fl, fr);
 			as.start();
-		} else if(fl != null) {
+		} else if (fl != null) {
 			fl.start();
-		} else if(fr != null) {
+		} else if (fr != null) {
 			fr.start();
 		}
 	}
