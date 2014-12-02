@@ -82,7 +82,6 @@ android {
 dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.android.support:support-v4:20.0.+'
-    compile 'com.google.android.gms:play-services:6.1.+'
 
     compile 'com.squareup.dagger:dagger:1.2.2'
     provided 'com.squareup.dagger:dagger-compiler:1.2.2'
