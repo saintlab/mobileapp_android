@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +33,7 @@ import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.drawable.TransitionDrawable;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -196,6 +197,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected int mDefaultAnimDuration;
 
+	private com.omnom.android.utils.drawable.TransitionDrawable bgTransitionDrawable;
+	
 	@Override
 	protected void handleIntent(Intent intent) {
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
@@ -233,7 +236,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		} else {
 			loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
 		}
-		((TransitionDrawable) rootView.getBackground()).reverseTransition(mDefaultAnimDuration);
+		if(bgTransitionDrawable.isTransitioned()) {
+			bgTransitionDrawable.reverseTransition();
+		}
 	}
 
 	@Override
@@ -261,7 +266,16 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		mDefaultAnimDuration = getResources().getInteger(R.integer.default_animation_duration_short);
+		bgTransitionDrawable = new com.omnom.android.utils.drawable.TransitionDrawable(
+				getResources().getInteger(R.integer.default_animation_duration_short),
+				new Drawable[]{
+						new ColorDrawable(getResources().getColor(R.color.transparent)),
+						new ColorDrawable(getResources().getColor(R.color.error_bg_white_transparent))
+				}
+		);
+
+		bgTransitionDrawable.setCrossFadeEnabled(true);
+		rootView.setBackgroundDrawable(bgTransitionDrawable);
 		mPicasso = Picasso.with(getApplicationContext());
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -295,6 +309,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
 				final BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
 				final TransitionDrawable td = new TransitionDrawable(
+						1000,
 						new Drawable[]{
 								getResources().getDrawable(R.drawable.bg_wood),
 								drawable
@@ -303,7 +318,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				td.setCrossFadeEnabled(true);
 				getWindow().getDecorView().setBackgroundDrawable(td);
 				// getActivity().findViewById(R.id.img_holder).setBackgroundDrawable(td);
-				td.startTransition(1000);
+				td.startTransition();
 			}
 
 			@Override
@@ -353,7 +368,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				                    if(hasNoErrors) {
 					                    loadOrders(v);
 				                    } else {
-					                    ((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
+					                    startErrorTransition();
 					                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
 					                    getPanelBottom().animate().translationY(200).start();
 					                    v.setEnabled(true);
@@ -362,11 +377,15 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		                    }, new Action1<Throwable>() {
 			                    @Override
 			                    public void call(final Throwable throwable) {
-				                    ((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
+				                    startErrorTransition();
 				                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
 				                    v.setEnabled(true);
 			                    }
 		                    });
+	}
+
+	protected void startErrorTransition() {
+		bgTransitionDrawable.startTransition();
 	}
 
 	private void loadOrders(final View v) {
@@ -385,7 +404,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 								if(!orders.isEmpty()) {
 									showOrders(orders);
 								} else {
-									((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
+									startErrorTransition();
 									mErrorHelper.showNoOrders(new View.OnClickListener() {
 										@Override
 										public void onClick(View v) {
@@ -606,12 +625,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 								final DemoTableData data = response.get(0);
 								onDataLoaded(data.getRestaurant(), data.getTable());
 							}
-						}, new Action1<Throwable>() {
-							@Override
-							public void call(Throwable throwable) {
-								Log.e(ValidateActivity.TAG, "validateDemo", throwable);
-							}
-						});
+						}, onError);
 				mFirstRun = false;
 			}
 			return true;

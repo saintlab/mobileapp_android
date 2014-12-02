@@ -52,7 +52,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 		intent.putExtra(EXTRA_CARD_DATA, card);
 		intent.putExtra(EXTRA_TYPE, TYPE_ADD_CONFIRM);
 		if(AndroidUtils.isJellyBean()) {
-			 Bundle extras = ActivityOptions.makeCustomAnimation(activity,
+			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
 			                                                    R.anim.slide_in_right,
 			                                                    R.anim.slide_out_left).toBundle();
 			activity.startActivityForResult(intent, code, extras);
@@ -162,11 +162,9 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 		editText.addTextChangedListener(new TextWatcher() {
 			public boolean hadComma = false;
 
-			public String delimiter = StringUtils.getCurrencyDelimiter();
-
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				hadComma = s.toString().contains(delimiter);
+				hadComma = s.toString().contains(StringUtils.CURRENCY_DELIMITER);
 			}
 
 			@Override
@@ -178,16 +176,16 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 				editText.removeTextChangedListener(this);
 				final String str = s.toString();
 
-				final int separatorIndex = str.indexOf(delimiter);
+				final int separatorIndex = str.indexOf(StringUtils.CURRENCY_DELIMITER);
 				String amount = StringUtils.filterAmount(str);
 				final int length = amount.length();
 				if(length == 2 && separatorIndex == -1 && !hadComma) {
-					amount += delimiter;
+					amount += StringUtils.CURRENCY_DELIMITER;
 				}
 
 				if(length == 3 && separatorIndex == -1) {
 					final String last = amount.substring(length - 1, length);
-					amount = amount.replace(last, delimiter + last);
+					amount = amount.replace(last, StringUtils.CURRENCY_DELIMITER + last);
 				}
 
 				final String text = amount + getCurrencySuffix();

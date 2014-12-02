@@ -3,7 +3,6 @@ package com.omnom.android.activity;
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.view.View;
 
@@ -96,7 +95,7 @@ public class ValidateActivityBle extends ValidateActivity {
 	protected void startLoader() {
 		clearErrors();
 
-		loader.startProgressAnimation(getResources().getInteger(R.integer.validation_duration), new Runnable() {
+		loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration), new Runnable() {
 			@Override
 			public void run() {
 			}
@@ -112,8 +111,7 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                         if(hasNoErrors) {
 					                                         readBeacons();
 				                                         } else {
-					                                         ((TransitionDrawable) rootView.getBackground()).startTransition(
-							                                         mDefaultAnimDuration);
+					                                         startErrorTransition();
 					                                         final View viewById = findViewById(R.id.panel_bottom);
 					                                         if(viewById != null) {
 						                                         viewById.animate().translationY(200).start();
@@ -123,8 +121,7 @@ public class ValidateActivityBle extends ValidateActivity {
 		                                         }, new Action1<Throwable>() {
 			                                         @Override
 			                                         public void call(Throwable throwable) {
-				                                         ((TransitionDrawable) rootView.getBackground()).startTransition(
-						                                         mDefaultAnimDuration);
+				                                         startErrorTransition();
 				                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
 			                                         }
 		                                         });
@@ -140,10 +137,10 @@ public class ValidateActivityBle extends ValidateActivity {
 				final int size = nearBeacons.size();
 				application.cacheBeacon(null);
 				if(size == 0) {
-					((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
+					startErrorTransition();
 					mErrorHelper.showErrorDemo(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
 				} else if(size > 1) {
-					((TransitionDrawable) rootView.getBackground()).startTransition(mDefaultAnimDuration);
+					startErrorTransition();
 					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
@@ -162,6 +159,12 @@ public class ValidateActivityBle extends ValidateActivity {
 												                                                            ValidateActivityBle.this);
 										                                                            throw new RuntimeException(
 												                                                            "Wrong auth token");
+									                                                            } else if(tableDataResponse.hasErrors()) {
+										                                                            startErrorTransition();
+										                                                            mErrorHelper.showErrorDemo(
+												                                                            LoaderError.WEAK_SIGNAL,
+												                                                            mInternetErrorClickListener);
+										                                                            return Observable.empty();
 									                                                            } else {
 										                                                            table[0] = tableDataResponse;
 										                                                            return api.getRestaurant(
@@ -183,8 +186,7 @@ public class ValidateActivityBle extends ValidateActivity {
 							                                           new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 								                                           @Override
 								                                           protected void onError(final Throwable throwable) {
-									                                           ((TransitionDrawable) rootView.getBackground())
-											                                           .startTransition(mDefaultAnimDuration);
+									                                           startErrorTransition();
 									                                           mErrorHelper.showErrorDemo(
 											                                           LoaderError.NO_CONNECTION_TRY,
 											                                           mInternetErrorClickListener);
