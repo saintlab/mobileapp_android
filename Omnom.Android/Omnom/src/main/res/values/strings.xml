@@ -37,6 +37,9 @@
     <string name="order_overall">Итого: %1$s</string>
     <string name="order_paid">Оплачено: %1$s</string>
     <string name="pay_amount">Оплатить %1$s</string>
+    <string name="amount_is_too_high">Сумма слишком большая</string>
+    <string name="pay">Оплатить</string>
+    <string name="refuse">Отказаться</string>
     <string name="tip_percent">%1$s%%</string>
     <string name="tip_hint_or">или %1$s</string>
     <string name="i_m_going_to_pay">Я оплачу</string>

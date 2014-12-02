@@ -6,6 +6,8 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -16,6 +18,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,9 +32,11 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
@@ -399,13 +404,22 @@ public class OrderFragment extends Fragment {
 			btnPay.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(final View v) {
-					final BigDecimal amount = getEnteredAmount();
-					final BigDecimal tips = getSelectedTips(amount);
-					final BigDecimal amountToPay = amount.add(tips);
-					final PaymentDetails paymentDetails = new PaymentDetails(amountToPay.doubleValue(), tips.doubleValue());
-					final OrdersActivity activity = (OrdersActivity) getActivity();
-					CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS,
-					                    activity.isDemo());
+					if (amountIsTooHigh()) {
+						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+						builder.setMessage(R.string.amount_is_too_high)
+								.setPositiveButton(R.string.pay, new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										showCardsActivity();
+									}
+								})
+								.setNegativeButton(R.string.refuse, null);
+						AlertDialog dialog = builder.create();
+						dialog.show();
+						TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
+						messageView.setGravity(Gravity.CENTER);
+					} else {
+						showCardsActivity();
+					}
 				}
 			});
 
@@ -498,6 +512,20 @@ public class OrderFragment extends Fragment {
 		initPicker();
 		initFooter(mSingle);
 		initList();
+	}
+
+	private boolean amountIsTooHigh() {
+		return getEnteredAmount().doubleValue() > 1.5 * mOrder.getAmountToPay();
+	}
+
+	private void showCardsActivity() {
+		final BigDecimal amount = getEnteredAmount();
+		final BigDecimal tips = getSelectedTips(amount);
+		final BigDecimal amountToPay = amount.add(tips);
+		final PaymentDetails paymentDetails = new PaymentDetails(amountToPay.doubleValue(), tips.doubleValue());
+		final OrdersActivity activity = (OrdersActivity) getActivity();
+		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor,
+				OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
 	}
 
 	private void initList() {
