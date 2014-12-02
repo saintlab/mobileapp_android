@@ -80,14 +80,9 @@ android {
 }
 
 dependencies {
-<<<<<<< HEAD
-    compile 'com.google.code.gson:gson:2.2.4'
-    compile 'com.android.support:support-v4:20.0.+'
-=======
     // google
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.android.support:support-v4:21.0.2'
->>>>>>> omnom_socket_io
 
     // socket.io
     compile 'com.github.nkzawa:socket.io-client:0.3.0@jar'
