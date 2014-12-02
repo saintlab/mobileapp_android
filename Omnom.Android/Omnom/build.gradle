@@ -106,6 +106,9 @@ dependencies {
     // other
     compile 'uk.co.chrisjenx:calligraphy:1.2.0'
     compile 'com.mixpanel.android:mixpanel-android:4.3.1@aar'
+    compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
+        exclude group: 'com.google.android', module: 'support-v4'
+    }
 
     compile project(':libraries:Omnom.Altbeacon')
     compile project(':libraries:Omnom.Beacon')

@@ -12,8 +12,6 @@ import com.omnom.android.adapter.OrdersPagerAdaper;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
-import com.omnom.android.socket.OmnomSocketBase;
-import com.omnom.android.socket.OmnomSocketFactory;
 import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -23,7 +21,6 @@ import com.omnom.android.view.OrdersViewPager;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
 import com.squareup.otto.Subscribe;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import butterknife.InjectView;
@@ -79,14 +76,6 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	@Override
 	public void initUi() {
-		try {
-			final OmnomSocketBase socket = OmnomSocketFactory.init(this, orders.get(0));
-			socket.connect();
-			socket.subscribe(this);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 6);

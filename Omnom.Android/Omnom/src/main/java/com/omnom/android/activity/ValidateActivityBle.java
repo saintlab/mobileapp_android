@@ -13,16 +13,20 @@ import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.socket.event.PaymentSocketEvent;
+import com.omnom.android.utils.CroutonHelper;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.Subscription;
@@ -45,6 +49,8 @@ public class ValidateActivityBle extends ValidateActivity {
 	private Subscription mValidateSubscribtion;
 
 	private Subscription mFindBeaconSubscription;
+
+	private Crouton mCrouton;
 
 	@Override
 	public void initUi() {

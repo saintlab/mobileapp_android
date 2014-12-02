@@ -15,6 +15,7 @@ import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.restaurateur.RestaurateurModule;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
+import com.omnom.android.socket.OmnomSocketBase;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
 import com.omnom.android.utils.preferences.PreferenceProvider;
@@ -68,6 +69,8 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	private BeaconFindRequest cachedBeacon;
 
 	private Picasso _lazy_Picasso;
+
+	private OmnomSocketBase mTableSocket;
 
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
@@ -183,8 +186,8 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	public Picasso getOrCreatePicasso() {
 		if(_lazy_Picasso == null) {
 			_lazy_Picasso = new Picasso.Builder(getApplicationContext()).indicatorsEnabled(BuildConfig.DEBUG)
-			                                                       .loggingEnabled(BuildConfig.DEBUG)
-			                                                       .build();
+			                                                            .loggingEnabled(BuildConfig.DEBUG)
+			                                                            .build();
 		}
 		return _lazy_Picasso;
 	}

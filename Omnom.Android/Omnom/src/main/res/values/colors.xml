@@ -28,4 +28,6 @@
 
     <color name="tip_active">#ffffff</color>
     <color name="tip_default">#7affffff</color>
+
+    <color name="balk_notification_background">#02c164</color>
 </resources>

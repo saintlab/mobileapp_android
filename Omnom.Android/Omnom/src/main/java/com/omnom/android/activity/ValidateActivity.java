@@ -179,8 +179,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected Func1<Restaurant, Restaurant> mPreloadBackgroundFunction;
 
-	protected int mDefaultAnimDuration;
-
 	private int mAnimationType;
 
 	private boolean mWaiterCalled;
@@ -198,6 +196,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	private com.omnom.android.utils.drawable.TransitionDrawable bgTransitionDrawable;
 
 	private Picasso mPicasso;
+
+	private PaymentListener mPaymentListener;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -219,6 +219,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		mPaymentListener.onPause();
 		if(mRestaurant == null) {
 			loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 		}
@@ -249,6 +250,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		OmnomObservable.unsubscribe(mWaiterCallSubscribtion);
 		OmnomObservable.unsubscribe(mUserSubscription);
 		OmnomObservable.unsubscribe(mGuestSubscribtion);
+		mPaymentListener.onDestroy();
 	}
 
 	@Override
@@ -266,6 +268,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		mPaymentListener = new PaymentListener(this);
 		bgTransitionDrawable = new com.omnom.android.utils.drawable.TransitionDrawable(
 				getResources().getInteger(R.integer.default_animation_duration_short),
 				new Drawable[]{
@@ -340,6 +343,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					startLoader();
 				}
 			});
+		}
+		if(mTable != null) {
+			mPaymentListener.initTableSocket(mTable);
 		}
 		mFirstRun = false;
 	}
@@ -513,14 +519,18 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	protected final void onDataLoaded(final Restaurant restaurant, TableDataResponse table) {
+		final OmnomApplication app = OmnomApplication.get(getActivity());
+
 		mRestaurant = restaurant;
 		mTable = table;
 
-		final String token = OmnomApplication.get(getActivity()).getAuthToken();
+		mPaymentListener.initTableSocket(mTable);
+
+		final String token = app.getAuthToken();
 		mUserSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
 			@Override
 			public void call(UserResponse userResponse) {
-				OmnomApplication.get(getActivity()).cacheUserProfile(new UserProfile(userResponse));
+				app.cacheUserProfile(new UserProfile(userResponse));
 			}
 		}, new Action1<Throwable>() {
 			@Override
