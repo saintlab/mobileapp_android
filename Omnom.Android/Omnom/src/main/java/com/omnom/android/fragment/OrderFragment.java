@@ -16,9 +16,11 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.TypedValue;
+import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 import android.view.ViewStub;
@@ -345,10 +347,21 @@ public class OrderFragment extends Fragment {
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
 		mFontSmall = getResources().getDimension(R.dimen.font_large);
 
+		boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+		boolean hasHomeKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_HOME);
+
 		mListTrasnlationActive = getResources().getDimensionPixelSize(R.dimen.order_list_trasnlation_active);
 		mPaymentTranslationY = getResources().getDimensionPixelSize(R.dimen.order_payment_translation_y);
 		mTipsTranslationY = getResources().getDimensionPixelSize(R.dimen.order_tips_translation_y);
 		mListHeight = getResources().getDimensionPixelSize(R.dimen.order_list_height);
+
+		if(hasBackKey && hasHomeKey && ViewConfiguration.get(getActivity()).hasPermanentMenuKey()) {
+			// no navigation bar, unless it is enabled in the settings
+		} else {
+			// 99% sure there's a navigation bar
+			mListTrasnlationActive += 144;
+			mListHeight -= 144 * 4;
+		}
 
 		ButterKnife.inject(this, view);
 		return view;
