@@ -96,6 +96,8 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 
 	private Order mOrder;
 
+	private CardInfo mCardInfo;
+
 	private boolean mIsDemo;
 
 	private int mAccentColor;
@@ -103,11 +105,13 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 	private String mTransactionUrl;
 
 	public static void start(final Activity activity, final int code, final double amount,
-	                         final Order order, final boolean isDemo, final int accentColor) {
+	                         final Order order, CardInfo cardInfo, final boolean isDemo,
+	                         final int accentColor) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
 		intent.putExtra(Extras.EXTRA_ORDER_AMOUNT, amount);
 		intent.putExtra(Extras.EXTRA_ORDER, order);
+		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
 		activity.startActivityForResult(intent, code);
 	}
@@ -170,15 +174,12 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 	private void processPayment(final double amount, final int tip) {
 		final Activity activity = getActivity();
 
-		final String cardId = getPreferences().getCardId(activity);
-		final CardInfo cardInfo = CardInfo.create(activity, cardId);
-
 		final BillRequest request = BillRequest.create(amount, mOrder);
 		mBillSubscription = AndroidObservable.bindActivity(activity, api.bill(request)).subscribe(new Action1<BillResponse>() {
 			@Override
 			public void call(final BillResponse response) {
 				if(!response.hasErrors()) {
-					tryToPay(cardInfo, response, amount, tip);
+					tryToPay(mCardInfo, response, amount, tip);
 				} else {
 					if(response.getError() != null) {
 						showToast(activity, response.getError());
@@ -309,6 +310,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
 		mAmount = intent.getDoubleExtra(Extras.EXTRA_ORDER_AMOUNT, 0);
 		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
+		mCardInfo = intent.getParcelableExtra(Extras.EXTRA_CARD_DATA);
 		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);
 	}
 }

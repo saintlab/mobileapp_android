@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -46,6 +47,8 @@ import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
 public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.AnimationEndListener {
+
+	private static final String TAG = CardsActivity.class.getSimpleName();
 
 	private static final int REQUEST_CODE_CARD_CONFIRM = 100;
 
@@ -204,8 +207,14 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	@OnClick(R.id.btn_pay)
 	protected void onPay() {
+		final String cardId = getPreferences().getCardId(this);
+		final CardInfo cardInfo = CardInfo.create(this, cardId);
+		pay(cardInfo);
+	}
+
+	private void pay(final CardInfo cardInfo) {
 		PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails.getAmount(),
-									 mOrder, mIsDemo, mAccentColor);
+									 mOrder, cardInfo, mIsDemo, mAccentColor);
 	}
 
 	@Override
@@ -215,8 +224,14 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 				setResult(RESULT_OK);
 				finish();
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
-			}
-			if(requestCode == REQUEST_CODE_CARD_CONFIRM || requestCode == REQUEST_CODE_CARD_ADD) {
+			} else if (requestCode == REQUEST_CODE_CARD_ADD && data != null) {
+				CardInfo cardInfo = data.getParcelableExtra(EXTRA_CARD_DATA);
+				if (cardInfo != null) {
+					pay(cardInfo);
+				} else {
+					Log.w(TAG, "Card info is null");
+				}
+			} else if(requestCode == REQUEST_CODE_CARD_CONFIRM || requestCode == REQUEST_CODE_CARD_ADD) {
 				AnimationUtils.animateAlpha(mList, false, new Runnable() {
 					@Override
 					public void run() {

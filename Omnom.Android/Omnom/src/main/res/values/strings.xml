@@ -48,10 +48,12 @@
     <string name="tips_another">другой</string>
     <string name="tips">Чаевые</string>
     <string name="app_version_build">версия %1$s</string>
+    <string name="save_card_data">Сохранить данные карты для следующих платежей</string>
     <string name="add_card">Добавить карту</string>
     <string name="currency_ruble"></string>
     <string name="cardio_app_token">e041fdfc4e9c4c6ba1dbd26969a98d92</string>
     <string name="ready">Готово</string>
+    <string name="bind">Привязать</string>
     <string name="title_activity_card_confirm">CardConfirmActivity</string>
     <string name="card_binding">Привязка карты</string>
     <string name="hint_confirm_amount">00,00 </string>

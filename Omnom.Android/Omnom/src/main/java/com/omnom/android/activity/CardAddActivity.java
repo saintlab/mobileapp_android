@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +24,7 @@ import com.omnom.android.utils.view.ErrorEditText;
 import com.omnom.android.view.HeaderView;
 
 import butterknife.InjectView;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
@@ -64,6 +66,9 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	@InjectView(R.id.panel_card)
 	protected View mPanelCard;
 
+	@InjectView(R.id.check_save_card)
+	protected CheckBox mCheckSaveCard;
+
 	@InjectView(R.id.panel_camera)
 	protected View mPanelCamera;
 
@@ -82,12 +87,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	@Override
 	public void initUi() {
-		mPanelTop.setButtonRight(R.string.ready, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				doProceed();
-			}
-		});
+		mCheckSaveCard.setChecked(true);
 		mPanelTop.setButtonRightEnabled(false);
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
 			@Override
@@ -169,7 +169,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(requestCode== REQUEST_CODE_CARD_REGISTER) {
+		if(requestCode == REQUEST_CODE_CARD_REGISTER && resultCode == RESULT_OK) {
 			setResult(RESULT_OK);
 			finish();
 		}
@@ -187,15 +187,30 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		}
 	}
 
-	private void doProceed() {
-		if(!validate(true)) {
-			return;
-		}
+	private CardInfo createCardInfo() {
 		final String pan = CardUtils.preparePan(mEditCardNumber.getText().toString());
 		final String expDate = CardUtils.prepareExpDare(mEditCardExpDate.getText().toString());
 		final String cvv = mEditCardCvv.getText().toString();
 		final String holder = getString(R.string.acquiring_mailru_cardholder);
-		CardConfirmActivity.startAddConfirm(this, CardInfo.create(pan, expDate, cvv, holder), REQUEST_CODE_CARD_REGISTER);
+		return CardInfo.create(pan, expDate, cvv, holder);
+	}
+
+	private void doBind() {
+		if(!validate(true)) {
+			return;
+		}
+		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER);
+	}
+
+	private void doPay() {
+		if(!validate(true)) {
+			return;
+		}
+		Intent intent = new Intent();
+		intent.putExtra(EXTRA_CARD_DATA, createCardInfo());
+		setResult(RESULT_OK, intent);
+		finish();
+		overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 	}
 
 	private boolean validate(boolean showErrors) {
@@ -234,6 +249,33 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_POSTAL_CODE, false);
 		scanIntent.putExtra(CardIOActivity.EXTRA_SUPPRESS_MANUAL_ENTRY, true);
 		startActivityForResult(scanIntent, REQUEST_CODE_CARD_IO);
+	}
+
+	@OnCheckedChanged(R.id.check_save_card)
+	public void onCheckSaveCard(final boolean checked) {
+		if (checked) {
+			bindMode();
+		} else {
+			payMode();
+		}
+	}
+
+	private void bindMode() {
+		mPanelTop.setButtonRight(R.string.bind, new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				doBind();
+			}
+		});
+	}
+
+	private void payMode() {
+		mPanelTop.setButtonRight(R.string.pay, new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				doPay();
+			}
+		});
 	}
 
 	@Override
