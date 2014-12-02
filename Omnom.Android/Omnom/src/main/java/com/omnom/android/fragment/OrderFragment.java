@@ -95,6 +95,8 @@ public class OrderFragment extends Fragment {
 
 	public static final int PICKER_MIN_VALUE = 0;
 
+	public static final int PICKER_DEFAULT_VALUE = 10;
+
 	public static class PaymentDetails implements Parcelable {
 		public static final Creator<PaymentDetails> CREATOR = new Creator<PaymentDetails>() {
 			@Override
@@ -757,7 +759,7 @@ public class OrderFragment extends Fragment {
 				updateCustomTipsText(newVal);
 			}
 		});
-		pickerTips.setValue(0);
+		pickerTips.setValue(PICKER_DEFAULT_VALUE);
 	}
 
 	private void updateCustomTipsText(final int newVal) {
