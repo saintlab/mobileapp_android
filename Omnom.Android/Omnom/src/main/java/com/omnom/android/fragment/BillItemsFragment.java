@@ -124,6 +124,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 		final BigDecimal amount = getAmount();
 		if(amount.compareTo(BigDecimal.ZERO) > 0) {
 			btnCommit.setTag(R.id.edit_amount, amount);
+			btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_ITEMS);
 			final String text = getString(R.string.bill_split_amount_, StringUtils.formatCurrency(amount));
 			AnimationUtils.animateAlpha(btnCommit, true, new Runnable() {
 				@Override

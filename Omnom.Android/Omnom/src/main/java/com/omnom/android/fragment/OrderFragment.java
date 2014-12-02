@@ -39,6 +39,7 @@ import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
+import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderItemSelectedEvent;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
@@ -272,6 +273,8 @@ public class OrderFragment extends Fragment {
 
 	private int mListHeight;
 
+	private OrderItemsAdapter mAdapter;
+
 	public OrderFragment() {
 	}
 
@@ -299,13 +302,16 @@ public class OrderFragment extends Fragment {
 	@Subscribe
 	public void onSplitCommit(SplitHideEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
-			// list.animate().translationY(mListTrasnlationActive).start();
+			mAdapter.notifyDataSetChanged();
 		}
 	}
 
 	@Subscribe
 	public void onSplitCommit(OrderSplitCommitEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
+			if(event.getSplitType() == BillSplitFragment.SPLIT_TYPE_PERSON) {
+				cancelSplit();
+			}
 			final BigDecimal amount = event.getAmount();
 			final String s = StringUtils.formatCurrency(amount, getCurrencySuffix());
 			editAmount.setText(s);
@@ -318,23 +324,12 @@ public class OrderFragment extends Fragment {
 	public void onOrderItemSelected(OrderItemSelectedEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
 			mCheckedStates.put(event.getPosition(), event.isSelected());
-			if(hasSelectedItems()) {
+			if(AndroidUtils.hasSelectedItems(mCheckedStates, list.getCount())) {
 				initFooter2();
 			} else {
 				initFooter(true);
 			}
 		}
-	}
-
-	private boolean hasSelectedItems() {
-		final int size = mCheckedStates.size();
-		for(int i = 0; i < size; i++) {
-			int key = mCheckedStates.keyAt(i);
-			if(mCheckedStates.get(key) && key < list.getCount() - 1) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override
@@ -462,7 +457,7 @@ public class OrderFragment extends Fragment {
 		mFragmentView.setTag("order_page_" + mPosition);
 
 		final String billText = getString(R.string.bill_number_, mPosition + 1);
-		if (((OrdersActivity) getActivity()).getOrdersCount() > 1) {
+		if(((OrdersActivity) getActivity()).getOrdersCount() > 1) {
 			mHeader.setTitleBig(billText, R.drawable.bg_card_title, new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -501,7 +496,8 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void initList() {
-		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems(), true));
+		mAdapter = new OrderItemsAdapterSimple(getActivity(), mOrder.getItems(), mCheckedStates, true);
+		list.setAdapter(mAdapter);
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 
@@ -696,7 +692,9 @@ public class OrderFragment extends Fragment {
 
 	private void cancelSplit() {
 		mCheckedStates.clear();
+		mAdapter.notifyDataSetChanged();
 		initFooter(true);
+		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
 	}
 
 	@SuppressLint("NewApi")
