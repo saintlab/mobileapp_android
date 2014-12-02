@@ -16,7 +16,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -270,8 +269,8 @@ public class LoaderView extends FrameLayout {
 
 	public void scaleUp(final Runnable endCallback) {
 		AnimationUtils.scale(mImgLoader,
-							 mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
-							 endCallback);
+		                     mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
+		                     endCallback);
 	}
 
 	@DebugLog
@@ -490,14 +489,11 @@ public class LoaderView extends FrameLayout {
 			return;
 		}
 
-		RequestCreator requestCreator = Picasso.with(getContext()).load(logo).placeholder(placeholderResId);
-		if(getContext().getResources().getDisplayMetrics().densityDpi == DisplayMetrics.DENSITY_XXHIGH) {
-			final int size = (int) (220 * 2.5f);
-			requestCreator = requestCreator.resize(size, size).centerInside();
-		}
-		if(getContext().getResources().getDisplayMetrics().densityDpi == DisplayMetrics.DENSITY_MEDIUM) {
-			requestCreator.transform(mScaleTransformation);
-		}
+		RequestCreator requestCreator = Picasso.with(getContext())
+		                                       .load(logo)
+		                                       .placeholder(placeholderResId)
+		                                       .resizeDimen(R.dimen.loader_logo_size, R.dimen.loader_logo_size)
+		                                       .centerInside();
 		mTarget = new Target() {
 			@Override
 			public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
