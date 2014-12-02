@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -17,25 +16,11 @@ import android.widget.ListView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.acquiring.AcquiringType;
-import com.omnom.android.acquiring.ExtraData;
-import com.omnom.android.acquiring.OrderInfo;
-import com.omnom.android.acquiring.PaymentInfoFactory;
-import com.omnom.android.acquiring.api.Acquiring;
-import com.omnom.android.acquiring.api.PaymentInfo;
-import com.omnom.android.acquiring.demo.DemoAcquiring;
-import com.omnom.android.acquiring.mailru.OrderInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.MailRuExtra;
-import com.omnom.android.acquiring.mailru.model.MerchantData;
-import com.omnom.android.acquiring.mailru.model.UserData;
-import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
-import com.omnom.android.restaurateur.model.bill.BillRequest;
-import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.Card;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.order.Order;
@@ -48,7 +33,6 @@ import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.HeaderView;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -61,17 +45,13 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
-import static com.omnom.android.utils.utils.AndroidUtils.showToast;
-
 public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.AnimationEndListener {
 
 	private static final int REQUEST_CODE_CARD_CONFIRM = 100;
 
 	private static final int REQUEST_CODE_CARD_ADD = 101;
 
-	private static final int REQUEST_CODE_PAYMENT_OK = 102;
-
-	private static final String TAG = CardsActivity.class.getSimpleName();
+	private static final int REQUEST_PAYMENT = 102;
 
 	public class DemoCard extends Card {
 		@Override
@@ -121,12 +101,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	@InjectView(R.id.list)
 	protected ListView mList;
 
-	@Inject
-	protected Acquiring mAcquiring;
-
-	@Inject
-	protected DemoAcquiring mDemoAcquiring;
-
 	private int mAccentColor;
 
 	private Subscription mCardsSubscription;
@@ -134,10 +108,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	private PreferenceProvider mPreferences;
 
 	private ValueAnimator dividerAnimation;
-
-	private Subscription mPaySubscription;
-
-	private Subscription mBillSubscription;
 
 	private Order mOrder;
 
@@ -234,90 +204,17 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	@OnClick(R.id.btn_pay)
 	protected void onPay() {
-		pay(mDetails.getAmount(), 0);
-	}
-
-	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final double tip) {
-		final com.omnom.android.auth.UserData cachedUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		final UserData user = UserData.create(String.valueOf(cachedUser.getId()), cachedUser.getPhone());
-		final MerchantData merchant = new MerchantData(getActivity());
-		pay(billData, card, merchant, user, amount, tip);
-	}
-
-	private void pay(BillResponse billData, final CardInfo cardInfo, MerchantData merchant, UserData user, double amount, double tip) {
-		final ExtraData extra = MailRuExtra.create(tip, billData.getMailRestaurantId());
-		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
-		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
-		mPaySubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().pay(merchant, paymentInfo))
-		                                    .subscribe(new Action1<AcquiringPollingResponse>() {
-			                                    @Override
-			                                    public void call(AcquiringPollingResponse response) {
-				                                    onPayOk(response);
-			                                    }
-		                                    }, new Action1<Throwable>() {
-			                                    @Override
-			                                    public void call(Throwable throwable) {
-				                                    onPayError(throwable);
-			                                    }
-		                                    });
-	}
-
-	private Acquiring getAcquiring() {
-		return mIsDemo ? mDemoAcquiring : mAcquiring;
-	}
-
-	private void onPayError(Throwable throwable) {
-		Log.d(TAG, "status = " + throwable);
-		mBtnPay.setEnabled(true);
-		showToast(getActivity(), "Unable to pay");
-	}
-
-	private void onPayOk(AcquiringPollingResponse response) {
-		Log.d(TAG, "status = " + response.getStatus());
-		mBtnPay.setEnabled(true);
-		ThanksActivity.start(this, REQUEST_CODE_PAYMENT_OK, mAccentColor);
-	}
-
-	private void pay(final double amount, final int tip) {
-		final Activity activity = getActivity();
-
-		final String cardId = getPreferences().getCardId(activity);
-		final CardInfo cardInfo = CardInfo.create(activity, cardId);
-		mBtnPay.setEnabled(false);
-
-		final BillRequest request = BillRequest.create(amount, mOrder);
-		mBillSubscription = AndroidObservable.bindActivity(activity, api.bill(request)).subscribe(new Action1<BillResponse>() {
-			@Override
-			public void call(final BillResponse response) {
-				if(!response.hasErrors()) {
-					tryToPay(cardInfo, response, amount, tip);
-				} else {
-					if(response.getError() != null) {
-						showToast(activity, response.getError());
-					} else if(response.getErrors() != null) {
-						showToast(activity, response.getErrors().toString());
-					}
-					mBtnPay.setEnabled(true);
-				}
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				mBtnPay.setEnabled(true);
-			}
-		});
-	}
-
-	private BigDecimal getEnteredAmount() {
-		return null;
+		PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails.getAmount(),
+									 mOrder, mIsDemo, mAccentColor);
 	}
 
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		if(resultCode == RESULT_OK) {
-			if(requestCode == REQUEST_CODE_PAYMENT_OK) {
+			if(requestCode == REQUEST_PAYMENT) {
 				setResult(RESULT_OK);
 				finish();
+				overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
 			}
 			if(requestCode == REQUEST_CODE_CARD_CONFIRM || requestCode == REQUEST_CODE_CARD_ADD) {
 				AnimationUtils.animateAlpha(mList, false, new Runnable() {

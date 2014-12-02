@@ -111,12 +111,7 @@ public class LoaderView extends FrameLayout {
 		mImgLoader = findById(this, R.id.img_loader);
 		mImgLogo = findById(this, R.id.img_logo);
 		mProgressBar = findById(this, R.id.progress);
-		final LayerDrawable progressDrawable = (LayerDrawable) mProgressBar.getProgressDrawable();
-		if(progressDrawable != null) {
-			final RotateDrawable rotateDrawable = (RotateDrawable) progressDrawable.findDrawableByLayerId(android.R.id.progress);
-			GradientDrawable shape = (GradientDrawable) rotateDrawable.getDrawable();
-			shape.setColor(mProgressColor);
-		}
+		setProgressColor(mProgressColor);
 
 		mEditTableNumber = findById(this, R.id.edit_table_number);
 
@@ -219,6 +214,15 @@ public class LoaderView extends FrameLayout {
 		sd.invalidateSelf();
 	}
 
+	public void setProgressColor(final int color) {
+		final LayerDrawable progressDrawable = (LayerDrawable) mProgressBar.getProgressDrawable();
+		if(progressDrawable != null) {
+			final RotateDrawable rotateDrawable = (RotateDrawable) progressDrawable.findDrawableByLayerId(android.R.id.progress);
+			GradientDrawable shape = (GradientDrawable) rotateDrawable.getDrawable();
+			shape.setColor(color);
+		}
+	}
+
 	public void showProgress(final boolean visible) {
 		showProgress(visible, false);
 	}
@@ -236,8 +240,11 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void scaleDown(final Runnable scaleDownUpdate, final Runnable endAction) {
-		AnimationUtils.scaleHeight(mImgLoader, loaderSize);
-		AnimationUtils.scaleWidth(mImgLoader, loaderSize, scaleDownUpdate, endAction);
+		scaleDown(loaderSize, scaleDownUpdate, endAction);
+	}
+
+	public void scaleDown(final long duration, final Runnable endAction) {
+		scaleDown(loaderSize, duration, endAction);
 	}
 
 	public void scaleDown(int size, final Runnable scaleDownUpdate, final Runnable endAction) {
@@ -263,8 +270,8 @@ public class LoaderView extends FrameLayout {
 
 	public void scaleUp(final Runnable endCallback) {
 		AnimationUtils.scale(mImgLoader,
-		                     mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
-		                     endCallback);
+							 mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
+							 endCallback);
 	}
 
 	@DebugLog

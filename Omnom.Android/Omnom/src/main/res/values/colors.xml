@@ -9,6 +9,7 @@
     <color name="profile_hint">#aaa</color>
 
     <color name="info_hint">#7f000000</color>
+    <color name="order_item_price">#7d7d7d</color>
 
     <color name="light_blue">#488ee1</color>
     <color name="card_selected">#4a90e2</color>
@@ -22,6 +23,8 @@
 
     <color name="card_number_default">#ff000000</color>
     <color name="card_type_default">#7f000000</color>
+
+    <color name="payment_progress_color">#ffe4e4e4</color>
 
     <color name="tip_active">#ffffff</color>
     <color name="tip_default">#7affffff</color>

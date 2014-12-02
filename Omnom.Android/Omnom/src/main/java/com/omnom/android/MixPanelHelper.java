@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.mixpanel.model.Event;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +44,15 @@ public class MixPanelHelper {
 		try {
 			json.put(KEY_DATA, json.toString());
 			track(event, json);
+		} catch(JSONException e) {
+			Log.e(TAG, "track", e);
+		}
+	}
+
+	public void track(Event event) {
+		try {
+			final JSONObject json = new JSONObject(mGson.toJson(event));
+			track(event.getName(), json);
 		} catch(JSONException e) {
 			Log.e(TAG, "track", e);
 		}

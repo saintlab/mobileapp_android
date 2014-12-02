@@ -4,10 +4,13 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
+import android.view.View;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.beacon.BeaconFilter;
+import com.omnom.android.preferences.PreferenceHelper;
+import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ObservableUtils;
@@ -26,8 +29,6 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
-
-import static butterknife.ButterKnife.findById;
 
 public class ValidateActivityBle extends ValidateActivity {
 
@@ -94,7 +95,7 @@ public class ValidateActivityBle extends ValidateActivity {
 	protected void startLoader() {
 		clearErrors();
 
-		loader.startProgressAnimation(getResources().getInteger(R.integer.validation_duration), new Runnable() {
+		loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration), new Runnable() {
 			@Override
 			public void run() {
 			}
@@ -110,17 +111,17 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                         if(hasNoErrors) {
 					                                         readBeacons();
 				                                         } else {
-					                                         findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
-							                                         R.color.white_transparent));
-					                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
-					                                         findViewById(R.id.panel_bottom).animate().translationY(200).start();
+					                                         startErrorTransition();
+					                                         final View viewById = findViewById(R.id.panel_bottom);
+					                                         if(viewById != null) {
+						                                         viewById.animate().translationY(200).start();
+					                                         }
 				                                         }
 			                                         }
 		                                         }, new Action1<Throwable>() {
 			                                         @Override
 			                                         public void call(Throwable throwable) {
-				                                         findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
-						                                         R.color.white_transparent));
+				                                         startErrorTransition();
 				                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
 			                                         }
 		                                         });
@@ -130,17 +131,20 @@ public class ValidateActivityBle extends ValidateActivity {
 		scanBleDevices(true, new Runnable() {
 			@Override
 			public void run() {
-				final BeaconFilter filter = new BeaconFilter(OmnomApplication.get(getActivity()));
+				final OmnomApplication application = OmnomApplication.get(getActivity());
+				final BeaconFilter filter = new BeaconFilter(application);
 				final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
 				final int size = nearBeacons.size();
+				application.cacheBeacon(null);
 				if(size == 0) {
-					findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(R.color.white_transparent));
+					startErrorTransition();
 					mErrorHelper.showErrorDemo(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
 				} else if(size > 1) {
-					findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(R.color.white_transparent));
+					startErrorTransition();
 					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
+					application.cacheBeacon(new BeaconFindRequest(beacon));
 					final TableDataResponse[] table = new TableDataResponse[1];
 					mFindBeaconSubscription = AndroidObservable.bindActivity(getActivity(),
 					                                                         api.findBeacon(beacon)
@@ -155,6 +159,12 @@ public class ValidateActivityBle extends ValidateActivity {
 												                                                            ValidateActivityBle.this);
 										                                                            throw new RuntimeException(
 												                                                            "Wrong auth token");
+									                                                            } else if(tableDataResponse.hasErrors()) {
+										                                                            startErrorTransition();
+										                                                            mErrorHelper.showErrorDemo(
+												                                                            LoaderError.WEAK_SIGNAL,
+												                                                            mInternetErrorClickListener);
+										                                                            return Observable.empty();
 									                                                            } else {
 										                                                            table[0] = tableDataResponse;
 										                                                            return api.getRestaurant(
@@ -169,13 +179,14 @@ public class ValidateActivityBle extends ValidateActivity {
 								                                           @Override
 								                                           public void call(final Restaurant restaurant) {
 									                                           onDataLoaded(restaurant, table[0]);
+									                                           ((PreferenceHelper) getPreferences()).saveBeacon(
+											                                           getActivity(), beacon);
 								                                           }
 							                                           },
 							                                           new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 								                                           @Override
 								                                           protected void onError(final Throwable throwable) {
-									                                           findById(getActivity(), R.id.root).setBackgroundColor(
-											                                           getResources().getColor(R.color.white_transparent));
+									                                           startErrorTransition();
 									                                           mErrorHelper.showErrorDemo(
 											                                           LoaderError.NO_CONNECTION_TRY,
 											                                           mInternetErrorClickListener);

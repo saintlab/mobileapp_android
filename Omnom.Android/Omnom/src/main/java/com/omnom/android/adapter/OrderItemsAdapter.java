@@ -1,7 +1,7 @@
 package com.omnom.android.adapter;
 
 import android.content.Context;
-import android.os.Parcel;
+import android.graphics.Color;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
+import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +25,19 @@ import butterknife.InjectView;
  */
 public class OrderItemsAdapter extends BaseAdapter {
 
+	public static final int COLOR_TEXT_SELECTED = Color.WHITE;
+
+	public static final int COLOR_TEXT_NORMAL = Color.BLACK;
+
 	static class ViewHolder {
 		@InjectView(R.id.txt_title)
 		protected TextView txtTitle;
 
 		@InjectView(R.id.txt_price)
 		protected TextView txtPrice;
+
+		@InjectView(R.id.divider)
+		protected View divider;
 
 		private ViewHolder(View convertView) {
 			ButterKnife.inject(this, convertView);
@@ -40,15 +48,11 @@ public class OrderItemsAdapter extends BaseAdapter {
 
 	private static final int TYPE_FAKE = 1;
 
-	private class FakeOrder extends OrderItem {
-		public FakeOrder(final Parcel parcel) {
-			super(parcel);
-		}
-	}
-
 	private final LayoutInflater mInflater;
 
 	private final SparseBooleanArray mCheckedStates;
+
+	private final int mColorPriceNormal;
 
 	private Context mContext;
 
@@ -64,11 +68,10 @@ public class OrderItemsAdapter extends BaseAdapter {
 			addFakeView) {
 		mContext = context;
 		mAddFakeView = addFakeView;
-		if(addFakeView && items.size() < 4) {
-		}
 		mItems = items;
 		mInflater = LayoutInflater.from(mContext);
 		mCheckedStates = states;
+		mColorPriceNormal = mContext.getResources().getColor(R.color.order_item_price);
 	}
 
 	@Override
@@ -138,12 +141,18 @@ public class OrderItemsAdapter extends BaseAdapter {
 		if(item == null) {
 			return;
 		}
-		if(mCheckedStates.get(position)) {
-			convertView.setBackgroundColor(mContext.getResources().getColor(R.color.btn_pay_green));
-		} else {
-			convertView.setBackgroundColor(mContext.getResources().getColor(android.R.color.white));
-		}
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
+		if(mCheckedStates.get(position)) {
+			ViewUtils.setVisible(holder.divider, false);
+			convertView.setBackgroundColor(mContext.getResources().getColor(R.color.btn_pay_green));
+			holder.txtTitle.setTextColor(COLOR_TEXT_SELECTED);
+			holder.txtPrice.setTextColor(COLOR_TEXT_SELECTED);
+		} else {
+			ViewUtils.setVisible(holder.divider, position != getCount() - 1);
+			convertView.setBackgroundColor(mContext.getResources().getColor(android.R.color.white));
+			holder.txtTitle.setTextColor(COLOR_TEXT_NORMAL);
+			holder.txtPrice.setTextColor(mColorPriceNormal);
+		}
 		holder.txtTitle.setText(item.getTitle());
 		holder.txtPrice.setText(String.valueOf(item.getPricePerItem()));
 	}

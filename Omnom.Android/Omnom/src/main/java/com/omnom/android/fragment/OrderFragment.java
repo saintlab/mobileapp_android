@@ -1,7 +1,10 @@
 package com.omnom.android.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -17,6 +20,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.view.ViewStub;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
@@ -35,10 +39,14 @@ import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderItemSelectedEvent;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
+import com.omnom.android.mixpanel.model.BillViewEvent;
+import com.omnom.android.mixpanel.model.Event;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
@@ -47,6 +55,7 @@ import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.OmnomListView;
+import com.omnom.android.view.HeaderView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -85,6 +94,8 @@ public class OrderFragment extends Fragment {
 	public static final int PICKER_MAX_VALUE = 200;
 
 	public static final int PICKER_MIN_VALUE = 0;
+
+	public static final int PICKER_DEFAULT_VALUE = 10;
 
 	public static class PaymentDetails implements Parcelable {
 		public static final Creator<PaymentDetails> CREATOR = new Creator<PaymentDetails>() {
@@ -173,6 +184,9 @@ public class OrderFragment extends Fragment {
 
 	@Nullable
 	protected TextView txtCustomTips;
+
+	@InjectView(R.id.panel_top)
+	protected HeaderView mHeader;
 
 	@InjectView(R.id.txt_title)
 	protected TextView txtTitle;
@@ -285,7 +299,7 @@ public class OrderFragment extends Fragment {
 	@Subscribe
 	public void onSplitCommit(SplitHideEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
-			list.animate().translationY(mListTrasnlationActive).start();
+			// list.animate().translationY(mListTrasnlationActive).start();
 		}
 	}
 
@@ -326,7 +340,8 @@ public class OrderFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
-		final View view = inflater.inflate(R.layout.fragment_order, container, false);
+		final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_order, container, false);
+
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
 		mFontSmall = getResources().getDimension(R.dimen.font_large);
 
@@ -358,8 +373,9 @@ public class OrderFragment extends Fragment {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, false);
 		}
+		ViewUtils.setVisible(mHeader, false);
 		AnimationUtils.animateAlpha3(getPanelPayment(), false);
-		list.setScrollingEnabled(false);
+		list.setSwipeEnabled(false);
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0).start();
 		AnimationUtils.animateAlpha(txtTitle, true);
 	}
@@ -397,7 +413,7 @@ public class OrderFragment extends Fragment {
 			btnApply.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(final View v) {
-					doApply(v);;
+					doApply(v);
 				}
 			});
 			btnCancel = (ImageButton) inflate.findViewById(R.id.btn_cancel);
@@ -443,13 +459,30 @@ public class OrderFragment extends Fragment {
 	@Override
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 		mFragmentView = view;
+		mFragmentView.setTag("order_page_" + mPosition);
+
+		final String billText = getString(R.string.bill_number_, mPosition + 1);
+		if (((OrdersActivity) getActivity()).getOrdersCount() > 1) {
+			mHeader.setTitleBig(billText, R.drawable.bg_card_title, new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					getActivity().onBackPressed();
+				}
+			});
+		}
+		mHeader.setButtonLeft(R.string.close, new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				((OrdersActivity) getActivity()).close();
+			}
+		});
+		ViewUtils.setVisible(mHeader, false);
 
 		if(mAnimate) {
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
 			mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
-
 			mFragmentView.animate().translationYBy(-mListHeight).setDuration(0).start();
-			mFragmentView.animate().translationYBy(mListHeight).setStartDelay((mPosition + 1) * 350).setDuration(850).start();
+			mFragmentView.animate().translationYBy(mListHeight).setStartDelay((mPosition + 1) * 200).setDuration(500).start();
 		} else if(mSingle) {
 			ViewUtils.setVisible(getPanelPayment(), true);
 			list.setTranslationY(mListTrasnlationActive);
@@ -460,10 +493,10 @@ public class OrderFragment extends Fragment {
 		}
 
 		pickerTips.setDividerDrawable(new ColorDrawable(mAccentColor));
-		txtTitle.setText(getString(R.string.bill_number_, mPosition + 1));
+		txtTitle.setText(billText);
 
 		initPicker();
-		initFooter(false);
+		initFooter(mSingle);
 		initList();
 	}
 
@@ -471,6 +504,14 @@ public class OrderFragment extends Fragment {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems(), true));
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+
+		list.setSwipeEnabled(false);
+		list.setSwipeListener(new OmnomListView.SwipeListener() {
+			@Override
+			public void onRefresh() {
+				splitBill();
+			}
+		});
 		if(mAnimate) {
 			AnimationUtils.scaleHeight(list, mListHeight);
 		} else {
@@ -493,6 +534,8 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void zoomInFragment(final OrdersActivity activity) {
+		OmnomApplication application = OmnomApplication.get(getActivity());
+		sendBillViewEvent(application.getUserProfile().getUser(), application.getBeacon(), mOrder);
 		if(mFooterView1 != null) {
 			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
 			ViewUtils.setVisible(billSplit, true);
@@ -501,15 +544,23 @@ public class OrderFragment extends Fragment {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, true);
 		}
+		ViewUtils.setVisible(mHeader, true);
 		AnimationUtils.animateAlpha(getPanelPayment(), true);
 		AnimationUtils.animateAlpha(txtTitle, false);
 		AndroidUtils.scrollEnd(list);
+		list.setSwipeEnabled(true);
 		activity.showOther(mPosition, false);
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, mListTrasnlationActive).start();
 	}
 
 	public boolean isDownscaled() {
 		return list.getTranslationY() == 0;
+	}
+
+	private void sendBillViewEvent(UserData user, BeaconFindRequest beacon, Order order) {
+		Event billViewEvent = new BillViewEvent(order.getRestaurantId(), beacon,
+		                                        user, order.getAmountToPay());
+		OmnomApplication.getMixPanelHelper(getActivity()).track(billViewEvent);
 	}
 
 	private void initAmount() {
@@ -648,10 +699,20 @@ public class OrderFragment extends Fragment {
 		initFooter(true);
 	}
 
+	@SuppressLint("NewApi")
 	private void splitBill() {
 		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder, mCheckedStates);
 		getFragmentManager().beginTransaction().add(android.R.id.content, billSplitFragment, BillSplitFragment.TAG).commit();
-		list.animate().translationY(-100).setDuration(getResources().getInteger(R.integer.listview_animation_delay)).start();
+		final ViewPropertyAnimator animator = list.animate();
+		animator.translationY(-100).setListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(final Animator animation) {
+				list.cancelRefreshing();
+				list.setTranslationY(mListTrasnlationActive);
+				animator.setListener(null);
+			}
+		}).setDuration(getResources().getInteger(
+				R.integer.listview_animation_delay)).start();
 	}
 
 	private void initRadioButtons() {
@@ -698,7 +759,7 @@ public class OrderFragment extends Fragment {
 				updateCustomTipsText(newVal);
 			}
 		});
-		pickerTips.setValue(0);
+		pickerTips.setValue(PICKER_DEFAULT_VALUE);
 	}
 
 	private void updateCustomTipsText(final int newVal) {
@@ -902,8 +963,10 @@ public class OrderFragment extends Fragment {
 		if(fragmentByTag != null) {
 			BillSplitFragment splitFragment = (BillSplitFragment) fragmentByTag;
 			splitFragment.hide();
+			list.setSwipeEnabled(true);
 			return true;
 		}
+		list.setSwipeEnabled(false);
 		return false;
 	}
 

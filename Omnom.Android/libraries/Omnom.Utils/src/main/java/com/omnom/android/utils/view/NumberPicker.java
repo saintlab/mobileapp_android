@@ -717,7 +717,7 @@ public class NumberPicker extends LinearLayout {
 		paintSelected.setAntiAlias(true);
 		paintSelected.setTextAlign(Align.CENTER);
 		paintSelected.setTextSize(mTextSize);
-		paintSelected.setTypeface(TypefaceUtils.load(getResources().getAssets(), "fonts/Futura-LSF-Omnom-Regular.otf"));
+		paintSelected.setTypeface(TypefaceUtils.load(getResources().getAssets(), "fonts/Futura-LSF-Omnom-LE-Regular.otf"));
 		ColorStateList colors = mInputText.getTextColors();
 		int color = colors.getColorForState(ENABLED_STATE_SET, Color.WHITE);
 		paintSelected.setColor(color);
@@ -728,7 +728,7 @@ public class NumberPicker extends LinearLayout {
 		paintDefault.setAntiAlias(true);
 		paintDefault.setTextAlign(Align.CENTER);
 		paintDefault.setTextSize(mTextSize);
-		paintDefault.setTypeface(TypefaceUtils.load(getResources().getAssets(), "fonts/Futura-LSF-Omnom-Regular.otf"));
+		paintDefault.setTypeface(TypefaceUtils.load(getResources().getAssets(), "fonts/Futura-LSF-Omnom-LE-Regular.otf"));
 		paintDefault.setColor(Color.parseColor("#7d000000"));
 		mSelectorWheelPaintDefault = paintDefault;
 

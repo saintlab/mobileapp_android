@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Omnom.</string>
+    <string name="app_name">Omnom</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_entering">EnteringActivity</string>
@@ -23,7 +23,7 @@
     <string name="invalid_email">Некорректный e-mail</string>
     <string name="proceed">Далее</string>
     <string name="title_activity_confirm_phone">ConfirmPhoneActivity</string>
-    <string name="confirm_code_sms_text">Введите код из SMS,\nрисланного на номер\n%1$s</string>
+    <string name="confirm_code_sms_text">Введите код из SMS,\nприсланного на номер\n%1$s</string>
     <string name="request_new_confirmation_code">Выслать новый код</string>
     <string name="create_account">Создать аккаунт</string>
     <string name="ok">OK</string>
@@ -33,7 +33,6 @@
     <string name="waiter">Официант</string>
     <string name="bill">Счёт</string>
     <string name="title_activity_orders">OrdersActivity</string>
-    <string name="there_are_no_orders_on_this_table">На данном столе нет заказов</string>
     <string name="title_activity_add_card">AddCardActivity</string>
     <string name="order_overall">Итого: %1$s</string>
     <string name="order_paid">Оплачено: %1$s</string>
@@ -64,6 +63,7 @@
     <string name="bill_split_amount_">= %1$s</string>
     <string name="bill_number_">Счёт %1$s</string>
     <string name="split_the_bill">Разделить счёт</string>
+    <string name="close">Закрыть</string>
     <string name="title_plus_tips">+ Чаевые</string>
     <string name="your_has_n_orders">На вашем столике\nраздельных счетов: %1$s</string>
     <string name="demo_mode">Демо-режим</string>
@@ -74,4 +74,5 @@
     <string name="quit">Выйти</string>
     <string name="confirm">Подтвердить</string>
     <string name="how_many_guests_will_pay">На сколько гостей делить</string>
+    <string name="welcome_to_">Добро пожаловать в %1$s</string>
 </resources>

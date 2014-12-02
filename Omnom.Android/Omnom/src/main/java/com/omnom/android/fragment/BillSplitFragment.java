@@ -2,6 +2,8 @@ package com.omnom.android.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,7 +14,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -103,7 +105,10 @@ public class BillSplitFragment extends Fragment {
 		mListHeight = getResources().getDimensionPixelSize(R.dimen.order_list_height);
 		mFragmentView.setTranslationY(-mListHeight);
 		mFragmentView.setAlpha(0.5f);
-		mFragmentView.animate().alpha(1).translationY(0).start();
+		mFragmentView.animate()
+		             .alpha(1)
+		             .translationY(0)
+		             .start();
 
 		final String fontPath = "fonts/Futura-OSF-Omnom-Regular.otf";
 		final float fontSize = getResources().getDimension(R.dimen.font_medium);
@@ -168,16 +173,27 @@ public class BillSplitFragment extends Fragment {
 	}
 
 	public void hide() {
-		final ViewPropertyAnimator viewPropertyAnimator = mFragmentView
-				.animate()
-				.setDuration(getResources().getInteger(R.integer.listview_animation_delay))
-				.alpha(0).translationY(-mListHeight);
-		viewPropertyAnimator.setListener(new AnimatorListenerAdapter() {
+		final AnimatorSet as = new AnimatorSet();
+		final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mFragmentView, View.TRANSLATION_X, mFragmentView.getTranslationX(),
+		                                                     getResources().getDisplayMetrics().widthPixels);
+
+		final View order_page_0 = getActivity().getWindow().getDecorView().findViewWithTag("order_page_0");
+		if(order_page_0 != null) {
+			order_page_0.setTranslationX(-200);
+			final ObjectAnimator scaleX2 = ObjectAnimator.ofFloat(order_page_0, View.TRANSLATION_X, -200, 0);
+			as.playTogether(scaleX, scaleX2);
+		} else {
+			as.playTogether(scaleX);
+		}
+		as.setInterpolator(new AccelerateDecelerateInterpolator());
+		as.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
 				getFragmentManager().beginTransaction().remove(BillSplitFragment.this).commit();
 			}
-		}).start();
+		});
+		as.start();
+
 		mBus.post(new SplitHideEvent(mOrder.getId()));
 	}
 

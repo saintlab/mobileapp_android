@@ -4,6 +4,7 @@
     <color name="loader_bg_transparent">#aa16a5d7</color>
 
     <color name="error_red">#D0021B</color>
+    <color name="error_bg_white_transparent">#77ffffff</color>
 
     <color name="transparent">#00000000</color>
 </resources>

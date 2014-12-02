@@ -19,5 +19,6 @@
 
     android:fromYDelta="0"
     android:toYDelta="100%p"
+    android:zAdjustment="top"
 
     android:duration="@android:integer/config_longAnimTime" />

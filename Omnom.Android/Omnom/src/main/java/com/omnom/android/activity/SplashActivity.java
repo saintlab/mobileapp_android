@@ -1,14 +1,22 @@
 package com.omnom.android.activity;
 
+import android.annotation.TargetApi;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.os.Build;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.service.bluetooth.BackgroundBleService;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 
 import java.util.Collections;
@@ -36,6 +44,7 @@ public class SplashActivity extends BaseOmnomActivity {
 	protected ImageView imgBackground;
 
 	private TransitionDrawable transitionDrawable;
+
 	private boolean mAnimate = true;
 
 	private void animateValidation() {
@@ -111,10 +120,34 @@ public class SplashActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		if(AndroidUtils.isKitKat()) {
+			startBleServiceKK();
+		} else if(AndroidUtils.isJellyBeanMR2()) {
+			startBleServiceJB();
+		}
+
 		transitionDrawable = new TransitionDrawable(
 				new Drawable[]{getResources().getDrawable(R.drawable.ic_splash_fork_n_knife),
 						getResources().getDrawable(R.drawable.ic_fork_n_knife)});
 		transitionDrawable.setCrossFadeEnabled(true);
+	}
+
+	@TargetApi(Build.VERSION_CODES.KITKAT)
+	private void startBleServiceKK() {
+		final AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+		final Intent intent = new Intent(this, BackgroundBleService.class);
+		final PendingIntent alarmIntent = PendingIntent.getService(this, 0, intent, 0);
+		final long triggerMillis = SystemClock.elapsedRealtime() + (AlarmManager.INTERVAL_FIFTEEN_MINUTES / 15);
+		alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerMillis, alarmIntent);
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+	private void startBleServiceJB() {
+		final AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+		final Intent intent = new Intent(this, BackgroundBleService.class);
+		final PendingIntent alarmIntent = PendingIntent.getService(this, 0, intent, 0);
+		final long triggerMillis = SystemClock.elapsedRealtime() + (AlarmManager.INTERVAL_FIFTEEN_MINUTES / 15);
+		alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerMillis, alarmIntent);
 	}
 
 	@Override

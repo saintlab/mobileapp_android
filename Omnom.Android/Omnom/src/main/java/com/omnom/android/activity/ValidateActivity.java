@@ -2,12 +2,10 @@ package com.omnom.android.activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +33,7 @@ import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.drawable.TransitionDrawable;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -70,6 +69,8 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
  * Created by Ch3D on 08.10.2014.
  */
 public abstract class ValidateActivity extends BaseOmnomActivity {
+
+	public static final int REQUEST_CODE_ORDERS = 100;
 
 	private static final String TAG = ValidateActivity.class.getSimpleName();
 
@@ -134,7 +135,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.btn_bottom)
 	protected View btnErrorRepeat;
 
-	@InjectView(R.id.txt_error_repeat)
+	@InjectView(R.id.txt_bottom)
 	protected TextView txtErrorRepeat;
 
 	@InjectView(R.id.btn_demo)
@@ -145,6 +146,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.stub_bottom_menu)
 	protected ViewStub stubBottomMenu;
+
+	@InjectView(R.id.root)
+	protected View rootView;
 
 	@InjectViews({R.id.txt_error, R.id.panel_errors})
 	protected List<View> errorViews;
@@ -191,6 +195,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private View bottomView;
 
+	protected int mDefaultAnimDuration;
+
+	private com.omnom.android.utils.drawable.TransitionDrawable bgTransitionDrawable;
+	
 	@Override
 	protected void handleIntent(Intent intent) {
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
@@ -223,7 +231,14 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected void clearErrors() {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-		findById(this, R.id.root).setBackgroundColor(getResources().getColor(R.color.transparent));
+		if(mRestaurant == null) {
+			loader.animateLogo(R.drawable.ic_fork_n_knife);
+		} else {
+			loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
+		}
+		if(bgTransitionDrawable.isTransitioned()) {
+			bgTransitionDrawable.reverseTransition();
+		}
 	}
 
 	@Override
@@ -251,6 +266,16 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		bgTransitionDrawable = new com.omnom.android.utils.drawable.TransitionDrawable(
+				getResources().getInteger(R.integer.default_animation_duration_short),
+				new Drawable[]{
+						new ColorDrawable(getResources().getColor(R.color.transparent)),
+						new ColorDrawable(getResources().getColor(R.color.error_bg_white_transparent))
+				}
+		);
+
+		bgTransitionDrawable.setCrossFadeEnabled(true);
+		rootView.setBackgroundDrawable(bgTransitionDrawable);
 		mPicasso = Picasso.with(getApplicationContext());
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -283,21 +308,17 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			@Override
 			public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
 				final BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
-				final BitmapDrawable drawable2 = new BitmapDrawable(getResources(), bitmap);
-				drawable2.mutate();
-				drawable2.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
-				drawable2.invalidateSelf();
 				final TransitionDrawable td = new TransitionDrawable(
+						1000,
 						new Drawable[]{
 								getResources().getDrawable(R.drawable.bg_wood),
-								drawable,
-								drawable2
+								drawable
 						}
 				);
 				td.setCrossFadeEnabled(true);
 				getWindow().getDecorView().setBackgroundDrawable(td);
 				// getActivity().findViewById(R.id.img_holder).setBackgroundDrawable(td);
-				td.startTransition(1000);
+				td.startTransition();
 			}
 
 			@Override
@@ -329,6 +350,15 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	public void onBill(final View v) {
 		v.setEnabled(false);
+		ViewUtils.setVisible(getPanelBottom(), false);
+		ViewUtils.setVisible(imgProfile, false);
+		ViewUtils.setVisible(txtLeave, false);
+		loader.setLogo(R.drawable.ic_bill_white);
+		loader.startProgressAnimation(10000, new Runnable() {
+			@Override
+			public void run() {
+			}
+		});
 		ValidationObservable.validateSmart(this)
 		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickBillListener))
 		                    .isEmpty()
@@ -336,37 +366,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
 				                    if(hasNoErrors) {
-					                    clearErrors();
-					                    getPanelBottom().animate().translationY(0).start();
-					                    mOrdersSubscription = AndroidObservable.bindActivity(getActivity(),
-					                                                                         api.getOrders(mTable.getRestaurantId(),
-					                                                                                       mTable.getId()))
-					                                                           .subscribe(new Action1<List<Order>>() {
-						                                                           @Override
-						                                                           public void call(List<Order> orders) {
-							                                                           v.setEnabled(true);
-							                                                           if(!orders.isEmpty()) {
-								                                                           OrdersActivity.start(ValidateActivity.this,
-								                                                                                new ArrayList<Order>(
-										                                                                                orders),
-								                                                                                mRestaurant.getDecoration()
-								                                                                                           .getBackgroundColor(),
-								                                                                                mIsDemo);
-							                                                           } else {
-								                                                           showToastLong(getActivity(),
-								                                                                         R.string
-										                                                                         .there_are_no_orders_on_this_table);
-							                                                           }
-						                                                           }
-					                                                           }, new Action1<Throwable>() {
-						                                                           @Override
-						                                                           public void call(Throwable throwable) {
-							                                                           v.setEnabled(true);
-						                                                           }
-					                                                           });
+					                    loadOrders(v);
 				                    } else {
-					                    findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
-							                    R.color.white_transparent));
+					                    startErrorTransition();
 					                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
 					                    getPanelBottom().animate().translationY(200).start();
 					                    v.setEnabled(true);
@@ -375,12 +377,73 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		                    }, new Action1<Throwable>() {
 			                    @Override
 			                    public void call(final Throwable throwable) {
-				                    findById(getActivity(), R.id.root).setBackgroundColor(getResources().getColor(
-						                    R.color.white_transparent));
+				                    startErrorTransition();
 				                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
 				                    v.setEnabled(true);
 			                    }
 		                    });
+	}
+
+	protected void startErrorTransition() {
+		bgTransitionDrawable.startTransition();
+	}
+
+	private void loadOrders(final View v) {
+		getPanelBottom().animate().translationY(0).start();
+		mOrdersSubscription = AndroidObservable.bindActivity(getActivity(), api.getOrders(mTable.getRestaurantId(),
+															 mTable.getId()))
+				.subscribe(new Action1<List<Order>>() {
+					@Override
+					public void call(final List<Order> orders) {
+						loader.stopProgressAnimation();
+						loader.updateProgressMax(new Runnable() {
+							@Override
+							public void run() {
+								loader.showProgress(false);
+								v.setEnabled(true);
+								if(!orders.isEmpty()) {
+									showOrders(orders);
+								} else {
+									startErrorTransition();
+									mErrorHelper.showNoOrders(new View.OnClickListener() {
+										@Override
+										public void onClick(View v) {
+											clearErrors();
+											loader.animateLogoFast(mRestaurant.getDecoration().getLogo(),
+																   R.drawable.ic_bill_white);
+											loader.showProgress(false);
+											configureScreen(mRestaurant);
+											ViewUtils.setVisible(imgProfile, !mIsDemo);
+											ViewUtils.setVisible(txtLeave, mIsDemo);
+											ViewUtils.setVisible(getPanelBottom(), true);
+										}
+									});
+								}
+							}
+						});
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						v.setEnabled(true);
+					}
+				});
+	}
+
+	private void showOrders(final List<Order> orders) {
+		loader.showProgress(false);
+		loader.hideLogo();
+		loader.scaleUp(new Runnable() {
+			@Override
+			public void run() {
+				OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders),
+									 mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS,
+									 mIsDemo);
+				if (orders.size() == 1) {
+					overridePendingTransition(R.anim.slide_in_down, R.anim.nothing);
+				}
+			}
+		});
 	}
 
 	public void onWaiter(final View v) {
@@ -416,6 +479,22 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		// imgHolder.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
 		loader.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
 		AnimationUtils.animateAlpha(btnDownPromo, false);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == REQUEST_CODE_ORDERS && resultCode == RESULT_OK) {
+			loader.scaleDown(null, new Runnable() {
+				@Override
+				public void run() {
+					ViewUtils.setVisible(getPanelBottom(), true);
+					ViewUtils.setVisible(imgProfile, !mIsDemo);
+					ViewUtils.setVisible(txtLeave, mIsDemo);
+					loader.animateLogoFast(mRestaurant.getDecoration().getLogo(),
+										   R.drawable.ic_bill_white);
+				}
+			});
+		}
 	}
 
 	@Override
@@ -546,12 +625,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 								final DemoTableData data = response.get(0);
 								onDataLoaded(data.getRestaurant(), data.getTable());
 							}
-						}, new Action1<Throwable>() {
-							@Override
-							public void call(Throwable throwable) {
-								Log.e(ValidateActivity.TAG, "validateDemo", throwable);
-							}
-						});
+						}, onError);
 				mFirstRun = false;
 			}
 			return true;
