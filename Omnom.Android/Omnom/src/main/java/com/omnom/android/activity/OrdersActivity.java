@@ -37,9 +37,11 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	public static final String TAG_SWITCHER_DELIMITER = ":";
 
-	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor, int code, boolean isDemo) {
+	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, String requestId,
+	                         final String bgColor, int code, boolean isDemo) {
 		final Intent intent = new Intent(activity, OrdersActivity.class);
 		intent.putParcelableArrayListExtra(OrdersActivity.EXTRA_ORDERS, orders);
+		intent.putExtra(OrdersActivity.EXTRA_REQUEST_ID, requestId);
 		intent.putExtra(OrdersActivity.EXTRA_ACCENT_COLOR, bgColor);
 		intent.putExtra(OrdersActivity.EXTRA_DEMO_MODE, isDemo);
 		activity.startActivityForResult(intent, code);
@@ -64,6 +66,8 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	private ArrayList<Order> orders = null;
 
+	private String requestId;
+
 	private int bgColor;
 
 	private int margin;
@@ -79,8 +83,9 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	@Override
 	public void initUi() {
+		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, requestId, bgColor);
 		mPaymentListener = new PaymentEventListener(this);
-		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, bgColor);
+		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, requestId, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 6);
 		mPager.setPageMargin(margin);
@@ -117,6 +122,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 	@Override
 	protected void handleIntent(Intent intent) {
 		orders = intent.getParcelableArrayListExtra(EXTRA_ORDERS);
+		requestId = intent.getStringExtra(EXTRA_REQUEST_ID);
 		final String colorStr = intent.getStringExtra(EXTRA_ACCENT_COLOR);
 		bgColor = RestaurantHelper.getBackgroundColor(colorStr);
 		mDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);

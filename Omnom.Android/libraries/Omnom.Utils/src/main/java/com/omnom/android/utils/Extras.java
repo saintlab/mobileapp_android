@@ -20,6 +20,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_TABLE_NUMBER = "com.omnom.android.restaurant.table_number";
 	public static final String EXTRA_PHONE = "com.omnom.android.user.phone";
 	public static final String EXTRA_ORDERS = "com.omnom.android.table.orders";
+	public static final String EXTRA_REQUEST_ID = "com.omnom.android.request_id";
 	public static final String EXTRA_MARGIN = "com.omnom.android.page.margin";
 	public static final String EXTRA_ACCENT_COLOR = "com.omnom.android.order.color.accent";
 	public static final String EXTRA_ORDER_AMOUNT = "com.omnom.android.order.amount";

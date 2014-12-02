@@ -148,6 +148,8 @@ public class OrderFragment extends Fragment {
 
 	private static final String ARG_ORDER = "order";
 
+	private static final String ARG_REQUEST_ID = "request_id";
+
 	private static final String ARG_COLOR = "color";
 
 	private static final String ARG_POSITION = "position";
@@ -156,11 +158,12 @@ public class OrderFragment extends Fragment {
 
 	private static final String ARG_SINGLE = "single";
 
-	public static Fragment newInstance(Order order, final int bgColor, final int postition, final boolean animate,
-	                                   final boolean isSingle) {
+	public static Fragment newInstance(Order order, String requestId, final int bgColor,
+	                                   final int postition, final boolean animate, final boolean isSingle) {
 		final OrderFragment fragment = new OrderFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, order);
+		args.putString(ARG_REQUEST_ID, requestId);
 		args.putInt(ARG_COLOR, bgColor);
 		args.putInt(ARG_POSITION, postition);
 		args.putBoolean(ARG_ANIMATE, animate);
@@ -243,6 +246,8 @@ public class OrderFragment extends Fragment {
 	private RadioGroup radioGroup;
 
 	private Order mOrder;
+
+	private String mRequestId;
 
 	private boolean mCurrentKeyboardVisility = false;
 
@@ -559,7 +564,8 @@ public class OrderFragment extends Fragment {
 
 	private void zoomInFragment(final OrdersActivity activity) {
 		OmnomApplication application = OmnomApplication.get(getActivity());
-		sendBillViewEvent(application.getUserProfile().getUser(), application.getBeacon(), mOrder);
+		sendBillViewEvent(application.getUserProfile().getUser(), application.getBeacon(),
+						  mOrder, mRequestId);
 		if(mFooterView1 != null) {
 			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
 			ViewUtils.setVisible(billSplit, true);
@@ -581,9 +587,10 @@ public class OrderFragment extends Fragment {
 		return list.getTranslationY() == 0;
 	}
 
-	private void sendBillViewEvent(UserData user, BeaconFindRequest beacon, Order order) {
-		Event billViewEvent = new BillViewEvent(order.getRestaurantId(), beacon,
-		                                        user, order.getAmountToPay());
+	private void sendBillViewEvent(UserData user, BeaconFindRequest beacon, Order order,
+	                               String requestId) {
+		Event billViewEvent = new BillViewEvent(order.getRestaurantId(), beacon, user,
+												order.getAmountToPay(), requestId);
 		OmnomApplication.getMixPanelHelper(getActivity()).track(billViewEvent);
 	}
 
@@ -969,6 +976,7 @@ public class OrderFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
+			mRequestId = getArguments().getString(ARG_REQUEST_ID);
 			mAccentColor = getArguments().getInt(ARG_COLOR);
 			mAnimate = getArguments().getBoolean(ARG_ANIMATE, false);
 			mSingle = getArguments().getBoolean(ARG_SINGLE, false);

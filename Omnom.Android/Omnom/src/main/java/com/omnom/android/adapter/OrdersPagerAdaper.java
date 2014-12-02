@@ -20,11 +20,14 @@ public class OrdersPagerAdaper extends FragmentPagerAdapter {
 
 	private Fragment mCurrentFragment;
 
+	private String mRequestId;
+
 	private int mLastAnimated = -1;
 
-	public OrdersPagerAdaper(FragmentManager fm, List<Order> orders, final int bgColor) {
+	public OrdersPagerAdaper(FragmentManager fm, List<Order> orders, String requestId, final int bgColor) {
 		super(fm);
 		mOrders = orders;
+		mRequestId = requestId;
 		mBgColor = bgColor;
 	}
 
@@ -54,7 +57,8 @@ public class OrdersPagerAdaper extends FragmentPagerAdapter {
 	public Fragment getItem(int position) {
 		final boolean isAnimate = (position > mLastAnimated) && (mLastAnimated < 2) && (position < 2);
 		final boolean isSingle = getCount() == 1;
-		final Fragment fragment = OrderFragment.newInstance(mOrders.get(position), mBgColor, position, isAnimate && !isSingle, isSingle);
+		final Fragment fragment = OrderFragment.newInstance(mOrders.get(position), mRequestId,
+															mBgColor, position, isAnimate && !isSingle, isSingle);
 		if(isAnimate) {
 			mLastAnimated = position;
 		}

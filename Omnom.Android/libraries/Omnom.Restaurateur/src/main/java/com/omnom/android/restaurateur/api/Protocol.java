@@ -25,4 +25,5 @@ public interface Protocol {
 
 	public static final String FIELD_QR_DATA = "qr";
 	public static final String HEADER_AUTH_TOKEN = "X-Authentication-Token";
+	public static final String X_REQUEST_ID = "X-Request-ID";
 }

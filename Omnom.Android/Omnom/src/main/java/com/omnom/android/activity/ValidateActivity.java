@@ -28,6 +28,7 @@ import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
@@ -404,52 +405,52 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	private void loadOrders(final View v) {
 		getPanelBottom().animate().translationY(0).start();
 		mOrdersSubscription = AndroidObservable.bindActivity(getActivity(), api.getOrders(mTable.getRestaurantId(),
-		                                                                                  mTable.getId()))
-		                                       .subscribe(new Action1<List<Order>>() {
-			                                       @Override
-			                                       public void call(final List<Order> orders) {
-				                                       loader.stopProgressAnimation();
-				                                       loader.updateProgressMax(new Runnable() {
-					                                       @Override
-					                                       public void run() {
-						                                       loader.showProgress(false);
-						                                       v.setEnabled(true);
-						                                       if(!orders.isEmpty()) {
-							                                       showOrders(orders);
-						                                       } else {
-							                                       startErrorTransition();
-							                                       mErrorHelper.showNoOrders(new View.OnClickListener() {
-								                                       @Override
-								                                       public void onClick(View v) {
-									                                       clearErrors();
-									                                       loader.animateLogoFast(mRestaurant.getDecoration().getLogo(),
-									                                                              R.drawable.ic_bill_white);
-									                                       loader.showProgress(false);
-									                                       configureScreen(mRestaurant);
-									                                       ViewUtils.setVisible(imgProfile, !mIsDemo);
-									                                       ViewUtils.setVisible(txtLeave, mIsDemo);
-									                                       ViewUtils.setVisible(getPanelBottom(), true);
-								                                       }
-							                                       });
-						                                       }
-					                                       }
-				                                       });
-			                                       }
-		                                       }, new Action1<Throwable>() {
-			                                       @Override
-			                                       public void call(Throwable throwable) {
-				                                       v.setEnabled(true);
-			                                       }
-		                                       });
+															 mTable.getId()))
+				.subscribe(new Action1<OrdersResponse>() {
+					@Override
+					public void call(final OrdersResponse ordersResponse) {
+						loader.stopProgressAnimation();
+						loader.updateProgressMax(new Runnable() {
+							@Override
+							public void run() {
+								loader.showProgress(false);
+								v.setEnabled(true);
+								if(!ordersResponse.getOrders().isEmpty()) {
+									showOrders(ordersResponse.getOrders(), ordersResponse.getRequestId());
+								} else {
+									startErrorTransition();
+									mErrorHelper.showNoOrders(new View.OnClickListener() {
+										@Override
+										public void onClick(View v) {
+											clearErrors();
+											loader.animateLogoFast(mRestaurant.getDecoration().getLogo(),
+																   R.drawable.ic_bill_white);
+											loader.showProgress(false);
+											configureScreen(mRestaurant);
+											ViewUtils.setVisible(imgProfile, !mIsDemo);
+											ViewUtils.setVisible(txtLeave, mIsDemo);
+											ViewUtils.setVisible(getPanelBottom(), true);
+										}
+									});
+								}
+							}
+						});
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						v.setEnabled(true);
+					}
+				});
 	}
 
-	private void showOrders(final List<Order> orders) {
+	private void showOrders(final List<Order> orders, final String requestId) {
 		loader.showProgress(false);
 		loader.hideLogo();
 		loader.scaleUp(new Runnable() {
 			@Override
 			public void run() {
-				OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders),
+				OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
 				                     mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS,
 				                     mIsDemo);
 				if(orders.size() == 1) {

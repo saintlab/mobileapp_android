@@ -16,7 +16,7 @@ import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
-import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
@@ -24,6 +24,8 @@ import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.restaurateur.serializer.MailRuSerializer;
+import com.omnom.android.restaurateur.retrofit.RestaurateurRxSupport;
+import com.omnom.android.restaurateur.serializer.OrdersResponseSerializer;
 
 import java.util.List;
 
@@ -44,13 +46,14 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 		// final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
 		final Gson gson = new GsonBuilder()
-							.registerTypeAdapter(AcquiringData.class, new MailRuSerializer())
-							.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+				.registerTypeAdapter(AcquiringData.class, new MailRuSerializer())
+				.registerTypeAdapter(OrdersResponse.class, new OrdersResponseSerializer())
+				.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		final GsonConverter converter = new GsonConverter(gson);
 
 		final RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(interceptor).setEndpoint(dataEndPoint)
-		                                                          .setLogLevel(
-				                                                          logLevel)
+		                                                          .setRxSupport(new RestaurateurRxSupport(interceptor))
+																  .setLogLevel(logLevel)
 		                                                          .setConverter(converter).build();
 		return new RestaurateurDataProvider(mRestAdapter.create(RestaurateurDataService.class));
 	}
@@ -138,7 +141,7 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	}
 
 	@Override
-	public Observable<List<Order>> getOrders(String restaurantId, String tableId) {
+	public Observable<OrdersResponse> getOrders(String restaurantId, String tableId) {
 		return mDataService.getOrders(restaurantId, tableId).subscribeOn(Schedulers.io()).observeOn(
 				AndroidSchedulers.mainThread());
 	}

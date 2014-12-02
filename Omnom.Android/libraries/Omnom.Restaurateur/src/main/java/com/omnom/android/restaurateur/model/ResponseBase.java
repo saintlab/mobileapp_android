@@ -10,6 +10,12 @@ import com.google.gson.annotations.Expose;
 public class ResponseBase {
 
 	/**
+	 * Value from X-Request-ID header.
+	 */
+	@Expose
+	private String requestId;
+
+	/**
 	 * Restaurateur error
 	 */
 	@Expose
@@ -20,6 +26,14 @@ public class ResponseBase {
 	 */
 	@Expose
 	private OmnomErrors errors;
+
+	public String getRequestId() {
+		return requestId;
+	}
+
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
+	}
 
 	public OmnomErrors getErrors() {
 		return errors;
