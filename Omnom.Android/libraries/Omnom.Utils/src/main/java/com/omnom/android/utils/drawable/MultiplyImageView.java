@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -12,7 +11,6 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Shader;
 import android.os.Environment;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.omnom.android.utils.R;
@@ -29,8 +27,10 @@ import java.nio.channels.FileChannel;
  */
 public class MultiplyImageView extends ImageView {
 	private Paint paint;
+	private Paint fillPaint;
 	private int radius;
 	private int offset;
+	private int fillAlpha;
 
 	public MultiplyImageView(Context context) {
 		super(context);
@@ -93,18 +93,24 @@ public class MultiplyImageView extends ImageView {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if (paint == null) {
-			Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-			Canvas bgCanvas = new Canvas(bitmap);
+			final Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+			final Canvas bgCanvas = new Canvas(bitmap);
 			super.onDraw(bgCanvas);
 
-			Shader shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+			final Shader shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
 			paint = new Paint();
 			paint.setShader(shader);
-			ColorFilter filter = new PorterDuffColorFilter(getResources().getColor(R.color.error_red), PorterDuff.Mode.MULTIPLY);
+			final ColorFilter filter = new PorterDuffColorFilter(getResources().getColor(R.color.error_red), PorterDuff.Mode.MULTIPLY);
 			paint.setColorFilter(filter);
+
+			fillPaint = new Paint();
+			fillPaint.setColor(getResources().getColor(R.color.error_red));
+			fillPaint.setAlpha(0);
 		}
+		// paint.setAlpha(255 - fillAlpha);
+		fillPaint.setAlpha(fillAlpha);
 		canvas.drawCircle(getWidth() / 2, (getHeight() / 2) - offset, radius, paint);
-		canvas.drawCircle(getWidth() / 2, (getHeight() / 2) - offset, radius, paint);
+		canvas.drawCircle(getWidth() / 2, (getHeight() / 2) - offset, radius, fillPaint);
 	}
 
 	public void setRadius(int radius) {
@@ -113,5 +119,13 @@ public class MultiplyImageView extends ImageView {
 
 	public void setOffset(int offset) {
 		this.offset = offset;
+	}
+
+	public void setFillAlpha(int fillAlpha) {
+		this.fillAlpha = fillAlpha;
+	}
+
+	public int getFillAlpha() {
+		return fillAlpha;
 	}
 }

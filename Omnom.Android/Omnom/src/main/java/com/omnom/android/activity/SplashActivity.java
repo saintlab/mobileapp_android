@@ -11,6 +11,7 @@ import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.os.SystemClock;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 
 import com.omnom.android.R;
@@ -120,8 +121,19 @@ public class SplashActivity extends BaseOmnomActivity {
 				imgMultiply.invalidate();
 			}
 		});
+
+		ValueAnimator alphaAnimator = ValueAnimator.ofInt(0, 255);
+		alphaAnimator.setDuration(animationDuration);
+		alphaAnimator.setInterpolator(new AccelerateInterpolator(2.2f));
+		alphaAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation) {
+				imgMultiply.setFillAlpha((Integer) animation.getAnimatedValue());
+			}
+		});
+
 		final ValueAnimator multiplyAnimator = builder.build();
-		as.playTogether(translationAnimator, multiplyAnimator);
+		as.playTogether(translationAnimator, alphaAnimator, multiplyAnimator);
 		as.start();
 	}
 
