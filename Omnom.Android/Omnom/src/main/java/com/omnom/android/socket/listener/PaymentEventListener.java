@@ -1,13 +1,13 @@
-package com.omnom.android.activity;
+package com.omnom.android.socket.listener;
 
 import android.util.Log;
 
-import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.socket.OmnomSocketBase;
 import com.omnom.android.socket.OmnomSocketFactory;
 import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.utils.CroutonHelper;
+import com.omnom.android.utils.activity.OmnomActivity;
 import com.squareup.otto.Subscribe;
 
 import java.net.URISyntaxException;
@@ -17,35 +17,40 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 /**
  * Created by Ch3D on 02.12.2014.
  */
-public class PaymentListener {
-	private static final String TAG = PaymentListener.class.getSimpleName();
+public class PaymentEventListener {
+	private static final String TAG = PaymentEventListener.class.getSimpleName();
 
-	private BaseOmnomActivity mActivity;
+	private OmnomActivity mActivity;
 
 	private OmnomSocketBase mTableSocket;
 
-	private Crouton mCrouton;
-
-	public PaymentListener(final BaseOmnomActivity activity) {
+	public PaymentEventListener(final OmnomActivity activity) {
 		mActivity = activity;
 	}
 
 	@Subscribe
 	public void onPaymentEvent(final PaymentSocketEvent event) {
-		mActivity.runOnUiThread(new Runnable() {
+		mActivity.getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				mCrouton = CroutonHelper.createPaymentNotification(mActivity, event.getPaymentData());
-				if(mCrouton != null) {
-					mCrouton.show();
-				}
+				CroutonHelper.showPaymentNotification(mActivity.getActivity(), event.getPaymentData());
 			}
 		});
 	}
 
+	public void initTableSocket(final String tableId) {
+		try {
+			mTableSocket = OmnomSocketFactory.initTable(mActivity.getActivity(), tableId);
+			mTableSocket.connect();
+			mTableSocket.subscribe(this);
+		} catch(URISyntaxException e) {
+			Log.e(TAG, "Unable to initiate socket connection");
+		}
+	}
+
 	public void initTableSocket(final TableDataResponse table) {
 		try {
-			mTableSocket = OmnomSocketFactory.init(mActivity, table);
+			mTableSocket = OmnomSocketFactory.init(mActivity.getActivity(), table);
 			mTableSocket.connect();
 			mTableSocket.subscribe(this);
 		} catch(URISyntaxException e) {
@@ -65,4 +70,5 @@ public class PaymentListener {
 	public void onDestroy() {
 		Crouton.cancelAllCroutons();
 	}
+
 }

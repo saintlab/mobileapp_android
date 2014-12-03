@@ -13,6 +13,7 @@ import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.socket.event.PaymentSocketEvent;
+import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -69,6 +70,8 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	private boolean mDemo;
 
+	private PaymentEventListener mPaymentListener;
+
 	@Subscribe
 	public void onPayment(PaymentSocketEvent event) {
 		// payment handling logic
@@ -76,6 +79,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	@Override
 	public void initUi() {
+		mPaymentListener = new PaymentEventListener(this);
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 6);
@@ -85,6 +89,29 @@ public class OrdersActivity extends BaseFragmentActivity {
 		mPager.setOnPageChangeListener(mIndicator);
 		mTextInfo.setText(getString(R.string.your_has_n_orders, mPagerAdapter.getCount()));
 		AndroidUtils.setAccentColor(getWindow(), bgColor);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if(orders.size() > 0) {
+			final Order order = orders.get(0);
+			if(order != null) {
+				mPaymentListener.initTableSocket(order.getTableId());
+			}
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mPaymentListener.onPause();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mPaymentListener.onDestroy();
 	}
 
 	@Override
@@ -157,7 +184,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 	public ObjectAnimator getFragmentAnimation(int pos, boolean show) {
 		final OrderFragment fragment = (OrderFragment) getSupportFragmentManager()
 				.findFragmentByTag(TAG_ANDROID_SWITCHER + mPager.getId() + TAG_SWITCHER_DELIMITER + mPagerAdapter.getItemId(pos));
-		if (fragment != null) {
+		if(fragment != null) {
 			final View view = fragment.getFragmentView();
 			final int startAlpha = show ? 0 : 1;
 			final int endAlpha = show ? 1 : 0;
@@ -173,13 +200,13 @@ public class OrdersActivity extends BaseFragmentActivity {
 		ViewUtils.setVisible(mBtnClose, visible);
 		final ObjectAnimator fl = getFragmentAnimation(position - 1, visible);
 		final ObjectAnimator fr = getFragmentAnimation(position + 1, visible);
-		if (fl != null && fr != null) {
+		if(fl != null && fr != null) {
 			final AnimatorSet as = new AnimatorSet();
 			as.playTogether(fl, fr);
 			as.start();
-		} else if (fl != null) {
+		} else if(fl != null) {
 			fl.start();
-		} else if (fr != null) {
+		} else if(fr != null) {
 			fr.start();
 		}
 	}

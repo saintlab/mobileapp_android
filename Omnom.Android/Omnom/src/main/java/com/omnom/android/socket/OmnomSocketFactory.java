@@ -16,4 +16,8 @@ public class OmnomSocketFactory {
 	public static OmnomSocketBase init(Context context, TableDataResponse table) {
 		return new OmnomTableSocket(context, table);
 	}
+
+	public static OmnomSocketBase initTable(Context context, String tableId) {
+		return new OmnomTableSocket(context, tableId);
+	}
 }

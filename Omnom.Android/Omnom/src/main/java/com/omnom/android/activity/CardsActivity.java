@@ -24,6 +24,7 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.cards.Card;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.preferences.PreferenceProvider;
@@ -55,11 +56,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	public class DemoCard extends Card {
 		@Override
-		public boolean isRegistered() {
-			return true;
-		}
-
-		@Override
 		public String getAssociation() {
 			return "visa";
 		}
@@ -67,6 +63,11 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		@Override
 		public String getMaskedPan() {
 			return "4111 .... .... 1111";
+		}
+
+		@Override
+		public boolean isRegistered() {
+			return true;
 		}
 	}
 
@@ -115,8 +116,48 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private boolean mIsDemo;
 
+	private PaymentEventListener mPaymentListener;
+
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(R.anim.fake_fade_out_long, R.anim.slide_out_down);
+	}
+
+	@Override
+	public int getLayoutResource() {
+		return R.layout.activity_cards;
+	}
+
+	@Override
+	protected void handleIntent(final Intent intent) {
+		mDetails = intent.getParcelableExtra(Extras.EXTRA_PAYMENT_DETAILS);
+		if(mDetails == null) {
+			finish();
+			return;
+		}
+		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
+		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
+		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);
+	}
+
+	private void initDividerAnimation() {
+		final ColorDrawable dividerDrawable = new ColorDrawable(getResources().getColor(R.color.card_unregistered));
+		mList.setDivider(dividerDrawable);
+		dividerAnimation = ValueAnimator.ofInt(0, 255);
+		dividerAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(final ValueAnimator animation) {
+				Integer animatedValue = (Integer) animation.getAnimatedValue();
+				dividerDrawable.setAlpha(animatedValue);
+				mList.setDividerHeight(ViewUtils.dipToPixels(getActivity(), 1));
+			}
+		});
+	}
+
 	@Override
 	public void initUi() {
+		mPaymentListener = new PaymentEventListener(this);
 		mPreferences = OmnomApplication.get(getActivity()).getPreferences();
 
 		initDividerAnimation();
@@ -202,12 +243,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		}
 	}
 
-	@OnClick(R.id.btn_pay)
-	protected void onPay() {
-		PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails.getAmount(),
-									 mOrder, mIsDemo, mAccentColor);
-	}
-
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		if(resultCode == RESULT_OK) {
@@ -229,56 +264,38 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		}
 	}
 
-	private void initDividerAnimation() {
-		final ColorDrawable dividerDrawable = new ColorDrawable(getResources().getColor(R.color.card_unregistered));
-		mList.setDivider(dividerDrawable);
-		dividerAnimation = ValueAnimator.ofInt(0, 255);
-		dividerAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-			@Override
-			public void onAnimationUpdate(final ValueAnimator animation) {
-				Integer animatedValue = (Integer) animation.getAnimatedValue();
-				dividerDrawable.setAlpha(animatedValue);
-				mList.setDividerHeight(ViewUtils.dipToPixels(getActivity(), 1));
-			}
-		});
-	}
-
-	@Override
-	public int getLayoutResource() {
-		return R.layout.activity_cards;
-	}
-
-	@Override
-	public void finish() {
-		super.finish();
-		overridePendingTransition(R.anim.fake_fade_out_long, R.anim.slide_out_down);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		OmnomObservable.unsubscribe(mCardsSubscription);
-	}
-
 	public void onAdd() {
 		CardAddActivity.start(this, REQUEST_CODE_CARD_ADD);
-	}
-
-	@Override
-	protected void handleIntent(final Intent intent) {
-		mDetails = intent.getParcelableExtra(Extras.EXTRA_PAYMENT_DETAILS);
-		if(mDetails == null) {
-			finish();
-			return;
-		}
-		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
-		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
-		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);
 	}
 
 	@Override
 	public void onAnimationEnd() {
 		dividerAnimation.setDuration(1000);
 		dividerAnimation.start();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mPaymentListener.onPause();
+		OmnomObservable.unsubscribe(mCardsSubscription);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mPaymentListener.onPause();
+	}
+
+	@OnClick(R.id.btn_pay)
+	protected void onPay() {
+		PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails.getAmount(),
+		                             mOrder, mIsDemo, mAccentColor);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		mPaymentListener.initTableSocket(mOrder.getTableId());
 	}
 }

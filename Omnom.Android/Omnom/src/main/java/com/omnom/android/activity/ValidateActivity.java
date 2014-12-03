@@ -31,6 +31,7 @@ import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.drawable.TransitionDrawable;
@@ -197,7 +198,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private Picasso mPicasso;
 
-	private PaymentListener mPaymentListener;
+	private PaymentEventListener mPaymentListener;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -268,7 +269,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		mPaymentListener = new PaymentListener(this);
+		mPaymentListener = new PaymentEventListener(this);
 		bgTransitionDrawable = new com.omnom.android.utils.drawable.TransitionDrawable(
 				getResources().getInteger(R.integer.default_animation_duration_short),
 				new Drawable[]{

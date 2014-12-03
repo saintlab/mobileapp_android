@@ -56,5 +56,13 @@ public class CroutonHelper {
 		return sConfiguration;
 	}
 
+	public static Crouton showPaymentNotification(final Activity activity, final PaymentData paymentData) {
+		final Crouton paymentNotification = createPaymentNotification(activity, paymentData);
+		if(paymentNotification != null) {
+			paymentNotification.show();
+		}
+		return paymentNotification;
+	}
+
 	private static Configuration sConfiguration;
 }

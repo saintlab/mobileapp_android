@@ -139,6 +139,7 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 		if(BuildConfig.DEBUG) {
 			Log.d(TAG, "Destroying socket for roomId = " + getRoomId());
 		}
+		mSocket.off();
 		mSocket = null;
 		mBus = null;
 	}
