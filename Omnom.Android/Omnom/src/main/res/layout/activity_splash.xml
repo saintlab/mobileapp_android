@@ -1,15 +1,17 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.omnom.android.utils.drawable.MultiplyImageView
+    <com.omnom.android.utils.view.MultiplyImageView
         android:id="@+id/img_multiply"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/bg_wood"
         android:layout_gravity="center"
-        android:scaleType="fitXY"/>
+        android:scaleType="fitXY"
+        omnom:color="@color/loader_bg"/>
 
     <ImageView
         android:id="@+id/img_bg"

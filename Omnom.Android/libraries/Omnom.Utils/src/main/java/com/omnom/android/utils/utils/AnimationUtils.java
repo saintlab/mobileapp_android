@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.omnom.android.utils.R;
-import com.omnom.android.utils.drawable.MultiplyImageView;
 
 import hugo.weaving.DebugLog;
 

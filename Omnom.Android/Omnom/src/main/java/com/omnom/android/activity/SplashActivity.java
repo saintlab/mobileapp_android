@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
@@ -17,7 +18,7 @@ import android.widget.ImageView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
-import com.omnom.android.utils.drawable.MultiplyImageView;
+import com.omnom.android.utils.view.MultiplyImageView;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -141,17 +142,12 @@ public class SplashActivity extends BaseOmnomActivity {
 	protected void onResume() {
 		super.onResume();
 
-		// Workaround for white loader circle (reproducable from second app run)
-//		final GradientDrawable sd = (GradientDrawable) imgBackground.getDrawable();
-//		sd.setColor(getResources().getColor(R.color.loader_bg_transparent));
-//		sd.invalidateSelf();
-
-//		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
-//		if(hasToken) {
-		animateValidation();
-//		} else {
-//			animateLogin();
-//		}
+		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
+		if (hasToken) {
+			animateValidation();
+		} else {
+			animateLogin();
+		}
 	}
 
 	private void animateLogin() {

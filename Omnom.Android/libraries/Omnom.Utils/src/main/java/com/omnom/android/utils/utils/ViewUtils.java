@@ -4,8 +4,6 @@ import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
 
-import com.omnom.android.utils.drawable.MultiplyImageView;
-
 import java.util.List;
 
 import butterknife.ButterKnife;
