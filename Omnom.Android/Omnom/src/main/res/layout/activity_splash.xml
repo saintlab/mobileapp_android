@@ -3,13 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.omnom.android.utils.drawable.MultiplyImageView
+        android:id="@+id/img_multiply"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_wood"
+        android:layout_gravity="center"
+        android:scaleType="fitXY"/>
+
     <ImageView
         android:id="@+id/img_bg"
         android:layout_marginTop="@dimen/loader_margin_top"
         android:layout_gravity="center"
         android:layout_width="@dimen/loader_size_huge"
         android:layout_height="@dimen/loader_size_huge"
-        android:src="@drawable/bg_loader_rounded_transparent"/>
+        android:src="@drawable/bg_loader_rounded_transparent"
+        android:visibility="gone"/>
 
     <RelativeLayout
         android:layout_gravity="center"

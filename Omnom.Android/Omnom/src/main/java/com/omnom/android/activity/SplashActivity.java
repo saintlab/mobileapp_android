@@ -1,22 +1,23 @@
 package com.omnom.android.activity;
 
+import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.os.SystemClock;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
+import com.omnom.android.utils.drawable.MultiplyImageView;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
 
 import java.util.Collections;
@@ -40,6 +41,9 @@ public class SplashActivity extends BaseOmnomActivity {
 	@InjectView(R.id.img_cards)
 	protected ImageView imgCards;
 
+	@InjectView(R.id.img_multiply)
+	protected MultiplyImageView imgMultiply;
+
 	@InjectView(R.id.img_bg)
 	protected ImageView imgBackground;
 
@@ -48,7 +52,7 @@ public class SplashActivity extends BaseOmnomActivity {
 	private boolean mAnimate = true;
 
 	private void animateValidation() {
-		if(!mAnimate) {
+		if (!mAnimate) {
 			return;
 		}
 
@@ -67,16 +71,17 @@ public class SplashActivity extends BaseOmnomActivity {
 				AnimationUtils.animateAlpha(imgLogo, false, durationShort);
 				AnimationUtils.animateAlpha(imgRing, false, durationShort);
 				AnimationUtils.translateUp(Collections.singletonList((View) imgFork), -(int) upperLogoPoint, null, animationDuration);
-				AnimationUtils.scale(imgBackground, (int) loaderBgSize, animationDuration, null);
+				AnimationUtils.scale(imgMultiply, (int) loaderBgSize, animationDuration, null);
 				transitionDrawable.startTransition(durationShort);
+				animateMultiply();
 				AnimationUtils.scaleWidth(imgFork, dimensionPixelSize, durationShort, null);
 				postDelayed(animationDuration, new Runnable() {
 					@Override
 					public void run() {
-						if(!isFinishing()) {
-							ValidateActivity.start(SplashActivity.this, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short,
-							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, false);
-						}
+//						if (!isFinishing()) {
+//							ValidateActivity.start(SplashActivity.this, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short,
+//							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, false);
+//						}
 					}
 				});
 			}
@@ -86,25 +91,39 @@ public class SplashActivity extends BaseOmnomActivity {
 		mAnimate = false;
 	}
 
+	private void animateMultiply() {
+		AnimationBuilder builder =
+				AnimationBuilder.create(imgMultiply, (int)imgMultiply.getMeasuredWidth(), (int)getResources().getDimension(R.dimen
+						                                                                                                       .loader_size));
+		builder.setDuration(getResources().getInteger(R.integer.splash_animation_duration));
+		builder.addListener(new AnimationBuilder.UpdateLisetener() {
+			@Override
+			public void invoke(ValueAnimator animation) {
+				imgMultiply.setRadius((Integer) animation.getAnimatedValue());
+			}
+		});
+		builder.build().start();
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 
 		// Workaround for white loader circle (reproducable from second app run)
-		final GradientDrawable sd = (GradientDrawable) imgBackground.getDrawable();
-		sd.setColor(getResources().getColor(R.color.loader_bg_transparent));
-		sd.invalidateSelf();
+//		final GradientDrawable sd = (GradientDrawable) imgBackground.getDrawable();
+//		sd.setColor(getResources().getColor(R.color.loader_bg_transparent));
+//		sd.invalidateSelf();
 
-		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
-		if(hasToken) {
-			animateValidation();
-		} else {
-			animateLogin();
-		}
+//		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
+//		if(hasToken) {
+		animateValidation();
+//		} else {
+//			animateLogin();
+//		}
 	}
 
 	private void animateLogin() {
-		if(!mAnimate) {
+		if (!mAnimate) {
 			return;
 		}
 		findViewById(android.R.id.content).postDelayed(new Runnable() {
@@ -120,15 +139,16 @@ public class SplashActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		if(AndroidUtils.isKitKat()) {
+		imgMultiply.setRadius(getResources().getDimensionPixelSize(R.dimen.loader_size_huge) / 2);
+
+		if (AndroidUtils.isKitKat()) {
 			startBleServiceKK();
-		} else if(AndroidUtils.isJellyBeanMR2()) {
+		} else if (AndroidUtils.isJellyBeanMR2()) {
 			startBleServiceJB();
 		}
 
-		transitionDrawable = new TransitionDrawable(
-				new Drawable[]{getResources().getDrawable(R.drawable.ic_splash_fork_n_knife),
-						getResources().getDrawable(R.drawable.ic_fork_n_knife)});
+		transitionDrawable = new TransitionDrawable(new Drawable[]{getResources().getDrawable(R.drawable.ic_splash_fork_n_knife),
+				getResources().getDrawable(R.drawable.ic_fork_n_knife)});
 		transitionDrawable.setCrossFadeEnabled(true);
 	}
 
