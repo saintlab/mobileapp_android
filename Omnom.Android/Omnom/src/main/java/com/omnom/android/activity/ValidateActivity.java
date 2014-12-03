@@ -282,8 +282,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			public void onClick(final View v) {
 				mErrorHelper.hideError();
 				ValidateActivity.start(ValidateActivity.this,
-				                       R.anim.fake_fade_in_short,
-				                       R.anim.fake_fade_out_short,
+				                       R.anim.fake_fade_in_instant,
+				                       R.anim.fake_fade_out_instant,
 				                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
 			}
 		});

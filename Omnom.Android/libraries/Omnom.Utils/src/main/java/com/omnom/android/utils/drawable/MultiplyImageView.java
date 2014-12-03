@@ -30,6 +30,7 @@ import java.nio.channels.FileChannel;
 public class MultiplyImageView extends ImageView {
 	private Paint paint;
 	private int radius;
+	private int offset;
 
 	public MultiplyImageView(Context context) {
 		super(context);
@@ -102,12 +103,15 @@ public class MultiplyImageView extends ImageView {
 			ColorFilter filter = new PorterDuffColorFilter(getResources().getColor(R.color.error_red), PorterDuff.Mode.MULTIPLY);
 			paint.setColorFilter(filter);
 		}
-		canvas.drawColor(Color.TRANSPARENT);
-		View parent = (View) getParent();
-		canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius, paint);
+		canvas.drawCircle(getWidth() / 2, (getHeight() / 2) - offset, radius, paint);
+		canvas.drawCircle(getWidth() / 2, (getHeight() / 2) - offset, radius, paint);
 	}
 
 	public void setRadius(int radius) {
 		this.radius = radius;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
 	}
 }

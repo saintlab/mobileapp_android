@@ -148,8 +148,8 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 						                                        public void run() {
 							                                        ConfirmPhoneActivity.this.finish();
 							                                        ValidateActivity.start(ConfirmPhoneActivity.this,
-							                                                               R.anim.fake_fade_in_short,
-							                                                               R.anim.fake_fade_out_short,
+							                                                               R.anim.fake_fade_in_instant,
+							                                                               R.anim.fake_fade_out_instant,
 							                                                               EXTRA_LOADER_ANIMATION_SCALE_UP, false);
 						                                        }
 					                                        });
