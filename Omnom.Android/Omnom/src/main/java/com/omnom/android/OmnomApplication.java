@@ -14,6 +14,7 @@ import com.omnom.android.modules.OmnomApplicationModule;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.restaurateur.RestaurateurModule;
 import com.omnom.android.restaurateur.model.UserProfile;
+import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
@@ -57,6 +58,8 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	private Stack<Activity> activityStack = new Stack<Activity>();
 
 	private MixPanelHelper mixPanelHelper;
+
+	private Config cachedConfig;
 
 	private UserProfile cachedUser;
 
@@ -155,6 +158,14 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	@Override
 	public Context getContext() {
 		return this;
+	}
+
+	public void cacheConfig(final Config config) {
+		cachedConfig = config;
+	}
+
+	public Config getConfig() {
+		return cachedConfig;
 	}
 
 	public void cacheUserProfile(UserProfile user) {

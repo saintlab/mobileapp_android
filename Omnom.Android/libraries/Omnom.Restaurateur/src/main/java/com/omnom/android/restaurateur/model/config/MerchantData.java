@@ -1,9 +1,6 @@
-package com.omnom.android.acquiring.mailru.model;
-
-import android.content.Context;
+package com.omnom.android.restaurateur.model.config;
 
 import com.google.gson.annotations.Expose;
-import com.omnom.android.R;
 
 import java.util.HashMap;
 
@@ -17,9 +14,9 @@ public class MerchantData {
 	@Expose
 	private String vtermId;
 
-	public MerchantData(Context context) {
-		merchId = context.getString(R.string.acquiring_mailru_merch_id);
-		vtermId = context.getString(R.string.acquiring_mailru_vterm_id);
+	public MerchantData(String merchId, String vtermId) {
+		this.merchId = merchId;
+		this.vtermId = vtermId;
 	}
 
 	public String getMerchId() {

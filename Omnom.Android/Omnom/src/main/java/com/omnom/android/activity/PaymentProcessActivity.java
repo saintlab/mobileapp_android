@@ -20,7 +20,7 @@ import com.omnom.android.acquiring.demo.DemoAcquiring;
 import com.omnom.android.acquiring.mailru.OrderInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.MailRuExtra;
-import com.omnom.android.acquiring.mailru.model.MerchantData;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
@@ -201,15 +201,15 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final double tip) {
 		final com.omnom.android.auth.UserData cachedUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		final UserData user = UserData.create(String.valueOf(cachedUser.getId()), cachedUser.getPhone());
-		final MerchantData merchant = new MerchantData(getActivity());
-		pay(billData, card, merchant, user, amount, tip);
+		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
+		pay(billData, card, acquiringData, user, amount, tip);
 	}
 
-	private void pay(BillResponse billData, final CardInfo cardInfo, MerchantData merchant, UserData user, double amount, double tip) {
+	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, double amount, double tip) {
 		final ExtraData extra = MailRuExtra.create(tip, billData.getMailRestaurantId());
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
-		mPaySubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().pay(merchant, paymentInfo))
+		mPaySubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().pay(acquiringData, paymentInfo))
 				.subscribe(new Action1<AcquiringResponse>() {
 					@Override
 					public void call(final AcquiringResponse response) {

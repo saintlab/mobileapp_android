@@ -2,6 +2,7 @@ package com.omnom.android.restaurateur.api;
 
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
+import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
@@ -74,6 +75,9 @@ public interface RestaurateurDataService {
 	Observable<Restaurant> link(@Path(Protocol.FIELD_ORDER_ID) long orderId,
 	                            @Path(Protocol.FIELD_AMOUNT) double amount,
 	                            @Path(Protocol.FIELD_TIP) double tip);
+
+	@GET("/mobile/config")
+	Observable<Config> getConfig();
 
 	@POST("/qr/bind")
 	Observable<TableDataResponse> bindQrCode(@Body QRCodeBindRequest request);

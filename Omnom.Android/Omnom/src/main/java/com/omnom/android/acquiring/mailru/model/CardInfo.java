@@ -32,10 +32,10 @@ public class CardInfo implements Parcelable {
 		}
 	};
 
-	public static CardInfo create(final Context context, final String id) {
+	public static CardInfo create(final Context context, final String id, final String testCvv) {
 		final CardInfo cardInfo = new CardInfo();
 		cardInfo.setCardId(id);
-		cardInfo.cvv = context.getString(R.string.acquiring_mailru_test_cvv);
+		cardInfo.cvv = testCvv;
 		return cardInfo;
 	}
 

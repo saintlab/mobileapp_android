@@ -26,6 +26,7 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
+import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
@@ -103,6 +104,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
 		@Override
 		protected void onThrowable(Throwable throwable) {
+			Log.e(TAG, throwable.getMessage());
 			loader.stopProgressAnimation(true);
 			if(throwable instanceof RetrofitError) {
 				throwable.printStackTrace();
@@ -193,6 +195,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private Subscription mGuestSubscribtion;
 
+	private Subscription mAcquiringConfigSubscribtion;
+
 	private View bottomView;
 
 	protected int mDefaultAnimDuration;
@@ -249,6 +253,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		OmnomObservable.unsubscribe(mWaiterCallSubscribtion);
 		OmnomObservable.unsubscribe(mUserSubscription);
 		OmnomObservable.unsubscribe(mGuestSubscribtion);
+		OmnomObservable.unsubscribe(mAcquiringConfigSubscribtion);
 	}
 
 	@Override
@@ -541,9 +546,18 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				                                      }, new Action1<Throwable>() {
 					                                      @Override
 					                                      public void call(Throwable throwable) {
-
+						                                      Log.w(TAG, throwable.getMessage());
 					                                      }
 				                                      });
+
+		mAcquiringConfigSubscribtion = AndroidObservable.bindActivity(this, api.getConfig())
+				.subscribe(
+						new Action1<Config>() {
+							@Override
+							public void call(Config config) {
+								OmnomApplication.get(getActivity()).cacheConfig(config);
+							}
+						}, onError);
 
 		loader.post(new Runnable() {
 			@Override

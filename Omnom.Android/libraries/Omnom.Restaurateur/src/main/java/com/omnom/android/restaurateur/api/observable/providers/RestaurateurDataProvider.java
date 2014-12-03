@@ -7,6 +7,8 @@ import com.omnom.android.restaurateur.api.RestaurateurDataService;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
+import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
@@ -21,6 +23,7 @@ import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.restaurateur.serializer.MailRuSerializer;
 
 import java.util.List;
 
@@ -40,7 +43,9 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	public static RestaurateurDataProvider create(final String dataEndPoint, final RequestInterceptor interceptor) {
 		// final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
-		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+		final Gson gson = new GsonBuilder()
+							.registerTypeAdapter(AcquiringData.class, new MailRuSerializer())
+							.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		final GsonConverter converter = new GsonConverter(gson);
 
 		final RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(interceptor).setEndpoint(dataEndPoint)
@@ -154,6 +159,11 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	public Observable<Restaurant> link(long orderId, double amount, double tip) {
 		return mDataService.link(orderId, amount, tip).subscribeOn(Schedulers.io()).observeOn(
 				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<Config> getConfig() {
+		return mDataService.getConfig().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

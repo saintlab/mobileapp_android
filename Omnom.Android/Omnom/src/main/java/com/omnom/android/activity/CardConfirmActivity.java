@@ -16,7 +16,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.MerchantData;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
@@ -94,7 +94,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 
 	private UserData mUser;
 
-	private MerchantData mMerchant;
+	private AcquiringData mAcquiringData;
 
 	private View.OnClickListener mVerifyClickListener = new View.OnClickListener() {
 		@Override
@@ -126,7 +126,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 		mEditAmount.getEditText().setEnabled(false);
 		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		mUser = UserData.create(mUserProfile.getUser());
-		mMerchant = new MerchantData(getActivity());
+		mAcquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		mPanelTop.setTitleBig(R.string.card_binding);
 		mPanelTop.setButtonRightEnabled(false);
 		mPanelTop.setButtonRight(R.string.ready, mVerifyClickListener);
@@ -213,11 +213,11 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 
 	private void registerCard() {
 		mPanelTop.showProgress(true);
-		final MerchantData merchant = new MerchantData(getActivity());
+		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		com.omnom.android.auth.UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		final UserData user = UserData.create(String.valueOf(wicketUser.getId()), wicketUser.getPhone());
 		mCardRegisterSubscription = AndroidObservable.bindActivity(this,
-		                                                           mAcquiring.registerCard(merchant, user, mCard)
+		                                                           mAcquiring.registerCard(acquiringData, user, mCard)
 		                                                                     .delaySubscription(1000, TimeUnit.MILLISECONDS)
 		                                                          )
 		                                             .subscribe(
@@ -257,7 +257,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 		final ErrorEdit text = findById(this, R.id.edit_amount);
 		final String filterAmount = StringUtils.filterAmount(text.getText());
 		final double amount = Double.parseDouble(filterAmount);
-		mCardVerifySubscribtion = AndroidObservable.bindActivity(this, mAcquiring.verifyCard(mMerchant, mUser, mCard, amount))
+		mCardVerifySubscribtion = AndroidObservable.bindActivity(this, mAcquiring.verifyCard(mAcquiringData, mUser, mCard, amount))
 		                                           .subscribe(new Action1<AcquiringResponse>() {
 			                                           @Override
 			                                           public void call(AcquiringResponse response) {

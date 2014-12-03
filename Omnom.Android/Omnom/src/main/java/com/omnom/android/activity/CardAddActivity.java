@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.activity.base.BaseOmnomActivity;
@@ -191,7 +192,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		final String pan = CardUtils.preparePan(mEditCardNumber.getText().toString());
 		final String expDate = CardUtils.prepareExpDare(mEditCardExpDate.getText().toString());
 		final String cvv = mEditCardCvv.getText().toString();
-		final String holder = getString(R.string.acquiring_mailru_cardholder);
+		final String holder = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getCardHolder();
 		return CardInfo.create(pan, expDate, cvv, holder);
 	}
 

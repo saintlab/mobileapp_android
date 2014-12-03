@@ -159,7 +159,8 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 						adapter.notifyDataSetChanged();
 					}
 				} else {
-					final CardInfo cardInfo = CardInfo.create(activity, card.getExternalCardId());
+					String cvv = OmnomApplication.get(activity).getConfig().getAcquiringData().getTestCvv();
+					final CardInfo cardInfo = CardInfo.create(activity, card.getExternalCardId(), cvv);
 					CardConfirmActivity.startConfirm(CardsActivity.this, cardInfo, REQUEST_CODE_CARD_CONFIRM);
 				}
 			}
@@ -208,7 +209,8 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	@OnClick(R.id.btn_pay)
 	protected void onPay() {
 		final String cardId = getPreferences().getCardId(this);
-		final CardInfo cardInfo = CardInfo.create(this, cardId);
+		String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
+		final CardInfo cardInfo = CardInfo.create(this, cardId, cvv);
 		pay(cardInfo);
 	}
 
