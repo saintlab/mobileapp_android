@@ -24,7 +24,7 @@
         android:textColor="@android:color/white"
         android:paddingLeft="@dimen/activity_horizontal_margin_medium"
         android:gravity="left|center_vertical"
-        android:textAppearance="?android:textAppearanceMedium"
+        android:textAppearance="?android:textAppearance"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
 </LinearLayout>
