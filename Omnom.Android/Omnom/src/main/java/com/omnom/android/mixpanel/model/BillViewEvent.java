@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
+import com.omnom.android.utils.utils.AmountHelper;
 
 /**
  * Created by mvpotter on 21/11/14.
@@ -32,7 +33,7 @@ public final class BillViewEvent implements Event {
 		this.restaurantId = restaurantId;
 		this.beacon = beaconStr;
 		this.user = user;
-		this.amount = (int)(amount * 100);
+		this.amount = AmountHelper.toInt(amount);
 	}
 
 	@Override

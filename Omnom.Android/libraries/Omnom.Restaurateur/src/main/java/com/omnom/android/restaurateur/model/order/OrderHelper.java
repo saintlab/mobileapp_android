@@ -2,6 +2,8 @@ package com.omnom.android.restaurateur.model.order;
 
 import android.support.annotation.Nullable;
 
+import com.omnom.android.utils.utils.AmountHelper;
+
 import java.math.BigDecimal;
 
 /**
@@ -17,7 +19,7 @@ public class OrderHelper {
 
 	public static int getTipsAmount(final BigDecimal amount, final int percent) {
 		// final BigDecimal divide = amount.divide(BigDecimal.valueOf(100), BigDecimal.ROUND_DOWN);
-		final double divide = amount.doubleValue() / 100;
+		final double divide = AmountHelper.toDouble(amount);
 		final double v = percent * divide;
 		return (int) Math.round(v);
 	}

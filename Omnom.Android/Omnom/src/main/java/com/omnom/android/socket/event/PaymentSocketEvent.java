@@ -3,6 +3,7 @@ package com.omnom.android.socket.event;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.restaurateur.model.order.PaymentData;
 import com.omnom.android.restaurateur.model.order.Transaction;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.UserHelper;
 
 /**
@@ -14,7 +15,7 @@ public class PaymentSocketEvent extends BaseSocketEvent {
 	public static PaymentSocketEvent createDemoEvent(UserData userData, double amount) {
 		final PaymentData data = new PaymentData();
 		data.setUser(UserHelper.toPaymentUser(userData));
-		data.setTransaction(new Transaction((int) (amount * 100), 0));
+		data.setTransaction(new Transaction(AmountHelper.toInt(amount), 0));
 		return new PaymentSocketEvent(data);
 	}
 
