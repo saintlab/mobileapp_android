@@ -17,6 +17,7 @@ import android.os.ResultReceiver;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -244,5 +245,16 @@ public class AndroidUtils {
 
 	public static boolean isKitKat() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+	}
+
+	public static boolean hasSelectedItems(SparseBooleanArray array, int keyLimit) {
+		final int size = array.size();
+		for(int i = 0; i < size; i++) {
+			int key = array.keyAt(i);
+			if(array.get(key) && key < keyLimit) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

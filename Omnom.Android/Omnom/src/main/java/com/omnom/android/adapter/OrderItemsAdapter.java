@@ -50,11 +50,11 @@ public class OrderItemsAdapter extends BaseAdapter {
 
 	private final LayoutInflater mInflater;
 
-	private final SparseBooleanArray mCheckedStates;
+	protected final SparseBooleanArray mCheckedStates;
 
 	private final int mColorPriceNormal;
 
-	private Context mContext;
+	protected Context mContext;
 
 	private boolean mAddFakeView;
 
@@ -137,7 +137,7 @@ public class OrderItemsAdapter extends BaseAdapter {
 		return convertView;
 	}
 
-	private void bindView(View convertView, final int position, OrderItem item) {
+	protected void bindView(View convertView, final int position, OrderItem item) {
 		if(item == null) {
 			return;
 		}
@@ -174,7 +174,7 @@ public class OrderItemsAdapter extends BaseAdapter {
 		ArrayList<OrderItem> result = new ArrayList<OrderItem>(size);
 		for(int i = 0; i < size; i++) {
 			int key = mCheckedStates.keyAt(i);
-			if(mCheckedStates.get(key) && key < getCount() - 1) {
+			if(mCheckedStates.get(key) && key < getCount()) {
 				result.add(mItems.get(key));
 			}
 		}

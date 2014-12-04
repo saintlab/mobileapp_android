@@ -10,9 +10,12 @@ public class OrderSplitCommitEvent {
 
 	private BigDecimal mAmount;
 
-	public OrderSplitCommitEvent(String orderId, final BigDecimal amount) {
+	private int mTagSplitType;
+
+	public OrderSplitCommitEvent(String orderId, final BigDecimal amount, final int tagSplitType) {
 		mOrderId = orderId;
 		mAmount = amount;
+		mTagSplitType = tagSplitType;
 	}
 
 	public BigDecimal getAmount() {
@@ -21,5 +24,9 @@ public class OrderSplitCommitEvent {
 
 	public String getOrderId() {
 		return mOrderId;
+	}
+
+	public int getSplitType() {
+		return mTagSplitType;
 	}
 }

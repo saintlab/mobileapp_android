@@ -96,6 +96,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 		final BigDecimal amount = getAmount();
 		btnCommit.setText(getString(R.string.bill_split_amount_, StringUtils.formatCurrency(amount)));
 		btnCommit.setTag(R.id.edit_amount, amount);
+		btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_PERSON);
 		AnimationUtils.animateAlpha(btnCommit, true);
 	}
 }
