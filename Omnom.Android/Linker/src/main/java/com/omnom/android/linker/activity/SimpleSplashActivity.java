@@ -72,7 +72,7 @@ public class SimpleSplashActivity extends BaseActivity {
 						if(!isFinishing()) {
 							Intent intent = new Intent(SimpleSplashActivity.this, ValidationActivity.class);
 							intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
-							start(intent, R.anim.fake_fade_in_short, R.anim.fake_fade_out_short, true);
+							start(intent, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, true);
 						}
 					}
 				});
