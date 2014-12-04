@@ -20,10 +20,15 @@ import com.omnom.android.utils.R;
  */
 public class MultiplyImageView extends ImageView {
 	private Paint mPaint;
+
 	private Paint mFillPaint;
+
 	private int mRadius;
+
 	private int mOffset;
+
 	private int mFillAlpha;
+
 	private int mColor;
 
 	public MultiplyImageView(Context context) {
@@ -40,18 +45,9 @@ public class MultiplyImageView extends ImageView {
 		processAttrs(attrs);
 	}
 
-	private void processAttrs(AttributeSet attrs) {
-		final TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.MultiplyImageView, 0, 0);
-		try {
-			mColor = a.getColor(R.styleable.MultiplyImageView_color, getResources().getColor(R.color.loader_bg_transparent));
-		} finally {
-			a.recycle();
-		}
-	}
-
 	@Override
 	protected void onDraw(Canvas canvas) {
-		if (mPaint == null) {
+		if(mPaint == null) {
 			final Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
 			final Canvas bgCanvas = new Canvas(bitmap);
 			super.onDraw(bgCanvas);
@@ -73,15 +69,24 @@ public class MultiplyImageView extends ImageView {
 		canvas.drawCircle(cx, cy, mRadius, mFillPaint);
 	}
 
-	public void setRadius(int mRadius) {
-		this.mRadius = mRadius;
+	private void processAttrs(AttributeSet attrs) {
+		final TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.MultiplyImageView, 0, 0);
+		try {
+			mColor = a.getColor(R.styleable.MultiplyImageView_color, getResources().getColor(R.color.loader_bg_transparent));
+		} finally {
+			a.recycle();
+		}
+	}
+
+	public void setFillAlpha(int mFillAlpha) {
+		this.mFillAlpha = mFillAlpha;
 	}
 
 	public void setOffset(int mOffset) {
 		this.mOffset = mOffset;
 	}
 
-	public void setFillAlpha(int mFillAlpha) {
-		this.mFillAlpha = mFillAlpha;
+	public void setRadius(int mRadius) {
+		this.mRadius = mRadius;
 	}
 }

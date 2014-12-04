@@ -18,12 +18,12 @@ import android.widget.ImageView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
-import com.omnom.android.utils.view.MultiplyImageView;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.view.MultiplyImageView;
 
-import java.util.ArrayList;
+import java.util.Collections;
 
 import butterknife.InjectView;
 
@@ -71,7 +71,6 @@ public class SplashActivity extends BaseOmnomActivity {
 				AnimationUtils.animateAlpha(imgCards, false, durationShort);
 				AnimationUtils.animateAlpha(imgLogo, false, durationShort);
 				AnimationUtils.animateAlpha(imgRing, false, durationShort);
-
 				animateMultiply();
 				transitionDrawable.startTransition(durationShort);
 
@@ -79,7 +78,7 @@ public class SplashActivity extends BaseOmnomActivity {
 				postDelayed(animationDuration, new Runnable() {
 					@Override
 					public void run() {
-						if (!isFinishing()) {
+						if(!isFinishing()) {
 							ValidateActivity.start(SplashActivity.this, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
 							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, false);
 						}
@@ -92,18 +91,17 @@ public class SplashActivity extends BaseOmnomActivity {
 		mAnimate = false;
 	}
 
+	/**
+	 * Animate of fork_n_knife logo and loader
+	 * */
 	private void animateMultiply() {
 		final float upperLogoPoint = getResources().getDimension(R.dimen.loader_margin_top);
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
 
-		final AnimatorSet as = new AnimatorSet();
-
-		ArrayList<View> translateViews = new ArrayList<View>(2);
-		translateViews.add(imgFork);
-
+		// translating up animation
 		final AnimationBuilder translationBuilder = AnimationBuilder.create(imgFork, 0, (int) upperLogoPoint);
 		translationBuilder.setDuration(animationDuration);
-		final ValueAnimator translationAnimator = AnimationUtils.prepareTranslation(translateViews, null, translationBuilder);
+		final ValueAnimator translationAnimator = AnimationUtils.prepareTranslation(Collections.singletonList((View) imgFork), null, translationBuilder);
 		translationAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
@@ -111,6 +109,7 @@ public class SplashActivity extends BaseOmnomActivity {
 			}
 		});
 
+		// loader/circle downscaling animation
 		float end = getResources().getDimension(R.dimen.loader_size);
 		float start = getResources().getDimension(R.dimen.loader_size_huge);
 		AnimationBuilder builder = AnimationBuilder.create(imgMultiply, (int) start, (int) end);
@@ -122,7 +121,9 @@ public class SplashActivity extends BaseOmnomActivity {
 				imgMultiply.invalidate();
 			}
 		});
+		final ValueAnimator multiplyAnimator = builder.build();
 
+		// main color animation
 		ValueAnimator alphaAnimator = ValueAnimator.ofInt(0, 255);
 		alphaAnimator.setDuration(animationDuration);
 		alphaAnimator.setInterpolator(new AccelerateInterpolator(2.2f));
@@ -133,7 +134,8 @@ public class SplashActivity extends BaseOmnomActivity {
 			}
 		});
 
-		final ValueAnimator multiplyAnimator = builder.build();
+		// simultaneous animation playback
+		final AnimatorSet as = new AnimatorSet();
 		as.playTogether(translationAnimator, alphaAnimator, multiplyAnimator);
 		as.start();
 	}
