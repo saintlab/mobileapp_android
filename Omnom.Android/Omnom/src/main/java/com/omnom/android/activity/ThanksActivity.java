@@ -28,9 +28,20 @@ public class ThanksActivity extends BaseOmnomActivity {
 
 	private int mAccentColor;
 
-	private PaymentEventListener mPaymentListener;
+	protected PaymentEventListener mPaymentListener;
 
 	private Order mOrder;
+
+	@Override
+	public int getLayoutResource() {
+		return R.layout.activity_thanks;
+	}
+
+	@Override
+	protected void handleIntent(final Intent intent) {
+		mAccentColor = intent.getIntExtra(EXTRA_ACCENT_COLOR, 0);
+		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
+	}
 
 	@Override
 	public void initUi() {
@@ -46,15 +57,9 @@ public class ThanksActivity extends BaseOmnomActivity {
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-		mPaymentListener.initTableSocket(mOrder.getTableId());
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		mPaymentListener.onPause();
+	public void onBackPressed() {
+		setResult(RESULT_OK);
+		super.onBackPressed();
 	}
 
 	@Override
@@ -64,19 +69,14 @@ public class ThanksActivity extends BaseOmnomActivity {
 	}
 
 	@Override
-	protected void handleIntent(final Intent intent) {
-		mAccentColor = intent.getIntExtra(EXTRA_ACCENT_COLOR, 0);
-		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
+	protected void onPause() {
+		super.onPause();
+		mPaymentListener.onPause();
 	}
 
 	@Override
-	public void onBackPressed() {
-		setResult(RESULT_OK);
-		super.onBackPressed();
-	}
-
-	@Override
-	public int getLayoutResource() {
-		return R.layout.activity_thanks;
+	protected void onResume() {
+		super.onResume();
+		mPaymentListener.initTableSocket(mOrder.getTableId());
 	}
 }

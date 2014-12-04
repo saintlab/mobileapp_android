@@ -68,6 +68,18 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 		activity.startActivityForResult(intent, code);
 	}
 
+	public static void start(final Activity activity, final int code, final double amount,
+	                         final Order order, CardInfo cardInfo, final boolean isDemo,
+	                         final int accentColor) {
+		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
+		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
+		intent.putExtra(Extras.EXTRA_ORDER_AMOUNT, amount);
+		intent.putExtra(Extras.EXTRA_ORDER, order);
+		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
+		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
+		activity.startActivityForResult(intent, code);
+	}
+
 	@Inject
 	protected RestaurateurObeservableApi api;
 
@@ -116,18 +128,6 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 	private PaymentEventListener mPaymentListener;
 
 	private String mTransactionUrl;
-
-	public static void start(final Activity activity, final int code, final double amount,
-	                         final Order order, CardInfo cardInfo, final boolean isDemo,
-	                         final int accentColor) {
-		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
-		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
-		intent.putExtra(Extras.EXTRA_ORDER_AMOUNT, amount);
-		intent.putExtra(Extras.EXTRA_ORDER, order);
-		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
-		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
-		activity.startActivityForResult(intent, code);
-	}
 
 	@Override
 	public void initUi() {
@@ -232,29 +232,30 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 		pay(billData, card, acquiringData, user, amount, tip);
 	}
 
-	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, double amount, double tip) {
+	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, double amount,
+	                 double tip) {
 		final ExtraData extra = MailRuExtra.create(tip, billData.getMailRestaurantId());
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
 		mPaySubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().pay(acquiringData, paymentInfo))
-				.subscribe(new Action1<AcquiringResponse>() {
-					@Override
-					public void call(final AcquiringResponse response) {
-						if (response.getError() != null) {
-							Log.w(TAG, response.getError().toString());
-							onPayError();
-						} else {
-							mTransactionUrl = response.getUrl();
-							checkResult(response);
-						}
-					}
-				}, new Action1<Throwable>() {
-					@Override
-					public void call(Throwable throwable) {
-						Log.w(TAG, throwable.getMessage());
-						onInternetError();
-					}
-				});
+		                                    .subscribe(new Action1<AcquiringResponse>() {
+			                                    @Override
+			                                    public void call(final AcquiringResponse response) {
+				                                    if(response.getError() != null) {
+					                                    Log.w(TAG, response.getError().toString());
+					                                    onPayError();
+				                                    } else {
+					                                    mTransactionUrl = response.getUrl();
+					                                    checkResult(response);
+				                                    }
+			                                    }
+		                                    }, new Action1<Throwable>() {
+			                                    @Override
+			                                    public void call(Throwable throwable) {
+				                                    Log.w(TAG, throwable.getMessage());
+				                                    onInternetError();
+			                                    }
+		                                    });
 	}
 
 	private void checkResult(final AcquiringResponse response) {
@@ -288,7 +289,11 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 		loader.updateProgressMax(new Runnable() {
 			@Override
 			public void run() {
-				ThanksActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor);
+				if(mIsDemo) {
+					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mAmount);
+				} else {
+					ThanksActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor);
+				}
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 			}
 		});

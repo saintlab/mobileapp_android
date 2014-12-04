@@ -29,6 +29,14 @@ public class CroutonHelper {
 		}
 
 		final View view = LayoutInflater.from(activity).inflate(com.omnom.android.R.layout.layout_balk_notification, null);
+		final Crouton crouton = Crouton.make(activity, view).setConfiguration(getDefaulConfiguration(activity));
+
+		final View.OnClickListener closeListener = new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				crouton.hide();
+			}
+		};
 
 		final String name = data.getUser().getName();
 		final BigDecimal bd = BigDecimal.valueOf(data.getTransaction().getAmount());
@@ -37,13 +45,8 @@ public class CroutonHelper {
 		                                      name,
 		                                      StringUtils.formatCurrency(subtract));
 		((TextView) view.findViewById(com.omnom.android.R.id.txt_message)).setText(msg);
-		final Crouton crouton = Crouton.make(activity, view).setConfiguration(getDefaulConfiguration(activity));
-		crouton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				crouton.hide();
-			}
-		});
+		view.findViewById(com.omnom.android.R.id.btn_close).setOnClickListener(closeListener);
+		crouton.setOnClickListener(closeListener);
 		return crouton;
 	}
 
@@ -65,4 +68,5 @@ public class CroutonHelper {
 	}
 
 	private static Configuration sConfiguration;
+
 }

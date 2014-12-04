@@ -12,6 +12,15 @@ public class Transaction {
 	@Expose
 	private int tip;
 
+	public Transaction() {
+		// do nothing
+	}
+
+	public Transaction(int amount, int tip) {
+		this.amount = amount;
+		this.tip = tip;
+	}
+
 	public int getTip() {
 		return tip;
 	}

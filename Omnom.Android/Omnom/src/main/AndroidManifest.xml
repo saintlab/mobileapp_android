@@ -134,6 +134,13 @@
             android:windowSoftInputMode="stateHidden" />
 
         <activity
+            android:name="com.omnom.android.activity.ThanksDemoActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood.Red"
+            android:windowSoftInputMode="stateHidden" />
+
+        <activity
             android:name="com.omnom.android.activity.OmnomQRCaptureActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
