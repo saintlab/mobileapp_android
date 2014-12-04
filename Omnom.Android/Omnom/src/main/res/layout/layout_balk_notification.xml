@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/activity_horizontal_margin_medium"
+    android:background="@color/balk_notification_background"
+    android:gravity="center_vertical|left">
+
+    <View
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/ic_cross_white" />
+
+    <TextView
+        android:id="@+id/txt_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textColor="@android:color/white"
+        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+        android:gravity="left|center_vertical"
+        android:textAppearance="?android:textAppearanceMedium"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+</LinearLayout>

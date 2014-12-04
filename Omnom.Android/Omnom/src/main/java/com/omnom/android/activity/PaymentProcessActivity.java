@@ -20,7 +20,6 @@ import com.omnom.android.acquiring.demo.DemoAcquiring;
 import com.omnom.android.acquiring.mailru.OrderInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.MailRuExtra;
-import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
@@ -28,7 +27,9 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.loader.LoaderView;
@@ -56,6 +57,16 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 	private static final String TAG = PaymentProcessActivity.class.getSimpleName();
 
 	private static final int REQUEST_THANKS = 100;
+
+	public static void start(final Activity activity, final int code, final double amount,
+	                         final Order order, final boolean isDemo, final int accentColor) {
+		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
+		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
+		intent.putExtra(Extras.EXTRA_ORDER_AMOUNT, amount);
+		intent.putExtra(Extras.EXTRA_ORDER, order);
+		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
+		activity.startActivityForResult(intent, code);
+	}
 
 	@Inject
 	protected RestaurateurObeservableApi api;
@@ -102,6 +113,8 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 
 	private int mAccentColor;
 
+	private PaymentEventListener mPaymentListener;
+
 	private String mTransactionUrl;
 
 	public static void start(final Activity activity, final int code, final double amount,
@@ -118,6 +131,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		mPaymentListener = new PaymentEventListener(this);
 		mErrorHelper = new ErrorHelper(loader, txtError, btnBottom, txtBottom, btnDemo, errorViews);
 		final int dpSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
 		loader.setSize(dpSize, dpSize);
@@ -126,9 +140,21 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		mPaymentListener.initTableSocket(mOrder.getTableId());
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mPaymentListener.onPause();
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (savedInstanceState != null) {
+		if(savedInstanceState != null) {
 			mTransactionUrl = savedInstanceState.getString(Extras.EXTRA_TRANSACTION_URL);
 		}
 	}
@@ -148,6 +174,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		mPaymentListener.onDestroy();
 		loader.onDestroy();
 		OmnomObservable.unsubscribe(mBillSubscription);
 		OmnomObservable.unsubscribe(mPaySubscription);
@@ -162,7 +189,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 			public void run() {
 			}
 		});
-		if (mTransactionUrl == null) {
+		if(mTransactionUrl == null) {
 			processPayment(amount, tip);
 		} else {
 			AcquiringResponse acquiringResponse = new AcquiringResponse();
@@ -232,23 +259,23 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 
 	private void checkResult(final AcquiringResponse response) {
 		mCheckSubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().checkResult(response))
-				.subscribe(new Action1<AcquiringPollingResponse>() {
-					@Override
-					public void call(final AcquiringPollingResponse response) {
-						processResponse(response);
-					}
-				}, new Action1<Throwable>() {
-					@Override
-					public void call(Throwable throwable) {
-						Log.w(TAG, throwable.getMessage());
-						onInternetError();
-					}
-				});
+		                                      .subscribe(new Action1<AcquiringPollingResponse>() {
+			                                      @Override
+			                                      public void call(final AcquiringPollingResponse response) {
+				                                      processResponse(response);
+			                                      }
+		                                      }, new Action1<Throwable>() {
+			                                      @Override
+			                                      public void call(Throwable throwable) {
+				                                      Log.w(TAG, throwable.getMessage());
+				                                      onInternetError();
+			                                      }
+		                                      });
 	}
 
 	private void processResponse(AcquiringPollingResponse response) {
 		Log.i(TAG, "status = " + response.getStatus());
-		if (AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
+		if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
 			onPayOk(response);
 		} else {
 			onPayError();
@@ -261,7 +288,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 		loader.updateProgressMax(new Runnable() {
 			@Override
 			public void run() {
-				ThanksActivity.start(getActivity(), REQUEST_THANKS, mAccentColor);
+				ThanksActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor);
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 			}
 		});
