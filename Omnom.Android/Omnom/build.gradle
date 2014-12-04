@@ -85,8 +85,8 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.2'
 
     // socket.io
-    compile 'com.github.nkzawa:socket.io-client:0.3.0@jar'
-    compile 'com.github.nkzawa:engine.io-client:0.3.1@jar'
+    // compile 'com.github.nkzawa:socket.io-client:0.3.1@jar'
+    // compile 'com.github.nkzawa:engine.io-client:0.3.1@jar'
     compile 'org.java-websocket:Java-WebSocket:1.3.0@jar'
 
     // square
@@ -116,6 +116,8 @@ dependencies {
     compile project(':libraries:Omnom.Utils')
     compile project(':libraries:Omnom.Auth')
     compile project(':libraries:Omnom.Restaurateur')
+    compile project(':libraries:Io.Socket.Client')
+    compile project(':libraries:Io.Engine.Client')
     androidTestCompile('com.jakewharton.espresso:espresso:1.1-r3') {
         exclude group: 'com.squareup.dagger'
     }
