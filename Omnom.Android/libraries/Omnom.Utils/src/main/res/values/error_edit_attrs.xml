@@ -6,6 +6,7 @@
         <attr name="textSize" format="reference|dimension"/>
         <attr name="errorTextSize" format="reference|dimension"/>
         <attr name="maxLength" format="reference|integer"/>
+        <attr name="editTextWidth" format="reference|dimension"/>
         <attr name="textGravity">
             <flag name="left" value="0x00000000"/>
             <flag name="center" value="0x00000001"/>
