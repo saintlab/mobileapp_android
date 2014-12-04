@@ -1,0 +1,61 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <ImageButton
+        android:id="@+id/btn_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:background="@drawable/ic_cross_black"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@null"/>
+
+    <Button
+        android:id="@+id/btn_pay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+        android:paddingRight="@dimen/activity_horizontal_margin_medium"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:background="@drawable/btn_pay"
+        android:textColor="@drawable/text_color_selector_white"
+        android:textSize="@dimen/font_medium"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_above="@id/btn_pay"
+        android:layout_below="@id/btn_close">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:text="@string/sms_notifications_off"
+            android:gravity="center"
+            android:textColor="@color/profile_hint"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:text="@string/pay_once"
+            android:gravity="center"
+            android:textColor="@color/profile_hint"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

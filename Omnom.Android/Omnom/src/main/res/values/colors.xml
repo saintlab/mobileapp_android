@@ -15,6 +15,8 @@
     <color name="card_selected">#4a90e2</color>
     <color name="card_unregistered">#26000000</color>
 
+    <color name="link_color">#4a90e2</color>
+
     <color name="white_transparent">#ddffffff</color>
     <color name="card_data_hint">#7dffffff</color>
 

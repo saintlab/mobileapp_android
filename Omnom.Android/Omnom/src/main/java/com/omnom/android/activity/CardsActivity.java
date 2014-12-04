@@ -49,6 +49,8 @@ import rx.functions.Action1;
 
 public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.AnimationEndListener {
 
+	public static final int RESULT_PAY = 10;
+
 	private static final String TAG = CardsActivity.class.getSimpleName();
 
 	private static final int REQUEST_CODE_CARD_CONFIRM = 100;
@@ -202,7 +204,8 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 				} else {
 					String cvv = OmnomApplication.get(activity).getConfig().getAcquiringData().getTestCvv();
 					final CardInfo cardInfo = CardInfo.create(activity, card.getExternalCardId(), cvv);
-					CardConfirmActivity.startConfirm(CardsActivity.this, cardInfo, REQUEST_CODE_CARD_CONFIRM);
+					CardConfirmActivity.startConfirm(CardsActivity.this, cardInfo, REQUEST_CODE_CARD_CONFIRM,
+													 mDetails.getAmount());
 				}
 			}
 		});
@@ -267,13 +270,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 				setResult(RESULT_OK);
 				finish();
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
-			} else if (requestCode == REQUEST_CODE_CARD_ADD && data != null) {
-				CardInfo cardInfo = data.getParcelableExtra(EXTRA_CARD_DATA);
-				if (cardInfo != null) {
-					pay(cardInfo);
-				} else {
-					Log.w(TAG, "Card info is null");
-				}
 			} else if(requestCode == REQUEST_CODE_CARD_CONFIRM || requestCode == REQUEST_CODE_CARD_ADD) {
 				AnimationUtils.animateAlpha(mList, false, new Runnable() {
 					@Override
@@ -284,11 +280,14 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 					}
 				});
 			}
+		} else if(resultCode == RESULT_PAY && data != null) {
+			CardInfo cardInfo = data.getParcelableExtra(EXTRA_CARD_DATA);
+			if (cardInfo != null) {
+				pay(cardInfo);
+			} else {
+				Log.w(TAG, "Card info is null");
+			}
 		}
-	}
-
-	public void onAdd() {
-		CardAddActivity.start(this, REQUEST_CODE_CARD_ADD);
 	}
 
 	@Override
@@ -302,6 +301,10 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		super.onDestroy();
 		mPaymentListener.onPause();
 		OmnomObservable.unsubscribe(mCardsSubscription);
+	}
+
+	public void onAdd() {
+		CardAddActivity.start(this, mDetails.getAmount(), mAccentColor, REQUEST_CODE_CARD_ADD);
 	}
 
 	@Override

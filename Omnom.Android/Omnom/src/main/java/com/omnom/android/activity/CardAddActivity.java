@@ -36,9 +36,15 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	private static final int REQUEST_CODE_CARD_REGISTER = 102;
 
+	private double mAmount;
+
+	private int mAccentColor;
+
 	@SuppressLint("NewApi")
-	public static void start(Activity activity, int code) {
+	public static void start(Activity activity, double amount, int accentColor, int code) {
 		final Intent intent = new Intent(activity, CardAddActivity.class);
+		intent.putExtra(EXTRA_ORDER_AMOUNT, amount);
+		intent.putExtra(EXTRA_ACCENT_COLOR, accentColor);
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
 			                                                    R.anim.slide_in_right,
@@ -170,9 +176,13 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(requestCode == REQUEST_CODE_CARD_REGISTER && resultCode == RESULT_OK) {
-			setResult(RESULT_OK);
-			finish();
+		if(requestCode == REQUEST_CODE_CARD_REGISTER) {
+			if (resultCode == CardsActivity.RESULT_PAY) {
+				doPay();
+			} else if (resultCode == RESULT_OK) {
+				setResult(RESULT_OK);
+				finish();
+			}
 		}
 		if(requestCode == REQUEST_CODE_CARD_IO) {
 			if(data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
@@ -200,7 +210,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		if(!validate(true)) {
 			return;
 		}
-		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER);
+		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER, mAmount);
 	}
 
 	private void doPay() {
@@ -209,7 +219,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		}
 		Intent intent = new Intent();
 		intent.putExtra(EXTRA_CARD_DATA, createCardInfo());
-		setResult(RESULT_OK, intent);
+		setResult(CardsActivity.RESULT_PAY, intent);
 		finish();
 		overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 	}
@@ -290,4 +300,9 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		return R.layout.activity_card_add;
 	}
 
+	@Override
+	protected void handleIntent(Intent intent) {
+		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);
+		mAccentColor = intent.getIntExtra(EXTRA_ACCENT_COLOR, 0);
+	}
 }
