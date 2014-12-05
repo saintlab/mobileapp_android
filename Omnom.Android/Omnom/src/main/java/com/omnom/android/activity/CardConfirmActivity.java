@@ -16,6 +16,8 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -143,6 +145,8 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	private Fragment payOnceFragment;
 
+	private boolean isKeyboardVisible = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -183,6 +187,19 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			mEditAmount.getEditText().setEnabled(true);
 			mPanelTop.setButtonRightEnabled(true);
 		}
+		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+		addKeyboardListener(activityRootView);
+	}
+
+	private void addKeyboardListener(View activityRootView) {
+		ViewTreeObserver.OnGlobalLayoutListener listener =
+				AndroidUtils.createKeyboardListener(activityRootView, new AndroidUtils.KeyboardVisibilityListener() {
+					@Override
+					public void onVisibilityChanged(boolean isVisible) {
+						isKeyboardVisible = isVisible;
+					}
+				});
+		activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(listener);
 	}
 
 	private void initAmount() {
@@ -336,16 +353,20 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		ClickableSpan clickableSpan = new ClickableSpan() {
 			@Override
 			public void onClick(View widget) {
-				AndroidUtils.hideKeyboard(mEditAmount.getEditText(), new ResultReceiver(new Handler()) {
-					@Override
-					protected void onReceiveResult(int resultCode, Bundle resultData) {
-						super.onReceiveResult(resultCode, resultData);
-						if (resultCode == InputMethodManager.RESULT_HIDDEN ||
-								resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN) {
-							showPayOnceFragment();
+				if (!isKeyboardVisible) {
+					showPayOnceFragment();
+				} else {
+					AndroidUtils.hideKeyboard(mEditAmount.getEditText(), new ResultReceiver(new Handler()) {
+						@Override
+						protected void onReceiveResult(int resultCode, Bundle resultData) {
+							super.onReceiveResult(resultCode, resultData);
+							if (resultCode == InputMethodManager.RESULT_HIDDEN ||
+									resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN) {
+								showPayOnceFragment();
+							}
 						}
-					}
-				});
+					});
+				}
 			}
 		};
 		int noSmsLength = getResources().getString(R.string.no_sms).length();
