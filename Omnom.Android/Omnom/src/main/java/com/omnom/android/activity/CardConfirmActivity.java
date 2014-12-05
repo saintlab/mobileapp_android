@@ -295,7 +295,13 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		mPanelTop.showProgress(true);
 		final ErrorEdit text = findById(this, R.id.edit_amount);
 		final String filterAmount = StringUtils.filterAmount(text.getText());
-		final double amount = Double.parseDouble(filterAmount);
+		double amount;
+		try {
+			amount = Double.parseDouble(filterAmount);
+		} catch (NumberFormatException e) {
+			Log.d(TAG, "Invalid double value: \"" + filterAmount + "\"");
+			amount = 0;
+		}
 		mCardVerifySubscribtion = AndroidObservable.bindActivity(this, mAcquiring.verifyCard(mAcquiringData, mUser, mCard, amount))
 		                                           .subscribe(new Action1<AcquiringResponse>() {
 			                                           @Override
