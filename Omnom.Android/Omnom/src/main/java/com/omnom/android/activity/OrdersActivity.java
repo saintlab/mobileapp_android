@@ -163,7 +163,11 @@ public class OrdersActivity extends BaseFragmentActivity {
 	}
 
 	public int getOrdersCount() {
-		return mPagerAdapter.getCount();
+		int count = 0;
+		if (mPagerAdapter != null) {
+			count = mPagerAdapter.getCount();
+		}
+		return count;
 	}
 
 	public void close() {
