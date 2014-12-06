@@ -27,7 +27,6 @@
         android:layout_height="@dimen/order_items_list_height_collapsed"
         android:layout_marginTop="48dp"
         android:layout_gravity="top"
-        android:layout_alignParentBottom="true"
         android:stackFromBottom="true"
         android:divider="@android:color/white"
         android:dividerHeight="1dp"
@@ -53,13 +52,13 @@
         android:textColor="@android:color/white"
         android:textAppearance="?android:textAppearanceLarge"
         omnom:fontPath="fonts/Futura-OSF-Omnom-Medium.otf"
-        android:textSize="@dimen/font_xlarge"/>g
+        android:textSize="@dimen/font_xlarge"/>
 
     <ViewStub
         android:id="@+id/stub_payment_options"
         android:inflatedId="@+id/panel_order_payment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="300dp"
         android:paddingBottom="@dimen/order_payment_padding_bottom"
         android:layout_gravity="bottom" />
 
