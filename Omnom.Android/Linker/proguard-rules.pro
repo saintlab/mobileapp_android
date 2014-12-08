@@ -150,3 +150,6 @@
 -keep class com.omnom.android.auth.** { *; }
 -keep class com.omnom.android.utils.** { *; }
 -keep class com.omnom.android.restaurateur.** { *; }
+
+#okio
+-dontwarn okio.**
