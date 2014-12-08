@@ -6,8 +6,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -17,8 +15,8 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,17 +24,14 @@ import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 import android.view.ViewStub;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
@@ -44,7 +39,6 @@ import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
-import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderItemSelectedEvent;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
@@ -283,8 +277,6 @@ public class OrderFragment extends Fragment {
 
 	private int mListHeight;
 
-	private OrderItemsAdapter mAdapter;
-
 	public OrderFragment() {
 	}
 
@@ -312,16 +304,13 @@ public class OrderFragment extends Fragment {
 	@Subscribe
 	public void onSplitCommit(SplitHideEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
-			mAdapter.notifyDataSetChanged();
+			// list.animate().translationY(mListTrasnlationActive).start();
 		}
 	}
 
 	@Subscribe
 	public void onSplitCommit(OrderSplitCommitEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
-			if(event.getSplitType() == BillSplitFragment.SPLIT_TYPE_PERSON) {
-				cancelSplit();
-			}
 			final BigDecimal amount = event.getAmount();
 			final String s = StringUtils.formatCurrency(amount, getCurrencySuffix());
 			editAmount.setText(s);
@@ -334,12 +323,23 @@ public class OrderFragment extends Fragment {
 	public void onOrderItemSelected(OrderItemSelectedEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
 			mCheckedStates.put(event.getPosition(), event.isSelected());
-			if(AndroidUtils.hasSelectedItems(mCheckedStates, list.getCount())) {
+			if(hasSelectedItems()) {
 				initFooter2();
 			} else {
 				initFooter(true);
 			}
 		}
+	}
+
+	private boolean hasSelectedItems() {
+		final int size = mCheckedStates.size();
+		for(int i = 0; i < size; i++) {
+			int key = mCheckedStates.keyAt(i);
+			if(mCheckedStates.get(key) && key < list.getCount() - 1) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -350,13 +350,37 @@ public class OrderFragment extends Fragment {
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
 		mFontSmall = getResources().getDimension(R.dimen.font_large);
 
-		mListTrasnlationActive = getResources().getDimensionPixelSize(R.dimen.order_list_trasnlation_active);
 		mPaymentTranslationY = getResources().getDimensionPixelSize(R.dimen.order_payment_translation_y);
 		mTipsTranslationY = getResources().getDimensionPixelSize(R.dimen.order_tips_translation_y);
-		mListHeight = getResources().getDimensionPixelSize(R.dimen.order_list_height);
+
+		configureSizing();
 
 		ButterKnife.inject(this, view);
 		return view;
+	}
+
+	private void configureSizing() {
+		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+		final int heightPixels = displayMetrics.heightPixels;
+
+		final int defaultPadding = ViewUtils.dipToPixels(getActivity(), 48);
+		final boolean hasNavigationBar = AndroidUtils.hasNavigationBar(getActivity());
+		mListHeight = heightPixels - defaultPadding - (hasNavigationBar ? defaultPadding : 0);
+
+		final int bottomMin = getResources().getDimensionPixelSize(R.dimen.order_payment_height);
+		final int i = mListHeight / 2;
+		if(i < bottomMin) {
+			mListTrasnlationActive = (-mListHeight / 2) - (bottomMin - i);
+		} else {
+			mListTrasnlationActive = -mListHeight / 2;
+		}
+
+		// TODO: Find out generic solution for small devices like megafon login 1
+		if(displayMetrics.densityDpi == DisplayMetrics.DENSITY_MEDIUM) {
+			final int mdpiPadding = ViewUtils.dipToPixels(getActivity(), 72);
+			mListHeight -= mdpiPadding;
+			mListTrasnlationActive += mdpiPadding;
+		}
 	}
 
 	private AnimatorSet getListClickAnimator(float scaleRation, int listTranslation) {
@@ -389,7 +413,11 @@ public class OrderFragment extends Fragment {
 		final View panelPayment = findById(mFragmentView, R.id.panel_order_payment);
 		if(panelPayment == null) {
 			stubPaymentOptions.setLayoutResource(R.layout.view_order_payment_options);
-			View inflate = stubPaymentOptions.inflate();
+
+			final ViewGroup inflate = (ViewGroup) stubPaymentOptions.inflate();
+
+			AndroidUtils.applyFont(getActivity(), inflate, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+
 			editAmount = (EditText) inflate.findViewById(R.id.edit_payment_amount);
 			txtCustomTips = (TextView) inflate.findViewById(R.id.txt_custom_tips);
 			txtPaymentTitle = (TextView) inflate.findViewById(R.id.txt_payment_title);
@@ -404,22 +432,13 @@ public class OrderFragment extends Fragment {
 			btnPay.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(final View v) {
-					if (amountIsTooHigh()) {
-						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-						builder.setMessage(R.string.amount_is_too_high)
-								.setPositiveButton(R.string.pay, new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										showCardsActivity();
-									}
-								})
-								.setNegativeButton(R.string.refuse, null);
-						AlertDialog dialog = builder.create();
-						dialog.show();
-						TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
-						messageView.setGravity(Gravity.CENTER);
-					} else {
-						showCardsActivity();
-					}
+					final BigDecimal amount = getEnteredAmount();
+					final BigDecimal tips = getSelectedTips(amount);
+					final BigDecimal amountToPay = amount.add(tips);
+					final PaymentDetails paymentDetails = new PaymentDetails(amountToPay.doubleValue(), tips.doubleValue());
+					final OrdersActivity activity = (OrdersActivity) getActivity();
+					CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS,
+					                    activity.isDemo());
 				}
 			});
 
@@ -514,25 +533,18 @@ public class OrderFragment extends Fragment {
 		initList();
 	}
 
-	private boolean amountIsTooHigh() {
-		return getEnteredAmount().doubleValue() > 1.5 * mOrder.getAmountToPay();
-	}
-
-	private void showCardsActivity() {
-		final BigDecimal amount = getEnteredAmount();
-		final BigDecimal tips = getSelectedTips(amount);
-		final BigDecimal amountToPay = amount.add(tips);
-		final PaymentDetails paymentDetails = new PaymentDetails(amountToPay.doubleValue(), tips.doubleValue());
-		final OrdersActivity activity = (OrdersActivity) getActivity();
-		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor,
-				OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
-	}
-
 	private void initList() {
-		mAdapter = new OrderItemsAdapterSimple(getActivity(), mOrder.getItems(), mCheckedStates, true);
-		list.setAdapter(mAdapter);
+		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems(), true));
+
+		if(mAnimate) {
+			ViewUtils.setHeight(list, mListHeight);
+			//AnimationUtils.scaleHeight(list, mListHeight);
+		} else {
+			ViewUtils.setHeight(list, mListHeight);
+		}
+		// AndroidUtils.scrollEnd(list);
+
 		list.setScrollingEnabled(false);
-		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 
 		list.setSwipeEnabled(false);
 		list.setSwipeListener(new OmnomListView.SwipeListener() {
@@ -541,11 +553,6 @@ public class OrderFragment extends Fragment {
 				splitBill();
 			}
 		});
-		if(mAnimate) {
-			AnimationUtils.scaleHeight(list, mListHeight);
-		} else {
-			ViewUtils.setHeight(list, mListHeight);
-		}
 
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -628,7 +635,7 @@ public class OrderFragment extends Fragment {
 			}
 		});
 		txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(mOrder.getPaidAmount(), getCurrencySuffix())));
-		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
+		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay(), getCurrencySuffix()));
 		editAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -727,9 +734,7 @@ public class OrderFragment extends Fragment {
 
 	private void cancelSplit() {
 		mCheckedStates.clear();
-		mAdapter.notifyDataSetChanged();
 		initFooter(true);
-		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
 	}
 
 	@SuppressLint("NewApi")

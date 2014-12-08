@@ -6,7 +6,7 @@
     android:id="@+id/panel_order_payment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/activity_horizontal_margin_medium"
+    android:paddingBottom="@dimen/order_payment_padding_bottom"
     android:layout_gravity="bottom"
     android:visibility="gone"
     tools:showIn="@layout/fragment_order">
@@ -206,7 +206,7 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-        android:layout_marginBottom="@dimen/order_edit_title_margin"
+        android:layout_marginBottom="-24dp"
         android:text="@string/to_be_paid"/>
 
     <TextView
@@ -217,7 +217,7 @@
         android:layout_centerHorizontal="true"
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
-        android:layout_marginBottom="-16dp"
+        android:layout_marginBottom="-24dp"
         android:text="@string/title_plus_tips"
         android:visibility="gone"/>
 
