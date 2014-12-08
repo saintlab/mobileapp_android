@@ -41,7 +41,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	@Override
 	protected void startLoader() {
-		clearErrors();
+		clearErrors(true);
 
 		if (BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
 			// findTableForQr("http://www.riston.ru/wishes"); // mehico

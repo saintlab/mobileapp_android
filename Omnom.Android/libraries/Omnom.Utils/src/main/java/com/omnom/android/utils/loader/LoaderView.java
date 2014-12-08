@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -12,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RotateDrawable;
+import android.os.Build;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -29,6 +31,7 @@ import android.widget.ProgressBar;
 
 import com.omnom.android.utils.R;
 import com.omnom.android.utils.animation.BezierCubicInterpolation;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
@@ -187,20 +190,27 @@ public class LoaderView extends FrameLayout {
 		post(new Runnable() {
 			@Override
 			public void run() {
-				ValueAnimator colorAnimator = ValueAnimator.ofInt(startColor, endColor);
+				mImgLoader.getDrawable().mutate();
+
+				final ValueAnimator colorAnimator = ValueAnimator.ofInt(startColor, endColor);
 				colorAnimator.setDuration(duration);
 				colorAnimator.setEvaluator(new ArgbEvaluator());
 				colorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-				colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-					@Override
-					public void onAnimationUpdate(ValueAnimator animation) {
-						GradientDrawable sd = (GradientDrawable) mImgLoader.getDrawable();
-						currentColor = (Integer) animation.getAnimatedValue();
-						sd.mutate();
-						sd.setColor(currentColor);
-						sd.invalidateSelf();
-					}
-				});
+				if(AndroidUtils.isJellyBean()) {
+					colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+						@Override
+						public void onAnimationUpdate(ValueAnimator animation) {
+							setColor16((Integer) animation.getAnimatedValue());
+						}
+					});
+				} else {
+					colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+						@Override
+						public void onAnimationUpdate(ValueAnimator animation) {
+							setColor((Integer) animation.getAnimatedValue());
+						}
+					});
+				}
 				colorAnimator.start();
 			}
 		});
@@ -209,6 +219,14 @@ public class LoaderView extends FrameLayout {
 	public void setColor(final int color) {
 		final GradientDrawable sd = (GradientDrawable) mImgLoader.getDrawable();
 		sd.setColor(color);
+		currentColor = color;
+		sd.invalidateSelf();
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	public void setColor16(final int color) {
+		final GradientDrawable sd = (GradientDrawable) mImgLoader.getDrawable();
+		sd.setColors(new int[]{color, color});
 		currentColor = color;
 		sd.invalidateSelf();
 	}

@@ -236,12 +236,14 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		onBackPressed();
 	}
 
-	protected void clearErrors() {
+	protected void clearErrors(boolean animateLogo) {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-		if(mRestaurant == null) {
-			loader.animateLogo(R.drawable.ic_fork_n_knife);
-		} else {
-			loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
+		if(animateLogo) {
+			if(mRestaurant == null) {
+				loader.animateLogo(R.drawable.ic_fork_n_knife);
+			} else {
+				loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
+			}
 		}
 		if(bgTransitionDrawable.isTransitioned()) {
 			bgTransitionDrawable.reverseTransition();
@@ -379,7 +381,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
 				                    if(hasNoErrors) {
-					                    clearErrors();
+					                    clearErrors(false);
 					                    loadOrders(v);
 				                    } else {
 					                    startErrorTransition();
@@ -422,7 +424,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 									mErrorHelper.showNoOrders(new View.OnClickListener() {
 										@Override
 										public void onClick(View v) {
-											clearErrors();
+											clearErrors(true);
 											loader.animateLogoFast(mRestaurant.getDecoration().getLogo(),
 																   R.drawable.ic_bill_white);
 											loader.showProgress(false);
@@ -505,6 +507,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 						ViewUtils.setVisible(imgProfile, !mIsDemo);
 						ViewUtils.setVisible(txtLeave, mIsDemo);
 						loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
+						loader.showLogo();
 					}
 				});
 			}
