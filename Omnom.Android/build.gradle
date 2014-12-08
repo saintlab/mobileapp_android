@@ -15,6 +15,7 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenCentral()
         jcenter()
 	    maven { url 'https://raw.github.com/mvpotter/retrofit/mvn-repo/' }
     }
