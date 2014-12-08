@@ -497,16 +497,17 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(requestCode == REQUEST_CODE_ORDERS && resultCode == RESULT_OK) {
-			loader.scaleDown(null, new Runnable() {
-				@Override
-				public void run() {
-					ViewUtils.setVisible(getPanelBottom(), true);
-					ViewUtils.setVisible(imgProfile, !mIsDemo);
-					ViewUtils.setVisible(txtLeave, mIsDemo);
-					loader.animateLogoFast(mRestaurant.getDecoration().getLogo(),
-					                       R.drawable.ic_bill_white);
-				}
-			});
+			if(mRestaurant != null) {
+				loader.scaleDown(null, new Runnable() {
+					@Override
+					public void run() {
+						ViewUtils.setVisible(getPanelBottom(), true);
+						ViewUtils.setVisible(imgProfile, !mIsDemo);
+						ViewUtils.setVisible(txtLeave, mIsDemo);
+						loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
+					}
+				});
+			}
 		}
 	}
 
