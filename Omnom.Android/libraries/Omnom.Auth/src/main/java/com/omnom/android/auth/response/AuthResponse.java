@@ -18,6 +18,9 @@ public class AuthResponse {
 	}
 
 	@Expose
+	private String requestId;
+
+	@Expose
 	private String status;
 
 	@Expose
@@ -25,6 +28,14 @@ public class AuthResponse {
 
 	@Expose
 	private AuthError error;
+
+	public String getRequestId() {
+		return requestId;
+	}
+
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
+	}
 
 	public AuthError getError() {
 		return error;

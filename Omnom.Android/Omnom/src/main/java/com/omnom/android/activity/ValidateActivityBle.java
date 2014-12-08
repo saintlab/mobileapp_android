@@ -23,6 +23,7 @@ import java.util.List;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.Subscription;
@@ -45,6 +46,8 @@ public class ValidateActivityBle extends ValidateActivity {
 	private Subscription mValidateSubscribtion;
 
 	private Subscription mFindBeaconSubscription;
+
+	private Crouton mCrouton;
 
 	@Override
 	public void initUi() {
@@ -93,7 +96,7 @@ public class ValidateActivityBle extends ValidateActivity {
 
 	@Override
 	protected void startLoader() {
-		clearErrors();
+		clearErrors(true);
 
 		loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration), new Runnable() {
 			@Override

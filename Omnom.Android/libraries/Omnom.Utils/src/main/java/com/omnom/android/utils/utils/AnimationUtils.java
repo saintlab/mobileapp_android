@@ -113,7 +113,7 @@ public class AnimationUtils {
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
-	private static ValueAnimator prepareTranslation(final Iterable<View> views, final Runnable endCallback, AnimationBuilder builder) {
+	public static ValueAnimator prepareTranslation(final Iterable<View> views, final Runnable endCallback, AnimationBuilder builder) {
 		return builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
 			public void invoke(ValueAnimator animation1) {

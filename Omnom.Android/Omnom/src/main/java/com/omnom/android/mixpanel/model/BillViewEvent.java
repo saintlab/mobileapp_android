@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
+import com.omnom.android.utils.utils.AmountHelper;
 
 /**
  * Created by mvpotter on 21/11/14.
@@ -22,9 +23,11 @@ public final class BillViewEvent implements Event {
 	private UserData user;
 	@Expose
 	private int amount;
+	@Expose
+	private String requestId;
 
 	public BillViewEvent(String restaurantId, BeaconFindRequest beacon,
-	                     UserData user, double amount) {
+	                     UserData user, double amount, String requestId) {
 		String beaconStr = beacon == null ? null :
 											String.format(BEACON_FORMAT, beacon.getUuid(),
 																		 beacon.getMajor(),
@@ -32,7 +35,8 @@ public final class BillViewEvent implements Event {
 		this.restaurantId = restaurantId;
 		this.beacon = beaconStr;
 		this.user = user;
-		this.amount = (int)(amount * 100);
+		this.amount = AmountHelper.toInt(amount);
+		this.requestId = requestId;
 	}
 
 	@Override
@@ -56,4 +60,7 @@ public final class BillViewEvent implements Event {
 		return user;
 	}
 
+	public String getRequestId() {
+		return requestId;
+	}
 }

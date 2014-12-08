@@ -269,7 +269,11 @@ public class BackgroundBleService extends Service {
 				.setPriority(Notification.PRIORITY_HIGH).build();
 
 		final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		notificationManager.notify(beacon.getId3().toInt(), notification);
+		final String uuid = beacon.getIdValue(0);
+		// Do not show notification multiple times for single restaurant
+		// final String tableId = beacon.getIdValue(2);
+		// notificationManager.notify(uuid, tableId, notification);
+		notificationManager.notify(uuid, 0, notification);
 	}
 
 	private PendingIntent getNotificationIntent() {

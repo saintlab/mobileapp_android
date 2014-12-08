@@ -12,12 +12,15 @@ import com.omnom.android.adapter.OrdersPagerAdaper;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.socket.event.PaymentSocketEvent;
+import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.OrdersViewPager;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
@@ -34,9 +37,11 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	public static final String TAG_SWITCHER_DELIMITER = ":";
 
-	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, final String bgColor, int code, boolean isDemo) {
+	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, String requestId,
+	                         final String bgColor, int code, boolean isDemo) {
 		final Intent intent = new Intent(activity, OrdersActivity.class);
 		intent.putParcelableArrayListExtra(OrdersActivity.EXTRA_ORDERS, orders);
+		intent.putExtra(OrdersActivity.EXTRA_REQUEST_ID, requestId);
 		intent.putExtra(OrdersActivity.EXTRA_ACCENT_COLOR, bgColor);
 		intent.putExtra(OrdersActivity.EXTRA_DEMO_MODE, isDemo);
 		activity.startActivityForResult(intent, code);
@@ -61,15 +66,26 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	private ArrayList<Order> orders = null;
 
+	private String requestId;
+
 	private int bgColor;
 
 	private int margin;
 
 	private boolean mDemo;
 
+	private PaymentEventListener mPaymentListener;
+
+	@Subscribe
+	public void onPayment(PaymentSocketEvent event) {
+		// payment handling logic
+	}
+
 	@Override
 	public void initUi() {
-		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, bgColor);
+		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, requestId, bgColor);
+		mPaymentListener = new PaymentEventListener(this);
+		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, requestId, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 6);
 		mPager.setPageMargin(margin);
@@ -81,8 +97,32 @@ public class OrdersActivity extends BaseFragmentActivity {
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		if(orders.size() > 0) {
+			final Order order = orders.get(0);
+			if(order != null) {
+				mPaymentListener.initTableSocket(order.getTableId());
+			}
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mPaymentListener.onPause();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mPaymentListener.onDestroy();
+	}
+
+	@Override
 	protected void handleIntent(Intent intent) {
 		orders = intent.getParcelableArrayListExtra(EXTRA_ORDERS);
+		requestId = intent.getStringExtra(EXTRA_REQUEST_ID);
 		final String colorStr = intent.getStringExtra(EXTRA_ACCENT_COLOR);
 		bgColor = RestaurantHelper.getBackgroundColor(colorStr);
 		mDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
@@ -129,7 +169,11 @@ public class OrdersActivity extends BaseFragmentActivity {
 	}
 
 	public int getOrdersCount() {
-		return mPagerAdapter.getCount();
+		int count = 0;
+		if (mPagerAdapter != null) {
+			count = mPagerAdapter.getCount();
+		}
+		return count;
 	}
 
 	public void close() {
@@ -148,8 +192,8 @@ public class OrdersActivity extends BaseFragmentActivity {
 	}
 
 	public ObjectAnimator getFragmentAnimation(int pos, boolean show) {
-		final OrderFragment fragment = (OrderFragment) getSupportFragmentManager().findFragmentByTag(
-				TAG_ANDROID_SWITCHER + mPager.getId() + TAG_SWITCHER_DELIMITER + mPagerAdapter.getItemId(pos));
+		final OrderFragment fragment = (OrderFragment) getSupportFragmentManager()
+				.findFragmentByTag(TAG_ANDROID_SWITCHER + mPager.getId() + TAG_SWITCHER_DELIMITER + mPagerAdapter.getItemId(pos));
 		if(fragment != null) {
 			final View view = fragment.getFragmentView();
 			final int startAlpha = show ? 0 : 1;

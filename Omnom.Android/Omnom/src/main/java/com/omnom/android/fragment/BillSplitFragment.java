@@ -42,6 +42,10 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 public class BillSplitFragment extends Fragment {
 	public static final String TAG = BillSplitFragment.class.getSimpleName();
 
+	public static final int SPLIT_TYPE_PERSON = 1;
+
+	public static final int SPLIT_TYPE_ITEMS = 2;
+
 	private static final String ARG_ORDER = "order";
 
 	private static final String ARG_STATES = "states";
@@ -125,8 +129,9 @@ public class BillSplitFragment extends Fragment {
 			@Override
 			public void onClick(final View v) {
 				final BigDecimal tag = (BigDecimal) mBtnCommit.getTag(R.id.edit_amount);
+				final int tagSplitType = (Integer) mBtnCommit.getTag(R.id.split_type);
 				if(tag != null) {
-					mBus.post(new OrderSplitCommitEvent(mOrder.getId(), tag));
+					mBus.post(new OrderSplitCommitEvent(mOrder.getId(), tag, tagSplitType));
 					hide();
 				}
 			}
@@ -177,6 +182,7 @@ public class BillSplitFragment extends Fragment {
 		final ObjectAnimator scaleX = ObjectAnimator.ofFloat(mFragmentView, View.TRANSLATION_X, mFragmentView.getTranslationX(),
 		                                                     getResources().getDisplayMetrics().widthPixels);
 
+		// FIXME: Hardcoded tag!
 		final View order_page_0 = getActivity().getWindow().getDecorView().findViewWithTag("order_page_0");
 		if(order_page_0 != null) {
 			order_page_0.setTranslationX(-200);

@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
+import com.omnom.android.utils.utils.AmountHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -234,7 +235,7 @@ public class Order implements Parcelable {
 	}
 
 	public double getPaidAmount() {
-		return (double) (paidAmount - paidTip) / 100;
+		return AmountHelper.toDouble(paidAmount - paidTip);
 	}
 
 	public void setPaidAmount(int paidAmount) {
@@ -272,7 +273,7 @@ public class Order implements Parcelable {
 	}
 
 	public double getPaidTip() {
-		return (double) paidTip / 100;
+		return AmountHelper.toDouble(paidTip);
 	}
 
 	public void setPaidTip(int paidTip) {

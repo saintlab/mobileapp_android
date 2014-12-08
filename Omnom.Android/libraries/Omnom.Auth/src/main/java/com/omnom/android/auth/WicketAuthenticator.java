@@ -9,6 +9,7 @@ import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.auth.retrofit.AuthRxSupport;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
@@ -29,6 +30,7 @@ public class WicketAuthenticator implements AuthService {
 		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		final RestAdapter mRestAdapter = new RestAdapter.Builder()
+				.setRxSupport(new AuthRxSupport())
 				.setEndpoint(endpoint)
 				.setLogLevel(logLevel).setConverter(new GsonConverter(gson)).build();
 		authService = mRestAdapter.create(AuthService.class);

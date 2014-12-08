@@ -7,6 +7,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -16,6 +17,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.omnom.android.utils.R;
@@ -96,6 +98,8 @@ public class ErrorEdit extends LinearLayout {
 
 	private int mMaxLen;
 
+	private float mEditTextWidth;
+
 	private int mImeOptions;
 
 	public ErrorEdit(Context context) {
@@ -131,6 +135,7 @@ public class ErrorEdit extends LinearLayout {
 			mImeOptions = a.getInt(R.styleable.ErrorEdit_imeOptions, EditorInfo.IME_ACTION_NONE);
 			mTextGravity = a.getInt(R.styleable.ErrorEdit_textGravity, GRAVITY_LEFT);
 			mMaxLen = a.getInt(R.styleable.ErrorEdit_maxLength, 0);
+			mEditTextWidth = a.getDimension(R.styleable.ErrorEdit_editTextWidth, TableRow.LayoutParams.MATCH_PARENT);
 			mTextSize = a.getDimension(R.styleable.ErrorEdit_textSize, getResources().getDimension(R.dimen.font_medium));
 			mErrorTextSize = a.getDimension(R.styleable.ErrorEdit_errorTextSize, getResources().getDimension(R.dimen.font_medium));
 		} finally {
@@ -145,6 +150,8 @@ public class ErrorEdit extends LinearLayout {
 		editView.addTextChangedListener(onTextChanged);
 		editView.setHint(mHintText);
 		editView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
+		editView.setLayoutParams(new TableRow.LayoutParams((int) mEditTextWidth,
+														   TableRow.LayoutParams.WRAP_CONTENT));
 		if(mMaxLen > 0) {
 			final InputFilter[] filters = editView.getFilters();
 			final InputFilter[] newFilters = Arrays.copyOf(filters, filters.length + 1);
@@ -244,8 +251,9 @@ public class ErrorEdit extends LinearLayout {
 		setError(getResources().getString(strId));
 	}
 
-	public void setError(final String msg) {
+	public void setError(final CharSequence msg) {
 		errorTextView.setText(msg);
+		errorTextView.setMovementMethod(LinkMovementMethod.getInstance());
 		editView.setError(true);
 		ViewUtils.setVisible(errorTextView, true);
 	}

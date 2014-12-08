@@ -4,26 +4,41 @@ import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.MerchantData;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.fragment.PayOnceFragment;
 import com.omnom.android.restaurateur.model.UserProfile;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
@@ -41,16 +56,23 @@ import rx.functions.Action1;
 import static butterknife.ButterKnife.findById;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
-public class CardConfirmActivity extends BaseOmnomActivity {
+public class CardConfirmActivity extends BaseOmnomFragmentActivity
+							     implements PayOnceFragment.OnPayListener,
+											PayOnceFragment.VisibilityListener {
+
+	private static final String TAG = CardConfirmActivity.class.getSimpleName();
+
 	private static final int TYPE_ADD_CONFIRM = 0;
 
 	private static final int TYPE_CONFIRM = 1;
 
 	@SuppressLint("NewApi")
-	public static void startAddConfirm(BaseOmnomActivity activity, final CardInfo card, int code) {
+	public static void startAddConfirm(BaseOmnomActivity activity, final CardInfo card, int code,
+	                                   double amount) {
 		final Intent intent = new Intent(activity, CardConfirmActivity.class);
 		intent.putExtra(EXTRA_CARD_DATA, card);
 		intent.putExtra(EXTRA_TYPE, TYPE_ADD_CONFIRM);
+		intent.putExtra(EXTRA_ORDER_AMOUNT, amount);
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
 			                                                    R.anim.slide_in_right,
@@ -62,10 +84,12 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 	}
 
 	@SuppressLint("NewApi")
-	public static void startConfirm(BaseOmnomActivity activity, final CardInfo card, int code) {
+	public static void startConfirm(BaseOmnomActivity activity, final CardInfo card, int code,
+	                                double amount) {
 		final Intent intent = new Intent(activity, CardConfirmActivity.class);
 		intent.putExtra(EXTRA_CARD_DATA, card);
 		intent.putExtra(EXTRA_TYPE, TYPE_CONFIRM);
+		intent.putExtra(EXTRA_ORDER_AMOUNT, amount);
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
 			                                                    R.anim.slide_in_right,
@@ -85,6 +109,9 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 	@InjectView(R.id.txt_info)
 	protected TextView mTextInfo;
 
+	@InjectView(R.id.transparent_panel)
+	protected FrameLayout transparentPanel;
+
 	@Inject
 	protected Acquiring mAcquiring;
 
@@ -94,7 +121,9 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 
 	private UserData mUser;
 
-	private MerchantData mMerchant;
+	private AcquiringData mAcquiringData;
+
+	private double mAmount;
 
 	private View.OnClickListener mVerifyClickListener = new View.OnClickListener() {
 		@Override
@@ -114,10 +143,23 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 
 	private int mType;
 
+	private Fragment payOnceFragment;
+
+	private boolean isKeyboardVisible = false;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		if (savedInstanceState == null) {
+			payOnceFragment = PayOnceFragment.newInstance(mAmount);
+		}
+	}
+
 	@Override
 	protected void handleIntent(final Intent intent) {
 		mCard = intent.getParcelableExtra(EXTRA_CARD_DATA);
 		mType = intent.getIntExtra(EXTRA_TYPE, TYPE_ADD_CONFIRM);
+		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);
 	}
 
 	@Override
@@ -126,7 +168,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 		mEditAmount.getEditText().setEnabled(false);
 		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		mUser = UserData.create(mUserProfile.getUser());
-		mMerchant = new MerchantData(getActivity());
+		mAcquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		mPanelTop.setTitleBig(R.string.card_binding);
 		mPanelTop.setButtonRightEnabled(false);
 		mPanelTop.setButtonRight(R.string.ready, mVerifyClickListener);
@@ -145,6 +187,19 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 			mEditAmount.getEditText().setEnabled(true);
 			mPanelTop.setButtonRightEnabled(true);
 		}
+		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+		addKeyboardListener(activityRootView);
+	}
+
+	private void addKeyboardListener(View activityRootView) {
+		ViewTreeObserver.OnGlobalLayoutListener listener =
+				AndroidUtils.createKeyboardListener(activityRootView, new AndroidUtils.KeyboardVisibilityListener() {
+					@Override
+					public void onVisibilityChanged(boolean isVisible) {
+						isKeyboardVisible = isVisible;
+					}
+				});
+		activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(listener);
 	}
 
 	private void initAmount() {
@@ -213,11 +268,11 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 
 	private void registerCard() {
 		mPanelTop.showProgress(true);
-		final MerchantData merchant = new MerchantData(getActivity());
+		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		com.omnom.android.auth.UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		final UserData user = UserData.create(String.valueOf(wicketUser.getId()), wicketUser.getPhone());
 		mCardRegisterSubscription = AndroidObservable.bindActivity(this,
-		                                                           mAcquiring.registerCard(merchant, user, mCard)
+		                                                           mAcquiring.registerCard(acquiringData, user, mCard)
 		                                                                     .delaySubscription(1000, TimeUnit.MILLISECONDS)
 		                                                          )
 		                                             .subscribe(
@@ -236,6 +291,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 				                                             }, new Action1<Throwable>() {
 					                                             @Override
 					                                             public void call(final Throwable throwable) {
+						                                             Log.w(TAG, throwable.getMessage());
 						                                             ViewUtils.setVisible(mTextInfo, false);
 						                                             mPanelTop.showProgress(false);
 						                                             mEditAmount.setError(R.string.something_went_wrong_try_agint);
@@ -256,8 +312,14 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 		mPanelTop.showProgress(true);
 		final ErrorEdit text = findById(this, R.id.edit_amount);
 		final String filterAmount = StringUtils.filterAmount(text.getText());
-		final double amount = Double.parseDouble(filterAmount);
-		mCardVerifySubscribtion = AndroidObservable.bindActivity(this, mAcquiring.verifyCard(mMerchant, mUser, mCard, amount))
+		double amount;
+		try {
+			amount = Double.parseDouble(filterAmount);
+		} catch (NumberFormatException e) {
+			Log.d(TAG, "Invalid double value: \"" + filterAmount + "\"");
+			amount = 0;
+		}
+		mCardVerifySubscribtion = AndroidObservable.bindActivity(this, mAcquiring.verifyCard(mAcquiringData, mUser, mCard, amount))
 		                                           .subscribe(new Action1<AcquiringResponse>() {
 			                                           @Override
 			                                           public void call(AcquiringResponse response) {
@@ -272,15 +334,85 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 		                                           }, new Action1<Throwable>() {
 			                                           @Override
 			                                           public void call(Throwable throwable) {
+				                                           Log.w(TAG, throwable.getMessage());
 				                                           onVerificationError();
 			                                           }
 		                                           });
 	}
 
 	private void onVerificationError() {
+		ViewUtils.setVisible(mTextInfo, false);
 		mPanelTop.showProgress(false);
 		mPanelTop.setButtonRight(R.string.repeat, mVerifyClickListener);
-		showToast(getActivity(), "VERIFICATION ERROR");
+		mEditAmount.setError(getWrongChecksumMessage());
+	}
+
+	private SpannableString getWrongChecksumMessage() {
+		SpannableString spannableString = new SpannableString(getResources().getString(R.string.wrong_checksum));
+		ForegroundColorSpan colorSpan = new ForegroundColorSpan(getResources().getColor(R.color.link_color));
+		ClickableSpan clickableSpan = new ClickableSpan() {
+			@Override
+			public void onClick(View widget) {
+				if (!isKeyboardVisible) {
+					showPayOnceFragment();
+				} else {
+					AndroidUtils.hideKeyboard(mEditAmount.getEditText(), new ResultReceiver(new Handler()) {
+						@Override
+						protected void onReceiveResult(int resultCode, Bundle resultData) {
+							super.onReceiveResult(resultCode, resultData);
+							if (resultCode == InputMethodManager.RESULT_HIDDEN ||
+									resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN) {
+								showPayOnceFragment();
+							}
+						}
+					});
+				}
+			}
+		};
+		int noSmsLength = getResources().getString(R.string.no_sms).length();
+		spannableString.setSpan(clickableSpan, spannableString.length() - noSmsLength, spannableString.length(),
+				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		spannableString.setSpan(colorSpan, spannableString.length() - noSmsLength, spannableString.length(),
+				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		return spannableString;
+	}
+
+	private void showPayOnceFragment() {
+		mEditAmount.getEditText().setEnabled(false);
+		getSupportFragmentManager().beginTransaction()
+				.addToBackStack(null)
+				.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
+									 R.anim.slide_in_up, R.anim.slide_out_down)
+				.add(R.id.fragment_container, payOnceFragment)
+				.commit();
+		AnimationUtils.animateAlpha(transparentPanel, true);
+	}
+
+	@Override
+	public void pay() {
+		setResult(CardsActivity.RESULT_PAY);
+		finish();
+	}
+
+	@Override
+	public void onVisibilityChanged(boolean isVisible) {
+		if (!isVisible) {
+			AndroidUtils.showKeyboard(mEditAmount.getEditText());
+		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (payOnceFragment != null && payOnceFragment.isVisible()) {
+			mEditAmount.getEditText().setEnabled(true);
+			AnimationUtils.animateAlpha(transparentPanel, false);
+			getSupportFragmentManager().beginTransaction()
+					.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
+									     R.anim.slide_in_up, R.anim.slide_out_down)
+					.detach(payOnceFragment)
+					.commit();
+		}
+		super.onBackPressed();
 	}
 
 	@Override
@@ -293,6 +425,7 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 	@Override
 	public void finish() {
 		super.finish();
+		AndroidUtils.hideKeyboard(mEditAmount.getEditText());
 		overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 	}
 
@@ -300,4 +433,5 @@ public class CardConfirmActivity extends BaseOmnomActivity {
 	public int getLayoutResource() {
 		return R.layout.activity_card_confirm;
 	}
+
 }

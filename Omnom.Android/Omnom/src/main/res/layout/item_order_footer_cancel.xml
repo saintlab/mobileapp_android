@@ -34,7 +34,7 @@
             android:textAppearance="?android:textAppearanceMedium"
             android:singleLine="true"
             android:ellipsize="end"
-            android:textColor="#b0b0b0"
+            android:textColor="@color/order_content_unselected"
             android:text="Отменить"/>
 
         <TextView

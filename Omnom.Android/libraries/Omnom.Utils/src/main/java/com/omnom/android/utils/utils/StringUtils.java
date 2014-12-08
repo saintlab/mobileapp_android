@@ -1,6 +1,7 @@
 package com.omnom.android.utils.utils;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.math.BigDecimal;
 
@@ -15,6 +16,8 @@ public class StringUtils {
 	public static final String CURRENCY_DELIMITER = ".";
 
 	public static final String WHITESPACE = " ";
+
+	private static final String TAG = StringUtils.class.getSimpleName();
 
 	public static String concat(String delimiter, String... data) {
 		final StringBuilder sb = new StringBuilder();
@@ -98,5 +101,14 @@ public class StringUtils {
 			}
 		}
 		return false;
+	}
+
+	public static int toInt(final String str) {
+		try {
+			return Integer.valueOf(str);
+		} catch(NumberFormatException e) {
+			Log.e(TAG, "Unable to convert " + str + " to int");
+			return 0;
+		}
 	}
 }

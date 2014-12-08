@@ -5,11 +5,10 @@ import android.content.Context;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.api.PaymentInfo;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.MerchantData;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.acquiring.mailru.model.PaymentInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
@@ -39,23 +38,23 @@ public class AcquiringMailRu implements Acquiring {
 	}
 
 	@Override
-	public Observable<AcquiringResponse> pay(MerchantData merchant, PaymentInfo paymentInfo) {
+	public Observable<AcquiringResponse> pay(final AcquiringData acquiringData, final PaymentInfo paymentInfo) {
 		final PaymentInfoMailRu info = (PaymentInfoMailRu) paymentInfo;
 		if(info == null) {
 			throw new RuntimeException("PaymentInfo is null or not a PaymentInfoMailRu");
 		}
 		final HashMap<String, String> signatureParams = new HashMap<String, String>();
-		merchant.toMap(signatureParams);
+		acquiringData.getMerchantData().toMap(signatureParams);
 		info.getUser().storeLogin(signatureParams);
 		signatureParams.put("order_id", info.getOrderId());
 		signatureParams.put("order_amount", Double.toString(info.getOrderAmount()));
 		signatureParams.put("order_message", info.getOrderMessage());
 		signatureParams.put("extra", info.getExtra().getExtra(gson));
-		final String signature = EncryptionUtils.getSignature(mContext.getString(R.string.acquiring_mailru_secret_key), signatureParams);
+		final String signature = EncryptionUtils.getSignature(acquiringData.getSecretKey(), signatureParams);
 
 		final HashMap<String, String> parameters = signatureParams;
 		parameters.put("signature", signature);
-		parameters.put("cardholder", mContext.getString(R.string.acquiring_mailru_cardholder));
+		parameters.put("cardholder", acquiringData.getCardHolder());
 		parameters.putAll(info.getCardInfo().getCardInfoMap());
 		info.getUser().storePhone(parameters);
 
@@ -68,12 +67,12 @@ public class AcquiringMailRu implements Acquiring {
 	}
 
 	@Override
-	public Observable<AcquiringResponse> deleteCard(MerchantData merchant, UserData user, CardInfo cardInfo) {
+	public Observable<AcquiringResponse> deleteCard(AcquiringData acquiringData, UserData user, CardInfo cardInfo) {
 		final HashMap<String, String> signatureParams = new HashMap<String, String>();
-		merchant.toMap(signatureParams);
+		acquiringData.getMerchantData().toMap(signatureParams);
 		user.storeLogin(signatureParams);
 		cardInfo.storeCardId(signatureParams);
-		final String signature = EncryptionUtils.getSignature(mContext.getString(R.string.acquiring_mailru_secret_key), signatureParams);
+		final String signature = EncryptionUtils.getSignature(acquiringData.getSecretKey(), signatureParams);
 
 		final HashMap<String, String> parameters = signatureParams;
 		parameters.put("signature", signature);
@@ -82,13 +81,13 @@ public class AcquiringMailRu implements Acquiring {
 	}
 
 	@Override
-	public Observable<AcquiringResponse> verifyCard(MerchantData merchant, UserData user, CardInfo cardInfo, double amount) {
+	public Observable<AcquiringResponse> verifyCard(AcquiringData acquiringData, UserData user, CardInfo cardInfo, double amount) {
 		final HashMap<String, String> signatureParams = new HashMap<String, String>();
-		merchant.toMap(signatureParams);
+		acquiringData.getMerchantData().toMap(signatureParams);
 		user.storeLogin(signatureParams);
 		cardInfo.storeCardId(signatureParams);
 
-		final String signature = EncryptionUtils.getSignature(mContext.getString(R.string.acquiring_mailru_secret_key), signatureParams);
+		final String signature = EncryptionUtils.getSignature(acquiringData.getSecretKey(), signatureParams);
 
 		final HashMap<String, String> parameters = signatureParams;
 		parameters.put("signature", signature);
@@ -98,11 +97,11 @@ public class AcquiringMailRu implements Acquiring {
 	}
 
 	@Override
-	public Observable<CardRegisterPollingResponse> registerCard(final MerchantData merchant, UserData user, final CardInfo cardInfo) {
+	public Observable<CardRegisterPollingResponse> registerCard(AcquiringData acquiringData, UserData user, final CardInfo cardInfo) {
 		HashMap<String, String> reqiredSignatureParams = new HashMap<String, String>();
-		merchant.toMap(reqiredSignatureParams);
+		acquiringData.getMerchantData().toMap(reqiredSignatureParams);
 		user.storeLogin(reqiredSignatureParams);
-		final String signature = EncryptionUtils.getSignature(mContext.getString(R.string.acquiring_mailru_secret_key),
+		final String signature = EncryptionUtils.getSignature(acquiringData.getSecretKey(),
 		                                                      reqiredSignatureParams);
 		final HashMap<String, String> parameters = reqiredSignatureParams;
 		user.storePhone(parameters);

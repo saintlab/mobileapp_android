@@ -4,12 +4,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/txt_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@android:color/white"
+        android:textAppearance="?android:textAppearanceLarge"
+        omnom:fontPath="fonts/Futura-OSF-Omnom-Medium.otf"
+        android:textSize="@dimen/font_xlarge"/>
+
     <ViewStub
         android:id="@+id/stub_payment_options"
         android:inflatedId="@+id/panel_order_payment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/activity_horizontal_margin_medium"
+        android:layout_height="300dp"
+        android:paddingBottom="@dimen/order_payment_padding_bottom"
         android:layout_gravity="bottom" />
 
     <com.omnom.android.utils.view.NumberPicker
@@ -27,7 +37,6 @@
         android:layout_height="@dimen/order_items_list_height_collapsed"
         android:layout_marginTop="48dp"
         android:layout_gravity="top"
-        android:layout_alignParentBottom="true"
         android:stackFromBottom="true"
         android:divider="@android:color/white"
         android:dividerHeight="1dp"
@@ -36,23 +45,13 @@
         android:scrollbars="none"
         android:scrollingCache="false"
         android:animationCache="false"
-        android:smoothScrollbar="true"/>
+        android:smoothScrollbar="true" />
 
     <com.omnom.android.view.HeaderView
         android:id="@+id/panel_top"
         android:layout_width="match_parent"
         android:layout_height="@dimen/view_size_default"
         android:background="@color/list_header"
-        android:padding="@dimen/activity_horizontal_margin_small"/>
-
-    <TextView
-        android:id="@+id/txt_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textColor="@android:color/white"
-        android:textAppearance="?android:textAppearanceLarge"
-        omnom:fontPath="fonts/Futura-OSF-Omnom-Medium.otf"
-        android:textSize="@dimen/font_xlarge"/>
+        android:padding="@dimen/activity_horizontal_margin_small" />
 
 </FrameLayout>

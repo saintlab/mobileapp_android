@@ -31,7 +31,6 @@ import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
-import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
 
@@ -178,7 +177,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 			final int padding = ViewUtils.dipToPixels(this, 24);
 			mImgUser.setPadding(padding, padding, padding, padding);
 		} else {
-			Picasso.with(this).load(url).placeholder(getPlaceholderDrawable(dimension))
+			OmnomApplication.getPicasso(this).load(url).placeholder(getPlaceholderDrawable(dimension))
 			       .resize(dimension, dimension).centerCrop()
 			       .transform(RoundTransformation.create(dimension, 0)).into(mImgUser);
 		}

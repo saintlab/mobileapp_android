@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -23,7 +24,6 @@ import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 import android.view.ViewStub;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -142,6 +142,8 @@ public class OrderFragment extends Fragment {
 
 	private static final String ARG_ORDER = "order";
 
+	private static final String ARG_REQUEST_ID = "request_id";
+
 	private static final String ARG_COLOR = "color";
 
 	private static final String ARG_POSITION = "position";
@@ -150,11 +152,12 @@ public class OrderFragment extends Fragment {
 
 	private static final String ARG_SINGLE = "single";
 
-	public static Fragment newInstance(Order order, final int bgColor, final int postition, final boolean animate,
-	                                   final boolean isSingle) {
+	public static Fragment newInstance(Order order, String requestId, final int bgColor,
+	                                   final int postition, final boolean animate, final boolean isSingle) {
 		final OrderFragment fragment = new OrderFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, order);
+		args.putString(ARG_REQUEST_ID, requestId);
 		args.putInt(ARG_COLOR, bgColor);
 		args.putInt(ARG_POSITION, postition);
 		args.putBoolean(ARG_ANIMATE, animate);
@@ -237,6 +240,8 @@ public class OrderFragment extends Fragment {
 	private RadioGroup radioGroup;
 
 	private Order mOrder;
+
+	private String mRequestId;
 
 	private boolean mCurrentKeyboardVisility = false;
 
@@ -345,13 +350,37 @@ public class OrderFragment extends Fragment {
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
 		mFontSmall = getResources().getDimension(R.dimen.font_large);
 
-		mListTrasnlationActive = getResources().getDimensionPixelSize(R.dimen.order_list_trasnlation_active);
 		mPaymentTranslationY = getResources().getDimensionPixelSize(R.dimen.order_payment_translation_y);
 		mTipsTranslationY = getResources().getDimensionPixelSize(R.dimen.order_tips_translation_y);
-		mListHeight = getResources().getDimensionPixelSize(R.dimen.order_list_height);
+
+		configureSizing();
 
 		ButterKnife.inject(this, view);
 		return view;
+	}
+
+	private void configureSizing() {
+		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+		final int heightPixels = displayMetrics.heightPixels;
+
+		final int defaultPadding = ViewUtils.dipToPixels(getActivity(), 48);
+		final boolean hasNavigationBar = AndroidUtils.hasNavigationBar(getActivity());
+		mListHeight = heightPixels - defaultPadding - (hasNavigationBar ? defaultPadding : 0);
+
+		final int bottomMin = getResources().getDimensionPixelSize(R.dimen.order_payment_height);
+		final int i = mListHeight / 2;
+		if(i < bottomMin) {
+			mListTrasnlationActive = (-mListHeight / 2) - (bottomMin - i);
+		} else {
+			mListTrasnlationActive = -mListHeight / 2;
+		}
+
+		// TODO: Find out generic solution for small devices like megafon login 1
+		if(displayMetrics.densityDpi == DisplayMetrics.DENSITY_MEDIUM) {
+			final int mdpiPadding = ViewUtils.dipToPixels(getActivity(), 72);
+			mListHeight -= mdpiPadding;
+			mListTrasnlationActive += mdpiPadding;
+		}
 	}
 
 	private AnimatorSet getListClickAnimator(float scaleRation, int listTranslation) {
@@ -384,7 +413,11 @@ public class OrderFragment extends Fragment {
 		final View panelPayment = findById(mFragmentView, R.id.panel_order_payment);
 		if(panelPayment == null) {
 			stubPaymentOptions.setLayoutResource(R.layout.view_order_payment_options);
-			View inflate = stubPaymentOptions.inflate();
+
+			final ViewGroup inflate = (ViewGroup) stubPaymentOptions.inflate();
+
+			AndroidUtils.applyFont(getActivity(), inflate, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+
 			editAmount = (EditText) inflate.findViewById(R.id.edit_payment_amount);
 			txtCustomTips = (TextView) inflate.findViewById(R.id.txt_custom_tips);
 			txtPaymentTitle = (TextView) inflate.findViewById(R.id.txt_payment_title);
@@ -462,7 +495,7 @@ public class OrderFragment extends Fragment {
 		mFragmentView.setTag("order_page_" + mPosition);
 
 		final String billText = getString(R.string.bill_number_, mPosition + 1);
-		if (((OrdersActivity) getActivity()).getOrdersCount() > 1) {
+		if(((OrdersActivity) getActivity()).getOrdersCount() > 1) {
 			mHeader.setTitleBig(billText, R.drawable.bg_card_title, new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -502,8 +535,16 @@ public class OrderFragment extends Fragment {
 
 	private void initList() {
 		list.setAdapter(new OrderItemsAdapter(getActivity(), mOrder.getItems(), true));
+
+		if(mAnimate) {
+			ViewUtils.setHeight(list, mListHeight);
+			//AnimationUtils.scaleHeight(list, mListHeight);
+		} else {
+			ViewUtils.setHeight(list, mListHeight);
+		}
+		// AndroidUtils.scrollEnd(list);
+
 		list.setScrollingEnabled(false);
-		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 
 		list.setSwipeEnabled(false);
 		list.setSwipeListener(new OmnomListView.SwipeListener() {
@@ -512,11 +553,6 @@ public class OrderFragment extends Fragment {
 				splitBill();
 			}
 		});
-		if(mAnimate) {
-			AnimationUtils.scaleHeight(list, mListHeight);
-		} else {
-			ViewUtils.setHeight(list, mListHeight);
-		}
 
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -535,7 +571,8 @@ public class OrderFragment extends Fragment {
 
 	private void zoomInFragment(final OrdersActivity activity) {
 		OmnomApplication application = OmnomApplication.get(getActivity());
-		sendBillViewEvent(application.getUserProfile().getUser(), application.getBeacon(), mOrder);
+		sendBillViewEvent(application.getUserProfile().getUser(), application.getBeacon(),
+						  mOrder, mRequestId);
 		if(mFooterView1 != null) {
 			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
 			ViewUtils.setVisible(billSplit, true);
@@ -557,9 +594,10 @@ public class OrderFragment extends Fragment {
 		return list.getTranslationY() == 0;
 	}
 
-	private void sendBillViewEvent(UserData user, BeaconFindRequest beacon, Order order) {
-		Event billViewEvent = new BillViewEvent(order.getRestaurantId(), beacon,
-		                                        user, order.getAmountToPay());
+	private void sendBillViewEvent(UserData user, BeaconFindRequest beacon, Order order,
+	                               String requestId) {
+		Event billViewEvent = new BillViewEvent(order.getRestaurantId(), beacon, user,
+												order.getAmountToPay(), requestId);
 		OmnomApplication.getMixPanelHelper(getActivity()).track(billViewEvent);
 	}
 
@@ -597,7 +635,7 @@ public class OrderFragment extends Fragment {
 			}
 		});
 		txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(mOrder.getPaidAmount(), getCurrencySuffix())));
-		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
+		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay(), getCurrencySuffix()));
 		editAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -943,6 +981,7 @@ public class OrderFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
+			mRequestId = getArguments().getString(ARG_REQUEST_ID);
 			mAccentColor = getArguments().getInt(ARG_COLOR);
 			mAnimate = getArguments().getBoolean(ARG_ANIMATE, false);
 			mSingle = getArguments().getBoolean(ARG_SINGLE, false);

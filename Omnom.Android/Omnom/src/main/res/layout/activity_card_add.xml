@@ -110,6 +110,16 @@
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
     </RelativeLayout>
 
+    <CheckBox
+        android:id="@+id/check_save_card"
+        android:layout_width="@dimen/card_frame_width"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/panel_card"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:text="@string/save_card_data"
+        android:textColor="@color/profile_hint"/>
+
     <include
         layout="@layout/view_cards_footer"
         android:layout_width="wrap_content"

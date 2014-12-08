@@ -2,6 +2,7 @@ package com.omnom.android.restaurateur.api;
 
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
+import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
@@ -9,7 +10,7 @@ import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
-import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
@@ -57,8 +58,8 @@ public interface RestaurateurDataService {
 	Observable<Restaurant> getMenu(@Path(Protocol.FIELD_ID) String restaurantId);
 
 	@GET("/restaurants/{restaurant_id}/tables/{table_id}/orders")
-	Observable<List<Order>> getOrders(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
-	                                  @Path(Protocol.FIELD_TABLE_ID) String tableId);
+	Observable<OrdersResponse> getOrders(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
+	                                     @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@POST("/restaurants/{restaurant_id}/tables/{table_id}/new/guest")
 	Observable<ResponseBase> newGuest(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
@@ -74,6 +75,9 @@ public interface RestaurateurDataService {
 	Observable<Restaurant> link(@Path(Protocol.FIELD_ORDER_ID) long orderId,
 	                            @Path(Protocol.FIELD_AMOUNT) double amount,
 	                            @Path(Protocol.FIELD_TIP) double tip);
+
+	@GET("/mobile/config")
+	Observable<Config> getConfig();
 
 	@POST("/qr/bind")
 	Observable<TableDataResponse> bindQrCode(@Body QRCodeBindRequest request);

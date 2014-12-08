@@ -21,6 +21,8 @@
     <integer name="splash_screen_timeout">2000</integer>
     <integer name="splash_animation_duration">850</integer>
 
+    <integer name="balk_notification_duration">5000</integer>
+
     <integer name="loader_data_max_length">5</integer>
     <integer name="loader_font_size_normal">24</integer>
     <integer name="loader_font_size_large">40</integer>

@@ -5,7 +5,7 @@ import android.content.Context;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.api.PaymentInfo;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.MerchantData;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
@@ -32,7 +32,7 @@ public class DemoAcquiring implements Acquiring {
 	}
 
 	@Override
-	public Observable<AcquiringResponse> pay(final MerchantData merchant, final PaymentInfo paymentInfo) {
+	public Observable<AcquiringResponse> pay(final AcquiringData acquiringData, final PaymentInfo paymentInfo) {
 		return new Observable<AcquiringResponse>(new Observable.OnSubscribe<AcquiringResponse>() {
 			@Override
 			public void call(Subscriber<? super AcquiringResponse> subscriber) {
@@ -59,7 +59,7 @@ public class DemoAcquiring implements Acquiring {
 	}
 
 	@Override
-	public Observable<AcquiringResponse> deleteCard(final MerchantData merchant, final UserData user, final CardInfo cardInfo) {
+	public Observable<AcquiringResponse> deleteCard(final AcquiringData acquiringData, final UserData user, final CardInfo cardInfo) {
 		return new Observable<AcquiringResponse>(new Observable.OnSubscribe<AcquiringResponse>() {
 			@Override
 			public void call(Subscriber<? super AcquiringResponse> subscriber) {
@@ -72,7 +72,7 @@ public class DemoAcquiring implements Acquiring {
 	}
 
 	@Override
-	public Observable<AcquiringResponse> verifyCard(final MerchantData merchant, final UserData user, final CardInfo cardInfo, final
+	public Observable<AcquiringResponse> verifyCard(final AcquiringData acquiringData, final UserData user, final CardInfo cardInfo, final
 	double amount) {
 		return new Observable<AcquiringResponse>(new Observable.OnSubscribe<AcquiringResponse>() {
 			@Override
@@ -86,7 +86,7 @@ public class DemoAcquiring implements Acquiring {
 	}
 
 	@Override
-	public Observable<CardRegisterPollingResponse> registerCard(final MerchantData merchant, final UserData user,
+	public Observable<CardRegisterPollingResponse> registerCard(final AcquiringData acquiringData, final UserData user,
 	                                                            final CardInfo cardInfo) {
 		return new Observable<CardRegisterPollingResponse>(new Observable.OnSubscribe<CardRegisterPollingResponse>() {
 			@Override

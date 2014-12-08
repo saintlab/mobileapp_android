@@ -13,11 +13,17 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.ResultReceiver;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.SparseBooleanArray;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
@@ -30,6 +36,8 @@ import com.omnom.android.utils.R;
 import com.omnom.android.utils.view.ErrorEdit;
 
 import java.lang.reflect.Method;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 import static butterknife.ButterKnife.findById;
 
@@ -55,13 +63,40 @@ public class AndroidUtils {
 		imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 	}
 
+	public static void hideKeyboard(EditText view, ResultReceiver resultReceiver) {
+		InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(view.getWindowToken(), 0, resultReceiver);
+	}
+
 	public static void hideKeyboard(Activity activity) {
 		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(activity.getWindow().peekDecorView().getWindowToken(), 0);
 	}
 
+	public static int getStatusBarHeight(Context context) {
+		int result = 0;
+		int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+		if(resourceId > 0) {
+			result = context.getResources().getDimensionPixelSize(resourceId);
+		}
+		return result;
+	}
+
+	public static boolean hasNavigationBar(final Context context) {
+		boolean hasMenuKey = ViewConfiguration.get(context).hasPermanentMenuKey();
+		boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+		boolean hasHomeKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_HOME);
+
+		return !hasMenuKey;
+	}
+
 	public static void scrollEnd(final ListView list) {
-		list.setSelection(list.getCount() - 1);
+		list.post(new Runnable() {
+			@Override
+			public void run() {
+				list.setSelection(list.getCount() - 1);
+			}
+		});
 	}
 
 	public static ViewTreeObserver.OnGlobalLayoutListener createKeyboardListener(final View view,
@@ -238,5 +273,28 @@ public class AndroidUtils {
 
 	public static boolean isKitKat() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+	}
+
+	public static boolean hasSelectedItems(SparseBooleanArray array, int keyLimit) {
+		final int size = array.size();
+		for(int i = 0; i < size; i++) {
+			int key = array.keyAt(i);
+			if(array.get(key) && key < keyLimit) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void applyFont(final Context context, final ViewGroup view, final String fontPath) {
+		for(int i = 0; i < view.getChildCount(); i++) {
+			final View childAt = view.getChildAt(i);
+			if(childAt instanceof ViewGroup) {
+				applyFont(context, (ViewGroup) childAt, fontPath);
+			}
+			if(childAt instanceof TextView) {
+				CalligraphyUtils.applyFontToTextView(context, (TextView) childAt, fontPath);
+			}
+		}
 	}
 }
