@@ -13,13 +13,10 @@ import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
-import com.omnom.android.socket.event.PaymentSocketEvent;
-import com.omnom.android.utils.CroutonHelper;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
-import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +96,7 @@ public class ValidateActivityBle extends ValidateActivity {
 
 	@Override
 	protected void startLoader() {
-		clearErrors();
+		clearErrors(true);
 
 		loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration), new Runnable() {
 			@Override
