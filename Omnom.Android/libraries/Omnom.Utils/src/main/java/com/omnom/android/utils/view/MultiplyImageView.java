@@ -57,10 +57,12 @@ public class MultiplyImageView extends ImageView {
 			mPaint.setShader(shader);
 			final ColorFilter filter = new PorterDuffColorFilter(mColor, PorterDuff.Mode.MULTIPLY);
 			mPaint.setColorFilter(filter);
+			mPaint.setDither(true);
 
 			mFillPaint = new Paint();
 			mFillPaint.setColor(mColor);
 			mFillPaint.setAlpha(0);
+			mFillPaint.setDither(true);
 		}
 		mFillPaint.setAlpha(mFillAlpha);
 		final int cx = getWidth() / 2;

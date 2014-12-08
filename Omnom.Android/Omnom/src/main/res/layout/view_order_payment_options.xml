@@ -31,7 +31,6 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="@dimen/order_payment_tips_radio_padding_bottom"
         android:gravity="center"
         android:divider="@drawable/divider_tips"
         android:dividerPadding="24dp"
@@ -41,7 +40,7 @@
             android:id="@+id/radio_tips_1"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:tag="10"
             android:gravity="center"
             android:layout_gravity="center"
@@ -55,7 +54,7 @@
             android:id="@+id/radio_tips_2"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:tag="15"
             android:gravity="center"
             android:layout_gravity="center"
@@ -69,7 +68,7 @@
             android:id="@+id/radio_tips_3"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:tag="25"
             android:gravity="center"
             android:layout_gravity="center"
@@ -83,7 +82,7 @@
             android:id="@+id/radio_tips_4"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="@string/tips_another"
             android:tag="-1"
             android:gravity="center"
@@ -103,7 +102,7 @@
         android:layout_centerHorizontal="true"
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
-        android:layout_marginBottom="@dimen/order_payment_tips_title_margin"
+        android:layout_marginBottom="-24dp"
         omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf"
         android:text="@string/title_plus_tips"/>
 
@@ -207,7 +206,7 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-        android:layout_marginBottom="@dimen/order_edit_title_margin"
+        android:layout_marginBottom="-24dp"
         android:text="@string/to_be_paid"/>
 
     <TextView
@@ -218,7 +217,7 @@
         android:layout_centerHorizontal="true"
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
-        android:layout_marginBottom="-16dp"
+        android:layout_marginBottom="-24dp"
         android:text="@string/title_plus_tips"
         android:visibility="gone"/>
 

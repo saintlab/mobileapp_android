@@ -4,46 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<!--    <ViewStub
-        android:id="@+id/stub_payment_options"
-        android:inflatedId="@+id/panel_order_payment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/activity_horizontal_margin_medium"
-        android:layout_gravity="bottom" />
-
-    <com.omnom.android.utils.view.NumberPicker
-        android:id="@+id/tips_picker"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@android:color/white"
-        android:visibility="gone"
-        style="@style/NPWidget.Holo.Light.NumberPicker.Grey"/>-->
-
-    <com.omnom.android.utils.view.OmnomListView
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/order_items_list_height_collapsed"
-        android:layout_marginTop="48dp"
-        android:layout_gravity="top"
-        android:stackFromBottom="true"
-        android:divider="@android:color/white"
-        android:dividerHeight="1dp"
-        android:overScrollMode="never"
-        android:listSelector="@color/transparent"
-        android:scrollbars="none"
-        android:scrollingCache="false"
-        android:animationCache="false"
-        android:smoothScrollbar="true"/>
-
-    <com.omnom.android.view.HeaderView
-        android:id="@+id/panel_top"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/view_size_default"
-        android:background="@color/list_header"
-        android:padding="@dimen/activity_horizontal_margin_small"/>
-
     <TextView
         android:id="@+id/txt_title"
         android:layout_width="wrap_content"
@@ -70,5 +30,28 @@
         android:background="@android:color/white"
         android:visibility="gone"
         style="@style/NPWidget.Holo.Light.NumberPicker.Grey"/>
+
+    <com.omnom.android.utils.view.OmnomListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/order_items_list_height_collapsed"
+        android:layout_marginTop="48dp"
+        android:layout_gravity="top"
+        android:stackFromBottom="true"
+        android:divider="@android:color/white"
+        android:dividerHeight="1dp"
+        android:overScrollMode="never"
+        android:listSelector="@color/transparent"
+        android:scrollbars="none"
+        android:scrollingCache="false"
+        android:animationCache="false"
+        android:smoothScrollbar="true" />
+
+    <com.omnom.android.view.HeaderView
+        android:id="@+id/panel_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:background="@color/list_header"
+        android:padding="@dimen/activity_horizontal_margin_small" />
 
 </FrameLayout>

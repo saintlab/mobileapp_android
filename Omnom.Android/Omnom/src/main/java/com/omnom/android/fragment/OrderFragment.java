@@ -345,14 +345,23 @@ public class OrderFragment extends Fragment {
 		mFontNormal = getResources().getDimension(R.dimen.font_xlarge);
 		mFontSmall = getResources().getDimension(R.dimen.font_large);
 
-		mListTrasnlationActive = getResources().getDimensionPixelSize(R.dimen.order_list_trasnlation_active);
 		mPaymentTranslationY = getResources().getDimensionPixelSize(R.dimen.order_payment_translation_y);
 		mTipsTranslationY = getResources().getDimensionPixelSize(R.dimen.order_tips_translation_y);
 
+		configureSizing();
+
+		ButterKnife.inject(this, view);
+		return view;
+	}
+
+	private void configureSizing() {
 		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 		final int heightPixels = displayMetrics.heightPixels;
-		mListHeight = heightPixels - (int) (48 * displayMetrics.density)
-				- (AndroidUtils.hasNavigationBar(getActivity()) ? (int) (48 * displayMetrics.density) : 0);
+
+		final int defaultPadding = ViewUtils.dipToPixels(getActivity(), 48);
+		final boolean hasNavigationBar = AndroidUtils.hasNavigationBar(getActivity());
+		mListHeight = heightPixels - defaultPadding - (hasNavigationBar ? defaultPadding : 0);
+
 		final int bottomMin = getResources().getDimensionPixelSize(R.dimen.order_payment_height);
 		final int i = mListHeight / 2;
 		if(i < bottomMin) {
@@ -361,8 +370,12 @@ public class OrderFragment extends Fragment {
 			mListTrasnlationActive = -mListHeight / 2;
 		}
 
-		ButterKnife.inject(this, view);
-		return view;
+		// TODO: Find out generic solution for small devices like megafon login 1
+		if(displayMetrics.densityDpi == DisplayMetrics.DENSITY_MEDIUM) {
+			final int mdpiPadding = ViewUtils.dipToPixels(getActivity(), 72);
+			mListHeight -= mdpiPadding;
+			mListTrasnlationActive += mdpiPadding;
+		}
 	}
 
 	private AnimatorSet getListClickAnimator(float scaleRation, int listTranslation) {
@@ -520,10 +533,11 @@ public class OrderFragment extends Fragment {
 
 		if(mAnimate) {
 			ViewUtils.setHeight(list, mListHeight);
+			//AnimationUtils.scaleHeight(list, mListHeight);
 		} else {
 			ViewUtils.setHeight(list, mListHeight);
 		}
-		AndroidUtils.scrollEnd(list);
+		// AndroidUtils.scrollEnd(list);
 
 		list.setScrollingEnabled(false);
 
@@ -562,17 +576,7 @@ public class OrderFragment extends Fragment {
 			ViewUtils.setVisible(billSplit2, true);
 		}
 		ViewUtils.setVisible(mHeader, true);
-		AnimationUtils.animateAlpha(getPanelPayment(), true, new Runnable() {
-			@Override
-			public void run() {
-				final View byId = findById(getActivity(), R.id.panel_order_payment);
-				ViewGroup.LayoutParams lp = byId.getLayoutParams();
-				lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-				byId.setLayoutParams(lp);
-				System.err.println(">>> inflated height = " + byId.getHeight());
-				System.err.println(">>> inflated height >> " + byId);
-			}
-		});
+		AnimationUtils.animateAlpha(getPanelPayment(), true);
 		AnimationUtils.animateAlpha(txtTitle, false);
 		AndroidUtils.scrollEnd(list);
 		list.setSwipeEnabled(true);
