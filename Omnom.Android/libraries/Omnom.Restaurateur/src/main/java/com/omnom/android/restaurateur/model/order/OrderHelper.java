@@ -47,7 +47,7 @@ public class OrderHelper {
 			tipsValue = tipsValues.get(position).getPercent();
 		} else {
 			final int thresholdIndex = getThresholdIndex(order, amount);
-			tipsValue = (int) Math.round(AmountHelper.toDouble(tipsValues.get(thresholdIndex).getAmounts().get(position)));
+			tipsValue = (int) Math.round(AmountHelper.toDouble(tipsValues.get(position).getAmounts().get(thresholdIndex)));
 		}
 		return tipsValue;
 	}
