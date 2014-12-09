@@ -411,17 +411,25 @@ public class OrderFragment extends Fragment {
 				@Override
 				public void onClick(final View v) {
 					if (amountIsTooHigh()) {
-						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-						builder.setMessage(R.string.amount_is_too_high)
-								.setPositiveButton(R.string.pay, new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
+						final AlertDialog alertDialog = AndroidUtils.showDialog(getActivity(), R.string.amount_is_too_high,
+								R.string.pay, new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(final DialogInterface dialog, final int which) {
 										showCardsActivity();
 									}
-								})
-								.setNegativeButton(R.string.refuse, null);
-						AlertDialog dialog = builder.create();
-						dialog.show();
-						TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
+								}, R.string.refuse, new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(final DialogInterface dialog, final int which) {
+										dialog.dismiss();
+									}
+								});
+						alertDialog.setCanceledOnTouchOutside(true);
+						final float btnTextSize = getResources().getDimension(R.dimen.font_normal);
+						final Button btn1 = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+						btn1.setTextSize(TypedValue.COMPLEX_UNIT_PX, btnTextSize);
+						final Button btn2 = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+						btn2.setTextSize(TypedValue.COMPLEX_UNIT_PX, btnTextSize);
+						TextView messageView = (TextView) alertDialog.findViewById(android.R.id.message);
 						messageView.setGravity(Gravity.CENTER);
 					} else {
 						showCardsActivity();
