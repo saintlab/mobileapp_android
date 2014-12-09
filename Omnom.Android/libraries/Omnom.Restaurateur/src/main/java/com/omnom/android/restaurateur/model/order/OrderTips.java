@@ -25,28 +25,29 @@ public class OrderTips implements Parcelable {
 		}
 	};
 	@Expose
-	private int threshold;
+	private List<Integer> thresholds;
 
 	@Expose
 	private ArrayList<TipsValue> values = new ArrayList<TipsValue>();
 
 	public OrderTips(Parcel parcel) {
-		threshold = parcel.readInt();
+		thresholds = new ArrayList<Integer>();
+		parcel.readList(thresholds, List.class.getClassLoader());
 		parcel.readTypedList(values, TipsValue.CREATOR);
 	}
 
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
-		parcel.writeInt(threshold);
+		parcel.writeList(thresholds);
 		parcel.writeTypedList(values);
 	}
 
-	public int getThreshold() {
-		return threshold / 100;
+	public List<Integer> getThresholds() {
+		return thresholds;
 	}
 
-	public void setThreshold(int threshold) {
-		this.threshold = threshold;
+	public void setThresholds(List<Integer> thresholds) {
+		this.thresholds = thresholds;
 	}
 
 	public List<TipsValue> getValues() {
