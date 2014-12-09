@@ -11,6 +11,7 @@ import com.omnom.android.activity.LoginActivity;
 import com.omnom.android.activity.OmnomQRCaptureActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.activity.PaymentProcessActivity;
+import com.omnom.android.activity.RestaurantsListActivity;
 import com.omnom.android.activity.SplashActivity;
 import com.omnom.android.activity.ThanksActivity;
 import com.omnom.android.activity.ThanksDemoActivity;
@@ -35,7 +36,7 @@ import dagger.Module;
 		ConfirmPhoneActivity.class, LoginActivity.class, ValidateActivityBle.class, ValidateActivityCamera.class,
 		ValidateActivityBle.class, OrdersActivity.class, CardsActivity.class, UserProfileActivity.class, CardAddActivity.class,
 		CardConfirmActivity.class, ThanksActivity.class, ThanksDemoActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
-		PaymentProcessActivity.class,
+		PaymentProcessActivity.class, RestaurantsListActivity.class,
 		/* services */
 		BackgroundBleService.class,
 		/* fragments */

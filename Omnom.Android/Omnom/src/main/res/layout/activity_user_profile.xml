@@ -50,7 +50,7 @@
 
 
             <LinearLayout
-                android:id="@+id/btn_table_number"
+                android:id="@+id/panel_table_number"
                 android:layout_width="match_parent"
                 android:layout_height="?android:listPreferredItemHeightSmall"
                 android:orientation="horizontal"
@@ -77,7 +77,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="8dp"
-                    android:textColor="#147DFA"
+                    android:textColor="@color/bright_blue"
                     android:drawableLeft="@drawable/ic_profile_table_marker"
                     android:drawableRight="@drawable/ic_arrow_right_icon"
                     android:textAppearance="?android:textAppearanceMedium"
@@ -85,7 +85,9 @@
 
             </LinearLayout>
 
-            <include layout="@layout/delimiter_profile_vertical"/>
+            <include
+                android:id="@+id/delimiter_table_number"
+                layout="@layout/delimiter_profile_vertical"/>
 
             <TextView
                 android:layout_height="?android:listPreferredItemHeightSmall"

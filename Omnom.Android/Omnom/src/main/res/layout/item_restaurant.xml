@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/img_cover"
+        android:layout_width="match_parent"
+        android:layout_height="144dp"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/txt_title"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="TITLE"
+        android:textSize="@dimen/font_xxlarge" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/txt_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="STREET 40"
+            android:textAppearance="?android:textAppearanceLarge" />
+        <TextView
+            android:id="@+id/txt_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="12dp"
+            android:text="~50 м"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@color/info_hint"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txt_schedule"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/activity_vertical_margin_small"
+        android:paddingBottom="@dimen/activity_vertical_margin_large"
+        android:text="STREET 40"
+        android:drawableLeft="@drawable/ic_profile_table_marker"
+        android:drawablePadding="@dimen/drawable_padding_default"
+        android:textAppearance="?android:textAppearanceMedium" />
+
+</LinearLayout>

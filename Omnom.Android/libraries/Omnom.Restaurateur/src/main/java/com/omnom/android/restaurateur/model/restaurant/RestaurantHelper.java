@@ -6,7 +6,10 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import com.omnom.android.restaurateur.R;
+import com.omnom.android.restaurateur.model.restaurant.schedule.DailySchedule;
 import com.omnom.android.utils.utils.StringUtils;
+
+import java.util.Calendar;
 
 /**
  * Created by Ch3D on 09.09.2014.
@@ -25,6 +28,16 @@ public class RestaurantHelper {
 			                          address.getStreet(),
 			                          address.getBuilding(),
 			                          floor);
+		}
+		return StringUtils.EMPTY_STRING;
+	}
+
+	public static String getAddressSmall(final Context context, final Restaurant restaurant) {
+		final Address address = restaurant.getAddress();
+		if(address != null) {
+			return StringUtils.concat(context.getString(R.string.restaurant_address_delimiter),
+			                          address.getStreet(),
+			                          address.getBuilding());
 		}
 		return StringUtils.EMPTY_STRING;
 	}
@@ -50,6 +63,42 @@ public class RestaurantHelper {
 			return Color.parseColor(COLOR_PREFIX + decorationBg);
 		} else {
 			return Color.parseColor(decorationBg);
+		}
+	}
+
+	public static String getOpenedTime(Context context, Restaurant restaurant, int weekDay) {
+		final DailySchedule dailySchedule = getDailySchedule(restaurant, weekDay);
+		if(dailySchedule.isClosed()) {
+			return context.getString(R.string.restaurant_closed);
+		}
+		return context.getString(R.string.restaurant_schedule_from_till, dailySchedule.getOpenTime(), dailySchedule.getCloseTime());
+	}
+
+	/**
+	 * weekDay is integer in form of {@code Calendar.MODAY} ,..., {@code Calendar.SUNDAY}
+	 *
+	 * @see java.util.Calendar#MONDAY
+	 * @see java.util.Calendar#SUNDAY
+	 */
+	public static DailySchedule getDailySchedule(Restaurant restaurant, int weekDay) {
+		switch(weekDay) {
+			case Calendar.MONDAY:
+				return restaurant.getSchedules().getWorkingSchedule().getMonday();
+			case Calendar.TUESDAY:
+				return restaurant.getSchedules().getWorkingSchedule().getTuesday();
+			case Calendar.WEDNESDAY:
+				return restaurant.getSchedules().getWorkingSchedule().getWednesday();
+			case Calendar.THURSDAY:
+				return restaurant.getSchedules().getWorkingSchedule().getThursday();
+			case Calendar.FRIDAY:
+				return restaurant.getSchedules().getWorkingSchedule().getFriday();
+			case Calendar.SATURDAY:
+				return restaurant.getSchedules().getWorkingSchedule().getSaturday();
+			case Calendar.SUNDAY:
+				return restaurant.getSchedules().getWorkingSchedule().getSunday();
+
+			default:
+				return restaurant.getSchedules().getWorkingSchedule().getMonday();
 		}
 	}
 

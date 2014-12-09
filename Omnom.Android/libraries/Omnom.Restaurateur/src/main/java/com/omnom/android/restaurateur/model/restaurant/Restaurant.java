@@ -32,6 +32,9 @@ public class Restaurant implements Parcelable {
 	private String description;
 
 	@Expose
+	private Schedules schedules;
+
+	@Expose
 	private String title;
 
 	@Expose
@@ -130,6 +133,14 @@ public class Restaurant implements Parcelable {
 
 	@Override
 	public String toString() {
-		return "id: " +  id + " title: " + title + " rssiThreshold: " + rssiThreshold;
+		return "id: " + id + " title: " + title + " rssiThreshold: " + rssiThreshold;
+	}
+
+	public Schedules getSchedules() {
+		return schedules;
+	}
+
+	public void setSchedules(final Schedules schedules) {
+		this.schedules = schedules;
 	}
 }

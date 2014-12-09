@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -68,6 +69,12 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@InjectView(R.id.txt_app_info)
 	protected TextView mTxtAppInfo;
 
+	@InjectView(R.id.panel_table_number)
+	protected View panelTableNumber;
+
+	@InjectView(R.id.delimiter_table_number)
+	protected View delimiterTableNumber;
+
 	@InjectView(R.id.txt_table_number)
 	protected TextView mTxtTableNumber;
 
@@ -102,7 +109,14 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	public void initUi() {
 		initAppInfo();
 
-		mTxtTableNumber.setText(String.valueOf(mTableNumber));
+		if(mTableNumber > 0) {
+			ViewUtils.setVisible(panelTableNumber, true);
+			ViewUtils.setVisible(delimiterTableNumber, true);
+			mTxtTableNumber.setText(String.valueOf(mTableNumber));
+		} else {
+			ViewUtils.setVisible(panelTableNumber, false);
+			ViewUtils.setVisible(delimiterTableNumber, false);
+		}
 
 		final UserProfile userProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		if(userProfile != null && userProfile.getUser() != null) {
