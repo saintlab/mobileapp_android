@@ -13,6 +13,7 @@ import android.view.ViewStub;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
@@ -158,7 +159,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected List<View> errorViews;
 
 	@InjectView(R.id.img_profile)
-	protected View imgProfile;
+	protected ImageView imgProfile;
 
 	@InjectView(R.id.txt_demo_leave)
 	protected TextView txtLeave;
@@ -237,6 +238,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	protected void clearErrors(boolean animateLogo) {
+		hideProfile();
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 		if(animateLogo) {
 			if(mRestaurant == null) {
@@ -346,6 +348,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected void validate() {
 		if(mFirstRun || mRestaurant == null) {
 			ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
+			hideProfile();
 			loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 			loader.showProgress(false);
 			loader.scaleDown(null, new Runnable() {
@@ -365,8 +368,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	public void onBill(final View v) {
 		v.setEnabled(false);
+		hideProfile();
 		ViewUtils.setVisible(getPanelBottom(), false);
-		ViewUtils.setVisible(imgProfile, false);
 		ViewUtils.setVisible(txtLeave, false);
 		loader.setLogo(R.drawable.ic_bill_white);
 		loader.startProgressAnimation(10000, new Runnable() {
@@ -429,7 +432,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 																   R.drawable.ic_bill_white);
 											loader.showProgress(false);
 											configureScreen(mRestaurant);
-											ViewUtils.setVisible(imgProfile, !mIsDemo);
+											updateLightProfile(!mIsDemo);
 											ViewUtils.setVisible(txtLeave, mIsDemo);
 											ViewUtils.setVisible(getPanelBottom(), true);
 										}
@@ -444,6 +447,23 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 						v.setEnabled(true);
 					}
 				});
+	}
+
+	protected void updateLightProfile(final boolean visible) {
+		updateProfile(R.drawable.ic_profile_white, visible);
+	}
+
+	protected void updateDarkProfile(final boolean visible) {
+		updateProfile(R.drawable.ic_profile, visible);
+	}
+
+	private void updateProfile(final int backgroundResource, final boolean visible) {
+		imgProfile.setImageResource(backgroundResource);
+		ViewUtils.setVisible(imgProfile, visible);
+	}
+
+	protected void hideProfile() {
+		ViewUtils.setVisible(imgProfile, false);
 	}
 
 	private void showOrders(final List<Order> orders, final String requestId) {
@@ -504,7 +524,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					@Override
 					public void run() {
 						ViewUtils.setVisible(getPanelBottom(), true);
-						ViewUtils.setVisible(imgProfile, !mIsDemo);
+						updateLightProfile(!mIsDemo);
 						ViewUtils.setVisible(txtLeave, mIsDemo);
 						loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
 						loader.showLogo();
@@ -528,7 +548,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.img_profile)
 	protected void onProfile(View v) {
-		UserProfileActivity.startSliding(this, mTable.getInternalId());
+		UserProfileActivity.startSliding(this, mTable != null ? mTable.getInternalId() : 0);
 	}
 
 	protected final void onDataLoaded(final Restaurant restaurant, TableDataResponse table) {
@@ -591,7 +611,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			public void run() {
 				configureScreen(mRestaurant);
 				// ViewUtils.setVisible(imgHolder, true);
-				ViewUtils.setVisible(imgProfile, !mIsDemo);
+				updateLightProfile(!mIsDemo);
 				ViewUtils.setVisible(txtLeave, mIsDemo);
 				ViewUtils.setVisible(getPanelBottom(), true);
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
