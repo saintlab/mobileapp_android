@@ -2,9 +2,12 @@ package com.omnom.android.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -13,6 +16,7 @@ import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 
 import javax.inject.Inject;
@@ -72,6 +76,20 @@ public class RestaurantsListActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+				final Restaurant item = (Restaurant) mAdapter.getItem(position);
+				final ImageView imgCover = (ImageView) view.findViewById(R.id.img_cover);
+				//imgCover.animate().translationYBy(-100).start();
+				//AnimationUtils.scaleHeight(imgCover, 450);
+				final BitmapDrawable drawable = (BitmapDrawable) imgCover.getDrawable();
+				final ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat
+						.makeThumbnailScaleUpAnimation(view, drawable.getBitmap(), (int)view.getX(), (int)view.getY());
+				startActivity(new Intent(getActivity(), UserProfileActivity.class), activityOptionsCompat.toBundle());
+			}
+		});
+
 		api.getRestaurants().subscribe(new Action1<RestaurantsResponse>() {
 			@Override
 			public void call(final RestaurantsResponse restaurants) {
