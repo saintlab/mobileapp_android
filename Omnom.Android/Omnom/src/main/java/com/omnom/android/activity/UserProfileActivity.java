@@ -44,12 +44,14 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseOmnomActivity {
+
 	private static final String TAG = UserProfileActivity.class.getSimpleName();
 
-	public static void startSliding(OmnomActivity activity, final int tableNumber) {
+	public static void startSliding(OmnomActivity activity, final int tableNumber, final String tableId) {
 		final Intent intent = new Intent(activity.getActivity(), UserProfileActivity.class);
 		intent.putExtra(EXTRA_ANIMATE, false);
 		intent.putExtra(EXTRA_TABLE_NUMBER, tableNumber);
+		intent.putExtra(EXTRA_TABLE_ID, tableId);
 		activity.start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
 	}
 
@@ -83,9 +85,19 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	private int mTableNumber;
 
+	private String mTableId;
+
 	@Override
 	protected void handleIntent(Intent intent) {
 		mTableNumber = intent.getIntExtra(EXTRA_TABLE_NUMBER, 0);
+		mTableId = intent.getStringExtra(EXTRA_TABLE_ID);
+	}
+
+	@OnClick(R.id.btn_my_cards)
+	protected void onMyCards() {
+		final Intent intent = new Intent(this, CardsActivity.class);
+		intent.putExtra(EXTRA_TABLE_ID, mTableId);
+		startActivity(intent);
 	}
 
 	@OnClick(R.id.btn_feedback)
@@ -103,7 +115,6 @@ public class UserProfileActivity extends BaseOmnomActivity {
 		initAppInfo();
 
 		mTxtTableNumber.setText(String.valueOf(mTableNumber));
-
 		final UserProfile userProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		if(userProfile != null && userProfile.getUser() != null) {
 			initUserData(userProfile.getUser(), userProfile.getImageUrl());

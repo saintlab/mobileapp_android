@@ -42,7 +42,8 @@
     <dimen name="loader_progress_thickness">12dp</dimen>
     <item type="dimen" format="float" name="loader_progress_inner_radius">2.265</item>
 
-    <dimen name="pay_once_fragment_height">300dp</dimen>
+    <dimen name="pay_once_fragment_height_large">300dp</dimen>
+    <dimen name="pay_once_fragment_height_small">150dp</dimen>
 
     <dimen name="profile_margin_top">-48dp</dimen>
     <dimen name="profile_avatar_size">156dp</dimen>

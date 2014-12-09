@@ -9,9 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 
 import butterknife.ButterKnife;
 
@@ -90,18 +92,24 @@ public class PayOnceFragment extends Fragment {
 			}
 		});
 		Button btnPay = (Button) view.findViewById(R.id.btn_pay);
-		final String text = StringUtils.formatCurrency(mAmount) + getString(R.string.currency_ruble);
-		btnPay.setText(getString(R.string.pay_amount, text));
-		btnPay.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (mPayListener != null) {
-					// remove visibility listener to keep keyboard hidden on frame close
-					mVisibilityListener = null;
-					mPayListener.pay();
+		TextView txtPayOnce = (TextView) view.findViewById(R.id.txt_pay_once);
+		if (mAmount > 0) {
+			final String text = StringUtils.formatCurrency(mAmount) + getString(R.string.currency_ruble);
+			btnPay.setText(getString(R.string.pay_amount, text));
+			btnPay.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (mPayListener != null) {
+						// remove visibility listener to keep keyboard hidden on frame close
+						mVisibilityListener = null;
+						mPayListener.pay();
+					}
 				}
-			}
-		});
+			});
+		} else {
+			ViewUtils.setVisible(btnPay, false);
+			ViewUtils.setVisible(txtPayOnce, false);
+		}
 		return view;
 	}
 

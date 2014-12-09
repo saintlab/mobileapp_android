@@ -13,7 +13,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
@@ -76,7 +78,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		}
 	}
 
-	@SuppressLint("NewApi")
 	public static void start(final Activity activity, final Order order, final OrderFragment.PaymentDetails details,
 	                         final int accentColor, final int code, boolean isDemo) {
 		final Intent intent = new Intent(activity, CardsActivity.class);
@@ -84,11 +85,15 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
 		intent.putExtra(Extras.EXTRA_ORDER, order);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
+		startActivity(activity, intent, code);
+	}
 
+	@SuppressLint("NewApi")
+	private static void startActivity(final Activity activity, final Intent intent, final int code) {
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
-			                                                    R.anim.slide_in_up,
-			                                                    R.anim.fake_fade_out_long).toBundle();
+					R.anim.slide_in_up,
+					R.anim.fake_fade_out_long).toBundle();
 			activity.startActivityForResult(intent, code, extras);
 		} else {
 			activity.startActivityForResult(intent, code);
@@ -100,6 +105,9 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	@InjectView(R.id.panel_top)
 	protected HeaderView mPanelTop;
+
+	@InjectView(R.id.footer)
+	protected LinearLayout cardsFooter;
 
 	@InjectView(R.id.btn_pay)
 	protected Button mBtnPay;
@@ -121,6 +129,8 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private boolean mIsDemo;
 
+	private String mTableId;
+
 	private PaymentEventListener mPaymentListener;
 
 	@Override
@@ -137,13 +147,10 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	@Override
 	protected void handleIntent(final Intent intent) {
 		mDetails = intent.getParcelableExtra(Extras.EXTRA_PAYMENT_DETAILS);
-		if(mDetails == null) {
-			finish();
-			return;
-		}
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
 		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
 		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);
+		mTableId = intent.getStringExtra(Extras.EXTRA_TABLE_ID);
 	}
 
 	private void initDividerAnimation() {
@@ -162,7 +169,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	@Override
 	public void initUi() {
-		mPaymentListener = new PaymentEventListener(this);
 		mPreferences = OmnomApplication.get(getActivity()).getPreferences();
 
 		initDividerAnimation();
@@ -187,8 +193,18 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 		loadCards();
 
-		final String text = StringUtils.formatCurrency(mDetails.getAmount()) + getString(R.string.currency_ruble);
-		mBtnPay.setText(getString(R.string.pay_amount, text));
+		if (mTableId != null) {
+			mPaymentListener = new PaymentEventListener(this);
+		}
+
+		if (mDetails != null) {
+			final String text = StringUtils.formatCurrency(mDetails.getAmount()) + getString(R.string.currency_ruble);
+			mBtnPay.setText(getString(R.string.pay_amount, text));
+		} else {
+			RelativeLayout.LayoutParams layoutParams =(RelativeLayout.LayoutParams) cardsFooter.getLayoutParams();
+			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+			ViewUtils.setVisible(mBtnPay, false);
+		}
 
 		mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -205,7 +221,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 					String cvv = OmnomApplication.get(activity).getConfig().getAcquiringData().getTestCvv();
 					final CardInfo cardInfo = CardInfo.create(activity, card.getExternalCardId(), cvv);
 					CardConfirmActivity.startConfirm(CardsActivity.this, cardInfo, REQUEST_CODE_CARD_CONFIRM,
-													 mDetails.getAmount());
+													 mDetails != null ? mDetails.getAmount() : 0);
 				}
 			}
 		});
@@ -259,8 +275,10 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	}
 
 	private void pay(final CardInfo cardInfo) {
-		PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails.getAmount(),
-									 mOrder, cardInfo, mIsDemo, mAccentColor);
+		if (mDetails != null) {
+			PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails.getAmount(),
+										 mOrder, cardInfo, mIsDemo, mAccentColor);
+		}
 	}
 
 	@Override
@@ -299,23 +317,29 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mPaymentListener.onPause();
+		if (mPaymentListener != null) {
+			mPaymentListener.onPause();
+		}
 		OmnomObservable.unsubscribe(mCardsSubscription);
 	}
 
 	public void onAdd() {
-		CardAddActivity.start(this, mDetails.getAmount(), mAccentColor, REQUEST_CODE_CARD_ADD);
+		CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : 0, REQUEST_CODE_CARD_ADD);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mPaymentListener.onPause();
+		if (mPaymentListener != null) {
+			mPaymentListener.onPause();
+		}
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mPaymentListener.initTableSocket(mOrder.getTableId());
+		if (mPaymentListener != null) {
+			mPaymentListener.initTableSocket(mTableId);
+		}
 	}
 }
