@@ -4,28 +4,39 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.acquiring.AcquiringResponseException;
+import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
+import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.cards.Card;
+import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.Extras;
@@ -45,9 +56,11 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.AnimationEndListener {
 
@@ -103,6 +116,9 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	@Inject
 	protected RestaurateurObeservableApi api;
 
+	@Inject
+	protected Acquiring mAcquiring;
+
 	@InjectView(R.id.panel_top)
 	protected HeaderView mPanelTop;
 
@@ -118,6 +134,8 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	private int mAccentColor;
 
 	private Subscription mCardsSubscription;
+
+	private Subscription mDeleteCardSubscription;
 
 	private PreferenceProvider mPreferences;
 
@@ -226,15 +244,104 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 			}
 		});
 
+		mList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+				if(!mIsDemo) {
+					final CardsAdapter adapter = (CardsAdapter) mList.getAdapter();
+					final Card card = (Card) adapter.getItem(position);
+					askForRemoval(card);
+					return true;
+				}
+				return false;
+			}
+		});
+
 		GradientDrawable sd = (GradientDrawable) mBtnPay.getBackground();
 		sd.setColor(getResources().getColor(R.color.btn_pay_green));
 		sd.invalidateSelf();
 	}
 
-	private void loadCards() {
-		if(mCardsSubscription != null) {
-			OmnomObservable.unsubscribe(mCardsSubscription);
+	private void askForRemoval(final Card card) {
+		final AlertDialog alertDialog = AndroidUtils.showDialog(this, getString(R.string.card_removal_confirmation, card.getMaskedPan()),
+				R.string.yes, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						removeCard(card);
+					}
+				}, R.string.no, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						dialog.dismiss();
+					}
+				});
+		alertDialog.setCanceledOnTouchOutside(true);
+		final float btnTextSize = getResources().getDimension(R.dimen.font_normal);
+		final Button btn1 = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+		btn1.setTextSize(TypedValue.COMPLEX_UNIT_PX, btnTextSize);
+		final Button btn2 = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+		btn2.setTextSize(TypedValue.COMPLEX_UNIT_PX, btnTextSize);
+		TextView messageView = (TextView) alertDialog.findViewById(android.R.id.message);
+		messageView.setGravity(Gravity.CENTER);
+	}
+
+	private void removeCard(final Card card) {
+		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
+		UserData userData = UserData.create(OmnomApplication.get(getActivity()).getUserProfile().getUser());
+		String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
+		final CardInfo cardInfo = CardInfo.create(getActivity(), card.getExternalCardId(), cvv);
+		mDeleteCardSubscription = AndroidObservable.bindActivity(this, mAcquiring.deleteCard(acquiringData, userData, cardInfo))
+				.flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
+								   Observable<CardDeleteResponse>>() {
+					@Override
+					public Observable<CardDeleteResponse> call(com.omnom.android.acquiring.mailru.response.CardDeleteResponse cardDeleteResponse) {
+						if (cardDeleteResponse.isSuccess()) {
+							return api.deleteCard(card.getId());
+						} else {
+							throw new AcquiringResponseException(cardDeleteResponse.getError());
+						}
+					}
+				}).subscribe(new Action1<CardDeleteResponse>() {
+			@Override
+			public void call(CardDeleteResponse cardDeleteResponse) {
+				if (cardDeleteResponse.isSuccess()) {
+					final CardsAdapter adapter = (CardsAdapter) mList.getAdapter();
+					adapter.remove(card);
+				} else {
+					if (cardDeleteResponse.getError() != null) {
+						cardRemovalError();
+					} else if (cardDeleteResponse.hasErrors()) {
+						if (cardDeleteResponse.hasCommonError()) {
+							cardRemovalError(cardDeleteResponse.getErrors().getCommon());
+						}
+					}
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				Log.w(TAG, throwable.getMessage());
+				cardRemovalError();
+			}
+		});
+	}
+
+	private void cardRemovalError() {
+		cardRemovalError(null);
+	}
+
+	private void cardRemovalError(String message) {
+		Log.w(TAG, message);
+		if (message != null) {
+			Toast.makeText(this, "Unable to remove card: " + message, Toast.LENGTH_LONG).show();
+		} else {
+			Toast.makeText(this, "Unable to remove card", Toast.LENGTH_LONG).show();
 		}
+	}
+
+	private void loadCards() {
+		OmnomObservable.unsubscribe(mCardsSubscription);
 		if(mIsDemo) {
 			final List<DemoCard> demoCards = Arrays.asList(new DemoCard());
 			mList.setAdapter(new CardsAdapter(getActivity(), demoCards, CardsActivity.this, true));
@@ -321,6 +428,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 			mPaymentListener.onPause();
 		}
 		OmnomObservable.unsubscribe(mCardsSubscription);
+		OmnomObservable.unsubscribe(mDeleteCardSubscription);
 	}
 
 	public void onAdd() {

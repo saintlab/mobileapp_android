@@ -7,6 +7,7 @@ import com.omnom.android.acquiring.mailru.AcquiringProxyMailRu;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringTransactionExtendedResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringTransactionResponse;
+import com.omnom.android.acquiring.mailru.response.CardDeleteResponse;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
 
 import java.util.HashMap;
@@ -60,11 +61,11 @@ public class AcquiringMailRuMixpanel extends AcquiringProxyMailRu {
 	}
 
 	@Override
-	public Observable<AcquiringResponse> deleteCard(HashMap<String, String> params) {
+	public Observable<CardDeleteResponse> deleteCard(HashMap<String, String> params) {
 		mMixHelper.track("acquiting.mail.deleteCard ->", params);
-		return super.deleteCard(params).doOnNext(new Action1<AcquiringResponse>() {
+		return super.deleteCard(params).doOnNext(new Action1<CardDeleteResponse>() {
 			@Override
-			public void call(AcquiringResponse response) {
+			public void call(CardDeleteResponse response) {
 				mMixHelper.track("acquiting.mail.deleteCard <-", response);
 			}
 		});

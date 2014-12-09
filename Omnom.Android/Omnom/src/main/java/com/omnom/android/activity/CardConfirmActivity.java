@@ -394,7 +394,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 				.addToBackStack(null)
 				.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
 									 R.anim.slide_in_up, R.anim.slide_out_down)
-				.add(R.id.fragment_container, payOnceFragment)
+				.replace(R.id.fragment_container, payOnceFragment)
 				.commit();
 		AnimationUtils.animateAlpha(transparentPanel, true);
 	}

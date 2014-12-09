@@ -48,7 +48,11 @@ public class ResponseBase {
 	}
 
 	public boolean hasAuthError() {
-		return errors != null;
+		return errors != null && errors.getAuthentication() != null;
+	}
+
+	public boolean hasCommonError() {
+		return errors != null && errors.getCommon() != null;
 	}
 
 	public String getError() {

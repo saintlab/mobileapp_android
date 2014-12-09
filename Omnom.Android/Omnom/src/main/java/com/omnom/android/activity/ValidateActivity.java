@@ -303,6 +303,15 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		});
 		mErrorHelper = new ErrorHelper(loader, txtError, btnErrorRepeat, txtErrorRepeat, btnDemo, errorViews);
 
+		mAcquiringConfigSubscribtion = AndroidObservable.bindActivity(this, api.getConfig())
+				.subscribe(
+						new Action1<Config>() {
+							@Override
+							public void call(Config config) {
+								OmnomApplication.get(getActivity()).cacheConfig(config);
+							}
+						}, onError);
+
 		mPreloadBackgroundFunction = new Func1<Restaurant, Restaurant>() {
 			@Override
 			public Restaurant call(final Restaurant restaurant) {
@@ -586,15 +595,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 						                                      Log.w(TAG, throwable.getMessage());
 					                                      }
 				                                      });
-
-		mAcquiringConfigSubscribtion = AndroidObservable.bindActivity(this, api.getConfig())
-				.subscribe(
-						new Action1<Config>() {
-							@Override
-							public void call(Config config) {
-								OmnomApplication.get(getActivity()).cacheConfig(config);
-							}
-						}, onError);
 
 		loader.post(new Runnable() {
 			@Override
