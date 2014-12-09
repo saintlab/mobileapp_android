@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import com.omnom.android.utils.utils.AmountHelper;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Created by Ch3D on 20.10.2014.
@@ -17,6 +18,13 @@ public class OrderHelper {
 		return getTipsAmount(BigDecimal.valueOf(order.getAmountToPay()), percent);
 	}
 
+	/**
+	 * Returns a given percent from specified amount
+	 *
+	 * @param amount amount to pay
+	 * @param percent percent (e.g. 15 for 15%)
+	 * @return percent from specified amount
+	 */
 	public static int getTipsAmount(final BigDecimal amount, final int percent) {
 		// final BigDecimal divide = amount.divide(BigDecimal.valueOf(100), BigDecimal.ROUND_DOWN);
 		final double divide = AmountHelper.toDouble(amount);
@@ -24,18 +32,52 @@ public class OrderHelper {
 		return (int) Math.round(v);
 	}
 
-	public static boolean isPercentTips(final @Nullable Order order) {
-		if(order == null) {
-			return false;
+	/**
+	 * Returns tips value for a given button position.
+	 *
+	 * @param order order data
+	 * @param amount amount to pay
+	 * @param position tips button position
+	 * @return recommended tips for specified button position
+	 */
+	public static int getTipsValue(final Order order, final BigDecimal amount, final int position) {
+		List<TipsValue> tipsValues = order.getTips().getValues();
+		int tipsValue;
+		if (isPercentTips(order, amount)) {
+			tipsValue = tipsValues.get(position).getPercent();
+		} else {
+			final int thresholdIndex = getThresholdIndex(order, amount);
+			tipsValue = (int) Math.round(AmountHelper.toDouble(tipsValues.get(thresholdIndex).getAmounts().get(position)));
 		}
-		return order.getAmountToPay() > order.getTips().getThreshold();
+		return tipsValue;
 	}
 
-	// TODO: avoid BigDecimal.doubleValue()
+	private static int getThresholdIndex(final Order order, final BigDecimal amount) {
+		List<Integer> thresholds = order.getTips().getThresholds();
+		int thresholdIndex = thresholds.size();
+		for (int i = 0; i < thresholds.size(); i++) {
+			final int thresholdValue = (int) Math.round(AmountHelper.toDouble(thresholds.get(i)));
+			if (amount.compareTo(BigDecimal.valueOf(thresholdValue)) <= 0 ) {
+				thresholdIndex = i;
+				break;
+			}
+		}
+		return thresholdIndex;
+	}
+
+	/**
+	 * Checks if tips for specified amount should be displayed in percent.
+	 *
+	 * @param order order data
+	 * @param amount amount to pay
+	 * @return true, if tips should be displayed in percent
+	 */
 	public static boolean isPercentTips(final @Nullable Order order, final @Nullable BigDecimal amount) {
 		if(order == null || amount == null || order.getTips() == null) {
 			return false;
 		}
-		return amount.doubleValue() >= order.getTips().getThreshold();
+		List<Integer> thresholds = order.getTips().getThresholds();
+		int maxThreshold = (int) Math.round(AmountHelper.toDouble(thresholds.get(thresholds.size() - 1)));
+		return amount.compareTo(BigDecimal.valueOf(maxThreshold)) > 0;
 	}
 }
