@@ -48,4 +48,26 @@ public class PreferenceHelper implements PreferenceProvider {
 	public boolean setCardData(Context context, String cardId) {
 		return false;
 	}
+
+	@Override
+	public boolean setUserProfileJson(Context context, String userProfile) {
+		return false;
+	}
+
+	@Override
+	public String getUserProfileJson(Context context) {
+		// do nothing
+		return StringUtils.EMPTY_STRING;
+	}
+
+	@Override
+	public boolean setConfigJson(Context context, String config) {
+		return false;
+	}
+
+	@Override
+	public String getConfigJson(Context context) {
+		// do nothing
+		return StringUtils.EMPTY_STRING;
+	}
 }

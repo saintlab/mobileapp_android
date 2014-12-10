@@ -11,11 +11,12 @@ import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.AuthMixpanelModule;
 import com.omnom.android.modules.BeaconModule;
 import com.omnom.android.modules.OmnomApplicationModule;
-import com.omnom.android.preferences.PreferenceHelper;
+import com.omnom.android.preferences.JsonPreferenceProvider;
+import com.omnom.android.preferences.PreferenceHelperAdapter;
 import com.omnom.android.restaurateur.RestaurateurModule;
 import com.omnom.android.restaurateur.model.UserProfile;
-import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
+import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.socket.OmnomSocketBase;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
@@ -57,7 +58,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	private ObjectGraph objectGraph;
 
-	private PreferenceProvider preferenceHelper;
+	private JsonPreferenceProvider preferenceHelper;
 
 	private MixpanelAPI mixPanel;
 
@@ -113,7 +114,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		}
 		injectList.clear();
 		inject(this);
-		preferenceHelper = new PreferenceHelper();
+		preferenceHelper = new PreferenceHelperAdapter();
 
 		registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
 			@Override
@@ -172,17 +173,25 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	public void cacheConfig(final Config config) {
 		cachedConfig = config;
+		preferenceHelper.setConfig(this, config);
 	}
 
 	public Config getConfig() {
+		if (cachedConfig == null) {
+			cachedConfig = preferenceHelper.getConfig(this);
+		}
 		return cachedConfig;
 	}
 
 	public void cacheUserProfile(UserProfile user) {
 		cachedUser = user;
+		preferenceHelper.setUserProfile(this, user);
 	}
 
 	public UserProfile getUserProfile() {
+		if (cachedUser == null) {
+			cachedUser = preferenceHelper.getUserProfile(this);
+		}
 		return cachedUser;
 	}
 

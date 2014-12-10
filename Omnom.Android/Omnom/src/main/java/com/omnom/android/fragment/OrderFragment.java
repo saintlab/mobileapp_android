@@ -577,10 +577,9 @@ public class OrderFragment extends Fragment {
 
 	private void zoomInFragment(final OrdersActivity activity) {
 		OmnomApplication application = OmnomApplication.get(getActivity());
-		// FIXME: find a way to store UserProfile to guarantee it is not null
 		if (application.getUserProfile() != null) {
 			sendBillViewEvent(application.getUserProfile().getUser(), application.getBeacon(),
-					mOrder, mRequestId);
+							  mOrder, mRequestId);
 		} else {
 			Log.w(TAG, "UserProfile not set");
 		}
