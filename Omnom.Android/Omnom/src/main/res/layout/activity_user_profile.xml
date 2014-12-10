@@ -77,7 +77,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="8dp"
-                    android:textColor="@color/bright_blue"
+                    android:textColor="@color/blue_bright"
                     android:drawableLeft="@drawable/ic_profile_table_marker"
                     android:drawableRight="@drawable/ic_arrow_right_icon"
                     android:textAppearance="?android:textAppearanceMedium"

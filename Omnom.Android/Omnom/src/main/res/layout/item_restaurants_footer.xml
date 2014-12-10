@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Не нашли любимое заведение?"
+        android:text="@string/didnt_find_restaurant"
         android:textAppearance="?android:textAppearanceLarge"/>
 
     <TextView
@@ -17,8 +17,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Напишите нам"
-        android:textColor="@color/bright_blue"
+        android:text="@string/write_to_us"
+        android:textColor="@color/blue_bright"
         android:textAppearance="?android:textAppearanceLarge"
         android:drawableBottom="@drawable/ic_mail_flying"
         android:drawablePadding="@dimen/activity_vertical_margin_small"

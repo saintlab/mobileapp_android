@@ -89,5 +89,10 @@
     <string name="balk_notification_user_paid_">%1$s: оплачено по счету %2$s </string>
     <string name="title_activity_restaurants_list">RestaurantsListActivity</string>
     <string name="title_activity_restaurant">RestaurantActivity</string>
+    <string name="reserve_table">Бронировать\nстолик</string>
+    <string name="im_inside_restaurant">Я внутри</string>
+    <string name="make_an_order">Сделать\nзаказ</string>
+    <string name="write_to_us">Напишите нам</string>
+    <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
 
 </resources>

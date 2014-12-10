@@ -115,15 +115,11 @@
 
     <ImageView
         android:id="@+id/img_profile"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:padding="8dp"
-        android:layout_margin="4dp"
-        android:cropToPadding="true"
-        android:scaleType="centerCrop"
+        android:layout_margin="@dimen/activity_vertical_margin_xsmall"
         android:layout_gravity="top|right"
         android:src="@drawable/ic_profile_white"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        style="@style/ImageView.Clickable.Cropped"/>
 
     <TextView
         android:id="@+id/txt_demo_leave"

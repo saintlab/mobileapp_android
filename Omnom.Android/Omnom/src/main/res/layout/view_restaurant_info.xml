@@ -8,8 +8,9 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:maxLines="2"
+        android:ellipsize="end"
         android:gravity="center"
-        android:text="TITLE"
         android:textSize="@dimen/font_xxlarge" />
 
     <LinearLayout
@@ -21,17 +22,16 @@
             android:id="@+id/txt_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="STREET 40"
             android:textAppearance="?android:textAppearanceLarge" />
 
         <TextView
             android:id="@+id/txt_distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="12dp"
-            android:text="~50 м"
+            android:paddingLeft="@dimen/restaurant_distance_padding"
             android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="@color/info_hint" />
+            android:textColor="@color/info_hint"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <TextView
@@ -40,7 +40,6 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/activity_vertical_margin_small"
         android:gravity="center_vertical"
-        android:text="STREET 40"
         android:drawableLeft="@drawable/ic_time_schedule"
         android:drawablePadding="@dimen/drawable_padding_default"
         android:textAppearance="?android:textAppearanceLarge" />
