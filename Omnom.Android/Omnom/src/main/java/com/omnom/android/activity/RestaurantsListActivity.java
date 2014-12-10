@@ -1,9 +1,5 @@
 package com.omnom.android.activity;
 
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,9 +27,8 @@ public class RestaurantsListActivity extends BaseOmnomActivity {
 
 	private static final String TAG = RestaurantsListActivity.class.getSimpleName();
 
-	public static void start(Context context) {
-		final Intent intent = new Intent(context, RestaurantsListActivity.class);
-		context.startActivity(intent);
+	public static void start(BaseOmnomActivity activity) {
+		activity.start(RestaurantsListActivity.class, false);
 	}
 
 	@InjectView(android.R.id.list)
@@ -80,13 +75,14 @@ public class RestaurantsListActivity extends BaseOmnomActivity {
 			@Override
 			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
 				final Restaurant item = (Restaurant) mAdapter.getItem(position);
-				final ImageView imgCover = (ImageView) view.findViewById(R.id.img_cover);
-				//imgCover.animate().translationYBy(-100).start();
-				//AnimationUtils.scaleHeight(imgCover, 450);
-				final BitmapDrawable drawable = (BitmapDrawable) imgCover.getDrawable();
-				final ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat
-						.makeThumbnailScaleUpAnimation(view, drawable.getBitmap(), (int)view.getX(), (int)view.getY());
-				startActivity(new Intent(getActivity(), UserProfileActivity.class), activityOptionsCompat.toBundle());
+				RestaurantActivity.start(RestaurantsListActivity.this, item);
+				//final ImageView imgCover = (ImageView) view.findViewById(R.id.img_cover);
+				////imgCover.animate().translationYBy(-100).start();
+				////AnimationUtils.scaleHeight(imgCover, 450);
+				//final BitmapDrawable drawable = (BitmapDrawable) imgCover.getDrawable();
+				//final ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat
+				//		.makeThumbnailScaleUpAnimation(view, drawable.getBitmap(), (int)view.getX(), (int)view.getY());
+				//startActivity(new Intent(getActivity(), UserProfileActivity.class), activityOptionsCompat.toBundle());
 			}
 		});
 

@@ -88,5 +88,6 @@
     <string name="welcome_to_">Добро пожаловать в %1$s</string>
     <string name="balk_notification_user_paid_">%1$s: оплачено по счету %2$s </string>
     <string name="title_activity_restaurants_list">RestaurantsListActivity</string>
+    <string name="title_activity_restaurant">RestaurantActivity</string>
 
 </resources>

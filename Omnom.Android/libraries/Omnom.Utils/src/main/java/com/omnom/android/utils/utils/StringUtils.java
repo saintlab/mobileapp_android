@@ -93,6 +93,10 @@ public class StringUtils {
 		return result.toString();
 	}
 
+	public static String removeWhitespaces(final String s) {
+		return s.replace(WHITESPACE, EMPTY_STRING);
+	}
+
 	public static boolean hasDigits(final String s) {
 		for(int i = 0; i < s.length(); i++) {
 			final char c = s.charAt(i);

@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.ResultReceiver;
 import android.provider.Settings;
@@ -296,5 +297,11 @@ public class AndroidUtils {
 				CalligraphyUtils.applyFontToTextView(context, (TextView) childAt, fontPath);
 			}
 		}
+	}
+
+	public static void openDialer(final Context context, final String phone) {
+		final Uri parse = Uri.parse("tel:" + StringUtils.removeWhitespaces(phone));
+		final Intent intent = new Intent(Intent.ACTION_DIAL, parse);
+		context.startActivity(intent);
 	}
 }

@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.omnom.android.utils.utils.StringUtils;
 
 /**
  * Created by Ch3D on 09.12.2014.
@@ -23,6 +24,8 @@ public class DailySchedule implements Parcelable {
 		}
 	};
 
+	public static final DailySchedule NULL = new DailySchedule();
+
 	@Expose
 	@SerializedName("is_closed")
 	private Boolean closed;
@@ -32,6 +35,12 @@ public class DailySchedule implements Parcelable {
 
 	@Expose
 	private String closeTime;
+
+	private DailySchedule() {
+		closed = false;
+		openTime = StringUtils.EMPTY_STRING;
+		closeTime = StringUtils.EMPTY_STRING;
+	}
 
 	public DailySchedule(Parcel parcel) {
 		closed = parcel.readInt() == 1;

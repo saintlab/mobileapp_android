@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.omnom.android" >
+    package="com.omnom.android">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -32,7 +32,7 @@
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Wood.Red" >
+        android:theme="@style/Theme.Wood.Red">
         <service
             android:name=".service.bluetooth.BackgroundBleService"
             android:enabled="true"
@@ -44,7 +44,7 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood.Red"
-            android:windowSoftInputMode="stateAlwaysHidden" >
+            android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -140,13 +140,19 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden" />
-
         <activity
             android:name=".activity.RestaurantsListActivity"
             android:label="@string/title_activity_restaurants_list"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White"
-            android:windowSoftInputMode="stateAlwaysHidden"/>
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity
+            android:name=".activity.RestaurantActivity"
+            android:label="@string/title_activity_restaurant"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White"
+            android:windowSoftInputMode="stateAlwaysHidden" />
 
         <meta-data
             android:name="com.crashlytics.ApiKey"

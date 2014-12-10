@@ -81,24 +81,28 @@ public class RestaurantHelper {
 	 * @see java.util.Calendar#SUNDAY
 	 */
 	public static DailySchedule getDailySchedule(Restaurant restaurant, int weekDay) {
+		final Schedules schedules = restaurant.getSchedules();
+		if(schedules == null) {
+			return DailySchedule.NULL;
+		}
 		switch(weekDay) {
 			case Calendar.MONDAY:
-				return restaurant.getSchedules().getWorkingSchedule().getMonday();
+				return schedules.getWorkingSchedule().getMonday();
 			case Calendar.TUESDAY:
-				return restaurant.getSchedules().getWorkingSchedule().getTuesday();
+				return schedules.getWorkingSchedule().getTuesday();
 			case Calendar.WEDNESDAY:
-				return restaurant.getSchedules().getWorkingSchedule().getWednesday();
+				return schedules.getWorkingSchedule().getWednesday();
 			case Calendar.THURSDAY:
-				return restaurant.getSchedules().getWorkingSchedule().getThursday();
+				return schedules.getWorkingSchedule().getThursday();
 			case Calendar.FRIDAY:
-				return restaurant.getSchedules().getWorkingSchedule().getFriday();
+				return schedules.getWorkingSchedule().getFriday();
 			case Calendar.SATURDAY:
-				return restaurant.getSchedules().getWorkingSchedule().getSaturday();
+				return schedules.getWorkingSchedule().getSaturday();
 			case Calendar.SUNDAY:
-				return restaurant.getSchedules().getWorkingSchedule().getSunday();
+				return schedules.getWorkingSchedule().getSunday();
 
 			default:
-				return restaurant.getSchedules().getWorkingSchedule().getMonday();
+				return schedules.getWorkingSchedule().getMonday();
 		}
 	}
 

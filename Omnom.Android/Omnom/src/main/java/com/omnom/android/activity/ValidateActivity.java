@@ -366,7 +366,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	public void onBill(final View v) {
 
 		if(true) {
-			RestaurantsListActivity.start(getActivity());
+			RestaurantsListActivity.start(this);
 			return;
 		}
 

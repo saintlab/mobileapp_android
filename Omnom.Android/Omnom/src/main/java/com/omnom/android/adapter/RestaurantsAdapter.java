@@ -1,7 +1,9 @@
 package com.omnom.android.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,24 +29,40 @@ import butterknife.InjectView;
  */
 public class RestaurantsAdapter extends BaseAdapter {
 
-	static class ViewHolder {
+	public static class RestaurantViewHolder {
 		@InjectView(R.id.img_cover)
-		protected ImageView imgCover;
+		public ImageView imgCover;
 
 		@InjectView(R.id.txt_title)
-		protected TextView txtTitle;
+		public TextView txtTitle;
 
 		@InjectView(R.id.txt_address)
-		protected TextView txtAddress;
+		public TextView txtAddress;
 
 		@InjectView(R.id.txt_distance)
-		protected TextView txtDistance;
+		public TextView txtDistance;
 
 		@InjectView(R.id.txt_schedule)
-		protected TextView txtSchedule;
+		public TextView txtSchedule;
 
-		private ViewHolder(View convertView) {
+		public RestaurantViewHolder(View convertView) {
 			ButterKnife.inject(this, convertView);
+		}
+
+		public RestaurantViewHolder(Activity activity) {
+			ButterKnife.inject(this, activity);
+		}
+
+		public void bindData(final Context context, final Restaurant item, Drawable placeholder, int weekDay) {
+			OmnomApplication.getPicasso(context)
+			                .load(RestaurantHelper.getBackground(item, context.getResources().getDisplayMetrics()))
+			                .placeholder(placeholder)
+			                .into(imgCover);
+
+			txtTitle.setText(item.getTitle());
+			txtAddress.setText(RestaurantHelper.getAddressSmall(context, item));
+			txtDistance.setText("~50м");
+			txtSchedule.setText(RestaurantHelper.getOpenedTime(context, item, weekDay));
 		}
 	}
 
@@ -90,7 +108,7 @@ public class RestaurantsAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if(convertView == null) {
 			convertView = mInflater.inflate(R.layout.item_restaurant, parent, false);
-			ViewHolder holder = new ViewHolder(convertView);
+			RestaurantViewHolder holder = new RestaurantViewHolder(convertView);
 			convertView.setTag(holder);
 		}
 		bindView(convertView, (Restaurant) getItem(position), position);
@@ -98,17 +116,10 @@ public class RestaurantsAdapter extends BaseAdapter {
 	}
 
 	private void bindView(final View convertView, final Restaurant item, final int position) {
-		ViewHolder holder = (ViewHolder) convertView.getTag();
+		RestaurantViewHolder holder = (RestaurantViewHolder) convertView.getTag();
 		if(holder == null) {
 			return;
 		}
-		mDisplayMetrics = mContext.getResources().getDisplayMetrics();
-		mPicasso.load(RestaurantHelper.getBackground(item, mDisplayMetrics))
-		        .placeholder(mPlaceholderDrawable)
-		        .into(holder.imgCover);
-		holder.txtTitle.setText(item.getTitle());
-		holder.txtAddress.setText(RestaurantHelper.getAddressSmall(mContext, item));
-		holder.txtDistance.setText("~50м");
-		holder.txtSchedule.setText(RestaurantHelper.getOpenedTime(mContext, item, mWeekDay));
+		holder.bindData(mContext, item, mPlaceholderDrawable, mWeekDay);
 	}
 }
