@@ -50,9 +50,28 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	}
 
+	@OnClick(R.id.btn_close)
+	protected void doClose() {
+		finish();
+	}
+
+	@OnClick(R.id.btn_demo)
+	protected void doDemo() {
+		ValidateActivity.start(this,
+		                       R.anim.fake_fade_in_instant,
+		                       R.anim.fake_fade_out_instant,
+		                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
+	}
+
 	@Override
 	protected void handleIntent(final Intent intent) {
 		mRestaurant = intent.getParcelableExtra(EXTRA_RESTAURANT);
+	}
+
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 	}
 
 	@Override

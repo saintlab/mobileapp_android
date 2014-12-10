@@ -7,6 +7,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
@@ -14,6 +15,7 @@ import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
+import com.omnom.android.utils.utils.AnimationUtils;
 
 import javax.inject.Inject;
 
@@ -46,6 +48,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity {
 	@InjectView(R.id.img_profile)
 	protected ImageView imgProfile;
 
+	@InjectView(R.id.progress)
+	protected ProgressBar progressBar;
+
 	@Inject
 	RestaurateurObeservableApi api;
 
@@ -71,6 +76,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		if(mAdapter == null) {
+			AnimationUtils.animateAlpha(progressBar, true);
+		}
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
@@ -90,15 +98,27 @@ public class RestaurantsListActivity extends BaseOmnomActivity {
 			@Override
 			public void call(final RestaurantsResponse restaurants) {
 				mAdapter = new RestaurantsAdapter(getActivity(), restaurants.getItems());
-				list.setAdapter(mAdapter);
-				list.addFooterView(LayoutInflater.from(getActivity()).inflate(R.layout.item_restaurants_footer, null));
+				AnimationUtils.animateAlpha(progressBar, false, new Runnable() {
+					@Override
+					public void run() {
+						list.addFooterView(LayoutInflater.from(getActivity()).inflate(R.layout.item_restaurants_footer, null));
+						list.setAdapter(mAdapter);
+					}
+				});
 			}
 		}, new OmnomBaseErrorHandler(this) {
 			@Override
 			protected void onThrowable(final Throwable throwable) {
+				AnimationUtils.animateAlpha(progressBar, false);
 				Log.e(TAG, "getRestaurants", throwable);
 			}
 		});
+	}
+
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 	}
 
 	@Override

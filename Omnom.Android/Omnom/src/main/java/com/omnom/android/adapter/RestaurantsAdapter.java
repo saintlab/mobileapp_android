@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
-import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 import java.util.List;
@@ -72,19 +70,14 @@ public class RestaurantsAdapter extends BaseAdapter {
 
 	private final LayoutInflater mInflater;
 
-	private final Picasso mPicasso;
-
 	private final int mWeekDay;
 
 	private final ColorDrawable mPlaceholderDrawable;
-
-	private DisplayMetrics mDisplayMetrics;
 
 	public RestaurantsAdapter(Context context, List<Restaurant> restaurants) {
 		mContext = context;
 		mRestaurants = restaurants;
 		mInflater = LayoutInflater.from(mContext);
-		mPicasso = OmnomApplication.getPicasso(mContext);
 		mWeekDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 		mPlaceholderDrawable = new ColorDrawable(mContext.getResources().getColor(R.color.order_item_price));
 	}
