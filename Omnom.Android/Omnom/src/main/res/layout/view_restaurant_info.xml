@@ -43,5 +43,5 @@
         android:text="STREET 40"
         android:drawableLeft="@drawable/ic_time_schedule"
         android:drawablePadding="@dimen/drawable_padding_default"
-        android:textAppearance="?android:textAppearanceMedium" />
+        android:textAppearance="?android:textAppearanceLarge" />
 </merge>
