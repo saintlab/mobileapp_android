@@ -58,7 +58,7 @@
     <dimen name="font_larger">26sp</dimen>
     <dimen name="font_xlarge">30sp</dimen>
     <dimen name="font_xxlarge">40sp</dimen>
-    <dimen name="font_intro_info">30sp</dimen>
+    <dimen name="font_intro_info">28sp</dimen>
 
     <dimen name="error_text_padding">24dp</dimen>
 
