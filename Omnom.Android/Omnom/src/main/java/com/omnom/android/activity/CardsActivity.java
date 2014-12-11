@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -151,6 +152,8 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private PaymentEventListener mPaymentListener;
 
+	private boolean isPaymentRequest = true;
+
 	@Override
 	public void finish() {
 		super.finish();
@@ -218,6 +221,9 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		if (mDetails != null) {
 			final String text = StringUtils.formatCurrency(mDetails.getAmount()) + getString(R.string.currency_ruble);
 			mBtnPay.setText(getString(R.string.pay_amount, text));
+			if (!mIsDemo) {
+				mBtnPay.setEnabled(false);
+			}
 		} else {
 			RelativeLayout.LayoutParams layoutParams =(RelativeLayout.LayoutParams) cardsFooter.getLayoutParams();
 			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -306,8 +312,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 			@Override
 			public void call(CardDeleteResponse cardDeleteResponse) {
 				if (cardDeleteResponse.isSuccess()) {
-					final CardsAdapter adapter = (CardsAdapter) mList.getAdapter();
-					adapter.remove(card);
+					onRemoveSuccess(card);
 				} else {
 					if (cardDeleteResponse.getError() != null) {
 						cardRemovalError();
@@ -325,6 +330,19 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 				cardRemovalError();
 			}
 		});
+	}
+
+	private void onRemoveSuccess(final Card card) {
+		final CardsAdapter adapter = (CardsAdapter) mList.getAdapter();
+		adapter.remove(card);
+		updateCardsSelection(adapter, card);
+	}
+
+	private void updateCardsSelection(CardsAdapter adapter, Card card) {
+		final String selectedId = mPreferences.getCardId(getActivity());
+		if (card.getExternalCardId().equals(selectedId)) {
+			mBtnPay.setEnabled(selectCard(adapter, selectedId));
+		}
 	}
 
 	private void cardRemovalError() {
@@ -354,12 +372,11 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 						                                      @Override
 						                                      public void call(final CardsResponse cards) {
 							                                      final List<Card> cardsList = cards.getCards();
-							                                      if(cardsList.size() == 1) {
-								                                      mPreferences.setCardId(getActivity(), cardsList.get(0)
-								                                                                                     .getExternalCardId());
-							                                      }
 							                                      mList.setAdapter(new CardsAdapter(getActivity(), cardsList,
 							                                                                        CardsActivity.this, false));
+							                                      boolean isSelected = selectCard((CardsAdapter) mList.getAdapter(),
+									                                                            mPreferences.getCardId(getActivity()));
+							                                      mBtnPay.setEnabled(isSelected);
 							                                      mPanelTop.showProgress(false);
 							                                      mPanelTop.showButtonRight(true);
 						                                      }
@@ -371,6 +388,58 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 						                                      }
 					                                      });
 		}
+	}
+
+	private boolean selectCard(final CardsAdapter cardsAdapter, final String selectedCardId) {
+		boolean isSelected;
+		// open CardAddActivity if no card registered on bill payment
+		if (cardsAdapter.isEmpty()) {
+			if (mDetails != null && isPaymentRequest) {
+				onAdd();
+			}
+			return false;
+		} else {
+			final Card cardToSelect = findCardToSelect(cardsAdapter, selectedCardId);
+			// If appropriate card found - mark as selected
+			if (cardToSelect != null) {
+				// If selection is not changed - do nothing
+				if (!cardToSelect.getExternalCardId().equals(selectedCardId)) {
+					mPreferences.setCardId(getActivity(), cardToSelect.getExternalCardId());
+					cardsAdapter.notifyDataSetChanged();
+				}
+				isSelected = true;
+			// If not found - remove preference record
+			} else {
+				isSelected = false;
+				if (!TextUtils.isEmpty(selectedCardId)) {
+					mPreferences.setCardId(getActivity(), null);
+				}
+			}
+		}
+
+		return isSelected;
+	}
+
+	private Card findCardToSelect(CardsAdapter cardsAdapter, String selectedCardId) {
+		Card cardToSelect = null;
+		for (int i = 0; i < cardsAdapter.getCount(); i++) {
+			final Card card = (Card) cardsAdapter.getItem(i);
+			// Select only registered cards
+			if (card.isRegistered()) {
+				if (cardToSelect == null) {
+					cardToSelect = card;
+				}
+				// Select the first registered card if nothing is set
+				if (TextUtils.isEmpty(selectedCardId)) {
+					break;
+				// If selected card is found in a list - finish search
+				} else if (selectedCardId.equals(card.getExternalCardId())) {
+					cardToSelect = card;
+					break;
+				}
+			}
+		}
+		return cardToSelect;
 	}
 
 	@OnClick(R.id.btn_pay)
@@ -390,6 +459,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		isPaymentRequest = false;
 		if(resultCode == RESULT_OK) {
 			if(requestCode == REQUEST_PAYMENT) {
 				setResult(RESULT_OK);
