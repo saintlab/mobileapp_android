@@ -24,6 +24,7 @@ import com.omnom.android.view.HeaderView;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
+import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -94,6 +95,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	private boolean mFirstStart = true;
 	private int type;
 	private Subscription mConfirmSubscription;
+	private Subscription mRequestCodeSubscription;
 
 	@Override
 	public void initUi() {
@@ -101,10 +103,6 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		topPanel.setTitle(R.string.enter);
 		topPanel.setContentVisibility(false, true);
 		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 1);
-
-		btnRequestCode.setEnabled(false);
-		btnRequestCode.setFocusable(false);
-		btnRequestCode.setFocusableInTouchMode(false);
 
 		edit1.addTextChangedListener(new Watcher(edit1));
 		edit2.addTextChangedListener(new Watcher(edit2));
@@ -146,11 +144,9 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 							                                        R.integer.default_animation_duration_short), new Runnable() {
 						                                        @Override
 						                                        public void run() {
-							                                        ConfirmPhoneActivity.this.finish();
-							                                        ValidateActivity.start(ConfirmPhoneActivity.this,
-							                                                               R.anim.fake_fade_in_instant,
-							                                                               R.anim.fake_fade_out_instant,
-							                                                               EXTRA_LOADER_ANIMATION_SCALE_UP, false);
+									                                SplashActivity.start(ConfirmPhoneActivity.this,
+									                                                     R.anim.fake_fade_in_instant,
+									                                                     R.anim.fake_fade_out_instant, 0);
 						                                        }
 					                                        });
 				                                        } else {
@@ -200,6 +196,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		OmnomObservable.unsubscribe(mConfirmSubscription);
+		OmnomObservable.unsubscribe(mRequestCodeSubscription);
 	}
 
 	@Override
@@ -216,16 +213,36 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 					                     getResources().getInteger(android.R.integer.config_mediumAnimTime));
 		}
 		if(mFirstStart) {
-			postDelayed(getResources().getInteger(R.integer.default_sms_request_timeout), new Runnable() {
-				@Override
-				public void run() {
-					btnRequestCode.setEnabled(true);
-					btnRequestCode.setFocusable(true);
-					btnRequestCode.setFocusableInTouchMode(true);
-				}
-			});
+			startRequestCodeTimeout();
 		}
 		mFirstStart = false;
+	}
+
+	@OnClick(R.id.btn_request_code)
+	protected void onRequestCode() {
+		mRequestCodeSubscription = AndroidObservable.bindActivity(this, authenticator.confirmResend(phone))
+				.subscribe(new Action1<AuthResponse>() {
+					@Override
+					public void call(AuthResponse authResponse) {
+						// handle result if necessary
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						Log.w(TAG, throwable.getMessage());
+					}
+				});
+		startRequestCodeTimeout();
+	}
+
+	private void startRequestCodeTimeout() {
+		btnRequestCode.setEnabled(false);
+		postDelayed(getResources().getInteger(R.integer.default_sms_request_timeout), new Runnable() {
+			@Override
+			public void run() {
+				btnRequestCode.setEnabled(true);
+			}
+		});
 	}
 
 	@Override

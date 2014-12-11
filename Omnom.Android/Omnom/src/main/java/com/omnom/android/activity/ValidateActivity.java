@@ -67,7 +67,6 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 import static butterknife.ButterKnife.findById;
-import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
 /**
  * Created by Ch3D on 08.10.2014.
@@ -126,8 +125,12 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				return;
 			}
 			throwable.printStackTrace();
-			showToastLong(getActivity(), R.string.error_unknown_server_error);
-			finish();
+			mErrorHelper.showBackendError(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					getActivity().finish();
+				}
+			});
 		}
 	};
 

@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
+import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -56,7 +57,15 @@ public class SplashActivity extends BaseOmnomActivity {
 	@InjectView(R.id.img_bg)
 	protected ImageView imgBackground;
 
+	private int durationSplash;
+
 	private boolean mAnimate = true;
+
+	public static void start(BaseActivity context, int enterAnim, int exitAnim, int durationSplash) {
+		final Intent intent = new Intent(context, SplashActivity.class);
+		intent.putExtra(EXTRA_DURATION_SPLASH, durationSplash);
+		context.start(intent, enterAnim, exitAnim, true);
+	}
 
 	private void animateValidation() {
 		if(!mAnimate) {
@@ -64,7 +73,6 @@ public class SplashActivity extends BaseOmnomActivity {
 		}
 
 		final int durationShort = getResources().getInteger(R.integer.default_animation_duration_short);
-		final int durationSplash = getResources().getInteger(R.integer.splash_screen_timeout);
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
 		final int dimensionPixelSize = getResources().getDimensionPixelSize(R.dimen.loader_logo_size);
 
@@ -222,6 +230,11 @@ public class SplashActivity extends BaseOmnomActivity {
 		} else if(AndroidUtils.isJellyBeanMR2()) {
 			startBleServiceJB();
 		}
+	}
+
+	@Override
+	protected void handleIntent(Intent intent) {
+		durationSplash = intent.getIntExtra(EXTRA_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
 	}
 
 	@TargetApi(Build.VERSION_CODES.KITKAT)
