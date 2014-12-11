@@ -50,7 +50,7 @@ public class OrderItemsAdapter extends BaseAdapter {
 
 	private final LayoutInflater mInflater;
 
-	protected final SparseBooleanArray mCheckedStates;
+	protected SparseBooleanArray mCheckedStates;
 
 	private final int mColorPriceNormal;
 
@@ -59,6 +59,8 @@ public class OrderItemsAdapter extends BaseAdapter {
 	private boolean mAddFakeView;
 
 	private List<OrderItem> mItems;
+
+	private SparseBooleanArrayParcelable mStates;
 
 	public OrderItemsAdapter(final Context context, final List<OrderItem> orders, boolean addFakeView) {
 		this(context, orders, new SparseBooleanArrayParcelable(), addFakeView);
@@ -179,5 +181,9 @@ public class OrderItemsAdapter extends BaseAdapter {
 			}
 		}
 		return result;
+	}
+
+	public void setStates(final SparseBooleanArrayParcelable states) {
+		mCheckedStates = states;
 	}
 }

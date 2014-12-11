@@ -7,7 +7,7 @@ import android.util.SparseBooleanArray;
 /**
  * Created by Ch3D on 12.11.2014.
  */
-public class SparseBooleanArrayParcelable extends SparseBooleanArray implements Parcelable {
+public class SparseBooleanArrayParcelable extends SparseBooleanArray implements Parcelable, Cloneable {
 	public static Parcelable.Creator<SparseBooleanArrayParcelable> CREATOR = new Parcelable.Creator<SparseBooleanArrayParcelable>() {
 		@Override
 		public SparseBooleanArrayParcelable createFromParcel(Parcel source) {
@@ -41,6 +41,11 @@ public class SparseBooleanArrayParcelable extends SparseBooleanArray implements 
 		for(int i = 0; i < sparseBooleanArray.size(); i++) {
 			this.put(sparseBooleanArray.keyAt(i), sparseBooleanArray.valueAt(i));
 		}
+	}
+
+	@Override
+	public SparseBooleanArrayParcelable clone() {
+		return (SparseBooleanArrayParcelable) super.clone();
 	}
 
 	@Override
