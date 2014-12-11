@@ -46,7 +46,7 @@
     <dimen name="pay_once_fragment_height_small">150dp</dimen>
 
     <dimen name="profile_margin_top">-48dp</dimen>
-    <dimen name="profile_avatar_size">156dp</dimen>
+    <dimen name="profile_avatar_size">132dp</dimen>
 
     <dimen name="font_xxsmall">8sp</dimen>
     <dimen name="font_xsmall">12sp</dimen>

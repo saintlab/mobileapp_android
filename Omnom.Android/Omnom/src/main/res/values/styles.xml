@@ -6,6 +6,8 @@
         <item name="android:textAppearanceLarge">@style/TextAppearance.Large</item>
         <item name="android:textAppearanceMedium">@style/TextAppearance.Medium</item>
 
+        <item name="android:listPreferredItemHeight">56dp</item>
+
         <item name="android:textAppearanceInverse">@style/TextAppearance.Inverse</item>
         <item name="android:textAppearanceSmallInverse">@style/TextAppearance.Small.Inverse</item>
         <item name="android:textAppearanceLargeInverse">@style/TextAppearance.Large.Inverse</item>
@@ -134,13 +136,15 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:singleLine">true</item>
-        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingTop">24dp</item>
         <item name="android:textAppearance">?android:textAppearanceLarge</item>
         <!--<item name="fontPath">fonts/Futura-LSF-Omnom-LE-Regular.otf</item>-->
     </style>
 
     <style name="TextView.User.Data.Hint">
+        <item name="android:paddingTop">0dp</item>
         <item name="android:textColor">@color/profile_hint</item>
+        <item name="android:textAppearance">?android:textAppearance</item>
     </style>
 
     <style name="TextView.User.Hint">
@@ -153,7 +157,7 @@
 
     <style name="Button.UserProfile.Data">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">?android:listPreferredItemHeightSmall</item>
+        <item name="android:layout_height">?android:listPreferredItemHeight</item>
         <item name="android:paddingLeft">@dimen/activity_horizontal_margin_medium</item>
         <item name="android:paddingRight">@dimen/activity_horizontal_margin_medium</item>
         <item name="android:gravity">left|center_vertical</item>

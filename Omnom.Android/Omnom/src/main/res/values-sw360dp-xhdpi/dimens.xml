@@ -19,7 +19,7 @@
     <dimen name="loader_progress_thickness">12dp</dimen>
     <item type="dimen" format="float" name="loader_progress_inner_radius">2.265</item>
 
-    <dimen name="profile_avatar_size">156dp</dimen>
+    <dimen name="profile_avatar_size">132dp</dimen>
     <dimen name="card_area_margin_top">48dp</dimen>
 
     <dimen name="order_list_trasnlation_active">-240dp</dimen>
