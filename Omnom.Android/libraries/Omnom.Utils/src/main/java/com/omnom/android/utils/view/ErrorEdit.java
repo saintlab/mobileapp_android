@@ -16,8 +16,8 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.omnom.android.utils.R;
@@ -135,7 +135,7 @@ public class ErrorEdit extends LinearLayout {
 			mImeOptions = a.getInt(R.styleable.ErrorEdit_imeOptions, EditorInfo.IME_ACTION_NONE);
 			mTextGravity = a.getInt(R.styleable.ErrorEdit_textGravity, GRAVITY_LEFT);
 			mMaxLen = a.getInt(R.styleable.ErrorEdit_maxLength, 0);
-			mEditTextWidth = a.getDimension(R.styleable.ErrorEdit_editTextWidth, TableRow.LayoutParams.MATCH_PARENT);
+			mEditTextWidth = a.getDimension(R.styleable.ErrorEdit_editTextWidth, FrameLayout.LayoutParams.MATCH_PARENT);
 			mTextSize = a.getDimension(R.styleable.ErrorEdit_textSize, getResources().getDimension(R.dimen.font_medium));
 			mErrorTextSize = a.getDimension(R.styleable.ErrorEdit_errorTextSize, getResources().getDimension(R.dimen.font_medium));
 		} finally {
@@ -150,8 +150,8 @@ public class ErrorEdit extends LinearLayout {
 		editView.addTextChangedListener(onTextChanged);
 		editView.setHint(mHintText);
 		editView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
-		editView.setLayoutParams(new TableRow.LayoutParams((int) mEditTextWidth,
-														   TableRow.LayoutParams.WRAP_CONTENT));
+		editView.setLayoutParams(new FrameLayout.LayoutParams((int) mEditTextWidth,
+															  FrameLayout.LayoutParams.WRAP_CONTENT));
 		if(mMaxLen > 0) {
 			final InputFilter[] filters = editView.getFilters();
 			final InputFilter[] newFilters = Arrays.copyOf(filters, filters.length + 1);
