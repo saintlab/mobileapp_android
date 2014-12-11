@@ -278,11 +278,11 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void translateUp(final Runnable endCallback, final int translation) {
-		AnimationUtils.translateUp(translationViews, translation, endCallback);
+		AnimationUtils.translateUp(getContext(), translationViews, translation, endCallback);
 	}
 
 	public void translateDown(final Runnable endCallback, final int translation) {
-		AnimationUtils.translateDown(translationViews, translation, endCallback);
+		AnimationUtils.translateDown(getContext(), translationViews, translation, endCallback);
 	}
 
 	public void scaleUp(final Runnable endCallback) {
