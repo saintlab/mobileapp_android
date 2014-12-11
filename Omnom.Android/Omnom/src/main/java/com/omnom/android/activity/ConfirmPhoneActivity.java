@@ -146,11 +146,9 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 							                                        R.integer.default_animation_duration_short), new Runnable() {
 						                                        @Override
 						                                        public void run() {
-							                                        ConfirmPhoneActivity.this.finish();
-							                                        ValidateActivity.start(ConfirmPhoneActivity.this,
-							                                                               R.anim.fake_fade_in_instant,
-							                                                               R.anim.fake_fade_out_instant,
-							                                                               EXTRA_LOADER_ANIMATION_SCALE_UP, false);
+									                                SplashActivity.start(ConfirmPhoneActivity.this,
+									                                                     R.anim.fake_fade_in_instant,
+									                                                     R.anim.fake_fade_out_instant, 0);
 						                                        }
 					                                        });
 				                                        } else {
