@@ -207,7 +207,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@Override
 	public void finish() {
 		UserProfileActivity.super.finish();
-		overridePendingTransition(R.anim.fake_fade_out_long, R.anim.slide_out_down);
+		overridePendingTransition(R.anim.fake_fade_out_short, R.anim.slide_out_down);
 	}
 
 	@OnClick(R.id.btn_bottom)
