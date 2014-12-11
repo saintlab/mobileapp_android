@@ -235,15 +235,6 @@ public class OrderFragment extends Fragment {
 	private List<CompoundButton> tipsButtons;
 
 	@Nullable
-	private RadioButton btnTips1;
-
-	@Nullable
-	private RadioButton btnTips2;
-
-	@Nullable
-	private RadioButton btnTips3;
-
-	@Nullable
 	private RadioButton otherTips;
 
 	@Nullable
@@ -451,9 +442,9 @@ public class OrderFragment extends Fragment {
 					doCancel(v);
 				}
 			});
-			btnTips1 = (RadioButton) inflate.findViewById(R.id.radio_tips_1);
-			btnTips2 = (RadioButton) inflate.findViewById(R.id.radio_tips_2);
-			btnTips3 = (RadioButton) inflate.findViewById(R.id.radio_tips_3);
+			RadioButton btnTips1 = (RadioButton) inflate.findViewById(R.id.radio_tips_1);
+			RadioButton btnTips2 = (RadioButton) inflate.findViewById(R.id.radio_tips_2);
+			RadioButton btnTips3 = (RadioButton) inflate.findViewById(R.id.radio_tips_3);
 			tipsButtons = Arrays.asList((CompoundButton) btnTips1,
 										(CompoundButton) btnTips2,
 									    (CompoundButton) btnTips3);
@@ -776,20 +767,17 @@ public class OrderFragment extends Fragment {
 			@Override
 			public void onCheckedChanged(final CompoundButton btn, final boolean isChecked) {
 				if(isChecked) {
+					lastCheckedTipsButtonId = btn.getId();
 					final BigDecimal amount = getEnteredAmount();
 					mCheckedId = btn.getId();
 					updateTipsButtonState(btn);
 					otherTips.setTag(WRONG_VALUE);
 					otherTips.setChecked(false);
-					updateOtherTipsButtonState(otherTips);
+					updateTipsButtonState(otherTips);
 					final double selectedTips = getSelectedTips(btn, amount);
 					updatePayButton(amount.add(BigDecimal.valueOf(selectedTips)));
 				} else {
-					if (btn.getId() == R.id.radio_tips_4) {
-						updateOtherTipsButtonState(btn);
-					} else {
-						updateTipsButtonState(btn);
-					}
+					updateTipsButtonState(btn);
 				}
 			}
 		};
@@ -868,11 +856,11 @@ public class OrderFragment extends Fragment {
 		}
 		if(mMode == MODE_TIPS) {
 			showCustomTips(false);
-
 			otherTips.setChecked(true);
+			lastCheckedTipsButtonId = otherTips.getId();
 			otherTips.setTag(pickerTips.getValue());
 			final BigDecimal amount = getEnteredAmount();
-			updateOtherTipsButtonState(otherTips);
+			updateTipsButtonState(otherTips);
 			final double otherTips = getOtherTips(amount);
 			updatePayButton(amount.add(BigDecimal.valueOf(otherTips)));
 		}
@@ -894,7 +882,7 @@ public class OrderFragment extends Fragment {
 			}
 			radioGroup.check(mCheckedId);
 			otherTips.setTag(WRONG_VALUE);
-			updateOtherTipsButtonState(otherTips);
+			updateTipsButtonState(otherTips);
 		}
 	}
 
@@ -903,7 +891,7 @@ public class OrderFragment extends Fragment {
 		if(btn == null) {
 			return BigDecimal.ZERO;
 		}
-		if(OrderHelper.isPercentTips(mOrder, amount) || btn.getId() == R.id.radio_tips_4) {
+		if(OrderHelper.isPercentTips(mOrder, amount) || btn.getId() == otherTips.getId()) {
 			final int percent = (Integer) btn.getTag();
 			final int tipsAmount = OrderHelper.getTipsAmount(amount, percent);
 			return BigDecimal.valueOf(tipsAmount);
@@ -935,7 +923,7 @@ public class OrderFragment extends Fragment {
 
 	private void updatePaymentTipsAmount(BigDecimal amount) {
 		updatePaymentTipsAmount(amount, tipsButtons);
-		updateOtherTipsButtonState(otherTips);
+		updateTipsButtonState(otherTips);
 	}
 
 	private void updatePaymentTipsAmount(final BigDecimal amount, final List<CompoundButton> tipsButtons) {
@@ -958,11 +946,7 @@ public class OrderFragment extends Fragment {
 				final CompoundButton btn = findById(getActivity(), lastCheckedTipsButtonId);
 				if(btn != null) {
 					btn.setChecked(true);
-					if (btn.getId() == R.id.radio_tips_4) {
-						updateOtherTipsButtonState(btn);
-					} else {
-						updateTipsButtonState(btn);
-					}
+					updateTipsButtonState(btn);
 				}
 			}
 		}
@@ -982,22 +966,20 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void updateTipsButtonState(final CompoundButton tipsButton) {
-		if(tipsButton.isChecked()) {
-			lastCheckedTipsButtonId = radioGroup.getCheckedRadioButtonId();
-			tipsButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontNormal);
+		if (tipsButton.getId() == otherTips.getId()) {
+			if(tipsButton.isChecked()) {
+				tipsButton.setText(getString(R.string.tip_percent, tipsButton.getTag()));
+				tipsButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontNormal);
+			} else {
+				tipsButton.setText(getString(R.string.tips_another));
+				tipsButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSmall);
+			}
 		} else {
-			tipsButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSmall);
-		}
-	}
-
-	private void updateOtherTipsButtonState(final CompoundButton tipsButton) {
-		if(tipsButton.isChecked()) {
-			lastCheckedTipsButtonId = radioGroup.getCheckedRadioButtonId();
-			tipsButton.setText(getString(R.string.tip_percent, tipsButton.getTag()));
-			tipsButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontNormal);
-		} else {
-			tipsButton.setText(getString(R.string.tips_another));
-			tipsButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSmall);
+			if (tipsButton.isChecked()) {
+				tipsButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontNormal);
+			} else {
+				tipsButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSmall);
+			}
 		}
 	}
 
