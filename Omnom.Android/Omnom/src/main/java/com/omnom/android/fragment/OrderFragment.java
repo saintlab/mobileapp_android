@@ -209,7 +209,7 @@ public class OrderFragment extends Fragment {
 	protected ViewStub stubPaymentOptions;
 
 	@Nullable
-	protected TextView btnPay;
+	protected Button btnPay;
 
 	@Nullable
 	protected ImageButton btnApply;
