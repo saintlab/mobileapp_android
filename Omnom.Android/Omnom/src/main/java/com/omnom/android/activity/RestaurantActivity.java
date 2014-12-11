@@ -3,12 +3,14 @@ package com.omnom.android.activity;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.AnimationUtils;
 
 import java.util.Calendar;
 
@@ -70,8 +72,16 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@Override
 	public void finish() {
-		super.finish();
-		overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+		final ImageView imgCover = mRestaurantViewHolder.imgCover;
+		imgCover.animate().translationYBy(getResources().getDimensionPixelSize(R.dimen.view_size_default)).start();
+		AnimationUtils.scaleHeight(imgCover,
+		                           getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_small), new Runnable() {
+					@Override
+					public void run() {
+						RestaurantActivity.super.finish();
+						overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+					}
+				});
 	}
 
 	@Override

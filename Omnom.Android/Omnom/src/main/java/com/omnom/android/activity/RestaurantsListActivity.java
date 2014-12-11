@@ -19,6 +19,7 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		activity.start(RestaurantsListActivity.class, false);
 	}
 
+	@InjectView(R.id.panel_top)
+	protected View panelTop;
+
 	@InjectView(android.R.id.list)
 	protected ListView list;
 
@@ -65,6 +69,10 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@Nullable
 	private ArrayList<Restaurant> mRestaurants;
+
+	private ImageView selectedImgCover;
+
+	private View nextView;
 
 	@OnClick(R.id.img_qr)
 	public void doQrShortcut() {
@@ -86,8 +94,10 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@Override
 	protected void handleIntent(final Intent intent) {
-		mRestaurants = getIntent().getParcelableArrayListExtra(EXTRA_RESTAURANTS);
-		mAdapter = new RestaurantsAdapter(this, mRestaurants);
+		if(getIntent().hasExtra(EXTRA_RESTAURANTS)) {
+			mRestaurants = getIntent().getParcelableArrayListExtra(EXTRA_RESTAURANTS);
+			mAdapter = new RestaurantsAdapter(this, mRestaurants);
+		}
 	}
 
 	@Override
@@ -125,8 +135,26 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@Override
 	public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-		final Restaurant item = (Restaurant) mAdapter.getItem(position);
-		RestaurantActivity.start(RestaurantsListActivity.this, item);
+		//final Restaurant item = (Restaurant) mAdapter.getItem(position);
+		//RestaurantActivity.start(RestaurantsListActivity.this, item);
+		mAdapter.setSelected(position);
+		list.smoothScrollToPositionFromTop(position, 0);
+		selectedImgCover = (ImageView) view.findViewById(R.id.img_cover);
+		panelTop.animate().translationYBy(-panelTop.getHeight()).start();
+		list.animate().translationYBy(-panelTop.getHeight()).start();
+		nextView = list.getChildAt(position + 1);
+		if(nextView != null) {
+			nextView.animate().alpha(0).start();
+		}
+		AnimationUtils.scaleHeight(selectedImgCover, getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_large),
+		                           new Runnable() {
+			                           @Override
+			                           public void run() {
+				                           list.requestLayout();
+				                           final Restaurant item = (Restaurant) mAdapter.getItem(position);
+				                           RestaurantActivity.start(RestaurantsListActivity.this, item);
+			                           }
+		                           });
 		//final ImageView imgCover = (ImageView) view.findViewById(R.id.img_cover);
 		////imgCover.animate().translationYBy(-100).start();
 		////AnimationUtils.scaleHeight(imgCover, 450);
@@ -134,6 +162,19 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		//final ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat
 		//		.makeThumbnailScaleUpAnimation(view, drawable.getBitmap(), (int)view.getX(), (int)view.getY());
 		//startActivity(new Intent(getActivity(), UserProfileActivity.class), activityOptionsCompat.toBundle());
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		panelTop.setTranslationY(0);
+		list.setTranslationY(0);
+		mAdapter.setSelected(-1);
+		mAdapter.notifyDataSetChanged();
+		if(nextView != null) {
+			nextView.setAlpha(1);
+		}
+		ViewUtils.setHeight(selectedImgCover, getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_small));
 	}
 
 	@Override

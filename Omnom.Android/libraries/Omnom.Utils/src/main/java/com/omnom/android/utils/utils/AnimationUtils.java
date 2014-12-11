@@ -168,6 +168,15 @@ public class AnimationUtils {
 		}).build().start();
 	}
 
+	public static void scaleHeight(final View view, int height, Runnable endCallback) {
+		AnimationBuilder.create(view, view.getMeasuredHeight(), height).addListener(new AnimationBuilder.UpdateLisetener() {
+			@Override
+			public void invoke(ValueAnimator animation) {
+				ViewUtils.setHeight(view, (Integer) animation.getAnimatedValue());
+			}
+		}).onEnd(endCallback).build().start();
+	}
+
 	public static void scaleHeight(final View view, int height, long duration) {
 		AnimationBuilder builder = AnimationBuilder.create(view, view.getMeasuredHeight(), height);
 		builder.setDuration(duration);

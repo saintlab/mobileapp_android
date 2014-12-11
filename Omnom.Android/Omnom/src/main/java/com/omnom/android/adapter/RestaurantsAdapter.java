@@ -74,6 +74,8 @@ public class RestaurantsAdapter extends BaseAdapter {
 
 	private final ColorDrawable mPlaceholderDrawable;
 
+	private int mSelectedPosition = -1;
+
 	public RestaurantsAdapter(Context context, List<Restaurant> restaurants) {
 		mContext = context;
 		mRestaurants = restaurants;
@@ -113,6 +115,20 @@ public class RestaurantsAdapter extends BaseAdapter {
 		if(holder == null) {
 			return;
 		}
+		if(mSelectedPosition != -1) {
+			if(mSelectedPosition != position) {
+				convertView.animate().alpha(0).start();
+			}
+		} else {
+			if(convertView.getAlpha() != 1.0f) {
+				convertView.setAlpha(0);
+				convertView.animate().alpha(1).start();
+			}
+		}
 		holder.bindData(mContext, item, mPlaceholderDrawable, mWeekDay);
+	}
+
+	public void setSelected(final int position) {
+		mSelectedPosition = position;
 	}
 }
