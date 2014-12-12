@@ -50,7 +50,6 @@ import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.mixpanel.model.BillViewEvent;
 import com.omnom.android.mixpanel.model.Event;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
-import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
@@ -639,7 +638,13 @@ public class OrderFragment extends Fragment {
 				updatePayButton(amount.add(selectedTips));
 			}
 		});
-		txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(mOrder.getPaidAmount(), getCurrencySuffix())));
+		final double paidAmount = mOrder.getPaidAmount();
+		if(paidAmount > 0) {
+			txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(paidAmount, getCurrencySuffix())));
+			ViewUtils.setVisible2(txtAlreadyPaid, true);
+		} else {
+			ViewUtils.setVisible2(txtAlreadyPaid, false);
+		}
 		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
 		editAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
