@@ -214,7 +214,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 		loadCards();
 
-		if(mTableId != null) {
+		if(!TextUtils.isEmpty(mTableId)) {
 			mPaymentListener = new PaymentEventListener(this);
 		}
 
