@@ -327,7 +327,8 @@ public class OrderFragment extends Fragment {
 			final String s = StringUtils.formatCurrency(amount, getCurrencySuffix());
 			editAmount.setText(s);
 			updatePaymentTipsAmount(amount);
-			updatePayButton(amount.add(getSelectedTips(amount)));
+			final BigDecimal tips = getSelectedTips(amount);
+			updatePayButton(amount.add(tips));
 		}
 	}
 
@@ -390,7 +391,10 @@ public class OrderFragment extends Fragment {
 		final View panelPayment = findById(mFragmentView, R.id.panel_order_payment);
 		if(panelPayment == null) {
 			stubPaymentOptions.setLayoutResource(R.layout.view_order_payment_options);
-			View inflate = stubPaymentOptions.inflate();
+
+			ViewGroup inflate = (ViewGroup) stubPaymentOptions.inflate();
+			AndroidUtils.applyFont(getActivity(), inflate, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+
 			editAmount = (EditText) inflate.findViewById(R.id.edit_payment_amount);
 			txtCustomTips = (TextView) inflate.findViewById(R.id.txt_custom_tips);
 			txtPaymentTitle = (TextView) inflate.findViewById(R.id.txt_payment_title);
@@ -528,7 +532,7 @@ public class OrderFragment extends Fragment {
 
 	private void showCardsActivity() {
 		final BigDecimal amount = getEnteredAmount();
-		final BigDecimal tips = getSelectedTips(amount);
+		final BigDecimal tips = getSelectedTips(amount).divide(new BigDecimal(100));
 		final BigDecimal amountToPay = amount.add(tips);
 		final PaymentDetails paymentDetails = new PaymentDetails(amountToPay.doubleValue(), tips.intValue() * 100);
 		final OrdersActivity activity = (OrdersActivity) getActivity();
@@ -542,7 +546,7 @@ public class OrderFragment extends Fragment {
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 
-		list.setSwipeEnabled(false);
+		list.setSwipeEnabled(mSingle);
 		list.setSwipeListener(new OmnomListView.SwipeListener() {
 			@Override
 			public void onRefresh() {
@@ -636,7 +640,8 @@ public class OrderFragment extends Fragment {
 				}
 				final BigDecimal amount = getEnteredAmount();
 				updatePaymentTipsAmount(amount);
-				updatePayButton(amount.add(getSelectedTips(amount)));
+				final BigDecimal selectedTips = getSelectedTips(amount).divide(new BigDecimal(100));
+				updatePayButton(amount.add(selectedTips));
 			}
 		});
 		txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(mOrder.getPaidAmount(), getCurrencySuffix())));
