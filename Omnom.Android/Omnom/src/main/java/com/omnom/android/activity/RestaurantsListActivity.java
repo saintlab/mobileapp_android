@@ -18,6 +18,7 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.SimpleListView;
 
@@ -83,7 +84,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@OnClick(R.id.img_profile)
 	public void doUserProfile() {
-		UserProfileActivity.startSliding(this, -1);
+		UserProfileActivity.startSliding(this, -1, StringUtils.EMPTY_STRING);
 	}
 
 	@OnClick(R.id.btn_demo)
