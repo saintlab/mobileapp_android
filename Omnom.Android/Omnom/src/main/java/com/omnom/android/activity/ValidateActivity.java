@@ -527,6 +527,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_ORDERS && resultCode == RESULT_OK) {
 			if(mRestaurant != null) {
 				loader.scaleDown(null, new Runnable() {

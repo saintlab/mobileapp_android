@@ -130,9 +130,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 	@Override
 	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		if(requestCode == REQUEST_CODE_CARDS && resultCode == RESULT_OK) {
-			setResult(RESULT_OK);
-			finish();
-			overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
+			close();
 		}
 	}
 
