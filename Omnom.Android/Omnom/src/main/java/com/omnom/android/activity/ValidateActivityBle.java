@@ -102,7 +102,7 @@ public class ValidateActivityBle extends ValidateActivity {
 			public void run() {
 			}
 		});
-		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this)
+		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
 		                                                                                 .map(OmnomObservable.getValidationFunc(this,
 		                                                                                                                        mErrorHelper,
 		                                                                                                                        mInternetErrorClickListener))

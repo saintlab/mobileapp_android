@@ -389,7 +389,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			public void run() {
 			}
 		});
-		ValidationObservable.validateSmart(this)
+		ValidationObservable.validateSmart(this, mIsDemo)
 		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickBillListener))
 		                    .isEmpty()
 		                    .subscribe(new Action1<Boolean>() {

@@ -24,7 +24,7 @@ public class ValidationObservable {
 
 	public static final int TIMEOUT = 100;
 
-	public static Observable<? extends ValidationObservable.Error> hasConnection(final Context context) {
+	public static Observable<ValidationObservable.Error> hasConnection(final Context context) {
 		return Observable.create(new Observable.OnSubscribe<Error>() {
 			@Override
 			public void call(Subscriber<? super Error> subscriber) {
@@ -79,23 +79,31 @@ public class ValidationObservable {
 		                 });
 	}
 
-	public static Observable<? extends ValidationObservable.Error> validateSmart(final Context context) {
+	public static Observable<? extends ValidationObservable.Error> validateSmart(final Context context, final boolean isDemo) {
 		final Observable<Error> observableChain;
-		if(hasBluetooth()) {
-			observableChain = Observable.concat(hasConnection(context), isLocationEnabled(context), isBluetoothEnabled(context));
+		if(isDemo) {
+			observableChain = hasConnection(context);
 		} else {
-			observableChain = Observable.concat(hasConnection(context), isLocationEnabled(context));
+			if(hasBluetooth()) {
+				observableChain = Observable.concat(hasConnection(context), isLocationEnabled(context), isBluetoothEnabled(context));
+			} else {
+				observableChain = Observable.concat(hasConnection(context), isLocationEnabled(context));
+			}
 		}
 		return observableChain
-		                 .timeout(TIMEOUT, TimeUnit.MILLISECONDS)
-		                 .delaySubscription(400, TimeUnit.MILLISECONDS)
-		                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-		                 .takeFirst(new Func1<Error, Boolean>() {
-			                 @Override
-			                 public Boolean call(Error error) {
-				                 return error != Error.OK;
-			                 }
-		                 });
+				.timeout(TIMEOUT, TimeUnit.MILLISECONDS)
+				.delaySubscription(400, TimeUnit.MILLISECONDS)
+				.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+				.takeFirst(new Func1<Error, Boolean>() {
+					@Override
+					public Boolean call(Error error) {
+						return error != Error.OK;
+					}
+				});
+	}
+
+	public static Observable<? extends ValidationObservable.Error> validateSmart(final Context context) {
+		return validateSmart(context, false);
 	}
 
 	private static boolean hasBluetooth() {
