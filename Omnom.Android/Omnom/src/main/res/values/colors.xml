@@ -24,6 +24,8 @@
     <color name="split_bill_red">#d90013</color>
     <color name="btn_pay_green">#00c194</color>
 
+    <color name="blue_bright">#147DFA</color>
+
     <color name="card_number_default">#ff000000</color>
     <color name="card_type_default">#7f000000</color>
 

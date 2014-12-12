@@ -23,25 +23,23 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
-        android:name="com.omnom.android.OmnomApplication"
+        android:name=".OmnomApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
         android:theme="@style/Theme.Wood.Red">
-
         <service
             android:name=".service.bluetooth.BackgroundBleService"
             android:enabled="true"
             android:exported="true" />
 
         <activity
-            android:name="com.omnom.android.activity.SplashActivity"
+            android:name=".activity.SplashActivity"
             android:icon="@drawable/ic_app"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
@@ -54,102 +52,112 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.omnom.android.activity.UserRegisterActivity"
+            android:name=".activity.UserRegisterActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name="com.omnom.android.activity.EnteringActivity"
+            android:name=".activity.EnteringActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Transparent"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name="com.omnom.android.activity.ConfirmPhoneActivity"
+            android:name=".activity.ConfirmPhoneActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.ConfirmPhone"
             android:windowSoftInputMode="stateAlwaysVisible" />
         <activity
-            android:name="com.omnom.android.activity.LoginActivity"
+            android:name=".activity.LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name="com.omnom.android.activity.ValidateActivityBle"
+            android:name=".activity.ValidateActivityBle"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name="com.omnom.android.activity.ValidateActivityCamera"
+            android:name=".activity.ValidateActivityCamera"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name="com.omnom.android.activity.OrdersActivity"
+            android:name=".activity.OrdersActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood.Light"
-            android:windowSoftInputMode="adjustResize|stateHidden"></activity>
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name="io.card.payment.CardIOActivity"
             android:configChanges="keyboardHidden|orientation" />
         <activity android:name="io.card.payment.DataEntryActivity" />
         <activity
-            android:name="com.omnom.android.activity.CardsActivity"
+            android:name=".activity.CardsActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White" />
         <activity
-            android:name="com.omnom.android.activity.UserProfileActivity"
+            android:name=".activity.UserProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name="com.omnom.android.activity.CardAddActivity"
+            android:name=".activity.CardAddActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.White.Light"></activity>
+            android:theme="@style/Theme.White.Light" />
         <activity
-            android:name="com.omnom.android.activity.CardConfirmActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.White"
-            android:windowSoftInputMode="stateHidden"></activity>
-
-        <activity
-            android:name="com.omnom.android.activity.PaymentProcessActivity"
+            android:name=".activity.CardConfirmActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White"
-            android:windowSoftInputMode="stateHidden"/>
-
+            android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name="com.omnom.android.activity.ThanksActivity"
+            android:name=".activity.PaymentProcessActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activity.ThanksActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood.Red"
             android:windowSoftInputMode="stateHidden" />
-
         <activity
-            android:name="com.omnom.android.activity.ThanksDemoActivity"
+            android:name=".activity.ThanksDemoActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood.Red"
             android:windowSoftInputMode="stateHidden" />
-
         <activity
-            android:name="com.omnom.android.activity.OmnomQRCaptureActivity"
+            android:name=".activity.OmnomQRCaptureActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activity.RestaurantsListActivity"
+            android:label="@string/title_activity_restaurants_list"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity
+            android:name=".activity.RestaurantActivity"
+            android:label="@string/title_activity_restaurant"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White"
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="80e157ab6e31985057b3080949fbc7c82e4501a4" />
+
     </application>
 
 </manifest>

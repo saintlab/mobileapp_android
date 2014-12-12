@@ -32,6 +32,12 @@ public class Restaurant implements Parcelable {
 	private String description;
 
 	@Expose
+	private String phone;
+
+	@Expose
+	private Schedules schedules;
+
+	@Expose
 	private String title;
 
 	@Expose
@@ -43,13 +49,14 @@ public class Restaurant implements Parcelable {
 	@Expose
 	private int rssiThreshold;
 
-	public Restaurant(String id, String title, String authCode, String descr, Decoration decoration, Address address) {
+	public Restaurant(String id, String title, String authCode, String descr, Decoration decoration, Address address, String phone) {
 		this.id = id;
 		this.title = title;
 		this.authCode = authCode;
 		this.description = descr;
 		this.decoration = decoration;
 		this.address = address;
+		this.phone = phone;
 	}
 
 	public Restaurant(Parcel in) {
@@ -59,6 +66,8 @@ public class Restaurant implements Parcelable {
 		description = in.readString();
 		decoration = in.readParcelable(Decoration.class.getClassLoader());
 		address = in.readParcelable(Address.class.getClassLoader());
+		schedules = in.readParcelable(Schedules.class.getClassLoader());
+		phone = in.readString();
 	}
 
 	public String getId() {
@@ -114,6 +123,8 @@ public class Restaurant implements Parcelable {
 		dest.writeString(description);
 		dest.writeParcelable(decoration, flags);
 		dest.writeParcelable(address, flags);
+		dest.writeParcelable(schedules, flags);
+		dest.writeString(phone);
 	}
 
 	public Address getAddress() {
@@ -130,6 +141,22 @@ public class Restaurant implements Parcelable {
 
 	@Override
 	public String toString() {
-		return "id: " +  id + " title: " + title + " rssiThreshold: " + rssiThreshold;
+		return "id: " + id + " title: " + title + " rssiThreshold: " + rssiThreshold;
+	}
+
+	public Schedules getSchedules() {
+		return schedules;
+	}
+
+	public void setSchedules(final Schedules schedules) {
+		this.schedules = schedules;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(final String phone) {
+		this.phone = phone;
 	}
 }

@@ -71,7 +71,6 @@
     <string name="something_went_wrong_try_agint">Что-то пошло не так.\nПовторите попытку</string>
     <string name="repeat">Повторить</string>
     <string name="title_activity_thanks">ThanksActivity</string>
-
     <string name="bill_split_amount_">= %1$s</string>
     <string name="bill_number_">Счёт %1$s</string>
     <string name="split_the_bill">Разделить счёт</string>
@@ -90,4 +89,12 @@
     <string name="how_many_guests_will_pay">На сколько гостей делить</string>
     <string name="welcome_to_">Добро пожаловать в %1$s</string>
     <string name="balk_notification_user_paid_">%1$s: оплачено по счету %2$s </string>
+    <string name="title_activity_restaurants_list">RestaurantsListActivity</string>
+    <string name="title_activity_restaurant">RestaurantActivity</string>
+    <string name="reserve_table">Бронировать\nстолик</string>
+    <string name="im_inside_restaurant">Я внутри</string>
+    <string name="make_an_order">Сделать\nзаказ</string>
+    <string name="write_to_us">Напишите нам</string>
+    <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
+
 </resources>

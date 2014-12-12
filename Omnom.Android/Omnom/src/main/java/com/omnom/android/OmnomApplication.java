@@ -1,6 +1,7 @@
 package com.omnom.android;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -21,6 +22,7 @@ import com.omnom.android.socket.OmnomSocketBase;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
 import com.omnom.android.utils.preferences.PreferenceProvider;
+import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -207,8 +209,16 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		if(_lazy_Picasso == null) {
 			_lazy_Picasso = new Picasso.Builder(getApplicationContext()).indicatorsEnabled(BuildConfig.DEBUG)
 			                                                            .loggingEnabled(BuildConfig.DEBUG)
+			                                                            .memoryCache(new LruCache(getCacheSize()))
 			                                                            .build();
 		}
 		return _lazy_Picasso;
+	}
+
+	private int getCacheSize() {
+		final ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		final int memoryClass = am.getMemoryClass();
+		// Target ~25% of the available heap.
+		return 1024 * 1024 * memoryClass / 4;
 	}
 }

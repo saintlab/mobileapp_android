@@ -100,7 +100,7 @@
         <item name="android:textSize">@dimen/font_large</item>
     </style>
 
-    <style name="ButtonBarButton"/>
+    <style name="ButtonBarButton" />
 
     <style name="EditText" parent="android:Widget.Holo.Light.EditText">
         <item name="android:background">@drawable/edit_text</item>
@@ -124,7 +124,7 @@
         <item name="android:singleLine">true</item>
     </style>
 
-    <style name="TextView" parent="android:Widget.Holo.Light.TextView"/>
+    <style name="TextView" parent="android:Widget.Holo.Light.TextView" />
 
     <style name="TextView.User">
         <item name="android:ellipsize">end</item>
@@ -149,7 +149,7 @@
         <item name="android:textColor">@color/profile_hint</item>
     </style>
 
-    <style name="Button.UserProfile" parent="@android:style/Widget.Holo.Button.Borderless"/>
+    <style name="Button.UserProfile" parent="@android:style/Widget.Holo.Button.Borderless" />
 
     <style name="Button.UserProfile.Data">
         <item name="android:layout_width">match_parent</item>
@@ -191,16 +191,39 @@
         <item name="android:textAppearance">?android:textAppearanceMedium</item>
     </style>
 
-    <style name="ImageView"/>
+    <style name="ImageView" />
 
-    <style name="ImageView.Place"/>
+    <style name="ImageView.Place" />
 
     <style name="ImageView.Place.ListLogo">
         <item name="android:layout_width">?android:attr/listPreferredItemHeightLarge</item>
         <item name="android:layout_height">?android:attr/listPreferredItemHeightLarge</item>
     </style>
 
-    <style name="Button" parent="android:Widget.Holo.Light.Button"/>
+    <style name="Button" parent="android:Widget.Holo.Light.Button" />
+
+    <style name="ImageView.Clickable.Cropped" parent="android:Widget.Holo.Button.Borderless">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:padding">@dimen/activity_vertical_margin_small</item>
+        <item name="android:cropToPadding">true</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <style name="Button.Demo" parent="android:Widget.Holo.Button.Borderless.Small">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">@string/demo_mode</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">@dimen/font_large</item>
+        <item name="android:drawableLeft">@drawable/ic_demo_mode_small</item>
+        <item name="android:drawablePadding">@dimen/drawable_padding_default</item>
+    </style>
+
+    <style name="Button.Demo.White">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:drawableLeft">@drawable/ic_demo_mode_small_white</item>
+    </style>
 
     <style name="Button.Bottom" parent="android:Widget.Holo.Light.Button.Borderless.Small">
         <item name="android:layout_width">match_parent</item>
@@ -209,7 +232,7 @@
         <item name="android:typeface">monospace</item>
     </style>
 
-    <style name="Button.Rounded"/>
+    <style name="Button.Rounded" />
 
     <style name="Button.Rounded.Blue">
         <item name="android:layout_width">@dimen/btn_rounded_width</item>
@@ -233,6 +256,16 @@
         <item name="android:imeOptions">actionNone</item>
         <item name="android:textSize">@dimen/font_large</item>
         <item name="android:gravity">center</item>
+    </style>
+
+    <style name="TextView.Restaurant.Landing">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/blue_bright</item>
     </style>
 
 </resources>

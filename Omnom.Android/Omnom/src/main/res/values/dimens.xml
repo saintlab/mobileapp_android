@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="order_items_list_height_collapsed">240dp</dimen>
 
+    <dimen name="order_items_list_height_collapsed">240dp</dimen>
     <dimen name="order_list_trasnlation_active">-240dp</dimen>
     <dimen name="order_payment_translation_y">0dp</dimen>
     <dimen name="order_tips_translation_y">0dp</dimen>
@@ -10,9 +10,15 @@
     <dimen name="order_edit_title_margin">-16dp</dimen>
     <dimen name="order_fake_item_height">380dp</dimen>
     <dimen name="order_payment_padding_bottom">16dp</dimen>
-
     <dimen name="order_payment_height">320dp</dimen>
-
     <dimen name="order_payment_tips_title_margin">-24dp</dimen>
     <dimen name="order_payment_tips_radio_padding_bottom">0dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="drawable_padding_default">8dp</dimen>
+    <dimen name="restaurant_cover_height_small">144dp</dimen>
+    <dimen name="restaurant_cover_height_large">216dp</dimen>
+    <dimen name="restaurant_distance_padding">12dp</dimen>
+    <dimen name="restaurants_topbar_height">60dp</dimen>
+
 </resources>
