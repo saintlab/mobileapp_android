@@ -430,7 +430,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 						loader.updateProgressMax(new Runnable() {
 							@Override
 							public void run() {
-								loader.showProgress(false);
 								v.setEnabled(true);
 								if(!ordersResponse.getOrders().isEmpty()) {
 									showOrders(ordersResponse.getOrders(), ordersResponse.getRequestId());
@@ -479,17 +478,20 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	private void showOrders(final List<Order> orders, final String requestId) {
-		loader.showProgress(false);
-		loader.hideLogo();
-		loader.scaleUp(new Runnable() {
+		loader.hideLogo(new Runnable() {
 			@Override
 			public void run() {
-				OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
-				                     mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS,
-				                     mIsDemo);
-				if(orders.size() == 1) {
-					overridePendingTransition(R.anim.slide_in_down, R.anim.nothing);
-				}
+				loader.scaleUp(getResources().getInteger(R.integer.default_animation_duration_medium), new Runnable() {
+					@Override
+					public void run() {
+						OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
+								mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS,
+								mIsDemo);
+						if(orders.size() == 1) {
+							overridePendingTransition(R.anim.slide_in_down_medium, R.anim.nothing);
+						}
+					}
+				});
 			}
 		});
 	}

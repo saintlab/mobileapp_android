@@ -132,7 +132,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 		if(requestCode == REQUEST_CODE_CARDS && resultCode == RESULT_OK) {
 			setResult(RESULT_OK);
 			finish();
-			overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
+			overridePendingTransition(R.anim.nothing, R.anim.slide_out_up_medium);
 		}
 	}
 

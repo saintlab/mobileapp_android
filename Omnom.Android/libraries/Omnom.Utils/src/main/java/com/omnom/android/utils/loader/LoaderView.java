@@ -285,10 +285,16 @@ public class LoaderView extends FrameLayout {
 		AnimationUtils.translateDown(getContext(), translationViews, translation, endCallback);
 	}
 
+	public void scaleUp(final long duration, final Runnable endCallback) {
+		AnimationUtils.scale(mImgLoader,
+							 mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
+							 duration, endCallback);
+	}
+
 	public void scaleUp(final Runnable endCallback) {
 		AnimationUtils.scale(mImgLoader,
 		                     mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
-		                     endCallback);
+							 endCallback);
 	}
 
 	@DebugLog
@@ -426,7 +432,7 @@ public class LoaderView extends FrameLayout {
 
 	public ValueAnimator updateProgressMax(final Runnable callback) {
 		mProgressAnimator = ValueAnimator.ofInt(mProgressBar.getProgress(), mProgressBar.getMax());
-		mProgressAnimator.setDuration(getResources().getInteger(R.integer.default_animation_duration_short));
+		mProgressAnimator.setDuration(getResources().getInteger(R.integer.default_animation_duration_medium));
 		mProgressAnimator.setInterpolator(new AccelerateInterpolator());
 		mProgressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
@@ -459,6 +465,11 @@ public class LoaderView extends FrameLayout {
 	@DebugLog
 	public void hideLogo() {
 		AnimationUtils.animateAlpha(mImgLogo, false);
+	}
+
+	@DebugLog
+	public void hideLogo(final Runnable callback) {
+		AnimationUtils.animateAlpha(mImgLogo, false, callback);
 	}
 
 	@DebugLog
