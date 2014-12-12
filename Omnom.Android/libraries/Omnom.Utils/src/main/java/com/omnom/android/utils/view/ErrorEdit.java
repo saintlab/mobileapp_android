@@ -150,8 +150,10 @@ public class ErrorEdit extends LinearLayout {
 		editView.addTextChangedListener(onTextChanged);
 		editView.setHint(mHintText);
 		editView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
-		editView.setLayoutParams(new FrameLayout.LayoutParams((int) mEditTextWidth,
-															  FrameLayout.LayoutParams.WRAP_CONTENT));
+		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams((int) mEditTextWidth,
+																			 FrameLayout.LayoutParams.WRAP_CONTENT);
+		layoutParams.gravity = Gravity.CENTER;
+		editView.setLayoutParams(layoutParams);
 		if(mMaxLen > 0) {
 			final InputFilter[] filters = editView.getFilters();
 			final InputFilter[] newFilters = Arrays.copyOf(filters, filters.length + 1);
