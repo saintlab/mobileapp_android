@@ -270,13 +270,13 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	}
 
 	private void askForRemoval(final Card card) {
-		final AlertDialog alertDialog = AndroidUtils.showDialog(this, getString(R.string.card_removal_confirmation, card.getMaskedPan()),
-		                                                        R.string.yes, new DialogInterface.OnClickListener() {
+		final AlertDialog alertDialog = AndroidUtils.showDialog(this, card.getMaskedPan(),
+				R.string.delete, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(final DialogInterface dialog, final int which) {
 						removeCard(card);
 					}
-				}, R.string.no, new DialogInterface.OnClickListener() {
+				}, R.string.cancel, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(final DialogInterface dialog, final int which) {
 						dialog.dismiss();
