@@ -3,7 +3,7 @@ package com.omnom.android.mixpanel.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.omnom.android.auth.UserData;
-import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
+import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.utils.utils.AmountHelper;
 
 /**
@@ -11,56 +11,77 @@ import com.omnom.android.utils.utils.AmountHelper;
  */
 public final class BillViewEvent implements Event {
 
-	private static String BEACON_FORMAT = "%s+%s+%s";
-
 	@Expose
-	@SerializedName("restaurant_id")
-	private String restaurantId;
-	@Expose
-	private String beacon;
+	private String requestId;
 	@Expose
 	@SerializedName("omn_user")
 	private UserData user;
 	@Expose
 	private int amount;
 	@Expose
-	private String requestId;
+	@SerializedName("paid_amount")
+	private int paidAmount;
+	@Expose
+	@SerializedName("paid_tip_amount")
+	private int paidTipAmount;
+	@Expose
+	@SerializedName("order_id")
+	private String orderId;
+	@Expose
+	@SerializedName("restaurant_id")
+	private String restaurantId;
+	@Expose
+	@SerializedName("table_id")
+	private String tableId;
 
-	public BillViewEvent(String restaurantId, BeaconFindRequest beacon,
-	                     UserData user, double amount, String requestId) {
-		String beaconStr = beacon == null ? null :
-											String.format(BEACON_FORMAT, beacon.getUuid(),
-																		 beacon.getMajor(),
-																		 beacon.getMinor());
-		this.restaurantId = restaurantId;
-		this.beacon = beaconStr;
-		this.user = user;
-		this.amount = AmountHelper.toInt(amount);
+	public BillViewEvent(final String requestId, final Order order, final UserData user) {
 		this.requestId = requestId;
+		this.user = user;
+		if (order != null) {
+			this.amount = AmountHelper.toInt(order.getTotalAmount());
+			this.paidAmount = AmountHelper.toInt(order.getPaidAmount());
+			this.paidTipAmount = AmountHelper.toInt(order.getPaidTip());
+			this.orderId = order.getId();
+			this.restaurantId = order.getRestaurantId();
+			this.tableId = order.getTableId();
+		}
 	}
 
 	@Override
 	public String getName() {
-		return "BILL_VIEW";
+		return "bill_view";
 	}
 
-	public int getAmount() {
-		return amount;
-	}
-
-	public String getRestaurantId() {
-		return restaurantId;
-	}
-
-	public String getBeacon() {
-		return beacon;
+	public String getRequestId() {
+		return requestId;
 	}
 
 	public UserData getUser() {
 		return user;
 	}
 
-	public String getRequestId() {
-		return requestId;
+	public int getAmount() {
+		return amount;
 	}
+
+	public int getPaidAmount() {
+		return paidAmount;
+	}
+
+	public int getPaidTipAmount() {
+		return paidTipAmount;
+	}
+
+	public String getOrderId() {
+		return orderId;
+	}
+
+	public String getRestaurantId() {
+		return restaurantId;
+	}
+
+	public String getTableId() {
+		return tableId;
+	}
+
 }
