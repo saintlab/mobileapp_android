@@ -24,6 +24,7 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
@@ -58,22 +59,22 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 
 	private static final int REQUEST_THANKS = 100;
 
-	public static void start(final Activity activity, final int code, final double amount,
+	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final Order order, final boolean isDemo, final int accentColor) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
-		intent.putExtra(Extras.EXTRA_ORDER_AMOUNT, amount);
+		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
 		intent.putExtra(Extras.EXTRA_ORDER, order);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
 		activity.startActivityForResult(intent, code);
 	}
 
-	public static void start(final Activity activity, final int code, final double amount,
+	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final Order order, CardInfo cardInfo, final boolean isDemo,
 	                         final int accentColor) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
-		intent.putExtra(Extras.EXTRA_ORDER_AMOUNT, amount);
+		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
 		intent.putExtra(Extras.EXTRA_ORDER, order);
 		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
@@ -115,7 +116,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 
 	private Subscription mCheckSubscription;
 
-	private double mAmount;
+	private OrderFragment.PaymentDetails mDetails;
 
 	private Order mOrder;
 
@@ -162,7 +163,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		pay(mAmount, 0);
+		pay(mDetails.getAmount(), mDetails.getTip());
 	}
 
 	@Override
@@ -225,7 +226,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 		});
 	}
 
-	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final double tip) {
+	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final int tip) {
 		final com.omnom.android.auth.UserData cachedUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		final UserData user = UserData.create(String.valueOf(cachedUser.getId()), cachedUser.getPhone());
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
@@ -233,7 +234,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 	}
 
 	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, double amount,
-	                 double tip) {
+	                 int tip) {
 		final ExtraData extra = MailRuExtra.create(tip, billData.getMailRestaurantId());
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
@@ -290,7 +291,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 			@Override
 			public void run() {
 				if(mIsDemo) {
-					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mAmount);
+					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mDetails.getAmount());
 				} else {
 					ThanksActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor);
 				}
@@ -315,7 +316,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 		mErrorHelper.showInternetError(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				pay(mAmount, 0);
+				pay(mDetails.getAmount(), mDetails.getTip());
 			}
 		});
 	}
@@ -340,7 +341,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 	@Override
 	protected void handleIntent(Intent intent) {
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
-		mAmount = intent.getDoubleExtra(Extras.EXTRA_ORDER_AMOUNT, 0);
+		mDetails = intent.getParcelableExtra(EXTRA_PAYMENT_DETAILS);
 		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
 		mCardInfo = intent.getParcelableExtra(Extras.EXTRA_CARD_DATA);
 		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);

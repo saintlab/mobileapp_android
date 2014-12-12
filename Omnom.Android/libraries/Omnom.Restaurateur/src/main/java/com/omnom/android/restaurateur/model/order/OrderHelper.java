@@ -27,7 +27,7 @@ public class OrderHelper {
 	 */
 	public static int getTipsAmount(final BigDecimal amount, final int percent) {
 		// final BigDecimal divide = amount.divide(BigDecimal.valueOf(100), BigDecimal.ROUND_DOWN);
-		final double divide = AmountHelper.toDouble(amount);
+		final double divide = AmountHelper.toDouble(amount) * 100;
 		final double v = percent * divide;
 		return (int) Math.round(v);
 	}

@@ -106,8 +106,8 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	private static void startActivity(final Activity activity, final Intent intent, final int code) {
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
-					R.anim.slide_in_up,
-					R.anim.fake_fade_out_long).toBundle();
+			                                                    R.anim.slide_in_up,
+			                                                    R.anim.fake_fade_out_long).toBundle();
 			activity.startActivityForResult(intent, code, extras);
 		} else {
 			activity.startActivityForResult(intent, code);
@@ -214,18 +214,18 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 		loadCards();
 
-		if (mTableId != null) {
+		if(mTableId != null) {
 			mPaymentListener = new PaymentEventListener(this);
 		}
 
-		if (mDetails != null) {
+		if(mDetails != null) {
 			final String text = StringUtils.formatCurrency(mDetails.getAmount()) + getString(R.string.currency_ruble);
 			mBtnPay.setText(getString(R.string.pay_amount, text));
-			if (!mIsDemo) {
+			if(!mIsDemo) {
 				mBtnPay.setEnabled(false);
 			}
 		} else {
-			RelativeLayout.LayoutParams layoutParams =(RelativeLayout.LayoutParams) cardsFooter.getLayoutParams();
+			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) cardsFooter.getLayoutParams();
 			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 			ViewUtils.setVisible(mBtnPay, false);
 		}
@@ -245,7 +245,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 					String cvv = OmnomApplication.get(activity).getConfig().getAcquiringData().getTestCvv();
 					final CardInfo cardInfo = CardInfo.create(activity, card.getExternalCardId(), cvv);
 					CardConfirmActivity.startConfirm(CardsActivity.this, cardInfo, REQUEST_CODE_CARD_CONFIRM,
-													 mDetails != null ? mDetails.getAmount() : 0);
+					                                 mDetails != null ? mDetails.getAmount() : 0);
 				}
 			}
 		});
@@ -271,7 +271,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private void askForRemoval(final Card card) {
 		final AlertDialog alertDialog = AndroidUtils.showDialog(this, getString(R.string.card_removal_confirmation, card.getMaskedPan()),
-				R.string.yes, new DialogInterface.OnClickListener() {
+		                                                        R.string.yes, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(final DialogInterface dialog, final int which) {
 						removeCard(card);
@@ -298,38 +298,40 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
 		final CardInfo cardInfo = CardInfo.create(getActivity(), card.getExternalCardId(), cvv);
 		mDeleteCardSubscription = AndroidObservable.bindActivity(this, mAcquiring.deleteCard(acquiringData, userData, cardInfo))
-				.flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
-								   Observable<CardDeleteResponse>>() {
+		                                           .flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
+				                                           Observable<CardDeleteResponse>>() {
+			                                           @Override
+			                                           public Observable<CardDeleteResponse> call(com.omnom.android.acquiring.mailru
+					                                                                                      .response.CardDeleteResponse
+					                                                                                      cardDeleteResponse) {
+				                                           if(cardDeleteResponse.isSuccess()) {
+					                                           return api.deleteCard(card.getId());
+				                                           } else {
+					                                           throw new AcquiringResponseException(cardDeleteResponse.getError());
+				                                           }
+			                                           }
+		                                           }).subscribe(new Action1<CardDeleteResponse>() {
 					@Override
-					public Observable<CardDeleteResponse> call(com.omnom.android.acquiring.mailru.response.CardDeleteResponse cardDeleteResponse) {
-						if (cardDeleteResponse.isSuccess()) {
-							return api.deleteCard(card.getId());
+					public void call(CardDeleteResponse cardDeleteResponse) {
+						if(cardDeleteResponse.isSuccess()) {
+							onRemoveSuccess(card);
 						} else {
-							throw new AcquiringResponseException(cardDeleteResponse.getError());
+							if(cardDeleteResponse.getError() != null) {
+								cardRemovalError();
+							} else if(cardDeleteResponse.hasErrors()) {
+								if(cardDeleteResponse.hasCommonError()) {
+									cardRemovalError(cardDeleteResponse.getErrors().getCommon());
+								}
+							}
 						}
 					}
-				}).subscribe(new Action1<CardDeleteResponse>() {
-			@Override
-			public void call(CardDeleteResponse cardDeleteResponse) {
-				if (cardDeleteResponse.isSuccess()) {
-					onRemoveSuccess(card);
-				} else {
-					if (cardDeleteResponse.getError() != null) {
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						Log.w(TAG, throwable.getMessage());
 						cardRemovalError();
-					} else if (cardDeleteResponse.hasErrors()) {
-						if (cardDeleteResponse.hasCommonError()) {
-							cardRemovalError(cardDeleteResponse.getErrors().getCommon());
-						}
 					}
-				}
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				Log.w(TAG, throwable.getMessage());
-				cardRemovalError();
-			}
-		});
+				});
 	}
 
 	private void onRemoveSuccess(final Card card) {
@@ -340,7 +342,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private void updateCardsSelection(CardsAdapter adapter, Card card) {
 		final String selectedId = mPreferences.getCardId(getActivity());
-		if (card.getExternalCardId().equals(selectedId)) {
+		if(card.getExternalCardId().equals(selectedId)) {
 			mBtnPay.setEnabled(selectCard(adapter, selectedId));
 		}
 	}
@@ -351,7 +353,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private void cardRemovalError(String message) {
 		Log.w(TAG, message);
-		if (message != null) {
+		if(message != null) {
 			Toast.makeText(this, "Unable to remove card: " + message, Toast.LENGTH_LONG).show();
 		} else {
 			Toast.makeText(this, "Unable to remove card", Toast.LENGTH_LONG).show();
@@ -375,7 +377,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 							                                      mList.setAdapter(new CardsAdapter(getActivity(), cardsList,
 							                                                                        CardsActivity.this, false));
 							                                      boolean isSelected = selectCard((CardsAdapter) mList.getAdapter(),
-									                                                            mPreferences.getCardId(getActivity()));
+							                                                                      mPreferences.getCardId(getActivity()));
 							                                      mBtnPay.setEnabled(isSelected);
 							                                      mPanelTop.showProgress(false);
 							                                      mPanelTop.showButtonRight(true);
@@ -393,25 +395,25 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	private boolean selectCard(final CardsAdapter cardsAdapter, final String selectedCardId) {
 		boolean isSelected;
 		// open CardAddActivity if no card registered on bill payment
-		if (cardsAdapter.isEmpty()) {
-			if (mDetails != null && isPaymentRequest) {
+		if(cardsAdapter.isEmpty()) {
+			if(mDetails != null && isPaymentRequest) {
 				onAdd();
 			}
 			return false;
 		} else {
 			final Card cardToSelect = findCardToSelect(cardsAdapter, selectedCardId);
 			// If appropriate card found - mark as selected
-			if (cardToSelect != null) {
+			if(cardToSelect != null) {
 				// If selection is not changed - do nothing
-				if (!cardToSelect.getExternalCardId().equals(selectedCardId)) {
+				if(!cardToSelect.getExternalCardId().equals(selectedCardId)) {
 					mPreferences.setCardId(getActivity(), cardToSelect.getExternalCardId());
 					cardsAdapter.notifyDataSetChanged();
 				}
 				isSelected = true;
-			// If not found - remove preference record
+				// If not found - remove preference record
 			} else {
 				isSelected = false;
-				if (!TextUtils.isEmpty(selectedCardId)) {
+				if(!TextUtils.isEmpty(selectedCardId)) {
 					mPreferences.setCardId(getActivity(), null);
 				}
 			}
@@ -422,18 +424,18 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private Card findCardToSelect(CardsAdapter cardsAdapter, String selectedCardId) {
 		Card cardToSelect = null;
-		for (int i = 0; i < cardsAdapter.getCount(); i++) {
+		for(int i = 0; i < cardsAdapter.getCount(); i++) {
 			final Card card = (Card) cardsAdapter.getItem(i);
 			// Select only registered cards
-			if (card.isRegistered()) {
-				if (cardToSelect == null) {
+			if(card.isRegistered()) {
+				if(cardToSelect == null) {
 					cardToSelect = card;
 				}
 				// Select the first registered card if nothing is set
-				if (TextUtils.isEmpty(selectedCardId)) {
+				if(TextUtils.isEmpty(selectedCardId)) {
 					break;
-				// If selected card is found in a list - finish search
-				} else if (selectedCardId.equals(card.getExternalCardId())) {
+					// If selected card is found in a list - finish search
+				} else if(selectedCardId.equals(card.getExternalCardId())) {
 					cardToSelect = card;
 					break;
 				}
@@ -451,9 +453,9 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	}
 
 	private void pay(final CardInfo cardInfo) {
-		if (mDetails != null) {
-			PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails.getAmount(),
-										 mOrder, cardInfo, mIsDemo, mAccentColor);
+		if(mDetails != null) {
+			PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails,
+			                             mOrder, cardInfo, mIsDemo, mAccentColor);
 		}
 	}
 
@@ -477,7 +479,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 			}
 		} else if(resultCode == RESULT_PAY && data != null) {
 			CardInfo cardInfo = data.getParcelableExtra(EXTRA_CARD_DATA);
-			if (cardInfo != null) {
+			if(cardInfo != null) {
 				pay(cardInfo);
 			} else {
 				Log.w(TAG, "Card info is null");
@@ -494,7 +496,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (mPaymentListener != null) {
+		if(mPaymentListener != null) {
 			mPaymentListener.onPause();
 		}
 		OmnomObservable.unsubscribe(mCardsSubscription);
@@ -508,7 +510,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (mPaymentListener != null) {
+		if(mPaymentListener != null) {
 			mPaymentListener.onPause();
 		}
 	}
@@ -516,7 +518,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (mPaymentListener != null) {
+		if(mPaymentListener != null) {
 			mPaymentListener.initTableSocket(mTableId);
 		}
 	}

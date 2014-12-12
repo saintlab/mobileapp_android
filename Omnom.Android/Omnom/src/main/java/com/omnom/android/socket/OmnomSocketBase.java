@@ -145,6 +145,9 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 	}
 
 	protected void post(final BaseSocketEvent event) {
+		if(mBus == null) {
+			Log.w(TAG, "skip socket event = " + event);
+		}
 		mBus.post(event);
 	}
 }
