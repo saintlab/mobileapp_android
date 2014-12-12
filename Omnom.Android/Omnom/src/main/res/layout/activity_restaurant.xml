@@ -62,16 +62,15 @@
                     android:text="@string/make_an_order"
                     android:drawablePadding="@dimen/drawable_padding_default"
                     android:drawableTop="@drawable/ic_make_order"
-                    style="@style/TextView.Restaurant.Landing"/>
+                    style="@style/TextView.Restaurant.Landing" />
             </LinearLayout>
-
 
         </LinearLayout>
 
         <ImageView
             android:id="@+id/btn_close"
             android:src="@drawable/ic_cross_white"
-            style="@style/ImageView.Clickable.Cropped"/>
+            style="@style/ImageView.Clickable.Cropped" />
 
         <Button
             android:id="@+id/btn_demo"

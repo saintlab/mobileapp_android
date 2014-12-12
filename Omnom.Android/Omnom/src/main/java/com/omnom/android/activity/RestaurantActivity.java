@@ -3,7 +3,6 @@ package com.omnom.android.activity;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
@@ -32,37 +31,51 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	private Restaurant mRestaurant;
 
+	private boolean mFinishing = false;
+
 	@OnClick(R.id.txt_reserve)
 	protected void doReserve() {
-
+		if(!mFinishing) {
+			// TODO: Implement
+		}
 	}
 
 	@OnClick(R.id.txt_im_inside)
 	protected void doImInside() {
-
+		if(!mFinishing) {
+			// TODO: Implement
+		}
 	}
 
 	@OnClick(R.id.btn_call)
 	protected void doCall() {
-		AndroidUtils.openDialer(this, mRestaurant.getPhone());
+		if(!mFinishing) {
+			AndroidUtils.openDialer(this, mRestaurant.getPhone());
+		}
 	}
 
 	@OnClick(R.id.txt_order)
 	protected void doMakeOrder() {
-
+		if(!mFinishing) {
+			// TODO: Implement
+		}
 	}
 
 	@OnClick(R.id.btn_close)
 	protected void doClose() {
-		finish();
+		if(!mFinishing) {
+			finish();
+		}
 	}
 
 	@OnClick(R.id.btn_demo)
 	protected void doDemo() {
-		ValidateActivity.start(this,
-		                       R.anim.fake_fade_in_instant,
-		                       R.anim.fake_fade_out_instant,
-		                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
+		if(!mFinishing) {
+			ValidateActivity.start(this,
+			                       R.anim.fake_fade_in_instant,
+			                       R.anim.fake_fade_out_instant,
+			                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
+		}
 	}
 
 	@Override
@@ -72,16 +85,29 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@Override
 	public void finish() {
-		final ImageView imgCover = mRestaurantViewHolder.imgCover;
-		imgCover.animate().translationYBy(getResources().getDimensionPixelSize(R.dimen.view_size_default)).start();
-		AnimationUtils.scaleHeight(imgCover,
+		mFinishing = true;
+
+		if(mRestaurantViewHolder == null) {
+			finishSimple();
+			return;
+		}
+
+		final int translationY = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);
+		mRestaurantViewHolder.minimize(translationY);
+		btnCall.animate().alpha(0).start();
+
+		AnimationUtils.scaleHeight(mRestaurantViewHolder.imgCover,
 		                           getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_small), new Runnable() {
 					@Override
 					public void run() {
-						RestaurantActivity.super.finish();
-						overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+						finishSimple();
 					}
 				});
+	}
+
+	private void finishSimple() {
+		RestaurantActivity.super.finish();
+		overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 	}
 
 	@Override

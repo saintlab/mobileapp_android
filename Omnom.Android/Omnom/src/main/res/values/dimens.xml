@@ -19,5 +19,6 @@
     <dimen name="restaurant_cover_height_small">144dp</dimen>
     <dimen name="restaurant_cover_height_large">216dp</dimen>
     <dimen name="restaurant_distance_padding">12dp</dimen>
+    <dimen name="restaurants_topbar_height">60dp</dimen>
 
 </resources>

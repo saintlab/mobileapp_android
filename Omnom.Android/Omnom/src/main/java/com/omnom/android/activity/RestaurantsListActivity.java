@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.omnom.android.R;
@@ -20,6 +19,7 @@ import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
+import com.omnom.android.utils.view.SimpleListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	protected View panelTop;
 
 	@InjectView(android.R.id.list)
-	protected ListView list;
+	protected SimpleListView list;
 
 	@InjectView(R.id.btn_demo)
 	protected Button btnDemo;
@@ -73,6 +73,8 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	private ImageView selectedImgCover;
 
 	private View nextView;
+
+	private boolean mItemClicked = false;
 
 	@OnClick(R.id.img_qr)
 	public void doQrShortcut() {
@@ -131,18 +133,24 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		list.addFooterView(LayoutInflater.from(getActivity()).inflate(R.layout.item_restaurants_footer, null));
 		list.setAdapter(mAdapter);
 		list.setOnItemClickListener(this);
+		list.setScrollEnabled(true);
 	}
 
 	@Override
 	public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-		//final Restaurant item = (Restaurant) mAdapter.getItem(position);
-		//RestaurantActivity.start(RestaurantsListActivity.this, item);
+		if(mItemClicked) {
+			// skip item selection
+			return;
+		}
+
+		mItemClicked = true;
 		mAdapter.setSelected(position);
 		list.smoothScrollToPositionFromTop(position, 0);
 		selectedImgCover = (ImageView) view.findViewById(R.id.img_cover);
 		panelTop.animate().translationYBy(-panelTop.getHeight()).start();
 		list.animate().translationYBy(-panelTop.getHeight()).start();
 		nextView = list.getChildAt(position + 1);
+		list.setScrollEnabled(false);
 		if(nextView != null) {
 			nextView.animate().alpha(0).start();
 		}
@@ -153,20 +161,16 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 				                           list.requestLayout();
 				                           final Restaurant item = (Restaurant) mAdapter.getItem(position);
 				                           RestaurantActivity.start(RestaurantsListActivity.this, item);
+				                           mItemClicked = false;
 			                           }
 		                           });
-		//final ImageView imgCover = (ImageView) view.findViewById(R.id.img_cover);
-		////imgCover.animate().translationYBy(-100).start();
-		////AnimationUtils.scaleHeight(imgCover, 450);
-		//final BitmapDrawable drawable = (BitmapDrawable) imgCover.getDrawable();
-		//final ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat
-		//		.makeThumbnailScaleUpAnimation(view, drawable.getBitmap(), (int)view.getX(), (int)view.getY());
-		//startActivity(new Intent(getActivity(), UserProfileActivity.class), activityOptionsCompat.toBundle());
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
+		mItemClicked = false;
+		list.setScrollEnabled(true);
 		panelTop.setTranslationY(0);
 		list.setTranslationY(0);
 		mAdapter.setSelected(-1);

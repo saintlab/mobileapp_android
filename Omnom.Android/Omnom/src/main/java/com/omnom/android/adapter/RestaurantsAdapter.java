@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,9 @@ public class RestaurantsAdapter extends BaseAdapter {
 		@InjectView(R.id.txt_title)
 		public TextView txtTitle;
 
+		@InjectView(R.id.panel_linear)
+		public View panelAddress;
+
 		@InjectView(R.id.txt_address)
 		public TextView txtAddress;
 
@@ -61,6 +65,13 @@ public class RestaurantsAdapter extends BaseAdapter {
 			txtAddress.setText(RestaurantHelper.getAddressSmall(context, item));
 			txtDistance.setText("~50м");
 			txtSchedule.setText(RestaurantHelper.getOpenedTime(context, item, weekDay));
+		}
+
+		public void minimize(final int translationY) {
+			imgCover.animate().translationYBy(translationY).start();
+			txtTitle.animate().translationYBy(translationY).start();
+			panelAddress.animate().translationYBy(translationY).start();
+			txtSchedule.animate().translationYBy(translationY).start();
 		}
 	}
 
@@ -115,17 +126,23 @@ public class RestaurantsAdapter extends BaseAdapter {
 		if(holder == null) {
 			return;
 		}
+		holder.bindData(mContext, item, mPlaceholderDrawable, mWeekDay);
 		if(mSelectedPosition != -1) {
 			if(mSelectedPosition != position) {
+				ViewCompat.setHasTransientState(convertView, true);
 				convertView.animate().alpha(0).start();
+			} else {
+				ViewCompat.setHasTransientState(convertView, false);
 			}
 		} else {
 			if(convertView.getAlpha() != 1.0f) {
+				ViewCompat.setHasTransientState(convertView, true);
 				convertView.setAlpha(0);
 				convertView.animate().alpha(1).start();
+			} else {
+				ViewCompat.setHasTransientState(convertView, false);
 			}
 		}
-		holder.bindData(mContext, item, mPlaceholderDrawable, mWeekDay);
 	}
 
 	public void setSelected(final int position) {

@@ -14,7 +14,7 @@
     <RelativeLayout
         android:id="@+id/panel_top"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="@dimen/restaurants_topbar_height">
 
         <Button
             android:id="@+id/btn_demo"
@@ -42,7 +42,7 @@
             style="@style/ImageView.Clickable.Cropped"/>
     </RelativeLayout>
 
-    <ListView
+    <com.omnom.android.utils.view.SimpleListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
