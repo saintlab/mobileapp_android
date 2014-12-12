@@ -79,8 +79,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	@Override
 	protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
-		if (resultCode == RESULT_OK) {
-			if (requestCode == REQUEST_CODE_SCAN_QR) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == REQUEST_CODE_SCAN_QR) {
+			if (resultCode == RESULT_OK) {
 				loader.startProgressAnimation(10000, new Runnable() {
 					@Override
 					public void run() {
@@ -88,9 +89,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 				});
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
 				findTableForQr(mQrData);
+			} else {
+				finish();
 			}
-		} else {
-			finish();
 		}
 	}
 
