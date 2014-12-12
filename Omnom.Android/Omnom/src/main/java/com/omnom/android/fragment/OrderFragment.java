@@ -51,7 +51,6 @@ import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.mixpanel.model.BillViewEvent;
 import com.omnom.android.mixpanel.model.Event;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
-import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
@@ -573,8 +572,7 @@ public class OrderFragment extends Fragment {
 	private void zoomInFragment(final OrdersActivity activity) {
 		OmnomApplication application = OmnomApplication.get(getActivity());
 		if(application.getUserProfile() != null) {
-			sendBillViewEvent(application.getUserProfile().getUser(), application.getBeacon(),
-			                  mOrder, mRequestId);
+			sendBillViewEvent(mRequestId, application.getUserProfile().getUser(), mOrder);
 		} else {
 			Log.w(TAG, "UserProfile not set");
 		}
