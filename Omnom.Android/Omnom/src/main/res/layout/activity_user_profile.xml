@@ -17,7 +17,7 @@
 
             <ImageView
                 android:id="@+id/img_user"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="72dp"
                 android:layout_width="@dimen/profile_avatar_size"
                 android:layout_height="@dimen/profile_avatar_size"
                 android:src="@drawable/empty_avatar"/>
@@ -25,19 +25,21 @@
             <TextView
                 android:id="@+id/txt_username"
                 android:text="Firstname Lastname"
+                android:includeFontPadding="false"
                 android:textSize="24sp"
                 style="@style/TextView.User.Data"/>
 
             <TextView
                 android:id="@+id/txt_login"
                 android:text="firstname.lastname"
+                android:includeFontPadding="false"
                 style="@style/TextView.User.Data.Hint"/>
 
             <TextView
                 android:id="@+id/txt_info"
                 android:text="Restaurant: Admin"
                 style="@style/TextView.User.Data.Hint"
-                android:paddingBottom="@dimen/activity_vertical_margin"/>
+                android:paddingBottom="32dp"/>
 
             <include layout="@layout/delimiter_profile_vertical"/>
 
@@ -52,7 +54,7 @@
             <LinearLayout
                 android:id="@+id/panel_table_number"
                 android:layout_width="match_parent"
-                android:layout_height="?android:listPreferredItemHeightSmall"
+                android:layout_height="?android:listPreferredItemHeight"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/activity_horizontal_margin_medium"
                 android:paddingRight="@dimen/activity_horizontal_margin_medium"
@@ -76,12 +78,17 @@
                     android:id="@+id/txt_table_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="8dp"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:drawablePadding="2dp"
                     android:textColor="@color/blue_bright"
                     android:drawableLeft="@drawable/ic_profile_table_marker"
-                    android:drawableRight="@drawable/ic_arrow_right_icon"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+                    android:textAppearance="?android:textAppearanceLarge" />
+
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arrow_right_icon"/>
 
             </LinearLayout>
 
@@ -90,7 +97,7 @@
                 layout="@layout/delimiter_profile_vertical"/>
 
             <TextView
-                android:layout_height="?android:listPreferredItemHeightSmall"
+                android:layout_height="?android:listPreferredItemHeight"
                 android:paddingLeft="@dimen/activity_horizontal_margin_medium"
                 android:paddingBottom="@dimen/activity_vertical_margin_small"
                 android:text="О ПРОГРАММЕ"
@@ -129,7 +136,7 @@
             <Button
                 android:id="@+id/btn_bottom"
                 android:layout_width="fill_parent"
-                android:layout_height="?android:listPreferredItemHeightSmall"
+                android:layout_height="?android:listPreferredItemHeight"
                 android:text="@string/logout_user"
                 android:textColor="@color/error_red"
                 android:textAppearance="?android:textAppearanceMedium"

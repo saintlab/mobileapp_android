@@ -45,12 +45,12 @@ import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapter;
 import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
-import com.omnom.android.fragment.events.OrderItemSelectedEvent;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.mixpanel.model.BillViewEvent;
 import com.omnom.android.mixpanel.model.Event;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
@@ -310,7 +310,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	@Subscribe
-	public void onSplitCommit(SplitHideEvent event) {
+	public void onSplitHide(SplitHideEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
 			mAdapter.notifyDataSetChanged();
 		}
@@ -320,7 +320,17 @@ public class OrderFragment extends Fragment {
 	public void onSplitCommit(OrderSplitCommitEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
 			if(event.getSplitType() == BillSplitFragment.SPLIT_TYPE_PERSON) {
-				cancelSplit();
+				cancelSplit(true);
+			}
+			if(event.getSplitType() == BillSplitFragment.SPLIT_TYPE_ITEMS) {
+				mCheckedStates = event.getStates();
+				mAdapter.setStates(mCheckedStates);
+				mAdapter.notifyDataSetChanged();
+				if(AndroidUtils.hasSelectedItems(mCheckedStates, list.getCount())) {
+					initFooter2();
+				} else {
+					initFooter(true);
+				}
 			}
 			final BigDecimal amount = event.getAmount();
 			final String s = StringUtils.formatCurrency(amount, getCurrencySuffix());
@@ -328,18 +338,6 @@ public class OrderFragment extends Fragment {
 			updatePaymentTipsAmount(amount);
 			final BigDecimal tips = getSelectedTips(amount);
 			updatePayButton(amount.add(tips));
-		}
-	}
-
-	@Subscribe
-	public void onOrderItemSelected(OrderItemSelectedEvent event) {
-		if(event.getOrderId().equals(mOrder.getId())) {
-			mCheckedStates.put(event.getPosition(), event.isSelected());
-			if(AndroidUtils.hasSelectedItems(mCheckedStates, list.getCount())) {
-				initFooter2();
-			} else {
-				initFooter(true);
-			}
 		}
 	}
 
@@ -734,21 +732,24 @@ public class OrderFragment extends Fragment {
 		mFooterView2.findViewById(R.id.txt_cancel).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				cancelSplit();
+				cancelSplit(true);
 			}
 		});
 	}
 
-	private void cancelSplit() {
+	private void cancelSplit(boolean resetAmount) {
 		mCheckedStates.clear();
 		mAdapter.notifyDataSetChanged();
 		initFooter(true);
-		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
+		if(resetAmount) {
+			editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
+		}
 	}
 
 	@SuppressLint("NewApi")
 	private void splitBill() {
-		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder, mCheckedStates);
+		final SparseBooleanArrayParcelable stateCopy = mCheckedStates.clone();
+		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder, stateCopy);
 		getFragmentManager().beginTransaction().add(android.R.id.content, billSplitFragment, BillSplitFragment.TAG).commit();
 		final ViewPropertyAnimator animator = list.animate();
 		animator.translationY(-100).setListener(new AnimatorListenerAdapter() {
@@ -854,6 +855,7 @@ public class OrderFragment extends Fragment {
 
 	protected void doApply(View v) {
 		if(mMode == MODE_AMOUNT) {
+			cancelSplit(false);
 			mApply = true;
 			AndroidUtils.hideKeyboard(getActivity());
 			mPaymentTitleChanged = true;

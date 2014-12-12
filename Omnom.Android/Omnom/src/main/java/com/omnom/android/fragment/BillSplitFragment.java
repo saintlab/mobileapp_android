@@ -131,7 +131,7 @@ public class BillSplitFragment extends Fragment {
 				final BigDecimal tag = (BigDecimal) mBtnCommit.getTag(R.id.edit_amount);
 				final int tagSplitType = (Integer) mBtnCommit.getTag(R.id.split_type);
 				if(tag != null) {
-					mBus.post(new OrderSplitCommitEvent(mOrder.getId(), tag, tagSplitType));
+					mBus.post(new OrderSplitCommitEvent(mOrder.getId(), mStates, tag, tagSplitType));
 					hide();
 				}
 			}

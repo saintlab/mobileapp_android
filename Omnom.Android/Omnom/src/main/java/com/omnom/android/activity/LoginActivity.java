@@ -3,7 +3,9 @@ package com.omnom.android.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -31,9 +33,9 @@ import rx.functions.Action1;
 
 public class LoginActivity extends BaseOmnomActivity {
 
-	private static final String TAG = LoginActivity.class.getSimpleName();
-
 	public static final int ERROR_AUTH_UNKNOWN_USER = 101;
+
+	private static final String TAG = LoginActivity.class.getSimpleName();
 
 	public static void start(Context context, UserDataHolder dataHolder) {
 		throw new RuntimeException("IMPLEMENT");
@@ -64,11 +66,21 @@ public class LoginActivity extends BaseOmnomActivity {
 		topPanel.setButtonRight(R.string.proceed, new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				doProceed(v);
+				doProceed();
 			}
 		});
 		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 0);
 		topPanel.setContentVisibility(false, true);
+		editPhone.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
+				if(actionId == EditorInfo.IME_ACTION_DONE) {
+					doProceed();
+					return true;
+				}
+				return false;
+			}
+		});
 	}
 
 	@Override
@@ -105,7 +117,6 @@ public class LoginActivity extends BaseOmnomActivity {
 	protected void handleIntent(Intent intent) {
 	}
 
-
 	@OnClick(R.id.txt_register)
 	public void doRegister() {
 		AndroidUtils.hideKeyboard(editPhone);
@@ -120,7 +131,7 @@ public class LoginActivity extends BaseOmnomActivity {
 		});
 	}
 
-	public void doProceed(final View view) {
+	public void doProceed() {
 		if(!validate()) {
 			return;
 		}

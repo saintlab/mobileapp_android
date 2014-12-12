@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
+
 import static butterknife.ButterKnife.findById;
 
 public class EnteringPageFragment extends Fragment {
@@ -61,6 +63,7 @@ public class EnteringPageFragment extends Fragment {
 		drawable.mutate();
 		drawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
 		findById(view, R.id.root).setBackgroundDrawable(drawable);
+		CalligraphyUtils.applyFontToTextView(getActivity(), (TextView) findById(view, R.id.text), "fonts/Futura-OSF-Omnom-Regular.otf");
 		drawable.invalidateSelf();
 		((ImageView) findById(view, R.id.img_icon)).setImageResource(icon);
 		((TextView) findById(view, R.id.text)).setText(strId);

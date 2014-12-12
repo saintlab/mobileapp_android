@@ -3,7 +3,7 @@ package com.omnom.android.utils.utils;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.view.View;
+import android.content.Context;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
@@ -17,9 +17,9 @@ public class AnimationBuilder {
 		public void invoke(ValueAnimator animation);
 	}
 
-	public static AnimationBuilder create(View view, int... values) {
+	public static AnimationBuilder create(Context context, int... values) {
 		AnimationBuilder animationBuilder = new AnimationBuilder().ofInt(values);
-		animationBuilder.initDefaults(view);
+		animationBuilder.initDefaults(context);
 		return animationBuilder;
 	}
 
@@ -32,8 +32,8 @@ public class AnimationBuilder {
 		animator.setDuration(duration);
 	}
 
-	private void initDefaults(View view) {
-		animator.setDuration(view.getResources().getInteger(R.integer.default_animation_duration_long));
+	private void initDefaults(final Context context) {
+		animator.setDuration(context.getResources().getInteger(R.integer.default_animation_duration_long));
 		animator.setInterpolator(new AccelerateDecelerateInterpolator());
 	}
 

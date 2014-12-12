@@ -67,7 +67,6 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 import static butterknife.ButterKnife.findById;
-import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
 /**
  * Created by Ch3D on 08.10.2014.
@@ -100,8 +99,12 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				return;
 			}
 			throwable.printStackTrace();
-			showToastLong(getActivity(), R.string.error_unknown_server_error);
-			finish();
+			mErrorHelper.showBackendError(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					getActivity().finish();
+				}
+			});
 		}
 	};
 
@@ -427,7 +430,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				                                       loader.updateProgressMax(new Runnable() {
 					                                       @Override
 					                                       public void run() {
-						                                       loader.showProgress(false);
 						                                       v.setEnabled(true);
 						                                       if(!ordersResponse.getOrders().isEmpty()) {
 							                                       showOrders(ordersResponse.getOrders(), ordersResponse.getRequestId());
@@ -441,7 +443,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 									                                                              R.drawable.ic_bill_white);
 									                                       loader.showProgress(false);
 									                                       configureScreen(mRestaurant);
-									                                       ViewUtils.setVisible(imgProfile, !mIsDemo);
+									                                       updateLightProfile(!mIsDemo);
 									                                       ViewUtils.setVisible(txtLeave, mIsDemo);
 									                                       ViewUtils.setVisible(getPanelBottom(), true);
 								                                       }
@@ -476,17 +478,20 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	private void showOrders(final List<Order> orders, final String requestId) {
-		loader.showProgress(false);
-		loader.hideLogo();
-		loader.scaleUp(new Runnable() {
+		loader.hideLogo(new Runnable() {
 			@Override
 			public void run() {
-				OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
-				                     mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS,
-				                     mIsDemo);
-				if(orders.size() == 1) {
-					overridePendingTransition(R.anim.slide_in_down, R.anim.nothing);
-				}
+				loader.scaleUp(getResources().getInteger(R.integer.default_animation_duration_medium), new Runnable() {
+					@Override
+					public void run() {
+						OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
+						                     mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS,
+						                     mIsDemo);
+						if(orders.size() == 1) {
+							overridePendingTransition(R.anim.slide_in_down_short, R.anim.nothing);
+						}
+					}
+				});
 			}
 		});
 	}
@@ -595,7 +600,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				                                      Log.w(TAG, throwable.getMessage());
 			                                      }
 		                                      });
-
 		mAcquiringConfigSubscribtion = AndroidObservable.bindActivity(this, api.getConfig())
 		                                                .subscribe(
 				                                                new Action1<Config>() {

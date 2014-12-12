@@ -22,11 +22,11 @@
 
     <dimen name="order_payment_height">320dp</dimen>
 
-    <dimen name="loader_size">280dp</dimen>
+    <dimen name="loader_size">220dp</dimen>
     <dimen name="loader_size_huge">1080dp</dimen>
     <dimen name="loader_margin_top">-102dp</dimen>
-    <dimen name="loader_progress_size">318dp</dimen>
-    <dimen name="loader_logo_size">270dp</dimen>
+    <dimen name="loader_progress_size">249dp</dimen>
+    <dimen name="loader_logo_size">210dp</dimen>
     <dimen name="loader_progress_thickness">10dp</dimen>
     <item type="dimen" format="float" name="loader_progress_inner_radius">2.265</item>
 </resources>
