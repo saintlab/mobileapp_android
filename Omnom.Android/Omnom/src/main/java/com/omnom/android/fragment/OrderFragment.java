@@ -671,6 +671,7 @@ public class OrderFragment extends Fragment {
 				AndroidUtils.createKeyboardListener(activityRootView, new AndroidUtils.KeyboardVisibilityListener() {
 					@Override
 					public void onVisibilityChanged(boolean isVisible) {
+						ViewUtils.setVisible(mHeader, !isVisible);
 						if (mCurrentKeyboardVisility != isVisible) {
 							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
@@ -826,22 +827,26 @@ public class OrderFragment extends Fragment {
 	private void showCustomTips(boolean visible) {
 		list.animate().translationYBy(visible ? mListTrasnlationActive : -mListTrasnlationActive).start();
 		getPanelPayment().animate().yBy(visible ? -mTipsTranslationY : mTipsTranslationY).start();
-		pickerTips.setVisibility(visible ? View.VISIBLE : View.GONE);
 
-		txtTipsHint.setVisibility(visible ? View.VISIBLE : View.GONE);
-		editAmount.setVisibility(visible ? View.GONE : View.VISIBLE);
-		txtCustomTips.setVisibility(visible ? View.VISIBLE : View.GONE);
-		radioGroup.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
-		txtPaymentTitle.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
-		txtAlreadyPaid.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
-		txtTipsTitle.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
-		txtTipsAmountHint.setVisibility(visible ? View.VISIBLE : View.GONE);
+		ViewUtils.setVisible(mHeader, !visible);
+		ViewUtils.setVisible(editAmount, !visible);
 
-		btnApply.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+		ViewUtils.setVisible(pickerTips, visible);
+		ViewUtils.setVisible(txtTipsHint, visible);
+		ViewUtils.setVisible(txtCustomTips, visible);
+		ViewUtils.setVisible(txtTipsAmountHint, visible);
+
+		ViewUtils.setVisible2(radioGroup, !visible);
+		ViewUtils.setVisible2(txtPaymentTitle, !visible);
+		ViewUtils.setVisible2(txtAlreadyPaid, !visible);
+		ViewUtils.setVisible2(txtTipsTitle, !visible);
+
+		ViewUtils.setVisible2(btnApply, visible);
+
 		btnApply.setAlpha(1.0f);
 		btnApply.invalidate();
 		btnApply.invalidateDrawable(btnApply.getDrawable());
-		btnCancel.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+		ViewUtils.setVisible2(btnCancel, visible);
 		btnCancel.setAlpha(1.0f);
 		btnCancel.invalidate();
 		btnCancel.invalidateDrawable(btnCancel.getDrawable());
@@ -947,9 +952,7 @@ public class OrderFragment extends Fragment {
 			radioGroup.setEnabled(false);
 			for (CompoundButton tipsButton : tipsButtons) {
 				tipsButton.setEnabled(false);
-				updateTipsButtonState(tipsButton);
 			}
-			return;
 		} else {
 			radioGroup.setEnabled(true);
 			for (CompoundButton tipsButton : tipsButtons) {
