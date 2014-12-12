@@ -599,14 +599,13 @@ public class OrderFragment extends Fragment {
 		return list.getTranslationY() == 0;
 	}
 
-	private void sendBillViewEvent(UserData user, BeaconFindRequest beacon, Order order,
-	                               String requestId) {
-		Event billViewEvent = new BillViewEvent(order.getRestaurantId(), beacon, user,
-		                                        order.getAmountToPay(), requestId);
+	private void sendBillViewEvent(String requestId, UserData user, Order order) {
+		Event billViewEvent = new BillViewEvent(requestId, order, user);
 		OmnomApplication.getMixPanelHelper(getActivity()).track(billViewEvent);
 	}
 
 	private void initAmount() {
+		editAmount.setCursorVisible(false);
 		editAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {

@@ -9,6 +9,8 @@ import com.omnom.android.mixpanel.model.Event;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -20,6 +22,8 @@ public class MixPanelHelper {
 	public static final String KEY_TIMESTAMP = "timestamp";
 
 	private static final String TAG = MixPanelHelper.class.getSimpleName();
+
+	private static final String DATE_FORMAT = "{yyyy-MM-dd'T'HH:mm:ssZ}";
 
 	private final Gson mGson;
 	private MixpanelAPI mMixpanelApi;
@@ -60,7 +64,7 @@ public class MixPanelHelper {
 
 	public void track(String event, JSONObject json) {
 		try {
-			json.put(KEY_TIMESTAMP, System.currentTimeMillis());
+			json.put(KEY_TIMESTAMP, new SimpleDateFormat(DATE_FORMAT).format(new Date()));
 			mMixpanelApi.track(event, json);
 		} catch(JSONException e) {
 			Log.e(TAG, "track", e);
