@@ -21,6 +21,7 @@
         omnom:textSize="@dimen/font_medium"
         omnom:font="regular_le"
         omnom:hint="@string/phone_number"
+        omnom:imeOptions="actionDone"
         omnom:showClear="true"
         omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
 
