@@ -467,14 +467,14 @@ public class OrderFragment extends Fragment {
 			viewsAmountShow.add(btnApply);
 			viewsAmountShow.add(btnCancel);
 
-			initRadioButtons();
 			updateCustomTipsText(0);
-			btnTips2.setChecked(true);
 			initKeyboardListener();
 			initAmount();
+			initRadioButtons();
 
 			final BigDecimal amount = getEnteredAmount();
 			updatePaymentTipsAmount(amount, tipsButtons);
+			btnTips2.setChecked(true);
 			return inflate;
 		} else {
 			return panelPayment;
@@ -531,7 +531,7 @@ public class OrderFragment extends Fragment {
 
 	private void showCardsActivity() {
 		final BigDecimal amount = getEnteredAmount();
-		final BigDecimal tips = getSelectedTips(amount).divide(new BigDecimal(100));
+		final BigDecimal tips = getSelectedTips(amount);
 		final BigDecimal amountToPay = amount.add(tips);
 		final PaymentDetails paymentDetails = new PaymentDetails(amountToPay.doubleValue(), tips.intValue() * 100);
 		final OrdersActivity activity = (OrdersActivity) getActivity();
