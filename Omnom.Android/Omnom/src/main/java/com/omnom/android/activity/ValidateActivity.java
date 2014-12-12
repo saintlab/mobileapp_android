@@ -487,8 +487,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 						OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
 								mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS,
 								mIsDemo);
-						if(orders.size() == 1) {
-							overridePendingTransition(R.anim.slide_in_down_medium, R.anim.nothing);
+						if (orders.size() == 1) {
+							overridePendingTransition(R.anim.slide_in_down_short, R.anim.nothing);
 						}
 					}
 				});
@@ -593,13 +593,13 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			                                      @Override
 			                                      public void call(ResponseBase responseBase) {
 
-					                                      }
-				                                      }, new Action1<Throwable>() {
-					                                      @Override
-					                                      public void call(Throwable throwable) {
-						                                      Log.w(TAG, throwable.getMessage());
-					                                      }
-				                                      });
+			                                      }
+		                                      }, new Action1<Throwable>() {
+			                                      @Override
+			                                      public void call(Throwable throwable) {
+				                                      Log.w(TAG, throwable.getMessage());
+			                                      }
+		                                      });
 
 		loader.post(new Runnable() {
 			@Override

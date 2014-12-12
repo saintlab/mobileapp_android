@@ -21,4 +21,4 @@
     android:toYDelta="0"
     android:zAdjustment="top"
 
-    android:duration="@android:integer/config_mediumAnimTime" />
+    android:duration="@integer/default_animation_duration_short" />
