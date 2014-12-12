@@ -364,18 +364,12 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected abstract void startLoader();
 
 	public void onBill(final View v) {
-
-		if(true) {
-			RestaurantsListActivity.start(this);
-			return;
-		}
-
 		v.setEnabled(false);
 		ViewUtils.setVisible(getPanelBottom(), false);
 		ViewUtils.setVisible(imgProfile, false);
 		ViewUtils.setVisible(txtLeave, false);
 		loader.setLogo(R.drawable.ic_bill_white);
-		loader.startProgressAnimation(10000, new Runnable() {
+		loader.startProgressAnimation(10000, new Runnable() {   
 			@Override
 			public void run() {
 			}
