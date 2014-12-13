@@ -400,7 +400,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					                    loadOrders(v);
 				                    } else {
 					                    startErrorTransition();
-					                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
 					                    getPanelBottom().animate().translationY(200).start();
 					                    v.setEnabled(true);
 				                    }
