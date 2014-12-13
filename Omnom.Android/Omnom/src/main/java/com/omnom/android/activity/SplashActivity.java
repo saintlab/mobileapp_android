@@ -64,6 +64,9 @@ public class SplashActivity extends BaseOmnomActivity {
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int durationSplash) {
 		final Intent intent = new Intent(context, SplashActivity.class);
 		intent.putExtra(EXTRA_DURATION_SPLASH, durationSplash);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		context.start(intent, enterAnim, exitAnim, true);
 	}
 
