@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Ch3D on 10.10.2014.
  */
@@ -22,28 +25,29 @@ public class TipsValue implements Parcelable {
 		}
 	};
 	@Expose
-	private int amount;
+	private List<Integer> amounts;
 
 	@Expose
 	private int percent;
 
 	public TipsValue(Parcel parcel) {
-		amount = parcel.readInt();
+		amounts = new ArrayList<Integer>();
+		parcel.readList(amounts, List.class.getClassLoader());
 		percent = parcel.readInt();
 	}
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(amount);
+		dest.writeList(amounts);
 		dest.writeInt(percent);
 	}
 
-	public int getAmount() {
-		return amount;
+	public List<Integer> getAmounts() {
+		return amounts;
 	}
 
-	public void setAmount(int amount) {
-		this.amount = amount;
+	public void setAmounts(List<Integer> amounts) {
+		this.amounts = amounts;
 	}
 
 	public int getPercent() {

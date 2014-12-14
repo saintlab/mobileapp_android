@@ -24,6 +24,10 @@ public class PreferenceHelper implements PreferenceProvider {
 
 	private static final String CARD_DATA = "com.omnom.android.card_data";
 
+	private static final String USER_PROFILE = "com.omnom.android.user_profile";
+
+	private static final String CONFIG = "com.omnom.android.config";
+
 	@Override
 	public void setCardId(final Context context, final String externalCardId) {
 		context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
@@ -83,5 +87,33 @@ public class PreferenceHelper implements PreferenceProvider {
 		              .edit()
 		              .putString(CARD_DATA, cardId)
 		              .commit();
+	}
+
+	@Override
+	public boolean setUserProfileJson(Context context, String userProfile) {
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
+					  .edit()
+					  .putString(USER_PROFILE, userProfile)
+					  .commit();
+	}
+
+	@Override
+	public String getUserProfileJson(Context context) {
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
+					  .getString(CONFIG, StringUtils.EMPTY_STRING);
+	}
+
+	@Override
+	public boolean setConfigJson(Context context, String config) {
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
+				.edit()
+				.putString(CONFIG, config)
+				.commit();
+	}
+
+	@Override
+	public String getConfigJson(Context context) {
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
+					  .getString(CONFIG, StringUtils.EMPTY_STRING);
 	}
 }

@@ -95,6 +95,10 @@ public class ErrorHelper {
 		showError(LoaderError.NO_CONNECTION_TRY, onClickListener);
 	}
 
+	public void showBackendError(View.OnClickListener onClickListener) {
+		showError(LoaderError.BACKEND_ERROR, onClickListener);
+	}
+
 	public void showErrorBluetoothDisabled(final Activity activity, final int requestCode) {
 		showError(LoaderError.BLE_DISABLED, new View.OnClickListener() {
 			@Override

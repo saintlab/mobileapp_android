@@ -114,6 +114,8 @@ public class BillSplitFragment extends Fragment {
 		             .translationY(0)
 		             .start();
 
+		CalligraphyUtils.applyFontToTextView(getActivity(), mBtnCommit, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+
 		final String fontPath = "fonts/Futura-OSF-Omnom-Regular.otf";
 		final float fontSize = getResources().getDimension(R.dimen.font_medium);
 		for(int i = 0; i < mPagerTitle.getChildCount(); ++i) {
@@ -131,7 +133,7 @@ public class BillSplitFragment extends Fragment {
 				final BigDecimal tag = (BigDecimal) mBtnCommit.getTag(R.id.edit_amount);
 				final int tagSplitType = (Integer) mBtnCommit.getTag(R.id.split_type);
 				if(tag != null) {
-					mBus.post(new OrderSplitCommitEvent(mOrder.getId(), tag, tagSplitType));
+					mBus.post(new OrderSplitCommitEvent(mOrder.getId(), mStates, tag, tagSplitType));
 					hide();
 				}
 			}

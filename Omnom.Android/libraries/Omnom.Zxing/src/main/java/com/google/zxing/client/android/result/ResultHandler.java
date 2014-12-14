@@ -132,7 +132,7 @@ public abstract class ResultHandler {
 	 * Some barcode contents are considered secure, and should not be saved to history, copied to
 	 * the clipboard, or otherwise persisted.
 	 *
-	 * @return If true, do not create any permanent record of these contents.
+	 * @return If true, do not createSelectableColor any permanent record of these contents.
 	 */
 	public boolean areContentsSecure() {
 		return false;

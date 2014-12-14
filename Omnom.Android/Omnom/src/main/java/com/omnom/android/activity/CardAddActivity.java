@@ -38,13 +38,10 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	private double mAmount;
 
-	private int mAccentColor;
-
 	@SuppressLint("NewApi")
-	public static void start(Activity activity, double amount, int accentColor, int code) {
+	public static void start(Activity activity, double amount, int code) {
 		final Intent intent = new Intent(activity, CardAddActivity.class);
 		intent.putExtra(EXTRA_ORDER_AMOUNT, amount);
-		intent.putExtra(EXTRA_ACCENT_COLOR, accentColor);
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
 			                                                    R.anim.slide_in_right,
@@ -102,6 +99,10 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 				finish();
 			}
 		});
+
+		if (mAmount == 0) {
+			mCheckSaveCard.setEnabled(false);
+		}
 
 		mEditCardExpDate.addTextChangedListener(new CardExpirationTextWatcher(mEditCardExpDate, this));
 		mEditCardNumber.addTextChangedListener(new CardNumberTextWatcher(mEditCardNumber, this));
@@ -303,6 +304,5 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	@Override
 	protected void handleIntent(Intent intent) {
 		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);
-		mAccentColor = intent.getIntExtra(EXTRA_ACCENT_COLOR, 0);
 	}
 }

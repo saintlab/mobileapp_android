@@ -8,6 +8,8 @@ import com.google.gson.annotations.Expose;
 public class OmnomErrors {
 	@Expose
 	private String authentication;
+	@Expose
+	private String common;
 
 	public String getAuthentication() {
 		return authentication;
@@ -16,4 +18,13 @@ public class OmnomErrors {
 	public void setAuthentication(String authentication) {
 		this.authentication = authentication;
 	}
+
+	public String getCommon() {
+		return common;
+	}
+
+	public void setCommon(String common) {
+		this.common = common;
+	}
+
 }

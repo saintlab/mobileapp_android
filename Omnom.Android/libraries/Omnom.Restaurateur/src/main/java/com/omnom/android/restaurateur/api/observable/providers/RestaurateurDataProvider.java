@@ -7,15 +7,16 @@ import com.omnom.android.restaurateur.api.RestaurateurDataService;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
-import com.omnom.android.restaurateur.model.config.AcquiringData;
-import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
+import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
+import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -23,8 +24,8 @@ import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
-import com.omnom.android.restaurateur.serializer.MailRuSerializer;
 import com.omnom.android.restaurateur.retrofit.RestaurateurRxSupport;
+import com.omnom.android.restaurateur.serializer.MailRuSerializer;
 import com.omnom.android.restaurateur.serializer.OrdersResponseSerializer;
 
 import java.util.List;
@@ -117,7 +118,7 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	}
 
 	@Override
-	public Observable<RestaurantsResponse> deleteCard(String cardId) {
+	public Observable<CardDeleteResponse> deleteCard(int cardId) {
 		return mDataService.deleteCard(cardId).subscribeOn(Schedulers.io()).observeOn(
 				AndroidSchedulers.mainThread());
 	}

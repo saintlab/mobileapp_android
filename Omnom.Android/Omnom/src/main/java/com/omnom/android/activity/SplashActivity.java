@@ -6,8 +6,6 @@ import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.os.SystemClock;
 import android.text.TextUtils;
@@ -18,22 +16,32 @@ import android.widget.ImageView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
+import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.MultiplyImageView;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.InjectView;
 
 public class SplashActivity extends BaseOmnomActivity {
+
+	public static final float SCALE_FACTOR_FORK_LARGE = 0.4258f; // 104px / 178px = small_fork / large_fork
+
+	public static final float SCALE_FACTOR_FORK_SMALL = 1 / SCALE_FACTOR_FORK_LARGE;
 
 	@InjectView(R.id.img_logo)
 	protected ImageView imgLogo;
 
 	@InjectView(R.id.img_fork)
 	protected ImageView imgFork;
+
+	@InjectView(R.id.img_fork_large)
+	protected ImageView imgForkLarge;
 
 	@InjectView(R.id.img_bill)
 	protected ImageView imgBill;
@@ -50,9 +58,18 @@ public class SplashActivity extends BaseOmnomActivity {
 	@InjectView(R.id.img_bg)
 	protected ImageView imgBackground;
 
-	private TransitionDrawable transitionDrawable;
+	private int durationSplash;
 
 	private boolean mAnimate = true;
+
+	public static void start(BaseActivity context, int enterAnim, int exitAnim, int durationSplash) {
+		final Intent intent = new Intent(context, SplashActivity.class);
+		intent.putExtra(EXTRA_DURATION_SPLASH, durationSplash);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		context.start(intent, enterAnim, exitAnim, true);
+	}
 
 	private void animateValidation() {
 		if (!mAnimate) {
@@ -60,7 +77,6 @@ public class SplashActivity extends BaseOmnomActivity {
 		}
 
 		final int durationShort = getResources().getInteger(R.integer.default_animation_duration_short);
-		final int durationSplash = getResources().getInteger(R.integer.splash_screen_timeout);
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
 		final int dimensionPixelSize = getResources().getDimensionPixelSize(R.dimen.loader_logo_size);
 
@@ -72,13 +88,13 @@ public class SplashActivity extends BaseOmnomActivity {
 				AnimationUtils.animateAlpha(imgLogo, false, durationShort);
 				AnimationUtils.animateAlpha(imgRing, false, durationShort);
 				animateMultiply();
-				transitionDrawable.startTransition(durationShort);
+				// transitionDrawable.startTransition(durationShort);
 
-				AnimationUtils.scaleWidth(imgFork, dimensionPixelSize, durationShort, null);
+				// AnimationUtils.scaleWidth(imgFork, dimensionPixelSize, durationShort, null);
 				postDelayed(animationDuration, new Runnable() {
 					@Override
 					public void run() {
-						if(!isFinishing()) {
+						if (!isFinishing()) {
 							ValidateActivity.start(SplashActivity.this, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
 							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, false);
 						}
@@ -87,21 +103,23 @@ public class SplashActivity extends BaseOmnomActivity {
 			}
 		}, durationSplash);
 		getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
-		imgFork.setImageDrawable(transitionDrawable);
 		mAnimate = false;
 	}
 
 	/**
 	 * Animate of fork_n_knife logo and loader
-	 * */
+	 */
 	private void animateMultiply() {
 		final float upperLogoPoint = getResources().getDimension(R.dimen.loader_margin_top);
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
 
 		// translating up animation
-		final AnimationBuilder translationBuilder = AnimationBuilder.create(imgFork, 0, (int) upperLogoPoint);
-		translationBuilder.setDuration(animationDuration);
-		final ValueAnimator translationAnimator = AnimationUtils.prepareTranslation(Collections.singletonList((View) imgFork), null, translationBuilder);
+		final AnimationBuilder translationSmallBuilder = AnimationBuilder.create(getActivity(), 0, (int) upperLogoPoint);
+		translationSmallBuilder.setDuration(animationDuration);
+		final List<View> views = new ArrayList<View>();
+		views.add(imgFork);
+		views.add(imgForkLarge);
+		final ValueAnimator translationAnimator = AnimationUtils.prepareTranslation(views, null, translationSmallBuilder);
 		translationAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
@@ -112,7 +130,7 @@ public class SplashActivity extends BaseOmnomActivity {
 		// loader/circle downscaling animation
 		float end = getResources().getDimension(R.dimen.loader_size);
 		float start = getResources().getDimension(R.dimen.loader_size_huge);
-		AnimationBuilder builder = AnimationBuilder.create(imgMultiply, (int) start, (int) end);
+		AnimationBuilder builder = AnimationBuilder.create(getActivity(), (int) start, (int) end);
 		builder.setDuration(getResources().getInteger(R.integer.splash_animation_duration));
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
@@ -134,9 +152,44 @@ public class SplashActivity extends BaseOmnomActivity {
 			}
 		});
 
+		ValueAnimator alphaAnimtorForkSmall = ValueAnimator.ofFloat(1, 0);
+		alphaAnimtorForkSmall.setDuration(animationDuration);
+		alphaAnimtorForkSmall.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation) {
+				imgFork.setAlpha((Float) animation.getAnimatedValue());
+			}
+		});
+
+		ValueAnimator scaleAnimator = ValueAnimator.ofFloat(SCALE_FACTOR_FORK_LARGE, 1.0f);
+		scaleAnimator.setDuration(animationDuration);
+		scaleAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation) {
+				final float animatedValue = (Float) animation.getAnimatedValue();
+				imgForkLarge.setScaleX(animatedValue);
+				imgForkLarge.setScaleY(animatedValue);
+				final float s = 1 + ((animatedValue - SCALE_FACTOR_FORK_LARGE) * SCALE_FACTOR_FORK_SMALL);
+				imgFork.setScaleX(s);
+				imgFork.setScaleY(s);
+			}
+		});
+
+//		imgForkLarge.animate().setDuration(animationDuration).translationXBy(ViewUtils.dipToPixels(this, 7)).start();
+//		imgFork.animate().setDuration(animationDuration).translationXBy(ViewUtils.dipToPixels(this, 7)).start();
+
+		ValueAnimator alphaAnimtorForkLarge = ValueAnimator.ofFloat(0, 1);
+		alphaAnimtorForkLarge.setDuration(animationDuration);
+		alphaAnimtorForkLarge.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation) {
+				imgForkLarge.setAlpha((Float) animation.getAnimatedValue());
+			}
+		});
+
 		// simultaneous animation playback
 		final AnimatorSet as = new AnimatorSet();
-		as.playTogether(translationAnimator, alphaAnimator, multiplyAnimator);
+		as.playTogether(translationAnimator, alphaAnimator, alphaAnimtorForkSmall, alphaAnimtorForkLarge, multiplyAnimator, scaleAnimator);
 		as.start();
 	}
 
@@ -163,12 +216,14 @@ public class SplashActivity extends BaseOmnomActivity {
 			}
 		}, getResources().getInteger(R.integer.splash_screen_timeout));
 		getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
-		imgFork.setImageDrawable(transitionDrawable);
 		mAnimate = false;
 	}
 
 	@Override
 	public void initUi() {
+		imgForkLarge.setScaleX(0.4258f);
+		imgForkLarge.setScaleY(0.4258f);
+
 		imgMultiply.setRadius(getResources().getDimensionPixelSize(R.dimen.loader_size_huge) / 2);
 
 		if (AndroidUtils.isKitKat()) {
@@ -176,10 +231,11 @@ public class SplashActivity extends BaseOmnomActivity {
 		} else if (AndroidUtils.isJellyBeanMR2()) {
 			startBleServiceJB();
 		}
+	}
 
-		transitionDrawable = new TransitionDrawable(new Drawable[]{getResources().getDrawable(R.drawable.ic_splash_fork_n_knife),
-				getResources().getDrawable(R.drawable.ic_fork_n_knife)});
-		transitionDrawable.setCrossFadeEnabled(true);
+	@Override
+	protected void handleIntent(Intent intent) {
+		durationSplash = intent.getIntExtra(EXTRA_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
 	}
 
 	@TargetApi(Build.VERSION_CODES.KITKAT)

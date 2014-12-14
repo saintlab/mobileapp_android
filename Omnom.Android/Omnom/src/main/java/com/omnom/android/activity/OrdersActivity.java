@@ -83,7 +83,6 @@ public class OrdersActivity extends BaseFragmentActivity {
 
 	@Override
 	public void initUi() {
-		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, requestId, bgColor);
 		mPaymentListener = new PaymentEventListener(this);
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, requestId, bgColor);
 		mPager.setAdapter(mPagerAdapter);
@@ -131,9 +130,7 @@ public class OrdersActivity extends BaseFragmentActivity {
 	@Override
 	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		if(requestCode == REQUEST_CODE_CARDS && resultCode == RESULT_OK) {
-			setResult(RESULT_OK);
-			finish();
-			overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
+			close();
 		}
 	}
 
@@ -192,13 +189,15 @@ public class OrdersActivity extends BaseFragmentActivity {
 	}
 
 	public ObjectAnimator getFragmentAnimation(int pos, boolean show) {
-		final OrderFragment fragment = (OrderFragment) getSupportFragmentManager()
-				.findFragmentByTag(TAG_ANDROID_SWITCHER + mPager.getId() + TAG_SWITCHER_DELIMITER + mPagerAdapter.getItemId(pos));
-		if(fragment != null) {
-			final View view = fragment.getFragmentView();
-			final int startAlpha = show ? 0 : 1;
-			final int endAlpha = show ? 1 : 0;
-			return ObjectAnimator.ofFloat(view, View.ALPHA, startAlpha, endAlpha);
+		if (mPagerAdapter != null) {
+			final OrderFragment fragment = (OrderFragment) getSupportFragmentManager()
+					.findFragmentByTag(TAG_ANDROID_SWITCHER + mPager.getId() + TAG_SWITCHER_DELIMITER + mPagerAdapter.getItemId(pos));
+			if (fragment != null) {
+				final View view = fragment.getFragmentView();
+				final int startAlpha = show ? 0 : 1;
+				final int endAlpha = show ? 1 : 0;
+				return ObjectAnimator.ofFloat(view, View.ALPHA, startAlpha, endAlpha);
+			}
 		}
 		return null;
 	}

@@ -111,6 +111,11 @@ public class CardsAdapter extends BaseAdapter {
 		return 0;
 	}
 
+	public void remove(final Card card) {
+		mCards.remove(card);
+		notifyDataSetChanged();
+	}
+
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if(convertView == null) {

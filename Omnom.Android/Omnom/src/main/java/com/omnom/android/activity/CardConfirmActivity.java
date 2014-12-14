@@ -22,6 +22,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
@@ -112,6 +113,9 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	@InjectView(R.id.transparent_panel)
 	protected FrameLayout transparentPanel;
 
+	@InjectView(R.id.fragment_container)
+	protected FrameLayout fragmentContainer;
+
 	@Inject
 	protected Acquiring mAcquiring;
 
@@ -189,6 +193,13 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		}
 		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		addKeyboardListener(activityRootView);
+		if (mAmount == 0) {
+			int height = (int) getResources().getDimension(R.dimen.pay_once_fragment_height_small);
+			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+																					   height);
+			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+			fragmentContainer.setLayoutParams(layoutParams);
+		}
 	}
 
 	private void addKeyboardListener(View activityRootView) {
@@ -383,7 +394,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 				.addToBackStack(null)
 				.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
 									 R.anim.slide_in_up, R.anim.slide_out_down)
-				.add(R.id.fragment_container, payOnceFragment)
+				.replace(R.id.fragment_container, payOnceFragment)
 				.commit();
 		AnimationUtils.animateAlpha(transparentPanel, true);
 	}

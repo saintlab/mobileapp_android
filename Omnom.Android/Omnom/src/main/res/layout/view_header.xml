@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge
-    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+<merge xmlns:omnom="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Button
@@ -8,8 +7,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:textColor="@drawable/text_color_selector"
-        style="@android:style/Widget.Holo.Button.Borderless"/>
+        android:textColor="@color/text_color_black" />
 
     <ImageButton
         android:id="@+id/btn_right_drawable"
@@ -19,15 +17,14 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="@dimen/header_view_horizontal_margin"
         android:background="@null"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/btn_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:textColor="@drawable/text_color_selector"
-        style="@android:style/Widget.Holo.Button.Borderless"/>
+        android:textColor="@color/text_color_black" />
 
     <ImageButton
         android:id="@+id/btn_left_drawable"
@@ -37,7 +34,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/header_view_horizontal_margin"
         android:background="@null"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <ProgressBar
         android:id="@+id/progress"
@@ -46,7 +43,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="@dimen/header_view_horizontal_margin"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/title"
@@ -55,7 +52,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:textSize="@dimen/font_normal"
-        android:textColor="?android:textColorHint"/>
+        android:textColor="?android:textColorHint" />
 
     <TextView
         android:id="@+id/title_big"
@@ -64,7 +61,7 @@
         android:layout_centerInParent="true"
         android:textSize="@dimen/font_large"
         omnom:fontPath="fonts/Futura-OSF-Omnom-Medium.otf"
-        android:textColor="@android:color/black"/>
+        android:textColor="@android:color/black" />
 
     <com.omnom.android.view.ViewPagerIndicatorCircle
         android:id="@+id/page_indicator"
@@ -75,6 +72,6 @@
         omnom:radius="2dp"
         omnom:centered="true"
         omnom:fillColor="@android:color/black"
-        omnom:pageColor="@android:color/darker_gray"/>
+        omnom:pageColor="@android:color/darker_gray" />
 
 </merge>

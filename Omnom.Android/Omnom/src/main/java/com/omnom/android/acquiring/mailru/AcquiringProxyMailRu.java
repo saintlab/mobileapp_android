@@ -10,6 +10,7 @@ import com.omnom.android.R;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringTransactionExtendedResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringTransactionResponse;
+import com.omnom.android.acquiring.mailru.response.CardDeleteResponse;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
 
 import java.util.HashMap;
@@ -57,7 +58,7 @@ public class AcquiringProxyMailRu implements AcquiringServiceMailRu {
 	}
 
 	@Override
-	public Observable<AcquiringResponse> deleteCard(HashMap<String, String> params) {
+	public Observable<CardDeleteResponse> deleteCard(HashMap<String, String> params) {
 		return mAcquiringService.deleteCard(params).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 

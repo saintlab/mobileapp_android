@@ -97,13 +97,12 @@ public class ValidateActivityBle extends ValidateActivity {
 	@Override
 	protected void startLoader() {
 		clearErrors(true);
-
 		loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration), new Runnable() {
 			@Override
 			public void run() {
 			}
 		});
-		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this)
+		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
 		                                                                                 .map(OmnomObservable.getValidationFunc(this,
 		                                                                                                                        mErrorHelper,
 		                                                                                                                        mInternetErrorClickListener))
@@ -141,9 +140,11 @@ public class ValidateActivityBle extends ValidateActivity {
 				application.cacheBeacon(null);
 				if(size == 0) {
 					startErrorTransition();
+					updateDarkProfile(true);
 					mErrorHelper.showErrorDemo(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
 				} else if(size > 1) {
 					startErrorTransition();
+					updateDarkProfile(true);
 					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
 				} else if(size == 1) {
 					final Beacon beacon = nearBeacons.get(0);
@@ -164,6 +165,7 @@ public class ValidateActivityBle extends ValidateActivity {
 												                                                            "Wrong auth token");
 									                                                            } else if(tableDataResponse.hasErrors()) {
 										                                                            startErrorTransition();
+										                                                            updateDarkProfile(true);
 										                                                            mErrorHelper.showErrorDemo(
 												                                                            LoaderError.WEAK_SIGNAL,
 												                                                            mInternetErrorClickListener);

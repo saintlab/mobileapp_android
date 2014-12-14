@@ -3,6 +3,7 @@ package com.omnom.android.acquiring.mailru;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringTransactionExtendedResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringTransactionResponse;
+import com.omnom.android.acquiring.mailru.response.CardDeleteResponse;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
 
 import java.util.HashMap;
@@ -31,7 +32,7 @@ public interface AcquiringServiceMailRu {
 
 	@FormUrlEncoded
 	@POST("/card/delete")
-	public Observable<AcquiringResponse> deleteCard(@FieldMap HashMap<String, String> params);
+	public Observable<CardDeleteResponse> deleteCard(@FieldMap HashMap<String, String> params);
 
 	@FormUrlEncoded
 	@POST("/transaction/check")

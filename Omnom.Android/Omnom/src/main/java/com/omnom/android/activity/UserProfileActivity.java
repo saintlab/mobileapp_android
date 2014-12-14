@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -44,12 +45,14 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseOmnomActivity {
+
 	private static final String TAG = UserProfileActivity.class.getSimpleName();
 
-	public static void startSliding(OmnomActivity activity, final int tableNumber) {
+	public static void startSliding(OmnomActivity activity, final int tableNumber, final String tableId) {
 		final Intent intent = new Intent(activity.getActivity(), UserProfileActivity.class);
 		intent.putExtra(EXTRA_ANIMATE, false);
 		intent.putExtra(EXTRA_TABLE_NUMBER, tableNumber);
+		intent.putExtra(EXTRA_TABLE_ID, tableId);
 		activity.start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
 	}
 
@@ -68,6 +71,12 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@InjectView(R.id.txt_app_info)
 	protected TextView mTxtAppInfo;
 
+	@InjectView(R.id.panel_table_number)
+	protected View panelTableNumber;
+
+	@InjectView(R.id.delimiter_table_number)
+	protected View delimiterTableNumber;
+
 	@InjectView(R.id.txt_table_number)
 	protected TextView mTxtTableNumber;
 
@@ -83,9 +92,19 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	private int mTableNumber;
 
+	private String mTableId;
+
 	@Override
 	protected void handleIntent(Intent intent) {
 		mTableNumber = intent.getIntExtra(EXTRA_TABLE_NUMBER, 0);
+		mTableId = intent.getStringExtra(EXTRA_TABLE_ID);
+	}
+
+	@OnClick(R.id.btn_my_cards)
+	protected void onMyCards() {
+		final Intent intent = new Intent(this, CardsActivity.class);
+		intent.putExtra(EXTRA_TABLE_ID, mTableId);
+		startActivity(intent);
 	}
 
 	@OnClick(R.id.btn_feedback)
@@ -102,7 +121,14 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	public void initUi() {
 		initAppInfo();
 
-		mTxtTableNumber.setText(String.valueOf(mTableNumber));
+		if(mTableNumber > 0) {
+			ViewUtils.setVisible(panelTableNumber, true);
+			ViewUtils.setVisible(delimiterTableNumber, true);
+			mTxtTableNumber.setText(String.valueOf(mTableNumber));
+		} else {
+			ViewUtils.setVisible(panelTableNumber, false);
+			ViewUtils.setVisible(delimiterTableNumber, false);
+		}
 
 		final UserProfile userProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		if(userProfile != null && userProfile.getUser() != null) {
@@ -196,7 +222,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@Override
 	public void finish() {
 		UserProfileActivity.super.finish();
-		overridePendingTransition(R.anim.fake_fade_out_long, R.anim.slide_out_down);
+		overridePendingTransition(R.anim.fake_fade_out_short, R.anim.slide_out_down);
 	}
 
 	@OnClick(R.id.btn_bottom)

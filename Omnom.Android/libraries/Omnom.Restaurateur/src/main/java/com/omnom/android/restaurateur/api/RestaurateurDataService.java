@@ -2,14 +2,15 @@ package com.omnom.android.restaurateur.api;
 
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
-import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
+import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
+import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -38,7 +39,7 @@ public interface RestaurateurDataService {
 	Observable<CardsResponse> getCards();
 
 	@DELETE("/cards/{card_id}")
-	Observable<RestaurantsResponse> deleteCard(@Path(Protocol.FIELD_CARD_ID) String cardId);
+	Observable<CardDeleteResponse> deleteCard(@Path(Protocol.FIELD_CARD_ID) int cardId);
 
 	@POST("/restaurants/{restaurant_id}/tables/{table_id}/waiter/call")
 	Observable<WaiterCallResponse> waiterCall(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,

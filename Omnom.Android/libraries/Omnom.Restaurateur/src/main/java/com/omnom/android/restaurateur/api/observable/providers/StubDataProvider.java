@@ -3,6 +3,7 @@ package com.omnom.android.restaurateur.api.observable.providers;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
+import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
@@ -111,7 +112,7 @@ public class StubDataProvider implements RestaurateurObeservableApi {
 	}
 
 	@Override
-	public Observable<RestaurantsResponse> deleteCard(String cardId) {
+	public Observable<CardDeleteResponse> deleteCard(int cardId) {
 		return null;
 	}
 

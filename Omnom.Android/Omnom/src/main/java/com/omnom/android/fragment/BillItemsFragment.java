@@ -14,7 +14,6 @@ import android.widget.HeaderViewListAdapter;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.OrderItemsAdapter;
-import com.omnom.android.fragment.events.OrderItemSelectedEvent;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
@@ -95,7 +94,6 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 				final OrderItemsAdapter wrappedAdapter = (OrderItemsAdapter) adapter.getWrappedAdapter();
 				final boolean selected = !checked;
 				wrappedAdapter.setSelected(position, selected);
-				mBus.post(new OrderItemSelectedEvent(mOrder.getId(), position, selected));
 				view.setTag(R.id.selected, selected);
 				wrappedAdapter.notifyDataSetChanged();
 				updateAmount();

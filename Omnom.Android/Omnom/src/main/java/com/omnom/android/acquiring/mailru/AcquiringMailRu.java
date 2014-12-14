@@ -8,13 +8,13 @@ import com.google.gson.GsonBuilder;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.api.PaymentInfo;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.acquiring.mailru.model.PaymentInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.utils.EncryptionUtils;
 
 import java.util.HashMap;
@@ -67,7 +67,7 @@ public class AcquiringMailRu implements Acquiring {
 	}
 
 	@Override
-	public Observable<AcquiringResponse> deleteCard(AcquiringData acquiringData, UserData user, CardInfo cardInfo) {
+	public Observable<com.omnom.android.acquiring.mailru.response.CardDeleteResponse> deleteCard(AcquiringData acquiringData, UserData user, CardInfo cardInfo) {
 		final HashMap<String, String> signatureParams = new HashMap<String, String>();
 		acquiringData.getMerchantData().toMap(signatureParams);
 		user.storeLogin(signatureParams);

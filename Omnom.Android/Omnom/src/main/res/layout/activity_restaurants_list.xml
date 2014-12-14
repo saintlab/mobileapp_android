@@ -1,0 +1,56 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.omnom.android.activity.RestaurantsListActivity">
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        style="?android:progressBarStyleLarge" />
+
+    <RelativeLayout
+        android:id="@+id/panel_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/restaurants_topbar_height">
+
+        <Button
+            android:id="@+id/btn_demo"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            style="@style/Button.Demo" />
+
+        <ImageView
+            android:id="@+id/img_profile"
+            android:layout_margin="@dimen/activity_vertical_margin_xsmall"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_profile_small"
+            style="@style/ImageView.Clickable.Cropped"/>
+
+        <ImageView
+            android:id="@+id/img_qr"
+            android:layout_margin="@dimen/activity_vertical_margin_xsmall"
+            android:layout_toLeftOf="@+id/img_profile"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_qr"
+            style="@style/ImageView.Clickable.Cropped"/>
+    </RelativeLayout>
+
+    <com.omnom.android.utils.view.SimpleListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin_small"
+        android:paddingRight="@dimen/activity_horizontal_margin_small"
+        android:divider="@color/transparent"
+        android:dividerHeight="0dp"
+        android:scrollbars="none"
+        android:layout_below="@id/panel_top" />
+
+</RelativeLayout>

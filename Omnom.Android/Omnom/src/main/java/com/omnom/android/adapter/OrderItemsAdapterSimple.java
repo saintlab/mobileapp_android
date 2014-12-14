@@ -28,7 +28,7 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 	                               final SparseBooleanArrayParcelable states,
 	                               final boolean addFakeView) {
 		super(context, items, states, addFakeView);
-		mTextColorDefault = mContext.getResources().getColor(R.color.order_content_unselected);
+		mTextColorDefault = mContext.getResources().getColor(R.color.text_color_split_gray);
 		mTextColorSelected = COLOR_TEXT_NORMAL;
 	}
 

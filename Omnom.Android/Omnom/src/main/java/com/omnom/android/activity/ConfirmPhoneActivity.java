@@ -24,6 +24,7 @@ import com.omnom.android.view.HeaderView;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
+import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -50,9 +51,9 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
-			if(s.length() > 0) {
+			if (s.length() > 0) {
 				final int nextFocusForwardId = mEditText.getNextFocusForwardId();
-				if(nextFocusForwardId != View.NO_ID) {
+				if (nextFocusForwardId != View.NO_ID) {
 					findViewById(nextFocusForwardId).requestFocus();
 				}
 			}
@@ -94,6 +95,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	private boolean mFirstStart = true;
 	private int type;
 	private Subscription mConfirmSubscription;
+	private Subscription mRequestCodeSubscription;
 
 	@Override
 	public void initUi() {
@@ -101,10 +103,6 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		topPanel.setTitle(R.string.enter);
 		topPanel.setContentVisibility(false, true);
 		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 1);
-
-		btnRequestCode.setEnabled(false);
-		btnRequestCode.setFocusable(false);
-		btnRequestCode.setFocusableInTouchMode(false);
 
 		edit1.addTextChangedListener(new Watcher(edit1));
 		edit2.addTextChangedListener(new Watcher(edit2));
@@ -116,7 +114,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if(s.length() > 0) {
+				if (s.length() > 0) {
 					doConfirm();
 				}
 			}
@@ -130,54 +128,44 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	}
 
 	private void doConfirm() {
-		mConfirmSubscription = AndroidObservable.bindActivity(this, getObservable())
-		                                        .subscribe(new Action1<AuthResponse>() {
-			                                        @Override
-			                                        public void call(final AuthResponse authResponse) {
-				                                        if(!authResponse.hasError()) {
-					                                        if(type == TYPE_REGISTER) {
-						                                        getMixPanel().alias(phone, null);
-					                                        } else {
-						                                        getMixPanel().identify(phone);
-					                                        }
-					                                        getPreferences().setAuthToken(getActivity(), authResponse.getToken());
-					                                        topPanel.setContentVisibility(false, false);
-					                                        postDelayed(getResources().getInteger(
-							                                        R.integer.default_animation_duration_short), new Runnable() {
-						                                        @Override
-						                                        public void run() {
-							                                        ConfirmPhoneActivity.this.finish();
-							                                        ValidateActivity.start(ConfirmPhoneActivity.this,
-							                                                               R.anim.fake_fade_in_instant,
-							                                                               R.anim.fake_fade_out_instant,
-							                                                               EXTRA_LOADER_ANIMATION_SCALE_UP, false);
-						                                        }
-					                                        });
-				                                        } else {
-					                                        edit1.setText(StringUtils.EMPTY_STRING);
-					                                        edit2.setText(StringUtils.EMPTY_STRING);
-					                                        edit3.setText(StringUtils.EMPTY_STRING);
-					                                        edit4.setText(StringUtils.EMPTY_STRING);
-					                                        edit1.requestFocus();
-					                                        final Animation animation = AnimationUtils.loadAnimation(getActivity(),
-					                                                                                                 R.anim.shake);
-					                                        panelDigits.startAnimation(animation);
-				                                        }
-			                                        }
-		                                        }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			                                        @Override
-			                                        public void onError(Throwable throwable) {
-				                                        Log.e(TAG, "doConfirm", throwable);
-				                                        finish();
-			                                        }
-		                                        });
+		mConfirmSubscription = AndroidObservable.bindActivity(this, getObservable()).subscribe(new Action1<AuthResponse>() {
+			@Override
+			public void call(final AuthResponse authResponse) {
+				if (!authResponse.hasError()) {
+					if (type == TYPE_REGISTER) {
+						getMixPanel().alias(phone, null);
+					} else {
+						getMixPanel().identify(phone);
+					}
+					getPreferences().setAuthToken(getActivity(), authResponse.getToken());
+					topPanel.setContentVisibility(false, false);
+					finish();
+					SplashActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, 0);
+
+				} else {
+					edit1.setText(StringUtils.EMPTY_STRING);
+					edit2.setText(StringUtils.EMPTY_STRING);
+					edit3.setText(StringUtils.EMPTY_STRING);
+					edit4.setText(StringUtils.EMPTY_STRING);
+					edit1.requestFocus();
+					final Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
+					panelDigits.startAnimation(animation);
+				}
+			}
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			@Override
+			public void onError(Throwable throwable) {
+				Log.e(TAG, "doConfirm", throwable);
+				finish();
+			}
+		});
 	}
 
 	private Observable<AuthResponse> getObservable() {
 		Observable<AuthResponse> observable;
-		if(type == TYPE_REGISTER) {
+		if (type == TYPE_REGISTER) {
 			observable = authenticator.confirm(phone, getCode());
-		} else if(type == TYPE_LOGIN) {
+		} else if (type == TYPE_LOGIN) {
 			observable = authenticator.authorizePhone(phone, getCode());
 		} else {
 			throw new RuntimeException("Wrong confirm type = " + type);
@@ -200,12 +188,13 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		OmnomObservable.unsubscribe(mConfirmSubscription);
+		OmnomObservable.unsubscribe(mRequestCodeSubscription);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(topPanel.isAlphaVisible()) {
+		if (topPanel.isAlphaVisible()) {
 			topPanel.postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -215,17 +204,37 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 			}, mFirstStart ? getResources().getInteger(android.R.integer.config_longAnimTime) :
 					                     getResources().getInteger(android.R.integer.config_mediumAnimTime));
 		}
-		if(mFirstStart) {
-			postDelayed(getResources().getInteger(R.integer.default_sms_request_timeout), new Runnable() {
-				@Override
-				public void run() {
-					btnRequestCode.setEnabled(true);
-					btnRequestCode.setFocusable(true);
-					btnRequestCode.setFocusableInTouchMode(true);
-				}
-			});
+		if (mFirstStart) {
+			startRequestCodeTimeout();
 		}
 		mFirstStart = false;
+	}
+
+	@OnClick(R.id.btn_request_code)
+	protected void onRequestCode() {
+		mRequestCodeSubscription =
+				AndroidObservable.bindActivity(this, authenticator.confirmResend(phone)).subscribe(new Action1<AuthResponse>() {
+					@Override
+					public void call(AuthResponse authResponse) {
+						// handle result if necessary
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						Log.w(TAG, throwable.getMessage());
+					}
+				});
+		startRequestCodeTimeout();
+	}
+
+	private void startRequestCodeTimeout() {
+		btnRequestCode.setEnabled(false);
+		postDelayed(getResources().getInteger(R.integer.default_sms_request_timeout), new Runnable() {
+			@Override
+			public void run() {
+				btnRequestCode.setEnabled(true);
+			}
+		});
 	}
 
 	@Override

@@ -5,11 +5,12 @@ import android.content.Context;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.api.PaymentInfo;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
+import com.omnom.android.acquiring.mailru.response.CardDeleteResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -59,12 +60,12 @@ public class DemoAcquiring implements Acquiring {
 	}
 
 	@Override
-	public Observable<AcquiringResponse> deleteCard(final AcquiringData acquiringData, final UserData user, final CardInfo cardInfo) {
-		return new Observable<AcquiringResponse>(new Observable.OnSubscribe<AcquiringResponse>() {
+	public Observable<CardDeleteResponse> deleteCard(final AcquiringData acquiringData, final UserData user, final CardInfo cardInfo) {
+		return new Observable<CardDeleteResponse>(new Observable.OnSubscribe<CardDeleteResponse>() {
 			@Override
-			public void call(Subscriber<? super AcquiringResponse> subscriber) {
-				AcquiringResponse response = new AcquiringResponse();
-				response.setUrl(HTTP_OMNOM_MENU);
+			public void call(Subscriber<? super CardDeleteResponse> subscriber) {
+				CardDeleteResponse response = new CardDeleteResponse();
+				response.setStatus(CardDeleteResponse.STATUS_SUCCESS);
 				subscriber.onNext(response);
 				subscriber.onCompleted();
 			}
