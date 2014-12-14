@@ -712,7 +712,7 @@ public class NumberPicker extends LinearLayout {
 				/ SELECTOR_MAX_FLING_VELOCITY_ADJUSTMENT;
 		mTextSize = (int) mInputText.getTextSize();
 
-		// create the selector wheel paintSelected
+		// createSelectableColor the selector wheel paintSelected
 		Paint paintSelected = new Paint();
 		paintSelected.setAntiAlias(true);
 		paintSelected.setTextAlign(Align.CENTER);
@@ -723,7 +723,7 @@ public class NumberPicker extends LinearLayout {
 		paintSelected.setColor(color);
 		mSelectorWheelPaint = paintSelected;
 
-		// create the selector wheel paintDefault
+		// createSelectableColor the selector wheel paintDefault
 		Paint paintDefault = new Paint();
 		paintDefault.setAntiAlias(true);
 		paintDefault.setTextAlign(Align.CENTER);
@@ -732,7 +732,7 @@ public class NumberPicker extends LinearLayout {
 		paintDefault.setColor(Color.parseColor("#7d000000"));
 		mSelectorWheelPaintDefault = paintDefault;
 
-		// create the fling and adjust scrollers
+		// createSelectableColor the fling and adjust scrollers
 		mFlingScroller = new Scroller(getContext(), null, true);
 		mAdjustScroller = new Scroller(getContext(), new DecelerateInterpolator(2.5f));
 

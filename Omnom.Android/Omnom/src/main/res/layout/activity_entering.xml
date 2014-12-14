@@ -34,12 +34,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="start|center_vertical"
-            android:textColor="@android:color/black"
             android:layout_alignParentLeft="true"
             android:drawablePadding="@dimen/activity_horizontal_margin_small"
             android:drawableLeft="@drawable/ic_profile_small"
-            android:ellipsize="end"
-            style="@android:style/Widget.Holo.Button.Borderless"/>
+            android:ellipsize="end" />
 
         <Button
             android:id="@+id/btn_enter"
@@ -47,12 +45,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end|center_vertical"
-            android:textColor="@android:color/black"
             android:layout_alignParentRight="true"
             android:drawablePadding="@dimen/activity_horizontal_margin_small"
             android:drawableLeft="@drawable/ic_login"
-            android:ellipsize="end"
-            style="@android:style/Widget.Holo.Button.Borderless"/>
+            android:ellipsize="end" />
     </RelativeLayout>
 
 </RelativeLayout>

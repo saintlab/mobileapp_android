@@ -383,7 +383,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		hideProfile();
 		ViewUtils.setVisible(getPanelBottom(), false);
 		ViewUtils.setVisible(txtLeave, false);
-		loader.setLogo(R.drawable.ic_bill_white);
+		loader.setLogo(R.drawable.ic_bill_white_normal);
 		loader.startProgressAnimation(10000, new Runnable() {
 			@Override
 			public void run() {
@@ -440,7 +440,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 								                                       public void onClick(View v) {
 									                                       clearErrors(true);
 									                                       loader.animateLogoFast(mRestaurant.getDecoration().getLogo(),
-									                                                              R.drawable.ic_bill_white);
+									                                                              R.drawable.ic_bill_white_normal);
 									                                       loader.showProgress(false);
 									                                       configureScreen(mRestaurant);
 									                                       updateLightProfile(!mIsDemo);

@@ -25,8 +25,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:paddingStart="@dimen/error_text_padding"
-                android:paddingEnd="@dimen/error_text_padding"
+                android:paddingLeft="@dimen/error_text_padding"
+                android:paddingRight="@dimen/error_text_padding"
                 android:paddingBottom="@dimen/error_text_padding"
                 android:gravity="center"
                 android:textColor="@android:color/secondary_text_light"
@@ -63,6 +63,7 @@
                         android:gravity="center"
                         android:drawablePadding="8dp"
                         android:drawableLeft="@drawable/ic_repeat_small"
+                        android:textColor="@color/text_color_black"
                         android:textAppearance="?android:textAppearanceLarge"/>
                 </LinearLayout>
 
@@ -80,7 +81,7 @@
                         android:layout_height="wrap_content"
                         android:drawablePadding="@dimen/drawable_padding_default"
                         android:gravity="center"
-                        android:drawableLeft="@drawable/ic_demo_mode_small"
+                        android:drawableLeft="@drawable/ic_demo"
                         android:textAppearance="?android:textAppearanceLarge"/>
                 </LinearLayout>
 

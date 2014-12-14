@@ -93,7 +93,7 @@ public final class WifiConfigManager extends AsyncTask<WifiParsedResult, Object,
 	}
 
 	/**
-	 * Update the network: either create a new network or modify an existing network
+	 * Update the network: either createSelectableColor a new network or modify an existing network
 	 *
 	 * @param config the new network configuration
 	 */

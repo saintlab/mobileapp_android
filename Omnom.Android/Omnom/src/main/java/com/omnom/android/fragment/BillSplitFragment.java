@@ -114,6 +114,8 @@ public class BillSplitFragment extends Fragment {
 		             .translationY(0)
 		             .start();
 
+		CalligraphyUtils.applyFontToTextView(getActivity(), mBtnCommit, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+
 		final String fontPath = "fonts/Futura-OSF-Omnom-Regular.otf";
 		final float fontSize = getResources().getDimension(R.dimen.font_medium);
 		for(int i = 0; i < mPagerTitle.getChildCount(); ++i) {

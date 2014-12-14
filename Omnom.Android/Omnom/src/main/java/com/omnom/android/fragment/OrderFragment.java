@@ -73,6 +73,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.Optional;
+import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 import static butterknife.ButterKnife.findById;
 
@@ -401,7 +402,7 @@ public class OrderFragment extends Fragment {
 			txtTipsAmountHint = (TextView) inflate.findViewById(R.id.txt_tips_amount_hint);
 
 			btnPay = (Button) inflate.findViewById(R.id.btn_pay);
-			btnPay.setTextColor(mAccentColor);
+			btnPay.setTextColor(AndroidUtils.createSelectableColor(mAccentColor));
 			btnPay.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(final View v) {
@@ -515,6 +516,7 @@ public class OrderFragment extends Fragment {
 		}
 
 		pickerTips.setDividerDrawable(new ColorDrawable(mAccentColor));
+		CalligraphyUtils.applyFontToTextView(getActivity(), txtTitle, "fonts/Futura-OSF-Omnom-Medium.otf");
 		txtTitle.setText(billText);
 
 		initPicker();

@@ -24,20 +24,17 @@
 
             <TextView
                 android:id="@+id/txt_username"
-                android:text="Firstname Lastname"
                 android:includeFontPadding="false"
                 android:textSize="24sp"
                 style="@style/TextView.User.Data"/>
 
             <TextView
                 android:id="@+id/txt_login"
-                android:text="firstname.lastname"
                 android:includeFontPadding="false"
                 style="@style/TextView.User.Data.Hint"/>
 
             <TextView
                 android:id="@+id/txt_info"
-                android:text="Restaurant: Admin"
                 style="@style/TextView.User.Data.Hint"
                 android:paddingBottom="32dp"/>
 
@@ -60,7 +57,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin_medium"
                 android:gravity="center_vertical"
                 android:clickable="true"
-                style="@android:style/Widget.Holo.Button.Borderless">
+                style="@style/Button.Selectable">
 
                 <TextView
                     android:text="Столик"
