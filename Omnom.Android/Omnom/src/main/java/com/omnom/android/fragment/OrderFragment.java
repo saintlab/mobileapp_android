@@ -540,8 +540,10 @@ public class OrderFragment extends Fragment {
 		mAdapter = new OrderItemsAdapterSimple(getActivity(), mOrder.getItems(), mCheckedStates, true);
 
 		// fix initial appearance - do not show bottom border (aka zubchiki)
-		list.setTranslationY(-48);
-		list.animate().translationY(0).start();
+		if(!mSingle) {
+			list.setTranslationY(-48);
+			list.animate().translationY(0).start();
+		}
 
 		list.setAdapter(mAdapter);
 		list.setScrollingEnabled(false);
