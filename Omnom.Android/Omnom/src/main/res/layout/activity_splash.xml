@@ -42,16 +42,15 @@
             android:layout_marginLeft="28dp"
             android:layout_marginRight="26dp"
             android:layout_marginBottom="14dp"
+            android:paddingTop="4dp"
             android:layout_centerInParent="true"
             android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_splash_fork_n_knife"/>
+            android:layout_height="40dp"
+            android:src="@drawable/ic_fork_n_knife"/>
 
         <ImageView
             android:id="@+id/img_fork_large"
             android:alpha="0"
-            android:paddingBottom="4dp"
-            android:paddingRight="7dp"
             android:layout_marginTop="32dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="26dp"
@@ -59,14 +58,14 @@
             android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_fork_n_knife" />
+            android:src="@drawable/ic_fork_n_knife"/>
 
         <ImageView
             android:id="@+id/img_bill"
             android:layout_alignTop="@+id/img_fork"
-            android:layout_width="38dp"
+            android:layout_marginTop="-2dp"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/img_logo"
             android:layout_toRightOf="@+id/img_fork"
             android:src="@drawable/ic_splash_bill"/>
 
@@ -76,7 +75,6 @@
             android:layout_marginTop="-4dp"
             android:layout_alignTop="@+id/img_fork"
             android:layout_height="wrap_content"
-            android:layout_below="@id/img_logo"
             android:layout_toLeftOf="@+id/img_fork"
             android:src="@drawable/ic_splash_bell"/>
 

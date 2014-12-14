@@ -383,13 +383,13 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		hideProfile();
 		ViewUtils.setVisible(getPanelBottom(), false);
 		ViewUtils.setVisible(txtLeave, false);
-		loader.setLogo(R.drawable.ic_bill_white);
+		loader.setLogo(R.drawable.ic_bill_white_normal);
 		loader.startProgressAnimation(10000, new Runnable() {
 			@Override
 			public void run() {
 			}
 		});
-		ValidationObservable.validateSmart(this)
+		ValidationObservable.validateSmart(this, mIsDemo)
 		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickBillListener))
 		                    .isEmpty()
 		                    .subscribe(new Action1<Boolean>() {
@@ -439,7 +439,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 								                                       public void onClick(View v) {
 									                                       clearErrors(true);
 									                                       loader.animateLogoFast(mRestaurant.getDecoration().getLogo(),
-									                                                              R.drawable.ic_bill_white);
+									                                                              R.drawable.ic_bill_white_normal);
 									                                       loader.showProgress(false);
 									                                       configureScreen(mRestaurant);
 									                                       updateLightProfile(!mIsDemo);

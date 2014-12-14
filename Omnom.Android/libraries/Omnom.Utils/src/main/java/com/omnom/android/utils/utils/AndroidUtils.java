@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -303,5 +305,33 @@ public class AndroidUtils {
 		final Uri parse = Uri.parse("tel:" + StringUtils.removeWhitespaces(phone));
 		final Intent intent = new Intent(Intent.ACTION_DIAL, parse);
 		context.startActivity(intent);
+	}
+
+	/**
+	 * @param factor from 0 to 1, means 0% to 100%
+	 */
+	public static int adjustAlpha(int color, float factor) {
+		int alpha = Math.round(Color.alpha(color) * factor);
+		int red = Color.red(color);
+		int green = Color.green(color);
+		int blue = Color.blue(color);
+		return Color.argb(alpha, red, green, blue);
+	}
+
+	public static ColorStateList createSelectableColor(int color) {
+		int[][] states = new int[][]{
+				new int[]{android.R.attr.state_pressed},  // pressed
+				new int[]{android.R.attr.state_enabled},  // pressed
+				new int[0] // default
+		};
+
+		int[] colors = new int[]{
+				adjustAlpha(color, 0.35f),
+				color,
+				color
+		};
+
+		return new ColorStateList(states, colors);
+
 	}
 }

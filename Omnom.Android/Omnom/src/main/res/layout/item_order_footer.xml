@@ -26,10 +26,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:drawableLeft="@drawable/ic_divide_split_icon"
+            android:drawableLeft="@drawable/ic_split_divide"
             android:drawablePadding="@dimen/activity_horizontal_margin"
             android:textAppearance="?android:textAppearanceLarge"
-            android:textColor="@color/split_bill_red"
+            android:textColor="@color/text_color_split_red"
             android:text="@string/split_the_bill"/>
 
     </LinearLayout>

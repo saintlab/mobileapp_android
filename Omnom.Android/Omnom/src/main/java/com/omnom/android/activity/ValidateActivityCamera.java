@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
+import android.view.View;
 
 import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.BuildConfig;
@@ -15,6 +16,7 @@ import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 
 import javax.inject.Inject;
@@ -37,13 +39,13 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private String mQrData;
 
-	private Subscription mFindBeaconSubscription;
+	private Subscription mValidateSubscribtion;
 
 	@Override
 	protected void startLoader() {
 		clearErrors(true);
 
-		if (BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
+		if(BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
 			// findTableForQr("http://www.riston.ru/wishes"); // mehico
 			findTableForQr("http://m.2gis.ru/os/"); // mehico
 			// findTableForQr("http://omnom.menu/qr/00e7232a4d9d2533e7fa503620c4431b"); // shashlikoff
@@ -52,7 +54,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 		final Intent intent = new Intent(this, OmnomQRCaptureActivity.class);
 		intent.putExtra(CaptureActivity.EXTRA_SHOW_BACK, false);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 			final ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(this, R.anim.slide_in_right,
 			                                                                            R.anim.slide_out_left);
 			startActivityForResult(intent, REQUEST_CODE_SCAN_QR, activityOptions.toBundle());
@@ -65,23 +67,28 @@ public class ValidateActivityCamera extends ValidateActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		OmnomObservable.unsubscribe(mCheckQrSubscribtion);
+		OmnomObservable.unsubscribe(mValidateSubscribtion);
+
 	}
 
 	@Override
 	protected void validate() {
-		if (validateDemo()) {
+		if(validateDemo()) {
 			return;
 		}
-		if (TextUtils.isEmpty(mQrData)) {
+		if(TextUtils.isEmpty(mQrData)) {
 			super.validate();
+		} else if(mRestaurant == null || mTable == null) {
+			clearErrors(true);
+			findTableForQr(mQrData);
 		}
 	}
 
 	@Override
 	protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == REQUEST_CODE_SCAN_QR) {
-			if (resultCode == RESULT_OK) {
+		if(requestCode == REQUEST_CODE_SCAN_QR) {
+			if(resultCode == RESULT_OK) {
 				loader.startProgressAnimation(10000, new Runnable() {
 					@Override
 					public void run() {
@@ -97,16 +104,47 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private void findTableForQr(final String mQrData) {
 		final TableDataResponse[] table = new TableDataResponse[1];
+
+		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
+		                                                                                 .map(OmnomObservable.getValidationFunc(this,
+		                                                                                                                        mErrorHelper,
+		                                                                                                                        mInternetErrorClickListener))
+		                                                                                 .isEmpty())
+		                                         .subscribe(new Action1<Boolean>() {
+			                                         @Override
+			                                         public void call(Boolean hasNoErrors) {
+				                                         if(hasNoErrors) {
+					                                         loadTable(mQrData, table);
+				                                         } else {
+					                                         startErrorTransition();
+					                                         final View viewById = findViewById(R.id.panel_bottom);
+					                                         if(viewById != null) {
+						                                         viewById.animate().translationY(200).start();
+					                                         }
+				                                         }
+			                                         }
+		                                         }, new Action1<Throwable>() {
+			                                         @Override
+			                                         public void call(Throwable throwable) {
+				                                         startErrorTransition();
+				                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
+			                                         }
+		                                         });
+
+
+	}
+
+	private void loadTable(final String mQrData, final TableDataResponse[] table) {
 		mCheckQrSubscribtion = AndroidObservable
 				.bindActivity(this, api.checkQrCode(mQrData).flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
 					@Override
 					public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
 						table[0] = tableDataResponse;
-						if (tableDataResponse.hasAuthError()) {
+						if(tableDataResponse.hasAuthError()) {
 							throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
 							                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED, tableDataResponse.getError()));
 						}
-						if (!TextUtils.isEmpty(tableDataResponse.getError())) {
+						if(!TextUtils.isEmpty(tableDataResponse.getError())) {
 							mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
 							return Observable.empty();
 						}

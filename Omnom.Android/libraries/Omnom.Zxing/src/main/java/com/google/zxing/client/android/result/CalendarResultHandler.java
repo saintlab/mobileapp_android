@@ -75,7 +75,7 @@ public final class CalendarResultHandler extends ResultHandler {
 	}
 
 	/**
-	 * Sends an intent to create a new calendar event by prepopulating the Add Event UI. Older
+	 * Sends an intent to createSelectableColor a new calendar event by prepopulating the Add Event UI. Older
 	 * versions of the system have a bug where the event title will not be filled out.
 	 *
 	 * @param summary     A description of the event

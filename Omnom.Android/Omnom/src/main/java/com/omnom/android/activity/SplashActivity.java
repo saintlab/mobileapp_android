@@ -20,6 +20,7 @@ import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.MultiplyImageView;
 
 import java.util.ArrayList;
@@ -64,11 +65,14 @@ public class SplashActivity extends BaseOmnomActivity {
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int durationSplash) {
 		final Intent intent = new Intent(context, SplashActivity.class);
 		intent.putExtra(EXTRA_DURATION_SPLASH, durationSplash);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		context.start(intent, enterAnim, exitAnim, true);
 	}
 
 	private void animateValidation() {
-		if(!mAnimate) {
+		if (!mAnimate) {
 			return;
 		}
 
@@ -90,7 +94,7 @@ public class SplashActivity extends BaseOmnomActivity {
 				postDelayed(animationDuration, new Runnable() {
 					@Override
 					public void run() {
-						if(!isFinishing()) {
+						if (!isFinishing()) {
 							ValidateActivity.start(SplashActivity.this, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
 							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, false);
 						}
@@ -106,7 +110,7 @@ public class SplashActivity extends BaseOmnomActivity {
 	 * Animate of fork_n_knife logo and loader
 	 */
 	private void animateMultiply() {
-		final float upperLogoPoint = getResources().getDimension(R.dimen.loader_margin_top) + 4;
+		final float upperLogoPoint = getResources().getDimension(R.dimen.loader_margin_top);
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
 
 		// translating up animation
@@ -115,14 +119,11 @@ public class SplashActivity extends BaseOmnomActivity {
 		final List<View> views = new ArrayList<View>();
 		views.add(imgFork);
 		views.add(imgForkLarge);
-		final ValueAnimator translationAnimator = AnimationUtils.prepareTranslation(
-				views,
-				null,
-				translationSmallBuilder);
+		final ValueAnimator translationAnimator = AnimationUtils.prepareTranslation(views, null, translationSmallBuilder);
 		translationAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
-				imgMultiply.setOffset(-(Integer) animation.getAnimatedValue() + 4);
+				imgMultiply.setOffset(-(Integer) animation.getAnimatedValue());
 			}
 		});
 
@@ -174,8 +175,8 @@ public class SplashActivity extends BaseOmnomActivity {
 			}
 		});
 
-		imgForkLarge.animate().setDuration(animationDuration).translationXBy(7).start();
-		imgFork.animate().setDuration(animationDuration).translationXBy(7).start();
+//		imgForkLarge.animate().setDuration(animationDuration).translationXBy(ViewUtils.dipToPixels(this, 7)).start();
+//		imgFork.animate().setDuration(animationDuration).translationXBy(ViewUtils.dipToPixels(this, 7)).start();
 
 		ValueAnimator alphaAnimtorForkLarge = ValueAnimator.ofFloat(0, 1);
 		alphaAnimtorForkLarge.setDuration(animationDuration);
@@ -197,7 +198,7 @@ public class SplashActivity extends BaseOmnomActivity {
 		super.onResume();
 
 		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
-		if(hasToken) {
+		if (hasToken) {
 			animateValidation();
 		} else {
 			animateLogin();
@@ -205,7 +206,7 @@ public class SplashActivity extends BaseOmnomActivity {
 	}
 
 	private void animateLogin() {
-		if(!mAnimate) {
+		if (!mAnimate) {
 			return;
 		}
 		findViewById(android.R.id.content).postDelayed(new Runnable() {
@@ -225,9 +226,9 @@ public class SplashActivity extends BaseOmnomActivity {
 
 		imgMultiply.setRadius(getResources().getDimensionPixelSize(R.dimen.loader_size_huge) / 2);
 
-		if(AndroidUtils.isKitKat()) {
+		if (AndroidUtils.isKitKat()) {
 			startBleServiceKK();
-		} else if(AndroidUtils.isJellyBeanMR2()) {
+		} else if (AndroidUtils.isJellyBeanMR2()) {
 			startBleServiceJB();
 		}
 	}
