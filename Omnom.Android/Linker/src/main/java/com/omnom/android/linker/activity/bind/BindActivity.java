@@ -648,13 +648,13 @@ public class BindActivity extends BaseActivity {
 					@Override
 					public void onVisibilityChanged(boolean isVisible) {
 						if(isVisible) {
-							AnimationUtils.translateUp(Collections.singletonList((View) mBtnBindTable),
+							AnimationUtils.translateUp(getActivity(), Collections.singletonList((View) mBtnBindTable),
 							                           btnTranslation, null);
 
 							mLoader.translateUp(null, mLoaderTranslation);
 						} else {
 							AnimationUtils
-									.translateDown(Collections.singletonList((View) mBtnBindTable),
+									.translateDown(getActivity(),Collections.singletonList((View) mBtnBindTable),
 									               btnTranslation, null);
 							mLoader.translateDown(null, mLoaderTranslation);
 						}
