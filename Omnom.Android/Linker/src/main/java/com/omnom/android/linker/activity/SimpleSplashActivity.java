@@ -62,7 +62,8 @@ public class SimpleSplashActivity extends BaseActivity {
 				AnimationUtils.animateAlpha(imgCards, false, durationShort);
 				AnimationUtils.animateAlpha(imgLogo, false, durationShort);
 				AnimationUtils.animateAlpha(imgRing, false, durationShort);
-				AnimationUtils.translateUp(Collections.singletonList((View) imgFork), -(int) upperLogoPoint, null, animationDuration);
+				AnimationUtils.translateUp(getActivity(), Collections.singletonList((View) imgFork), -(int) upperLogoPoint, null,
+				                           animationDuration);
 				AnimationUtils.scale(imgBackground, (int) loaderBgSize, animationDuration, null);
 				transitionDrawable.startTransition(durationShort);
 				AnimationUtils.scaleWidth(imgFork, dimensionPixelSize, durationShort, null);
