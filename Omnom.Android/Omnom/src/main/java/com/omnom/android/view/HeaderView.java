@@ -26,6 +26,8 @@ import static butterknife.ButterKnife.findById;
 public class HeaderView extends RelativeLayout {
 	private TextView txtTitle;
 
+	private TextView txtTitleMedium;
+
 	private TextView txtTitleBig;
 
 	private Button btnRight;
@@ -62,6 +64,7 @@ public class HeaderView extends RelativeLayout {
 	private void init() {
 		final View view = LayoutInflater.from(getContext()).inflate(R.layout.view_header, this);
 		txtTitle = findById(view, R.id.title);
+		txtTitleMedium = findById(view, R.id.title_medium);
 		txtTitleBig = findById(view, R.id.title_big);
 		btnRight = findById(view, R.id.btn_right);
 		btnLeft = findById(view, R.id.btn_left);
@@ -78,12 +81,21 @@ public class HeaderView extends RelativeLayout {
 	public void setTitle(final int resId) {
 		txtTitle.setText(resId);
 		ViewUtils.setVisible(txtTitleBig, false);
+		ViewUtils.setVisible(txtTitleMedium, false);
 		ViewUtils.setVisible(txtTitle, true);
+	}
+
+	public void setTxtTitleMedium(final int resId) {
+		txtTitleMedium.setText(resId);
+		ViewUtils.setVisible(txtTitleBig, false);
+		ViewUtils.setVisible(txtTitleMedium, true);
+		ViewUtils.setVisible(txtTitle, false);
 	}
 
 	public void setTitleBig(final int resId) {
 		txtTitleBig.setText(resId);
 		ViewUtils.setVisible(txtTitleBig, true);
+		ViewUtils.setVisible(txtTitleMedium, false);
 		ViewUtils.setVisible(txtTitle, false);
 	}
 

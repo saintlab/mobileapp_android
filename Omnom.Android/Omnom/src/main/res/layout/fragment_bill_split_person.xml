@@ -19,7 +19,7 @@
             android:layout_weight="2"
             android:gravity="bottom|center_horizontal"
             android:text="@string/how_many_guests_will_pay"
-            android:textSize="24sp"
+            android:textSize="16sp"
             android:textColor="@color/transparent_black"
             android:textAppearance="?android:textAppearance"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
@@ -35,12 +35,23 @@
             android:textAppearance="?android:textAppearance"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
         <com.omnom.android.utils.view.NumberPicker
             android:id="@+id/picker"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_weight="4"
+            android:layout_weight="5"
             style="@style/NPWidget.Holo.Light.NumberPicker.Grey"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"/>
+
     </LinearLayout>
 
 </FrameLayout>

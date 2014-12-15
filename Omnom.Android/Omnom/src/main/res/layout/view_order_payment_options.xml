@@ -6,7 +6,7 @@
     android:id="@+id/panel_order_payment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/order_payment_padding_bottom"
+    android:paddingBottom="@dimen/pay_button_margin_bottom"
     android:layout_gravity="bottom"
     android:visibility="gone"
     tools:showIn="@layout/fragment_order">
@@ -14,10 +14,9 @@
     <Button
         android:id="@+id/btn_pay"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
-        android:paddingRight="@dimen/activity_horizontal_margin_medium"
-        android:background="@drawable/btn_rounded_white"
+        android:layout_height="@dimen/pay_button_height"
+        android:minWidth="@dimen/pay_button_minimum_width"
+        android:background="@drawable/btn_pay"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
         android:textColor="@color/error_red"
         android:textSize="@dimen/font_medium"

@@ -5,6 +5,8 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 
+import hugo.weaving.DebugLog;
+
 /**
  * Created by Ch3D on 02.11.2014.
  */
@@ -13,6 +15,8 @@ public abstract class CardDataTextWatcher implements TextWatcher {
 	private final EditText mView;
 
 	private String moveString;
+
+	protected boolean mDeleteCharacter;
 
 	public CardDataTextWatcher(EditText view) {
 		mView = view;
@@ -23,11 +27,14 @@ public abstract class CardDataTextWatcher implements TextWatcher {
 	public abstract int getDelimiterLength();
 
 	@Override
+	@DebugLog
 	public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) {
 		moveString = null;
+		mDeleteCharacter = count != 0;
 	}
 
 	@Override
+	@DebugLog
 	public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
 		if(s.toString().length() > getMaxLength() + getDelimiterLength()) {
 			moveString = String.valueOf(s.charAt(s.length() - 1));

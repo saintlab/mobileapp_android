@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -117,7 +118,7 @@ public class BillSplitFragment extends Fragment {
 		CalligraphyUtils.applyFontToTextView(getActivity(), mBtnCommit, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
 
 		final String fontPath = "fonts/Futura-OSF-Omnom-Regular.otf";
-		final float fontSize = getResources().getDimension(R.dimen.font_medium);
+		final float fontSize = getResources().getDimension(R.dimen.font_normal);
 		for(int i = 0; i < mPagerTitle.getChildCount(); ++i) {
 			View nextChild = mPagerTitle.getChildAt(i);
 			if(nextChild instanceof TextView) {
@@ -139,7 +140,11 @@ public class BillSplitFragment extends Fragment {
 			}
 		});
 
-		mHeader.setTitleBig(R.string.split_the_bill);
+		GradientDrawable sd = (GradientDrawable) mBtnCommit.getBackground();
+		sd.setColor(getResources().getColor(R.color.btn_pay_green));
+		sd.invalidateSelf();
+
+		mHeader.setTxtTitleMedium(R.string.split_the_bill);
 		mHeader.setButtonLeftDrawable(R.drawable.ic_cross_black, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
