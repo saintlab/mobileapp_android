@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="loader_size">230dp</dimen>
+    <dimen name="loader_logo_size">180dp</dimen>
+</resources>
