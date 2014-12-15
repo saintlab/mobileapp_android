@@ -45,7 +45,7 @@
     <string name="i_m_going_to_pay">Я оплачу</string>
     <string name="to_be_paid">К оплате</string>
     <string name="already_paid">Уже оплачено: %1$s</string>
-    <string name="tips_another">другой</string>
+    <string name="tips_another">Другой</string>
     <string name="tips">Чаевые</string>
     <string name="app_version_build">версия %1$s</string>
     <string name="save_card_data">Сохранить данные карты для следующих платежей</string>
