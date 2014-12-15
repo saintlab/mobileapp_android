@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 
 import javax.inject.Inject;
 
@@ -654,7 +655,7 @@ public class BindActivity extends BaseActivity {
 							mLoader.translateUp(null, mLoaderTranslation);
 						} else {
 							AnimationUtils
-									.translateDown(getActivity(),Collections.singletonList((View) mBtnBindTable),
+									.translateDown(getActivity(), Collections.singletonList((View) mBtnBindTable),
 									               btnTranslation, null);
 							mLoader.translateDown(null, mLoaderTranslation);
 						}
@@ -775,7 +776,14 @@ public class BindActivity extends BaseActivity {
 						                                           .subscribe(new Action1<ResponseBase>() {
 							                                           @Override
 							                                           public void call(ResponseBase responseBase) {
-								                                           // Do nothing
+								                                           if(TextUtils.isEmpty(responseBase.getError())) {
+									                                           throw RetrofitError.unexpectedError(StringUtils
+											                                                                               .EMPTY_STRING,
+									                                                                               new
+											                                                                               ServiceConfigurationError(
+											                                                                               "There is a " +
+													                                                                               "problem on server-side"));
+								                                           }
 							                                           }
 						                                           }, new LinkerBaseErrorHandler(BindActivity.this) {
 							                                           @Override

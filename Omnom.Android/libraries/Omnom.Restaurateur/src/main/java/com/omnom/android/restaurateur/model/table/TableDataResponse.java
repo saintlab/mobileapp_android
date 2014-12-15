@@ -12,13 +12,13 @@ import java.util.List;
  * Created by Ch3D on 26.08.2014.
  */
 public class TableDataResponse extends ResponseBase {
-	public static final TableDataResponse NULL = new TableDataResponse("null_id", 0, "null_qr_data", "null_rest_id");
+	public static final TableDataResponse NULL = new TableDataResponse("null_id", 0, Collections.EMPTY_LIST, "null_rest_id");
 
 	@Expose
 	private int internalId;
 
 	@Expose
-	private String qrCode;
+	private List<String> qrCode;
 
 	@Expose
 	private String restaurantId;
@@ -28,7 +28,7 @@ public class TableDataResponse extends ResponseBase {
 	@Expose
 	private List<String> beaconUuids = new ArrayList<String>();
 
-	public TableDataResponse(String id, int internalId, String qrCode, String restaurantId) {
+	public TableDataResponse(String id, int internalId, List<String> qrCode, String restaurantId) {
 		this.internalId = internalId;
 		this.qrCode = qrCode;
 		this.restaurantId = restaurantId;
@@ -44,7 +44,7 @@ public class TableDataResponse extends ResponseBase {
 		return internalId;
 	}
 
-	public String getQrCode() {
+	public List<String> getQrCode() {
 		return qrCode;
 	}
 
