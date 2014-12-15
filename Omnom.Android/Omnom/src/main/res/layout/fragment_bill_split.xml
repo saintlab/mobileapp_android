@@ -6,14 +6,16 @@
     <com.omnom.android.view.HeaderView
         android:id="@+id/panel_top"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/view_size_default"
+        android:layout_height="@dimen/split_view_header_height"
         android:background="@color/list_header"
-        android:padding="@dimen/activity_horizontal_margin_small" />
+        android:paddingLeft="@dimen/activity_horizontal_margin_small"
+        android:paddingRight="@dimen/activity_horizontal_margin_small"
+        android:paddingTop="@dimen/activity_horizontal_margin_small" />
 
 
     <com.omnom.android.view.OrdersViewPager
         android:id="@+id/pager"
-        android:layout_marginTop="@dimen/view_size_default"
+        android:layout_marginTop="@dimen/split_view_header_height"
         android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -21,25 +23,31 @@
         <android.support.v4.view.PagerTabStrip
             android:id="@+id/pager_title"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="@dimen/split_view_header_height"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:background="@color/list_header"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
     </com.omnom.android.view.OrdersViewPager>
 
+    <View
+        android:id="@+id/view_behind_btn"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="@color/white_transparent"
+        android:layout_gravity="bottom"/>
+
     <Button
         android:id="@+id/btn_commit"
         android:layout_gravity="center_horizontal|bottom"
         android:gravity="center"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:background="@drawable/btn_rounded_green"
+        android:layout_height="@dimen/pay_button_height"
+        android:minWidth="@dimen/pay_button_minimum_width"
+        android:layout_marginBottom="@dimen/pay_button_margin_bottom"
+        android:background="@drawable/btn_pay"
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
         android:visibility="invisible"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 

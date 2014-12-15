@@ -45,7 +45,7 @@
     <string name="i_m_going_to_pay">Я оплачу</string>
     <string name="to_be_paid">К оплате</string>
     <string name="already_paid">Уже оплачено: %1$s</string>
-    <string name="tips_another">другой</string>
+    <string name="tips_another">Другой</string>
     <string name="tips">Чаевые</string>
     <string name="app_version_build">версия %1$s</string>
     <string name="save_card_data">Сохранить данные карты для следующих платежей</string>
@@ -86,7 +86,7 @@
     <string name="confirm">Подтвердить</string>
     <string name="card_removal_confirmation">Уверены что хотите удалить карту\n%1$s?</string>
     <string name="delete">Удалить</string>
-    <string name="how_many_guests_will_pay">На сколько гостей делить</string>
+    <string name="how_many_guests_will_pay">На скольких гостей делить?</string>
     <string name="welcome_to_">Добро пожаловать в %1$s</string>
     <string name="balk_notification_user_paid_">%1$s: оплачено по счету %2$s </string>
     <string name="title_activity_restaurants_list">RestaurantsListActivity</string>

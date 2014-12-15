@@ -55,6 +55,15 @@
         android:textColor="?android:textColorHint" />
 
     <TextView
+        android:id="@+id/title_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="@dimen/font_medium"
+        omnom:fontPath="fonts/Futura-OSF-Omnom-Medium.otf"
+        android:textColor="@android:color/black" />
+
+    <TextView
         android:id="@+id/title_big"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

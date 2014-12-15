@@ -18,13 +18,14 @@ public class TableDataResponse extends ResponseBase {
 	private int internalId;
 
 	@Expose
-	private List<String> qrCode;
+	private List<String> qrCode = new ArrayList<String>();
 
 	@Expose
 	private String restaurantId;
 
 	@Expose
 	private String id;
+
 	@Expose
 	private List<String> beaconUuids = new ArrayList<String>();
 

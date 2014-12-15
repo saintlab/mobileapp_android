@@ -46,6 +46,7 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:maxLines="2"
+                android:textColor="@android:color/white"
                 android:text="— Отсканируйте\nвашу карту"
                 android:textAppearance="?android:textAppearanceMediumInverse"/>
         </LinearLayout>

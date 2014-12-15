@@ -119,11 +119,13 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 	@Override
 	public void updateAmount() {
 		final Button btnCommit = (Button) getActivity().findViewById(R.id.btn_commit);
+		final View viewBehindBtn = getActivity().findViewById(R.id.view_behind_btn);
 		final BigDecimal amount = getAmount();
 		if(amount.compareTo(BigDecimal.ZERO) > 0) {
 			btnCommit.setTag(R.id.edit_amount, amount);
 			btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_ITEMS);
 			final String text = getString(R.string.bill_split_amount_, StringUtils.formatCurrency(amount));
+			AnimationUtils.animateAlpha(viewBehindBtn, true);
 			AnimationUtils.animateAlpha(btnCommit, true, new Runnable() {
 				@Override
 				public void run() {
@@ -132,6 +134,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 			});
 			btnCommit.setText(text);
 		} else {
+			AnimationUtils.animateAlpha(viewBehindBtn, false);
 			AnimationUtils.animateAlpha(btnCommit, false);
 		}
 	}

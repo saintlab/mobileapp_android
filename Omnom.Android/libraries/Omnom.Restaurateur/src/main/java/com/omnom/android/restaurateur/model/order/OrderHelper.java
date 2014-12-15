@@ -76,9 +76,6 @@ public class OrderHelper {
 		if(order == null || amount == null || order.getTips() == null) {
 			return false;
 		}
-		if(order.getAmountToPay() <= 0) {
-			return false;
-		}
 		List<Integer> thresholds = order.getTips().getThresholds();
 		int maxThreshold = (int) Math.round(AmountHelper.toDouble(thresholds.get(thresholds.size() - 1)));
 		return amount.compareTo(BigDecimal.valueOf(maxThreshold)) > 0;
