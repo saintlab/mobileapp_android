@@ -1,5 +1,6 @@
 package com.omnom.android.linker.modules;
 
+import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.activity.LoginActivity;
 import com.omnom.android.linker.activity.SimpleSplashActivity;
@@ -18,6 +19,6 @@ import dagger.Module;
  */
 @Module(injects = {LinkerApplication.class, LoginActivity.class, SimpleSplashActivity.class, ValidationActivity.class, BindActivity.class,
 		RestaurantActivity.class, RestaurantsListActivity.class, UserProfileActivity.class, BluetoothLeService.class,
-		BeaconRssiProviderSimple.class},
+		BeaconRssiProviderSimple.class, CaptureActivity.class},
         complete = false)
 public class ApplicationModule {}
