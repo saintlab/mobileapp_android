@@ -4,6 +4,12 @@ android {
     compileSdkVersion 20
     buildToolsVersion "20.0.0"
 
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'LICENSE.txt'
+    }
+
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 20
