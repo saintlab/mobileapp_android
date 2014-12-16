@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -431,6 +432,9 @@ public class OrderFragment extends Fragment {
 					}
 				}
 			});
+			GradientDrawable sd = (GradientDrawable) btnPay.getBackground();
+			sd.setColor(getResources().getColor(android.R.color.white));
+			sd.invalidateSelf();
 
 			btnApply = (ImageButton) inflate.findViewById(R.id.btn_apply);
 			btnApply.setOnClickListener(new View.OnClickListener() {
