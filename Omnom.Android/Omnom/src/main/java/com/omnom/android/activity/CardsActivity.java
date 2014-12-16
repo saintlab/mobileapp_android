@@ -17,9 +17,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -121,14 +119,14 @@ public class CardsActivity extends BaseOmnomActivity {
 	@InjectView(R.id.panel_top)
 	protected HeaderView mPanelTop;
 
-	@InjectView(R.id.footer)
-	protected LinearLayout cardsFooter;
-
 	@InjectView(R.id.btn_pay)
 	protected Button mBtnPay;
 
 	@InjectView(R.id.list)
 	protected ListView mList;
+
+	@InjectView(R.id.delimiter)
+	protected View mDelimiter;
 
 	private int mAccentColor;
 
@@ -172,6 +170,7 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		ViewUtils.setVisible(mDelimiter, false);
 		mPreferences = OmnomApplication.get(getActivity()).getPreferences();
 
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
@@ -200,8 +199,6 @@ public class CardsActivity extends BaseOmnomActivity {
 				mBtnPay.setEnabled(false);
 			}
 		} else {
-			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) cardsFooter.getLayoutParams();
-			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 			ViewUtils.setVisible(mBtnPay, false);
 		}
 
