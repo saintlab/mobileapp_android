@@ -245,8 +245,9 @@ public class CardsActivity extends BaseOmnomActivity {
 	}
 
 	private void askForRemoval(final Card card) {
-		final AlertDialog alertDialog = AndroidUtils.showDialog(this, card.getMaskedPan(),
-		                                                        R.string.delete, new DialogInterface.OnClickListener() {
+		final String title = getString(R.string.card_removal_confirmation, card.getMaskedPan(), card.getAssociation());
+		final AlertDialog alertDialog = AndroidUtils.showDialog(this, title,
+				R.string.delete, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(final DialogInterface dialog, final int which) {
 						removeCard(card);
@@ -265,6 +266,10 @@ public class CardsActivity extends BaseOmnomActivity {
 		btn2.setTextSize(TypedValue.COMPLEX_UNIT_PX, btnTextSize);
 		TextView messageView = (TextView) alertDialog.findViewById(android.R.id.message);
 		messageView.setGravity(Gravity.CENTER);
+		Button removeCardButton = (Button) alertDialog.findViewById(android.R.id.button1);
+		removeCardButton.setTextColor(getResources().getColor(android.R.color.holo_red_light));
+		Button cancelButton = (Button) alertDialog.findViewById(android.R.id.button2);
+		cancelButton.setTextColor(getResources().getColor(R.color.cancel_button));
 	}
 
 	private void removeCard(final Card card) {
