@@ -16,7 +16,6 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.cards.Card;
 import com.omnom.android.utils.preferences.PreferenceProvider;
-import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.List;
@@ -28,10 +27,6 @@ import butterknife.InjectView;
  * Created by Ch3D on 27.10.2014.
  */
 public class CardsAdapter extends BaseAdapter {
-
-	public interface AnimationEndListener {
-		public void onAnimationEnd();
-	}
 
 	static class ViewHolder {
 		@InjectView(R.id.txt_card_number)
@@ -45,6 +40,9 @@ public class CardsAdapter extends BaseAdapter {
 
 		@InjectView(R.id.root)
 		protected View root;
+
+		@InjectView(R.id.divider)
+		protected View divider;
 
 		private ViewHolder(View convertView) {
 			ButterKnife.inject(this, convertView);
@@ -71,15 +69,12 @@ public class CardsAdapter extends BaseAdapter {
 
 	private int mColorPanUnregistered;
 
-	private AnimationEndListener mListener;
-
 	private boolean mIsDemo;
 
 	private int mLastAnimated = -1;
 
-	public CardsAdapter(final Context context, List<? extends Card> cards, AnimationEndListener listener, boolean isDemo) {
+	public CardsAdapter(final Context context, List<? extends Card> cards, boolean isDemo) {
 		mContext = context;
-		mListener = listener;
 		mIsDemo = isDemo;
 		mInflater = LayoutInflater.from(context);
 		mCards = cards;
@@ -132,6 +127,7 @@ public class CardsAdapter extends BaseAdapter {
 		ViewHolder holder = (ViewHolder) convertView.getTag();
 		boolean isAnimate = position > mLastAnimated;
 		if(isAnimate) {
+			holder.divider.setAlpha(0);
 			convertView.setAlpha(0);
 			convertView.setTranslationY(-20);
 		}
@@ -160,22 +156,23 @@ public class CardsAdapter extends BaseAdapter {
 			holder.txtConfirm.setText(StringUtils.EMPTY_STRING);
 		} else {
 			holder.txtCardNumber.setTextColor(mColorPanUnregistered);
+			holder.txtType.setTextColor(mColorPanUnregistered);
 			holder.txtConfirm.setText(R.string.confirm);
 			holder.txtConfirm.setCompoundDrawables(null, null, null, null);
 		}
 
 		if(isAnimate) {
 			mLastAnimated = position;
-			ViewPropertyAnimator viewPropertyAnimator = convertView.animate().alpha(1).translationY(0).setDuration(mAnimDuration)
+			final boolean isLast = position == getCount() - 1;
+
+			ViewPropertyAnimator viewPropertyAnimator = convertView.animate()
+			                                                       .alpha(1)
+			                                                       .translationY(0)
+			                                                       .setDuration(mAnimDuration)
 			                                                       .setStartDelay(mAnimDelay);
-			if(position == getCount() - 1 && AndroidUtils.isJellyBean()) {
-				viewPropertyAnimator
-						.withEndAction(new Runnable() {
-							@Override
-							public void run() {
-								mListener.onAnimationEnd();
-							}
-						});
+			// do not display divider for last item
+			if(!isLast) {
+				holder.divider.animate().alpha(1).setStartDelay(mAnimDelay * 2);
 			}
 			viewPropertyAnimator.start();
 		}

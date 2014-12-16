@@ -1,42 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/footer"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:baselineAligned="false"
+    android:orientation="vertical"
     android:layout_above="@+id/btn_pay"
-    android:gravity="center"
     android:layout_centerHorizontal="true"
     android:padding="@dimen/activity_horizontal_margin_medium"
-    android:orientation="horizontal"
     tools:showIn="@layout/activity_cards">
 
-    <ImageView
-        android:layout_width="wrap_content"
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@drawable/mail_ru_icon"/>
+        android:text="@string/secure_payments"
+        android:textColor="@color/secure_payment_color"
+        android:textSize="@dimen/font_medium"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
-        android:src="@drawable/alfa_bank_icon"/>
+    <View
+        android:id="@+id/delimiter"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/activity_horizontal_margin_small"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin_small"
+        android:background="@color/secure_payment_color"/>
 
-    <ImageView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
-        android:src="@drawable/verified_by_visa_icon"/>
+        android:baselineAligned="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
-        android:src="@drawable/master_card_secure_code_icon"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/verified_by_visa_icon"
+            android:layout_weight="1"
+            android:contentDescription="@null"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/master_card_secure_code_icon"
+            android:layout_weight="1"
+            android:contentDescription="@null"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/mail_ru_icon"
+            android:layout_weight="1"
+            android:contentDescription="@null"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/alfa_bank_icon"
+            android:layout_weight="1"
+            android:contentDescription="@null"/>
+
+    </LinearLayout>
+
 </LinearLayout>

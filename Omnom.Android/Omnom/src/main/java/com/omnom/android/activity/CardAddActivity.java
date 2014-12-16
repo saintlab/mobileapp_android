@@ -252,14 +252,16 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		return !hasErrors;
 	}
 
-	@OnClick(R.id.img_camera)
-	public void startCardIo(View view) {
+	@OnClick({R.id.img_camera, R.id.txt_camera})
+	public void onImgCamera(View view) {
 		Intent scanIntent = new Intent(this, CardIOActivity.class);
 		scanIntent.putExtra(CardIOActivity.EXTRA_APP_TOKEN, getString(R.string.cardio_app_token));
 		scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_EXPIRY, false); //true
 		scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_CVV, false); //true
 		scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_POSTAL_CODE, false);
 		scanIntent.putExtra(CardIOActivity.EXTRA_SUPPRESS_MANUAL_ENTRY, true);
+		scanIntent.putExtra(CardIOActivity.EXTRA_SUPPRESS_CONFIRMATION, true);
+		scanIntent.putExtra(CardIOActivity.EXTRA_USE_CARDIO_LOGO, true);
 		startActivityForResult(scanIntent, REQUEST_CODE_CARD_IO);
 	}
 

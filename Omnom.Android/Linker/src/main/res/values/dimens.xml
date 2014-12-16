@@ -2,4 +2,6 @@
 <resources>
     <dimen name="loader_size">230dp</dimen>
     <dimen name="loader_logo_size">180dp</dimen>
+
+    <dimen name="drawable_padding_default">8dp</dimen>
 </resources>

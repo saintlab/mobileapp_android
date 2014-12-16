@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:gravity="start|center_vertical"
             android:layout_alignParentLeft="true"
-            android:drawablePadding="@dimen/activity_horizontal_margin_small"
+            android:drawablePadding="@dimen/drawable_padding_default"
             android:drawableLeft="@drawable/ic_profile_small"
             android:ellipsize="end" />
 
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:gravity="end|center_vertical"
             android:layout_alignParentRight="true"
-            android:drawablePadding="@dimen/activity_horizontal_margin_small"
+            android:drawablePadding="@dimen/drawable_padding_default"
             android:drawableLeft="@drawable/ic_login"
             android:ellipsize="end" />
     </RelativeLayout>
