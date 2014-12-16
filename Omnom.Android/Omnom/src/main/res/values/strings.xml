@@ -57,6 +57,7 @@
     <string name="title_activity_card_confirm">CardConfirmActivity</string>
     <string name="card_binding">Привязка карты</string>
     <string name="hint_confirm_amount">00,00 </string>
+    <string name="secure_payments">Платежи защищены</string>
     <string name="card_confirmation_text">Для привязки карты вам нужно подтвердить, что вы её владелец.
         Мы списали с вашей карты секретную сумму (до 50 руб.), о чём вам должна прийти SMS от банка.
         Посмотрите в сообщении, сколько списано и укажите сумму в поле выше.</string>
@@ -84,7 +85,7 @@
     <string name="are_you_to_quit">Вы действительно хотите выйти?</string>
     <string name="quit">Выйти</string>
     <string name="confirm">Подтвердить</string>
-    <string name="card_removal_confirmation">Уверены что хотите удалить карту\n%1$s?</string>
+    <string name="card_removal_confirmation">Карта %1$s %2$s</string>
     <string name="delete">Удалить</string>
     <string name="how_many_guests_will_pay">На скольких гостей делить?</string>
     <string name="welcome_to_">Добро пожаловать в %1$s</string>

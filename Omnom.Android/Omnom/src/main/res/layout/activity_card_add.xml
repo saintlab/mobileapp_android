@@ -62,7 +62,7 @@
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:nextFocusDown="@+id/txt_exp_date"
             android:singleLine="true"
-            android:inputType="phone"
+            android:inputType="number"
             android:imeOptions="actionNext"
             android:layout_marginTop="-8dp"
             android:hint="1234  5678  9123  4567"
@@ -123,7 +123,7 @@
 
     <include
         layout="@layout/view_cards_footer"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>

@@ -10,6 +10,7 @@
 
     <color name="info_hint">#7f000000</color>
     <color name="order_item_price">#7d7d7d</color>
+    <color name="order_item_unselected">#d1d1d1</color>
 
     <color name="light_blue">#488ee1</color>
     <color name="card_selected">#4a90e2</color>
@@ -32,5 +33,11 @@
     <color name="tip_active">#ffffff</color>
     <color name="tip_default">#7affffff</color>
 
+    <color name="cancel_button">#555</color>
+
     <color name="balk_notification_background">#02c164</color>
+
+    <color name="delimiter_color">#33aaaaaa</color>
+
+    <color name="secure_payment_color">#33000000</color>
 </resources>

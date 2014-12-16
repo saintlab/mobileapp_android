@@ -26,22 +26,21 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"/>
 
-    <include
-        layout="@layout/view_cards_footer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_pay"
-        android:layout_centerHorizontal="true"/>
-
     <ListView
         android:id="@+id/list"
         android:layout_below="@+id/panel_top"
-        android:layout_above="@+id/footer"
-        android:divider="@color/transparent"
-        android:dividerHeight="1dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
         android:footerDividersEnabled="false"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"/>
+
+    <include
+        layout="@layout/view_cards_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/list"
+        android:layout_centerHorizontal="true"/>
 
     <!--<EditText
         android:id="@+id/edit_amount"
