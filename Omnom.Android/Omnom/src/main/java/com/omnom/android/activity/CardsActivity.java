@@ -1,6 +1,5 @@
 package com.omnom.android.activity;
 
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
@@ -8,7 +7,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -44,7 +43,6 @@ import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.AndroidUtils;
-import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.HeaderView;
@@ -63,7 +61,7 @@ import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
-public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.AnimationEndListener {
+public class CardsActivity extends BaseOmnomActivity {
 
 	public static final int RESULT_PAY = 10;
 
@@ -140,8 +138,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private PreferenceProvider mPreferences;
 
-	private ValueAnimator dividerAnimation;
-
 	private Order mOrder;
 
 	private OrderFragment.PaymentDetails mDetails;
@@ -174,25 +170,9 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 		mTableId = intent.getStringExtra(Extras.EXTRA_TABLE_ID);
 	}
 
-	private void initDividerAnimation() {
-		final ColorDrawable dividerDrawable = new ColorDrawable(getResources().getColor(R.color.card_unregistered));
-		mList.setDivider(dividerDrawable);
-		dividerAnimation = ValueAnimator.ofInt(0, 255);
-		dividerAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-			@Override
-			public void onAnimationUpdate(final ValueAnimator animation) {
-				Integer animatedValue = (Integer) animation.getAnimatedValue();
-				dividerDrawable.setAlpha(animatedValue);
-				mList.setDividerHeight(ViewUtils.dipToPixels(getActivity(), 1));
-			}
-		});
-	}
-
 	@Override
 	public void initUi() {
 		mPreferences = OmnomApplication.get(getActivity()).getPreferences();
-
-		initDividerAnimation();
 
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
 			@Override
@@ -208,11 +188,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 				}
 			});
 		}
-
-		mPanelTop.showProgress(true);
-		mPanelTop.showButtonRight(false);
-
-		loadCards();
 
 		if(!TextUtils.isEmpty(mTableId)) {
 			mPaymentListener = new PaymentEventListener(this);
@@ -271,7 +246,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private void askForRemoval(final Card card) {
 		final AlertDialog alertDialog = AndroidUtils.showDialog(this, card.getMaskedPan(),
-				R.string.delete, new DialogInterface.OnClickListener() {
+		                                                        R.string.delete, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(final DialogInterface dialog, final int which) {
 						removeCard(card);
@@ -362,20 +337,29 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 
 	private void loadCards() {
 		OmnomObservable.unsubscribe(mCardsSubscription);
+
+		mPanelTop.showProgress(true);
+		mPanelTop.showButtonRight(false);
+
+		final Drawable divider = mList.getDivider();
+		if(divider != null) {
+			divider.setAlpha(0);
+			divider.invalidateSelf();
+		}
 		if(mIsDemo) {
 			final List<DemoCard> demoCards = Arrays.asList(new DemoCard());
-			mList.setAdapter(new CardsAdapter(getActivity(), demoCards, CardsActivity.this, true));
+			mList.setAdapter(new CardsAdapter(getActivity(), demoCards, true));
 			mPanelTop.showProgress(false);
 			mPanelTop.showButtonRight(true);
 		} else {
+			mList.setAdapter(null);
 			mCardsSubscription = AndroidObservable.bindActivity(this, api.getCards().delaySubscription(1000, TimeUnit.MILLISECONDS))
 			                                      .subscribe(
 					                                      new Action1<CardsResponse>() {
 						                                      @Override
 						                                      public void call(final CardsResponse cards) {
 							                                      final List<Card> cardsList = cards.getCards();
-							                                      mList.setAdapter(new CardsAdapter(getActivity(), cardsList,
-							                                                                        CardsActivity.this, false));
+							                                      mList.setAdapter(new CardsAdapter(getActivity(), cardsList, false));
 							                                      boolean isSelected = selectCard((CardsAdapter) mList.getAdapter(),
 							                                                                      mPreferences.getCardId(getActivity()));
 							                                      mBtnPay.setEnabled(isSelected);
@@ -467,15 +451,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 				setResult(RESULT_OK);
 				finish();
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
-			} else if(requestCode == REQUEST_CODE_CARD_CONFIRM || requestCode == REQUEST_CODE_CARD_ADD) {
-				AnimationUtils.animateAlpha(mList, false, new Runnable() {
-					@Override
-					public void run() {
-						mList.setAdapter(null);
-						AnimationUtils.animateAlpha(mList, true);
-						loadCards();
-					}
-				});
 			}
 		} else if(resultCode == RESULT_PAY && data != null) {
 			CardInfo cardInfo = data.getParcelableExtra(EXTRA_CARD_DATA);
@@ -485,12 +460,6 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 				Log.w(TAG, "Card info is null");
 			}
 		}
-	}
-
-	@Override
-	public void onAnimationEnd() {
-		dividerAnimation.setDuration(1000);
-		dividerAnimation.start();
 	}
 
 	@Override
@@ -518,6 +487,7 @@ public class CardsActivity extends BaseOmnomActivity implements CardsAdapter.Ani
 	@Override
 	protected void onResume() {
 		super.onResume();
+		loadCards();
 		if(mPaymentListener != null) {
 			mPaymentListener.initTableSocket(mTableId);
 		}

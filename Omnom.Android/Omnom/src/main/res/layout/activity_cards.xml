@@ -37,8 +37,8 @@
         android:id="@+id/list"
         android:layout_below="@+id/panel_top"
         android:layout_above="@+id/footer"
-        android:divider="@color/transparent"
-        android:dividerHeight="1dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
         android:footerDividersEnabled="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
