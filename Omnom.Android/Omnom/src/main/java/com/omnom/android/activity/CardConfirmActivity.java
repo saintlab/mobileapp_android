@@ -188,6 +188,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			registerCard();
 		} else {
 			// skip and wait until user submit verification amount
+			ViewUtils.setVisible(mTextInfo, true);
 			mEditAmount.getEditText().setEnabled(true);
 			mPanelTop.setButtonRightEnabled(true);
 		}
