@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:drawableLeft="@drawable/ic_split_divide"
-            android:drawablePadding="@dimen/activity_horizontal_margin"
+            android:drawablePadding="@dimen/drawable_padding_default"
             android:textAppearance="?android:textAppearanceLarge"
             android:textColor="@color/text_color_split_red"
             android:text="@string/split_the_bill"/>

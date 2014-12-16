@@ -240,7 +240,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:drawableLeft="@drawable/ic_bill_black"
-            android:drawablePadding="@dimen/activity_horizontal_margin"
+            android:drawablePadding="@dimen/drawable_padding_default"
             android:textColor="@android:color/black"
             android:textAppearance="?android:textAppearanceMedium"
             android:ellipsize="end"

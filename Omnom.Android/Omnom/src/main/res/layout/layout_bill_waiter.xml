@@ -15,7 +15,7 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:layout_alignParentLeft="true"
         android:gravity="start|center_vertical"
-        android:drawablePadding="@dimen/activity_horizontal_margin_small"
+        android:drawablePadding="@dimen/drawable_padding_default"
         android:ellipsize="end" />
 
     <Button
@@ -27,7 +27,7 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:layout_alignParentRight="true"
         android:gravity="end|center_vertical"
-        android:drawablePadding="@dimen/activity_horizontal_margin_small"
+        android:drawablePadding="@dimen/drawable_padding_default"
         android:drawableLeft="@drawable/ic_bill_black"
         android:ellipsize="end"/>
 </RelativeLayout>

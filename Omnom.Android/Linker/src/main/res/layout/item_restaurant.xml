@@ -36,7 +36,7 @@
         android:layout_below="@+id/name"
         android:gravity="center_vertical"
         android:drawableStart="@drawable/ic_location_marker"
-        android:drawablePadding="@dimen/activity_horizontal_margin_small"
+        android:drawablePadding="@dimen/drawable_padding_default"
         android:text="Location"
         style="@style/TextView.Restaurant.Data.Location"/>
 
