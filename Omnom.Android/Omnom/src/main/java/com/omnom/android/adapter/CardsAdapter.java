@@ -156,6 +156,7 @@ public class CardsAdapter extends BaseAdapter {
 			holder.txtConfirm.setText(StringUtils.EMPTY_STRING);
 		} else {
 			holder.txtCardNumber.setTextColor(mColorPanUnregistered);
+			holder.txtType.setTextColor(mColorPanUnregistered);
 			holder.txtConfirm.setText(R.string.confirm);
 			holder.txtConfirm.setCompoundDrawables(null, null, null, null);
 		}
