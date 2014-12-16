@@ -37,15 +37,18 @@ public class BaseTestCase1 extends ActivityInstrumentationTestCase2<SplashActivi
         //Click on ????
 		solo.clickOnView(solo.getView(com.omnom.android.R.id.btn_enter));
         //Wait for activity: 'com.omnom.android.activity.LoginActivity'
-		assertTrue("com.omnom.android.activity.LoginActivity is not found!", solo.waitForActivity(com.omnom.android.activity.LoginActivity.class));
+		/*assertTrue("com.omnom.android.activity.LoginActivity is not found!", solo.waitForActivity(com.omnom.android.activity
+				                                                                                           .LoginActivity.class));
         //Enter the text: '+79133952320'
 		solo.clearEditText((android.widget.EditText) solo.getView(R.id.edit));
 		solo.enterText((android.widget.EditText) solo.getView(R.id.edit), "+79133952320");
         //Click on Empty Text View
-		solo.clickOnView(solo.getView(R.id.btn_clear));
-        //Enter the text: '+79133952320'
+		solo.clickOnView(solo.getView(R.id.btn_clear));*/
+
+        /*//Enter the text: '+79133952320'
 		solo.clearEditText((android.widget.EditText) solo.getView(R.id.edit));
-		solo.enterText((android.widget.EditText) solo.getView(R.id.edit), "+79133952320");
+		solo.enterText((android.widget.EditText) solo.getView(R.id.edit), "+79133952320");*/
+
         //Click on ?????
 		solo.clickOnView(solo.getView(R.id.btn_right));
         //Wait for activity: 'com.omnom.android.activity.ConfirmPhoneActivity'
@@ -70,27 +73,36 @@ public class BaseTestCase1 extends ActivityInstrumentationTestCase2<SplashActivi
 		solo.clickOnView(solo.getView(R.id.btn_bill));
         //Wait for activity: 'com.omnom.android.activity.OrdersActivity'
 		assertTrue("com.omnom.android.activity.OrdersActivity is not found!", solo.waitForActivity(com.omnom.android.activity.OrdersActivity.class));
+
         //Click on 260 ????? ?????? ?????
 		solo.clickOnView(solo.getView(R.id.txt_title, 3));
-        //Click on 3968.9
+
+        //Click on amount
 		solo.clickOnView(solo.getView(R.id.edit_payment_amount));
+
         //Enter the text: '0.01 '
 		solo.clearEditText((android.widget.EditText) solo.getView(R.id.edit_payment_amount));
 		solo.enterText((android.widget.EditText) solo.getView(R.id.edit_payment_amount), "0.01?");
-        //Click on ImageView
+
+        //Click on Apply
 		solo.clickOnView(solo.getView(R.id.btn_apply));
-        //Enter the text: '0.01 '
+
+        /*//Enter the text: '0.01 '
 		solo.clearEditText((android.widget.EditText) solo.getView(R.id.edit_payment_amount));
-		solo.enterText((android.widget.EditText) solo.getView(R.id.edit_payment_amount), "0.01?");
-        //Click on ??????
+		solo.enterText((android.widget.EditText) solo.getView(R.id.edit_payment_amount), "0.01?");*/
+
+        //Click on Other tips
 		solo.clickOnView(solo.getView(R.id.radio_tips_4));
         //Enter the text: '0'
 		solo.clearEditText((android.widget.EditText) solo.getView(R.id.np__numberpicker_input));
 		solo.enterText((android.widget.EditText) solo.getView(R.id.np__numberpicker_input), "0");
-        //Click on ImageView
+
+        //Click on Apply
 		solo.clickOnView(solo.getView(R.id.btn_apply));
-        //Click on ???????? 0.01
+
+        //Click on Pay
 		solo.clickOnView(solo.getView(R.id.btn_pay));
+
         //Wait for activity: 'com.omnom.android.activity.CardsActivity'
 		assertTrue("com.omnom.android.activity.CardsActivity is not found!", solo.waitForActivity(com.omnom.android.activity.CardsActivity.class));
         //Click on 4245 .... .... 5928 visa
