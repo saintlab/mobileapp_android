@@ -176,7 +176,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		mPanelTop.setTitleBig(R.string.card_binding);
 		mPanelTop.setButtonRightEnabled(false);
 		mPanelTop.setButtonRight(R.string.ready, mVerifyClickListener);
-		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
+		mPanelTop.setButtonLeftDrawable(R.drawable.btn_previous, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				setResult(RESULT_CANCELED);
@@ -355,7 +355,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	private void onVerificationError() {
 		ViewUtils.setVisible(mTextInfo, false);
 		mPanelTop.showProgress(false);
-		mPanelTop.setButtonRight(R.string.repeat, mVerifyClickListener);
+		mPanelTop.setButtonRightDrawable(R.drawable.ic_repeat_small, mVerifyClickListener);
 		mEditAmount.setError(getWrongChecksumMessage());
 	}
 
