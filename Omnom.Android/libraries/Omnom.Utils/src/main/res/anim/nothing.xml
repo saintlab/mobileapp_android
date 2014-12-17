@@ -24,4 +24,4 @@
     android:fromAlpha="1.0"
     android:toAlpha="1.0"
     android:zAdjustment="bottom"
-    android:duration="0"/>
+    android:duration="@integer/default_animation_duration_long"/>
