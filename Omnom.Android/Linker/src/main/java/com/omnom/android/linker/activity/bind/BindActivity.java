@@ -775,7 +775,7 @@ public class BindActivity extends BaseActivity {
 						                                           .subscribe(new Action1<ResponseBase>() {
 							                                           @Override
 							                                           public void call(ResponseBase responseBase) {
-								                                           if(TextUtils.isEmpty(responseBase.getError())) {
+								                                           if(!TextUtils.isEmpty(responseBase.getError())) {
 									                                           throw RetrofitError.unexpectedError(StringUtils
 											                                                                               .EMPTY_STRING,
 									                                                                               new

@@ -105,7 +105,7 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	                                             final String qrData,
 	                                             final BeaconDataResponse beaconData,
 	                                             final Beacon oldBeacon) {
-		final BeaconQrBindRequest request = new BeaconQrBindRequest(restaurantId, tableNumber, qrData, oldBeacon, oldBeacon);
+		final BeaconQrBindRequest request = new BeaconQrBindRequest(restaurantId, tableNumber, qrData, beaconData, oldBeacon);
 		return mDataService.bind(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
