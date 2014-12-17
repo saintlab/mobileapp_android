@@ -4,7 +4,6 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
-import com.omnom.android.restaurateur.model.beacon.BeaconQrDataResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
@@ -78,13 +77,13 @@ public class StubDataProvider implements RestaurateurObeservableApi {
 	}
 
 	@Override
-	public Observable<BeaconQrDataResponse> bind(final String restaurantId, final int tableNumber, final String qrData,
+	public Observable<TableDataResponse> bind(final String restaurantId, final int tableNumber, final String qrData,
 	                                             final Beacon beacon, final Beacon oldBeacon) {
 		return null;
 	}
 
 	@Override
-	public Observable<BeaconQrDataResponse> bind(final String id, final int tableNumber, final String qrData, final BeaconDataResponse
+	public Observable<TableDataResponse> bind(final String id, final int tableNumber, final String qrData, final BeaconDataResponse
 			beaconData, final Beacon beacon) {
 		return null;
 	}

@@ -3,7 +3,6 @@ package com.omnom.android.restaurateur.api.observable;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
-import com.omnom.android.restaurateur.model.beacon.BeaconQrDataResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
@@ -33,13 +32,13 @@ public interface RestaurateurObeservableApi {
 
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
 
-	public Observable<BeaconQrDataResponse> bind(String restaurantId,
+	public Observable<TableDataResponse> bind(String restaurantId,
 	                                             int tableNumber,
 	                                             String qrData,
 	                                             Beacon beacon,
 	                                             Beacon oldBeacon);
 
-	public Observable<BeaconQrDataResponse> bind(String id,
+	public Observable<TableDataResponse> bind(String id,
 	                                             int tableNumber,
 	                                             String qrData,
 	                                             BeaconDataResponse beaconData,

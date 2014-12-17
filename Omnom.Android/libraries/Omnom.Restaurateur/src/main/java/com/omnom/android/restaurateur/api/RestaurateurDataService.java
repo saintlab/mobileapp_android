@@ -7,7 +7,6 @@ import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconQrBindRequest;
-import com.omnom.android.restaurateur.model.beacon.BeaconQrDataResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
@@ -86,7 +85,7 @@ public interface RestaurateurDataService {
 	Observable<TableDataResponse> bindQrCode(@Body QRCodeBindRequest request);
 
 	@POST("/table/bind")
-	Observable<BeaconQrDataResponse> bind(@Body BeaconQrBindRequest request);
+	Observable<TableDataResponse> bind(@Body BeaconQrBindRequest request);
 
 	@GET("/qr/{qr}")
 	Observable<TableDataResponse> checkQrCode(@Path(Protocol.FIELD_QR_DATA) String qrData);
