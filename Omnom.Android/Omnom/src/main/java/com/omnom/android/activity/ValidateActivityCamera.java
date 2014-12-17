@@ -1,8 +1,6 @@
 package com.omnom.android.activity;
 
-import android.app.ActivityOptions;
 import android.content.Intent;
-import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -52,15 +50,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 			return;
 		}
 
-		final Intent intent = new Intent(this, OmnomQRCaptureActivity.class);
-		intent.putExtra(CaptureActivity.EXTRA_SHOW_BACK, false);
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-			final ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(this, R.anim.slide_in_right,
-			                                                                            R.anim.slide_out_left);
-			startActivityForResult(intent, REQUEST_CODE_SCAN_QR, activityOptions.toBundle());
-		} else {
-			startActivityForResult(intent, REQUEST_CODE_SCAN_QR);
-		}
+		final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
+		final String tableId = mTable != null ? mTable.getId() : null;
+		OmnomQRCaptureActivity.start(this, tableNumber, tableId, REQUEST_CODE_SCAN_QR);
 	}
 
 	@Override

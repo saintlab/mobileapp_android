@@ -31,7 +31,7 @@
     <color name="payment_progress_color">#ffe4e4e4</color>
 
     <color name="tip_active">#ffffff</color>
-    <color name="tip_default">#7affffff</color>
+    <color name="tip_default">#b7ffffff</color>
 
     <color name="cancel_button">#555</color>
 

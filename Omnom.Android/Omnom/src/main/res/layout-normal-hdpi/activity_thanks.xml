@@ -24,7 +24,7 @@
             android:id="@+id/img_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/activity_vertical_margin_large"
+            android:paddingTop="@dimen/activity_vertical_margin_xlarge"
             android:src="@drawable/ic_success"/>
 
         <TextView
@@ -34,17 +34,18 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:textSize="@dimen/font_xxlarge"
-            android:text="Спасибо"/>
+            android:text="@string/payment_success"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
-            android:textSize="@dimen/font_larger"
             android:paddingTop="@dimen/activity_vertical_margin_small"
             android:includeFontPadding="false"
-            android:text="Оплата прошла успешно"/>
+            android:textAppearance="?android:textAppearance"
+            android:textColor="@color/info_hint"
+            android:text="@string/sms_sent_to_waiter"/>
 
         <View
             android:layout_width="48dp"
@@ -60,9 +61,10 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:textSize="@dimen/font_larger"
-            android:text="Счёт отправлен на почту"/>
+            android:text="@string/bill_sent_by_email"/>
 
-        <TextView
+        <!-- TODO: uncomment in #144 -->
+        <!--TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -71,7 +73,7 @@
             android:lineSpacingExtra="@dimen/activity_vertical_margin_xsmall"
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="@color/info_hint"
-            android:text="Подтверждение оплаты\nвы сможете найти на экране профиля\nв оплаченных счетах"/>
+            android:text="Подтверждение оплаты\nвы сможете найти на экране профиля\nв оплаченных счетах"/-->
 
     </LinearLayout>
 
