@@ -71,6 +71,9 @@
     <string name="something_went_wrong">Что-то пошло не так</string>
     <string name="something_went_wrong_try_agint">Что-то пошло не так.\nПовторите попытку</string>
     <string name="repeat">Повторить</string>
+    <string name="payment_success">Платёж принят</string>
+    <string name="sms_sent_to_waiter">Официант получил sms с суммой чаевых.</string>
+    <string name="bill_sent_by_email">Счёт отправлен на почту</string>
     <string name="title_activity_thanks">ThanksActivity</string>
     <string name="bill_split_amount_">= %1$s</string>
     <string name="bill_number_">Счёт %1$s</string>
