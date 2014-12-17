@@ -22,7 +22,7 @@
             android:textSize="16sp"
             android:textColor="@color/transparent_black"
             android:textAppearance="?android:textAppearance"
-            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+            omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf"/>
 
         <TextView
             android:id="@+id/txt_info"
