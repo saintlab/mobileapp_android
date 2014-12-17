@@ -313,7 +313,12 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					                                                public void call(Config config) {
 						                                                OmnomApplication.get(getActivity()).cacheConfig(config);
 					                                                }
-				                                                }, onError);
+				                                                }, new Action1<Throwable>() {
+					                                                @Override
+					                                                public void call(Throwable throwable) {
+						                                                Log.w(TAG, "Unable to load config: " + throwable.getMessage());
+					                                                }
+				                                                });
 
 		mPreloadBackgroundFunction = new Func1<Restaurant, Restaurant>() {
 			@Override
