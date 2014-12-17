@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -30,7 +31,8 @@ import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
-import com.omnom.android.socket.listener.PaymentEventListener;
+import com.omnom.android.socket.event.PaymentSocketEvent;
+import com.omnom.android.socket.listener.SilentPaymentEventListener;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.loader.LoaderView;
@@ -53,7 +55,7 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 /**
  * Created by mvpotter on 24/11/14.
  */
-public class PaymentProcessActivity extends BaseOmnomActivity {
+public class PaymentProcessActivity extends BaseOmnomActivity implements SilentPaymentEventListener.PaymentListener {
 
 	private static final String TAG = PaymentProcessActivity.class.getSimpleName();
 
@@ -126,13 +128,16 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 
 	private int mAccentColor;
 
-	private PaymentEventListener mPaymentListener;
+	private SilentPaymentEventListener mPaymentListener;
 
 	private String mTransactionUrl;
 
+	@Nullable
+	private PaymentSocketEvent mPaymentEvent;
+
 	@Override
 	public void initUi() {
-		mPaymentListener = new PaymentEventListener(this);
+		mPaymentListener = new SilentPaymentEventListener(this, this);
 		mErrorHelper = new ErrorHelper(loader, txtError, btnBottom, txtBottom, btnDemo, errorViews);
 		final int dpSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
 		loader.setSize(dpSize, dpSize);
@@ -293,7 +298,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 				if(mIsDemo) {
 					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mDetails.getAmount());
 				} else {
-					ThanksActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor);
+					ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
 				}
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 			}
@@ -345,5 +350,10 @@ public class PaymentProcessActivity extends BaseOmnomActivity {
 		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
 		mCardInfo = intent.getParcelableExtra(Extras.EXTRA_CARD_DATA);
 		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);
+	}
+
+	@Override
+	public void onPaymentEvent(final PaymentSocketEvent event) {
+		mPaymentEvent = event;
 	}
 }

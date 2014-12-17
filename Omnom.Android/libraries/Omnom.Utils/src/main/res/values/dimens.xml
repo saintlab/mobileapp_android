@@ -63,4 +63,8 @@
     <dimen name="error_text_padding">24dp</dimen>
 
     <dimen name="picker_drawable_height">20dp</dimen>
+
+    <dimen name="navigate_qr_text_font_size">25sp</dimen>
+    <dimen name="navigate_qr_text_width">250dp</dimen>
+    <dimen name="navigate_qr_text_margin_top">-20dp</dimen>
 </resources>

@@ -31,6 +31,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_TYPE = "com.omnom.android.type";
 	public static final String EXTRA_ORDER = "com.omnom.android.order";
 	public static final String EXTRA_PAYMENT_DETAILS = "com.omnom.android.payment.details";
+	public static final String EXTRA_PAYMENT_EVENT = "com.omnom.android.payment.event";
 	public static final String EXTRA_TRANSACTION_URL = "com.omnom.android.payment.transaction_url";
 
 	public static final String EXTRA_CHARACTERISTIC_UUID = "ble.characteristic.uuid";

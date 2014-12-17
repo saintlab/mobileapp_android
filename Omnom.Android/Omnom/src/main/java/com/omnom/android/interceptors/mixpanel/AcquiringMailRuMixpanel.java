@@ -29,66 +29,66 @@ public class AcquiringMailRuMixpanel extends AcquiringProxyMailRu {
 
 	@Override
 	public Observable<AcquiringResponse> pay(HashMap<String, String> params) {
-		mMixHelper.track("acquiting.mail.pay ->", params);
+		mMixHelper.track("acquiring.mail.pay ->", params);
 		return super.pay(params).doOnNext(new Action1<AcquiringResponse>() {
 			@Override
 			public void call(AcquiringResponse response) {
-				mMixHelper.track("acquiting.mail.pay <-", response);
+				mMixHelper.track("acquiring.mail.pay <-", response);
 			}
 		});
 	}
 
 	@Override
 	public Observable<RegisterCardResponse> registerCard(Map<String, String> params) {
-		mMixHelper.track("acquiting.mail.registerCard ->", params);
+		mMixHelper.track("acquiring.mail.registerCard ->", params);
 		return super.registerCard(params).doOnNext(new Action1<RegisterCardResponse>() {
 			@Override
 			public void call(RegisterCardResponse response) {
-				mMixHelper.track("acquiting.mail.registerCard <-", response);
+				mMixHelper.track("acquiring.mail.registerCard <-", response);
 			}
 		});
 	}
 
 	@Override
 	public Observable<AcquiringResponse> verifyCard(HashMap<String, String> params) {
-		mMixHelper.track("acquiting.mail.verifyCard ->", params);
+		mMixHelper.track("acquiring.mail.verifyCard ->", params);
 		return super.verifyCard(params).doOnNext(new Action1<AcquiringResponse>() {
 			@Override
 			public void call(AcquiringResponse response) {
-				mMixHelper.track("acquiting.mail.verifyCard <-", response);
+				mMixHelper.track("acquiring.mail.verifyCard <-", response);
 			}
 		});
 	}
 
 	@Override
 	public Observable<CardDeleteResponse> deleteCard(HashMap<String, String> params) {
-		mMixHelper.track("acquiting.mail.deleteCard ->", params);
+		mMixHelper.track("acquiring.mail.deleteCard ->", params);
 		return super.deleteCard(params).doOnNext(new Action1<CardDeleteResponse>() {
 			@Override
 			public void call(CardDeleteResponse response) {
-				mMixHelper.track("acquiting.mail.deleteCard <-", response);
+				mMixHelper.track("acquiring.mail.deleteCard <-", response);
 			}
 		});
 	}
 
 	@Override
 	public Observable<AcquiringTransactionResponse> checkTransaction(HashMap<String, String> params) {
-		mMixHelper.track("acquiting.mail.checkTransaction ->", params);
+		mMixHelper.track("acquiring.mail.checkTransaction ->", params);
 		return super.checkTransaction(params).doOnNext(new Action1<AcquiringTransactionResponse>() {
 			@Override
 			public void call(AcquiringTransactionResponse response) {
-				mMixHelper.track("acquiting.mail.checkTransaction <-", response);
+				mMixHelper.track("acquiring.mail.checkTransaction <-", response);
 			}
 		});
 	}
 
 	@Override
 	public Observable<AcquiringTransactionExtendedResponse> checkTransactionExtended(HashMap<String, String> params) {
-		mMixHelper.track("acquiting.mail.checkTransactionExtended ->", params);
+		mMixHelper.track("acquiring.mail.checkTransactionExtended ->", params);
 		return super.checkTransactionExtended(params).doOnNext(new Action1<AcquiringTransactionExtendedResponse>() {
 			@Override
 			public void call(AcquiringTransactionExtendedResponse response) {
-				mMixHelper.track("acquiting.mail.checkTransactionExtended <-", response);
+				mMixHelper.track("acquiring.mail.checkTransactionExtended <-", response);
 			}
 		});
 	}

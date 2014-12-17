@@ -16,11 +16,13 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 /**
  * Created by Ch3D on 02.12.2014.
+ *
+ * Listen to #PaymentSocketEvent and notifies a user with #Crouton
  */
 public class PaymentEventListener {
 	private static final String TAG = PaymentEventListener.class.getSimpleName();
 
-	private OmnomActivity mActivity;
+	protected OmnomActivity mActivity;
 
 	private OmnomSocketBase mTableSocket;
 
@@ -70,5 +72,4 @@ public class PaymentEventListener {
 	public void onDestroy() {
 		Crouton.cancelAllCroutons();
 	}
-
 }

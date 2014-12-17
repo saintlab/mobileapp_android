@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.view.HeaderView;
 import com.squareup.otto.Bus;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 
 import javax.inject.Inject;
@@ -119,6 +121,10 @@ public class BillSplitFragment extends Fragment {
 
 		final String fontPath = "fonts/Futura-OSF-Omnom-Regular.otf";
 		final float fontSize = getResources().getDimension(R.dimen.font_normal);
+		Class pagerTabStrip = PagerTabStrip.class;
+		resetPageTitleSpacing(pagerTabStrip);
+		mPagerTitle.setPadding((int) getResources().getDimension(R.dimen.bill_split_person_title_padding), 0,
+				               (int) getResources().getDimension(R.dimen.bill_split_person_title_padding), 0);
 		for(int i = 0; i < mPagerTitle.getChildCount(); ++i) {
 			View nextChild = mPagerTitle.getChildAt(i);
 			if(nextChild instanceof TextView) {
@@ -182,6 +188,20 @@ public class BillSplitFragment extends Fragment {
 				}
 			}
 		});
+	}
+
+	// Dirty hack to reset PagerTabStrip spacing as titles went out screen border on mdpi devices.
+	private void resetPageTitleSpacing(Class pagerTabStrip) {
+		try {
+			Field minTextSpacing = pagerTabStrip.getDeclaredField("mMinTextSpacing");
+			minTextSpacing.setAccessible(true);
+			minTextSpacing.set(mPagerTitle, 0);
+		} catch (NoSuchFieldException e) {
+			Log.d(TAG, e.getMessage());
+		} catch (IllegalAccessException e) {
+			Log.d(TAG, e.getMessage());
+		}
+		mPagerTitle.setTextSpacing(0);
 	}
 
 	public void hide() {

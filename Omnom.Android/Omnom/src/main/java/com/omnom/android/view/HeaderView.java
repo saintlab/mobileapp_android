@@ -99,9 +99,8 @@ public class HeaderView extends RelativeLayout {
 		ViewUtils.setVisible(txtTitle, false);
 	}
 
-	public void setTitleBig(final String title, final int backgroundRes, OnClickListener listener) {
+	public void setTitleBig(final String title, OnClickListener listener) {
 		txtTitleBig.setText(title);
-		txtTitleBig.setBackgroundResource(backgroundRes);
 		txtTitleBig.setOnClickListener(listener);
 		ViewUtils.setVisible(txtTitleBig, true);
 		ViewUtils.setVisible(txtTitle, false);
