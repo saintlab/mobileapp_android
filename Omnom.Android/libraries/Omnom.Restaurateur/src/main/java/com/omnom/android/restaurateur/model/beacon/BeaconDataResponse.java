@@ -13,8 +13,10 @@ public class BeaconDataResponse extends ResponseBase {
 
 	@Expose
 	private String uuid;
+
 	@Expose
 	private int major;
+
 	@Expose
 	private int minor;
 

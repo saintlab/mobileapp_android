@@ -71,7 +71,6 @@ import butterknife.OnClick;
 import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action0;
@@ -770,9 +769,9 @@ public class BindActivity extends BaseActivity {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						mApiBindingSubscription = AndroidObservable.bindActivity(getActivity(), Observable
-								.merge(api.bindBeacon(mRestaurant.getId(), mLoader.getTableNumber(), mBeaconData, mBeacon),
-								       api.bindQrCode(mRestaurant.getId(), mLoader.getTableNumber(), mQrData)))
+						mApiBindingSubscription = AndroidObservable.bindActivity(getActivity(), api.bind(mRestaurant.getId(),
+						                                                                                 mLoader.getTableNumber(),
+						                                                                                 mQrData, mBeaconData, mBeacon))
 						                                           .subscribe(new Action1<ResponseBase>() {
 							                                           @Override
 							                                           public void call(ResponseBase responseBase) {
