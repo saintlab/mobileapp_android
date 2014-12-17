@@ -26,6 +26,7 @@ import android.view.SurfaceHolder;
 
 import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.client.android.camera.open.OpenCameraInterface;
+import com.omnom.android.zxing.R;
 
 import java.io.IOException;
 
@@ -40,7 +41,7 @@ public final class CameraManager {
 
 	private static final String TAG = CameraManager.class.getSimpleName();
 
-	private static final int MIN_FRAME_WIDTH = 240;
+	private static int minFrameWidth;
 	private static final int MIN_FRAME_HEIGHT = 360;
 	private static final int MAX_FRAME_WIDTH = 400; // = 5/8 * 1920
 	private static final int MAX_FRAME_HEIGHT = 600; // = 5/8 * 1080
@@ -66,6 +67,8 @@ public final class CameraManager {
 		this.context = context;
 		this.configManager = new CameraConfigurationManager(context);
 		previewCallback = new PreviewCallback(configManager);
+
+		minFrameWidth = (int) context.getResources().getDimension(R.dimen.min_frame_width);
 	}
 
 	/**
@@ -223,7 +226,7 @@ public final class CameraManager {
 				return null;
 			}
 
-			int width = findDesiredDimensionInRange(screenResolution.x, MIN_FRAME_WIDTH, MAX_FRAME_WIDTH);
+			int width = findDesiredDimensionInRange(screenResolution.x, minFrameWidth, MAX_FRAME_WIDTH);
 			// make findView square sized
 //			int height = findDesiredDimensionInRange(screenResolution.y, MIN_FRAME_HEIGHT, MAX_FRAME_HEIGHT);
 			int height = width;

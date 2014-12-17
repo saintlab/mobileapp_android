@@ -42,8 +42,8 @@ import java.util.List;
  */
 public final class ViewfinderView extends View {
 
-	public static final int CADRE_SIZE         = 100;
-	public static final int CADRE_SIZE_VISIBLE = 16;
+	public static int cadreSize;
+	public static int cadreSizeVisible;
 
 	private static final int[] SCANNER_ALPHA         = {0, 64, 128, 192, 255, 192, 128, 64};
 	private static final long  ANIMATION_DELAY       = 80L;
@@ -67,6 +67,9 @@ public final class ViewfinderView extends View {
 	// This constructor is used when the class is built from an XML resource.
 	public ViewfinderView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+
+		cadreSize = (int) getResources().getDimension(R.dimen.carde_size);
+		cadreSizeVisible = (int) getResources().getDimension(R.dimen.carde_size_visible);
 
 		// Initialize these once for performance rather than calling them every time in onDraw().
 		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -101,20 +104,19 @@ public final class ViewfinderView extends View {
 			return;
 		}
 
-		canvas.clipRect(frame.left + CADRE_SIZE_VISIBLE, frame.top + CADRE_SIZE_VISIBLE, frame.left + CADRE_SIZE, frame.top + CADRE_SIZE,
+		canvas.clipRect(frame.left + cadreSizeVisible, frame.top + cadreSizeVisible, frame.left + cadreSize, frame.top + cadreSize,
 		                Region.Op.DIFFERENCE);
-		canvas.clipRect(frame.right - CADRE_SIZE, frame.top + CADRE_SIZE_VISIBLE, frame.right - CADRE_SIZE_VISIBLE, frame.top + CADRE_SIZE,
+		canvas.clipRect(frame.right - cadreSize, frame.top + cadreSizeVisible, frame.right - cadreSizeVisible, frame.top + cadreSize,
 		                Region.Op.DIFFERENCE);
-		canvas.clipRect(frame.right - CADRE_SIZE, frame.bottom - CADRE_SIZE, frame.right - CADRE_SIZE_VISIBLE,
-		                frame.bottom - CADRE_SIZE_VISIBLE, Region.Op.DIFFERENCE);
-		canvas.clipRect(frame.left + CADRE_SIZE_VISIBLE, frame.bottom - CADRE_SIZE, frame.left + CADRE_SIZE,
-		                frame.bottom - CADRE_SIZE_VISIBLE, Region.Op.DIFFERENCE);
+		canvas.clipRect(frame.right - cadreSize, frame.bottom - cadreSize, frame.right - cadreSizeVisible,
+		                frame.bottom - cadreSizeVisible, Region.Op.DIFFERENCE);
+		canvas.clipRect(frame.left + cadreSizeVisible, frame.bottom - cadreSize, frame.left + cadreSize,
+		                frame.bottom - cadreSizeVisible, Region.Op.DIFFERENCE);
 
-		canvas.drawRect(frame.left, frame.top, frame.left + CADRE_SIZE, frame.top + CADRE_SIZE, cadrePaint);
-		canvas.drawRect(frame.right - CADRE_SIZE, frame.top, frame.right, frame.top + CADRE_SIZE, cadrePaint);
-		canvas.drawRect(frame.right - CADRE_SIZE, frame.bottom - CADRE_SIZE, frame.right, frame.bottom, cadrePaint);
-		canvas.drawRect(frame.left, frame.bottom - CADRE_SIZE, frame.left + CADRE_SIZE, frame.bottom, cadrePaint);
-
+		canvas.drawRect(frame.left, frame.top, frame.left + cadreSize, frame.top + cadreSize, cadrePaint);
+		canvas.drawRect(frame.right - cadreSize, frame.top, frame.right, frame.top + cadreSize, cadrePaint);
+		canvas.drawRect(frame.right - cadreSize, frame.bottom - cadreSize, frame.right, frame.bottom, cadrePaint);
+		canvas.drawRect(frame.left, frame.bottom - cadreSize, frame.left + cadreSize, frame.bottom, cadrePaint);
 
 		canvas.restore();
 	}
