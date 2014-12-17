@@ -539,16 +539,24 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_ORDERS && resultCode == RESULT_OK) {
 			if(mRestaurant != null) {
-				loader.scaleDown(null, new Runnable() {
+				// The following delay is required due to different behavior on different devices.
+				// Some of them wait for activity transition animation to finish and then invoke onActivityResult,
+				// others perform them in parallel.
+				loader.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						ViewUtils.setVisible(getPanelBottom(), true);
-						updateLightProfile(!mIsDemo);
-						ViewUtils.setVisible(txtLeave, mIsDemo);
-						loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
-						loader.showLogo();
+						loader.scaleDown(null, new Runnable() {
+							@Override
+							public void run() {
+								ViewUtils.setVisible(getPanelBottom(), true);
+								updateLightProfile(!mIsDemo);
+								ViewUtils.setVisible(txtLeave, mIsDemo);
+								loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
+								loader.showLogo();
+							}
+						});
 					}
-				});
+				}, getResources().getInteger(R.integer.default_animation_duration_short));
 			}
 		}
 	}
