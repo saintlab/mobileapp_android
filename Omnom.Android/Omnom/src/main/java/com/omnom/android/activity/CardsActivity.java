@@ -170,7 +170,7 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		ViewUtils.setVisible(mDelimiter, false);
+		ViewUtils.setVisible(mDelimiter, true);
 		mPreferences = OmnomApplication.get(getActivity()).getPreferences();
 
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
@@ -244,7 +244,7 @@ public class CardsActivity extends BaseOmnomActivity {
 	private void askForRemoval(final Card card) {
 		final String title = getString(R.string.card_removal_confirmation, card.getMaskedPan(), card.getAssociation());
 		final AlertDialog alertDialog = AndroidUtils.showDialog(this, title,
-				R.string.delete, new DialogInterface.OnClickListener() {
+		                                                        R.string.delete, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(final DialogInterface dialog, final int which) {
 						removeCard(card);

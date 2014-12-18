@@ -26,32 +26,23 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"/>
 
+    <include
+        android:id="@+id/footer"
+        layout="@layout/view_cards_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_pay"
+        android:layout_centerHorizontal="true" />
+
     <ListView
         android:id="@+id/list"
         android:layout_below="@+id/panel_top"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
         android:footerDividersEnabled="false"
+        android:layout_above="@+id/footer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"/>
 
-    <include
-        layout="@layout/view_cards_footer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list"
-        android:layout_centerHorizontal="true"/>
-
-    <!--<EditText
-        android:id="@+id/edit_amount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="numberDecimal"/>
-
-    <Button
-        android:id="@+id/btn_verify"
-        android:text="Verify"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>-->
 
 </RelativeLayout>
