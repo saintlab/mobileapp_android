@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    android:padding="@dimen/activity_horizontal_margin">
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_horizontal_margin">
 
     <ImageButton
         android:id="@+id/btn_close"
@@ -41,8 +43,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_margin="@dimen/activity_horizontal_margin"
             android:text="@string/sms_notifications_off"
+            android:textSize="@dimen/pay_once_font_size"
             android:gravity="center"
             android:textColor="@color/profile_hint"/>
 
@@ -51,8 +53,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_margin="@dimen/activity_horizontal_margin"
             android:text="@string/pay_once"
+            android:textSize="@dimen/pay_once_font_size"
             android:gravity="center"
             android:textColor="@color/profile_hint"/>
 

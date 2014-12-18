@@ -402,7 +402,9 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void pay() {
-		setResult(CardsActivity.RESULT_PAY);
+		Intent intent = new Intent();
+		intent.putExtra(EXTRA_CARD_DATA, mCard);
+		setResult(CardsActivity.RESULT_PAY, intent);
 		finish();
 	}
 
