@@ -205,7 +205,7 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-        android:layout_marginBottom="-24dp"
+        android:layout_marginBottom="-16dp"
         android:text="@string/to_be_paid"/>
 
     <TextView

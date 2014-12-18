@@ -364,12 +364,12 @@ public class OrderFragment extends Fragment {
 		final boolean hasNavigationBar = AndroidUtils.hasNavigationBar(getActivity());
 		mListHeight = heightPixels - defaultPadding - (hasNavigationBar ? defaultPadding : 0);
 
-		final int bottomMin = getResources().getDimensionPixelSize(R.dimen.order_payment_height);
+		final int bottomMin = getResources().getDimensionPixelSize(R.dimen.order_payment_height) - (hasNavigationBar ? 0 : defaultPadding);
 		final int i = mListHeight / 2;
 		if(i < bottomMin) {
 			mListTrasnlationActive = (-mListHeight / 2) - (bottomMin - i);
 		} else {
-			mListTrasnlationActive = -mListHeight / 2;
+			mListTrasnlationActive = -mListHeight / 2 + (i - bottomMin);
 		}
 
 		// TODO: Find out generic solution for small devices like megafon login 1
