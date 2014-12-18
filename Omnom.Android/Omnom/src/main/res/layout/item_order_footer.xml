@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -20,7 +21,8 @@
         android:background="@android:color/white"
         android:paddingLeft="@dimen/activity_horizontal_margin_medium"
         android:paddingRight="@dimen/activity_horizontal_margin_medium"
-        android:layout_height="?android:listPreferredItemHeight">
+        android:layout_height="?android:listPreferredItemHeight"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
@@ -31,6 +33,34 @@
             android:textAppearance="?android:textAppearanceLarge"
             android:textColor="@color/text_color_split_red"
             android:text="@string/split_the_bill"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_overall"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:clickable="true"
+        android:background="@android:color/white"
+        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+        android:paddingRight="@dimen/activity_horizontal_margin_medium"
+        android:layout_height="?android:listPreferredItemHeight">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/overall"
+            omnom:fontPath="fonts/Futura-OSF-Omnom-Medium.otf"/>
+
+        <TextView
+            android:id="@+id/txt_overall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin_small"
+            android:gravity="center"
+            omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf"/>
 
     </LinearLayout>
 

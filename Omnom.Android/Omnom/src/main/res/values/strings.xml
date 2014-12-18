@@ -35,6 +35,7 @@
     <string name="title_activity_orders">OrdersActivity</string>
     <string name="title_activity_add_card">AddCardActivity</string>
     <string name="order_overall">Итого: %1$s</string>
+    <string name="overall">Итого: </string>
     <string name="order_paid">Оплачено: %1$s</string>
     <string name="pay_amount">Оплатить %1$s</string>
     <string name="amount_is_too_high">Сумма слишком большая</string>

@@ -391,10 +391,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	public void downscale() {
-		if(mFooterView1 != null) {
-			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
-			ViewUtils.setVisible(billSplit, false);
-		}
+		updateFooter(false);
 		if(mFooterView2 != null) {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, false);
@@ -604,10 +601,7 @@ public class OrderFragment extends Fragment {
 		} else {
 			Log.w(TAG, "UserProfile not set");
 		}
-		if(mFooterView1 != null) {
-			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
-			ViewUtils.setVisible(billSplit, true);
-		}
+		updateFooter(true);
 		if(mFooterView2 != null) {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, true);
@@ -693,7 +687,7 @@ public class OrderFragment extends Fragment {
 				}));
 	}
 
-	private void initFooter(final boolean visible) {
+	private void initFooter(final boolean isZoomedIn) {
 		if(list.getFooterViewsCount() > 0) {
 			list.removeFooterView(mFooterView1);
 			list.removeFooterView(mFooterView2);
@@ -701,7 +695,10 @@ public class OrderFragment extends Fragment {
 		mFooterView1 = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
 		list.addFooterView(mFooterView1);
 		final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
-		ViewUtils.setVisible(billSplit, visible);
+		final TextView txtOverall = (TextView) mFooterView1.findViewById(R.id.txt_overall);
+		txtOverall.setText(StringUtils.formatCurrencyWithSpace(mOrder.getAmountToPay(), getCurrencySuffix()));
+		updateFooter(isZoomedIn);
+
 		billSplit.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -712,6 +709,15 @@ public class OrderFragment extends Fragment {
 				}
 			}
 		});
+	}
+
+	private void updateFooter(final boolean isZoomedIn) {
+		if(mFooterView1 != null) {
+			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
+			final View layoutOverall = mFooterView1.findViewById(R.id.layout_overall);
+			ViewUtils.setVisible(billSplit, isZoomedIn);
+			ViewUtils.setVisible(layoutOverall, !isZoomedIn);
+		}
 	}
 
 	private void initFooter2() {
