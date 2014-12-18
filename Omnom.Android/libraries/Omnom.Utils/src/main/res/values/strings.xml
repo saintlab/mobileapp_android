@@ -17,6 +17,7 @@
     <string name="error_user_not_found">Невозможно получить данные пользователя. Пожалуйста попробуйте позже</string>
     <string name="error_unknown_server_error">Произошла ошибка соединения с сервером. Пожалуйста, попробуйте позже</string>
     <string name="error_no_internet_connection">Нет соединения с\nинтернетом.</string>
+    <string name="something_went_wrong">Что-то пошло не так</string>
     <string name="error_backend">Нет связи с заведением.\nОфициант в помощь.</string>
     <string name="error_unknown_qr">Неверный QR-код,\nнайдите Omnom.</string>
     <string name="error_weak_beacon_signal">Слабый сигнал. Положите телефон в центр стола пожалуйста</string>

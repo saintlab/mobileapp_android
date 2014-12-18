@@ -40,6 +40,7 @@ import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -309,9 +310,9 @@ public class CardsActivity extends BaseOmnomActivity {
 							}
 						}
 					}
-				}, new Action1<Throwable>() {
+				}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					@Override
-					public void call(Throwable throwable) {
+					public void onError(Throwable throwable) {
 						Log.w(TAG, throwable.getMessage());
 						cardRemovalError();
 					}
@@ -375,9 +376,9 @@ public class CardsActivity extends BaseOmnomActivity {
 							                                      mPanelTop.showProgress(false);
 							                                      mPanelTop.showButtonRight(true);
 						                                      }
-					                                      }, new Action1<Throwable>() {
+					                                      }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 						                                      @Override
-						                                      public void call(final Throwable throwable) {
+						                                      public void onError(Throwable throwable) {
 							                                      mPanelTop.showProgress(false);
 							                                      mPanelTop.showButtonRight(true);
 						                                      }

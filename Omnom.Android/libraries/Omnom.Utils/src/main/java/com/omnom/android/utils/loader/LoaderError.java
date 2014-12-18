@@ -11,9 +11,13 @@ public class LoaderError {
 			new LoaderError(R.drawable.ic_no_connection, R.string.error_no_internet_connection, R.string.try_once_again,
 			                R.drawable.ic_repeat_small);
 
+	public static final LoaderError UNKNOWN_ERROR =
+			new LoaderError(R.drawable.ic_no_connection, R.string.something_went_wrong, R.string.try_once_again,
+							R.drawable.ic_repeat_small);
+
 	public static final LoaderError BACKEND_ERROR =
 			new LoaderError(R.drawable.ic_no_connection, R.string.error_backend, R.string.try_once_again,
-					R.drawable.ic_repeat_small);
+							R.drawable.ic_repeat_small);
 
 	public static final LoaderError UNKNOWN_QR_CODE =
 			new LoaderError(R.drawable.ic_no_connection, R.string.error_unknown_qr, R.string.try_once_again,

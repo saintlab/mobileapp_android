@@ -68,7 +68,6 @@
     <string name="wrong_checksum">Введена неверная проверочная сумма.\nЗагляните в последнее SMS.
         Там должно быть сообщение от банка. Введите сумму из SMS. <u>Если SMS нет?</u></string>
     <string name="no_sms">Если SMS нет?</string>
-    <string name="something_went_wrong">Что-то пошло не так</string>
     <string name="something_went_wrong_try_agint">Что-то пошло не так.\nПовторите попытку</string>
     <string name="repeat">Повторить</string>
     <string name="payment_success">Платёж принят</string>
