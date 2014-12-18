@@ -36,6 +36,7 @@ import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.ErrorHelper;
+import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.drawable.TransitionDrawable;
 import com.omnom.android.utils.loader.LoaderView;
@@ -313,9 +314,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					                                                public void call(Config config) {
 						                                                OmnomApplication.get(getActivity()).cacheConfig(config);
 					                                                }
-				                                                }, new Action1<Throwable>() {
+				                                                }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					                                                @Override
-					                                                public void call(Throwable throwable) {
+					                                                public void onError(Throwable throwable) {
 						                                                Log.w(TAG, "Unable to load config: " + throwable.getMessage());
 					                                                }
 				                                                });
@@ -456,9 +457,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					                                       }
 				                                       });
 			                                       }
-		                                       }, new Action1<Throwable>() {
+		                                       }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			                                       @Override
-			                                       public void call(Throwable throwable) {
+			                                       public void onError(Throwable throwable) {
 				                                       v.setEnabled(true);
 			                                       }
 		                                       });
@@ -514,9 +515,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					mWaiterCalled = !mWaiterCalled;
 				}
 			}
-		}, new Action1<Throwable>() {
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
-			public void call(Throwable throwable) {
+			public void onError(Throwable throwable) {
 				// TODO:
 			}
 		});
@@ -594,9 +595,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			public void call(UserResponse userResponse) {
 				app.cacheUserProfile(new UserProfile(userResponse));
 			}
-		}, new Action1<Throwable>() {
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
-			public void call(Throwable throwable) {
+			public void onError(Throwable throwable) {
 
 			}
 		});

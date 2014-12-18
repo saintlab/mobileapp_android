@@ -50,9 +50,9 @@ public class OrderItemsAdapter extends BaseAdapter {
 
 	private final LayoutInflater mInflater;
 
-	protected SparseBooleanArray mCheckedStates;
-
 	private final int mColorPriceNormal;
+
+	protected SparseBooleanArray mCheckedStates;
 
 	protected Context mContext;
 
@@ -84,7 +84,9 @@ public class OrderItemsAdapter extends BaseAdapter {
 		return mItems.size();
 	}
 
-	private boolean isFakeEnabled() {return mAddFakeView && mItems.size() < 4;}
+	private boolean isFakeEnabled() {
+		return mAddFakeView;
+	}
 
 	@Override
 	public int getViewTypeCount() {

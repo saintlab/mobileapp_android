@@ -43,7 +43,7 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 		}
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
 		ViewUtils.setVisible(holder.divider, position != getCount() - 1);
-		if(mCheckedStates.get(position) || !mHasSelection) {
+		if(mCheckedStates.get(position - 1) || !mHasSelection) {
 			holder.txtTitle.setTextColor(mTextColorSelected);
 			holder.txtPrice.setTextColor(mTextColorSelected);
 		} else {

@@ -110,6 +110,8 @@ public class OmnomListView extends ListView {
 		}
 	};
 
+	private float mMaxTopOffset;
+
 	public OmnomListView(Context context) {
 		super(context);
 		init();
@@ -213,6 +215,7 @@ public class OmnomListView extends ListView {
 		if(mDistanceToTriggerSync == -1) {
 			if(getHeight() > 0) {
 				final DisplayMetrics metrics = getResources().getDisplayMetrics();
+				mMaxTopOffset = 96 * metrics.density;
 				mDistanceToTriggerSync =
 						(int) Math.min(getHeight() * MAX_SWIPE_DISTANCE_FACTOR, REFRESH_TRIGGER_DISTANCE * metrics.density);
 			}
@@ -314,7 +317,8 @@ public class OmnomListView extends ListView {
 				}
 
 				if(mIsBeingDragged) {
-					if(yDiff > mDistanceToTriggerSync) {
+					System.err.println("yDiff = " + yDiff + " mDistanceToTriggerSync = " + mDistanceToTriggerSync);
+					if(yDiff > mDistanceToTriggerSync || mCurrentTargetOffsetTop > mMaxTopOffset) {
 						startRefresh();
 					} else {
 						updateContentOffsetTop((int) (yDiff));
