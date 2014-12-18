@@ -17,7 +17,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -119,6 +121,9 @@ public class CardsActivity extends BaseOmnomActivity {
 	@InjectView(R.id.panel_top)
 	protected HeaderView mPanelTop;
 
+	@InjectView(R.id.footer)
+	protected LinearLayout cardsFooter;
+
 	@InjectView(R.id.btn_pay)
 	protected Button mBtnPay;
 
@@ -199,6 +204,8 @@ public class CardsActivity extends BaseOmnomActivity {
 				mBtnPay.setEnabled(false);
 			}
 		} else {
+			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) cardsFooter.getLayoutParams();
+			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 			ViewUtils.setVisible(mBtnPay, false);
 		}
 
