@@ -37,4 +37,9 @@
     <dimen name="navigate_qr_text_width">350dp</dimen>
     <dimen name="navigate_qr_text_margin_top">-70dp</dimen>
     <dimen name="bill_split_person_title_padding">32dp</dimen>
+
+    <dimen name="pay_once_font_size">16sp</dimen>
+    <dimen name="pay_once_fragment_height_large">300dp</dimen>
+    <dimen name="pay_once_fragment_height_small">200dp</dimen>
+
 </resources>

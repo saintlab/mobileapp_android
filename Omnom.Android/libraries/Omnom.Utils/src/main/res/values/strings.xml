@@ -5,6 +5,7 @@
     <string name="error_you_have_no_internet_connection">У вас нет доступа к интернету</string>
     <string name="error_bluetooth_disabled">Чтобы пользоваться Омном, необходимо включить Bluetooth.</string>
     <string name="error_location_disabled">Чтобы пользоваться Омном, необходимо разрешить использование службы геопозиции.</string>
+    <string name="turn_on_bluetooth">Включить Bluetooth</string>
     <string name="open_settings">Перейти в настройки</string>
     <string name="try_once_again">Проверить ещё</string>
     <string name="repeat">Повторить</string>
@@ -16,6 +17,7 @@
     <string name="error_user_not_found">Невозможно получить данные пользователя. Пожалуйста попробуйте позже</string>
     <string name="error_unknown_server_error">Произошла ошибка соединения с сервером. Пожалуйста, попробуйте позже</string>
     <string name="error_no_internet_connection">Нет соединения с\nинтернетом.</string>
+    <string name="something_went_wrong">Что-то пошло не так</string>
     <string name="error_backend">Нет связи с заведением.\nОфициант в помощь.</string>
     <string name="error_unknown_qr">Неверный QR-код,\nнайдите Omnom.</string>
     <string name="error_weak_beacon_signal">Слабый сигнал. Положите телефон в центр стола пожалуйста</string>

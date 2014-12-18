@@ -35,6 +35,7 @@ import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.socket.listener.SilentPaymentEventListener;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -222,11 +223,11 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					onPayError();
 				}
 			}
-		}, new Action1<Throwable>() {
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
-			public void call(Throwable throwable) {
+			public void onError(Throwable throwable) {
 				Log.w(TAG, throwable.getMessage());
-				onInternetError();
+				onUnknownError();
 			}
 		});
 	}
@@ -255,11 +256,11 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					                                    checkResult(response);
 				                                    }
 			                                    }
-		                                    }, new Action1<Throwable>() {
+		                                    }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			                                    @Override
-			                                    public void call(Throwable throwable) {
+			                                    public void onError(Throwable throwable) {
 				                                    Log.w(TAG, throwable.getMessage());
-				                                    onInternetError();
+				                                    onUnknownError();
 			                                    }
 		                                    });
 	}
@@ -271,11 +272,11 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 			                                      public void call(final AcquiringPollingResponse response) {
 				                                      processResponse(response);
 			                                      }
-		                                      }, new Action1<Throwable>() {
+		                                      }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			                                      @Override
-			                                      public void call(Throwable throwable) {
+			                                      public void onError(Throwable throwable) {
 				                                      Log.w(TAG, throwable.getMessage());
-				                                      onInternetError();
+				                                      onUnknownError();
 			                                      }
 		                                      });
 	}
@@ -317,8 +318,8 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		});
 	}
 
-	private void onInternetError() {
-		mErrorHelper.showInternetError(new View.OnClickListener() {
+	private void onUnknownError() {
+		mErrorHelper.showUnknownError(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				pay(mDetails.getAmount(), mDetails.getTip());

@@ -241,7 +241,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 					@Override
 					public void onError(Throwable throwable) {
 						topPanel.showProgress(false);
-						Log.e(TAG, "doRegister", throwable);
+						Log.e(TAG, "doRegister " + throwable.getMessage());
 					}
 				});
 	}

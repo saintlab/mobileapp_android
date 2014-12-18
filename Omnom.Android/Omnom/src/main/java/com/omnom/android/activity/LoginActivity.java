@@ -174,7 +174,7 @@ public class LoginActivity extends BaseOmnomActivity {
 			                                        @Override
 			                                        public void onError(Throwable throwable) {
 				                                        topPanel.showProgress(false);
-				                                        Log.e(TAG + ":authorizePhone", "doProceed", throwable);
+				                                        Log.e(TAG + ":authorizePhone", "doProceed " + throwable.getMessage());
 			                                        }
 		                                        });
 	}
