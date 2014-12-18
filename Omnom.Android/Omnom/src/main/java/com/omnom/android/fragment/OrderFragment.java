@@ -393,7 +393,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	public void downscale() {
-		updateFooter(false);
+		initFooter(false);
 		if(mFooterView2 != null) {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, false);
@@ -602,7 +602,11 @@ public class OrderFragment extends Fragment {
 		} else {
 			Log.w(TAG, "UserProfile not set");
 		}
-		updateFooter(true);
+		if(AndroidUtils.hasSelectedItems(mCheckedStates, list.getCount())) {
+			initFooter2();
+		} else {
+			initFooter(true);
+		}
 		if(mFooterView2 != null) {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, true);
