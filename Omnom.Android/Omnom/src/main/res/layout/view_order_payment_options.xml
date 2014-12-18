@@ -139,7 +139,7 @@
             android:singleLine="true"
             android:textSize="@dimen/font_order_amont_edit"
             android:textColor="?android:textColorPrimaryInverse"
-            android:textCursorDrawable="@null"
+            android:textCursorDrawable="@drawable/cursor_amount"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
         <TextView
