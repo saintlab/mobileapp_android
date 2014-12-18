@@ -20,7 +20,7 @@ public class LoaderError {
 			                R.drawable.ic_repeat_small);
 
 	public static final LoaderError BLE_DISABLED =
-			new LoaderError(R.drawable.ic_bluetooth_white, R.string.error_bluetooth_disabled, R.string.open_settings, 0);
+			new LoaderError(R.drawable.ic_bluetooth_white, R.string.error_bluetooth_disabled, R.string.turn_on_bluetooth, 0);
 
 	public static final LoaderError LOCATION_DISABLED =
 			new LoaderError(R.drawable.ic_geolocation_white, R.string.error_location_disabled, R.string.open_settings, 0);
