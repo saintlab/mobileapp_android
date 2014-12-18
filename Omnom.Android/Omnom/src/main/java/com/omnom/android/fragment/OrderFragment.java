@@ -285,6 +285,8 @@ public class OrderFragment extends Fragment {
 
 	private int lastCheckedTipsButtonId = -1;
 
+	private boolean mSplitRunning;
+
 	public OrderFragment() {
 	}
 
@@ -569,7 +571,6 @@ public class OrderFragment extends Fragment {
 		list.setAdapter(mAdapter);
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-
 		list.setSwipeEnabled(mSingle);
 		list.setSwipeListener(new OmnomListView.SwipeListener() {
 			@Override
@@ -753,6 +754,11 @@ public class OrderFragment extends Fragment {
 
 	@SuppressLint("NewApi")
 	private void splitBill() {
+		if(mSplitRunning) {
+			// skip double-tap
+			return;
+		}
+		mSplitRunning = true;
 		final SparseBooleanArrayParcelable stateCopy = mCheckedStates.clone();
 		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder, stateCopy);
 		getFragmentManager().beginTransaction().add(android.R.id.content, billSplitFragment, BillSplitFragment.TAG).commit();
@@ -763,6 +769,7 @@ public class OrderFragment extends Fragment {
 				list.cancelRefreshing();
 				list.setTranslationY(mListTrasnlationActive);
 				animator.setListener(null);
+				mSplitRunning = false;
 			}
 		}).setDuration(getResources().getInteger(R.integer.listview_animation_delay)).start();
 	}
