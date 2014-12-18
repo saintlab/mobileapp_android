@@ -15,9 +15,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -633,7 +631,6 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void initAmount() {
-		editAmount.setCursorVisible(false);
 		editAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
@@ -644,25 +641,7 @@ public class OrderFragment extends Fragment {
 				return false;
 			}
 		});
-		editAmount.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
 
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				final String str = s.toString();
-				if(!str.endsWith(getCurrencySuffix())) {
-					final String text = editAmount.getText() + getCurrencySuffix();
-					editAmount.setText(text);
-					editAmount.setSelection(text.length() - 1);
-				}
-			}
-		});
 		final double paidAmount = mOrder.getPaidAmount();
 		if(paidAmount > 0) {
 			txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(paidAmount, getCurrencySuffix())));
@@ -670,18 +649,7 @@ public class OrderFragment extends Fragment {
 		} else {
 			ViewUtils.setVisible2(txtAlreadyPaid, false);
 		}
-		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
-		editAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if(hasFocus) {
-					int length = editAmount.getText().length();
-					if(length >= 2) {
-						editAmount.setSelection(length - 2);
-					}
-				}
-			}
-		});
+		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay(), getCurrencySuffix()));
 	}
 
 	private void updatePayButton(final BigDecimal amount) {
