@@ -155,7 +155,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
-				Log.e(TAG, "doConfirm", throwable);
+				Log.e(TAG, "doConfirm " + throwable.getMessage());
 				finish();
 			}
 		});

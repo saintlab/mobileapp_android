@@ -128,7 +128,7 @@
             android:src="@drawable/ic_cancel_editing_button"
             android:visibility="invisible"/>
 
-        <EditText
+        <com.omnom.android.view.AmountEditText
             android:id="@+id/edit_payment_amount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -139,7 +139,7 @@
             android:singleLine="true"
             android:textSize="@dimen/font_order_amont_edit"
             android:textColor="?android:textColorPrimaryInverse"
-            android:textCursorDrawable="@null"
+            android:textCursorDrawable="@drawable/cursor_amount"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
         <TextView
@@ -205,7 +205,7 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/white"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-        android:layout_marginBottom="-24dp"
+        android:layout_marginBottom="-16dp"
         android:text="@string/to_be_paid"/>
 
     <TextView

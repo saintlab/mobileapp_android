@@ -15,7 +15,7 @@
     <dimen name="order_list_height">660dp</dimen>
     <dimen name="font_order_amont_edit">48sp</dimen>
     <dimen name="order_edit_title_margin">-16dp</dimen>
-    <dimen name="order_fake_item_height">600dp</dimen>
+    <dimen name="order_fake_item_height">680dp</dimen>
     <dimen name="order_payment_tips_title_margin">-12dp</dimen>
     <dimen name="order_payment_tips_radio_padding_bottom">12dp</dimen>
 
@@ -23,7 +23,7 @@
     <dimen name="pay_button_minimum_width">250dp</dimen>
     <dimen name="pay_button_margin_bottom">12dp</dimen>
 
-    <dimen name="order_payment_height">260dp</dimen>
+    <dimen name="order_payment_height">272dp</dimen>
 
     <dimen name="loader_size">220dp</dimen>
     <dimen name="loader_size_huge">1080dp</dimen>
@@ -37,4 +37,9 @@
     <dimen name="navigate_qr_text_width">350dp</dimen>
     <dimen name="navigate_qr_text_margin_top">-70dp</dimen>
     <dimen name="bill_split_person_title_padding">32dp</dimen>
+
+    <dimen name="pay_once_font_size">16sp</dimen>
+    <dimen name="pay_once_fragment_height_large">300dp</dimen>
+    <dimen name="pay_once_fragment_height_small">200dp</dimen>
+
 </resources>

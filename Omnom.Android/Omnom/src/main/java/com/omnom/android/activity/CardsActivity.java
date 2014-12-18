@@ -17,7 +17,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +40,7 @@ import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -119,6 +122,9 @@ public class CardsActivity extends BaseOmnomActivity {
 	@InjectView(R.id.panel_top)
 	protected HeaderView mPanelTop;
 
+	@InjectView(R.id.footer)
+	protected LinearLayout cardsFooter;
+
 	@InjectView(R.id.btn_pay)
 	protected Button mBtnPay;
 
@@ -170,7 +176,7 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		ViewUtils.setVisible(mDelimiter, false);
+		ViewUtils.setVisible(mDelimiter, true);
 		mPreferences = OmnomApplication.get(getActivity()).getPreferences();
 
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
@@ -199,6 +205,8 @@ public class CardsActivity extends BaseOmnomActivity {
 				mBtnPay.setEnabled(false);
 			}
 		} else {
+			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) cardsFooter.getLayoutParams();
+			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 			ViewUtils.setVisible(mBtnPay, false);
 		}
 
@@ -244,7 +252,7 @@ public class CardsActivity extends BaseOmnomActivity {
 	private void askForRemoval(final Card card) {
 		final String title = getString(R.string.card_removal_confirmation, card.getMaskedPan(), card.getAssociation());
 		final AlertDialog alertDialog = AndroidUtils.showDialog(this, title,
-				R.string.delete, new DialogInterface.OnClickListener() {
+		                                                        R.string.delete, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(final DialogInterface dialog, final int which) {
 						removeCard(card);
@@ -302,9 +310,9 @@ public class CardsActivity extends BaseOmnomActivity {
 							}
 						}
 					}
-				}, new Action1<Throwable>() {
+				}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					@Override
-					public void call(Throwable throwable) {
+					public void onError(Throwable throwable) {
 						Log.w(TAG, throwable.getMessage());
 						cardRemovalError();
 					}
@@ -368,9 +376,9 @@ public class CardsActivity extends BaseOmnomActivity {
 							                                      mPanelTop.showProgress(false);
 							                                      mPanelTop.showButtonRight(true);
 						                                      }
-					                                      }, new Action1<Throwable>() {
+					                                      }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 						                                      @Override
-						                                      public void call(final Throwable throwable) {
+						                                      public void onError(Throwable throwable) {
 							                                      mPanelTop.showProgress(false);
 							                                      mPanelTop.showButtonRight(true);
 						                                      }

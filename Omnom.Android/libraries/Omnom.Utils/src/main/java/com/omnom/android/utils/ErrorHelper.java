@@ -95,6 +95,10 @@ public class ErrorHelper {
 		showError(LoaderError.NO_CONNECTION_TRY, onClickListener);
 	}
 
+	public void showUnknownError(View.OnClickListener onClickListener) {
+		showError(LoaderError.UNKNOWN_ERROR, onClickListener);
+	}
+
 	public void showBackendError(View.OnClickListener onClickListener) {
 		showError(LoaderError.BACKEND_ERROR, onClickListener);
 	}

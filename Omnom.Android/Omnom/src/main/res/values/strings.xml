@@ -35,6 +35,7 @@
     <string name="title_activity_orders">OrdersActivity</string>
     <string name="title_activity_add_card">AddCardActivity</string>
     <string name="order_overall">Итого: %1$s</string>
+    <string name="overall">Итого: </string>
     <string name="order_paid">Оплачено: %1$s</string>
     <string name="pay_amount">Оплатить %1$s</string>
     <string name="amount_is_too_high">Сумма слишком большая</string>
@@ -64,11 +65,10 @@
     <string name="sms_notifications_off">Вероятно, SMS-уведомления не подключены.\nНужно посмотреть
         последнее списание в банковской выписке и узнать сумму.</string>
     <string name="pay_once">Если посмотреть сумму списания сейчас возможности нет, вы можете однократно
-        оплатить сумму без привязки карты.</string>
+        оплатить\nсумму без привязки карты.</string>
     <string name="wrong_checksum">Введена неверная проверочная сумма.\nЗагляните в последнее SMS.
         Там должно быть сообщение от банка. Введите сумму из SMS. <u>Если SMS нет?</u></string>
     <string name="no_sms">Если SMS нет?</string>
-    <string name="something_went_wrong">Что-то пошло не так</string>
     <string name="something_went_wrong_try_agint">Что-то пошло не так.\nПовторите попытку</string>
     <string name="repeat">Повторить</string>
     <string name="payment_success">Платёж принят</string>

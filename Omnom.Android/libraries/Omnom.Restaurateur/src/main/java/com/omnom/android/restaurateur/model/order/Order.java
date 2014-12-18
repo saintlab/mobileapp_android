@@ -269,7 +269,7 @@ public class Order implements Parcelable {
 	}
 
 	public double getAmountToPay() {
-		return getTotalAmount() - getPaidAmount();
+		return Math.max(getTotalAmount() - getPaidAmount(), 0) ;
 	}
 
 	public double getPaidTip() {

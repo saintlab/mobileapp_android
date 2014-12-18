@@ -49,6 +49,10 @@ public class StringUtils {
 		return formatCurrency(BigDecimal.valueOf(value)) + currency;
 	}
 
+	public static String formatCurrencyWithSpace(double value, String currency) {
+		return formatCurrency(BigDecimal.valueOf(value)) + " " + currency;
+	}
+
 	public static String formatCurrency(String s) {
 		return s.indexOf(".") < 0 ? s : s.replaceAll("0*$", "").replaceAll("\\.$", "");
 	}

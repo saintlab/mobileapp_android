@@ -37,6 +37,7 @@ import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.fragment.PayOnceFragment;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
+import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -300,9 +301,9 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 						                                             editAmount.setEnabled(true);
 						                                             AndroidUtils.showKeyboard(editAmount);
 					                                             }
-				                                             }, new Action1<Throwable>() {
+				                                             }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					                                             @Override
-					                                             public void call(final Throwable throwable) {
+					                                             public void onError(Throwable throwable) {
 						                                             Log.w(TAG, throwable.getMessage());
 						                                             ViewUtils.setVisible(mTextInfo, false);
 						                                             mPanelTop.showProgress(false);
@@ -402,7 +403,9 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void pay() {
-		setResult(CardsActivity.RESULT_PAY);
+		Intent intent = new Intent();
+		intent.putExtra(EXTRA_CARD_DATA, mCard);
+		setResult(CardsActivity.RESULT_PAY, intent);
 		finish();
 	}
 
