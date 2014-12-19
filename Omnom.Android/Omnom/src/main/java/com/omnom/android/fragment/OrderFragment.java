@@ -96,6 +96,8 @@ public class OrderFragment extends Fragment {
 
 	private int mGuestsCount = 1;
 
+	private boolean isEditMode = false;
+
 	public static final float FRAGMENT_SCALE_RATIO_SMALL = 0.8f;
 
 	public static final float FRAGMENT_SCALE_RATIO_X_NORMAL = 1.0f;
@@ -670,7 +672,7 @@ public class OrderFragment extends Fragment {
 				AndroidUtils.createKeyboardListener(activityRootView, new AndroidUtils.KeyboardVisibilityListener() {
 					@Override
 					public void onVisibilityChanged(boolean isVisible) {
-						ViewUtils.setVisible(mHeader, !isVisible);
+						editMode(isVisible);
 						if (mCurrentKeyboardVisility != isVisible) {
 							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
@@ -756,6 +758,9 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void cancelSplit(boolean resetAmount) {
+		if (isEditMode) {
+			return;
+		}
 		mTagSplitType = BillSplitFragment.SPLIT_TYPE_ITEMS;
 		mGuestsCount = 1;
 		mCheckedStates.clear();
@@ -769,7 +774,7 @@ public class OrderFragment extends Fragment {
 
 	@SuppressLint("NewApi")
 	private void splitBill() {
-		if(mSplitRunning) {
+		if(mSplitRunning || isEditMode) {
 			// skip double-tap
 			return;
 		}
@@ -846,8 +851,8 @@ public class OrderFragment extends Fragment {
 	private void showCustomTips(boolean visible) {
 		list.animate().translationYBy(visible ? mListTrasnlationActive : -mListTrasnlationActive).start();
 		getPanelPayment().animate().yBy(visible ? -mTipsTranslationY : mTipsTranslationY).start();
+		editMode(visible);
 
-		ViewUtils.setVisible(mHeader, !visible);
 		ViewUtils.setVisible(editAmount, !visible);
 
 		ViewUtils.setVisible(pickerTips, visible);
@@ -872,6 +877,20 @@ public class OrderFragment extends Fragment {
 		mMode = visible ? MODE_TIPS : WRONG_VALUE;
 
 		updateCustomTipsText(pickerTips.getValue());
+	}
+
+	private void editMode(final boolean isActive) {
+		isEditMode = isActive;
+		final boolean orderControlsEnabled = !isActive;
+		list.setSwipeEnabled(orderControlsEnabled);
+		ViewUtils.setVisible(mHeader, orderControlsEnabled);
+		if (mFooterView1 != null) {
+			mFooterView1.findViewById(R.id.btn_bill_split).setEnabled(orderControlsEnabled);
+		}
+		if (mFooterView2 != null) {
+			mFooterView2.findViewById(R.id.txt_edit).setEnabled(orderControlsEnabled);
+			mFooterView2.findViewById(R.id.txt_cancel).setEnabled(orderControlsEnabled);
+		}
 	}
 
 	private BigDecimal getEnteredAmount() {
