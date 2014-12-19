@@ -160,7 +160,7 @@ public class ValidateActivityBle extends ValidateActivity {
 										                                                            (TableDataResponse tableDataResponse) {
 									                                                            if(tableDataResponse.hasAuthError()) {
 										                                                            EnteringActivity.start(
-												                                                            ValidateActivityBle.this);
+												                                                            ValidateActivityBle.this, true);
 										                                                            throw new RuntimeException(
 												                                                            "Wrong auth token");
 									                                                            } else if(tableDataResponse.hasErrors()) {

@@ -13,7 +13,6 @@ import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.activity.PaymentProcessActivity;
 import com.omnom.android.activity.RestaurantActivity;
 import com.omnom.android.activity.RestaurantsListActivity;
-import com.omnom.android.activity.SplashActivity;
 import com.omnom.android.activity.ThanksActivity;
 import com.omnom.android.activity.ThanksDemoActivity;
 import com.omnom.android.activity.UserProfileActivity;
@@ -23,7 +22,9 @@ import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.fragment.BillItemsFragment;
 import com.omnom.android.fragment.BillSplitFragment;
 import com.omnom.android.fragment.BillSplitPersonsFragment;
+import com.omnom.android.fragment.EnteringFragment;
 import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.fragment.SplashFragment;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
 
 import dagger.Module;
@@ -33,7 +34,7 @@ import dagger.Module;
  */
 @Module(injects = {OmnomApplication.class,
 		/* activities */
-		SplashActivity.class, UserRegisterActivity.class, EnteringActivity.class,
+		EnteringActivity.class, UserRegisterActivity.class, EnteringActivity.class,
 		ConfirmPhoneActivity.class, LoginActivity.class, ValidateActivityBle.class, ValidateActivityCamera.class,
 		ValidateActivityBle.class, OrdersActivity.class, CardsActivity.class, UserProfileActivity.class, CardAddActivity.class,
 		CardConfirmActivity.class, ThanksActivity.class, ThanksDemoActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
@@ -41,6 +42,8 @@ import dagger.Module;
 		/* services */
 		BackgroundBleService.class,
 		/* fragments */
-		OrderFragment.class, BillSplitFragment.class, BillItemsFragment.class, BillSplitPersonsFragment.class},
+		SplashFragment.class, EnteringFragment.class,
+		OrderFragment.class,
+		BillSplitFragment.class, BillItemsFragment.class, BillSplitPersonsFragment.class},
         complete = false)
 public class OmnomApplicationModule {}

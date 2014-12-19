@@ -1,0 +1,26 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <com.omnom.android.view.ViewPagerIndicatorCircle
+        android:id="@+id/pager_indicator"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/panel_bottom"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:padding="@dimen/activity_vertical_margin"/>
+
+    <Space
+        android:id="@+id/panel_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

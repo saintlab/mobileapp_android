@@ -3,13 +3,13 @@ package com.omnom.android.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -42,7 +42,7 @@ import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
-import com.omnom.android.utils.drawable.TransitionDrawable;
+import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -64,7 +64,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
-import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
@@ -93,15 +92,15 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				final RetrofitError cause = (RetrofitError) throwable;
 				if (cause.getResponse() != null) {
 					// TODO: Refactor this ugly piece of ... code
-					if (cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
-						EnteringActivity.start(ValidateActivity.this);
+					if(cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
+						EnteringActivity.start(ValidateActivity.this, true);
 						return;
 					}
 				}
 			}
 			if (throwable instanceof AuthServiceException) {
 				getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
-				EnteringActivity.start(ValidateActivity.this);
+				EnteringActivity.start(ValidateActivity.this, true);
 				return;
 			}
 			throwable.printStackTrace();
@@ -115,15 +114,25 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	};
 
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo) {
-		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
-		final Intent intent = new Intent(context, hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
+		Intent intent = createIntent(context, animationType, isDemo);
 		if (context instanceof ConfirmPhoneActivity) {
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		}
+		context.start(intent, enterAnim, exitAnim, !isDemo);
+	}
+
+	public static void start(BaseFragmentActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo) {
+		Intent intent = createIntent(context, animationType, isDemo);
+		context.start(intent, enterAnim, exitAnim, !isDemo);
+	}
+
+	private static Intent createIntent(Context context, int animationType, boolean isDemo) {
+		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
+		final Intent intent = new Intent(context, hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
-		context.start(intent, enterAnim, exitAnim, !isDemo);
+		return intent;
 	}
 
 	protected final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {

@@ -1,38 +1,43 @@
-package com.omnom.android.activity;
+package com.omnom.android.fragment;
 
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Intent;
-import android.os.Build;
-import android.os.SystemClock;
-import android.text.TextUtils;
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 
+import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.activity.base.BaseOmnomActivity;
-import com.omnom.android.service.bluetooth.BackgroundBleService;
-import com.omnom.android.utils.activity.BaseActivity;
-import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.activity.ValidateActivity;
+import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
-import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.MultiplyImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class SplashActivity extends BaseOmnomActivity {
+import static com.omnom.android.utils.Extras.EXTRA_LOADER_ANIMATION_SCALE_DOWN;
+
+/**
+ * Created by mvpotter on 12/3/2014.
+ */
+public class SplashFragment extends Fragment {
 
 	public static final float SCALE_FACTOR_FORK_LARGE = 0.4258f; // 104px / 178px = small_fork / large_fork
 
 	public static final float SCALE_FACTOR_FORK_SMALL = 1 / SCALE_FACTOR_FORK_LARGE;
+
+	private static final String ARG_DURATION_SPLASH = "durationSplash";
 
 	@InjectView(R.id.img_logo)
 	protected ImageView imgLogo;
@@ -58,20 +63,57 @@ public class SplashActivity extends BaseOmnomActivity {
 	@InjectView(R.id.img_bg)
 	protected ImageView imgBackground;
 
-	private int durationSplash;
-
 	private boolean mAnimate = true;
 
-	public static void start(BaseActivity context, int enterAnim, int exitAnim, int durationSplash) {
-		final Intent intent = new Intent(context, SplashActivity.class);
-		intent.putExtra(EXTRA_DURATION_SPLASH, durationSplash);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-		context.start(intent, enterAnim, exitAnim, true);
+	private int durationSplash;
+
+	private LaunchListener mLaunchListener;
+
+	public static SplashFragment newInstance(final int durationSplash) {
+		final SplashFragment fragment = new SplashFragment();
+		final Bundle args = new Bundle();
+		args.putInt(ARG_DURATION_SPLASH, durationSplash);
+		fragment.setArguments(args);
+		return fragment;
 	}
 
-	private void animateValidation() {
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		if(getArguments() != null) {
+			durationSplash = getArguments().getInt(ARG_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
+		}
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			mLaunchListener = (LaunchListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString() + " must implement LaunchListener");
+		}
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+		OmnomApplication.get(getActivity()).inject(this);
+		final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_splash, container, false);
+
+		ButterKnife.inject(this, view);
+		return view;
+	}
+
+	@Override
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		imgForkLarge.setScaleX(0.4258f);
+		imgForkLarge.setScaleY(0.4258f);
+
+		imgMultiply.setRadius(getResources().getDimensionPixelSize(R.dimen.loader_size_huge) / 2);
+	}
+
+	public void animateValidation() {
 		if (!mAnimate) {
 			return;
 		}
@@ -80,7 +122,7 @@ public class SplashActivity extends BaseOmnomActivity {
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
 		final int dimensionPixelSize = getResources().getDimensionPixelSize(R.dimen.loader_logo_size);
 
-		findViewById(android.R.id.content).postDelayed(new Runnable() {
+		getActivity().findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				AnimationUtils.animateAlpha(imgBill, false, durationShort);
@@ -91,18 +133,19 @@ public class SplashActivity extends BaseOmnomActivity {
 				// transitionDrawable.startTransition(durationShort);
 
 				// AnimationUtils.scaleWidth(imgFork, dimensionPixelSize, durationShort, null);
-				postDelayed(animationDuration, new Runnable() {
+				getActivity().findViewById(android.R.id.content).postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						if (!isFinishing()) {
-							ValidateActivity.start(SplashActivity.this, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
-							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, false);
+						if (!getActivity().isFinishing()) {
+							ValidateActivity.start((BaseFragmentActivity) getActivity(),
+												   R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
+												   EXTRA_LOADER_ANIMATION_SCALE_DOWN, false);
 						}
 					}
-				});
+				}, animationDuration);
 			}
 		}, durationSplash);
-		getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
+		getActivity().getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
 		mAnimate = false;
 	}
 
@@ -193,71 +236,26 @@ public class SplashActivity extends BaseOmnomActivity {
 		as.start();
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
-		if (hasToken) {
-			animateValidation();
-		} else {
-			animateLogin();
-		}
-	}
-
-	private void animateLogin() {
+	public void animateLogin() {
 		if (!mAnimate) {
 			return;
 		}
-		findViewById(android.R.id.content).postDelayed(new Runnable() {
+		getActivity().findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				EnteringActivity.start(SplashActivity.this, R.anim.slide_in_right, R.anim.slide_out_left);
+				mLaunchListener.launchEnteringScreen();
+
 			}
 		}, getResources().getInteger(R.integer.splash_screen_timeout));
-		getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
+		getActivity().getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
 		mAnimate = false;
 	}
 
-	@Override
-	public void initUi() {
-		imgForkLarge.setScaleX(0.4258f);
-		imgForkLarge.setScaleY(0.4258f);
-
-		imgMultiply.setRadius(getResources().getDimensionPixelSize(R.dimen.loader_size_huge) / 2);
-
-		if (AndroidUtils.isKitKat()) {
-			startBleServiceKK();
-		} else if (AndroidUtils.isJellyBeanMR2()) {
-			startBleServiceJB();
-		}
+	/**
+	 * Listener for launch events.
+	 */
+	public interface LaunchListener {
+		void launchEnteringScreen();
 	}
 
-	@Override
-	protected void handleIntent(Intent intent) {
-		durationSplash = intent.getIntExtra(EXTRA_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
-	}
-
-	@TargetApi(Build.VERSION_CODES.KITKAT)
-	private void startBleServiceKK() {
-		final AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-		final Intent intent = new Intent(this, BackgroundBleService.class);
-		final PendingIntent alarmIntent = PendingIntent.getService(this, 0, intent, 0);
-		final long triggerMillis = SystemClock.elapsedRealtime() + (AlarmManager.INTERVAL_FIFTEEN_MINUTES / 15);
-		alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerMillis, alarmIntent);
-	}
-
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-	private void startBleServiceJB() {
-		final AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-		final Intent intent = new Intent(this, BackgroundBleService.class);
-		final PendingIntent alarmIntent = PendingIntent.getService(this, 0, intent, 0);
-		final long triggerMillis = SystemClock.elapsedRealtime() + (AlarmManager.INTERVAL_FIFTEEN_MINUTES / 15);
-		alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerMillis, alarmIntent);
-	}
-
-	@Override
-	public int getLayoutResource() {
-		return R.layout.activity_splash;
-	}
 }

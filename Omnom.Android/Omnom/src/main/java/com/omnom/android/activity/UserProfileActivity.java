@@ -167,7 +167,9 @@ public class UserProfileActivity extends BaseOmnomActivity {
 		mTxtAppInfo.setText(getString(R.string.app_version_build, AndroidUtils.getAppVersion(this)));
 	}
 
-	private void forwardToIntro() {EnteringActivity.start(this);}
+	private void forwardToIntro() {
+		EnteringActivity.start(this, true);
+	}
 
 	@Override
 	protected void onDestroy() {
