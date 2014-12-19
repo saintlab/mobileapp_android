@@ -2,12 +2,12 @@ package com.omnom.android.restaurateur.api.observable;
 
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
-import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
-import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
+import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
+import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
@@ -32,7 +32,22 @@ public interface RestaurateurObeservableApi {
 
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
 
-	public Observable<BeaconDataResponse> bindBeacon(String restaurantId, int tableNumber, Beacon beacon, Beacon oldBeacon);
+	public Observable<TableDataResponse> bind(String restaurantId,
+	                                             int tableNumber,
+	                                             String qrData,
+	                                             Beacon beacon,
+	                                             Beacon oldBeacon);
+
+	public Observable<TableDataResponse> bind(String id,
+	                                             int tableNumber,
+	                                             String qrData,
+	                                             BeaconDataResponse beaconData,
+	                                             Beacon beacon);
+
+	public Observable<BeaconDataResponse> bindBeacon(String restaurantId,
+	                                                 int tableNumber,
+	                                                 Beacon beacon,
+	                                                 Beacon oldBeacon);
 
 	public Observable<BeaconDataResponse> bindBeacon(String restaurantId,
 	                                                 int tableNumber,
@@ -68,4 +83,5 @@ public interface RestaurateurObeservableApi {
 	public Observable<Restaurant> link(long orderId, double amount, double tip);
 
 	public Observable<Config> getConfig();
+
 }

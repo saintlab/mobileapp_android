@@ -27,6 +27,12 @@ public class TableDataResponse extends ResponseBase {
 	private String id;
 
 	@Expose
+	private int major;
+
+	@Expose
+	private int minor;
+
+	@Expose
 	private List<String> beaconUuids = new ArrayList<String>();
 
 	public TableDataResponse(String id, int internalId, List<String> qrCode, String restaurantId) {
@@ -63,5 +69,21 @@ public class TableDataResponse extends ResponseBase {
 
 	public void setBeaconUuids(List<String> beaconUuids) {
 		this.beaconUuids = beaconUuids;
+	}
+
+	public int getMajor() {
+		return major;
+	}
+
+	public void setMajor(final int major) {
+		this.major = major;
+	}
+
+	public int getMinor() {
+		return minor;
+	}
+
+	public void setMinor(final int minor) {
+		this.minor = minor;
 	}
 }
