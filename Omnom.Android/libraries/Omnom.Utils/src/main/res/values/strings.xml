@@ -7,7 +7,8 @@
     <string name="error_location_disabled">Чтобы пользоваться Омном, необходимо разрешить использование службы геопозиции.</string>
     <string name="turn_on_bluetooth">Включить Bluetooth</string>
     <string name="open_settings">Перейти в настройки</string>
-    <string name="try_once_again">Проверить ещё</string>
+    <string name="try_once_again">Попробуйте ещё раз</string>
+    <string name="lets_try_again">Давайте ещё раз</string>
     <string name="repeat">Повторить</string>
     <string name="cancel">Отменить</string>
     <string name="error_ok">Ок</string>
@@ -16,9 +17,8 @@
     <string name="there_are_no_orders_on_this_table">На данном столе нет заказов</string>
     <string name="error_user_not_found">Невозможно получить данные пользователя. Пожалуйста попробуйте позже</string>
     <string name="error_unknown_server_error">Произошла ошибка соединения с сервером. Пожалуйста, попробуйте позже</string>
-    <string name="error_no_internet_connection">Нет соединения с\nинтернетом.</string>
-    <string name="something_went_wrong">Что-то пошло не так</string>
-    <string name="error_backend">Нет связи с заведением.\nОфициант в помощь.</string>
+    <string name="error_no_internet_connection">Вы видите интернет?\nМы — нет.</string>
+    <string name="something_went_wrong">Помехи на линии</string>
     <string name="error_unknown_qr">Неверный QR-код,\nнайдите Omnom.</string>
     <string name="error_weak_beacon_signal">Слабый сигнал. Положите телефон в центр стола пожалуйста</string>
     <string name="error_more_than_one_beacon">Обноружено несколько маячков. Положите телефон в центр стола пожалуйста</string>
