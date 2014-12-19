@@ -154,6 +154,9 @@
 -keep class com.omnom.android.auth.** { *; }
 -keep class com.omnom.android.utils.** { *; }
 -keep class com.omnom.android.restaurateur.** { *; }
+-keep class com.omnom.android.mixpanel.model.** { *; }
+-keep class com.omnom.android.acquiring.mailru.model.** { *; }
+-keep class com.omnom.android.acquiring.mailru.response.** { *; }
 
 #card.io
 -keep class io.card.**
