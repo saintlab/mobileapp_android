@@ -15,6 +15,7 @@
             android:toDegrees="-90">
             <shape
                 android:shape="ring"
+                android:useLevel="true"
                 android:thickness="@dimen/loader_progress_thickness"
                 android:innerRadiusRatio="@dimen/loader_progress_inner_radius">
                 <solid android:color="@android:color/white"/>
