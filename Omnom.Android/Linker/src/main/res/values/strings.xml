@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Omnom Linker</string>
     <string name="restaurants_list">Список заведений</string>
     <string name="title_activity_places_list">Список заведений</string>
     <string name="remind_password_sent">Письмо для восстановления будет выслано вам на почту</string>
