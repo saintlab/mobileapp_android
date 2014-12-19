@@ -28,10 +28,13 @@ import butterknife.InjectView;
 public class BillSplitPersonsFragment extends Fragment implements NumberPicker.OnValueChangeListener, SplitFragment {
 	private static final String ARG_ORDER = "order";
 
-	public static Fragment newInstance(final Order order) {
+	private static final String ARG_GUESTS = "guests";
+
+	public static Fragment newInstance(final Order order, final int guestsCount) {
 		final BillSplitPersonsFragment fragment = new BillSplitPersonsFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, order);
+		args.putInt(ARG_GUESTS, guestsCount);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -44,11 +47,14 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 
 	private Order mOrder;
 
+	private int mGuestsCount;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
+			mGuestsCount = getArguments().getInt(ARG_GUESTS, 1);
 		}
 	}
 
@@ -57,7 +63,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 		mPicker.setMinValue(1);
 		mPicker.setMaxValue(40);
 		mPicker.setOnValueChangedListener(this);
-		mPicker.setValue(1);
+		mPicker.setValue(mGuestsCount);
 		mPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 		// onValueChanged(1);
 		// updateAmount();
@@ -96,6 +102,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 		final BigDecimal amount = getAmount();
 		btnCommit.setText(getString(R.string.bill_split_amount_, StringUtils.formatCurrency(amount)));
 		btnCommit.setTag(R.id.edit_amount, amount);
+		btnCommit.setTag(R.id.picker, mPicker.getValue());
 		btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_PERSON);
 		AnimationUtils.animateAlpha(btnCommit, true);
 	}

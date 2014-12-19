@@ -92,6 +92,10 @@ public class OrderFragment extends Fragment {
 
 	private int mCheckedId = WRONG_VALUE;
 
+	private int mTagSplitType = BillSplitFragment.SPLIT_TYPE_ITEMS;
+
+	private int mGuestsCount = 1;
+
 	public static final float FRAGMENT_SCALE_RATIO_SMALL = 0.8f;
 
 	public static final float FRAGMENT_SCALE_RATIO_X_NORMAL = 1.0f;
@@ -319,10 +323,16 @@ public class OrderFragment extends Fragment {
 	@Subscribe
 	public void onSplitCommit(OrderSplitCommitEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
+			mTagSplitType = event.getSplitType();
 			if(event.getSplitType() == BillSplitFragment.SPLIT_TYPE_PERSON) {
-				cancelSplit(true);
-			}
-			if(event.getSplitType() == BillSplitFragment.SPLIT_TYPE_ITEMS) {
+				mCheckedStates.clear();
+				mAdapter.notifyDataSetChanged();
+				// exclude case when split to single person
+				if (event.getAmount().compareTo(new BigDecimal(mOrder.getTotalAmount())) == -1) {
+					mGuestsCount = event.getGuestsCount();
+					initFooter2();
+				}
+			} else if(event.getSplitType() == BillSplitFragment.SPLIT_TYPE_ITEMS) {
 				mCheckedStates = event.getStates();
 				mAdapter.setStates(mCheckedStates);
 				mAdapter.notifyDataSetChanged();
@@ -582,8 +592,8 @@ public class OrderFragment extends Fragment {
 			@Override
 			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
 				final OrdersActivity activity = (OrdersActivity) getActivity();
-				if(isDownscaled()) {
-					if(activity.checkFragment(OrderFragment.this)) {
+				if (isDownscaled()) {
+					if (activity.checkFragment(OrderFragment.this)) {
 						zoomInFragment(activity);
 					}
 				} else {
@@ -661,7 +671,7 @@ public class OrderFragment extends Fragment {
 					@Override
 					public void onVisibilityChanged(boolean isVisible) {
 						ViewUtils.setVisible(mHeader, !isVisible);
-						if(mCurrentKeyboardVisility != isVisible) {
+						if (mCurrentKeyboardVisility != isVisible) {
 							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
 							ViewUtils.setVisible(radioGroup, !isVisible);
@@ -672,13 +682,13 @@ public class OrderFragment extends Fragment {
 							mCurrentKeyboardVisility = isVisible;
 							editAmount.setCursorVisible(isVisible);
 
-							if(isVisible) {
+							if (isVisible) {
 								mMode = MODE_AMOUNT;
 								mLastAmount = getEnteredAmount();
 								txtPaymentTitle.setText(R.string.i_m_going_to_pay);
 								editAmount.setSelection(editAmount.getText().length() - 1);
 							} else {
-								if(!mApply) {
+								if (!mApply) {
 									editAmount.setText(StringUtils.formatCurrency(mLastAmount, getCurrencySuffix()));
 								} else {
 									editAmount.setText(StringUtils.formatCurrency(editAmount.getText().toString(), getCurrencySuffix()));
@@ -706,7 +716,7 @@ public class OrderFragment extends Fragment {
 		billSplit.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				if(!isDownscaled()) {
+				if (!isDownscaled()) {
 					splitBill();
 				} else {
 					zoomInFragment((OrdersActivity) getActivity());
@@ -746,6 +756,8 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void cancelSplit(boolean resetAmount) {
+		mTagSplitType = BillSplitFragment.SPLIT_TYPE_ITEMS;
+		mGuestsCount = 1;
 		mCheckedStates.clear();
 		mAdapter.notifyDataSetChanged();
 		initFooter(true);
@@ -763,7 +775,7 @@ public class OrderFragment extends Fragment {
 		}
 		mSplitRunning = true;
 		final SparseBooleanArrayParcelable stateCopy = mCheckedStates.clone();
-		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mOrder, stateCopy);
+		final BillSplitFragment billSplitFragment = BillSplitFragment.newInstance(mTagSplitType, mOrder, stateCopy, mGuestsCount);
 		getFragmentManager().beginTransaction().add(android.R.id.content, billSplitFragment, BillSplitFragment.TAG).commit();
 		final ViewPropertyAnimator animator = list.animate();
 		animator.translationY(-100).setListener(new AnimatorListenerAdapter() {

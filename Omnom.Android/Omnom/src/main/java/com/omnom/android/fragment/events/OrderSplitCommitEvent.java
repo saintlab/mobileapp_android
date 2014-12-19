@@ -10,14 +10,19 @@ import java.math.BigDecimal;
 public class OrderSplitCommitEvent {
 	private String mOrderId;
 
+	private int mGuestsCount;
+
 	private SparseBooleanArrayParcelable mStates;
 
 	private BigDecimal mAmount;
 
 	private int mTagSplitType;
 
-	public OrderSplitCommitEvent(String orderId, final SparseBooleanArrayParcelable states, final BigDecimal amount, final int tagSplitType) {
+	public OrderSplitCommitEvent(String orderId, final int guestsCount,
+	                             final SparseBooleanArrayParcelable states, final BigDecimal amount,
+	                             final int tagSplitType) {
 		mOrderId = orderId;
+		mGuestsCount = guestsCount;
 		mStates = states;
 		mAmount = amount;
 		mTagSplitType = tagSplitType;
@@ -37,5 +42,9 @@ public class OrderSplitCommitEvent {
 
 	public SparseBooleanArrayParcelable getStates() {
 		return mStates;
+	}
+
+	public int getGuestsCount() {
+		return mGuestsCount;
 	}
 }
