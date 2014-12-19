@@ -24,4 +24,5 @@
     <string name="error_more_than_one_beacon">Обноружено несколько маячков. Положите телефон в центр стола пожалуйста</string>
     <string name="error_server_unavailable_please_try_again">Невозможно получить данные с сервера. Пожалуйста, попробуйте еще раз</string>
     <string name="error_payment_declined">Ваш банк отклонил платёж.\nПовторите попытку,\nдобавьте другую карту\nили оплатите наличными.</string>
+    <string name="email_subject_feedback">Обратная связь</string>
 </resources>

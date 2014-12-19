@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -109,12 +108,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.btn_feedback)
 	protected void onFeedback() {
-		Intent intent = new Intent(Intent.ACTION_SENDTO);
-		String email = "team@omnom.menu";
-		intent.setData(Uri.parse("mailto:" + email));
-		intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
-		intent.putExtra(Intent.EXTRA_SUBJECT, "Обратная связь");
-		startActivity(Intent.createChooser(intent, "Написать отзыв"));
+		AndroidUtils.sendFeedbackEmail(this, R.string.send_feedback);
 	}
 
 	@Override

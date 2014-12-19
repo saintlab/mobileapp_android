@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.ResultReceiver;
 import android.provider.Settings;
+import android.support.annotation.StringRes;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
@@ -48,6 +49,15 @@ import static butterknife.ButterKnife.findById;
  * Created by Ch3D on 29.07.2014.
  */
 public class AndroidUtils {
+
+	public static void sendFeedbackEmail(final Context context,@StringRes int resId) {
+		Intent intent = new Intent(Intent.ACTION_SENDTO);
+		String email = "team@omnom.menu";
+		intent.setData(Uri.parse("mailto:" + email));
+		intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
+		intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_subject_feedback));
+		context.startActivity(Intent.createChooser(intent, context.getString(resId)));
+	}
 
 	public interface KeyboardVisibilityListener {
 		public void onVisibilityChanged(boolean isVisible);
