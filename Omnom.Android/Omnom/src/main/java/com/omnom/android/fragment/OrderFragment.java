@@ -283,8 +283,6 @@ public class OrderFragment extends Fragment {
 
 	private OrderItemsAdapter mAdapter;
 
-	private int lastCheckedTipsButtonId = -1;
-
 	private boolean mSplitRunning;
 
 	public OrderFragment() {
@@ -790,7 +788,6 @@ public class OrderFragment extends Fragment {
 			@Override
 			public void onCheckedChanged(final CompoundButton btn, final boolean isChecked) {
 				if(isChecked) {
-					lastCheckedTipsButtonId = btn.getId();
 					mCheckedId = btn.getId();
 					updateTipsButtonState(btn);
 					otherTips.setTag(WRONG_VALUE);
@@ -887,7 +884,7 @@ public class OrderFragment extends Fragment {
 		if(mMode == MODE_TIPS) {
 			showCustomTips(false);
 			otherTips.setChecked(true);
-			lastCheckedTipsButtonId = otherTips.getId();
+			mCheckedId = otherTips.getId();
 			otherTips.setTag(pickerTips.getValue());
 			final BigDecimal amount = getEnteredAmount();
 			updatePaymentTipsAmount(amount);
@@ -905,11 +902,7 @@ public class OrderFragment extends Fragment {
 		}
 		if(mMode == MODE_TIPS) {
 			showCustomTips(false);
-			if(otherTips.getTag().equals(WRONG_VALUE)) {
-				return;
-			}
 			radioGroup.check(mCheckedId);
-			otherTips.setTag(WRONG_VALUE);
 			updateTipsButtonState(otherTips);
 		}
 	}
@@ -975,7 +968,7 @@ public class OrderFragment extends Fragment {
 			}
 			otherTips.setEnabled(true);
 			if(radioGroup.getCheckedRadioButtonId() == -1) {
-				final CompoundButton btn = findById(getActivity(), lastCheckedTipsButtonId);
+				final CompoundButton btn = findById(getActivity(), mCheckedId);
 				if(btn != null) {
 					btn.setChecked(true);
 					updateTipsButtonState(btn);
