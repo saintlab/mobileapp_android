@@ -63,11 +63,13 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            resValue "string", "app_name", "Omnom Linker"
         }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             applicationIdSuffix '.debug'
+            resValue "string", "app_name", "Omnom Linker Debug"
         }
     }
 }
