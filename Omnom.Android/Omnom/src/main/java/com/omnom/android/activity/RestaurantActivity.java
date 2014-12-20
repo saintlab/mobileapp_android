@@ -35,46 +35,43 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.txt_reserve)
 	protected void doReserve() {
-		if(!mFinishing) {
+		if (!mFinishing) {
 			// TODO: Implement
 		}
 	}
 
 	@OnClick(R.id.txt_im_inside)
 	protected void doImInside() {
-		if(!mFinishing) {
+		if (!mFinishing) {
 			// TODO: Implement
 		}
 	}
 
 	@OnClick(R.id.btn_call)
 	protected void doCall() {
-		if(!mFinishing) {
+		if (!mFinishing) {
 			AndroidUtils.openDialer(this, mRestaurant.getPhone());
 		}
 	}
 
 	@OnClick(R.id.txt_order)
 	protected void doMakeOrder() {
-		if(!mFinishing) {
+		if (!mFinishing) {
 			// TODO: Implement
 		}
 	}
 
 	@OnClick(R.id.btn_close)
 	protected void doClose() {
-		if(!mFinishing) {
+		if (!mFinishing) {
 			finish();
 		}
 	}
 
 	@OnClick(R.id.btn_demo)
 	protected void doDemo() {
-		if(!mFinishing) {
-			ValidateActivity.start(this,
-			                       R.anim.fake_fade_in_instant,
-			                       R.anim.fake_fade_out_instant,
-			                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
+		if (!mFinishing) {
+			ValidateActivity.startDemo(this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 		}
 	}
 
@@ -87,7 +84,7 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	public void finish() {
 		mFinishing = true;
 
-		if(mRestaurantViewHolder == null) {
+		if (mRestaurantViewHolder == null) {
 			finishSimple();
 			return;
 		}
@@ -96,13 +93,14 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		mRestaurantViewHolder.minimize(translationY);
 		btnCall.animate().alpha(0).start();
 
-		AnimationUtils.scaleHeight(mRestaurantViewHolder.imgCover,
-		                           getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_small), new Runnable() {
-					@Override
-					public void run() {
-						finishSimple();
-					}
-				});
+		AnimationUtils
+				.scaleHeight(mRestaurantViewHolder.imgCover, getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_small),
+				             new Runnable() {
+					             @Override
+					             public void run() {
+						             finishSimple();
+					             }
+				             });
 	}
 
 	private void finishSimple() {
@@ -112,7 +110,7 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		if(mRestaurant == null) {
+		if (mRestaurant == null) {
 			finish();
 			return;
 		}

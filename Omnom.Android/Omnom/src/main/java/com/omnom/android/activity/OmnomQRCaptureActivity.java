@@ -18,15 +18,15 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 	private int tableNumber;
 	private String tableId;
 
-	public static void start(final BaseOmnomActivity activity, final int tableNumber,
-	                         final String tableId, final int code) {
+	public static void start(final BaseOmnomActivity activity, final int tableNumber, final String tableId, final int code) {
 		final Intent intent = new Intent(activity, OmnomQRCaptureActivity.class);
 		intent.putExtra(CaptureActivity.EXTRA_SHOW_BACK, false);
 		intent.putExtra(CaptureActivity.EXTRA_TABLE_NUMBER, tableNumber);
 		intent.putExtra(CaptureActivity.EXTRA_TABLE_ID, tableId);
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-			final ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(activity, com.omnom.android.zxing.R.anim.slide_in_right,
-					com.omnom.android.zxing.R.anim.slide_out_left);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			final ActivityOptions activityOptions = ActivityOptions
+					.makeCustomAnimation(activity, com.omnom.android.zxing.R.anim.slide_in_right,
+					                     com.omnom.android.zxing.R.anim.slide_out_left);
 			activity.startActivityForResult(intent, code, activityOptions.toBundle());
 		} else {
 			activity.startActivityForResult(intent, code);
@@ -45,10 +45,8 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				ValidateActivity.start(OmnomQRCaptureActivity.this,
-						R.anim.fake_fade_in_instant,
-						R.anim.fake_fade_out_instant,
-						EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
+				ValidateActivity.startDemo(OmnomQRCaptureActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
+				                           EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 			}
 		});
 		final View imgProfile = findViewById(R.id.img_profile);

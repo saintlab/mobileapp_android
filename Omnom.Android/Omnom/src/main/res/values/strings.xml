@@ -101,5 +101,6 @@
     <string name="write_to_us">Напишите нам</string>
     <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
     <string name="navigate_qr_code">Наведитесь на QR-код Omnom.</string>
+    <string name="omnom_works_here">Omnom работает здесь</string>
 
 </resources>

@@ -30,17 +30,19 @@ public class PreferenceHelper implements PreferenceProvider {
 
 	@Override
 	public void setCardId(final Context context, final String externalCardId) {
-		context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-		       .edit()
-		       .putString(CARD_ID, externalCardId)
-		       .apply();
+		context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).edit().putString(CARD_ID, externalCardId).apply();
 	}
 
 	public void saveBeacon(final Context context, final Beacon beacon) {
-		context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE)
-		       .edit()
-		       .putLong(beacon.getBluetoothAddress(), SystemClock.elapsedRealtime())
-		       .apply();
+		long timestamp = SystemClock.elapsedRealtime();
+		context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).edit().putLong(beacon.getRestaurantData(), timestamp)
+				.putLong(beacon.getBluetoothAddress(), timestamp).apply();
+	}
+
+	public void saveRestaurantBeacon(final Context context, final Beacon beacon) {
+		long timestamp = SystemClock.elapsedRealtime();
+		context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).edit().putLong(beacon.getRestaurantData(), timestamp)
+				.apply();
 	}
 
 	public boolean hasBeacon(final Context context, final Beacon beacon) {
@@ -53,67 +55,58 @@ public class PreferenceHelper implements PreferenceProvider {
 
 	@Override
 	public String getCardId(final Context context) {
-		final String string = context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-		                             .getString(CARD_ID, StringUtils.EMPTY_STRING);
+		final String string =
+				context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).getString(CARD_ID, StringUtils.EMPTY_STRING);
 		return string;
 	}
 
 	@Override
 	public boolean setAuthToken(Context context, String value) {
-		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-		              .edit()
-		              .putString(AUTH_TOKEN, value)
-		              .commit();
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).edit().putString(AUTH_TOKEN, value).commit();
 	}
 
 	@Override
 	public String getAuthToken(Context context) {
-		final String string = context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-		                             .getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
+		final String string =
+				context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
 		return string;
 	}
 
 	@Override
 	public String getCardData(Context context) {
-		final String string = context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-		                             .getString(CARD_DATA, StringUtils.EMPTY_STRING);
+		final String string =
+				context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).getString(CARD_DATA, StringUtils.EMPTY_STRING);
 		return string;
 
 	}
 
 	@Override
 	public boolean setCardData(Context context, String cardId) {
-		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-		              .edit()
-		              .putString(CARD_DATA, cardId)
-		              .commit();
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).edit().putString(CARD_DATA, cardId).commit();
 	}
 
 	@Override
 	public boolean setUserProfileJson(Context context, String userProfile) {
-		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-					  .edit()
-					  .putString(USER_PROFILE, userProfile)
-					  .commit();
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).edit().putString(USER_PROFILE, userProfile).commit();
 	}
 
 	@Override
 	public String getUserProfileJson(Context context) {
-		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-					  .getString(CONFIG, StringUtils.EMPTY_STRING);
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).getString(CONFIG, StringUtils.EMPTY_STRING);
 	}
 
 	@Override
 	public boolean setConfigJson(Context context, String config) {
-		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-				.edit()
-				.putString(CONFIG, config)
-				.commit();
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).edit().putString(CONFIG, config).commit();
 	}
 
 	@Override
 	public String getConfigJson(Context context) {
-		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-					  .getString(CONFIG, StringUtils.EMPTY_STRING);
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).getString(CONFIG, StringUtils.EMPTY_STRING);
+	}
+
+	@Override
+	public boolean contains(Context context, String key) {
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).contains(key);
 	}
 }
