@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import com.crashlytics.android.Crashlytics;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.modules.AcquiringModuleMailRuMixpanel;
 import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.AuthMixpanelModule;

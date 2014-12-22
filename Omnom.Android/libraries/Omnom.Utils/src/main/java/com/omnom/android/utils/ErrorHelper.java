@@ -24,7 +24,7 @@ public class ErrorHelper {
 
 	private TextView mTxtBottom;
 
-	private LoaderView mLoader;
+	protected LoaderView mLoader;
 
 	private TextView mTxtError;
 

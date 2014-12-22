@@ -22,7 +22,8 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.response.UserResponse;
-import com.omnom.android.mixpanel.model.UserRegisteredEvent;
+import com.omnom.android.mixpanel.OmnomErrorHelper;
+import com.omnom.android.mixpanel.model.UserRegisteredMixpanelEvent;
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
@@ -36,7 +37,6 @@ import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.socket.listener.PaymentEventListener;
-import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.drawable.TransitionDrawable;
@@ -189,7 +189,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@Inject
 	protected AuthService authenticator;
 
-	protected ErrorHelper mErrorHelper;
+	protected OmnomErrorHelper mErrorHelper;
 
 	protected Target mTarget;
 
@@ -316,7 +316,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				                           EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 			}
 		});
-		mErrorHelper = new ErrorHelper(loader, txtError, btnErrorRepeat, txtErrorRepeat, btnDemo, errorViews);
+		mErrorHelper = new OmnomErrorHelper(loader, txtError, btnErrorRepeat, txtErrorRepeat, btnDemo, errorViews);
 
 		mAcquiringConfigSubscribtion = AndroidObservable.bindActivity(this, api.getConfig()).subscribe(new Action1<Config>() {
 			@Override
@@ -658,7 +658,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				break;
 			case ConfirmPhoneActivity.TYPE_REGISTER:
 				getMixPanel().alias(id, null);
-				getMixPanelHelper().track(new UserRegisteredEvent(userResponse.getUser()));
+				getMixPanelHelper().track(new UserRegisteredMixpanelEvent(userResponse.getUser()));
 				break;
 		}
 	}

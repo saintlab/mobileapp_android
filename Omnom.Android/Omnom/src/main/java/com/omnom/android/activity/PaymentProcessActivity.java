@@ -26,6 +26,7 @@ import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
@@ -33,7 +34,6 @@ import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.socket.listener.SilentPaymentEventListener;
-import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderView;
@@ -111,7 +111,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	@InjectViews({R.id.txt_error, R.id.panel_errors})
 	protected List<View> errorViews;
 
-	protected ErrorHelper mErrorHelper;
+	protected OmnomErrorHelper mErrorHelper;
 
 	private Subscription mBillSubscription;
 
@@ -139,7 +139,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	@Override
 	public void initUi() {
 		mPaymentListener = new SilentPaymentEventListener(this, this);
-		mErrorHelper = new ErrorHelper(loader, txtError, btnBottom, txtBottom, btnDemo, errorViews);
+		mErrorHelper = new OmnomErrorHelper(loader, txtError, btnBottom, txtBottom, btnDemo, errorViews);
 		final int dpSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
 		loader.setSize(dpSize, dpSize);
 		loader.setColor(getResources().getColor(android.R.color.black));

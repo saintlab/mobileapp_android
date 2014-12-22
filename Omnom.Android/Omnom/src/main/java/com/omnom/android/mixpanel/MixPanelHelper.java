@@ -1,10 +1,10 @@
-package com.omnom.android;
+package com.omnom.android.mixpanel;
 
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
-import com.omnom.android.mixpanel.model.Event;
+import com.omnom.android.mixpanel.model.MixpanelEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,7 +53,7 @@ public class MixPanelHelper {
 		}
 	}
 
-	public void track(Event event) {
+	public void track(MixpanelEvent event) {
 		try {
 			final JSONObject json = new JSONObject(mGson.toJson(event));
 			track(event.getName(), json);

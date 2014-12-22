@@ -9,7 +9,7 @@ import com.omnom.android.utils.utils.AmountHelper;
 /**
  * Created by mvpotter on 21/11/14.
  */
-public final class BillViewEvent implements Event {
+public final class BillViewMixpanelEvent implements MixpanelEvent {
 
 	@Expose
 	private String requestId;
@@ -34,7 +34,7 @@ public final class BillViewEvent implements Event {
 	@SerializedName("table_id")
 	private String tableId;
 
-	public BillViewEvent(final String requestId, final Order order, final UserData user) {
+	public BillViewMixpanelEvent(final String requestId, final Order order, final UserData user) {
 		this.requestId = requestId;
 		this.user = user;
 		if (order != null) {

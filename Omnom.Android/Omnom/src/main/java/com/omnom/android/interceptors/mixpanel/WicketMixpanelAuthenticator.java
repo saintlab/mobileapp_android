@@ -2,7 +2,7 @@ package com.omnom.android.interceptors.mixpanel;
 
 import android.content.Context;
 
-import com.omnom.android.MixPanelHelper;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.auth.WicketAuthenticator;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;

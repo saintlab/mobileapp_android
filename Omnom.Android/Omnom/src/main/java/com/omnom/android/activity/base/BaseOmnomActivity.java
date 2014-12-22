@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
-import com.omnom.android.MixPanelHelper;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.utils.activity.BaseActivity;
 
