@@ -247,8 +247,8 @@ public class BackgroundBleService extends Service {
 		}
 	}
 
-	private void reportRestaurantEnter(ArrayList<Beacon> beacons) {
-		if(beacons.size() > 0) {
+	private void reportRestaurantEnter(final ArrayList<Beacon> beacons) {
+		if(!beacons.isEmpty()) {
 			final Beacon beacon = beacons.get(0);
 			final String restaurantData = beacon.getRestaurantData();
 			final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
