@@ -21,6 +21,7 @@ import android.util.Log;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.activity.EnteringActivity;
 import com.omnom.android.beacon.BeaconFilter;
 import com.omnom.android.mixpanel.model.RestaurantEnterMixpanelEvent;
 import com.omnom.android.preferences.PreferenceHelper;
@@ -308,7 +309,7 @@ public class BackgroundBleService extends Service {
 	}
 
 	private PendingIntent getNotificationIntent() {
-		final Intent intent = new Intent(this, SplashActivity.class);
+		final Intent intent = new Intent(this, EnteringActivity.class);
 		intent.setAction(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER).setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		return PendingIntent.getActivity(this, 0, intent, 0);
 	}
