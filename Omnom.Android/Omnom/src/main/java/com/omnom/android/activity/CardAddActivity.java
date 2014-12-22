@@ -21,7 +21,12 @@ import com.omnom.android.utils.CardNumberTextWatcher;
 import com.omnom.android.utils.CardUtils;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEditText;
+import com.omnom.android.validator.Validator;
+import com.omnom.android.validator.card.CvvValidator;
+import com.omnom.android.validator.card.ExpirationDateValidator;
+import com.omnom.android.validator.card.PanValidator;
 import com.omnom.android.view.HeaderView;
 
 import butterknife.InjectView;
@@ -89,6 +94,20 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	private int panelX;
 
+	private Validator panValidator;
+
+	private Validator expDateValidator;
+
+	private Validator cvvValidator;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		panValidator = new PanValidator();
+		expDateValidator = new ExpirationDateValidator();
+		cvvValidator = new CvvValidator();
+	}
+
 	@Override
 	public void initUi() {
 		mCheckSaveCard.setChecked(true);
@@ -101,9 +120,13 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		});
 
 		if (mAmount == 0) {
-			mCheckSaveCard.setEnabled(false);
+			ViewUtils.setVisible(mCheckSaveCard, false);
 		}
 
+		setUpCardEditFields();
+	}
+
+	private void setUpCardEditFields() {
 		mEditCardExpDate.addTextChangedListener(new CardExpirationTextWatcher(mEditCardExpDate, this));
 		mEditCardNumber.addTextChangedListener(new CardNumberTextWatcher(mEditCardNumber, this));
 		mEditCardCvv.addTextChangedListener(new CardDataTextWatcher(mEditCardCvv) {
@@ -125,12 +148,20 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 				CardAddActivity.this.onTextChanged(s.toString());
 			}
 		});
+
+		mEditCardNumber.setOnFocusChangeListener(new OnFocusChangeListener(panValidator));
+		mEditCardExpDate.setOnFocusChangeListener(new OnFocusChangeListener(expDateValidator));
+		mEditCardCvv.setOnFocusChangeListener(new OnFocusChangeListener(cvvValidator));
+
+		mEditCardNumber.setError(false);
+		mEditCardExpDate.setError(false);
+		mEditCardCvv.setError(false);
 	}
 
 	@Override
 	public void onTextChanged(final CharSequence s) {
 		animteCamera(mEditCardCvv.length() > 0 || mEditCardExpDate.length() > 0 || mEditCardNumber.length() > 0);
-		mPanelTop.setButtonRightEnabled(validate(false));
+		mPanelTop.setButtonRightEnabled(validate());
 	}
 
 	private void animteCamera(final boolean minimize) {
@@ -208,14 +239,14 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	}
 
 	private void doBind() {
-		if(!validate(true)) {
+		if(!validate()) {
 			return;
 		}
 		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER, mAmount);
 	}
 
 	private void doPay() {
-		if(!validate(true)) {
+		if(!validate()) {
 			return;
 		}
 		Intent intent = new Intent();
@@ -225,31 +256,13 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 	}
 
-	private boolean validate(boolean showErrors) {
+	private boolean validate() {
 		final String pan = mEditCardNumber.getText().toString();
 		final String expDate = mEditCardExpDate.getText().toString();
 		final String cvv = mEditCardCvv.getText().toString();
-		boolean hasErrors = false;
-
-		if(pan.length() < 13) {
-			if(showErrors) {
-				mEditCardNumber.setError(true);
-			}
-			hasErrors |= true;
-		}
-		if(expDate.length() < 5) {
-			if(showErrors) {
-				mEditCardExpDate.setError(true);
-			}
-			hasErrors |= true;
-		}
-		if(cvv.length() < 3) {
-			if(showErrors) {
-				mEditCardCvv.setError(true);
-			}
-			hasErrors |= true;
-		}
-		return !hasErrors;
+		return panValidator.validate(pan) &&
+			   expDateValidator.validate(expDate) &&
+			   cvvValidator.validate(cvv);
 	}
 
 	@OnClick({R.id.img_camera, R.id.txt_camera})
@@ -307,4 +320,29 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	protected void handleIntent(Intent intent) {
 		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);
 	}
+
+	private class OnFocusChangeListener implements View.OnFocusChangeListener {
+
+		private final Validator validator;
+
+		private OnFocusChangeListener(final Validator validator) {
+			this.validator = validator;
+		}
+
+		@Override
+		public void onFocusChange(View v, boolean hasFocus) {
+			ErrorEditText editText = (ErrorEditText) v;
+			if (!hasFocus) {
+				String value = editText.getText().toString();
+				if (validator.validate(value)) {
+					editText.setError(false);
+				} else {
+					editText.setError(true);
+				}
+			} else {
+				editText.setError(false);
+			}
+		}
+	}
+
 }
