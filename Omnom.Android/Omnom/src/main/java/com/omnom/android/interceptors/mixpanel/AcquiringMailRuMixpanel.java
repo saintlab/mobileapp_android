@@ -2,7 +2,7 @@ package com.omnom.android.interceptors.mixpanel;
 
 import android.content.Context;
 
-import com.omnom.android.MixPanelHelper;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.acquiring.mailru.AcquiringProxyMailRu;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringTransactionExtendedResponse;

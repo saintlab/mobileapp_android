@@ -22,7 +22,7 @@ public interface PreferenceProvider {
 	/**
 	 * Sets user profile
 	 *
-	 * @param context context
+	 * @param context     context
 	 * @param userProfile user profile json
 	 */
 	boolean setUserProfileJson(Context context, String userProfile);
@@ -39,7 +39,7 @@ public interface PreferenceProvider {
 	 * Sets config
 	 *
 	 * @param context context
-	 * @param config config json
+	 * @param config  config json
 	 */
 	boolean setConfigJson(Context context, String config);
 
@@ -51,4 +51,5 @@ public interface PreferenceProvider {
 	 */
 	String getConfigJson(Context context);
 
+	boolean contains(Context context, String key);
 }

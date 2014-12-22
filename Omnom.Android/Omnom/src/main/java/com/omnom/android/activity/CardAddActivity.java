@@ -15,6 +15,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.mixpanel.model.CardAddedMixpanelEvent;
 import com.omnom.android.utils.CardDataTextWatcher;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
@@ -35,8 +36,6 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	private static final int REQUEST_CODE_CARD_IO = 101;
 
 	private static final int REQUEST_CODE_CARD_REGISTER = 102;
-
-	private double mAmount;
 
 	@SuppressLint("NewApi")
 	public static void start(Activity activity, double amount, int code) {
@@ -79,6 +78,8 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	@InjectView(R.id.txt_camera)
 	protected TextView mTextCamera;
 
+	private double mAmount;
+
 	private boolean mMinimized = false;
 
 	private int panelY;
@@ -88,6 +89,11 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	private int cameraX;
 
 	private int panelX;
+
+	/**
+	 * Used for mixpanel analytics
+	 */
+	private boolean mScanUsed = false;
 
 	@Override
 	public void initUi() {
@@ -100,7 +106,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 			}
 		});
 
-		if (mAmount == 0) {
+		if(mAmount == 0) {
 			mCheckSaveCard.setEnabled(false);
 		}
 
@@ -178,15 +184,16 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_CARD_REGISTER) {
-			if (resultCode == CardsActivity.RESULT_PAY) {
+			if(resultCode == CardsActivity.RESULT_PAY) {
 				doPay();
-			} else if (resultCode == RESULT_OK) {
+			} else if(resultCode == RESULT_OK) {
 				setResult(RESULT_OK);
 				finish();
 			}
 		}
 		if(requestCode == REQUEST_CODE_CARD_IO) {
 			if(data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
+				mScanUsed = true;
 				final CreditCard scanResult = data.getParcelableExtra(CardIOActivity.EXTRA_SCAN_RESULT);
 				postDelayed(350, new Runnable() {
 					@Override
@@ -212,6 +219,11 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 			return;
 		}
 		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER, mAmount);
+		reportMixPanel();
+	}
+
+	private void reportMixPanel() {
+		OmnomApplication.getMixPanelHelper(this).track(new CardAddedMixpanelEvent(getUserData(), mScanUsed, mCheckSaveCard.isChecked()));
 	}
 
 	private void doPay() {
@@ -267,7 +279,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	@OnCheckedChanged(R.id.check_save_card)
 	public void onCheckSaveCard(final boolean checked) {
-		if (checked) {
+		if(checked) {
 			bindMode();
 		} else {
 			payMode();

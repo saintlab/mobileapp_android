@@ -89,10 +89,10 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@OnClick(R.id.btn_demo)
 	public void doDemo() {
-		ValidateActivity.start(this,
+		ValidateActivity.startDemo(this,
 		                       R.anim.fake_fade_in_instant,
 		                       R.anim.fake_fade_out_instant,
-		                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
+		                       EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
 
 	@Override

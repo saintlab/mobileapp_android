@@ -20,7 +20,6 @@ import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
-import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.MultiplyImageView;
 
 import java.util.ArrayList;
@@ -62,9 +61,12 @@ public class SplashActivity extends BaseOmnomActivity {
 
 	private boolean mAnimate = true;
 
-	public static void start(BaseActivity context, int enterAnim, int exitAnim, int durationSplash) {
+	private int mType = -1;
+
+	public static void start(BaseActivity context, int enterAnim, int exitAnim, int type, int durationSplash) {
 		final Intent intent = new Intent(context, SplashActivity.class);
 		intent.putExtra(EXTRA_DURATION_SPLASH, durationSplash);
+		intent.putExtra(EXTRA_CONFIRM_TYPE, type);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
@@ -96,7 +98,7 @@ public class SplashActivity extends BaseOmnomActivity {
 					public void run() {
 						if (!isFinishing()) {
 							ValidateActivity.start(SplashActivity.this, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
-							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, false);
+							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, mType);
 						}
 					}
 				});
@@ -236,6 +238,7 @@ public class SplashActivity extends BaseOmnomActivity {
 	@Override
 	protected void handleIntent(Intent intent) {
 		durationSplash = intent.getIntExtra(EXTRA_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
+		mType = intent.getIntExtra(EXTRA_CONFIRM_TYPE, -1);
 	}
 
 	@TargetApi(Build.VERSION_CODES.KITKAT)

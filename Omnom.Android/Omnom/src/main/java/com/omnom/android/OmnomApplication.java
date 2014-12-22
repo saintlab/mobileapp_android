@@ -7,6 +7,8 @@ import android.os.Bundle;
 
 import com.crashlytics.android.Crashlytics;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.mixpanel.MixPanelHelper;
+import com.omnom.android.mixpanel.model.AppLaunchMixpanelEvent;
 import com.omnom.android.modules.AcquiringModuleMailRuMixpanel;
 import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.AuthMixpanelModule;
@@ -18,9 +20,9 @@ import com.omnom.android.restaurateur.RestaurateurModule;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.config.Config;
-import com.omnom.android.socket.OmnomSocketBase;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
+import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
@@ -76,8 +78,6 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	private Picasso _lazy_Picasso;
 
-	private OmnomSocketBase mTableSocket;
-
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
 		                     new OmnomApplicationModule(),
@@ -121,6 +121,9 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
 			@Override
 			public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+				if(activityStack.isEmpty()) {
+					getMixPanelHelper(activity).track(new AppLaunchMixpanelEvent(UserHelper.getUserData(activity)));
+				}
 				activityStack.push(activity);
 			}
 
@@ -179,7 +182,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	}
 
 	public Config getConfig() {
-		if (cachedConfig == null) {
+		if(cachedConfig == null) {
 			cachedConfig = preferenceHelper.getConfig(this);
 		}
 		return cachedConfig;
@@ -191,7 +194,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	}
 
 	public UserProfile getUserProfile() {
-		if (cachedUser == null) {
+		if(cachedUser == null) {
 			cachedUser = preferenceHelper.getUserProfile(this);
 		}
 		return cachedUser;

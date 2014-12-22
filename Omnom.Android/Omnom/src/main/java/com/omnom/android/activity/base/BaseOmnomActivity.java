@@ -6,6 +6,9 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.OmnomApplication;
+import com.omnom.android.auth.UserData;
+import com.omnom.android.mixpanel.MixPanelHelper;
+import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.activity.BaseActivity;
 
 import org.json.JSONException;
@@ -16,10 +19,15 @@ import org.json.JSONObject;
  */
 public abstract class BaseOmnomActivity extends BaseActivity {
 	private static final String TAG_MIXPANEL = MixpanelAPI.class.getSimpleName();
+
 	private Gson mGson;
 
 	public final MixpanelAPI getMixPanel() {
 		return OmnomApplication.getMixPanel(this);
+	}
+
+	public final MixPanelHelper getMixPanelHelper() {
+		return OmnomApplication.getMixPanelHelper(this);
 	}
 
 	@Override
@@ -49,5 +57,9 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 	protected void onDestroy() {
 		//		getMixPanel().flush();
 		super.onDestroy();
+	}
+
+	protected UserData getUserData() {
+		return UserHelper.getUserData(this);
 	}
 }

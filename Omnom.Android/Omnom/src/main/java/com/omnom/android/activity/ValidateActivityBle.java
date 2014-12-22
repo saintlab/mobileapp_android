@@ -9,6 +9,7 @@ import android.view.View;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.beacon.BeaconFilter;
+import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -172,6 +173,7 @@ public class ValidateActivityBle extends ValidateActivity {
 										                                                            return Observable.empty();
 									                                                            } else {
 										                                                            table[0] = tableDataResponse;
+										                                                            reportMixPanel(tableDataResponse);
 										                                                            return api.getRestaurant(
 												                                                            tableDataResponse
 														                                                            .getRestaurantId(),
@@ -200,6 +202,11 @@ public class ValidateActivityBle extends ValidateActivity {
 				}
 			}
 		});
+	}
+
+	private void reportMixPanel(final TableDataResponse tableDataResponse) {
+		getMixPanelHelper().track(OnTableMixpanelEvent.createEventBluetooth(getUserData(), tableDataResponse.getRestaurantId(),
+		                                                                     tableDataResponse.getId()));
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
