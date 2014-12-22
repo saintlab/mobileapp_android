@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Omnom</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_entering">EnteringActivity</string>
@@ -104,5 +103,5 @@
     <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
     <string name="navigate_qr_code">Наведитесь на QR-код Omnom.</string>
     <string name="omnom_works_here">Omnom работает здесь</string>
-
+    <string name="send_feedback">Написать отзыв</string>
 </resources>

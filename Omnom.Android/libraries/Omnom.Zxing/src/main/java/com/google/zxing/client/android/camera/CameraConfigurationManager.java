@@ -27,6 +27,8 @@ import android.view.WindowManager;
 
 import com.google.zxing.client.android.PreferencesActivity;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -38,7 +40,9 @@ final class CameraConfigurationManager {
 	private static final String TAG = "CameraConfiguration";
 
 	private final Context context;
+
 	private Point screenResolution;
+
 	private Point cameraResolution;
 
 	CameraConfigurationManager(Context context) {
@@ -58,7 +62,15 @@ final class CameraConfigurationManager {
 		screenResolution = theScreenResolution;
 		Log.i(TAG, "Screen resolution: " + screenResolution);
 		List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
-		if (supportedPreviewSizes != null && supportedPreviewSizes.size() > 0) {
+
+		Collections.sort(supportedPreviewSizes, new Comparator<Camera.Size>() {
+			@Override
+			public int compare(final Camera.Size lhs, final Camera.Size rhs) {
+				return lhs.width > rhs.width ? -1 : 1;
+			}
+		});
+
+		if(supportedPreviewSizes != null && supportedPreviewSizes.size() > 0) {
 			Camera.Size size = supportedPreviewSizes.get(0);
 			cameraResolution = new Point(size.width, size.height);
 		} else {
@@ -71,14 +83,14 @@ final class CameraConfigurationManager {
 		Camera.Parameters parameters = camera.getParameters();
 		camera.setDisplayOrientation(90);
 
-		if (parameters == null) {
+		if(parameters == null) {
 			Log.w(TAG, "Device error: no camera parameters are available. Proceeding without configuration.");
 			return;
 		}
 
 		Log.i(TAG, "Initial camera parameters: " + parameters.flatten());
 
-		if (safeMode) {
+		if(safeMode) {
 			Log.w(TAG, "In camera config safe mode -- most settings will not be honored");
 		}
 
@@ -89,16 +101,16 @@ final class CameraConfigurationManager {
 		CameraConfigurationUtils.setFocus(parameters, prefs.getBoolean(PreferencesActivity.KEY_AUTO_FOCUS, true),
 		                                  prefs.getBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, true), safeMode);
 
-		if (!safeMode) {
-			if (prefs.getBoolean(PreferencesActivity.KEY_INVERT_SCAN, false)) {
+		if(!safeMode) {
+			if(prefs.getBoolean(PreferencesActivity.KEY_INVERT_SCAN, false)) {
 				CameraConfigurationUtils.setInvertColor(parameters);
 			}
 
-			if (!prefs.getBoolean(PreferencesActivity.KEY_DISABLE_BARCODE_SCENE_MODE, true)) {
+			if(!prefs.getBoolean(PreferencesActivity.KEY_DISABLE_BARCODE_SCENE_MODE, true)) {
 				CameraConfigurationUtils.setBarcodeSceneMode(parameters);
 			}
 
-			if (!prefs.getBoolean(PreferencesActivity.KEY_DISABLE_METERING, true)) {
+			if(!prefs.getBoolean(PreferencesActivity.KEY_DISABLE_METERING, true)) {
 				CameraConfigurationUtils.setVideoStabilization(parameters);
 				CameraConfigurationUtils.setFocusArea(parameters);
 				CameraConfigurationUtils.setMetering(parameters);
@@ -115,7 +127,7 @@ final class CameraConfigurationManager {
 
 		Camera.Parameters afterParameters = camera.getParameters();
 		Camera.Size afterSize = afterParameters.getPreviewSize();
-		if (afterSize != null && (cameraResolution.x != afterSize.width || cameraResolution.y != afterSize.height)) {
+		if(afterSize != null && (cameraResolution.x != afterSize.width || cameraResolution.y != afterSize.height)) {
 			Log.w(TAG, "Camera said it supported preview size " + cameraResolution.x + 'x' + cameraResolution.y +
 					", but after setting it, preview size is " + afterSize.width + 'x' + afterSize.height);
 			cameraResolution.x = afterSize.width;
@@ -132,9 +144,9 @@ final class CameraConfigurationManager {
 	}
 
 	boolean getTorchState(Camera camera) {
-		if (camera != null) {
+		if(camera != null) {
 			Camera.Parameters parameters = camera.getParameters();
-			if (parameters != null) {
+			if(parameters != null) {
 				String flashMode = parameters.getFlashMode();
 				return flashMode != null && (Camera.Parameters.FLASH_MODE_ON.equals(flashMode) || Camera.Parameters.FLASH_MODE_TORCH
 						.equals(flashMode));
@@ -157,7 +169,7 @@ final class CameraConfigurationManager {
 	private void doSetTorch(Camera.Parameters parameters, boolean newSetting, boolean safeMode) {
 		CameraConfigurationUtils.setTorch(parameters, newSetting);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		if (!safeMode && !prefs.getBoolean(PreferencesActivity.KEY_DISABLE_EXPOSURE, true)) {
+		if(!safeMode && !prefs.getBoolean(PreferencesActivity.KEY_DISABLE_EXPOSURE, true)) {
 			CameraConfigurationUtils.setBestExposure(parameters, newSetting);
 		}
 	}

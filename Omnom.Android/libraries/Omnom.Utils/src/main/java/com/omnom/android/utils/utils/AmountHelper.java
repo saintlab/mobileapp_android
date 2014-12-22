@@ -19,4 +19,16 @@ public class AmountHelper {
 	public static double toDouble(final BigDecimal value) {
 		return value.doubleValue() / PERCENTAGE;
 	}
+
+	public static String format(final BigDecimal value) {
+		return format(value.doubleValue());
+	}
+
+	public static String format(final double value) {
+		if (value == (long) value) {
+			return String.format("%d", (long) value);
+		} else {
+			return String.format("%.2f", value).replace(',', '.');
+		}
+	}
 }

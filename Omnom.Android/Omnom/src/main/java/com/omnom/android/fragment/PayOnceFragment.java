@@ -13,7 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import butterknife.ButterKnife;
@@ -95,7 +95,7 @@ public class PayOnceFragment extends Fragment {
 		Button btnPay = (Button) view.findViewById(R.id.btn_pay);
 		TextView txtPayOnce = (TextView) view.findViewById(R.id.txt_pay_once);
 		if (mAmount > 0) {
-			final String text = StringUtils.formatCurrency(mAmount) + getString(R.string.currency_ruble);
+			final String text = AmountHelper.format(mAmount) + getString(R.string.currency_ruble);
 			btnPay.setText(getString(R.string.pay_amount, text));
 			btnPay.setOnClickListener(new View.OnClickListener() {
 				@Override

@@ -12,8 +12,8 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
-import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.view.NumberPicker;
 
 import java.math.BigDecimal;
@@ -28,10 +28,13 @@ import butterknife.InjectView;
 public class BillSplitPersonsFragment extends Fragment implements NumberPicker.OnValueChangeListener, SplitFragment {
 	private static final String ARG_ORDER = "order";
 
-	public static Fragment newInstance(final Order order) {
+	private static final String ARG_GUESTS = "guests";
+
+	public static Fragment newInstance(final Order order, final int guestsCount) {
 		final BillSplitPersonsFragment fragment = new BillSplitPersonsFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, order);
+		args.putInt(ARG_GUESTS, guestsCount);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -44,11 +47,14 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 
 	private Order mOrder;
 
+	private int mGuestsCount;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
+			mGuestsCount = getArguments().getInt(ARG_GUESTS, 1);
 		}
 	}
 
@@ -57,7 +63,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 		mPicker.setMinValue(1);
 		mPicker.setMaxValue(40);
 		mPicker.setOnValueChangedListener(this);
-		mPicker.setValue(1);
+		mPicker.setValue(mGuestsCount);
 		mPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 		// onValueChanged(1);
 		// updateAmount();
@@ -94,8 +100,9 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 	public void updateAmount() {
 		final Button btnCommit = (Button) getActivity().findViewById(R.id.btn_commit);
 		final BigDecimal amount = getAmount();
-		btnCommit.setText(getString(R.string.bill_split_amount_, StringUtils.formatCurrency(amount)));
+		btnCommit.setText(getString(R.string.bill_split_amount_, AmountHelper.format(amount)));
 		btnCommit.setTag(R.id.edit_amount, amount);
+		btnCommit.setTag(R.id.picker, mPicker.getValue());
 		btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_PERSON);
 		AnimationUtils.animateAlpha(btnCommit, true);
 	}

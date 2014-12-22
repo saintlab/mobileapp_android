@@ -21,7 +21,6 @@ import android.util.Log;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.activity.SplashActivity;
 import com.omnom.android.beacon.BeaconFilter;
 import com.omnom.android.mixpanel.model.RestaurantEnterMixpanelEvent;
 import com.omnom.android.preferences.PreferenceHelper;
