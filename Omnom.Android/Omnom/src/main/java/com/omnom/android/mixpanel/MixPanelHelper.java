@@ -2,7 +2,9 @@ package com.omnom.android.mixpanel;
 
 import android.util.Log;
 
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
 
@@ -19,6 +21,7 @@ import java.util.Map;
 public class MixPanelHelper {
 
 	public static final String KEY_DATA = "data";
+
 	public static final String KEY_TIMESTAMP = "timestamp";
 
 	private static final String TAG = MixPanelHelper.class.getSimpleName();
@@ -26,11 +29,12 @@ public class MixPanelHelper {
 	private static final String DATE_FORMAT = "{yyyy-MM-dd'T'HH:mm:ssZ}";
 
 	private final Gson mGson;
+
 	private MixpanelAPI mMixpanelApi;
 
 	public MixPanelHelper(MixpanelAPI api) {
 		mMixpanelApi = api;
-		mGson = new Gson();
+		mGson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 	}
 
 	public void track(String event, Object request) {

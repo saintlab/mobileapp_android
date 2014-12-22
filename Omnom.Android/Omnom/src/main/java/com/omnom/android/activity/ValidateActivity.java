@@ -104,7 +104,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			mErrorHelper.showBackendError(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					validate();
+					startLoader();
 				}
 			});
 		}

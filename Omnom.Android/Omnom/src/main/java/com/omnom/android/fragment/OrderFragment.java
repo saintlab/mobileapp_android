@@ -49,6 +49,8 @@ import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.mixpanel.model.BillViewMixpanelEvent;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
+import com.omnom.android.mixpanel.model.SplitWay;
+import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
@@ -102,6 +104,39 @@ public class OrderFragment extends Fragment {
 
 	public static final int PICKER_DEFAULT_VALUE = 10;
 
+	public static class TipData {
+
+		public static int TYPE_PERCENT = 0;
+
+		public static int TYPE_PREDEFINED = 1;
+
+		public static int TYPE_NULL = -1;
+
+		private final BigDecimal mAmount;
+
+		private final int mValue;
+
+		private final int mType;
+
+		public TipData(BigDecimal amount, int value, int type) {
+			mAmount = amount;
+			mValue = value;
+			mType = type;
+		}
+
+		public BigDecimal getAmount() {
+			return mAmount;
+		}
+
+		public int getValue() {
+			return mValue;
+		}
+
+		public int getType() {
+			return mType;
+		}
+	}
+
 	public static class PaymentDetails implements Parcelable {
 		public static final Creator<PaymentDetails> CREATOR = new Creator<PaymentDetails>() {
 			@Override
@@ -119,14 +154,62 @@ public class OrderFragment extends Fragment {
 
 		private int mTip;
 
+		private int mTipValue;
+
+		private int mTipsWay;
+
+		private int mSplitWay;
+
+		private String tableId;
+
+		private String restaurantName;
+
+		private String orderId;
+
 		public PaymentDetails(Parcel parcel) {
 			mAmount = parcel.readDouble();
 			mTip = parcel.readInt();
+			mTipValue = parcel.readInt();
+			orderId = parcel.readString();
+			tableId = parcel.readString();
+			restaurantName = parcel.readString();
+			mTipsWay = parcel.readInt();
+			mSplitWay = parcel.readInt();
 		}
 
-		public PaymentDetails(double amount, int tip) {
+		public PaymentDetails(double amount, int tip, Order order, TipsWay tipsWay, int tipValue, SplitWay splitWay) {
 			mAmount = amount;
 			mTip = tip;
+			mTipValue = tipValue;
+			tableId = order.getTableId();
+			restaurantName = order.getRestaurantId();
+			orderId = order.getId();
+			mTipsWay = tipsWay.ordinal();
+			mSplitWay = splitWay.ordinal();
+		}
+
+		public String getOrderId() {
+			return orderId;
+		}
+
+		public String getRestaurantName() {
+			return restaurantName;
+		}
+
+		public String getTableId() {
+			return tableId;
+		}
+
+		public int getSplitWay() {
+			return mSplitWay;
+		}
+
+		public int getTipsWay() {
+			return mTipsWay;
+		}
+
+		public int getTipValue() {
+			return mTipValue;
 		}
 
 		public int getTip() {
@@ -142,6 +225,12 @@ public class OrderFragment extends Fragment {
 		public void writeToParcel(final Parcel dest, final int flags) {
 			dest.writeDouble(mAmount);
 			dest.writeInt(mTip);
+			dest.writeInt(mTipValue);
+			dest.writeString(orderId);
+			dest.writeString(tableId);
+			dest.writeString(restaurantName);
+			dest.writeInt(mTipsWay);
+			dest.writeInt(mSplitWay);
 		}
 
 		public double getAmount() {
@@ -235,6 +324,10 @@ public class OrderFragment extends Fragment {
 	@Nullable
 	protected TextView txtTipsAmountHint;
 
+	private TipsWay mTipsWay = TipsWay.DEFAULT;
+
+	private SplitWay mSplitWay = SplitWay.WASNT_USED;
+
 	private List<CompoundButton> tipsButtons;
 
 	@Nullable
@@ -323,6 +416,7 @@ public class OrderFragment extends Fragment {
 		if(event.getOrderId().equals(mOrder.getId())) {
 			if(event.getSplitType() == BillSplitFragment.SPLIT_TYPE_PERSON) {
 				cancelSplit(true);
+				mSplitWay = SplitWay.BY_GUESTS;
 			}
 			if(event.getSplitType() == BillSplitFragment.SPLIT_TYPE_ITEMS) {
 				mCheckedStates = event.getStates();
@@ -333,6 +427,7 @@ public class OrderFragment extends Fragment {
 				} else {
 					initFooter(true);
 				}
+				mSplitWay = SplitWay.BY_POSITIONS;
 			}
 			final BigDecimal amount = event.getAmount();
 			final String s = StringUtils.formatCurrency(amount, getCurrencySuffix());
@@ -552,9 +647,12 @@ public class OrderFragment extends Fragment {
 
 	private void showCardsActivity() {
 		final BigDecimal amount = getEnteredAmount();
-		final BigDecimal tips = getSelectedTips(amount);
-		final BigDecimal amountToPay = amount.add(tips);
-		final PaymentDetails paymentDetails = new PaymentDetails(amountToPay.doubleValue(), tips.intValue() * 100);
+		final TipData tips = getSelectedTips(amount);
+		final BigDecimal amountTips = tips.getAmount();
+		final BigDecimal amountToPay = amount.add(amountTips);
+		final PaymentDetails paymentDetails = new PaymentDetails(amountToPay.doubleValue(), amountTips.intValue() * 100,
+		                                                         mOrder, mTipsWay, tips.getValue(),
+		                                                         mSplitWay);
 		final OrdersActivity activity = (OrdersActivity) getActivity();
 		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
 	}
@@ -747,6 +845,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void cancelSplit(boolean resetAmount) {
+		mSplitWay = SplitWay.WASNT_USED;
 		mCheckedStates.clear();
 		mAdapter.notifyDataSetChanged();
 		initFooter(true);
@@ -789,6 +888,7 @@ public class OrderFragment extends Fragment {
 			@Override
 			public void onCheckedChanged(final CompoundButton btn, final boolean isChecked) {
 				if(isChecked) {
+					mTipsWay = TipsWay.BILL_SCREEN;
 					lastCheckedTipsButtonId = btn.getId();
 					mCheckedId = btn.getId();
 					updateTipsButtonState(btn);
@@ -796,8 +896,8 @@ public class OrderFragment extends Fragment {
 					otherTips.setChecked(false);
 					updateTipsButtonState(otherTips);
 					final BigDecimal amount = getEnteredAmount();
-					final BigDecimal selectedTips = getSelectedTips(amount, btn);
-					updatePayButton(amount.add(selectedTips));
+					final TipData selectedTips = getSelectedTips(amount, btn);
+					updatePayButton(amount.add(selectedTips.getAmount()));
 				} else {
 					updateTipsButtonState(btn);
 				}
@@ -884,6 +984,7 @@ public class OrderFragment extends Fragment {
 			updatePaymentTipsAmount(amount);
 		}
 		if(mMode == MODE_TIPS) {
+			mTipsWay = TipsWay.MANUAL_PERCENTAGE;
 			showCustomTips(false);
 			otherTips.setChecked(true);
 			lastCheckedTipsButtonId = otherTips.getId();
@@ -913,22 +1014,23 @@ public class OrderFragment extends Fragment {
 		}
 	}
 
-	private BigDecimal getSelectedTips(final BigDecimal amount) {
+	private TipData getSelectedTips(final BigDecimal amount) {
 		final CompoundButton btn = findById(getActivity(), radioGroup.getCheckedRadioButtonId());
 		return getSelectedTips(amount, btn);
 	}
 
-	private BigDecimal getSelectedTips(final BigDecimal amount, final CompoundButton selectedTipsButton) {
+	private TipData getSelectedTips(final BigDecimal amount, final CompoundButton selectedTipsButton) {
 		if(selectedTipsButton == null) {
-			return BigDecimal.ZERO;
+			return new TipData(BigDecimal.ZERO, TipData.TYPE_NULL, TipData.TYPE_NULL);
 		}
 		if(OrderHelper.isPercentTips(mOrder, amount) || selectedTipsButton.getId() == otherTips.getId()) {
 			final int percent = (Integer) selectedTipsButton.getTag();
 			final int tipsAmount = OrderHelper.getTipsAmount(amount, percent);
-			return BigDecimal.valueOf(tipsAmount);
+
+			return new TipData(BigDecimal.valueOf(tipsAmount), percent, TipData.TYPE_PERCENT);
 		} else {
 			final int tag = (Integer) selectedTipsButton.getTag(R.id.tip);
-			return BigDecimal.valueOf(tag);
+			return new TipData(BigDecimal.valueOf(tag), tag, TipData.TYPE_PERCENT);
 		}
 	}
 
@@ -997,8 +1099,8 @@ public class OrderFragment extends Fragment {
 			updateTipsButtonState(tipsButton);
 		}
 		updateTipsButtonState(otherTips);
-		final BigDecimal selectedTips = getSelectedTips(resultAmount);
-		updatePayButton(resultAmount.add(selectedTips));
+		final TipData selectedTips = getSelectedTips(resultAmount);
+		updatePayButton(resultAmount.add(selectedTips.getAmount()));
 	}
 
 	private void updateTipsButtonState(final CompoundButton tipsButton) {

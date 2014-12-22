@@ -32,6 +32,7 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.mixpanel.model.SimpleMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.cards.Card;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
@@ -73,6 +74,8 @@ public class CardsActivity extends BaseOmnomActivity {
 	private static final int REQUEST_CODE_CARD_ADD = 101;
 
 	private static final int REQUEST_PAYMENT = 102;
+
+	public static final String EVENT_CARD_DELETED = "card_deleted";
 
 	public class DemoCard extends Card {
 		@Override
@@ -282,6 +285,7 @@ public class CardsActivity extends BaseOmnomActivity {
 		UserData userData = UserData.create(OmnomApplication.get(getActivity()).getUserProfile().getUser());
 		String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
 		final CardInfo cardInfo = CardInfo.create(getActivity(), card.getExternalCardId(), cvv);
+		reportMixPanel();
 		mDeleteCardSubscription = AndroidObservable.bindActivity(this, mAcquiring.deleteCard(acquiringData, userData, cardInfo))
 		                                           .flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
 				                                           Observable<CardDeleteResponse>>() {
@@ -319,6 +323,10 @@ public class CardsActivity extends BaseOmnomActivity {
 				});
 	}
 
+	private void reportMixPanel() {
+		getMixPanelHelper().track(new SimpleMixpanelEvent(EVENT_CARD_DELETED));
+	}
+
 	private void onRemoveSuccess(final Card card) {
 		final CardsAdapter adapter = (CardsAdapter) mList.getAdapter();
 		adapter.remove(card);
@@ -339,9 +347,10 @@ public class CardsActivity extends BaseOmnomActivity {
 	private void cardRemovalError(String message) {
 		Log.w(TAG, message);
 		if(message != null) {
-			Toast.makeText(this, "Unable to remove card: " + message, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, getString(R.string.unable_to_remove_card_number_try_againt_later, message),
+			               Toast.LENGTH_LONG).show();
 		} else {
-			Toast.makeText(this, "Unable to remove card", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, getString(R.string.unable_to_remove_card), Toast.LENGTH_LONG).show();
 		}
 	}
 

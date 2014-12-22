@@ -27,6 +27,7 @@ import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
+import com.omnom.android.mixpanel.model.PaymentSuccessMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
@@ -136,6 +137,8 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	@Nullable
 	private PaymentSocketEvent mPaymentEvent;
 
+	private int mBillId;
+
 	@Override
 	public void initUi() {
 		mPaymentListener = new SilentPaymentEventListener(this, this);
@@ -242,6 +245,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, double amount,
 	                 int tip) {
 		final ExtraData extra = MailRuExtra.create(tip, billData.getMailRestaurantId());
+		mBillId = billData.getId();
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
 		mPaySubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().pay(acquiringData, paymentInfo))
@@ -292,6 +296,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private void onPayOk(AcquiringPollingResponse response) {
 		Log.d(TAG, "status = " + response.getStatus());
+		reportMixPanel();
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override
@@ -304,6 +309,10 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 			}
 		});
+	}
+
+	private void reportMixPanel() {
+		getMixPanelHelper().track(new PaymentSuccessMixpanelEvent(mDetails, mBillId));
 	}
 
 	private void onPayError() {
