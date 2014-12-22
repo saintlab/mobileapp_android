@@ -206,7 +206,7 @@ public class BackgroundBleService extends Service {
 			}
 
 			if (filteredBeacons.size() == 1) {
-				if (AndroidUtils.hasConnection(this)) {
+				if (!AndroidUtils.hasConnection(this)) {
 					showNotification(beacon, null);
 				} else {
 					final TableDataResponse[] table = new TableDataResponse[1];
