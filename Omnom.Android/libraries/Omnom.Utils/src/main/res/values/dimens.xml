@@ -32,7 +32,7 @@
 
     <dimen name="bind_button_bind_margin_bottom">156dp</dimen>
 
-    <dimen name="loader_size">230dp</dimen>
+    <dimen name="loader_size">190dp</dimen>
     <dimen name="loader_size_huge">1500dp</dimen>
     <dimen name="loader_edit_with">200dp</dimen>
     <dimen name="loader_margin_top">-96dp</dimen>

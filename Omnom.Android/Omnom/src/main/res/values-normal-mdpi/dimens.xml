@@ -2,7 +2,7 @@
 <resources>
     <dimen name="order_items_list_height_collapsed">140dp</dimen>
 
-    <dimen name="loader_size">200dp</dimen>
+    <dimen name="loader_size">190dp</dimen>
     <dimen name="loader_size_huge">1500dp</dimen>
     <dimen name="loader_edit_with">140dp</dimen>
     <dimen name="loader_margin_top">-82dp</dimen>
