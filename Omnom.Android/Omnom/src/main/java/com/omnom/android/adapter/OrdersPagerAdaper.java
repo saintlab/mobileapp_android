@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Ch3D on 10.10.2014.
  */
 public class OrdersPagerAdaper extends FragmentPagerAdapter {
-	private final List<Order> mOrders;
+	private List<Order> mOrders;
 
 	private int mBgColor;
 
@@ -63,6 +63,10 @@ public class OrdersPagerAdaper extends FragmentPagerAdapter {
 			mLastAnimated = position;
 		}
 		return fragment;
+	}
+
+	public void updateOrders(final List<Order> orders) {
+		mOrders = orders;
 	}
 
 	@Override

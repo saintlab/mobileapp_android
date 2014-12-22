@@ -7,9 +7,14 @@ import java.math.BigDecimal;
  */
 public class AmountHelper {
 	public static final int PERCENTAGE = 100;
+	public static final BigDecimal PERCENTAGE_BIG = BigDecimal.valueOf(100);
 
 	public static int toInt(final double value) {
 		return (int) (value * PERCENTAGE);
+	}
+
+	public static int toInt(final BigDecimal value) {
+		return value.multiply(PERCENTAGE_BIG).intValue();
 	}
 
 	public static double toDouble(final int value) {
@@ -18,6 +23,10 @@ public class AmountHelper {
 
 	public static double toDouble(final BigDecimal value) {
 		return value.doubleValue() / PERCENTAGE;
+	}
+
+	public static BigDecimal toBigDecimal(final int value) {
+		return BigDecimal.valueOf(value).divide(PERCENTAGE_BIG);
 	}
 
 	public static String format(final BigDecimal value) {

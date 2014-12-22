@@ -45,6 +45,7 @@ public class PaymentEventListener {
 			mTableSocket = OmnomSocketFactory.initTable(mActivity.getActivity(), tableId);
 			mTableSocket.connect();
 			mTableSocket.subscribe(this);
+			mTableSocket.subscribe(mActivity);
 		} catch(URISyntaxException e) {
 			Log.e(TAG, "Unable to initiate socket connection");
 		}
@@ -55,6 +56,7 @@ public class PaymentEventListener {
 			mTableSocket = OmnomSocketFactory.init(mActivity.getActivity(), table);
 			mTableSocket.connect();
 			mTableSocket.subscribe(this);
+			mTableSocket.subscribe(mActivity);
 		} catch(URISyntaxException e) {
 			Log.e(TAG, "Unable to initiate socket connection");
 		}
@@ -63,6 +65,7 @@ public class PaymentEventListener {
 	public void onPause() {
 		if(mTableSocket != null) {
 			mTableSocket.unsubscribe(this);
+			mTableSocket.unsubscribe(mActivity);
 			mTableSocket.disconnect();
 			mTableSocket.destroy();
 			mTableSocket = null;
