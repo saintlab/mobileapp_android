@@ -223,7 +223,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	}
 
 	private void reportMixPanel() {
-		OmnomApplication.getMixPanelHelper(this).track(new CardAddedMixpanelEvent(mScanUsed, mCheckSaveCard.isChecked()));
+		OmnomApplication.getMixPanelHelper(this).track(new CardAddedMixpanelEvent(getUserData(), mScanUsed, mCheckSaveCard.isChecked()));
 	}
 
 	private void doPay() {

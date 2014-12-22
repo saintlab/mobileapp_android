@@ -55,6 +55,7 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
+import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -723,7 +724,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void sendBillViewEvent(String requestId, UserData user, Order order) {
-		MixpanelEvent billViewEvent = new BillViewMixpanelEvent(requestId, order, user);
+		MixpanelEvent billViewEvent = new BillViewMixpanelEvent(UserHelper.getUserData(getActivity()), requestId, order, user);
 		OmnomApplication.getMixPanelHelper(getActivity()).track(billViewEvent);
 	}
 

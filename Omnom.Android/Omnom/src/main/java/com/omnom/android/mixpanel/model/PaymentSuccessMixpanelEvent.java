@@ -1,11 +1,12 @@
 package com.omnom.android.mixpanel.model;
 
+import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
 
 /**
  * Created by Ch3D on 22.12.2014.
  */
-public class PaymentSuccessMixpanelEvent implements MixpanelEvent {
+public class PaymentSuccessMixpanelEvent extends BaseMixpanelEvent {
 
 	public static final String EVENT_TITLE = "payment_success";
 
@@ -27,7 +28,8 @@ public class PaymentSuccessMixpanelEvent implements MixpanelEvent {
 
 	private final int billId;
 
-	public PaymentSuccessMixpanelEvent(final OrderFragment.PaymentDetails details, final int billId) {
+	public PaymentSuccessMixpanelEvent(UserData userData, final OrderFragment.PaymentDetails details, final int billId) {
+		super(userData);
 		this.billId = billId;
 		orderId = details.getOrderId();
 		tableId = details.getTableId();

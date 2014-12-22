@@ -205,7 +205,8 @@ public class ValidateActivityBle extends ValidateActivity {
 	}
 
 	private void reportMixPanel(final TableDataResponse tableDataResponse) {
-		getMixPanelHelper().track(OnTableMixpanelEvent.createEventBluetooth(tableDataResponse.getRestaurantId(), tableDataResponse.getId()));
+		getMixPanelHelper().track(OnTableMixpanelEvent.createEventBluetooth(getUserData(), tableDataResponse.getRestaurantId(),
+		                                                                     tableDataResponse.getId()));
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)

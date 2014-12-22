@@ -7,7 +7,7 @@ import com.omnom.android.auth.UserData;
 /**
  * Created by xCh3Dx on 20.12.2014.
  */
-public class UserRegisteredMixpanelEvent implements MixpanelEvent {
+public class UserRegisteredMixpanelEvent extends BaseMixpanelEvent {
 
 	public static final String EVENT_NAME = "user_registered";
 
@@ -24,8 +24,9 @@ public class UserRegisteredMixpanelEvent implements MixpanelEvent {
 	public final String email;
 
 	public UserRegisteredMixpanelEvent(UserData user) {
-		if (BuildConfig.DEBUG) {
-			if (user == null) {
+		super(user);
+		if(BuildConfig.DEBUG) {
+			if(user == null) {
 				throw new RuntimeException("User cannot be null!");
 			}
 		}

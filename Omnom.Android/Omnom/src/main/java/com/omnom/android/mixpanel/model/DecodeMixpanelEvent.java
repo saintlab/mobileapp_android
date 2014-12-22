@@ -1,11 +1,12 @@
 package com.omnom.android.mixpanel.model;
 
 import com.google.gson.annotations.Expose;
+import com.omnom.android.auth.UserData;
 
 /**
  * Created by Ch3D on 22.12.2014.
  */
-public abstract class DecodeMixpanelEvent implements MixpanelEvent {
+public abstract class DecodeMixpanelEvent extends BaseMixpanelEvent {
 	public static final String METHODE_BLUETOOTH = "bluetooth";
 
 	public static final String METHODE_QR = "qr";
@@ -17,11 +18,12 @@ public abstract class DecodeMixpanelEvent implements MixpanelEvent {
 	protected final String tableId;
 
 	@Expose
-	protected final String methode;
+	protected final String method;
 
-	public DecodeMixpanelEvent(String tableId, String restaurantName, String methode) {
+	public DecodeMixpanelEvent(UserData userData, String tableId, String restaurantName, String method) {
+		super(userData);
 		this.tableId = tableId;
-		this.methode = methode;
+		this.method = method;
 		this.restaurantName = restaurantName;
 	}
 
@@ -33,7 +35,7 @@ public abstract class DecodeMixpanelEvent implements MixpanelEvent {
 		return tableId;
 	}
 
-	public String getMethode() {
-		return methode;
+	public String getMethod() {
+		return method;
 	}
 }

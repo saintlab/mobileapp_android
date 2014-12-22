@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.mixpanel.model.SimpleMixpanelEvent;
 import com.omnom.android.utils.ErrorHelper;
+import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.loader.LoaderView;
 
@@ -38,6 +39,8 @@ public class OmnomErrorHelper extends ErrorHelper {
 	}
 
 	private void reportMixPanel(final LoaderError error) {
-		OmnomApplication.getMixPanelHelper(mLoader.getContext()).track(new SimpleMixpanelEvent(error.getEventName()));
+		OmnomApplication.getMixPanelHelper(mLoader.getContext())
+		                .track(
+				                new SimpleMixpanelEvent(UserHelper.getUserData(mLoader.getContext()), error.getEventName()));
 	}
 }

@@ -312,7 +312,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	}
 
 	private void reportMixPanel() {
-		getMixPanelHelper().track(new PaymentSuccessMixpanelEvent(mDetails, mBillId));
+		getMixPanelHelper().track(new PaymentSuccessMixpanelEvent(getUserData(), mDetails, mBillId));
 	}
 
 	private void onPayError() {

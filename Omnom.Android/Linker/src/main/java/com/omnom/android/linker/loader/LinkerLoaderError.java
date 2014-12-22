@@ -2,6 +2,7 @@ package com.omnom.android.linker.loader;
 
 import com.omnom.android.linker.R;
 import com.omnom.android.utils.loader.LoaderError;
+import com.omnom.android.utils.utils.StringUtils;
 
 /**
  * Created by Ch3D on 16.10.2014.
@@ -15,6 +16,6 @@ public class LinkerLoaderError extends LoaderError {
 			                      R.drawable.ic_repeat_small);
 
 	public LinkerLoaderError(int drawableResId, int errResId, int btnResId, int btnDrawableId) {
-		super(drawableResId, errResId, btnResId, btnDrawableId);
+		super(StringUtils.EMPTY_STRING, drawableResId, errResId, btnResId, btnDrawableId);
 	}
 }

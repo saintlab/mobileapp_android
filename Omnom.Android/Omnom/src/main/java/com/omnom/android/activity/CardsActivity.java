@@ -67,6 +67,8 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	public static final int RESULT_PAY = 10;
 
+	public static final String EVENT_CARD_DELETED = "card_deleted";
+
 	private static final String TAG = CardsActivity.class.getSimpleName();
 
 	private static final int REQUEST_CODE_CARD_CONFIRM = 100;
@@ -74,8 +76,6 @@ public class CardsActivity extends BaseOmnomActivity {
 	private static final int REQUEST_CODE_CARD_ADD = 101;
 
 	private static final int REQUEST_PAYMENT = 102;
-
-	public static final String EVENT_CARD_DELETED = "card_deleted";
 
 	public class DemoCard extends Card {
 		@Override
@@ -324,7 +324,7 @@ public class CardsActivity extends BaseOmnomActivity {
 	}
 
 	private void reportMixPanel() {
-		getMixPanelHelper().track(new SimpleMixpanelEvent(EVENT_CARD_DELETED));
+		getMixPanelHelper().track(new SimpleMixpanelEvent(getUserData(), EVENT_CARD_DELETED));
 	}
 
 	private void onRemoveSuccess(final Card card) {

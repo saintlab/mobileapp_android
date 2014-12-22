@@ -36,13 +36,13 @@ public class PreferenceHelper implements PreferenceProvider {
 	public void saveBeacon(final Context context, final Beacon beacon) {
 		long timestamp = SystemClock.elapsedRealtime();
 		context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).edit().putLong(beacon.getRestaurantData(), timestamp)
-				.putLong(beacon.getBluetoothAddress(), timestamp).apply();
+		       .putLong(beacon.getBluetoothAddress(), timestamp).apply();
 	}
 
 	public void saveRestaurantBeacon(final Context context, final Beacon beacon) {
 		long timestamp = SystemClock.elapsedRealtime();
 		context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).edit().putLong(beacon.getRestaurantData(), timestamp)
-				.apply();
+		       .apply();
 	}
 
 	public boolean hasBeacon(final Context context, final Beacon beacon) {
@@ -107,6 +107,7 @@ public class PreferenceHelper implements PreferenceProvider {
 
 	@Override
 	public boolean contains(Context context, String key) {
-		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).contains(key);
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).contains(key)
+				|| context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).contains(key);
 	}
 }

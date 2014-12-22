@@ -456,6 +456,10 @@ public class Beacon implements Parcelable {
 		return getIdentifier(0) + "+" + getIdentifier(1);
 	}
 
+	public String getEncodeString() {
+		return getIdentifier(0) + "+" + getIdentifier(1) + "+" + getIdentifier(2);
+	}
+
 	/**
 	 * Builder class for Beacon objects. Provides a convenient way to set the various fields of a
 	 * Beacon

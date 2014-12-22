@@ -9,35 +9,38 @@ import com.omnom.android.utils.utils.AmountHelper;
 /**
  * Created by mvpotter on 21/11/14.
  */
-public final class BillViewMixpanelEvent implements MixpanelEvent {
+public final class BillViewMixpanelEvent extends BaseMixpanelEvent {
 
 	@Expose
 	private String requestId;
-	@Expose
-	@SerializedName("omn_user")
-	private UserData user;
+
 	@Expose
 	private int amount;
+
 	@Expose
 	@SerializedName("paid_amount")
 	private int paidAmount;
+
 	@Expose
 	@SerializedName("paid_tip_amount")
 	private int paidTipAmount;
+
 	@Expose
 	@SerializedName("order_id")
 	private String orderId;
+
 	@Expose
 	@SerializedName("restaurant_id")
 	private String restaurantId;
+
 	@Expose
 	@SerializedName("table_id")
 	private String tableId;
 
-	public BillViewMixpanelEvent(final String requestId, final Order order, final UserData user) {
+	public BillViewMixpanelEvent(UserData userData, final String requestId, final Order order, final UserData user) {
+		super(userData);
 		this.requestId = requestId;
-		this.user = user;
-		if (order != null) {
+		if(order != null) {
 			this.amount = AmountHelper.toInt(order.getTotalAmount());
 			this.paidAmount = AmountHelper.toInt(order.getPaidAmount());
 			this.paidTipAmount = AmountHelper.toInt(order.getPaidTip());
@@ -54,10 +57,6 @@ public final class BillViewMixpanelEvent implements MixpanelEvent {
 
 	public String getRequestId() {
 		return requestId;
-	}
-
-	public UserData getUser() {
-		return user;
 	}
 
 	public int getAmount() {
