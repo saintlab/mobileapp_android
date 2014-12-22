@@ -317,7 +317,6 @@ public class OmnomListView extends ListView {
 				}
 
 				if (mIsBeingDragged) {
-					System.err.println("yDiff = " + yDiff + " mDistanceToTriggerSync = " + mDistanceToTriggerSync);
 					if (yDiff > mDistanceToTriggerSync || mCurrentTargetOffsetTop > mMaxTopOffset) {
 						startRefresh();
 					} else {
