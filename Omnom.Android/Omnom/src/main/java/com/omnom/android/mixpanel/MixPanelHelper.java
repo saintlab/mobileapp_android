@@ -6,13 +6,16 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
+import com.omnom.android.restaurateur.model.bill.BillResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -73,5 +76,26 @@ public class MixPanelHelper {
 		} catch(JSONException e) {
 			Log.e(TAG, "track", e);
 		}
+	}
+
+	public void trackRevenue(final String userId, final OrderFragment.PaymentDetails details, final BillResponse billData) {
+		mMixpanelApi.getPeople().identify(userId);
+		final int tipValue = details.getTipValue();
+		final double totalAmount = details.getAmount();
+
+		Map<String, Number> userPayemtn = new HashMap<String, Number>();
+		userPayemtn.put("bill_sum", totalAmount - tipValue);
+		userPayemtn.put("tips_sum", tipValue);
+		userPayemtn.put("total_sum", totalAmount);
+		userPayemtn.put("number_of_payments", 1);
+		mMixpanelApi.getPeople().increment(userPayemtn);
+
+		JSONObject json = new JSONObject();
+		try {
+			json.put(KEY_TIMESTAMP, new SimpleDateFormat(DATE_FORMAT).format(new Date()));
+		} catch(JSONException e) {
+			Log.e(TAG, "trackRevenue", e);
+		}
+		mMixpanelApi.getPeople().trackCharge(totalAmount, json);
 	}
 }

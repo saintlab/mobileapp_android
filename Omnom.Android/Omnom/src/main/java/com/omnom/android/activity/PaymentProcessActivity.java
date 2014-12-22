@@ -139,6 +139,8 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private int mBillId;
 
+	private BillResponse mBillData;
+
 	@Override
 	public void initUi() {
 		mPaymentListener = new SilentPaymentEventListener(this, this);
@@ -245,6 +247,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, double amount,
 	                 int tip) {
 		final ExtraData extra = MailRuExtra.create(tip, billData.getMailRestaurantId());
+		mBillData = billData;
 		mBillId = billData.getId();
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
@@ -313,6 +316,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private void reportMixPanel() {
 		getMixPanelHelper().track(new PaymentSuccessMixpanelEvent(getUserData(), mDetails, mBillId));
+		getMixPanelHelper().trackRevenue(String.valueOf(getUserData().getId()), mDetails, mBillData);
 	}
 
 	private void onPayError() {
