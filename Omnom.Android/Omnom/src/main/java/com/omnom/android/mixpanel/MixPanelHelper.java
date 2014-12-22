@@ -81,7 +81,7 @@ public class MixPanelHelper {
 	public void trackRevenue(final String userId, final OrderFragment.PaymentDetails details, final BillResponse billData) {
 		mMixpanelApi.getPeople().identify(userId);
 		final int tipValue = details.getTipValue();
-		final double totalAmount = details.getAmount();
+		final double totalAmount = details.getAmount() * 100;
 
 		Map<String, Number> userPayemtn = new HashMap<String, Number>();
 		userPayemtn.put("bill_sum", totalAmount - tipValue);
