@@ -109,7 +109,6 @@ public class BackgroundBleService extends Service {
 	}
 
 	@Override
-	@DebugLog
 	public int onStartCommand(final Intent intent, final int flags, final int startId) {
 		this.mStartId = startId;
 		return START_REDELIVER_INTENT;
@@ -127,7 +126,6 @@ public class BackgroundBleService extends Service {
 	}
 
 	@TargetApi(JELLY_BEAN_MR2)
-	@DebugLog
 	private void scanBeacons() {
 		mHandler = new Handler();
 		mParser = new BeaconParser();
@@ -197,6 +195,10 @@ public class BackgroundBleService extends Service {
 		}
 		if(omnBeacons.size() > 0) {
 			final List<Beacon> filteredBeacons = filter.filterBeacons(omnBeacons);
+			if(filteredBeacons.isEmpty()) {
+				// fail if there is no beacons in a range
+				return;
+			}
 			final Beacon beacon = filteredBeacons.get(0);
 			if(isHandled(beacon)) {
 				// fail fast if beacon already handled
@@ -281,7 +283,6 @@ public class BackgroundBleService extends Service {
 	 * @return <code>true</code> if beacon is already handled.
 	 * This means that notification for this beacon already shown.
 	 */
-	@DebugLog
 	private boolean isHandled(final Beacon beacon) {
 		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
 		final boolean contains = preferences.hasBeacon(this, beacon);
@@ -293,7 +294,6 @@ public class BackgroundBleService extends Service {
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-	@DebugLog
 	private void showNotification(final Beacon beacon, @Nullable final Restaurant restaurant) {
 		final String content = restaurant != null ? getString(R.string.welcome_to_, restaurant.getTitle()) : getString(
 				R.string.omnom_works_here);
@@ -314,7 +314,6 @@ public class BackgroundBleService extends Service {
 		return PendingIntent.getActivity(this, 0, intent, 0);
 	}
 
-	@DebugLog
 	private void scheduleNextAlarm() {
 		if(Build.VERSION.SDK_INT == KITKAT) {
 			scheduleNextAlarmKK();
@@ -324,20 +323,17 @@ public class BackgroundBleService extends Service {
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-	@DebugLog
 	private void scheduleAlarmJB() {
 		((AlarmManager) getSystemService(ALARM_SERVICE)).set(AlarmManager.ELAPSED_REALTIME_WAKEUP, getTriggetAt(), getPendingIntent());
 	}
 
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	@DebugLog
 	private void scheduleNextAlarmKK() {
 		((AlarmManager) getSystemService(ALARM_SERVICE)).setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, getTriggetAt(),
 		                                                          getPendingIntent());
 	}
 
 	@TargetApi(JELLY_BEAN_MR2)
-	@DebugLog
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
 		if(enable) {
 			mHandler.postDelayed(new Runnable() {
@@ -361,13 +357,11 @@ public class BackgroundBleService extends Service {
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-	@DebugLog
 	private void stopScan(final Runnable endCallback) {
 		mBluetoothAdapter.stopLeScan(mLeScanCallback);
 		runCallback(endCallback);
 	}
 
-	@DebugLog
 	private void runCallback(final Runnable endCallback) {
 		if(endCallback != null) {
 			endCallback.run();
