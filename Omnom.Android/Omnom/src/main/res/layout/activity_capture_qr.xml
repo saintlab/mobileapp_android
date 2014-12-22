@@ -22,41 +22,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:id="@+id/panel_bottom"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/view_size_default"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="bottom"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:background="@color/white_transparent">
-
-            <LinearLayout
-                android:id="@+id/btn_demo"
-                android:text="@string/demo_mode"
-                android:layout_width="wrap_content"
-                android:gravity="center"
-                style="@style/Button.Bottom"
-                android:layout_alignParentRight="true">
-
-                <TextView
-                    android:text="@string/demo_mode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="@dimen/drawable_padding_default"
-                    android:gravity="center"
-                    android:drawableLeft="@drawable/ic_demo"
-                    android:textAppearance="?android:textAppearanceLarge"/>
-
-            </LinearLayout>
-
-        </RelativeLayout>
-
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/panel_bottom">
+            android:layout_height="match_parent">
 
             <SurfaceView
                 android:id="@+id/preview_view"
@@ -291,6 +259,37 @@
             </LinearLayout>
 
         </FrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/panel_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/view_size_default"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:background="@color/white_transparent">
+
+            <LinearLayout
+                android:id="@+id/btn_demo"
+                android:text="@string/demo_mode"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                style="@style/Button.Bottom"
+                android:layout_alignParentRight="true">
+
+                <TextView
+                    android:text="@string/demo_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="@dimen/drawable_padding_default"
+                    android:gravity="center"
+                    android:drawableLeft="@drawable/ic_demo"
+                    android:textAppearance="?android:textAppearanceLarge" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
 
     </RelativeLayout>
 

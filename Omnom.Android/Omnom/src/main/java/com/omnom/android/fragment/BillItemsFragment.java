@@ -17,8 +17,8 @@ import com.omnom.android.adapter.OrderItemsAdapter;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
-import com.omnom.android.utils.utils.StringUtils;
 import com.squareup.otto.Bus;
 
 import java.math.BigDecimal;
@@ -124,7 +124,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 		if(amount.compareTo(BigDecimal.ZERO) > 0) {
 			btnCommit.setTag(R.id.edit_amount, amount);
 			btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_ITEMS);
-			final String text = getString(R.string.bill_split_amount_, StringUtils.formatCurrency(amount));
+			final String text = getString(R.string.bill_split_amount_, AmountHelper.format(amount));
 			AnimationUtils.animateAlpha(viewBehindBtn, true);
 			AnimationUtils.animateAlpha(btnCommit, true, new Runnable() {
 				@Override

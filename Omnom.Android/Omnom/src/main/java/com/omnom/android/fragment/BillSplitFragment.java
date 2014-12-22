@@ -49,15 +49,23 @@ public class BillSplitFragment extends Fragment {
 
 	public static final int SPLIT_TYPE_ITEMS = 2;
 
+	private static final String ARG_TYPE = "type";
+
 	private static final String ARG_ORDER = "order";
 
 	private static final String ARG_STATES = "states";
 
-	public static BillSplitFragment newInstance(final Order order, final SparseBooleanArrayParcelable checkedStates) {
+	private static final String ARG_GUESTS = "guests";
+
+	public static BillSplitFragment newInstance(final int splitType, final Order order,
+	                                            final SparseBooleanArrayParcelable checkedStates,
+	                                            final int guestsCount) {
 		final BillSplitFragment fragment = new BillSplitFragment();
 		final Bundle args = new Bundle();
+		args.putInt(ARG_TYPE, splitType);
 		args.putParcelable(ARG_ORDER, order);
 		args.putParcelable(ARG_STATES, checkedStates);
+		args.putInt(ARG_GUESTS, guestsCount);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -77,11 +85,15 @@ public class BillSplitFragment extends Fragment {
 	@InjectView(R.id.panel_top)
 	protected HeaderView mHeader;
 
+	private int mType;
+
 	private Order mOrder;
 
 	private View mFragmentView;
 
 	private SparseBooleanArrayParcelable mStates;
+
+	private int mGuestsCount;
 
 	private int mListHeight;
 
@@ -139,8 +151,10 @@ public class BillSplitFragment extends Fragment {
 			public void onClick(final View v) {
 				final BigDecimal tag = (BigDecimal) mBtnCommit.getTag(R.id.edit_amount);
 				final int tagSplitType = (Integer) mBtnCommit.getTag(R.id.split_type);
+				final Object guestsCountTag = mBtnCommit.getTag(R.id.picker);
+				final int guestsCount = guestsCountTag == null ? 1 : (Integer) guestsCountTag;
 				if(tag != null) {
-					mBus.post(new OrderSplitCommitEvent(mOrder.getId(), mStates, tag, tagSplitType));
+					mBus.post(new OrderSplitCommitEvent(mOrder.getId(), guestsCount, mStates, tag, tagSplitType));
 					hide();
 				}
 			}
@@ -158,7 +172,7 @@ public class BillSplitFragment extends Fragment {
 			}
 		});
 
-		final BillSplitPagerAdapter adapter = new BillSplitPagerAdapter(getChildFragmentManager(), mOrder, mStates);
+		final BillSplitPagerAdapter adapter = new BillSplitPagerAdapter(getChildFragmentManager(), mOrder, mStates, mGuestsCount);
 		mPager.setAdapter(adapter);
 		mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
@@ -188,6 +202,7 @@ public class BillSplitFragment extends Fragment {
 				}
 			}
 		});
+		mPager.setCurrentItem(2 - mType);
 	}
 
 	// Dirty hack to reset PagerTabStrip spacing as titles went out screen border on mdpi devices.
@@ -234,8 +249,10 @@ public class BillSplitFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if(getArguments() != null) {
+			mType = getArguments().getInt(ARG_TYPE, SPLIT_TYPE_ITEMS);
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mStates = getArguments().getParcelable(ARG_STATES);
+			mGuestsCount = getArguments().getInt(ARG_GUESTS, 1);
 		}
 	}
 }

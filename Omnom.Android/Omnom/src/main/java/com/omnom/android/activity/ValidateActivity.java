@@ -1,5 +1,9 @@
 package com.omnom.android.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -22,6 +26,8 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.mixpanel.OmnomErrorHelper;
+import com.omnom.android.mixpanel.model.UserRegisteredMixpanelEvent;
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
@@ -35,10 +41,9 @@ import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.socket.listener.PaymentEventListener;
-import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
-import com.omnom.android.utils.drawable.TransitionDrawable;
+import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -89,36 +94,57 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				if(cause.getResponse() != null) {
 					// TODO: Refactor this ugly piece of ... code
 					if(cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
-						EnteringActivity.start(ValidateActivity.this);
+						EnteringActivity.start(ValidateActivity.this, true);
 						return;
 					}
 				}
 			}
 			if(throwable instanceof AuthServiceException) {
 				getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
-				EnteringActivity.start(ValidateActivity.this);
+				EnteringActivity.start(ValidateActivity.this, true);
 				return;
 			}
 			throwable.printStackTrace();
 			mErrorHelper.showBackendError(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					validate();
+					clearErrors(true);
+					startLoader();
 				}
 			});
 		}
 	};
 
-	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo) {
-		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
-		final Intent intent = new Intent(context, hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
+	public static void startDemo(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
+		start(context, enterAnim, exitAnim, animationType, true, -1);
+	}
+
+	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, int userEnterType) {
+		start(context, enterAnim, exitAnim, animationType, false, userEnterType);
+	}
+
+	private static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo,
+	                         final int userEnterType) {
+		Intent intent = createIntent(context, animationType, isDemo, userEnterType);
 		if(context instanceof ConfirmPhoneActivity) {
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		}
+		context.start(intent, enterAnim, exitAnim, !isDemo);
+	}
+
+	public static void start(BaseFragmentActivity context, int enterAnim, int exitAnim, int animationType, final int userEnterType) {
+		Intent intent = createIntent(context, animationType, false, userEnterType);
+		context.start(intent, enterAnim, exitAnim, true);
+	}
+
+	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
+		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
+		final Intent intent = new Intent(context, hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
-		context.start(intent, enterAnim, exitAnim, !isDemo);
+		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
+		return intent;
 	}
 
 	protected final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
@@ -174,7 +200,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@Inject
 	protected AuthService authenticator;
 
-	protected ErrorHelper mErrorHelper;
+	protected OmnomErrorHelper mErrorHelper;
 
 	protected Target mTarget;
 
@@ -187,6 +213,11 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected boolean mIsDemo = false;
 
 	protected Func1<Restaurant, Restaurant> mPreloadBackgroundFunction;
+
+	/**
+	 * ConfirmPhoneActivity.TYPE_LOGIN or ConfirmPhoneActivity.TYPE_REGISTER
+	 */
+	private int mType;
 
 	private int mAnimationType;
 
@@ -214,6 +245,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected void handleIntent(Intent intent) {
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 		mIsDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
+		mType = intent.getIntExtra(EXTRA_CONFIRM_TYPE, -1);
 	}
 
 	@Override
@@ -286,11 +318,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		mPaymentListener = new PaymentEventListener(this);
 		bgTransitionDrawable = new com.omnom.android.utils.drawable.TransitionDrawable(
 				getResources().getInteger(R.integer.default_animation_duration_short),
-				new Drawable[]{
-						new ColorDrawable(getResources().getColor(R.color.transparent)),
-						new ColorDrawable(getResources().getColor(R.color.error_bg_white_transparent))
-				}
-		);
+				new Drawable[]{new ColorDrawable(getResources().getColor(R.color.transparent)),
+						new ColorDrawable(getResources().getColor(R.color.error_bg_white_transparent))});
 
 		bgTransitionDrawable.setCrossFadeEnabled(true);
 		rootView.setBackgroundDrawable(bgTransitionDrawable);
@@ -299,27 +328,23 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			@Override
 			public void onClick(final View v) {
 				mErrorHelper.hideError();
-				ValidateActivity.start(ValidateActivity.this,
-				                       R.anim.fake_fade_in_instant,
-				                       R.anim.fake_fade_out_instant,
-				                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
+				ValidateActivity.startDemo(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
+				                           EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 			}
 		});
-		mErrorHelper = new ErrorHelper(loader, txtError, btnErrorRepeat, txtErrorRepeat, btnDemo, errorViews);
+		mErrorHelper = new OmnomErrorHelper(loader, txtError, btnErrorRepeat, txtErrorRepeat, btnDemo, errorViews);
 
-		mAcquiringConfigSubscribtion = AndroidObservable.bindActivity(this, api.getConfig())
-		                                                .subscribe(
-				                                                new Action1<Config>() {
-					                                                @Override
-					                                                public void call(Config config) {
-						                                                OmnomApplication.get(getActivity()).cacheConfig(config);
-					                                                }
-				                                                }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-					                                                @Override
-					                                                public void onError(Throwable throwable) {
-						                                                Log.w(TAG, "Unable to load config: " + throwable.getMessage());
-					                                                }
-				                                                });
+		mAcquiringConfigSubscribtion = AndroidObservable.bindActivity(this, api.getConfig()).subscribe(new Action1<Config>() {
+			@Override
+			public void call(Config config) {
+				OmnomApplication.get(getActivity()).cacheConfig(config);
+			}
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			@Override
+			public void onError(Throwable throwable) {
+				Log.w(TAG, "Unable to load config: " + throwable.getMessage());
+			}
+		});
 
 		mPreloadBackgroundFunction = new Func1<Restaurant, Restaurant>() {
 			@Override
@@ -340,17 +365,24 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			@Override
 			public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
 				final BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
-				final TransitionDrawable td = new TransitionDrawable(
-						1000,
-						new Drawable[]{
-								getResources().getDrawable(R.drawable.bg_wood),
-								drawable
-						}
-				);
-				td.setCrossFadeEnabled(true);
-				getWindow().getDecorView().setBackgroundDrawable(td);
-				// getActivity().findViewById(R.id.img_holder).setBackgroundDrawable(td);
-				td.startTransition();
+				drawable.setAlpha(0);
+				final View root = findViewById(R.id.root);
+				root.setBackgroundDrawable(drawable);
+				ValueAnimator va = ValueAnimator.ofInt(0, 255);
+				va.setDuration(1000);
+				va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+					@Override
+					public void onAnimationUpdate(ValueAnimator animation) {
+						drawable.setAlpha((Integer) animation.getAnimatedValue());
+					}
+				});
+				va.addListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationEnd(Animator animation) {
+						getWindow().getDecorView().setBackgroundDrawable(null);
+					}
+				});
+				va.start();
 			}
 
 			@Override
@@ -396,8 +428,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			}
 		});
 		ValidationObservable.validateSmart(this, mIsDemo)
-		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickBillListener))
-		                    .isEmpty()
+		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickBillListener)).isEmpty()
 		                    .subscribe(new Action1<Boolean>() {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
@@ -426,8 +457,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private void loadOrders(final View v) {
 		getPanelBottom().animate().translationY(0).start();
-		mOrdersSubscription = AndroidObservable.bindActivity(getActivity(), api.getOrders(mTable.getRestaurantId(),
-		                                                                                  mTable.getId()))
+		mOrdersSubscription = AndroidObservable.bindActivity(getActivity(), api.getOrders(mTable.getRestaurantId(), mTable.getId()))
 		                                       .subscribe(new Action1<OrdersResponse>() {
 			                                       @Override
 			                                       public void call(final OrdersResponse ordersResponse) {
@@ -490,8 +520,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					@Override
 					public void run() {
 						OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
-						                     mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS,
-						                     mIsDemo);
+						                     mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS, mIsDemo);
 						if(orders.size() == 1) {
 							overridePendingTransition(R.anim.slide_in_down_short, R.anim.nothing);
 						}
@@ -593,6 +622,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		mUserSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
 			@Override
 			public void call(UserResponse userResponse) {
+				reportMixPanel(userResponse);
 				app.cacheUserProfile(new UserProfile(userResponse));
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
@@ -614,14 +644,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				                                      Log.w(TAG, throwable.getMessage());
 			                                      }
 		                                      });
-		mAcquiringConfigSubscribtion = AndroidObservable.bindActivity(this, api.getConfig())
-		                                                .subscribe(
-				                                                new Action1<Config>() {
-					                                                @Override
-					                                                public void call(Config config) {
-						                                                OmnomApplication.get(getActivity()).cacheConfig(config);
-					                                                }
-				                                                }, onError);
 
 		loader.post(new Runnable() {
 			@Override
@@ -631,8 +653,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			}
 		});
 		loader.animateColor(RestaurantHelper.getBackgroundColor(restaurant));
-		OmnomApplication.getPicasso(this)
-		                .load(RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics()))
+		OmnomApplication.getPicasso(this).load(RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics()))
 		                .into(mTarget);
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
@@ -647,6 +668,22 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
 			}
 		});
+	}
+
+	/**
+	 * Report about user sign up or login
+	 */
+	private void reportMixPanel(UserResponse userResponse) {
+		final String id = String.valueOf(userResponse.getUser().getId());
+		switch(mType) {
+			case ConfirmPhoneActivity.TYPE_LOGIN:
+				getMixPanel().identify(id);
+				break;
+			case ConfirmPhoneActivity.TYPE_REGISTER:
+				getMixPanel().alias(id, null);
+				getMixPanelHelper().track(new UserRegisteredMixpanelEvent(userResponse.getUser()));
+				break;
+		}
 	}
 
 	private void configureScreen(final Restaurant restaurant) {
@@ -692,14 +729,13 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					public void run() {
 					}
 				});
-				api.getDemoTable().subscribe(
-						new Action1<List<DemoTableData>>() {
-							@Override
-							public void call(final List<DemoTableData> response) {
-								final DemoTableData data = response.get(0);
-								onDataLoaded(data.getRestaurant(), data.getTable());
-							}
-						}, onError);
+				api.getDemoTable().subscribe(new Action1<List<DemoTableData>>() {
+					@Override
+					public void call(final List<DemoTableData> response) {
+						final DemoTableData data = response.get(0);
+						onDataLoaded(data.getRestaurant(), data.getTable());
+					}
+				}, onError);
 				mFirstRun = false;
 			}
 			return true;

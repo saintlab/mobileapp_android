@@ -17,6 +17,7 @@ import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -89,10 +90,10 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@OnClick(R.id.btn_demo)
 	public void doDemo() {
-		ValidateActivity.start(this,
+		ValidateActivity.startDemo(this,
 		                       R.anim.fake_fade_in_instant,
 		                       R.anim.fake_fade_out_instant,
-		                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, true);
+		                       EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
 
 	@Override
@@ -131,7 +132,14 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	}
 
 	private void initList() {
-		list.addFooterView(LayoutInflater.from(getActivity()).inflate(R.layout.item_restaurants_footer, null));
+		View footer = LayoutInflater.from(getActivity()).inflate(R.layout.item_restaurants_footer, null);
+		footer.findViewById(R.id.txt_info).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				AndroidUtils.sendFeedbackEmail(getActivity(), R.string.email_subject_feedback);
+			}
+		});
+		list.addFooterView(footer);
 		list.setAdapter(mAdapter);
 		list.setOnItemClickListener(this);
 		list.setScrollEnabled(true);

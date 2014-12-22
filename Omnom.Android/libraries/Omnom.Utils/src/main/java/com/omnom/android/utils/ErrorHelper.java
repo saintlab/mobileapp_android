@@ -3,9 +3,10 @@ package com.omnom.android.utils;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.os.CountDownTimer;
+import android.text.Layout;
+import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.omnom.android.utils.loader.LoaderError;
@@ -22,9 +23,11 @@ import butterknife.ButterKnife;
  */
 public class ErrorHelper {
 
+	private static final int LINES_COUNT_TO_APPLY_LEFT_ALIGN = 3;
+
 	private TextView mTxtBottom;
 
-	private LoaderView mLoader;
+	protected LoaderView mLoader;
 
 	private TextView mTxtError;
 
@@ -34,27 +37,30 @@ public class ErrorHelper {
 
 	private List<View> mErrorViews;
 
-	public ErrorHelper(LoaderView loader, TextView txtError, Button btnBottom, List<View> errorViews, CountDownTimer timer) {
-		mLoader = loader;
-		mTxtError = txtError;
-		mBtnBottom = btnBottom;
-		mErrorViews = errorViews;
-	}
-
 	public ErrorHelper(LoaderView loader, TextView txtError, View btnBottom, List<View> errorViews) {
 		mLoader = loader;
 		mTxtError = txtError;
 		mBtnBottom = btnBottom;
 		mErrorViews = errorViews;
+		ViewTreeObserver vto = mTxtError.getViewTreeObserver();
+		vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				final Layout layout = mTxtError.getLayout();
+				if (layout != null) {
+					final int linesCount = layout.getLineCount();
+					if (linesCount > LINES_COUNT_TO_APPLY_LEFT_ALIGN) {
+						mTxtError.setGravity(Gravity.START);
+					}
+				}
+			}
+		});
 	}
 
 	public ErrorHelper(LoaderView loader, TextView txtError, View btnBottom, TextView txtBottom, View btnDemo, List<View> errorViews) {
-		mLoader = loader;
-		mTxtError = txtError;
-		mBtnBottom = btnBottom;
+		this(loader, txtError, btnBottom, errorViews);
 		mTxtBottom = txtBottom;
 		mBtnDemo = btnDemo;
-		mErrorViews = errorViews;
 	}
 
 	public void showError(final LoaderError error, View.OnClickListener onClickListener) {

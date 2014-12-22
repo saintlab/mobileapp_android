@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.omnom.android.restaurateur.model.order.PaymentData;
-import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.AmountHelper;
 
 import java.math.BigDecimal;
 
@@ -43,7 +43,7 @@ public class CroutonHelper {
 		final BigDecimal subtract = bd.divide(DIVIDER);
 		final String msg = activity.getString(com.omnom.android.R.string.balk_notification_user_paid_,
 		                                      name,
-		                                      StringUtils.formatCurrency(subtract));
+		                                      AmountHelper.format(subtract));
 		((TextView) view.findViewById(com.omnom.android.R.id.txt_message)).setText(msg);
 		view.findViewById(com.omnom.android.R.id.btn_close).setOnClickListener(closeListener);
 		crouton.setOnClickListener(closeListener);

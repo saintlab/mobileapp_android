@@ -15,13 +15,19 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.mixpanel.model.CardAddedMixpanelEvent;
 import com.omnom.android.utils.CardDataTextWatcher;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
 import com.omnom.android.utils.CardUtils;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEditText;
+import com.omnom.android.validator.Validator;
+import com.omnom.android.validator.card.CvvValidator;
+import com.omnom.android.validator.card.ExpirationDateValidator;
+import com.omnom.android.validator.card.PanValidator;
 import com.omnom.android.view.HeaderView;
 
 import butterknife.InjectView;
@@ -36,7 +42,29 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	private static final int REQUEST_CODE_CARD_REGISTER = 102;
 
-	private double mAmount;
+	private class OnFocusChangeListener implements View.OnFocusChangeListener {
+
+		private final Validator validator;
+
+		private OnFocusChangeListener(final Validator validator) {
+			this.validator = validator;
+		}
+
+		@Override
+		public void onFocusChange(View v, boolean hasFocus) {
+			ErrorEditText editText = (ErrorEditText) v;
+			if(!hasFocus) {
+				String value = editText.getText().toString();
+				if(validator.validate(value)) {
+					editText.setError(false);
+				} else {
+					editText.setError(true);
+				}
+			} else {
+				editText.setError(false);
+			}
+		}
+	}
 
 	@SuppressLint("NewApi")
 	public static void start(Activity activity, double amount, int code) {
@@ -79,6 +107,8 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	@InjectView(R.id.txt_camera)
 	protected TextView mTextCamera;
 
+	private double mAmount;
+
 	private boolean mMinimized = false;
 
 	private int panelY;
@@ -88,6 +118,25 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	private int cameraX;
 
 	private int panelX;
+
+	/**
+	 * Used for mixpanel analytics
+	 */
+	private boolean mScanUsed = false;
+
+	private Validator panValidator;
+
+	private Validator expDateValidator;
+
+	private Validator cvvValidator;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		panValidator = new PanValidator();
+		expDateValidator = new ExpirationDateValidator();
+		cvvValidator = new CvvValidator();
+	}
 
 	@Override
 	public void initUi() {
@@ -100,10 +149,14 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 			}
 		});
 
-		if (mAmount == 0) {
-			mCheckSaveCard.setEnabled(false);
+		if(mAmount == 0) {
+			ViewUtils.setVisible(mCheckSaveCard, false);
 		}
 
+		setUpCardEditFields();
+	}
+
+	private void setUpCardEditFields() {
 		mEditCardExpDate.addTextChangedListener(new CardExpirationTextWatcher(mEditCardExpDate, this));
 		mEditCardNumber.addTextChangedListener(new CardNumberTextWatcher(mEditCardNumber, this));
 		mEditCardCvv.addTextChangedListener(new CardDataTextWatcher(mEditCardCvv) {
@@ -125,12 +178,20 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 				CardAddActivity.this.onTextChanged(s.toString());
 			}
 		});
+
+		mEditCardNumber.setOnFocusChangeListener(new OnFocusChangeListener(panValidator));
+		mEditCardExpDate.setOnFocusChangeListener(new OnFocusChangeListener(expDateValidator));
+		mEditCardCvv.setOnFocusChangeListener(new OnFocusChangeListener(cvvValidator));
+
+		mEditCardNumber.setError(false);
+		mEditCardExpDate.setError(false);
+		mEditCardCvv.setError(false);
 	}
 
 	@Override
 	public void onTextChanged(final CharSequence s) {
 		animteCamera(mEditCardCvv.length() > 0 || mEditCardExpDate.length() > 0 || mEditCardNumber.length() > 0);
-		mPanelTop.setButtonRightEnabled(validate(false));
+		mPanelTop.setButtonRightEnabled(validate());
 	}
 
 	private void animteCamera(final boolean minimize) {
@@ -178,15 +239,16 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_CARD_REGISTER) {
-			if (resultCode == CardsActivity.RESULT_PAY) {
+			if(resultCode == CardsActivity.RESULT_PAY) {
 				doPay();
-			} else if (resultCode == RESULT_OK) {
+			} else if(resultCode == RESULT_OK) {
 				setResult(RESULT_OK);
 				finish();
 			}
 		}
 		if(requestCode == REQUEST_CODE_CARD_IO) {
 			if(data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
+				mScanUsed = true;
 				final CreditCard scanResult = data.getParcelableExtra(CardIOActivity.EXTRA_SCAN_RESULT);
 				postDelayed(350, new Runnable() {
 					@Override
@@ -208,14 +270,19 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	}
 
 	private void doBind() {
-		if(!validate(true)) {
+		if(!validate()) {
 			return;
 		}
 		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER, mAmount);
+		reportMixPanel();
+	}
+
+	private void reportMixPanel() {
+		OmnomApplication.getMixPanelHelper(this).track(new CardAddedMixpanelEvent(getUserData(), mScanUsed, mCheckSaveCard.isChecked()));
 	}
 
 	private void doPay() {
-		if(!validate(true)) {
+		if(!validate()) {
 			return;
 		}
 		Intent intent = new Intent();
@@ -225,31 +292,13 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 	}
 
-	private boolean validate(boolean showErrors) {
+	private boolean validate() {
 		final String pan = mEditCardNumber.getText().toString();
 		final String expDate = mEditCardExpDate.getText().toString();
 		final String cvv = mEditCardCvv.getText().toString();
-		boolean hasErrors = false;
-
-		if(pan.length() < 13) {
-			if(showErrors) {
-				mEditCardNumber.setError(true);
-			}
-			hasErrors |= true;
-		}
-		if(expDate.length() < 5) {
-			if(showErrors) {
-				mEditCardExpDate.setError(true);
-			}
-			hasErrors |= true;
-		}
-		if(cvv.length() < 3) {
-			if(showErrors) {
-				mEditCardCvv.setError(true);
-			}
-			hasErrors |= true;
-		}
-		return !hasErrors;
+		return panValidator.validate(pan) &&
+				expDateValidator.validate(expDate) &&
+				cvvValidator.validate(cvv);
 	}
 
 	@OnClick({R.id.img_camera, R.id.txt_camera})
@@ -267,7 +316,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	@OnCheckedChanged(R.id.check_save_card)
 	public void onCheckSaveCard(final boolean checked) {
-		if (checked) {
+		if(checked) {
 			bindMode();
 		} else {
 			payMode();
@@ -307,4 +356,5 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	protected void handleIntent(Intent intent) {
 		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);
 	}
+
 }

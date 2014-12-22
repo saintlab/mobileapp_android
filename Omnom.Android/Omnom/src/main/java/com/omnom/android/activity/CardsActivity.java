@@ -32,6 +32,7 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.mixpanel.model.SimpleMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.cards.Card;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
@@ -43,8 +44,8 @@ import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.preferences.PreferenceProvider;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
-import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.HeaderView;
 
@@ -65,6 +66,8 @@ import rx.functions.Func1;
 public class CardsActivity extends BaseOmnomActivity {
 
 	public static final int RESULT_PAY = 10;
+
+	public static final String EVENT_CARD_DELETED = "card_deleted";
 
 	private static final String TAG = CardsActivity.class.getSimpleName();
 
@@ -199,7 +202,7 @@ public class CardsActivity extends BaseOmnomActivity {
 		}
 
 		if(mDetails != null) {
-			final String text = StringUtils.formatCurrency(mDetails.getAmount()) + getString(R.string.currency_ruble);
+			final String text = AmountHelper.format(mDetails.getAmount()) + getString(R.string.currency_ruble);
 			mBtnPay.setText(getString(R.string.pay_amount, text));
 			if(!mIsDemo) {
 				mBtnPay.setEnabled(false);
@@ -282,6 +285,7 @@ public class CardsActivity extends BaseOmnomActivity {
 		UserData userData = UserData.create(OmnomApplication.get(getActivity()).getUserProfile().getUser());
 		String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
 		final CardInfo cardInfo = CardInfo.create(getActivity(), card.getExternalCardId(), cvv);
+		reportMixPanel();
 		mDeleteCardSubscription = AndroidObservable.bindActivity(this, mAcquiring.deleteCard(acquiringData, userData, cardInfo))
 		                                           .flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
 				                                           Observable<CardDeleteResponse>>() {
@@ -319,6 +323,10 @@ public class CardsActivity extends BaseOmnomActivity {
 				});
 	}
 
+	private void reportMixPanel() {
+		getMixPanelHelper().track(new SimpleMixpanelEvent(getUserData(), EVENT_CARD_DELETED));
+	}
+
 	private void onRemoveSuccess(final Card card) {
 		final CardsAdapter adapter = (CardsAdapter) mList.getAdapter();
 		adapter.remove(card);
@@ -339,9 +347,10 @@ public class CardsActivity extends BaseOmnomActivity {
 	private void cardRemovalError(String message) {
 		Log.w(TAG, message);
 		if(message != null) {
-			Toast.makeText(this, "Unable to remove card: " + message, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, getString(R.string.unable_to_remove_card_number_try_againt_later, message),
+			               Toast.LENGTH_LONG).show();
 		} else {
-			Toast.makeText(this, "Unable to remove card", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, getString(R.string.unable_to_remove_card), Toast.LENGTH_LONG).show();
 		}
 	}
 

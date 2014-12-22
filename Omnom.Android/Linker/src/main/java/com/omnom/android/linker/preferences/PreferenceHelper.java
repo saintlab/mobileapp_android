@@ -26,16 +26,13 @@ public class PreferenceHelper implements PreferenceProvider {
 
 	@Override
 	public boolean setAuthToken(Context context, final String value) {
-		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-		              .edit()
-		              .putString(AUTH_TOKEN, value)
-		              .commit();
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).edit().putString(AUTH_TOKEN, value).commit();
 	}
 
 	@Override
 	public String getAuthToken(Context context) {
-		final String string = context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE)
-		                             .getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
+		final String string =
+				context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).getString(AUTH_TOKEN, StringUtils.EMPTY_STRING);
 		return string;
 	}
 
@@ -69,5 +66,10 @@ public class PreferenceHelper implements PreferenceProvider {
 	public String getConfigJson(Context context) {
 		// do nothing
 		return StringUtils.EMPTY_STRING;
+	}
+
+	@Override
+	public boolean contains(Context context, String key) {
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).contains(key);
 	}
 }

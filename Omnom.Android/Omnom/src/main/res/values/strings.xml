@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Omnom</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_entering">EnteringActivity</string>
@@ -89,6 +88,8 @@
     <string name="quit">Выйти</string>
     <string name="confirm">Подтвердить</string>
     <string name="card_removal_confirmation">Карта %1$s %2$s</string>
+    <string name="unable_to_remove_card_number_try_againt_later">Не удается удалить карту: %1$s\nПожалуйста, попробуйте позже</string>
+    <string name="unable_to_remove_card">Не удается удалить карту</string>
     <string name="delete">Удалить</string>
     <string name="how_many_guests_will_pay">На скольких гостей делить?</string>
     <string name="welcome_to_">Добро пожаловать в %1$s</string>
@@ -101,5 +102,6 @@
     <string name="write_to_us">Напишите нам</string>
     <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
     <string name="navigate_qr_code">Наведитесь на QR-код Omnom.</string>
-
+    <string name="omnom_works_here">Omnom работает здесь</string>
+    <string name="send_feedback">Написать отзыв</string>
 </resources>

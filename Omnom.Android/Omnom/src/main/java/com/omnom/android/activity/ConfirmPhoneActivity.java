@@ -132,16 +132,10 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 			@Override
 			public void call(final AuthResponse authResponse) {
 				if (!authResponse.hasError()) {
-					if (type == TYPE_REGISTER) {
-						getMixPanel().alias(phone, null);
-					} else {
-						getMixPanel().identify(phone);
-					}
 					getPreferences().setAuthToken(getActivity(), authResponse.getToken());
 					topPanel.setContentVisibility(false, false);
 					finish();
-					SplashActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, 0);
-
+					EnteringActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, 0);
 				} else {
 					edit1.setText(StringUtils.EMPTY_STRING);
 					edit2.setText(StringUtils.EMPTY_STRING);

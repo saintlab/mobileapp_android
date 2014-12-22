@@ -26,6 +26,8 @@ import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.mixpanel.OmnomErrorHelper;
+import com.omnom.android.mixpanel.model.PaymentSuccessMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
@@ -33,7 +35,6 @@ import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.socket.listener.SilentPaymentEventListener;
-import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderView;
@@ -51,8 +52,6 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
-import static com.omnom.android.utils.utils.AndroidUtils.showToast;
-
 /**
  * Created by mvpotter on 24/11/14.
  */
@@ -61,16 +60,6 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	private static final String TAG = PaymentProcessActivity.class.getSimpleName();
 
 	private static final int REQUEST_THANKS = 100;
-
-	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
-	                         final Order order, final boolean isDemo, final int accentColor) {
-		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
-		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
-		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
-		intent.putExtra(Extras.EXTRA_ORDER, order);
-		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
-		activity.startActivityForResult(intent, code);
-	}
 
 	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final Order order, CardInfo cardInfo, final boolean isDemo,
@@ -111,7 +100,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	@InjectViews({R.id.txt_error, R.id.panel_errors})
 	protected List<View> errorViews;
 
-	protected ErrorHelper mErrorHelper;
+	protected OmnomErrorHelper mErrorHelper;
 
 	private Subscription mBillSubscription;
 
@@ -136,10 +125,14 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	@Nullable
 	private PaymentSocketEvent mPaymentEvent;
 
+	private int mBillId;
+
+	private BillResponse mBillData;
+
 	@Override
 	public void initUi() {
 		mPaymentListener = new SilentPaymentEventListener(this, this);
-		mErrorHelper = new ErrorHelper(loader, txtError, btnBottom, txtBottom, btnDemo, errorViews);
+		mErrorHelper = new OmnomErrorHelper(loader, txtError, btnBottom, txtBottom, btnDemo, errorViews);
 		final int dpSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
 		loader.setSize(dpSize, dpSize);
 		loader.setColor(getResources().getColor(android.R.color.black));
@@ -216,9 +209,9 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					tryToPay(mCardInfo, response, amount, tip);
 				} else {
 					if(response.getError() != null) {
-						showToast(activity, response.getError());
+						Log.w(TAG, response.getError());
 					} else if(response.getErrors() != null) {
-						showToast(activity, response.getErrors().toString());
+						Log.w(TAG, response.getErrors().toString());
 					}
 					onPayError();
 				}
@@ -242,6 +235,8 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, double amount,
 	                 int tip) {
 		final ExtraData extra = MailRuExtra.create(tip, billData.getMailRestaurantId());
+		mBillData = billData;
+		mBillId = billData.getId();
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
 		mPaySubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().pay(acquiringData, paymentInfo))
@@ -292,6 +287,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private void onPayOk(AcquiringPollingResponse response) {
 		Log.d(TAG, "status = " + response.getStatus());
+		reportMixPanel();
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override
@@ -304,6 +300,11 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 			}
 		});
+	}
+
+	private void reportMixPanel() {
+		getMixPanelHelper().track(new PaymentSuccessMixpanelEvent(getUserData(), mDetails, mBillId));
+		getMixPanelHelper().trackRevenue(String.valueOf(getUserData().getId()), mDetails, mBillData);
 	}
 
 	private void onPayError() {

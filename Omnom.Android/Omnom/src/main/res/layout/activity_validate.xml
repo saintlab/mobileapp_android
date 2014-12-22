@@ -22,9 +22,9 @@
 
             <TextView
                 android:id="@+id/txt_error"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
+                android:layout_centerInParent="true"
                 android:paddingLeft="@dimen/error_text_padding"
                 android:paddingRight="@dimen/error_text_padding"
                 android:paddingBottom="@dimen/error_text_padding"

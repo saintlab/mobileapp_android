@@ -9,6 +9,7 @@ import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
+import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
@@ -108,6 +109,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 				                                         if(hasNoErrors) {
 					                                         loadTable(mQrData, table);
 				                                         } else {
+					                                         reportMixPanel(table[0]);
 					                                         startErrorTransition();
 					                                         final View viewById = findViewById(R.id.panel_bottom);
 					                                         if(viewById != null) {
@@ -123,7 +125,13 @@ public class ValidateActivityCamera extends ValidateActivity {
 			                                         }
 		                                         });
 
+	}
 
+	private void reportMixPanel(final TableDataResponse tableDataResponse) {
+		if(tableDataResponse != null) {
+			getMixPanelHelper().track(OnTableMixpanelEvent.createEventQr(getUserData(), tableDataResponse.getRestaurantId(),
+			                                                             tableDataResponse.getId()));
+		}
 	}
 
 	private void loadTable(final String mQrData, final TableDataResponse[] table) {

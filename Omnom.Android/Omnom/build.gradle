@@ -41,8 +41,8 @@ android {
         applicationId "com.omnom.android"
         minSdkVersion 15
         targetSdkVersion 20
-        versionCode 26
-        versionName "0.0.26"
+        versionCode 27
+        versionName "0.1.1"
     }
 
     signingConfigs {
@@ -62,10 +62,12 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            resValue "string", "app_name", "Omnom"
         }
         debug {
             minifyEnabled false
             applicationIdSuffix '.debug'
+            resValue "string", "app_name", "Omnom Debug"
         }
     }
 }

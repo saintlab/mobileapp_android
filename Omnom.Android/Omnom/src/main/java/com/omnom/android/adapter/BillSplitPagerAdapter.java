@@ -22,12 +22,15 @@ public class BillSplitPagerAdapter extends FragmentStatePagerAdapter {
 
 	private final SparseBooleanArrayParcelable mStates;
 
+	private int mGuestsCount;
+
 	private Fragment mCurrentFragment;
 
-	public BillSplitPagerAdapter(final FragmentManager fm, final Order order, final SparseBooleanArrayParcelable states) {
+	public BillSplitPagerAdapter(final FragmentManager fm, final Order order, final SparseBooleanArrayParcelable states, final int guestsCount) {
 		super(fm);
 		mOrder = order;
 		mStates = states;
+		mGuestsCount = guestsCount;
 	}
 
 	@Override
@@ -63,7 +66,7 @@ public class BillSplitPagerAdapter extends FragmentStatePagerAdapter {
 			case 0:
 				return BillItemsFragment.newInstance(mOrder, mStates);
 			case 1:
-				return BillSplitPersonsFragment.newInstance(mOrder);
+				return BillSplitPersonsFragment.newInstance(mOrder, mGuestsCount);
 		}
 		return null;
 	}
