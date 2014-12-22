@@ -25,7 +25,7 @@
     <com.omnom.android.utils.view.NumberPicker
         android:id="@+id/tips_picker"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/order_tips_picker_height"
         android:layout_gravity="bottom"
         android:background="@android:color/white"
         android:visibility="gone"

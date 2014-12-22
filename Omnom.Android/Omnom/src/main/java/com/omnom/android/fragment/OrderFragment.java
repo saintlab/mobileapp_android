@@ -865,6 +865,7 @@ public class OrderFragment extends Fragment {
 		ViewUtils.setVisible2(txtPaymentTitle, !visible);
 		ViewUtils.setVisible2(txtAlreadyPaid, !visible);
 		ViewUtils.setVisible2(txtTipsTitle, !visible);
+		ViewUtils.setVisible2(btnPay, !visible);
 
 		ViewUtils.setVisible2(btnApply, visible);
 

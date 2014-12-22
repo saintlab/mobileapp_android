@@ -25,6 +25,7 @@
     <dimen name="order_list_trasnlation_active">-240dp</dimen>
     <dimen name="order_payment_translation_y">0dp</dimen>
     <dimen name="order_tips_translation_y">100dp</dimen>
+    <dimen name="order_tips_picker_height">270dp</dimen>
     <dimen name="order_list_height">450dp</dimen>
     <dimen name="font_order_amont_edit">48sp</dimen>
     <dimen name="order_edit_title_margin">-16dp</dimen>
