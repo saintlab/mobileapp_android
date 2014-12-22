@@ -14,6 +14,7 @@ import android.widget.ImageView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.activity.ConfirmPhoneActivity;
 import com.omnom.android.activity.ValidateActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AnimationBuilder;
@@ -146,7 +147,7 @@ public class SplashFragment extends Fragment {
 						if(!getActivity().isFinishing()) {
 							ValidateActivity.start((BaseFragmentActivity) getActivity(),
 							                       R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
-							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, false);
+							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, ConfirmPhoneActivity.TYPE_LOGIN);
 						}
 					}
 				}, animationDuration);

@@ -123,7 +123,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		start(context, enterAnim, exitAnim, animationType, false, userEnterType);
 	}
 
-	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo,
+	private static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo,
 	                         final int userEnterType) {
 		Intent intent = createIntent(context, animationType, isDemo, userEnterType);
 		if(context instanceof ConfirmPhoneActivity) {
@@ -133,10 +133,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		context.start(intent, enterAnim, exitAnim, !isDemo);
 	}
 
-	public static void start(BaseFragmentActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo, final int
-			userEnterType) {
-		Intent intent = createIntent(context, animationType, isDemo, userEnterType);
-		context.start(intent, enterAnim, exitAnim, !isDemo);
+	public static void start(BaseFragmentActivity context, int enterAnim, int exitAnim, int animationType, final int userEnterType) {
+		Intent intent = createIntent(context, animationType, false, userEnterType);
+		context.start(intent, enterAnim, exitAnim, true);
 	}
 
 	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
