@@ -51,8 +51,6 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
-import static com.omnom.android.utils.utils.AndroidUtils.showToast;
-
 /**
  * Created by mvpotter on 24/11/14.
  */
@@ -61,16 +59,6 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	private static final String TAG = PaymentProcessActivity.class.getSimpleName();
 
 	private static final int REQUEST_THANKS = 100;
-
-	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
-	                         final Order order, final boolean isDemo, final int accentColor) {
-		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
-		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
-		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
-		intent.putExtra(Extras.EXTRA_ORDER, order);
-		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
-		activity.startActivityForResult(intent, code);
-	}
 
 	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final Order order, CardInfo cardInfo, final boolean isDemo,
@@ -216,9 +204,9 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					tryToPay(mCardInfo, response, amount, tip);
 				} else {
 					if(response.getError() != null) {
-						showToast(activity, response.getError());
+						Log.w(TAG, response.getError());
 					} else if(response.getErrors() != null) {
-						showToast(activity, response.getErrors().toString());
+						Log.w(TAG, response.getErrors().toString());
 					}
 					onPayError();
 				}
