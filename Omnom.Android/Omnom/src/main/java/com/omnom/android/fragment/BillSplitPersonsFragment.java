@@ -12,8 +12,8 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
-import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.view.NumberPicker;
 
 import java.math.BigDecimal;
@@ -100,7 +100,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 	public void updateAmount() {
 		final Button btnCommit = (Button) getActivity().findViewById(R.id.btn_commit);
 		final BigDecimal amount = getAmount();
-		btnCommit.setText(getString(R.string.bill_split_amount_, StringUtils.formatCurrency(amount)));
+		btnCommit.setText(getString(R.string.bill_split_amount_, AmountHelper.format(amount)));
 		btnCommit.setTag(R.id.edit_amount, amount);
 		btnCommit.setTag(R.id.picker, mPicker.getValue());
 		btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_PERSON);

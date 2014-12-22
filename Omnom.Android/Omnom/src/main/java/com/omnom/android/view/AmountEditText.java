@@ -88,7 +88,7 @@ public class AmountEditText extends EditText {
 			@Override
 			public void afterTextChanged(Editable s) {
 				removeTextChangedListener(this);
-				final String str = s.toString();
+				String str = s.toString();
 				if(str.endsWith(".") || str.endsWith(",")) {
 					getText().delete(getSelectionEnd() - 1, getSelectionEnd());
 					setSelection(getSelectionEnd() - 1);
@@ -96,15 +96,16 @@ public class AmountEditText extends EditText {
 				}
 				final String currencySuffix = getCurrencySuffix();
 				if(!str.endsWith(currencySuffix)) {
-					final String text = getText() + currencySuffix;
-					setText(text);
-					setSelection(text.length() - 1);
+					str = str + currencySuffix;
 				}
-				if(str.startsWith(".")) {
-					final String text = "0" + str;
-					setText(text);
-					setSelection(text.length() - 1);
+				if (str.length() > 2 && str.charAt(0) == '0') {
+					str = str.substring(1);
 				}
+				if(str.equals(currencySuffix) || str.startsWith(".") || str.startsWith(",")) {
+					str = "0" + str;
+				}
+				setText(str);
+				setSelection(str.length() - 1);
 				addTextChangedListener(this);
 			}
 		});

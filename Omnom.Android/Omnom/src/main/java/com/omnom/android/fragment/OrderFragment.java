@@ -53,6 +53,7 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -345,7 +346,7 @@ public class OrderFragment extends Fragment {
 				}
 			}
 			final BigDecimal amount = event.getAmount();
-			final String s = StringUtils.formatCurrency(amount, getCurrencySuffix());
+			final String s = AmountHelper.format(amount) + getCurrencySuffix();
 			editAmount.setText(s);
 			updatePaymentTipsAmount(amount);
 		}
@@ -658,12 +659,12 @@ public class OrderFragment extends Fragment {
 		} else {
 			ViewUtils.setVisible2(txtAlreadyPaid, false);
 		}
-		editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay(), getCurrencySuffix()));
+		editAmount.setText(AmountHelper.format(mOrder.getAmountToPay()) + getCurrencySuffix());
 	}
 
 	private void updatePayButton(final BigDecimal amount) {
 		btnPay.setEnabled(BigDecimal.ZERO.compareTo(amount) != 0);
-		btnPay.setText(getString(R.string.pay_amount, amount + getCurrencySuffix()));
+		btnPay.setText(getString(R.string.pay_amount, AmountHelper.format(amount) + getCurrencySuffix()));
 	}
 
 	private void initKeyboardListener() {
@@ -691,9 +692,9 @@ public class OrderFragment extends Fragment {
 								editAmount.setSelection(editAmount.getText().length() - 1);
 							} else {
 								if (!mApply) {
-									editAmount.setText(StringUtils.formatCurrency(mLastAmount, getCurrencySuffix()));
+									editAmount.setText(AmountHelper.format(mLastAmount) + getCurrencySuffix());
 								} else {
-									editAmount.setText(StringUtils.formatCurrency(editAmount.getText().toString(), getCurrencySuffix()));
+									editAmount.setText(AmountHelper.format(getEnteredAmount()) + getCurrencySuffix());
 								}
 								mApply = false;
 								mLastAmount = WRONG_AMOUNT;
@@ -767,7 +768,7 @@ public class OrderFragment extends Fragment {
 		mAdapter.notifyDataSetChanged();
 		initFooter(true);
 		if(resetAmount) {
-			editAmount.setText(StringUtils.formatCurrency(mOrder.getAmountToPay()));
+			editAmount.setText(StringUtils.formatCurrency(AmountHelper.format(mOrder.getAmountToPay())));
 			updatePaymentTipsAmount(getEnteredAmount());
 		}
 	}
@@ -844,7 +845,7 @@ public class OrderFragment extends Fragment {
 	private void updateCustomTipsText(final int newVal) {
 		txtCustomTips.setText(getString(R.string.tip_percent, newVal));
 		final double tips = OrderHelper.getTipsAmount(getEnteredAmount(), newVal);
-		final String tipsFormatted = StringUtils.formatCurrency(BigDecimal.valueOf(tips), getCurrencySuffix());
+		final String tipsFormatted = AmountHelper.format(tips) + getCurrencySuffix();
 		txtTipsAmountHint.setText(getString(R.string.tip_hint_or, tipsFormatted));
 	}
 
@@ -910,6 +911,7 @@ public class OrderFragment extends Fragment {
 			txtPaymentTitle.setText(R.string.i_m_going_to_pay);
 			mMode = WRONG_VALUE;
 			final BigDecimal amount = getEnteredAmount();
+			editAmount.setText(AmountHelper.format(amount));
 			updatePaymentTipsAmount(amount);
 		}
 		if(mMode == MODE_TIPS) {

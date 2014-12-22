@@ -43,8 +43,8 @@ import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.preferences.PreferenceProvider;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
-import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.HeaderView;
 
@@ -199,7 +199,7 @@ public class CardsActivity extends BaseOmnomActivity {
 		}
 
 		if(mDetails != null) {
-			final String text = StringUtils.formatCurrency(mDetails.getAmount()) + getString(R.string.currency_ruble);
+			final String text = AmountHelper.format(mDetails.getAmount()) + getString(R.string.currency_ruble);
 			mBtnPay.setText(getString(R.string.pay_amount, text));
 			if(!mIsDemo) {
 				mBtnPay.setEnabled(false);
