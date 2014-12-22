@@ -1,6 +1,5 @@
 package com.omnom.android.mixpanel;
 
-import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -18,9 +17,8 @@ import java.util.List;
  * Created by Ch3D on 22.12.2014.
  */
 public class OmnomErrorHelper extends ErrorHelper {
-	public OmnomErrorHelper(final LoaderView loader, final TextView txtError, final Button btnBottom, final List<View> errorViews,
-	                        final CountDownTimer timer) {
-		super(loader, txtError, btnBottom, errorViews, timer);
+	public OmnomErrorHelper(final LoaderView loader, final TextView txtError, final Button btnBottom, final List<View> errorViews) {
+		super(loader, txtError, btnBottom, errorViews);
 	}
 
 	public OmnomErrorHelper(final LoaderView loader, final TextView txtError, final View btnBottom, final List<View> errorViews) {
