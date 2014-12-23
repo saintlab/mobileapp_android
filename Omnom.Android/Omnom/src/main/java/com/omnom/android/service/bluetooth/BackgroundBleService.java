@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.omnom.android.OmnomApplication;
@@ -41,7 +42,6 @@ import javax.inject.Inject;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
-import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -67,11 +67,8 @@ public class BackgroundBleService extends Service {
 	private class Callback implements BluetoothAdapter.LeScanCallback {
 		private final BeaconParser mParser;
 
-		private final ArrayList<Beacon> mBeacons;
-
-		private Callback(BeaconParser parser, ArrayList<Beacon> beacons) {
+		private Callback(BeaconParser parser) {
 			mParser = parser;
-			mBeacons = beacons;
 		}
 
 		@Override
@@ -92,7 +89,7 @@ public class BackgroundBleService extends Service {
 
 	private BeaconParser mParser;
 
-	private ArrayList<Beacon> mBeacons;
+	private ArrayList<Beacon> mBeacons = new ArrayList<Beacon>();
 
 	private boolean mBleState;
 
@@ -130,11 +127,13 @@ public class BackgroundBleService extends Service {
 		mHandler = new Handler();
 		mParser = new BeaconParser();
 		mParser.setBeaconLayout(getResources().getString(R.string.redbear_beacon_layout));
-		mBeacons = new ArrayList<Beacon>();
+
+		mBeacons.clear();
+
 		BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
 		mBluetoothAdapter = mBluetoothManager.getAdapter();
 		mBleState = mBluetoothAdapter.isEnabled();
-		mLeScanCallback = new Callback(mParser, mBeacons);
+		mLeScanCallback = new Callback(mParser);
 		endCallback = new Runnable() {
 			@Override
 			public void run() {
@@ -178,7 +177,7 @@ public class BackgroundBleService extends Service {
 		editor.apply();
 	}
 
-	private void notifyIfNeeded(final ArrayList<Beacon> beacons) {
+	private void notifyIfNeeded(final List<Beacon> beacons) {
 		if(beacons.isEmpty() || OmnomApplication.get(this).hasActivities()) {
 			// fail fast if omnom is already running
 			return;
@@ -206,72 +205,76 @@ public class BackgroundBleService extends Service {
 			}
 
 			if(filteredBeacons.size() == 1) {
-				if(AndroidUtils.hasConnection(this)) {
+				if(!AndroidUtils.hasConnection(this) || !hasAuthToken()) {
 					showNotification(beacon, null);
 				} else {
 					final TableDataResponse[] table = new TableDataResponse[1];
-					{
-						api.findBeacon(beacon).flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
-							@Override
-							public Observable<Restaurant> call(final TableDataResponse tableDataResponse) {
-								if(!tableDataResponse.hasErrors()) {
-									table[0] = tableDataResponse;
-									return api.getRestaurant(tableDataResponse.getRestaurantId());
-								}
-								return Observable.empty();
-							}
-						}).flatMap(new Func1<Restaurant, Observable<ResponseBase>>() {
-							@Override
-							public Observable<ResponseBase> call(final Restaurant restaurant) {
-								if(restaurant != null) {
-									cacheBeacon(beacon);
-									showNotification(beacon, restaurant);
-									return api.newGuest(restaurant.getId(), table[0].getId());
-								}
-								return Observable.empty();
-							}
-						}).subscribe(new Action1<ResponseBase>() {
-							@Override
-							public void call(final ResponseBase o) {
-								// Do nothing
-							}
-						}, new Action1<Throwable>() {
-							@Override
-							public void call(final Throwable throwable) {
-								Log.e(TAG, "notifyIfNeeded", throwable);
-							}
-						});
-					}
-				}
-			}
-		}
-	}
-
-	private void reportRestaurantEnter(final ArrayList<Beacon> beacons) {
-		if(!beacons.isEmpty()) {
-			final Beacon beacon = beacons.get(0);
-			final String restaurantData = beacon.getRestaurantData();
-			final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
-			if(!preferences.contains(this, restaurantData)) {
-				preferences.saveRestaurantBeacon(this, beacon);
-				if(AndroidUtils.hasConnection(this)) {
-					api.findBeacon(beacon).subscribe(new Action1<TableDataResponse>() {
+					api.findBeacon(beacon).flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
 						@Override
-						public void call(TableDataResponse tableDataResponse) {
-							OmnomApplication.getMixPanelHelper(BackgroundBleService.this).track(
-									RestaurantEnterMixpanelEvent.createEventBluetooth(UserHelper.getUserData(BackgroundBleService.this),
-									                                                  tableDataResponse,
-									                                                  beacon));
+						public Observable<Restaurant> call(final TableDataResponse tableDataResponse) {
+							if(!tableDataResponse.hasErrors()) {
+								table[0] = tableDataResponse;
+								return api.getRestaurant(tableDataResponse.getRestaurantId());
+							}
+							return Observable.empty();
+						}
+					}).flatMap(new Func1<Restaurant, Observable<ResponseBase>>() {
+						@Override
+						public Observable<ResponseBase> call(final Restaurant restaurant) {
+							if(restaurant != null) {
+								showNotification(beacon, restaurant);
+								return api.newGuest(restaurant.getId(), table[0].getId());
+							}
+							return Observable.empty();
+						}
+					}).subscribe(new Action1<ResponseBase>() {
+						@Override
+						public void call(final ResponseBase o) {
+							// Do nothing
 						}
 					}, new Action1<Throwable>() {
 						@Override
-						public void call(Throwable throwable) {
-							// Do nothing
+						public void call(final Throwable throwable) {
+							showNotification(beacon, null);
+							Log.e(TAG, "notifyIfNeeded", throwable);
 						}
 					});
 				}
 			}
 		}
+	}
+
+	private void reportRestaurantEnter(final List<Beacon> beacons) {
+		final Beacon beacon = beacons.get(0);
+		final String restaurantData = beacon.getRestaurantData();
+		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
+		if(!preferences.contains(this, restaurantData)) {
+			preferences.saveRestaurantBeacon(this, beacon);
+			if(AndroidUtils.hasConnection(this) && hasAuthToken()) {
+				api.findBeacon(beacon).subscribe(new Action1<TableDataResponse>() {
+					@Override
+					public void call(TableDataResponse tableDataResponse) {
+						OmnomApplication.getMixPanelHelper(BackgroundBleService.this).track(RestaurantEnterMixpanelEvent
+								                                                                    .createEventBluetooth(UserHelper
+										                                                                                          .getUserData(
+												                                                                                          BackgroundBleService.this),
+
+								                                                                                          tableDataResponse,
+								                                                                                          beacon));
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						// Do nothing
+					}
+				});
+			}
+		}
+	}
+
+	private boolean hasAuthToken() {
+		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
+		return !TextUtils.isEmpty(preferences.getAuthToken(this));
 	}
 
 	private void cacheBeacon(final Beacon beacon) {
@@ -295,8 +298,9 @@ public class BackgroundBleService extends Service {
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	private void showNotification(final Beacon beacon, @Nullable final Restaurant restaurant) {
-		final String content = restaurant != null ? getString(R.string.welcome_to_, restaurant.getTitle()) : getString(
-				R.string.omnom_works_here);
+		cacheBeacon(beacon);
+		final String content =
+				restaurant != null ? getString(R.string.welcome_to_, restaurant.getTitle()) : getString(R.string.omnom_works_here);
 
 		final Notification notification =
 				new Notification.Builder(this).setSmallIcon(R.drawable.ic_app).setContentTitle(getString(R.string.app_name))
