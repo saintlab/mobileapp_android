@@ -11,9 +11,12 @@ import java.util.ArrayList;
 /**
  * Created by Ch3D on 23.12.2014.
  */
-public class BeaconDecodeResponse extends ResponseBase {
+public class DecodeResponse extends ResponseBase {
 	@Expose
 	private BeaconRecord beacon;
+
+	@Expose
+	private String qr;
 
 	@Expose
 	private Restaurant restaurant;
@@ -54,5 +57,13 @@ public class BeaconDecodeResponse extends ResponseBase {
 
 	public void setBeacon(final BeaconRecord beacon) {
 		this.beacon = beacon;
+	}
+
+	public String getQr() {
+		return qr;
+	}
+
+	public void setQr(final String qr) {
+		this.qr = qr;
 	}
 }

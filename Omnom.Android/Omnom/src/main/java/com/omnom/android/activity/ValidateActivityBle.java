@@ -4,16 +4,17 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 
 import com.omnom.android.R;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
-import com.omnom.android.restaurateur.model.decode.BeaconDecodeResponse;
 import com.omnom.android.restaurateur.model.decode.BeaconRecord;
+import com.omnom.android.restaurateur.model.decode.DecodeResponse;
 import com.omnom.android.restaurateur.model.decode.RssiRecord;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.utils.ObservableUtils;
+import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 
@@ -22,7 +23,6 @@ import java.util.LinkedList;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 import hugo.weaving.DebugLog;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -43,8 +43,6 @@ public class ValidateActivityBle extends ValidateActivity {
 	private Subscription mValidateSubscribtion;
 
 	private Subscription mFindBeaconSubscription;
-
-	private Crouton mCrouton;
 
 	@Override
 	public void initUi() {
@@ -144,24 +142,35 @@ public class ValidateActivityBle extends ValidateActivity {
 		scanBleDevices(true, new Runnable() {
 			@Override
 			public void run() {
-				api.decode(new BeaconDecodeRequest(getResources().getInteger(R.integer.ble_scan_duration), mBeacons)).subscribe(
-						new Action1<BeaconDecodeResponse>() {
-							@Override
-							public void call(final BeaconDecodeResponse beaconDecodeResponse) {
-								// TODO: discuss and implement
-							}
-						},
-						new Action1<Throwable>() {
-							@Override
-							public void call(final Throwable throwable) {
-								Log.e(TAG, "readBeacons", throwable);
-							}
-						});
+				mFindBeaconSubscription = AndroidObservable.bindActivity(ValidateActivityBle.this,
+				                                                         api.decode(new BeaconDecodeRequest(getResources().getInteger(
+						                                                         R.integer.ble_scan_duration),
+				                                                                                            mBeacons))
+				                                                            .map(mPreloadBackgroundFunction))
+				                                           .subscribe(new Action1<DecodeResponse>() {
+					                                           @Override
+					                                           public void call(final DecodeResponse response) {
+						                                           reportMixPanel(response.getTable());
+						                                           onDataLoaded(response.getRestaurant(), response.getTable());
+						                                           // TODO: discuss and implement
+					                                           }
+				                                           }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					                                           @Override
+					                                           protected void onError(final Throwable throwable) {
+						                                           startErrorTransition();
+						                                           mErrorHelper.showErrorDemo(
+								                                           LoaderError.NO_CONNECTION_TRY,
+								                                           mInternetErrorClickListener);
+					                                           }
+				                                           });
 			}
 		});
 	}
 
 	private void reportMixPanel(final TableDataResponse tableDataResponse) {
+		if(tableDataResponse == null) {
+			return;
+		}
 		getMixPanelHelper().track(OnTableMixpanelEvent.createEventBluetooth(getUserData(), tableDataResponse.getRestaurantId(),
 		                                                                    tableDataResponse.getId()));
 	}
