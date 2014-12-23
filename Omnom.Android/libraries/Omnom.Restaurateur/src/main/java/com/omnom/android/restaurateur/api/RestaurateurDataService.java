@@ -12,6 +12,8 @@ import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.config.Config;
+import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
+import com.omnom.android.restaurateur.model.decode.BeaconDecodeResponse;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -49,6 +51,9 @@ public interface RestaurateurDataService {
 	@POST("/restaurants/{restaurant_id}/tables/{table_id}/waiter/call/stop")
 	Observable<WaiterCallResponse> waiterCallStop(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
 	                                              @Path(Protocol.FIELD_TABLE_ID) String tableId);
+
+	@POST("/v2/decode/ibeacons/omnom")
+	Observable<BeaconDecodeResponse> decode(@Body BeaconDecodeRequest request);
 
 	@GET("/restaurants")
 	Observable<RestaurantsResponse> getRestaurants();

@@ -5,7 +5,7 @@ import android.text.TextUtils;
 
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
-import com.omnom.android.restaurateur.api.observable.providers.RestaurateurDataProvider;
+import com.omnom.android.restaurateur.api.observable.RestaurateurDataProvider;
 import com.omnom.android.utils.AuthTokenProvider;
 
 import javax.inject.Singleton;
