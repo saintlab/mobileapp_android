@@ -3,6 +3,7 @@ package com.omnom.android.activity;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.TextView;
 
@@ -23,6 +24,7 @@ import com.omnom.android.view.ViewPagerIndicatorCircle;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -77,8 +79,37 @@ public class OrdersActivity extends BaseFragmentActivity {
 	private PaymentEventListener mPaymentListener;
 
 	@Subscribe
-	public void onPayment(PaymentSocketEvent event) {
-		// payment handling logic
+	public void onPayment(final PaymentSocketEvent event) {
+		final Order order = event.getPaymentData().getOrder();
+		final int position = replaceOrder(orders, order);
+		if (order != null && position >= 0 && mPagerAdapter != null) {
+			mPagerAdapter.updateOrders(orders);
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					final Fragment currentFragment = findFragmentByPosition(position);
+					if (currentFragment != null) {
+						((OrderFragment) currentFragment).onPayment(order);
+					}
+				}
+			});
+		}
+	}
+
+	/**
+	 * Returns fragment cached by FragmentPagerAdapter
+	 *
+	 * @param position fragment position
+	 * @return fragment or null if not found
+	 */
+	public Fragment findFragmentByPosition(int position) {
+		Fragment fragment = null;
+		if (mPager != null && mPagerAdapter != null) {
+			fragment = getSupportFragmentManager().findFragmentByTag(
+					"android:switcher:" + mPager.getId() + ":" + mPagerAdapter.getItemId(position));
+		}
+
+		return fragment;
 	}
 
 	@Override
@@ -223,4 +254,25 @@ public class OrdersActivity extends BaseFragmentActivity {
 	public boolean isDemo() {
 		return mDemo;
 	}
+
+	private int replaceOrder(final List<Order> orders, final Order orderToReplace) {
+		int position = -1;
+		if (orders == null || orderToReplace == null) {
+			return position;
+		}
+		for (int i = 0; i < orders.size(); i++) {
+			if (orders.get(i).getId().equals(orderToReplace.getId())) {
+				position = i;
+				break;
+			}
+		}
+		if (position >= 0) {
+			final Order originalOrder = orders.get(position);
+			orderToReplace.setTips(originalOrder.getTips());
+			orders.set(position, orderToReplace);
+		}
+
+		return position;
+	}
+
 }

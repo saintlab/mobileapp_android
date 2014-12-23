@@ -77,7 +77,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.Optional;
-import retrofit.http.HEAD;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 import static butterknife.ButterKnife.findById;
@@ -255,14 +254,14 @@ public class OrderFragment extends Fragment {
 
 	private static final String ARG_SINGLE = "single";
 
-	public static Fragment newInstance(Order order, String requestId, final int bgColor, final int postition, final boolean animate,
+	public static Fragment newInstance(Order order, String requestId, final int bgColor, final int position, final boolean animate,
 	                                   final boolean isSingle) {
 		final OrderFragment fragment = new OrderFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, order);
 		args.putString(ARG_REQUEST_ID, requestId);
 		args.putInt(ARG_COLOR, bgColor);
-		args.putInt(ARG_POSITION, postition);
+		args.putInt(ARG_POSITION, position);
 		args.putBoolean(ARG_ANIMATE, animate);
 		args.putBoolean(ARG_SINGLE, isSingle);
 		fragment.setArguments(args);
@@ -375,7 +374,7 @@ public class OrderFragment extends Fragment {
 
 	private boolean mSingle;
 
-	private int mListTrasnlationActive;
+	private int mListTraslationActive;
 
 	private int mPaymentTranslationY;
 
@@ -386,6 +385,8 @@ public class OrderFragment extends Fragment {
 	private OrderItemsAdapter mAdapter;
 
 	private boolean mSplitRunning;
+
+	private boolean isAmountModified;
 
 	public OrderFragment() {
 	}
@@ -449,6 +450,26 @@ public class OrderFragment extends Fragment {
 		}
 	}
 
+	public void onPayment(final Order order) {
+		if (order != null && order.getId().equals(mOrder.getId())) {
+			mOrder = order;
+			final double paidAmount = order.getPaidAmount();
+			if (txtAlreadyPaid != null) {
+				if (paidAmount > 0) {
+					txtAlreadyPaid.setText(getString(R.string.already_paid, AmountHelper.format(paidAmount) + getCurrencySuffix()));
+					ViewUtils.setVisible2(txtAlreadyPaid, true);
+				} else {
+					ViewUtils.setVisible2(txtAlreadyPaid, false);
+				}
+			}
+			if (!isAmountModified && editAmount != null) {
+				editAmount.setText(AmountHelper.format(order.getAmountToPay()) + getCurrencySuffix());
+				final BigDecimal amount = getEnteredAmount();
+				updatePaymentTipsAmount(amount, tipsButtons);
+			}
+		}
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
@@ -477,16 +498,16 @@ public class OrderFragment extends Fragment {
 		final int bottomMin = getResources().getDimensionPixelSize(R.dimen.order_payment_height) - (hasNavigationBar ? 0 : defaultPadding);
 		final int i = mListHeight / 2;
 		if(i < bottomMin) {
-			mListTrasnlationActive = (-mListHeight / 2) - (bottomMin - i);
+			mListTraslationActive = (-mListHeight / 2) - (bottomMin - i);
 		} else {
-			mListTrasnlationActive = -mListHeight / 2 + (i - bottomMin);
+			mListTraslationActive = -mListHeight / 2 + (i - bottomMin);
 		}
 
 		// TODO: Find out generic solution for small devices like megafon login 1
 		if(displayMetrics.densityDpi == DisplayMetrics.DENSITY_MEDIUM) {
 			final int mdpiPadding = ViewUtils.dipToPixels(getActivity(), 72);
 			mListHeight -= mdpiPadding;
-			mListTrasnlationActive += mdpiPadding;
+			mListTraslationActive += mdpiPadding;
 		}
 	}
 
@@ -638,7 +659,7 @@ public class OrderFragment extends Fragment {
 			mFragmentView.animate().translationYBy(mListHeight).setStartDelay((mPosition + 1) * 200).setDuration(500).start();
 		} else if(mSingle) {
 			ViewUtils.setVisible(getPanelPayment(), true);
-			list.setTranslationY(mListTrasnlationActive);
+			list.setTranslationY(mListTraslationActive);
 			zoomInFragment((OrdersActivity) getActivity());
 		} else {
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
@@ -695,8 +716,8 @@ public class OrderFragment extends Fragment {
 			@Override
 			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
 				final OrdersActivity activity = (OrdersActivity) getActivity();
-				if(isDownscaled()) {
-					if(activity.checkFragment(OrderFragment.this)) {
+				if (isDownscaled()) {
+					if (activity.checkFragment(OrderFragment.this)) {
 						zoomInFragment(activity);
 					}
 				} else {
@@ -728,7 +749,7 @@ public class OrderFragment extends Fragment {
 		AndroidUtils.scrollEnd(list);
 		list.setSwipeEnabled(true);
 		activity.showOther(mPosition, false);
-		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, mListTrasnlationActive).start();
+		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, mListTraslationActive).start();
 	}
 
 	public boolean isDownscaled() {
@@ -753,8 +774,19 @@ public class OrderFragment extends Fragment {
 		});
 
 		final double paidAmount = mOrder.getPaidAmount();
+		if (paidAmount > 0) {
+			txtAlreadyPaid.setText(getString(R.string.already_paid, AmountHelper.format(paidAmount) + getCurrencySuffix()));
+			ViewUtils.setVisible2(txtAlreadyPaid, true);
+		} else {
+			ViewUtils.setVisible2(txtAlreadyPaid, false);
+		}
+		editAmount.setText(AmountHelper.format(mOrder.getAmountToPay()) + getCurrencySuffix());
+	}
+
+	private void updateAmount(final Order order) {
+		final double paidAmount = mOrder.getPaidAmount();
 		if(paidAmount > 0) {
-			txtAlreadyPaid.setText(getString(R.string.already_paid, StringUtils.formatCurrency(paidAmount, getCurrencySuffix())));
+			txtAlreadyPaid.setText(getString(R.string.already_paid, AmountHelper.format(paidAmount) + getCurrencySuffix()));
 			ViewUtils.setVisible2(txtAlreadyPaid, true);
 		} else {
 			ViewUtils.setVisible2(txtAlreadyPaid, false);
@@ -779,7 +811,7 @@ public class OrderFragment extends Fragment {
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
 							ViewUtils.setVisible(radioGroup, !isVisible);
 
-							list.animate().translationYBy(isVisible ? mListTrasnlationActive : -mListTrasnlationActive).start();
+							list.animate().translationYBy(isVisible ? mListTraslationActive : -mListTraslationActive).start();
 							getPanelPayment().animate().yBy(isVisible ? mPaymentTranslationY : -mPaymentTranslationY).start();
 
 							mCurrentKeyboardVisility = isVisible;
@@ -813,13 +845,13 @@ public class OrderFragment extends Fragment {
 		list.addFooterView(mFooterView1);
 		final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
 		final TextView txtOverall = (TextView) mFooterView1.findViewById(R.id.txt_overall);
-		txtOverall.setText(StringUtils.formatCurrencyWithSpace(mOrder.getAmountToPay(), getCurrencySuffix()));
+		txtOverall.setText(StringUtils.formatCurrencyWithSpace(mOrder.getTotalAmount(), getCurrencySuffix()));
 		updateFooter(isZoomedIn);
 
 		billSplit.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				if(!isDownscaled()) {
+				if (!isDownscaled()) {
 					splitBill();
 				} else {
 					zoomInFragment((OrdersActivity) getActivity());
@@ -838,6 +870,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void initFooter2() {
+		amountModified(true);
 		if(list.getFooterViewsCount() > 0) {
 			list.removeFooterView(mFooterView1);
 			list.removeFooterView(mFooterView2);
@@ -863,6 +896,7 @@ public class OrderFragment extends Fragment {
 		if(isEditMode) {
 			return;
 		}
+		amountModified(false);
 		mTagSplitType = BillSplitFragment.SPLIT_TYPE_ITEMS;
 		mGuestsCount = 1;
 		mCheckedStates.clear();
@@ -889,7 +923,7 @@ public class OrderFragment extends Fragment {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
 				list.cancelRefreshing();
-				list.setTranslationY(mListTrasnlationActive);
+				list.setTranslationY(mListTraslationActive);
 				animator.setListener(null);
 				mSplitRunning = false;
 			}
@@ -952,7 +986,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void showCustomTips(boolean visible) {
-		list.animate().translationYBy(visible ? mListTrasnlationActive : -mListTrasnlationActive).start();
+		list.animate().translationYBy(visible ? mListTraslationActive : -mListTraslationActive).start();
 		getPanelPayment().animate().yBy(visible ? -mTipsTranslationY : mTipsTranslationY).start();
 		editMode(visible);
 
@@ -965,7 +999,7 @@ public class OrderFragment extends Fragment {
 
 		ViewUtils.setVisible2(radioGroup, !visible);
 		ViewUtils.setVisible2(txtPaymentTitle, !visible);
-		ViewUtils.setVisible2(txtAlreadyPaid, !visible);
+		ViewUtils.setVisible2(txtAlreadyPaid, mOrder.getPaidAmount() > 0 && !visible);
 		ViewUtils.setVisible2(txtTipsTitle, !visible);
 		ViewUtils.setVisible2(btnPay, !visible);
 
@@ -1014,6 +1048,9 @@ public class OrderFragment extends Fragment {
 			txtPaymentTitle.setText(R.string.i_m_going_to_pay);
 			mMode = WRONG_VALUE;
 			final BigDecimal amount = getEnteredAmount();
+			if (amount.compareTo(BigDecimal.valueOf(mOrder.getAmountToPay())) != 0) {
+				amountModified(true);
+			}
 			editAmount.setText(AmountHelper.format(amount));
 			updatePaymentTipsAmount(amount);
 		}
@@ -1188,4 +1225,13 @@ public class OrderFragment extends Fragment {
 		final Fragment splitFragment = getFragmentManager().findFragmentByTag(BillSplitFragment.TAG);
 		return splitFragment != null;
 	}
+
+	public String getOrderId() {
+		return mOrder.getId();
+	}
+
+	private void amountModified(final boolean isModified) {
+		isAmountModified = isModified;
+	}
+
 }

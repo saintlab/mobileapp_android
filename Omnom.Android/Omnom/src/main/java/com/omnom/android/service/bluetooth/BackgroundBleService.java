@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.omnom.android.OmnomApplication;
@@ -34,7 +35,6 @@ import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -67,11 +67,8 @@ public class BackgroundBleService extends Service {
 	private class Callback implements BluetoothAdapter.LeScanCallback {
 		private final BeaconParser mParser;
 
-		private final ArrayList<Beacon> mBeacons;
-
-		private Callback(BeaconParser parser, ArrayList<Beacon> beacons) {
+		private Callback(BeaconParser parser) {
 			mParser = parser;
-			mBeacons = beacons;
 		}
 
 		@Override
@@ -92,7 +89,7 @@ public class BackgroundBleService extends Service {
 
 	private BeaconParser mParser;
 
-	private ArrayList<Beacon> mBeacons;
+	private ArrayList<Beacon> mBeacons = new ArrayList<Beacon>();
 
 	private boolean mBleState;
 
@@ -118,7 +115,7 @@ public class BackgroundBleService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		OmnomApplication.get(this).inject(this);
-		if (!AndroidUtils.isJellyBeanMR2() || !BluetoothUtils.hasBleSupport(this)) {
+		if(!AndroidUtils.isJellyBeanMR2() || !BluetoothUtils.hasBleSupport(this)) {
 			stopSelf(mStartId);
 			return;
 		}
@@ -130,15 +127,17 @@ public class BackgroundBleService extends Service {
 		mHandler = new Handler();
 		mParser = new BeaconParser();
 		mParser.setBeaconLayout(getResources().getString(R.string.redbear_beacon_layout));
-		mBeacons = new ArrayList<Beacon>();
+
+		mBeacons.clear();
+
 		BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
 		mBluetoothAdapter = mBluetoothManager.getAdapter();
 		mBleState = mBluetoothAdapter.isEnabled();
-		mLeScanCallback = new Callback(mParser, mBeacons);
+		mLeScanCallback = new Callback(mParser);
 		endCallback = new Runnable() {
 			@Override
 			public void run() {
-				if (!mBleState) {
+				if(!mBleState) {
 					mBluetoothAdapter.disable();
 				}
 
@@ -150,7 +149,7 @@ public class BackgroundBleService extends Service {
 			}
 		};
 
-		if (!mBleState) {
+		if(!mBleState) {
 			mBluetoothAdapter.enable();
 			mHandler.postDelayed(new Runnable() {
 				@Override
@@ -169,115 +168,113 @@ public class BackgroundBleService extends Service {
 	private void clearCachedBeacons() {
 		final SharedPreferences sharedPreferences = getSharedPreferences(PreferenceHelper.BEACONS_PREFERENCES, MODE_PRIVATE);
 		final SharedPreferences.Editor editor = sharedPreferences.edit();
-		for (Map.Entry<String, ?> entry : sharedPreferences.getAll().entrySet()) {
+		for(Map.Entry<String, ?> entry : sharedPreferences.getAll().entrySet()) {
 			final Long timestamp = (Long) entry.getValue();
-			if (timestamp + BEACON_CACHE_INTERVAL < SystemClock.elapsedRealtime()) {
+			if(timestamp + BEACON_CACHE_INTERVAL < SystemClock.elapsedRealtime()) {
 				editor.remove(entry.getKey());
 			}
 		}
 		editor.apply();
 	}
 
-	private void notifyIfNeeded(final ArrayList<Beacon> beacons) {
-		if (beacons.isEmpty() || OmnomApplication.get(this).hasActivities()) {
+	private void notifyIfNeeded(final List<Beacon> beacons) {
+		if(beacons.isEmpty() || OmnomApplication.get(this).hasActivities()) {
 			// fail fast if omnom is already running
 			return;
 		}
 
-		reportRestaurantEnter(Collections.unmodifiableList(beacons));
+		reportRestaurantEnter(beacons);
 
 		ArrayList<Beacon> omnBeacons = new ArrayList<Beacon>();
 		final BeaconFilter filter = new BeaconFilter(OmnomApplication.get(this));
-		for (final Beacon b : beacons) {
-			if (filter.check(b)) {
+		for(final Beacon b : beacons) {
+			if(filter.check(b)) {
 				omnBeacons.add(b);
 			}
 		}
-		if (omnBeacons.size() > 0) {
+		if(omnBeacons.size() > 0) {
 			final List<Beacon> filteredBeacons = filter.filterBeacons(omnBeacons);
-			if (filteredBeacons.isEmpty()) {
+			if(filteredBeacons.isEmpty()) {
 				// fail if there is no beacons in a range
 				return;
 			}
 			final Beacon beacon = filteredBeacons.get(0);
-			if (isHandled(beacon)) {
+			if(isHandled(beacon)) {
 				// fail fast if beacon already handled
 				return;
 			}
 
-			if (filteredBeacons.size() == 1) {
-				if (AndroidUtils.hasConnection(this)) {
+			if(filteredBeacons.size() == 1) {
+				if(!AndroidUtils.hasConnection(this) || !hasAuthToken()) {
 					showNotification(beacon, null);
 				} else {
 					final TableDataResponse[] table = new TableDataResponse[1];
-					{
-						api.findBeacon(beacon).flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
-							@Override
-							public Observable<Restaurant> call(final TableDataResponse tableDataResponse) {
-								if (!tableDataResponse.hasErrors()) {
-									table[0] = tableDataResponse;
-									return api.getRestaurant(tableDataResponse.getRestaurantId());
-								}
-								return Observable.empty();
+					api.findBeacon(beacon).flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
+						@Override
+						public Observable<Restaurant> call(final TableDataResponse tableDataResponse) {
+							if(!tableDataResponse.hasErrors()) {
+								table[0] = tableDataResponse;
+								return api.getRestaurant(tableDataResponse.getRestaurantId());
 							}
-						}).flatMap(new Func1<Restaurant, Observable<ResponseBase>>() {
-							@Override
-							public Observable<ResponseBase> call(final Restaurant restaurant) {
-								if (restaurant != null) {
-									cacheBeacon(beacon);
-									showNotification(beacon, restaurant);
-									return api.newGuest(restaurant.getId(), table[0].getId());
-								}
-								return Observable.empty();
+							return Observable.empty();
+						}
+					}).flatMap(new Func1<Restaurant, Observable<ResponseBase>>() {
+						@Override
+						public Observable<ResponseBase> call(final Restaurant restaurant) {
+							if(restaurant != null) {
+								showNotification(beacon, restaurant);
+								return api.newGuest(restaurant.getId(), table[0].getId());
 							}
-						}).subscribe(new Action1<ResponseBase>() {
-							@Override
-							public void call(final ResponseBase o) {
-								// Do nothing
-							}
-						}, new Action1<Throwable>() {
-							@Override
-							public void call(final Throwable throwable) {
-								Log.e(TAG, "notifyIfNeeded", throwable);
-							}
-						});
-					}
+							return Observable.empty();
+						}
+					}).subscribe(new Action1<ResponseBase>() {
+						@Override
+						public void call(final ResponseBase o) {
+							// Do nothing
+						}
+					}, new Action1<Throwable>() {
+						@Override
+						public void call(final Throwable throwable) {
+							showNotification(beacon, null);
+							Log.e(TAG, "notifyIfNeeded", throwable);
+						}
+					});
 				}
 			}
 		}
 	}
 
 	private void reportRestaurantEnter(final List<Beacon> beacons) {
-		if (!beacons.isEmpty()) {
-			final Beacon beacon = beacons.get(0);
-			if(beacon == null) {
-				return;
-			}
-			final String restaurantData = beacon.getRestaurantData();
-			final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
-			if (!preferences.contains(this, restaurantData)) {
-				preferences.saveRestaurantBeacon(this, beacon);
-				if (AndroidUtils.hasConnection(this)) {
-					api.findBeacon(beacon).subscribe(new Action1<TableDataResponse>() {
-						@Override
-						public void call(TableDataResponse tableDataResponse) {
-							OmnomApplication.getMixPanelHelper(BackgroundBleService.this).track(RestaurantEnterMixpanelEvent
-									                                                                    .createEventBluetooth(UserHelper
-											                                                                                          .getUserData(
-													                                                                                          BackgroundBleService.this),
+		final Beacon beacon = beacons.get(0);
+		final String restaurantData = beacon.getRestaurantData();
+		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
+		if(!preferences.contains(this, restaurantData)) {
+			preferences.saveRestaurantBeacon(this, beacon);
+			if(AndroidUtils.hasConnection(this) && hasAuthToken()) {
+				api.findBeacon(beacon).subscribe(new Action1<TableDataResponse>() {
+					@Override
+					public void call(TableDataResponse tableDataResponse) {
+						OmnomApplication.getMixPanelHelper(BackgroundBleService.this).track(RestaurantEnterMixpanelEvent
+								                                                                    .createEventBluetooth(UserHelper
+										                                                                                          .getUserData(
+												                                                                                          BackgroundBleService.this),
 
-									                                                                                          tableDataResponse,
-									                                                                                          beacon));
-						}
-					}, new Action1<Throwable>() {
-						@Override
-						public void call(Throwable throwable) {
-							// Do nothing
-						}
-					});
-				}
+								                                                                                          tableDataResponse,
+								                                                                                          beacon));
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						// Do nothing
+					}
+				});
 			}
 		}
+	}
+
+	private boolean hasAuthToken() {
+		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
+		return !TextUtils.isEmpty(preferences.getAuthToken(this));
 	}
 
 	private void cacheBeacon(final Beacon beacon) {
@@ -292,7 +289,7 @@ public class BackgroundBleService extends Service {
 	private boolean isHandled(final Beacon beacon) {
 		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
 		final boolean contains = preferences.hasBeacon(this, beacon);
-		if (contains) {
+		if(contains) {
 			final long timestamp = preferences.getBeaconTimestamp(this, beacon);
 			return timestamp < SystemClock.elapsedRealtime() + BEACON_CACHE_INTERVAL;
 		}
@@ -301,13 +298,15 @@ public class BackgroundBleService extends Service {
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	private void showNotification(final Beacon beacon, @Nullable final Restaurant restaurant) {
+		cacheBeacon(beacon);
 		final String content =
 				restaurant != null ? getString(R.string.welcome_to_, restaurant.getTitle()) : getString(R.string.omnom_works_here);
 
 		final Notification notification =
 				new Notification.Builder(this).setSmallIcon(R.drawable.ic_app).setContentTitle(getString(R.string.app_name))
-						.setContentText(content).setContentIntent(getNotificationIntent()).setAutoCancel(true)
-						.setDefaults(Notification.DEFAULT_ALL).setOnlyAlertOnce(true).setPriority(Notification.PRIORITY_HIGH).build();
+				                              .setContentText(content).setContentIntent(getNotificationIntent()).setAutoCancel(true)
+				                              .setDefaults(Notification.DEFAULT_ALL).setOnlyAlertOnce(true).setPriority(
+						Notification.PRIORITY_HIGH).build();
 
 		final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		notificationManager.notify(beacon.getIdValue(0), 0, notification);
@@ -320,9 +319,9 @@ public class BackgroundBleService extends Service {
 	}
 
 	private void scheduleNextAlarm() {
-		if (Build.VERSION.SDK_INT == KITKAT) {
+		if(Build.VERSION.SDK_INT == KITKAT) {
 			scheduleNextAlarmKK();
-		} else if (Build.VERSION.SDK_INT == JELLY_BEAN_MR2) {
+		} else if(Build.VERSION.SDK_INT == JELLY_BEAN_MR2) {
 			scheduleAlarmJB();
 		}
 	}
@@ -340,7 +339,7 @@ public class BackgroundBleService extends Service {
 
 	@TargetApi(JELLY_BEAN_MR2)
 	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
-		if (enable) {
+		if(enable) {
 			mHandler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -368,7 +367,7 @@ public class BackgroundBleService extends Service {
 	}
 
 	private void runCallback(final Runnable endCallback) {
-		if (endCallback != null) {
+		if(endCallback != null) {
 			endCallback.run();
 		}
 	}
