@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
 import hugo.weaving.DebugLog;
+import retrofit.RetrofitError;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -150,17 +151,31 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                           .subscribe(new Action1<DecodeResponse>() {
 					                                           @Override
 					                                           public void call(final DecodeResponse response) {
-						                                           reportMixPanel(response.getTable());
-						                                           onDataLoaded(response.getRestaurant(), response.getTable());
-						                                           // TODO: discuss and implement
+						                                           if(response.hasErrors()) {
+							                                           startErrorTransition();
+							                                           mErrorHelper.showErrorDemo(
+									                                           LoaderError.BACKEND_ERROR,
+									                                           mInternetErrorClickListener);
+						                                           } else {
+							                                           reportMixPanel(response.getTable());
+							                                           onDataLoaded(response.getRestaurant(), response.getTable());
+							                                           // TODO: discuss and implement
+						                                           }
 					                                           }
 				                                           }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					                                           @Override
 					                                           protected void onError(final Throwable throwable) {
-						                                           startErrorTransition();
-						                                           mErrorHelper.showErrorDemo(
-								                                           LoaderError.NO_CONNECTION_TRY,
-								                                           mInternetErrorClickListener);
+						                                           if(throwable instanceof RetrofitError) {
+							                                           startErrorTransition();
+							                                           mErrorHelper.showErrorDemo(
+									                                           LoaderError.BACKEND_ERROR,
+									                                           mInternetErrorClickListener);
+						                                           } else {
+							                                           startErrorTransition();
+							                                           mErrorHelper.showErrorDemo(
+									                                           LoaderError.NO_CONNECTION_TRY,
+									                                           mInternetErrorClickListener);
+						                                           }
 					                                           }
 				                                           });
 			}
