@@ -34,6 +34,7 @@ import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.config.Config;
+import com.omnom.android.restaurateur.model.decode.DecodeResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -217,7 +218,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected boolean mIsDemo = false;
 
-	protected Func1<Restaurant, Restaurant> mPreloadBackgroundFunction;
+	protected Func1<DecodeResponse, DecodeResponse> mPreloadBackgroundFunction;
 
 	/**
 	 * ConfirmPhoneActivity.TYPE_LOGIN or ConfirmPhoneActivity.TYPE_REGISTER
@@ -350,18 +351,21 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			}
 		});
 
-		mPreloadBackgroundFunction = new Func1<Restaurant, Restaurant>() {
+		mPreloadBackgroundFunction = new Func1<DecodeResponse, DecodeResponse>() {
 			@Override
-			public Restaurant call(final Restaurant restaurant) {
-				final String bgImgUrl = RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics());
-				if(!TextUtils.isEmpty(bgImgUrl)) {
-					try {
-						OmnomApplication.getPicasso(getActivity()).load(bgImgUrl).get();
-					} catch(IOException e) {
-						Log.e(TAG, "unable to load img = " + bgImgUrl);
+			public DecodeResponse call(final DecodeResponse decodeResponse) {
+				final Restaurant restaurant = decodeResponse.getRestaurant();
+				if(restaurant != null) {
+					final String bgImgUrl = RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics());
+					if(!TextUtils.isEmpty(bgImgUrl)) {
+						try {
+							OmnomApplication.getPicasso(getActivity()).load(bgImgUrl).get();
+						} catch(IOException e) {
+							Log.e(TAG, "unable to load img = " + bgImgUrl);
+						}
 					}
 				}
-				return restaurant;
+				return decodeResponse;
 			}
 		};
 

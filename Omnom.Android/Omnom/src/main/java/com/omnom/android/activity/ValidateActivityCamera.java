@@ -11,7 +11,8 @@ import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
-import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.decode.DecodeResponse;
+import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -20,11 +21,9 @@ import com.omnom.android.utils.utils.AndroidUtils;
 
 import javax.inject.Inject;
 
-import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
-import rx.functions.Func1;
 
 public class ValidateActivityCamera extends ValidateActivity {
 	public static final String DEVICE_ID_GENYMOTION = "000000000000000";
@@ -107,7 +106,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 			                                         @Override
 			                                         public void call(Boolean hasNoErrors) {
 				                                         if(hasNoErrors) {
-					                                         loadTable(mQrData, table);
+					                                         loadTable(mQrData);
 				                                         } else {
 					                                         reportMixPanel(table[0]);
 					                                         startErrorTransition();
@@ -134,28 +133,26 @@ public class ValidateActivityCamera extends ValidateActivity {
 		}
 	}
 
-	private void loadTable(final String mQrData, final TableDataResponse[] table) {
+	private void loadTable(final String mQrData) {
+
 		mCheckQrSubscribtion = AndroidObservable
-				.bindActivity(this, api.checkQrCode(mQrData).flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
-					@Override
-					public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
-						table[0] = tableDataResponse;
-						if(tableDataResponse.hasAuthError()) {
-							throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
-							                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED, tableDataResponse.getError()));
-						}
-						if(!TextUtils.isEmpty(tableDataResponse.getError())) {
-							mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
-							return Observable.empty();
-						}
-						return api.getRestaurant(tableDataResponse.getRestaurantId(), mPreloadBackgroundFunction);
-					}
-				})).subscribe(new Action1<Restaurant>() {
-					@Override
-					public void call(final Restaurant restaurant) {
-						onDataLoaded(restaurant, table[0]);
-					}
-				}, onError);
+				.bindActivity(this, api.decode(new QrDecodeRequest(mQrData)).map(mPreloadBackgroundFunction)).subscribe(
+						new Action1<DecodeResponse>() {
+							@Override
+							public void call(final DecodeResponse decodeResponse) {
+								if(decodeResponse.hasAuthError()) {
+									throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
+									                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
+									                                             decodeResponse.getError()));
+								}
+								if(!TextUtils.isEmpty(decodeResponse.getError())) {
+									mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
+								} else {
+									reportMixPanel(decodeResponse.getTable());
+									onDataLoaded(decodeResponse.getRestaurant(), decodeResponse.getTable());
+								}
+							}
+						}, onError);
 	}
 
 	@Override

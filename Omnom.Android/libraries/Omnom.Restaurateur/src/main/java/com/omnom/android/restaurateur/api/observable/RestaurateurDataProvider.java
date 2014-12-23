@@ -18,7 +18,8 @@ import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
-import com.omnom.android.restaurateur.model.decode.BeaconDecodeResponse;
+import com.omnom.android.restaurateur.model.decode.DecodeResponse;
+import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -212,7 +213,12 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	}
 
 	@Override
-	public Observable<BeaconDecodeResponse> decode(final BeaconDecodeRequest request) {
+	public Observable<DecodeResponse> decode(final BeaconDecodeRequest request) {
+		return mDataService.decode(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<DecodeResponse> decode(final QrDecodeRequest request) {
 		return mDataService.decode(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 }
