@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -129,8 +130,9 @@ public class SplashFragment extends Fragment {
 		final int durationShort = getResources().getInteger(R.integer.default_animation_duration_short);
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
 		final int dimensionPixelSize = getResources().getDimensionPixelSize(R.dimen.loader_logo_size);
+		final FragmentActivity activity = getActivity();
 
-		getActivity().findViewById(android.R.id.content).postDelayed(new Runnable() {
+		activity.findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				AnimationUtils.animateAlpha(imgBill, false, durationShort);
@@ -141,11 +143,11 @@ public class SplashFragment extends Fragment {
 				// transitionDrawable.startTransition(durationShort);
 
 				// AnimationUtils.scaleWidth(imgFork, dimensionPixelSize, durationShort, null);
-				getActivity().findViewById(android.R.id.content).postDelayed(new Runnable() {
+				activity.findViewById(android.R.id.content).postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						if(!getActivity().isFinishing()) {
-							ValidateActivity.start((BaseFragmentActivity) getActivity(),
+						if(isAdded() && !activity.isFinishing()) {
+							ValidateActivity.start((BaseFragmentActivity) activity,
 							                       R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
 							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, ConfirmPhoneActivity.TYPE_LOGIN);
 						}
@@ -153,7 +155,9 @@ public class SplashFragment extends Fragment {
 				}, animationDuration);
 			}
 		}, durationSplash);
-		getActivity().getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
+		if (isAdded()) {
+			activity.getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
+		}
 		mAnimate = false;
 	}
 
@@ -161,6 +165,9 @@ public class SplashFragment extends Fragment {
 	 * Animate of fork_n_knife logo and loader
 	 */
 	private void animateMultiply() {
+		if (!isAdded()) {
+			return;
+		}
 		final float upperLogoPoint = getResources().getDimension(R.dimen.loader_margin_top);
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
 
@@ -245,7 +252,7 @@ public class SplashFragment extends Fragment {
 	}
 
 	public void animateLogin() {
-		if(!mAnimate) {
+		if(!mAnimate || !isAdded()) {
 			return;
 		}
 		getActivity().findViewById(android.R.id.content).postDelayed(new Runnable() {
