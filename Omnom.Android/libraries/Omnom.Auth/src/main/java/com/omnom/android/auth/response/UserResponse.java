@@ -10,6 +10,9 @@ public class UserResponse extends AuthResponse {
 	@Expose
 	private UserData user;
 
+	@Expose
+	private Long time;
+
 	public UserData getUser() {
 		return user;
 	}
@@ -18,10 +21,19 @@ public class UserResponse extends AuthResponse {
 		this.user = user;
 	}
 
+	public Long getTime() {
+		return time;
+	}
+
+	public void setTime(Long time) {
+		this.time = time;
+	}
+
 	@Override
 	public String toString() {
 		return "UserResponse{" +
 				"user=" + user +
+				", time=" + time +
 				'}';
 	}
 }

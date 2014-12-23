@@ -16,7 +16,6 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
-import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.UserProfileHelper;
 import com.omnom.android.auth.response.AuthResponse;
@@ -81,9 +80,6 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	@Inject
 	protected RestaurateurObeservableApi api;
-
-	@Inject
-	protected AuthService authenticator;
 
 	private Subscription profileSubscription;
 

@@ -27,4 +27,7 @@ public interface OmnomActivity {
 	public void initUi();
 
 	public PreferenceProvider getPreferences();
+
+	public void onApplicationLaunch();
+
 }

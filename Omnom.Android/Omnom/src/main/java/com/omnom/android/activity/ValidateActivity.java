@@ -23,7 +23,6 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
-import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
@@ -196,9 +195,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@Inject
 	protected RestaurateurObeservableApi api;
-
-	@Inject
-	protected AuthService authenticator;
 
 	protected OmnomErrorHelper mErrorHelper;
 
@@ -521,7 +517,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					public void run() {
 						OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
 						                     mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS, mIsDemo);
-						if(orders.size() == 1) {
+						if (orders.size() == 1) {
 							overridePendingTransition(R.anim.slide_in_down_short, R.anim.nothing);
 						}
 					}
@@ -622,13 +618,14 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		mUserSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
 			@Override
 			public void call(UserResponse userResponse) {
-				reportMixPanel(userResponse);
+				correctMixpanelTime(userResponse.getTime() == null ? 0 : userResponse.getTime());
 				app.cacheUserProfile(new UserProfile(userResponse));
+				reportMixPanel(userResponse);
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
-
+				Log.w(TAG, throwable.getMessage());
 			}
 		});
 
