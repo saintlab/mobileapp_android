@@ -80,11 +80,12 @@ public class MixPanelHelper {
 
 	public void trackRevenue(final String userId, final OrderFragment.PaymentDetails details, final BillResponse billData) {
 		mMixpanelApi.getPeople().identify(userId);
-		final int tipValue = details.getTipValue();
-		final double totalAmount = details.getAmount() * 100;
+		final int tipValue = details.getTipValue(); // already in kopeks
+		final double totalAmount = details.getAmount() * 100; // translate into kopeks
 
 		Map<String, Number> userPayemtn = new HashMap<String, Number>();
-		userPayemtn.put("bill_sum", totalAmount - tipValue);
+		final double billSum = totalAmount - tipValue;
+		userPayemtn.put("bill_sum", billSum);
 		userPayemtn.put("tips_sum", tipValue);
 		userPayemtn.put("total_sum", totalAmount);
 		userPayemtn.put("number_of_payments", 1);
@@ -96,6 +97,7 @@ public class MixPanelHelper {
 		} catch(JSONException e) {
 			Log.e(TAG, "trackRevenue", e);
 		}
-		mMixpanelApi.getPeople().trackCharge(totalAmount, json);
+		final double revenue = (billSum * billData.getAmountCommission()) + (tipValue * billData.getTipCommission());
+		mMixpanelApi.getPeople().trackCharge(revenue, json);
 	}
 }
