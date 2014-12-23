@@ -1,10 +1,9 @@
-package com.omnom.android.restaurateur.api.observable.providers;
+package com.omnom.android.restaurateur.api.observable;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.omnom.android.restaurateur.api.RestaurateurDataService;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
@@ -18,6 +17,8 @@ import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.config.Config;
+import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
+import com.omnom.android.restaurateur.model.decode.BeaconDecodeResponse;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -93,18 +94,18 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 
 	@Override
 	public Observable<TableDataResponse> bind(final String restaurantId, final int tableNumber, final String qrData,
-	                                             final Beacon beacon,
-	                                             final Beacon oldBeacon) {
+	                                          final Beacon beacon,
+	                                          final Beacon oldBeacon) {
 		final BeaconQrBindRequest request = new BeaconQrBindRequest(restaurantId, tableNumber, qrData, beacon, oldBeacon);
 		return mDataService.bind(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
 	public Observable<TableDataResponse> bind(final String restaurantId,
-	                                             final int tableNumber,
-	                                             final String qrData,
-	                                             final BeaconDataResponse beaconData,
-	                                             final Beacon oldBeacon) {
+	                                          final int tableNumber,
+	                                          final String qrData,
+	                                          final BeaconDataResponse beaconData,
+	                                          final Beacon oldBeacon) {
 		final BeaconQrBindRequest request = new BeaconQrBindRequest(restaurantId, tableNumber, qrData, beaconData, oldBeacon);
 		return mDataService.bind(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
@@ -208,5 +209,10 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid) {
 		return mDataService.buildBeacon(new BeaconBuildRequest(uuid, String.valueOf(tableNumber), restaurantId))
 		                   .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<BeaconDecodeResponse> decode(final BeaconDecodeRequest request) {
+		return mDataService.decode(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 }
