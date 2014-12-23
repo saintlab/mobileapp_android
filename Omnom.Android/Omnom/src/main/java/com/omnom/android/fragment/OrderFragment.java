@@ -999,7 +999,7 @@ public class OrderFragment extends Fragment {
 
 		ViewUtils.setVisible2(radioGroup, !visible);
 		ViewUtils.setVisible2(txtPaymentTitle, !visible);
-		ViewUtils.setVisible2(txtAlreadyPaid, !visible);
+		ViewUtils.setVisible2(txtAlreadyPaid, mOrder.getPaidAmount() > 0 && !visible);
 		ViewUtils.setVisible2(txtTipsTitle, !visible);
 		ViewUtils.setVisible2(btnPay, !visible);
 
