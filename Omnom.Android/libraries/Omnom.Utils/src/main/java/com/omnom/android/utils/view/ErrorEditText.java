@@ -1,12 +1,16 @@
 package com.omnom.android.utils.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.widget.EditText;
 
 import com.omnom.android.utils.R;
 
 public class ErrorEditText extends EditText {
+	private int mDefaultDrawableId = 0;
+
 	public ErrorEditText(Context context) {
 		super(context);
 	}
@@ -25,6 +29,18 @@ public class ErrorEditText extends EditText {
 	}
 
 	public void setError(boolean error) {
-		setBackgroundResource(error ? R.drawable.textfield_error_mtrl_alpha : R.drawable.edit_text);
+		setBackgroundResource(error ? R.drawable.textfield_error_mtrl_alpha : getDefaultDrawable());
+	}
+
+	private int getDefaultDrawable() {
+		TypedValue typedValue = new TypedValue();
+		if(mDefaultDrawableId == 0) {
+			getContext().getTheme().resolveAttribute(android.R.attr.editTextStyle, typedValue, true);
+			int[] attribute = new int[]{android.R.attr.background};
+			TypedArray array = getContext().obtainStyledAttributes(typedValue.resourceId, attribute);
+			int resId = array.getResourceId(0, -1);
+			mDefaultDrawableId = (resId == -1) ? R.drawable.edit_text : resId;
+		}
+		return mDefaultDrawableId;
 	}
 }
