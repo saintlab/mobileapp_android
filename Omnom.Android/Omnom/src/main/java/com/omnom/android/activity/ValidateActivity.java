@@ -679,7 +679,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		switch(mType) {
 			case ConfirmPhoneActivity.TYPE_LOGIN:
 				getMixPanel().identify(id);
-				getMixPanel().getPeople().identify(id);
 				getMixPanel().getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
 				getMixPanel().getPeople().showNotificationIfAvailable(this);
 				break;

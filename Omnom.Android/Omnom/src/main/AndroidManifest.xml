@@ -28,10 +28,10 @@
 
     <!-- START: MixPanel GCM Integration -->
     <permission
-        android:name="com.omnom.android.debug.permission.C2D_MESSAGE"
+        android:name="com.omnom.android.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.omnom.android.debug.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.omnom.android.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
@@ -48,13 +48,12 @@
 
         <!-- START: MixPanel GCM Integration -->
         <receiver
-            android:name="com.mixpanel.android.mpmetrics.GCMReceiver"
+            android:name=".mixpanel.MixpanelGCMReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-
-                <category android:name="com.omnom.android.debug" />
+                <category android:name="com.omnom.android" />
             </intent-filter>
         </receiver>
         <!-- END: MixPanel GCM Integration -->
