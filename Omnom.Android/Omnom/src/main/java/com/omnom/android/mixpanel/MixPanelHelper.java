@@ -98,7 +98,9 @@ public class MixPanelHelper {
 
 		JSONObject json = new JSONObject();
 		addTimestamp(json);
-		mMixpanelApi.getPeople().trackCharge(totalAmount, json);
+
+		final double revenue = (billSum * billData.getAmountCommission()) + (tipValue * billData.getTipCommission());
+		mMixpanelApi.getPeople().trackCharge(revenue, json);
 	}
 
 	public void setTimeDiff(final Long timeDiff) {
@@ -115,8 +117,6 @@ public class MixPanelHelper {
 		} catch(JSONException e) {
 			Log.e(TAG, "track", e);
 		}
-		final double revenue = (billSum * billData.getAmountCommission()) + (tipValue * billData.getTipCommission());
-		mMixpanelApi.getPeople().trackCharge(revenue, json);
 	}
 
 }
