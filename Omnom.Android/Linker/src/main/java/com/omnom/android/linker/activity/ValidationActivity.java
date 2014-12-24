@@ -188,8 +188,7 @@ public class ValidationActivity extends BaseActivity {
 		loader.setColor(getResources().getColor(R.color.loader_bg));
 		if(mFirstRun) {
 			if(mAnimationType == EXTRA_LOADER_ANIMATION_SCALE_DOWN) {
-				final int dpSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
-				loader.setSize(dpSize, dpSize);
+				loader.scaleDown();
 			} else {
 				loader.setSize(0, 0);
 			}

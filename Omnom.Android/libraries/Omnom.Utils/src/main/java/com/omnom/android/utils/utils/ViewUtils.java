@@ -97,4 +97,5 @@ public class ViewUtils {
 		view.getLayoutParams().height = value;
 		view.requestLayout();
 	}
+
 }
