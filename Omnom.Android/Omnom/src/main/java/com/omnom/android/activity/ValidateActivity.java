@@ -26,6 +26,7 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.mixpanel.model.UserRegisteredMixpanelEvent;
 import com.omnom.android.restaurateur.api.Protocol;
@@ -678,10 +679,15 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		switch(mType) {
 			case ConfirmPhoneActivity.TYPE_LOGIN:
 				getMixPanel().identify(id);
+				getMixPanel().getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
+				getMixPanel().getPeople().showNotificationIfAvailable(this);
 				break;
+
 			case ConfirmPhoneActivity.TYPE_REGISTER:
 				getMixPanel().alias(id, null);
 				getMixPanelHelper().track(new UserRegisteredMixpanelEvent(userResponse.getUser()));
+				getMixPanel().getPeople().identify(id);
+				getMixPanel().getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
 				break;
 		}
 	}
