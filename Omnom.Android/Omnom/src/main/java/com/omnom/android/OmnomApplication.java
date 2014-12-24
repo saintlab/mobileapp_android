@@ -121,9 +121,6 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
 			@Override
 			public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-				if(activityStack.isEmpty()) {
-					getMixPanelHelper(activity).track(new AppLaunchMixpanelEvent(UserHelper.getUserData(activity)));
-				}
 				activityStack.push(activity);
 			}
 
@@ -155,9 +152,6 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 			@Override
 			public void onActivityDestroyed(Activity activity) {
 				activityStack.pop();
-				if(!hasActivities()) {
-					mixPanel.flush();
-				}
 			}
 		});
 	}

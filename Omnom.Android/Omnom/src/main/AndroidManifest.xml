@@ -26,6 +26,18 @@
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <!-- START: MixPanel GCM Integration -->
+    <permission
+        android:name="com.omnom.android.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.omnom.android.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- END: MixPanel GCM Integration -->
+
     <application
         android:name=".OmnomApplication"
         android:allowBackup="true"
@@ -33,6 +45,19 @@
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
         android:theme="@style/Theme.Wood.Red">
+
+        <!-- START: MixPanel GCM Integration -->
+        <receiver
+            android:name=".mixpanel.MixpanelGCMReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="com.omnom.android" />
+            </intent-filter>
+        </receiver>
+        <!-- END: MixPanel GCM Integration -->
+
         <service
             android:name=".service.bluetooth.BackgroundBleService"
             android:enabled="true"

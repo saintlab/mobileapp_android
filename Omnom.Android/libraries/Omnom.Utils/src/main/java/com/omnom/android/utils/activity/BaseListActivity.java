@@ -46,6 +46,23 @@ public abstract class BaseListActivity extends ListActivity implements OmnomActi
 	}
 
 	@Override
+	public void onApplicationLaunch() {
+		// do nothing
+	}
+
+	@Override
+	protected void onPause() {
+		super.onStart();
+		mHelper.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onStop();
+		mHelper.onResume();
+	}
+
+	@Override
 	public PreferenceProvider getPreferences() {
 		return mHelper.getPreferences();
 	}

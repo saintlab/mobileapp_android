@@ -18,9 +18,11 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Interpolator;
@@ -54,6 +56,8 @@ public class LoaderView extends FrameLayout {
 	public enum Mode {
 		NONE, ENTER_DATA
 	}
+
+	public static final double LOADER_WIDTH_SCALE = 0.6;
 
 	public static final int WRONG_TABLE_NUMBER = -1;
 
@@ -138,9 +142,12 @@ public class LoaderView extends FrameLayout {
 			}
 		};
 
+		final DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+		loaderSize = (int) (displayMetrics.widthPixels * LOADER_WIDTH_SCALE + 0.5);
+		updateProgressSize(loaderSize);
+
 		currentColor = getDefaultBgColor();
 		mImgLogo.setTag(R.id.img_loader, R.drawable.ic_fork_n_knife);
-		loaderSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
 		translationViews.add(mProgressBar);
 		translationViews.add(mImgLoader);
 		translationViews.add(mImgLogo);
@@ -164,6 +171,16 @@ public class LoaderView extends FrameLayout {
 			public void afterTextChanged(Editable s) {
 			}
 		});
+	}
+
+	private void updateProgressSize(final int loaderSize) {
+		final ViewGroup.LayoutParams layoutParams = mProgressBar.getLayoutParams();
+		TypedValue outValue = new TypedValue();
+		getResources().getValue(R.dimen.loader_progress_inner_radius, outValue, true);
+		float innerRadiusRatio = outValue.getFloat();
+		final int progressSize = (int) (loaderSize * innerRadiusRatio / 2 + 0.5);
+		layoutParams.height = progressSize;
+		layoutParams.width = progressSize;
 	}
 
 	private int getDefaultBgColor() {
@@ -521,7 +538,7 @@ public class LoaderView extends FrameLayout {
 		RequestCreator requestCreator = Picasso.with(getContext())
 		                                       .load(logo)
 		                                       .placeholder(placeholderResId)
-		                                       .resizeDimen(R.dimen.loader_logo_size, R.dimen.loader_logo_size)
+		                                       .resize(loaderSize, loaderSize)
 		                                       .centerInside();
 		mTarget = new Target() {
 			@Override
@@ -555,4 +572,5 @@ public class LoaderView extends FrameLayout {
 	public void clearLogo() {
 		mImgLogo.setImageBitmap(null);
 	}
+
 }

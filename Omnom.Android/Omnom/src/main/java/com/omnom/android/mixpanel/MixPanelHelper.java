@@ -17,23 +17,32 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Ch3D on 03.10.2014.
  */
 public class MixPanelHelper {
 
+	public static final String KEY_MIXPANEL_TIME = "time";
+
 	public static final String KEY_DATA = "data";
+
+	public static final String KEY_DEVICE_TIMESTAMP = "device_timestamp";
 
 	public static final String KEY_TIMESTAMP = "timestamp";
 
+	public static final String MIXPANEL_PUSH_ID = "1021785355576";
+
 	private static final String TAG = MixPanelHelper.class.getSimpleName();
 
-	private static final String DATE_FORMAT = "{yyyy-MM-dd'T'HH:mm:ssZ}";
+	private static final String TIMESTAMP_FORMAT = "{yyyy-MM-dd'T'HH:mm:ssZ}";
 
 	private final Gson mGson;
 
 	private MixpanelAPI mMixpanelApi;
+
+	private Long timeDiff = 0L;
 
 	public MixPanelHelper(MixpanelAPI api) {
 		mMixpanelApi = api;
@@ -70,12 +79,8 @@ public class MixPanelHelper {
 	}
 
 	public void track(String event, JSONObject json) {
-		try {
-			json.put(KEY_TIMESTAMP, new SimpleDateFormat(DATE_FORMAT).format(new Date()));
-			mMixpanelApi.track(event, json);
-		} catch(JSONException e) {
-			Log.e(TAG, "track", e);
-		}
+		addTimestamp(json);
+		mMixpanelApi.track(event, json);
 	}
 
 	public void trackRevenue(final String userId, final OrderFragment.PaymentDetails details, final BillResponse billData) {
@@ -92,12 +97,26 @@ public class MixPanelHelper {
 		mMixpanelApi.getPeople().increment(userPayemtn);
 
 		JSONObject json = new JSONObject();
+		addTimestamp(json);
+		mMixpanelApi.getPeople().trackCharge(totalAmount, json);
+	}
+
+	public void setTimeDiff(final Long timeDiff) {
+		this.timeDiff = timeDiff == null ? 0 : timeDiff;
+	}
+
+	private void addTimestamp(final JSONObject json) {
 		try {
-			json.put(KEY_TIMESTAMP, new SimpleDateFormat(DATE_FORMAT).format(new Date()));
+			final Long currentTime = System.currentTimeMillis();
+			final Long timestamp = currentTime + timeDiff;
+			json.put(KEY_MIXPANEL_TIME, TimeUnit.MILLISECONDS.toSeconds(timestamp));
+			json.put(KEY_DEVICE_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT).format(new Date(currentTime)));
+			json.put(KEY_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT).format(new Date(timestamp)));
 		} catch(JSONException e) {
-			Log.e(TAG, "trackRevenue", e);
+			Log.e(TAG, "track", e);
 		}
 		final double revenue = (billSum * billData.getAmountCommission()) + (tipValue * billData.getTipCommission());
 		mMixpanelApi.getPeople().trackCharge(revenue, json);
 	}
+
 }

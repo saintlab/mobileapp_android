@@ -13,11 +13,11 @@ import android.util.Log;
 import android.view.View;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.fragment.EnteringFragment;
 import com.omnom.android.fragment.SplashFragment;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
 import com.omnom.android.utils.activity.BaseActivity;
-import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 
@@ -26,7 +26,7 @@ import java.util.Arrays;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class EnteringActivity extends BaseFragmentActivity implements SplashFragment.LaunchListener {
+public class EnteringActivity extends BaseOmnomFragmentActivity implements SplashFragment.LaunchListener {
 
 	private static final String TAG = EnteringActivity.class.getSimpleName();
 

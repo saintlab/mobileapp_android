@@ -31,4 +31,9 @@ public interface ActivityHelper {
 	PreferenceProvider getPreferences();
 
 	void onPostCreate();
+
+	void onResume();
+
+	void onPause();
+
 }

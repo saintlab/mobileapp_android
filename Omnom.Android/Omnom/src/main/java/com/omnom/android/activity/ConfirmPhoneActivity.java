@@ -13,15 +13,12 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
-import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.view.HeaderView;
-
-import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -87,9 +84,6 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.btn_request_code)
 	protected Button btnRequestCode;
-
-	@Inject
-	protected AuthService authenticator;
 
 	private String phone;
 	private boolean mFirstStart = true;

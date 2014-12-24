@@ -399,6 +399,11 @@ public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callb
 	}
 
 	@Override
+	public void onApplicationLaunch() {
+		// do nothing
+	}
+
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if(resultCode == RESULT_OK) {
 			if(requestCode == HISTORY_REQUEST_CODE) {
