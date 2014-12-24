@@ -183,7 +183,8 @@ public class BackgroundBleService extends Service {
 			return;
 		}
 
-		reportRestaurantEnter(beacons);
+		final Beacon firstBeacon = beacons.get(0);
+		reportRestaurantEnter(firstBeacon);
 
 		ArrayList<Beacon> omnBeacons = new ArrayList<Beacon>();
 		final BeaconFilter filter = new BeaconFilter(OmnomApplication.get(this));
@@ -192,6 +193,7 @@ public class BackgroundBleService extends Service {
 				omnBeacons.add(b);
 			}
 		}
+
 		if(omnBeacons.size() > 0) {
 			final List<Beacon> filteredBeacons = filter.filterBeacons(omnBeacons);
 			if(filteredBeacons.isEmpty()) {
@@ -244,8 +246,10 @@ public class BackgroundBleService extends Service {
 		}
 	}
 
-	private void reportRestaurantEnter(final List<Beacon> beacons) {
-		final Beacon beacon = beacons.get(0);
+	private void reportRestaurantEnter(final Beacon beacon) {
+		if(beacon == null) {
+			return;
+		}
 		final String restaurantData = beacon.getRestaurantData();
 		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
 		if(!preferences.contains(this, restaurantData)) {

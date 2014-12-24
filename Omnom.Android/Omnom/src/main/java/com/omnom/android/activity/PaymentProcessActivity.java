@@ -133,8 +133,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	public void initUi() {
 		mPaymentListener = new SilentPaymentEventListener(this, this);
 		mErrorHelper = new OmnomErrorHelper(loader, txtError, btnBottom, txtBottom, btnDemo, errorViews);
-		final int dpSize = getResources().getDimensionPixelSize(R.dimen.loader_size);
-		loader.setSize(dpSize, dpSize);
+		loader.scaleDown();
 		loader.setColor(getResources().getColor(android.R.color.black));
 		loader.setProgressColor(getResources().getColor(R.color.payment_progress_color));
 	}

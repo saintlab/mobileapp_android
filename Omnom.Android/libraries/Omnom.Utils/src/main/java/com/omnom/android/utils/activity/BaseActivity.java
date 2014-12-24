@@ -21,7 +21,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  * Created by Ch3D on 31.07.2014.
  */
 public abstract class BaseActivity extends Activity implements OmnomActivity, Extras {
-	private ActivityHelper mHelper;
+	protected ActivityHelper mHelper;
 
 	@Inject
 	protected Bus mBus;
@@ -39,14 +39,21 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 	}
 
 	@Override
+	public void onApplicationLaunch() {
+		// do nothing
+	}
+
+	@Override
 	protected void onPause() {
 		super.onPause();
+		mHelper.onPause();
 		mBus.unregister(this);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		mHelper.onResume();
 		mBus.register(this);
 	}
 

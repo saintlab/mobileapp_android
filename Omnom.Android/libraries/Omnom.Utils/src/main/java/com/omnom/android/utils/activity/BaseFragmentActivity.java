@@ -42,12 +42,14 @@ public abstract class BaseFragmentActivity extends FragmentActivity implements O
 	@Override
 	protected void onPause() {
 		super.onPause();
+		mHelper.onPause();
 		mBus.unregister(this);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		mHelper.onResume();
 		mBus.register(this);
 	}
 

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.omnom.android.R;
 import com.omnom.android.activity.ConfirmPhoneActivity;
 import com.omnom.android.activity.ValidateActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
+import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.view.MultiplyImageView;
@@ -186,7 +188,8 @@ public class SplashFragment extends Fragment {
 		});
 
 		// loader/circle downscaling animation
-		float end = getResources().getDimension(R.dimen.loader_size);
+		final DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+		float end = (int) (displayMetrics.widthPixels * LoaderView.LOADER_WIDTH_SCALE + 0.5);
 		float start = getResources().getDimension(R.dimen.loader_size_huge);
 		AnimationBuilder builder = AnimationBuilder.create(getActivity(), (int) start, (int) end);
 		builder.setDuration(getResources().getInteger(R.integer.splash_animation_duration));

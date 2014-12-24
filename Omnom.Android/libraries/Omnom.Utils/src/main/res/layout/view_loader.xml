@@ -12,8 +12,8 @@
     <ProgressBar
         android:id="@+id/progress"
         android:layout_marginTop="@dimen/loader_margin_top"
-        android:layout_width="@dimen/loader_progress_size"
-        android:layout_height="@dimen/loader_progress_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:indeterminate="false"
         android:progress="0"
@@ -26,8 +26,10 @@
         android:id="@+id/img_logo"
         android:layout_marginTop="@dimen/loader_margin_top"
         android:layout_gravity="center"
-        android:layout_width="@dimen/loader_logo_size"
-        android:layout_height="@dimen/loader_logo_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="@dimen/loader_logo_size"
+        android:minHeight="@dimen/loader_logo_size"
         android:scaleType="centerInside"
         android:src="@drawable/ic_fork_n_knife"/>
 

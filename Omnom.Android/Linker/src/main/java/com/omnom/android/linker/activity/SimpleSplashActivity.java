@@ -8,11 +8,13 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.omnom.android.linker.R;
 import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AnimationUtils;
 
 import java.util.Collections;
@@ -53,7 +55,8 @@ public class SimpleSplashActivity extends BaseActivity {
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
 		final int dimensionPixelSize = getResources().getDimensionPixelSize(R.dimen.loader_logo_size);
 		final float upperLogoPoint = getResources().getDimension(R.dimen.loader_margin_top);
-		final float loaderBgSize = getResources().getDimension(R.dimen.loader_size);
+		final DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+		final float loaderBgSize = (int) (displayMetrics.widthPixels * LoaderView.LOADER_WIDTH_SCALE + 0.5);
 
 		findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
