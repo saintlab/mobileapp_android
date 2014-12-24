@@ -39,6 +39,11 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 	}
 
 	@Override
+	public void onApplicationLaunch() {
+		// do nothing
+	}
+
+	@Override
 	protected void onPause() {
 		super.onPause();
 		mHelper.onPause();
