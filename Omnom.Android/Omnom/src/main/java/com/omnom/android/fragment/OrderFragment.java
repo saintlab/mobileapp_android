@@ -845,8 +845,18 @@ public class OrderFragment extends Fragment {
 		list.addFooterView(mFooterView1);
 		final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
 		final TextView txtOverall = (TextView) mFooterView1.findViewById(R.id.txt_overall);
+		final View layoutOverall = mFooterView1.findViewById(R.id.layout_overall);
 		txtOverall.setText(StringUtils.formatCurrencyWithSpace(mOrder.getTotalAmount(), getCurrencySuffix()));
 		updateFooter(isZoomedIn);
+
+		layoutOverall.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (isDownscaled()) {
+					zoomInFragment((OrdersActivity) getActivity());
+				}
+			}
+		});
 
 		billSplit.setOnClickListener(new View.OnClickListener() {
 			@Override

@@ -17,8 +17,8 @@ public class LoaderError {
 	public static final String EVENT_UNKNOWN_ERROR = "unknown_error";
 
 	public static final LoaderError UNKNOWN_ERROR =
-			new LoaderError(EVENT_UNKNOWN_ERROR, R.drawable.ic_no_connection, R.string.something_went_wrong, R.string.lets_try_again,
-			                R.drawable.ic_repeat_small);
+			new LoaderError(EVENT_UNKNOWN_ERROR, R.drawable.ic_no_connection, R.string.something_went_wrong,
+							R.string.error_ok, 0);
 
 	public static final String EVENT_BACKEND_ERROR = "backend_error";
 
