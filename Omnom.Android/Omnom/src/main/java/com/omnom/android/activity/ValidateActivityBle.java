@@ -10,7 +10,7 @@ import com.omnom.android.R;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.BeaconRecord;
-import com.omnom.android.restaurateur.model.decode.DecodeResponse;
+import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.decode.RssiRecord;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ObservableUtils;
@@ -139,6 +139,14 @@ public class ValidateActivityBle extends ValidateActivity {
 		                                         });
 	}
 
+	@Override
+	protected void reportMixPanel(final TableDataResponse table) {
+		if(table == null) {
+			return;
+		}
+		getMixPanelHelper().track(OnTableMixpanelEvent.createEventBluetooth(getUserData(), table.getRestaurantId(), table.getId()));
+	}
+
 	private void readBeacons() {
 		scanBleDevices(true, new Runnable() {
 			@Override
@@ -148,18 +156,16 @@ public class ValidateActivityBle extends ValidateActivity {
 						                                                         R.integer.ble_scan_duration),
 				                                                                                            mBeacons))
 				                                                            .map(mPreloadBackgroundFunction))
-				                                           .subscribe(new Action1<DecodeResponse>() {
+				                                           .subscribe(new Action1<RestaurantResponse>() {
 					                                           @Override
-					                                           public void call(final DecodeResponse response) {
+					                                           public void call(final RestaurantResponse response) {
 						                                           if(response.hasErrors()) {
 							                                           startErrorTransition();
 							                                           mErrorHelper.showErrorDemo(
 									                                           LoaderError.BACKEND_ERROR,
 									                                           mInternetErrorClickListener);
 						                                           } else {
-							                                           reportMixPanel(response.getTable());
-							                                           onDataLoaded(response.getRestaurant(), response.getTable());
-							                                           // TODO: discuss and implement
+							                                           handleDecodeResponse(response);
 						                                           }
 					                                           }
 				                                           }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
@@ -180,14 +186,6 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                           });
 			}
 		});
-	}
-
-	private void reportMixPanel(final TableDataResponse tableDataResponse) {
-		if(tableDataResponse == null) {
-			return;
-		}
-		getMixPanelHelper().track(OnTableMixpanelEvent.createEventBluetooth(getUserData(), tableDataResponse.getRestaurantId(),
-		                                                                    tableDataResponse.getId()));
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)

@@ -18,8 +18,8 @@ import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
-import com.omnom.android.restaurateur.model.decode.DecodeResponse;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
+import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -30,6 +30,7 @@ import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.restaurateur.retrofit.RestaurateurRxSupport;
 import com.omnom.android.restaurateur.serializer.MailRuSerializer;
 import com.omnom.android.restaurateur.serializer.OrdersResponseSerializer;
+import com.omnom.android.utils.generation.AutoParcelAdapterFactory;
 
 import java.util.List;
 
@@ -52,7 +53,9 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 		final Gson gson = new GsonBuilder()
 				.registerTypeAdapter(AcquiringData.class, new MailRuSerializer())
 				.registerTypeAdapter(OrdersResponse.class, new OrdersResponseSerializer())
-				.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+				.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+				.registerTypeAdapterFactory(new AutoParcelAdapterFactory())
+				.create();
 		final GsonConverter converter = new GsonConverter(gson);
 
 		final RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(interceptor).setEndpoint(dataEndPoint)
@@ -213,12 +216,12 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	}
 
 	@Override
-	public Observable<DecodeResponse> decode(final BeaconDecodeRequest request) {
+	public Observable<RestaurantResponse> decode(final BeaconDecodeRequest request) {
 		return mDataService.decode(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<DecodeResponse> decode(final QrDecodeRequest request) {
+	public Observable<RestaurantResponse> decode(final QrDecodeRequest request) {
 		return mDataService.decode(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 }

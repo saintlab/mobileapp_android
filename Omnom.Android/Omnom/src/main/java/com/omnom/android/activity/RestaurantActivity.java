@@ -50,7 +50,7 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	@OnClick(R.id.btn_call)
 	protected void doCall() {
 		if (!mFinishing) {
-			AndroidUtils.openDialer(this, mRestaurant.getPhone());
+			AndroidUtils.openDialer(this, mRestaurant.phone());
 		}
 	}
 
@@ -118,7 +118,7 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		mRestaurantViewHolder = new RestaurantsAdapter.RestaurantViewHolder(this);
 		final ColorDrawable colorDrawable = new ColorDrawable(getResources().getColor(R.color.order_item_price));
 		mRestaurantViewHolder.bindData(this, mRestaurant, colorDrawable, weekDay);
-		btnCall.setText(mRestaurant.getPhone());
+		btnCall.setText(mRestaurant.phone());
 	}
 
 	@Override

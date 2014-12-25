@@ -41,4 +41,8 @@ public class OmnomErrorHelper extends ErrorHelper {
 		                .track(
 				                new SimpleMixpanelEvent(UserHelper.getUserData(mLoader.getContext()), error.getEventName()));
 	}
+
+	public void showUnknownPlace() {
+
+	}
 }

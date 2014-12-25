@@ -41,7 +41,6 @@ import javax.inject.Inject;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
-import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -226,7 +225,7 @@ public class BackgroundBleService extends Service {
 								if(restaurant != null) {
 									cacheBeacon(beacon);
 									showNotification(beacon, restaurant);
-									return api.newGuest(restaurant.getId(), table[0].getId());
+									return api.newGuest(restaurant.id(), table[0].getId());
 								}
 								return Observable.empty();
 							}
@@ -295,7 +294,7 @@ public class BackgroundBleService extends Service {
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	private void showNotification(final Beacon beacon, @Nullable final Restaurant restaurant) {
-		final String content = restaurant != null ? getString(R.string.welcome_to_, restaurant.getTitle()) : getString(
+		final String content = restaurant != null ? getString(R.string.welcome_to_, restaurant.title()) : getString(
 				R.string.omnom_works_here);
 
 		final Notification notification =
