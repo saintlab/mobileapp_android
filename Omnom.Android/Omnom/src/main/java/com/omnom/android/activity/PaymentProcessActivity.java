@@ -308,23 +308,22 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private void onPayError() {
 		loader.showProgress(false);
-		mErrorHelper.showPaymentDeclined(new View.OnClickListener() {
+		mErrorHelper.showPaymentDeclined(finishOnClick());
+	}
+
+	private void onUnknownError() {
+		mErrorHelper.showUnknownError(finishOnClick());
+	}
+
+	private View.OnClickListener finishOnClick() {
+		return new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				setResult(RESULT_CANCELED);
 				finish();
 				overridePendingTransition(R.anim.nothing, R.anim.fade_out);
 			}
-		});
-	}
-
-	private void onUnknownError() {
-		mErrorHelper.showUnknownError(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				pay(mDetails.getAmount(), mDetails.getTip());
-			}
-		});
+		};
 	}
 
 	private Acquiring getAcquiring() {
