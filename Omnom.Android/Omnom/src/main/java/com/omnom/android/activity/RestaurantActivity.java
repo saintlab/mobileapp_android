@@ -2,6 +2,8 @@ package com.omnom.android.activity;
 
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.telephony.PhoneNumberUtils;
+import android.text.TextUtils;
 import android.widget.Button;
 
 import com.omnom.android.R;
@@ -10,6 +12,7 @@ import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.Calendar;
 
@@ -35,42 +38,42 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.txt_reserve)
 	protected void doReserve() {
-		if (!mFinishing) {
+		if(!mFinishing) {
 			// TODO: Implement
 		}
 	}
 
 	@OnClick(R.id.txt_im_inside)
 	protected void doImInside() {
-		if (!mFinishing) {
+		if(!mFinishing) {
 			// TODO: Implement
 		}
 	}
 
 	@OnClick(R.id.btn_call)
 	protected void doCall() {
-		if (!mFinishing) {
+		if(!mFinishing) {
 			AndroidUtils.openDialer(this, mRestaurant.phone());
 		}
 	}
 
 	@OnClick(R.id.txt_order)
 	protected void doMakeOrder() {
-		if (!mFinishing) {
+		if(!mFinishing) {
 			// TODO: Implement
 		}
 	}
 
 	@OnClick(R.id.btn_close)
 	protected void doClose() {
-		if (!mFinishing) {
+		if(!mFinishing) {
 			finish();
 		}
 	}
 
 	@OnClick(R.id.btn_demo)
 	protected void doDemo() {
-		if (!mFinishing) {
+		if(!mFinishing) {
 			ValidateActivity.startDemo(this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 		}
 	}
@@ -82,9 +85,13 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@Override
 	public void finish() {
+		if(mFinishing) {
+			// skip : already finishing
+			return;
+		}
 		mFinishing = true;
 
-		if (mRestaurantViewHolder == null) {
+		if(mRestaurantViewHolder == null) {
 			finishSimple();
 			return;
 		}
@@ -92,6 +99,8 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		final int translationY = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);
 		mRestaurantViewHolder.minimize(translationY);
 		btnCall.animate().alpha(0).start();
+
+		AnimationUtils.animateAlpha(findViewById(R.id.panel_bottom), false);
 
 		AnimationUtils
 				.scaleHeight(mRestaurantViewHolder.imgCover, getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_small),
@@ -110,7 +119,7 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		if (mRestaurant == null) {
+		if(mRestaurant == null) {
 			finish();
 			return;
 		}
@@ -118,7 +127,12 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		mRestaurantViewHolder = new RestaurantsAdapter.RestaurantViewHolder(this);
 		final ColorDrawable colorDrawable = new ColorDrawable(getResources().getColor(R.color.order_item_price));
 		mRestaurantViewHolder.bindData(this, mRestaurant, colorDrawable, weekDay);
-		btnCall.setText(mRestaurant.phone());
+		final String phone = mRestaurant.phone();
+		if(!TextUtils.isEmpty(phone)) {
+			btnCall.setText(PhoneNumberUtils.formatNumber(phone));
+		} else {
+			ViewUtils.setVisible(btnCall, false);
+		}
 	}
 
 	@Override

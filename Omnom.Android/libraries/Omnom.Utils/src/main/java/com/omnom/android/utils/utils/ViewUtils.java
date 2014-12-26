@@ -94,6 +94,9 @@ public class ViewUtils {
 	}
 
 	public static void setHeight(final View view, final int value) {
+		if(view == null || view.getLayoutParams() == null) {
+			return;
+		}
 		view.getLayoutParams().height = value;
 		view.requestLayout();
 	}

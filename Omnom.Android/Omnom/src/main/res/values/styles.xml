@@ -281,6 +281,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
         <item name="android:maxLines">2</item>
+        <item name="android:singleLine">false</item>
         <item name="android:ellipsize">end</item>
         <item name="android:textColor">@color/blue_bright</item>
     </style>

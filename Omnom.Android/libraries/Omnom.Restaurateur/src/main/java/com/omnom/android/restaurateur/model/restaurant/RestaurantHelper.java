@@ -124,7 +124,11 @@ public class RestaurantHelper {
 
 	public static String getBackground(final Restaurant restaurant, final DisplayMetrics displayMetrics) {
 		if(restaurant != null && restaurant.decoration() != null) {
-			return restaurant.decoration().getBackgroundImage() + "?w=" + displayMetrics.widthPixels;
+			final String backgroundImage = restaurant.decoration().getBackgroundImage();
+			if(TextUtils.isEmpty(backgroundImage)) {
+				return StringUtils.EMPTY_STRING;
+			}
+			return backgroundImage + "?w=" + displayMetrics.widthPixels;
 		}
 		return StringUtils.EMPTY_STRING;
 	}
