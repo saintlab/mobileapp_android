@@ -16,7 +16,7 @@
     <dimen name="order_list_height">660dp</dimen>
     <dimen name="font_order_amont_edit">48sp</dimen>
     <dimen name="order_edit_title_margin">-16dp</dimen>
-    <dimen name="order_fake_item_height">680dp</dimen>
+    <dimen name="order_fake_item_height">1000dp</dimen>
     <dimen name="order_payment_tips_title_margin">-12dp</dimen>
     <dimen name="order_payment_tips_radio_padding_bottom">12dp</dimen>
 

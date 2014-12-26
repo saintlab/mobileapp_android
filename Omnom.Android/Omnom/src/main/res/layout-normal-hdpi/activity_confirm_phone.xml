@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/view_size_default"
         android:background="@color/list_header"
-        android:padding="@dimen/activity_horizontal_margin"/>
+        android:padding="@dimen/activity_horizontal_margin_small"/>
 
     <TextView
         android:id="@+id/text"
@@ -40,18 +40,21 @@
 
         <EditText
             android:id="@+id/digit_2"
+            android:nextFocusLeft="@+id/digit_1"
             android:nextFocusForward="@+id/digit_3"
             app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             style="@style/ConfirmCode"/>
 
         <EditText
             android:id="@+id/digit_3"
+            android:nextFocusLeft="@+id/digit_2"
             android:nextFocusForward="@+id/digit_4"
             app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             style="@style/ConfirmCode"/>
 
         <EditText
             android:id="@+id/digit_4"
+            android:nextFocusLeft="@+id/digit_3"
             app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             style="@style/ConfirmCode"/>
     </LinearLayout>

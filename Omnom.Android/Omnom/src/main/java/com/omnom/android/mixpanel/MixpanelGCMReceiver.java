@@ -59,6 +59,12 @@ public class MixpanelGCMReceiver extends GCMReceiver {
 		final String message = intent.getStringExtra("mp_message");
 		final String url = intent.getStringExtra("open_url");
 		final String apsString = intent.getStringExtra("aps");
+
+		if(TextUtils.isEmpty(url) || TextUtils.isEmpty(apsString)) {
+			Log.w(LOGTAG, "skip handling push because of empty data");
+			return;
+		}
+
 		String soundName = StringUtils.EMPTY_STRING;
 
 		if(!TextUtils.isEmpty(apsString)) {

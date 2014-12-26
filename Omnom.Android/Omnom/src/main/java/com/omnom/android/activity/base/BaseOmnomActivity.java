@@ -39,6 +39,8 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 
 	private Gson mGson;
 
+	private boolean isBusy;
+
 	@Inject
 	protected AuthService authenticator;
 
@@ -115,4 +117,13 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 	protected UserData getUserData() {
 		return UserHelper.getUserData(this);
 	}
+
+	protected boolean isBusy() {
+		return isBusy;
+	}
+
+	protected void busy(final boolean isBusy) {
+		this.isBusy = isBusy;
+	}
+
 }
