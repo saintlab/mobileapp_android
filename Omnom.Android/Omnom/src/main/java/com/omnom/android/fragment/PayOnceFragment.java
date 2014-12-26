@@ -17,6 +17,8 @@ import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import butterknife.ButterKnife;
+import butterknife.InjectView;
+import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 /**
  * Created by mvpotter on 12/3/2014.
@@ -24,6 +26,18 @@ import butterknife.ButterKnife;
 public class PayOnceFragment extends Fragment {
 
 	private static final String ARG_AMOUNT = "amount";
+
+	@InjectView(R.id.btn_pay)
+	protected Button btnPay;
+
+	@InjectView(R.id.txt_sms_notifications_off)
+	protected TextView txtSmsNotificationsOff;
+
+	@InjectView(R.id.txt_pay_once)
+	protected TextView txtPayOnce;
+
+	@InjectView(R.id.btn_close)
+	protected ImageButton btnClose;
 
 	private OnPayListener mPayListener;
 
@@ -85,17 +99,24 @@ public class PayOnceFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_pay_once, container, false);
 		ButterKnife.inject(this, view);
-		ImageButton btnClose = (ImageButton) view.findViewById(R.id.btn_close);
+		return view;
+	}
+
+	@Override
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 		btnClose.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				getActivity().onBackPressed();
 			}
 		});
-		Button btnPay = (Button) view.findViewById(R.id.btn_pay);
-		TextView txtPayOnce = (TextView) view.findViewById(R.id.txt_pay_once);
 		if (mAmount > 0) {
-			final String text = AmountHelper.format(mAmount) + getString(R.string.currency_ruble);
+			CalligraphyUtils.applyFontToTextView(getActivity(), btnPay, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+			final String osfFontPath = "fonts/Futura-OSF-Omnom-Regular.otf";
+			CalligraphyUtils.applyFontToTextView(getActivity(), txtSmsNotificationsOff, osfFontPath);
+			CalligraphyUtils.applyFontToTextView(getActivity(), txtPayOnce, osfFontPath);
+			final String text = AmountHelper.format(mAmount) + getActivity().getString(R.string.currency_ruble);
 			btnPay.setText(getString(R.string.pay_amount, text));
 			btnPay.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -114,7 +135,6 @@ public class PayOnceFragment extends Fragment {
 			ViewUtils.setVisible(btnPay, false);
 			ViewUtils.setVisible(txtPayOnce, false);
 		}
-		return view;
 	}
 
 	/**

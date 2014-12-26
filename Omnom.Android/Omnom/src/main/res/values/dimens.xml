@@ -29,7 +29,7 @@
     <dimen name="split_view_header_height">38dp</dimen>
     <dimen name="bill_split_person_title_padding">16dp</dimen>
 
-    <dimen name="pay_once_font_size">12sp</dimen>
+    <dimen name="pay_once_font_size">14sp</dimen>
     <dimen name="pay_once_fragment_height_large">300dp</dimen>
     <dimen name="pay_once_fragment_height_small">150dp</dimen>
 

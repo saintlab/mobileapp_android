@@ -34,6 +34,8 @@ public abstract class BaseOmnomFragmentActivity extends BaseFragmentActivity {
 
 	private Subscription mUserSubscription;
 
+	private boolean isBusy;
+
 	@Override
 	public void onApplicationLaunch() {
 		final OmnomApplication app = OmnomApplication.get(getActivity());
@@ -68,4 +70,13 @@ public abstract class BaseOmnomFragmentActivity extends BaseFragmentActivity {
 	public final MixpanelAPI getMixPanel() {
 		return OmnomApplication.getMixPanel(this);
 	}
+
+	protected boolean isBusy() {
+		return isBusy;
+	}
+
+	protected void busy(final boolean isBusy) {
+		this.isBusy = isBusy;
+	}
+
 }

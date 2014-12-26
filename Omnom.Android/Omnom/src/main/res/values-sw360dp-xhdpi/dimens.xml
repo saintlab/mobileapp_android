@@ -27,7 +27,7 @@
     <dimen name="order_list_height">450dp</dimen>
     <dimen name="font_order_amont_edit">48sp</dimen>
     <dimen name="order_edit_title_margin">-16dp</dimen>
-    <dimen name="order_fake_item_height">420dp</dimen>
+    <dimen name="order_fake_item_height">1000dp</dimen>
     <dimen name="order_payment_tips_title_margin">-24dp</dimen>
 
     <dimen name="pay_button_height">40dp</dimen>
@@ -39,4 +39,6 @@
 
     <dimen name="picker_drawable_height">40dp</dimen>
     <dimen name="order_payment_tips_radio_padding_bottom">0dp</dimen>
+
+    <dimen name="pay_once_font_size">16sp</dimen>
 </resources>

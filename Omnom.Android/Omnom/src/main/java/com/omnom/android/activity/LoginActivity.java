@@ -126,9 +126,10 @@ public class LoginActivity extends BaseOmnomActivity {
 	}
 
 	public void doProceed() {
-		if(!validate()) {
+		if(!validate() || isBusy()) {
 			return;
 		}
+		busy(true);
 		topPanel.showProgress(true);
 		ViewUtils.setVisible(txtInfo, false);
 		ViewUtils.setVisible(txtRegister, false);
@@ -149,7 +150,6 @@ public class LoginActivity extends BaseOmnomActivity {
 							                                        intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_LOGIN);
 							                                        start(intent, R.anim.slide_in_right, R.anim.slide_out_left,
 							                                              false);
-							                                        topPanel.showProgress(false);
 						                                        }
 					                                        });
 				                                        } else {
@@ -162,15 +162,24 @@ public class LoginActivity extends BaseOmnomActivity {
 						                                        editPhone.setError(error.getMessage());
 					                                        }
 					                                        topPanel.showProgress(false);
+					                                        busy(false);
 				                                        }
 			                                        }
 		                                        }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			                                        @Override
 			                                        public void onError(Throwable throwable) {
 				                                        topPanel.showProgress(false);
+				                                        busy(false);
 				                                        Log.e(TAG + ":authorizePhone", "doProceed " + throwable.getMessage());
 			                                        }
 		                                        });
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		topPanel.showProgress(false);
+		busy(false);
 	}
 
 	@Override

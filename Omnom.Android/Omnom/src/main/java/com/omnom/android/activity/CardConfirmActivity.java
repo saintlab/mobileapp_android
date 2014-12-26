@@ -18,7 +18,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -220,7 +219,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-				if(actionId == EditorInfo.IME_ACTION_DONE) {
+				if(event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
 					verifyCard();
 					return true;
 				}
@@ -280,6 +279,9 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	}
 
 	private void registerCard() {
+		if (isBusy()) {
+			return;
+		}
 		mPanelTop.showProgress(true);
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		com.omnom.android.auth.UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
@@ -300,6 +302,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 						                                             final EditText editAmount = mEditAmount.getEditText();
 						                                             editAmount.setEnabled(true);
 						                                             AndroidUtils.showKeyboard(editAmount);
+						                                             busy(false);
 					                                             }
 				                                             }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					                                             @Override
@@ -313,15 +316,20 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 								                                             R.drawable.ic_repeat_small,
 								                                             mRegisterClickListener);
 						                                             mEditAmount.getEditText().setEnabled(false);
+						                                             busy(false);
 					                                             }
 				                                             });
 	}
 
 	public void verifyCard() {
+		if (isBusy()) {
+			return;
+		}
 		if(mCard == null) {
 			showToast(getActivity(), "Scan card");
 			return;
 		}
+		busy(true);
 		mPanelTop.showProgress(true);
 		final ErrorEdit text = findById(this, R.id.edit_amount);
 		final String filterAmount = StringUtils.filterAmount(text.getText());
@@ -343,12 +351,14 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 					                                           setResult(RESULT_OK);
 					                                           finish();
 				                                           }
+				                                           busy(false);
 			                                           }
 		                                           }, new Action1<Throwable>() {
 			                                           @Override
 			                                           public void call(Throwable throwable) {
 				                                           Log.w(TAG, throwable.getMessage());
 				                                           onVerificationError();
+				                                           busy(false);
 			                                           }
 		                                           });
 	}

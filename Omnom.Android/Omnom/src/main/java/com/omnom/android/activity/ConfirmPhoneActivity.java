@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -58,6 +59,29 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 		@Override
 		public void afterTextChanged(Editable s) {
+		}
+	}
+
+	private class OnKeyListener implements View.OnKeyListener {
+		private EditText mEditText;
+
+		private OnKeyListener(EditText editText) {
+			mEditText = editText;
+		}
+
+		@Override
+		public boolean onKey(View v, int keyCode, KeyEvent event) {
+			if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DEL) {
+				final int nextFocusLeftId = mEditText.getNextFocusLeftId();
+				mEditText.setText(StringUtils.EMPTY_STRING);
+				if (nextFocusLeftId != View.NO_ID) {
+					EditText editText = (EditText) findViewById(nextFocusLeftId);
+					editText.setText(StringUtils.EMPTY_STRING);
+					editText.requestFocus();
+				}
+				return true;
+			}
+			return false;
 		}
 	}
 
@@ -117,6 +141,9 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 			public void afterTextChanged(Editable s) {
 			}
 		});
+		edit2.setOnKeyListener(new OnKeyListener(edit2));
+		edit3.setOnKeyListener(new OnKeyListener(edit3));
+		edit4.setOnKeyListener(new OnKeyListener(edit4));
 		text.setText(getString(R.string.confirm_code_sms_text, phone));
 		AndroidUtils.showKeyboard(edit1);
 	}
