@@ -129,7 +129,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 					getPreferences().setAuthToken(getActivity(), authResponse.getToken());
 					topPanel.setContentVisibility(false, false);
 					finish();
-					EnteringActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, 0);
+					EnteringActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, 0, type);
 				} else {
 					edit1.setText(StringUtils.EMPTY_STRING);
 					edit2.setText(StringUtils.EMPTY_STRING);

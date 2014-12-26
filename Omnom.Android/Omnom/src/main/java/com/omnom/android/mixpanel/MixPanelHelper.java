@@ -1,14 +1,19 @@
 package com.omnom.android.mixpanel;
 
+import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
+import com.omnom.android.mixpanel.model.UserRegisteredMixpanelEvent;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
+import com.omnom.android.utils.utils.AndroidUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +29,20 @@ import java.util.concurrent.TimeUnit;
  */
 public class MixPanelHelper {
 
+	public static final String USER_ID = "id";
+
+	public static final String USER_NAME = "$name";
+
+	public static final String USER_NICK = "nick";
+
+	public static final String USER_BIRTHDAY = "birthday";
+
+	public static final String USER_EMAIL = "$email";
+
+	public static final String USER_PHONE = "$phone";
+
+	public static final String USER_CREATED = "$created";
+
 	public static final String KEY_MIXPANEL_TIME = "time";
 
 	public static final String KEY_DATA = "data";
@@ -37,6 +56,12 @@ public class MixPanelHelper {
 	private static final String TAG = MixPanelHelper.class.getSimpleName();
 
 	private static final String TIMESTAMP_FORMAT = "{yyyy-MM-dd'T'HH:mm:ssZ}";
+
+	public static final SimpleDateFormat sSimpleDateFormatter = new SimpleDateFormat(TIMESTAMP_FORMAT);
+
+	public static String formatDate(long ts) {
+		return sSimpleDateFormatter.format(new Date(ts));
+	}
 
 	private final Gson mGson;
 
@@ -78,6 +103,12 @@ public class MixPanelHelper {
 		}
 	}
 
+	public void trackDevice(Context context) {
+		mMixpanelApi.getPeople().set("Android", Build.VERSION.SDK_INT);
+		mMixpanelApi.getPeople().set("Device", Build.MANUFACTURER + " " + Build.MODEL);
+		mMixpanelApi.getPeople().set("App", AndroidUtils.getAppVersion(context));
+	}
+
 	public void track(String event, JSONObject json) {
 		addTimestamp(json);
 		mMixpanelApi.track(event, json);
@@ -112,11 +143,61 @@ public class MixPanelHelper {
 			final Long currentTime = System.currentTimeMillis();
 			final Long timestamp = currentTime + timeDiff;
 			json.put(KEY_MIXPANEL_TIME, TimeUnit.MILLISECONDS.toSeconds(timestamp));
-			json.put(KEY_DEVICE_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT).format(new Date(currentTime)));
-			json.put(KEY_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT).format(new Date(timestamp)));
+			json.put(KEY_DEVICE_TIMESTAMP, sSimpleDateFormatter.format(new Date(currentTime)));
+			json.put(KEY_TIMESTAMP, sSimpleDateFormatter.format(new Date(timestamp)));
 		} catch(JSONException e) {
 			Log.e(TAG, "track", e);
 		}
 	}
 
+	public void trackUserLogin(Context context, UserData user) {
+		if(user == null) {
+			return;
+		}
+		final String id = String.valueOf(user.getId());
+		mMixpanelApi.identify(id);
+		mMixpanelApi.getPeople().identify(id);
+		trackDevice(context);
+		mMixpanelApi.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
+	}
+
+	public void trackUserRegister(final Context context, final UserData user) {
+		if(user == null) {
+			return;
+		}
+		final String id = String.valueOf(user.getId());
+		mMixpanelApi.identify(id);
+		track(new UserRegisteredMixpanelEvent(user));
+
+		mMixpanelApi.getPeople().identify(id);
+		mMixpanelApi.getPeople().set(toJson(user));
+		mMixpanelApi.getPeople().set(MixPanelHelper.USER_CREATED, MixPanelHelper.formatDate(System.currentTimeMillis()));
+		trackDevice(context);
+		mMixpanelApi.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
+	}
+
+	public void trackUserDefault(final Context context, final UserData user) {
+		if(user == null) {
+			return;
+		}
+		// TODO:
+		final String id = String.valueOf(user.getId());
+		mMixpanelApi.getPeople().identify(id);
+		mMixpanelApi.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
+	}
+
+	public JSONObject toJson(UserData user) {
+		final JSONObject jsonUser = new JSONObject();
+		try {
+			jsonUser.put(USER_ID, user.getId());
+			jsonUser.put(USER_NAME, user.getName());
+			jsonUser.put(USER_NICK, user.getNick());
+			jsonUser.put(USER_BIRTHDAY, user.getBirthDate());
+			jsonUser.put(USER_EMAIL, user.getEmail());
+			jsonUser.put(USER_PHONE, user.getPhone());
+		} catch(JSONException e) {
+			Log.e(TAG, "toJson", e);
+		}
+		return jsonUser;
+	}
 }

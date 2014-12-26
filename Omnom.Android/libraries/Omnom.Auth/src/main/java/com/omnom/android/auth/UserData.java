@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by Ch3D on 03.09.2014.
  */
 public class UserData {
+
 	@Expose
 	private int id;
 
