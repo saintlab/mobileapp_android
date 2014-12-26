@@ -6,7 +6,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -16,7 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -49,7 +47,6 @@ import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
-import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -153,15 +150,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		return intent;
 	}
 
-	public static <T> Action1<T> emptyOnNext() {
-		return new Action1<T>() {
-			@Override
-			public void call(T response) {
-
-			}
-		};
-	}
-
 	protected final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -221,6 +209,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected boolean mFirstRun = true;
 
+	@Nullable
 	protected Restaurant mRestaurant;
 
 	@Nullable
@@ -245,15 +234,11 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private Subscription mUserSubscription;
 
-	private Subscription mGuestSubscribtion;
-
 	private Subscription mAcquiringConfigSubscribtion;
 
 	private View bottomView;
 
 	private com.omnom.android.utils.drawable.TransitionDrawable bgTransitionDrawable;
-
-	private Picasso mPicasso;
 
 	private PaymentEventListener mPaymentListener;
 
@@ -311,7 +296,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		OmnomObservable.unsubscribe(mOrdersSubscription);
 		OmnomObservable.unsubscribe(mWaiterCallSubscribtion);
 		OmnomObservable.unsubscribe(mUserSubscription);
-		OmnomObservable.unsubscribe(mGuestSubscribtion);
 		OmnomObservable.unsubscribe(mAcquiringConfigSubscribtion);
 		mPaymentListener.onDestroy();
 	}
@@ -337,8 +321,12 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 						new ColorDrawable(getResources().getColor(R.color.error_bg_white_transparent))});
 
 		bgTransitionDrawable.setCrossFadeEnabled(true);
+<<<<<<< HEAD
 		errorBgView.setBackgroundDrawable(bgTransitionDrawable);
 		mPicasso = Picasso.with(getApplicationContext());
+=======
+		rootView.setBackgroundDrawable(bgTransitionDrawable);
+>>>>>>> implement base qr-shortcut
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -390,7 +378,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				final View root = findViewById(R.id.root);
 				root.setBackgroundDrawable(drawable);
 				ValueAnimator va = ValueAnimator.ofInt(0, 255);
-				va.setDuration(1000);
+				va.setDuration(getResources().getInteger(R.integer.default_animation_duration_long));
 				va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 					@Override
 					public void onAnimationUpdate(ValueAnimator animation) {
@@ -573,18 +561,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		});
 	}
 
-	@OnClick(R.id.btn_down)
-	public void onDownPressed(final View v) {
-		final Rect rect = new Rect();
-		getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
-		final int height = rect.height();
-		final Interpolator interpolator = new DecelerateInterpolator();
-		final int duration = 700;
-		// imgHolder.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
-		loader.animate().translationY(-height).setDuration(duration).setInterpolator(interpolator).start();
-		AnimationUtils.animateAlpha(btnDownPromo, false);
-	}
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -612,18 +588,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		}
 	}
 
-	@Override
-	public void onBackPressed() {
-		// TODO: Fix when promo will be implemented
-		//if(imgHolder.getTranslationY() != 0) {
-		//	imgHolder.animate().translationY(0).start();
-		//	loader.animate().translationY(0).start();
-		//	AnimationUtils.animateAlpha(btnDownPromo, RestaurantHelper.isPromoEnabled(mRestaurant));
-		//} else {
-		super.onBackPressed();
-		//}
-	}
-
 	@OnClick(R.id.img_profile)
 	protected void onProfile(View v) {
 		final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
@@ -634,11 +598,17 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected final void onDataLoaded(final Restaurant restaurant, @Nullable TableDataResponse table) {
 		final OmnomApplication app = OmnomApplication.get(getActivity());
 
+		if(table == null) {
+			RestaurantActivity.start(this, restaurant, true);
+			return;
+		}
+
 		mRestaurant = restaurant;
 		mTable = table;
 
 		mPaymentListener.initTableSocket(mTable);
 
+<<<<<<< HEAD
 		final String token = app.getAuthToken();
 		mUserSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
 			@Override
@@ -651,19 +621,34 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			@Override
 			public void onError(Throwable throwable) {
 				Log.w(TAG, throwable.getMessage());
+=======
+		updateUserData(app);
+		onNewGuest(mTable);
+		animateRestaurantLogo(restaurant);
+		animateRestaurantBackground(restaurant);
+
+		loader.stopProgressAnimation();
+		loader.updateProgressMax(new Runnable() {
+			@Override
+			public void run() {
+				configureScreen(mRestaurant);
+				updateLightProfile(!mIsDemo);
+				ViewUtils.setVisible(txtLeave, mIsDemo);
+				ViewUtils.setVisible(getPanelBottom(), true);
+				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
+				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
+>>>>>>> implement base qr-shortcut
 			}
 		});
+	}
 
-		if(mTable != null) {
-			mGuestSubscribtion = AndroidObservable.bindActivity(this, api.newGuest(mTable.getRestaurantId(), mTable.getId()))
-			                                      .subscribe(emptyOnNext(), new Action1<Throwable>() {
-				                                      @Override
-				                                      public void call(Throwable throwable) {
-					                                      Log.w(TAG, throwable.getMessage());
-				                                      }
-			                                      });
-		}
+	private void animateRestaurantBackground(final Restaurant restaurant) {
+		OmnomApplication.getPicasso(this)
+		                .load(RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics()))
+		                .into(mTarget);
+	}
 
+	private void animateRestaurantLogo(final Restaurant restaurant) {
 		loader.post(new Runnable() {
 			@Override
 			public void run() {
@@ -672,19 +657,25 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			}
 		});
 		loader.animateColor(RestaurantHelper.getBackgroundColor(restaurant));
-		OmnomApplication.getPicasso(this).load(RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics()))
-		                .into(mTarget);
-		loader.stopProgressAnimation();
-		loader.updateProgressMax(new Runnable() {
+	}
+
+	private void onNewGuest(TableDataResponse table) {
+		api.newGuest(table.getRestaurantId(), table.getId())
+		   .subscribe(OmnomObservable.emptyOnNext(), OmnomObservable.loggerOnError(TAG));
+	}
+
+	private void updateUserData(final OmnomApplication app) {
+		final String token = app.getAuthToken();
+		mUserSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
 			@Override
-			public void run() {
-				configureScreen(mRestaurant);
-				// ViewUtils.setVisible(imgHolder, true);
-				updateLightProfile(!mIsDemo);
-				ViewUtils.setVisible(txtLeave, mIsDemo);
-				ViewUtils.setVisible(getPanelBottom(), true);
-				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
-				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
+			public void call(UserResponse userResponse) {
+				reportMixPanel(userResponse);
+				app.cacheUserProfile(new UserProfile(userResponse));
+			}
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			@Override
+			public void onError(Throwable throwable) {
+				// Do nothing
 			}
 		});
 	}

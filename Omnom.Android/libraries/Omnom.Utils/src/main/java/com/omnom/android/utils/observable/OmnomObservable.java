@@ -1,6 +1,7 @@
 package com.omnom.android.utils.observable;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 
 import com.omnom.android.utils.ErrorHelper;
@@ -12,6 +13,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedString;
 import rx.Subscription;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 /**
@@ -53,6 +55,24 @@ public class OmnomObservable {
 						break;
 				}
 				return false;
+			}
+		};
+	}
+
+	public static <T> Action1<T> emptyOnNext() {
+		return new Action1<T>() {
+			@Override
+			public void call(T response) {
+				// do nothing
+			}
+		};
+	}
+
+	public static Action1<Throwable> loggerOnError(final String tag) {
+		return new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				Log.w(tag, throwable.getMessage());
 			}
 		};
 	}

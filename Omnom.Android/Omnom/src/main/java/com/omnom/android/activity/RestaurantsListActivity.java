@@ -32,25 +32,22 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
-import static com.omnom.android.utils.utils.AndroidUtils.showToast;
-
 public class RestaurantsListActivity extends BaseOmnomActivity implements AdapterView.OnItemClickListener {
 
 	private static final String TAG = RestaurantsListActivity.class.getSimpleName();
 
 	public static void start(BaseOmnomActivity activity) {
-		activity.start(RestaurantsListActivity.class, false);
+		start(activity, false);
 	}
 
 	public static void start(BaseOmnomActivity activity, boolean finish) {
-		activity.start(RestaurantsListActivity.class, finish);
+		activity.start(new Intent(activity, RestaurantsListActivity.class), R.anim.fade_in, R.anim.fade_out, finish);
 	}
 
 	public static void start(BaseOmnomActivity activity, List<Restaurant> restaurants) {
 		final Intent intent = new Intent(activity, RestaurantsListActivity.class);
 		intent.putParcelableArrayListExtra(EXTRA_RESTAURANTS, new ArrayList<Parcelable>(restaurants));
-		activity.start(intent);
-		activity.start(RestaurantsListActivity.class, true);
+		activity.start(intent, R.anim.fade_in, R.anim.fade_out, true);
 	}
 
 	@InjectView(R.id.panel_top)
@@ -86,7 +83,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@OnClick(R.id.img_qr)
 	public void doQrShortcut() {
-		showToast(this, "NOT IMPLEMENTED YET!");
+		ValidateActivityCamera.start(this,
+		                             R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
+		                             EXTRA_LOADER_ANIMATION_SCALE_UP, ConfirmPhoneActivity.TYPE_DEFAULT);
 	}
 
 	@OnClick(R.id.img_profile)

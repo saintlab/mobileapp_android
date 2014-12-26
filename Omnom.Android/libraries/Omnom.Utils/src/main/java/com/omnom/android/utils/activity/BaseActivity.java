@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.AnimRes;
 import android.view.MenuItem;
 
 import com.omnom.android.utils.Extras;
@@ -21,10 +22,15 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  * Created by Ch3D on 31.07.2014.
  */
 public abstract class BaseActivity extends Activity implements OmnomActivity, Extras {
+<<<<<<< HEAD
 	protected ActivityHelper mHelper;
 
+=======
+>>>>>>> implement base qr-shortcut
 	@Inject
 	protected Bus mBus;
+
+	private ActivityHelper mHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -103,16 +109,16 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 		mHelper.start(intent);
 	}
 
-	public void startActivity(Class<?> cls, int animIn, int animOut) {
+	public void startActivity(Class<?> cls, @AnimRes int animIn, @AnimRes int animOut) {
 		mHelper.start(cls, animIn, animOut);
 	}
 
-	public void startActivity(Intent intent, int animIn, int animOut) {
+	public void startActivity(Intent intent, @AnimRes int animIn, @AnimRes int animOut) {
 		mHelper.start(intent, animIn, animOut);
 	}
 
 	@Override
-	public void start(Intent intent, int animIn, int animOut, boolean finish) {
+	public void start(Intent intent, @AnimRes int animIn, @AnimRes int animOut, boolean finish) {
 		mHelper.start(intent, animIn, animOut, finish);
 	}
 
