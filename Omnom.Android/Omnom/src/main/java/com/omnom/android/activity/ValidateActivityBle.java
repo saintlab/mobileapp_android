@@ -11,13 +11,13 @@ import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.BeaconRecord;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
-import com.omnom.android.restaurateur.model.decode.RssiRecord;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -64,12 +64,14 @@ public class ValidateActivityBle extends ValidateActivity {
 					@Override
 					public void run() {
 						final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
+						if(beacon == null) {
+							return;
+						}
 						BeaconRecord record = find(mBeacons, beacon);
 						if(record == null) {
 							record = BeaconRecord.create(beacon);
 							mBeacons.add(record);
 						}
-						record.addRssi(new RssiRecord(rssi, System.currentTimeMillis()));
 					}
 				});
 			}
@@ -152,9 +154,11 @@ public class ValidateActivityBle extends ValidateActivity {
 			@Override
 			public void run() {
 				mFindBeaconSubscription = AndroidObservable.bindActivity(ValidateActivityBle.this,
-				                                                         api.decode(new BeaconDecodeRequest(getResources().getInteger(
-						                                                         R.integer.ble_scan_duration),
-				                                                                                            mBeacons))
+				                                                         api.decode(new BeaconDecodeRequest(
+						                                                                    getResources().getInteger(
+								                                                                    R.integer.ble_scan_duration),
+						                                                                    Collections.unmodifiableList(mBeacons))
+				                                                                   )
 				                                                            .map(mPreloadBackgroundFunction))
 				                                           .subscribe(new Action1<RestaurantResponse>() {
 					                                           @Override

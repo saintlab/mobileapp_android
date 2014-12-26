@@ -42,6 +42,10 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		activity.start(RestaurantsListActivity.class, false);
 	}
 
+	public static void start(BaseOmnomActivity activity, boolean finish) {
+		activity.start(RestaurantsListActivity.class, finish);
+	}
+
 	public static void start(BaseOmnomActivity activity, List<Restaurant> restaurants) {
 		final Intent intent = new Intent(activity, RestaurantsListActivity.class);
 		intent.putParcelableArrayListExtra(EXTRA_RESTAURANTS, new ArrayList<Parcelable>(restaurants));
@@ -78,6 +82,8 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private boolean mItemClicked = false;
 
+	private View footer;
+
 	@OnClick(R.id.img_qr)
 	public void doQrShortcut() {
 		showToast(this, "NOT IMPLEMENTED YET!");
@@ -91,9 +97,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@OnClick(R.id.btn_demo)
 	public void doDemo() {
 		ValidateActivity.startDemo(this,
-		                       R.anim.fake_fade_in_instant,
-		                       R.anim.fake_fade_out_instant,
-		                       EXTRA_LOADER_ANIMATION_SCALE_DOWN);
+		                           R.anim.fake_fade_in_instant,
+		                           R.anim.fake_fade_out_instant,
+		                           EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
 
 	@Override
@@ -132,7 +138,10 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	}
 
 	private void initList() {
-		View footer = LayoutInflater.from(getActivity()).inflate(R.layout.item_restaurants_footer, null);
+		if(footer != null) {
+			list.removeFooterView(footer);
+		}
+		footer = LayoutInflater.from(getActivity()).inflate(R.layout.item_restaurants_footer, null);
 		footer.findViewById(R.id.txt_info).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

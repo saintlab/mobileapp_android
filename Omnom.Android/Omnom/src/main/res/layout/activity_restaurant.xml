@@ -35,6 +35,7 @@
                 android:background="@drawable/bg_rounded_bordered_black_disabled"/>
 
             <LinearLayout
+                android:id="@+id/panel_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin_large"

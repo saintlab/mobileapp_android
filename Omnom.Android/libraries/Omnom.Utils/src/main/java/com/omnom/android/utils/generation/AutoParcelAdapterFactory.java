@@ -9,6 +9,8 @@ import com.google.gson.TypeAdapterFactory;
  */
 public class AutoParcelAdapterFactory implements TypeAdapterFactory {
 
+	public static final String SUFFIX_AUTO_PARCEL = ".AutoParcel_";
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> TypeAdapter<T> create(final Gson gson, final com.google.gson.reflect.TypeToken<T> type) {
@@ -19,13 +21,13 @@ public class AutoParcelAdapterFactory implements TypeAdapterFactory {
 
 		String packageName = rawType.getPackage().getName();
 		String className = rawType.getName().substring(packageName.length() + 1).replace('$', '_');
-		String autoValueName = packageName + ".AutoValue_" + className;
+		String autoValueName = packageName + SUFFIX_AUTO_PARCEL + className;
 
 		try {
 			Class<?> autoValueType = Class.forName(autoValueName);
 			return (TypeAdapter<T>) gson.getAdapter(autoValueType);
 		} catch(ClassNotFoundException e) {
-			throw new RuntimeException("Could not load AutoValue type " + autoValueName, e);
+			throw new RuntimeException("Could not load AutoParcel type " + autoValueName, e);
 		}
 	}
 }
