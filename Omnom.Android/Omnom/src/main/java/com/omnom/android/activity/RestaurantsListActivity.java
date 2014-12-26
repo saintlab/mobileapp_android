@@ -50,7 +50,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		final Intent intent = new Intent(activity, RestaurantsListActivity.class);
 		intent.putParcelableArrayListExtra(EXTRA_RESTAURANTS, new ArrayList<Parcelable>(restaurants));
 		activity.start(intent);
-		activity.start(RestaurantsListActivity.class, false);
+		activity.start(RestaurantsListActivity.class, true);
 	}
 
 	@InjectView(R.id.panel_top)

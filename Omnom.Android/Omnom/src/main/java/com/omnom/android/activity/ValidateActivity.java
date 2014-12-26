@@ -777,11 +777,16 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		} else {
 			// TODO: show error or handle
 		}
-
 	}
 
 	private void handleRestaurants(final List<Restaurant> restaurants) {
-
+		loader.stopProgressAnimation();
+		loader.updateProgressMax(new Runnable() {
+			@Override
+			public void run() {
+				RestaurantsListActivity.start(ValidateActivity.this, restaurants);
+			}
+		});
 	}
 
 	private void handleEmpty() {
