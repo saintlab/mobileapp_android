@@ -492,20 +492,15 @@ public class OrderFragment extends Fragment {
 		final int heightPixels = displayMetrics.heightPixels;
 
 		final int defaultPadding = ViewUtils.dipToPixels(getActivity(), 48);
-		final boolean hasNavigationBar = AndroidUtils.hasNavigationBar(getActivity());
-		mListHeight = heightPixels - defaultPadding - (hasNavigationBar ? defaultPadding : 0);
+		final int navigationBarHeight = AndroidUtils.getNavigationBarHeight(getActivity());
+		mListHeight = heightPixels - navigationBarHeight - defaultPadding;
 
-		final int bottomMin = getResources().getDimensionPixelSize(R.dimen.order_payment_height) - (hasNavigationBar ? 0 : defaultPadding);
-		final int i = mListHeight / 2;
-		if(i < bottomMin) {
-			mListTraslationActive = (-mListHeight / 2) - (bottomMin - i);
-		} else {
-			mListTraslationActive = -mListHeight / 2 + (i - bottomMin);
-		}
+		final int bottomMin = getResources().getDimensionPixelSize(R.dimen.order_payment_height);
+		mListTraslationActive = -bottomMin;
 
 		// TODO: Find out generic solution for small devices like megafon login 1
 		if(displayMetrics.densityDpi == DisplayMetrics.DENSITY_MEDIUM) {
-			final int mdpiPadding = ViewUtils.dipToPixels(getActivity(), 72);
+			final int mdpiPadding = ViewUtils.dipToPixels(getActivity(), 16);
 			mListHeight -= mdpiPadding;
 			mListTraslationActive += mdpiPadding;
 		}
