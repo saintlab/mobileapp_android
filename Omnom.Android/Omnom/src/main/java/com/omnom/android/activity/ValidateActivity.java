@@ -20,14 +20,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthServiceException;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
-import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
-import com.omnom.android.mixpanel.model.UserRegisteredMixpanelEvent;
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
@@ -81,6 +81,11 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	public static final int REQUEST_CODE_ORDERS = 100;
 
+	/**
+	 * Used when there is an active auth token during validation process
+	 */
+	public static final int TYPE_DEFAULT = -1;
+
 	private static final String TAG = ValidateActivity.class.getSimpleName();
 
 	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
@@ -124,7 +129,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	private static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo,
-	                         final int userEnterType) {
+	                          final int userEnterType) {
 		Intent intent = createIntent(context, animationType, isDemo, userEnterType);
 		if(context instanceof ConfirmPhoneActivity) {
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -245,7 +250,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected void handleIntent(Intent intent) {
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 		mIsDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
-		mType = intent.getIntExtra(EXTRA_CONFIRM_TYPE, -1);
+		mType = intent.getIntExtra(EXTRA_CONFIRM_TYPE, TYPE_DEFAULT);
 	}
 
 	@Override
@@ -520,7 +525,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					public void run() {
 						OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
 						                     mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS, mIsDemo);
-						if (orders.size() == 1) {
+						if(orders.size() == 1) {
 							overridePendingTransition(R.anim.slide_in_down_short, R.anim.nothing);
 						}
 					}
@@ -674,19 +679,25 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	 * Report about user sign up or login
 	 */
 	private void reportMixPanel(UserResponse userResponse) {
-		final String id = String.valueOf(userResponse.getUser().getId());
+		final UserData user = userResponse.getUser();
+		final MixpanelAPI mixPanel = getMixPanel();
+
+		if(user == null || mixPanel == null) {
+			// fail fast NPE check
+			return;
+		}
+
 		switch(mType) {
 			case ConfirmPhoneActivity.TYPE_LOGIN:
-				getMixPanel().identify(id);
-				getMixPanel().getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
-				getMixPanel().getPeople().showNotificationIfAvailable(this);
+				getMixPanelHelper().trackUserLogin(this, user);
 				break;
 
 			case ConfirmPhoneActivity.TYPE_REGISTER:
-				getMixPanel().alias(id, null);
-				getMixPanelHelper().track(new UserRegisteredMixpanelEvent(userResponse.getUser()));
-				getMixPanel().getPeople().identify(id);
-				getMixPanel().getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
+				getMixPanelHelper().trackUserRegister(this, user);
+				break;
+
+			case TYPE_DEFAULT:
+				getMixPanelHelper().trackUserDefault(this, user);
 				break;
 		}
 	}

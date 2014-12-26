@@ -26,8 +26,10 @@ import com.omnom.android.activity.EnteringActivity;
 import com.omnom.android.beacon.BeaconFilter;
 import com.omnom.android.mixpanel.model.RestaurantEnterMixpanelEvent;
 import com.omnom.android.preferences.PreferenceHelper;
+import com.omnom.android.preferences.PreferenceHelperAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
+import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.UserHelper;
@@ -251,20 +253,28 @@ public class BackgroundBleService extends Service {
 			return;
 		}
 		final String restaurantData = beacon.getRestaurantData();
-		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
+		final PreferenceHelperAdapter preferences = (PreferenceHelperAdapter) OmnomApplication.get(this).getPreferences();
+		final UserProfile userProfile = preferences.getUserProfile(this);
+		if(userProfile == null || userProfile.getUser() == null) {
+			return;
+		}
+
 		if(!preferences.contains(this, restaurantData)) {
 			preferences.saveRestaurantBeacon(this, beacon);
 			if(AndroidUtils.hasConnection(this) && hasAuthToken()) {
 				api.findBeacon(beacon).subscribe(new Action1<TableDataResponse>() {
 					@Override
 					public void call(TableDataResponse tableDataResponse) {
-						OmnomApplication.getMixPanelHelper(BackgroundBleService.this).track(RestaurantEnterMixpanelEvent
-								                                                                    .createEventBluetooth(UserHelper
-										                                                                                          .getUserData(
-												                                                                                          BackgroundBleService.this),
+						final BackgroundBleService context = BackgroundBleService.this;
 
-								                                                                                          tableDataResponse,
-								                                                                                          beacon));
+						OmnomApplication.getMixPanel(context).identify(String.valueOf(userProfile.getUser().getId()));
+						OmnomApplication.getMixPanelHelper(context).track(RestaurantEnterMixpanelEvent
+								                                                  .createEventBluetooth(UserHelper
+										                                                                        .getUserData(
+												                                                                        context),
+
+								                                                                        tableDataResponse,
+								                                                                        beacon));
 					}
 				}, new Action1<Throwable>() {
 					@Override
