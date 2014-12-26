@@ -1,5 +1,6 @@
 package com.omnom.android.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
@@ -29,6 +31,23 @@ public class ValidateActivityCamera extends ValidateActivity {
 	public static final String DEVICE_ID_GENYMOTION = "000000000000000";
 
 	private static final String TAG = ValidateActivityCamera.class.getSimpleName();
+
+	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, final int userEnterType) {
+		Intent intent = createIntent(context, animationType, false, userEnterType);
+		if(context instanceof ConfirmPhoneActivity) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		}
+		context.start(intent, enterAnim, exitAnim, false);
+	}
+
+	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
+		final Intent intent = new Intent(context, ValidateActivityCamera.class);
+		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
+		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
+		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
+		return intent;
+	}
 
 	@Inject
 	protected RestaurateurObeservableApi api;

@@ -33,7 +33,10 @@ import rx.functions.Action1;
 public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	public static final int TYPE_LOGIN = 0;
+
 	public static final int TYPE_REGISTER = 1;
+
+	public static final int TYPE_DEFAULT = -1;
 
 	private static final String TAG = ConfirmPhoneActivity.class.getSimpleName();
 
@@ -51,9 +54,9 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
-			if (s.length() > 0) {
+			if(s.length() > 0) {
 				final int nextFocusForwardId = mEditText.getNextFocusForwardId();
-				if (nextFocusForwardId != View.NO_ID) {
+				if(nextFocusForwardId != View.NO_ID) {
 					findViewById(nextFocusForwardId).requestFocus();
 				}
 			}
@@ -92,9 +95,13 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	protected AuthService authenticator;
 
 	private String phone;
+
 	private boolean mFirstStart = true;
+
 	private int type;
+
 	private Subscription mConfirmSubscription;
+
 	private Subscription mRequestCodeSubscription;
 
 	@Override
@@ -114,7 +121,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if (s.length() > 0) {
+				if(s.length() > 0) {
 					doConfirm();
 				}
 			}
@@ -131,7 +138,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		mConfirmSubscription = AndroidObservable.bindActivity(this, getObservable()).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(final AuthResponse authResponse) {
-				if (!authResponse.hasError()) {
+				if(!authResponse.hasError()) {
 					getPreferences().setAuthToken(getActivity(), authResponse.getToken());
 					topPanel.setContentVisibility(false, false);
 					finish();
@@ -157,9 +164,9 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	private Observable<AuthResponse> getObservable() {
 		Observable<AuthResponse> observable;
-		if (type == TYPE_REGISTER) {
+		if(type == TYPE_REGISTER) {
 			observable = authenticator.confirm(phone, getCode());
-		} else if (type == TYPE_LOGIN) {
+		} else if(type == TYPE_LOGIN) {
 			observable = authenticator.authorizePhone(phone, getCode());
 		} else {
 			throw new RuntimeException("Wrong confirm type = " + type);
@@ -188,7 +195,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (topPanel.isAlphaVisible()) {
+		if(topPanel.isAlphaVisible()) {
 			topPanel.postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -198,7 +205,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 			}, mFirstStart ? getResources().getInteger(android.R.integer.config_longAnimTime) :
 					                     getResources().getInteger(android.R.integer.config_mediumAnimTime));
 		}
-		if (mFirstStart) {
+		if(mFirstStart) {
 			startRequestCodeTimeout();
 		}
 		mFirstStart = false;

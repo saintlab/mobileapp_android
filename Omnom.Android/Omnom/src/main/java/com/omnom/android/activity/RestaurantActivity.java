@@ -22,9 +22,13 @@ import butterknife.OnClick;
 public class RestaurantActivity extends BaseOmnomActivity {
 
 	public static void start(BaseOmnomActivity activity, Restaurant restaurant) {
+		start(activity, restaurant, false);
+	}
+
+	public static void start(BaseOmnomActivity activity, Restaurant restaurant, boolean finish) {
 		final Intent intent = new Intent(activity, RestaurantActivity.class);
 		intent.putExtra(EXTRA_RESTAURANT, restaurant);
-		activity.start(intent, false);
+		activity.start(intent, finish);
 	}
 
 	protected RestaurantsAdapter.RestaurantViewHolder mRestaurantViewHolder;
