@@ -40,18 +40,21 @@
 
         <EditText
             android:id="@+id/digit_2"
+            android:nextFocusLeft="@+id/digit_1"
             android:nextFocusForward="@+id/digit_3"
             app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             style="@style/ConfirmCode"/>
 
         <EditText
             android:id="@+id/digit_3"
+            android:nextFocusLeft="@+id/digit_2"
             android:nextFocusForward="@+id/digit_4"
             app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             style="@style/ConfirmCode"/>
 
         <EditText
             android:id="@+id/digit_4"
+            android:nextFocusLeft="@+id/digit_3"
             app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             style="@style/ConfirmCode"/>
     </LinearLayout>
