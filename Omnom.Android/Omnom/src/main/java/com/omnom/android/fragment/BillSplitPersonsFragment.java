@@ -95,7 +95,10 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 
 	private BigDecimal getAmount() {
 		final int value = mPicker.getValue();
-		final double amountToPay = mOrder.getTotalAmount();
+		double amountToPay = mOrder.getAmountToPay();
+		if (value > 1) {
+			amountToPay = mOrder.getTotalAmount();
+		}
 		final double v = amountToPay / value;
 		final BigDecimal bigDecimal = new BigDecimal(String.valueOf(v));
 		return bigDecimal.setScale(2, RoundingMode.HALF_UP);
