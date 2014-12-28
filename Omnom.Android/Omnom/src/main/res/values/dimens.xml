@@ -26,6 +26,8 @@
     <dimen name="restaurant_distance_padding">12dp</dimen>
     <dimen name="restaurants_topbar_height">60dp</dimen>
 
+    <dimen name="loader_logo_padding">0dp</dimen>
+
     <dimen name="split_view_header_height">38dp</dimen>
     <dimen name="bill_split_person_title_padding">16dp</dimen>
 
