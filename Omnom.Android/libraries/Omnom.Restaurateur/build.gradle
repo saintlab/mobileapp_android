@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'hugo'
+apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 20
@@ -25,7 +26,11 @@ dependencies {
     compile 'com.netflix.rxjava:rxjava-android:0.19.6'
     compile 'com.squareup.dagger:dagger:1.2.2'
     compile 'com.google.code.gson:gson:2.2.4'
-    provided 'com.squareup.dagger:dagger-compiler:1.2.2'
+    apt 'com.squareup.dagger:dagger-compiler:1.2.2'
+
+    // auto-parcel
+    compile 'com.github.frankiesardo:auto-parcel:+'
+    apt 'com.github.frankiesardo:auto-parcel-processor:+'
 
     compile project(':libraries:Omnom.Utils')
     compile project(':libraries:Omnom.Auth')

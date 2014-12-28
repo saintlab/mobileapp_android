@@ -11,8 +11,8 @@ import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
-import com.omnom.android.restaurateur.model.decode.DecodeResponse;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
+import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -126,10 +126,10 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	}
 
-	private void reportMixPanel(final TableDataResponse tableDataResponse) {
-		if(tableDataResponse != null) {
-			getMixPanelHelper().track(OnTableMixpanelEvent.createEventQr(getUserData(), tableDataResponse.getRestaurantId(),
-			                                                             tableDataResponse.getId()));
+	@Override
+	protected void reportMixPanel(final TableDataResponse table) {
+		if(table != null) {
+			getMixPanelHelper().track(OnTableMixpanelEvent.createEventQr(getUserData(), table.getRestaurantId(), table.getId()));
 		}
 	}
 
@@ -137,9 +137,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 		mCheckQrSubscribtion = AndroidObservable
 				.bindActivity(this, api.decode(new QrDecodeRequest(mQrData)).map(mPreloadBackgroundFunction)).subscribe(
-						new Action1<DecodeResponse>() {
+						new Action1<RestaurantResponse>() {
 							@Override
-							public void call(final DecodeResponse decodeResponse) {
+							public void call(final RestaurantResponse decodeResponse) {
 								if(decodeResponse.hasAuthError()) {
 									throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
 									                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
@@ -148,8 +148,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 								if(!TextUtils.isEmpty(decodeResponse.getError())) {
 									mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
 								} else {
-									reportMixPanel(decodeResponse.getTable());
-									onDataLoaded(decodeResponse.getRestaurant(), decodeResponse.getTable());
+									handleDecodeResponse(decodeResponse);
 								}
 							}
 						}, onError);

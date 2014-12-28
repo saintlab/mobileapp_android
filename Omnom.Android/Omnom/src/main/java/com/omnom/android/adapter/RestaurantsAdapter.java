@@ -61,7 +61,7 @@ public class RestaurantsAdapter extends BaseAdapter {
 			                .placeholder(placeholder)
 			                .into(imgCover);
 
-			txtTitle.setText(item.getTitle());
+			txtTitle.setText(item.title());
 			txtAddress.setText(RestaurantHelper.getAddressSmall(context, item));
 			txtDistance.setText("~50м");
 			txtSchedule.setText(RestaurantHelper.getOpenedTime(context, item, weekDay));

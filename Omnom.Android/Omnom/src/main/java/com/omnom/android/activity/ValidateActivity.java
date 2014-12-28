@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -30,11 +31,10 @@ import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
-import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.config.Config;
-import com.omnom.android.restaurateur.model.decode.DecodeResponse;
+import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -153,6 +153,15 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		return intent;
 	}
 
+	public static <T> Action1<T> emptyOnNext() {
+		return new Action1<T>() {
+			@Override
+			public void call(T response) {
+
+			}
+		};
+	}
+
 	protected final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -214,11 +223,12 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	protected Restaurant mRestaurant;
 
+	@Nullable
 	protected TableDataResponse mTable;
 
 	protected boolean mIsDemo = false;
 
-	protected Func1<DecodeResponse, DecodeResponse> mPreloadBackgroundFunction;
+	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBackgroundFunction;
 
 	/**
 	 * ConfirmPhoneActivity.TYPE_LOGIN or ConfirmPhoneActivity.TYPE_REGISTER
@@ -351,17 +361,20 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			}
 		});
 
-		mPreloadBackgroundFunction = new Func1<DecodeResponse, DecodeResponse>() {
+		mPreloadBackgroundFunction = new Func1<RestaurantResponse, RestaurantResponse>() {
 			@Override
-			public DecodeResponse call(final DecodeResponse decodeResponse) {
-				final Restaurant restaurant = decodeResponse.getRestaurant();
-				if(restaurant != null) {
-					final String bgImgUrl = RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics());
-					if(!TextUtils.isEmpty(bgImgUrl)) {
-						try {
-							OmnomApplication.getPicasso(getActivity()).load(bgImgUrl).get();
-						} catch(IOException e) {
-							Log.e(TAG, "unable to load img = " + bgImgUrl);
+			public RestaurantResponse call(final RestaurantResponse decodeResponse) {
+				final List<Restaurant> restaurants = decodeResponse.getRestaurants();
+				if(restaurants.size() == 1) {
+					final Restaurant restaurant = restaurants.get(0);
+					if(restaurant != null) {
+						final String bgImgUrl = RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics());
+						if(!TextUtils.isEmpty(bgImgUrl)) {
+							try {
+								OmnomApplication.getPicasso(getActivity()).load(bgImgUrl).get();
+							} catch(IOException e) {
+								Log.e(TAG, "unable to load img = " + bgImgUrl);
+							}
 						}
 					}
 				}
@@ -528,7 +541,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 					@Override
 					public void run() {
 						OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
-						                     mRestaurant.getDecoration().getBackgroundColor(), REQUEST_CODE_ORDERS, mIsDemo);
+						                     mRestaurant.decoration().getBackgroundColor(), REQUEST_CODE_ORDERS, mIsDemo);
 						if(orders.size() == 1) {
 							overridePendingTransition(R.anim.slide_in_down_short, R.anim.nothing);
 						}
@@ -541,9 +554,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	public void onWaiter(final View v) {
 		final Observable<WaiterCallResponse> observable;
 		if(!mWaiterCalled) {
-			observable = api.waiterCall(mRestaurant.getId(), mTable.getId());
+			observable = api.waiterCall(mRestaurant.id(), mTable.getId());
 		} else {
-			observable = api.waiterCallStop(mRestaurant.getId(), mTable.getId());
+			observable = api.waiterCallStop(mRestaurant.id(), mTable.getId());
 		}
 		mWaiterCallSubscribtion = AndroidObservable.bindActivity(this, observable).subscribe(new Action1<WaiterCallResponse>() {
 			@Override
@@ -618,7 +631,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		UserProfileActivity.startSliding(this, tableNumber, tableId);
 	}
 
-	protected final void onDataLoaded(final Restaurant restaurant, TableDataResponse table) {
+	protected final void onDataLoaded(final Restaurant restaurant, @Nullable TableDataResponse table) {
 		final OmnomApplication app = OmnomApplication.get(getActivity());
 
 		mRestaurant = restaurant;
@@ -641,18 +654,15 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			}
 		});
 
-		mGuestSubscribtion = AndroidObservable.bindActivity(this, api.newGuest(mTable.getRestaurantId(), mTable.getId()))
-		                                      .subscribe(new Action1<ResponseBase>() {
-			                                      @Override
-			                                      public void call(ResponseBase responseBase) {
-
-			                                      }
-		                                      }, new Action1<Throwable>() {
-			                                      @Override
-			                                      public void call(Throwable throwable) {
-				                                      Log.w(TAG, throwable.getMessage());
-			                                      }
-		                                      });
+		if(mTable != null) {
+			mGuestSubscribtion = AndroidObservable.bindActivity(this, api.newGuest(mTable.getRestaurantId(), mTable.getId()))
+			                                      .subscribe(emptyOnNext(), new Action1<Throwable>() {
+				                                      @Override
+				                                      public void call(Throwable throwable) {
+					                                      Log.w(TAG, throwable.getMessage());
+				                                      }
+			                                      });
+		}
 
 		loader.post(new Runnable() {
 			@Override
@@ -762,4 +772,48 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		}
 		return false;
 	}
+
+	protected void handleDecodeResponse(final RestaurantResponse response) {
+		final List<Restaurant> restaurants = response.getRestaurants();
+		if(restaurants != null) {
+			final int size = restaurants.size();
+			switch(size) {
+				case 0:
+					handleEmpty();
+					break;
+
+				case 1:
+					handleRestaurant(restaurants.get(0));
+					break;
+
+				default:
+					handleRestaurants(restaurants);
+					break;
+			}
+		} else {
+			// TODO: show error or handle
+		}
+
+	}
+
+	private void handleRestaurants(final List<Restaurant> restaurants) {
+
+	}
+
+	private void handleEmpty() {
+		mErrorHelper.showUnknownPlace();
+	}
+
+	private void handleRestaurant(final Restaurant restaurant) {
+		final List<TableDataResponse> tables = restaurant.tables();
+		if(tables != null && tables.size() == 1) {
+			final TableDataResponse table = tables.get(0);
+			reportMixPanel(table);
+			onDataLoaded(restaurant, table);
+		} else {
+			onDataLoaded(restaurant, null);
+		}
+	}
+
+	protected abstract void reportMixPanel(final TableDataResponse tableDataResponse);
 }
