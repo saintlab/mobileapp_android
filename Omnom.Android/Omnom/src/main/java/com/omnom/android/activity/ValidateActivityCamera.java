@@ -41,6 +41,12 @@ public class ValidateActivityCamera extends ValidateActivity {
 		context.start(intent, enterAnim, exitAnim, false);
 	}
 
+	public static void startShortcut(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
+		Intent intent = createIntent(context, animationType, false, ConfirmPhoneActivity.TYPE_DEFAULT);
+		intent.putExtra(EXTRA_ANIMATION_EXIT, EXTRA_ANIMATION_SLIDE_OUT_RIGHT);
+		context.start(intent, enterAnim, exitAnim, false);
+	}
+
 	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
 		final Intent intent = new Intent(context, ValidateActivityCamera.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
@@ -57,6 +63,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 	private String mQrData;
 
 	private Subscription mValidateSubscribtion;
+
+	private int outAnimation;
 
 	@Override
 	protected void startLoader() {
@@ -79,7 +87,20 @@ public class ValidateActivityCamera extends ValidateActivity {
 		super.onDestroy();
 		OmnomObservable.unsubscribe(mCheckQrSubscribtion);
 		OmnomObservable.unsubscribe(mValidateSubscribtion);
+	}
 
+	@Override
+	protected void handleIntent(final Intent intent) {
+		super.handleIntent(intent);
+		outAnimation = intent.getIntExtra(EXTRA_ANIMATION_EXIT, -1);
+	}
+
+	@Override
+	public void finish() {
+		super.finish();
+		if(outAnimation == EXTRA_ANIMATION_SLIDE_OUT_RIGHT) {
+			overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+		}
 	}
 
 	@Override
@@ -155,7 +176,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 	private void loadTable(final String mQrData) {
 
 		mCheckQrSubscribtion = AndroidObservable
-				.bindActivity(this, api.decode(new QrDecodeRequest(mQrData)).map(mPreloadBackgroundFunction)).subscribe(
+				.bindActivity(this, api.decode(new QrDecodeRequest(mQrData), mPreloadBackgroundFunction)).subscribe(
 						new Action1<RestaurantResponse>() {
 							@Override
 							public void call(final RestaurantResponse decodeResponse) {

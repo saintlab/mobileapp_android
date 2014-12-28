@@ -155,11 +155,11 @@ public class ValidateActivityBle extends ValidateActivity {
 			public void run() {
 				mFindBeaconSubscription = AndroidObservable.bindActivity(ValidateActivityBle.this,
 				                                                         api.decode(new BeaconDecodeRequest(
-						                                                                    getResources().getInteger(
-								                                                                    R.integer.ble_scan_duration),
-						                                                                    Collections.unmodifiableList(mBeacons))
-				                                                                   )
-				                                                            .map(mPreloadBackgroundFunction))
+						                                                         getResources().getInteger(
+								                                                         R.integer.ble_scan_duration),
+						                                                         Collections.unmodifiableList(mBeacons)
+				                                                         ), mPreloadBackgroundFunction)
+				                                                        )
 				                                           .subscribe(new Action1<RestaurantResponse>() {
 					                                           @Override
 					                                           public void call(final RestaurantResponse response) {

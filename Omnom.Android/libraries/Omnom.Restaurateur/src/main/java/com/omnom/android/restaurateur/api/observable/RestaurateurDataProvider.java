@@ -216,12 +216,13 @@ public class RestaurateurDataProvider implements RestaurateurObeservableApi {
 	}
 
 	@Override
-	public Observable<RestaurantResponse> decode(final BeaconDecodeRequest request) {
-		return mDataService.decode(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<RestaurantResponse> decode(final BeaconDecodeRequest request, Func1<RestaurantResponse,
+			RestaurantResponse> funcMap) {
+		return mDataService.decode(request).map(funcMap).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<RestaurantResponse> decode(final QrDecodeRequest request) {
-		return mDataService.decode(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<RestaurantResponse> decode(final QrDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap) {
+		return mDataService.decode(request).map(funcMap).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 }

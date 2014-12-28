@@ -35,9 +35,9 @@ public interface RestaurateurObeservableApi {
 
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
 
-	public Observable<RestaurantResponse> decode(BeaconDecodeRequest request);
+	public Observable<RestaurantResponse> decode(BeaconDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
 
-	public Observable<RestaurantResponse> decode(QrDecodeRequest request);
+	public Observable<RestaurantResponse> decode(QrDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
 
 	public Observable<TableDataResponse> bind(String restaurantId,
 	                                          int tableNumber,

@@ -183,6 +183,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.root)
 	protected View rootView;
 
+	@InjectView(R.id.content)
+	protected View contentView;
+
 	@InjectViews({R.id.txt_error, R.id.panel_errors})
 	protected List<View> errorViews;
 
@@ -317,7 +320,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 						new ColorDrawable(getResources().getColor(R.color.error_bg_white_transparent))});
 
 		bgTransitionDrawable.setCrossFadeEnabled(true);
-		rootView.setBackgroundDrawable(bgTransitionDrawable);
+		contentView.setBackgroundDrawable(bgTransitionDrawable);
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {

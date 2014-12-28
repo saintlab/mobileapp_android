@@ -83,9 +83,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@OnClick(R.id.img_qr)
 	public void doQrShortcut() {
-		ValidateActivityCamera.start(this,
-		                             R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
-		                             EXTRA_LOADER_ANIMATION_SCALE_UP, ConfirmPhoneActivity.TYPE_DEFAULT);
+		ValidateActivityCamera.startShortcut(this, R.anim.slide_in_right, R.anim.slide_out_left, EXTRA_LOADER_ANIMATION_SCALE_UP);
 	}
 
 	@OnClick(R.id.img_profile)
@@ -132,6 +130,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 				}
 			});
 		} else {
+			ViewUtils.setVisible(progressBar, false);
 			initList();
 		}
 	}
