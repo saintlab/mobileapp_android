@@ -34,6 +34,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_PAYMENT_DETAILS = "com.omnom.android.payment.details";
 	public static final String EXTRA_PAYMENT_EVENT = "com.omnom.android.payment.event";
 	public static final String EXTRA_TRANSACTION_URL = "com.omnom.android.payment.transaction_url";
+	public static final String EXTRA_ANIMATION_EXIT = "com.omnom.android.extra.animation";
 
 	public static final String EXTRA_CHARACTERISTIC_UUID = "ble.characteristic.uuid";
 	public static final String EXTRA_CHARACTERISTIC_VALUE = "ble.characteristic.value";
@@ -42,6 +43,8 @@ public interface Extras extends Preferences {
 	public static final int EXTRA_ERROR_WRONG_USERNAME = 2;
 	public static final int EXTRA_ERROR_AUTHTOKEN_EXPIRED = 4;
 	public static final int EXTRA_ERROR_LOGOUT = 8;
+
+	public static final int EXTRA_ANIMATION_SLIDE_OUT_RIGHT = 0;
 
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_UP = 0;
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_DOWN = 1;

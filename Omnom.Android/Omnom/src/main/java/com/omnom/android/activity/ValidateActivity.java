@@ -64,6 +64,7 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 import retrofit.RetrofitError;
+import retrofit.http.HEAD;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -188,8 +189,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@InjectView(R.id.root)
 	protected View rootView;
 
-	@InjectView(R.id.error_bg_layer)
-	protected View errorBgView;
+	@InjectView(R.id.content)
+	protected View contentView;
 
 	@InjectViews({R.id.txt_error, R.id.panel_errors})
 	protected List<View> errorViews;
@@ -321,12 +322,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 						new ColorDrawable(getResources().getColor(R.color.error_bg_white_transparent))});
 
 		bgTransitionDrawable.setCrossFadeEnabled(true);
-<<<<<<< HEAD
-		errorBgView.setBackgroundDrawable(bgTransitionDrawable);
-		mPicasso = Picasso.with(getApplicationContext());
-=======
-		rootView.setBackgroundDrawable(bgTransitionDrawable);
->>>>>>> implement base qr-shortcut
+		contentView.setBackgroundDrawable(bgTransitionDrawable);
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -608,20 +604,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 		mPaymentListener.initTableSocket(mTable);
 
-<<<<<<< HEAD
-		final String token = app.getAuthToken();
-		mUserSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
-			@Override
-			public void call(UserResponse userResponse) {
-				correctMixpanelTime(userResponse.getTime() == null ? 0 : userResponse.getTime());
-				app.cacheUserProfile(new UserProfile(userResponse));
-				reportMixPanel(userResponse);
-			}
-		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			@Override
-			public void onError(Throwable throwable) {
-				Log.w(TAG, throwable.getMessage());
-=======
 		updateUserData(app);
 		onNewGuest(mTable);
 		animateRestaurantLogo(restaurant);
@@ -637,7 +619,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				ViewUtils.setVisible(getPanelBottom(), true);
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
 				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
->>>>>>> implement base qr-shortcut
 			}
 		});
 	}
