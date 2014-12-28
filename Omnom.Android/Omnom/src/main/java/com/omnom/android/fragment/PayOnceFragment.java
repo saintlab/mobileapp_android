@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.CardConfirmActivity;
 import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -26,6 +27,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 public class PayOnceFragment extends Fragment {
 
 	private static final String ARG_AMOUNT = "amount";
+
+	private static final String ARG_TYPE = "type";
 
 	@InjectView(R.id.btn_pay)
 	protected Button btnPay;
@@ -45,10 +48,13 @@ public class PayOnceFragment extends Fragment {
 
 	private double mAmount;
 
-	public static Fragment newInstance(final double amount) {
+	private int mType;
+
+	public static Fragment newInstance(final double amount, final int type) {
 		final PayOnceFragment fragment = new PayOnceFragment();
 		final Bundle args = new Bundle();
 		args.putDouble(ARG_AMOUNT, amount);
+		args.putInt(ARG_TYPE, type);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -58,6 +64,7 @@ public class PayOnceFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		if (getArguments() != null) {
 			mAmount = getArguments().getDouble(ARG_AMOUNT);
+			mType = getArguments().getInt(ARG_TYPE);
 		}
 	}
 
@@ -117,7 +124,11 @@ public class PayOnceFragment extends Fragment {
 			CalligraphyUtils.applyFontToTextView(getActivity(), txtSmsNotificationsOff, osfFontPath);
 			CalligraphyUtils.applyFontToTextView(getActivity(), txtPayOnce, osfFontPath);
 			final String text = AmountHelper.format(mAmount) + getActivity().getString(R.string.currency_ruble);
-			btnPay.setText(getString(R.string.pay_amount, text));
+			if (mType == CardConfirmActivity.TYPE_BIND_CONFIRM) {
+				btnPay.setText(getString(R.string.pay_amount, text));
+			} else {
+				btnPay.setText(getString(R.string.enter_card_data));
+			}
 			btnPay.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
