@@ -6,7 +6,9 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -192,6 +194,17 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		mEditCardNumber.setError(false);
 		mEditCardExpDate.setError(false);
 		mEditCardCvv.setError(false);
+
+		mEditCardCvv.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
+				if(actionId == EditorInfo.IME_ACTION_DONE) {
+					mPanelTop.getBtnRight().callOnClick();
+					return true;
+				}
+				return false;
+			}
+		});
 	}
 
 	@Override
