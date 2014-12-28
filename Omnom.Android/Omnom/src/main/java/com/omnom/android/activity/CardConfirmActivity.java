@@ -379,7 +379,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	private void onVerificationError() {
 		ViewUtils.setVisible(mTextInfo, false);
 		mPanelTop.showProgress(false);
-		mPanelTop.setButtonRightDrawable(R.drawable.ic_repeat_small, mVerifyClickListener);
+		mPanelTop.setButtonRight(R.string.ready, mVerifyClickListener);
 		mEditAmount.setError(getWrongChecksumMessage());
 	}
 
