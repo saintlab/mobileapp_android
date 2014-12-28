@@ -110,6 +110,10 @@ public class HeaderView extends RelativeLayout {
 		setButton(btnRight, resId, listener);
 	}
 
+	public Button getBtnRight() {
+		return btnRight;
+	}
+
 	public void setButtonLeft(final int resId, OnClickListener listener) {
 		setButton(btnLeft, resId, listener);
 	}
