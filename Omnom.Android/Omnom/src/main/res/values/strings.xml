@@ -37,6 +37,7 @@
     <string name="overall">Итого: </string>
     <string name="order_paid">Оплачено: %1$s</string>
     <string name="pay_amount">Оплатить %1$s</string>
+    <string name="enter_card_data">Ввести карту</string>
     <string name="amount_is_too_high">Сумма слишком большая</string>
     <string name="pay">Оплатить</string>
     <string name="refuse">Отказаться</string>

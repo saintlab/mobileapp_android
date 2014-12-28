@@ -64,16 +64,16 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	private static final String TAG = CardConfirmActivity.class.getSimpleName();
 
-	private static final int TYPE_ADD_CONFIRM = 0;
+	public static final int TYPE_BIND_CONFIRM = 0;
 
-	private static final int TYPE_CONFIRM = 1;
+	public static final int TYPE_CONFIRM = 1;
 
 	@SuppressLint("NewApi")
 	public static void startAddConfirm(BaseOmnomActivity activity, final CardInfo card, int code,
 	                                   double amount) {
 		final Intent intent = new Intent(activity, CardConfirmActivity.class);
 		intent.putExtra(EXTRA_CARD_DATA, card);
-		intent.putExtra(EXTRA_TYPE, TYPE_ADD_CONFIRM);
+		intent.putExtra(EXTRA_TYPE, TYPE_BIND_CONFIRM);
 		intent.putExtra(EXTRA_ORDER_AMOUNT, amount);
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
@@ -156,14 +156,14 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState == null) {
-			payOnceFragment = PayOnceFragment.newInstance(mAmount);
+			payOnceFragment = PayOnceFragment.newInstance(mAmount, mType);
 		}
 	}
 
 	@Override
 	protected void handleIntent(final Intent intent) {
 		mCard = intent.getParcelableExtra(EXTRA_CARD_DATA);
-		mType = intent.getIntExtra(EXTRA_TYPE, TYPE_ADD_CONFIRM);
+		mType = intent.getIntExtra(EXTRA_TYPE, TYPE_BIND_CONFIRM);
 		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);
 	}
 
@@ -185,7 +185,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			}
 		});
 		initAmount();
-		if(mType == TYPE_ADD_CONFIRM) {
+		if(mType == TYPE_BIND_CONFIRM) {
 			registerCard();
 		} else {
 			// skip and wait until user submit verification amount
@@ -426,9 +426,13 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void pay() {
-		Intent intent = new Intent();
-		intent.putExtra(EXTRA_CARD_DATA, mCard);
-		setResult(CardsActivity.RESULT_PAY, intent);
+		if (mType == TYPE_BIND_CONFIRM) {
+			Intent intent = new Intent();
+			intent.putExtra(EXTRA_CARD_DATA, mCard);
+			setResult(CardsActivity.RESULT_PAY, intent);
+		} else {
+			setResult(CardsActivity.RESULT_ENTER_CARD_AND_PAY);
+		}
 		finish();
 	}
 
