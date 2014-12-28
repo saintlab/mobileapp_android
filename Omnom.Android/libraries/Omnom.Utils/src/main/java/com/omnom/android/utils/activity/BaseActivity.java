@@ -22,11 +22,6 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  * Created by Ch3D on 31.07.2014.
  */
 public abstract class BaseActivity extends Activity implements OmnomActivity, Extras {
-<<<<<<< HEAD
-	protected ActivityHelper mHelper;
-
-=======
->>>>>>> implement base qr-shortcut
 	@Inject
 	protected Bus mBus;
 
