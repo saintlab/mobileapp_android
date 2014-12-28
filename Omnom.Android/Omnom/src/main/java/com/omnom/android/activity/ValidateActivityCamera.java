@@ -41,12 +41,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 		context.start(intent, enterAnim, exitAnim, false);
 	}
 
-	public static void startShortcut(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
-		Intent intent = createIntent(context, animationType, false, ConfirmPhoneActivity.TYPE_DEFAULT);
-		intent.putExtra(EXTRA_ANIMATION_EXIT, EXTRA_ANIMATION_SLIDE_OUT_RIGHT);
-		context.start(intent, enterAnim, exitAnim, false);
-	}
-
 	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
 		final Intent intent = new Intent(context, ValidateActivityCamera.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
@@ -64,7 +58,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private Subscription mValidateSubscribtion;
 
-	private int outAnimation;
+	private int mOutAnimation;
+
 
 	@Override
 	protected void startLoader() {
@@ -92,13 +87,13 @@ public class ValidateActivityCamera extends ValidateActivity {
 	@Override
 	protected void handleIntent(final Intent intent) {
 		super.handleIntent(intent);
-		outAnimation = intent.getIntExtra(EXTRA_ANIMATION_EXIT, -1);
+		mOutAnimation = intent.getIntExtra(EXTRA_ANIMATION_EXIT, -1);
 	}
 
 	@Override
 	public void finish() {
 		super.finish();
-		if(outAnimation == EXTRA_ANIMATION_SLIDE_OUT_RIGHT) {
+		if(mOutAnimation == EXTRA_ANIMATION_SLIDE_OUT_RIGHT) {
 			overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 		}
 	}
@@ -174,7 +169,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 	}
 
 	private void loadTable(final String mQrData) {
-
 		mCheckQrSubscribtion = AndroidObservable
 				.bindActivity(this, api.decode(new QrDecodeRequest(mQrData), mPreloadBackgroundFunction)).subscribe(
 						new Action1<RestaurantResponse>() {
@@ -192,6 +186,16 @@ public class ValidateActivityCamera extends ValidateActivity {
 								}
 							}
 						}, onError);
+	}
+
+	private void onWrongQr() {
+		startErrorTransition();
+		mErrorHelper.showWrongQrError(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				startLoader();
+			}
+		});
 	}
 
 	@Override

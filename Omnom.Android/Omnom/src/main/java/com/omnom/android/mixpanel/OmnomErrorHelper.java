@@ -45,4 +45,8 @@ public class OmnomErrorHelper extends ErrorHelper {
 	public void showUnknownPlace() {
 
 	}
+
+	public void showWrongQrError(View.OnClickListener onClickListener) {
+		showError(LoaderError.UNKNOWN_QR_CODE, onClickListener);
+	}
 }

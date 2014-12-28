@@ -1,13 +1,18 @@
 package com.github.nkzawa.engineio.client;
 
 
+import android.util.Log;
+
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.engineio.parser.Packet;
 import com.github.nkzawa.engineio.parser.Parser;
 import com.github.nkzawa.thread.EventThread;
 
-import javax.net.ssl.SSLContext;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
+
 import java.util.Map;
+
+import javax.net.ssl.SSLContext;
 
 public abstract class Transport extends Emitter {
 
@@ -95,7 +100,11 @@ public abstract class Transport extends Emitter {
             @Override
             public void run() {
                 if (Transport.this.readyState == ReadyState.OPEN) {
-                    Transport.this.write(packets);
+	                try {
+		                Transport.this.write(packets);
+	                } catch(WebsocketNotConnectedException e) {
+		                Log.e(Transport.class.getSimpleName(), "send", e);
+	                }
                 } else {
                     throw new RuntimeException("Transport not open");
                 }

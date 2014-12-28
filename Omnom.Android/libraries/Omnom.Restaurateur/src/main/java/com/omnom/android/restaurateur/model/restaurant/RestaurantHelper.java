@@ -132,4 +132,8 @@ public class RestaurantHelper {
 		}
 		return StringUtils.EMPTY_STRING;
 	}
+
+	public static boolean hasOnlyTable(final Restaurant restaurant) {
+		return restaurant != null && restaurant.tables() != null && restaurant.tables().size() == 1;
+	}
 }

@@ -64,7 +64,6 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 import retrofit.RetrofitError;
-import retrofit.http.HEAD;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -745,7 +744,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		return false;
 	}
 
-	protected void handleDecodeResponse(final RestaurantResponse response) {
+	protected final void handleDecodeResponse(final RestaurantResponse response) {
 		final List<Restaurant> restaurants = response.getRestaurants();
 		if(restaurants != null) {
 			final int size = restaurants.size();
@@ -767,7 +766,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		}
 	}
 
-	private void handleRestaurants(final List<Restaurant> restaurants) {
+	protected void handleRestaurants(final List<Restaurant> restaurants) {
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override
@@ -777,7 +776,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		});
 	}
 
-	private void handleEmpty() {
+	protected void handleEmpty() {
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override
@@ -787,7 +786,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		});
 	}
 
-	private void handleRestaurant(final Restaurant restaurant) {
+	protected void handleRestaurant(final Restaurant restaurant) {
 		final List<TableDataResponse> tables = restaurant.tables();
 		if(tables != null && tables.size() == 1) {
 			final TableDataResponse table = tables.get(0);

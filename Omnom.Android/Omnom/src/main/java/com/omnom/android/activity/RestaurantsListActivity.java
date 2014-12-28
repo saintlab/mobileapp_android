@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
+import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
@@ -62,9 +62,6 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@InjectView(R.id.img_profile)
 	protected ImageView imgProfile;
 
-	@InjectView(R.id.progress)
-	protected ProgressBar progressBar;
-
 	@Inject
 	RestaurateurObeservableApi api;
 
@@ -83,7 +80,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@OnClick(R.id.img_qr)
 	public void doQrShortcut() {
-		ValidateActivityCamera.startShortcut(this, R.anim.slide_in_right, R.anim.slide_out_left, EXTRA_LOADER_ANIMATION_SCALE_UP);
+		ValidateActivityShortcut.start(this, R.anim.slide_in_right, R.anim.slide_out_left, EXTRA_LOADER_ANIMATION_SCALE_UP);
 	}
 
 	@OnClick(R.id.img_profile)
@@ -110,27 +107,19 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@Override
 	public void initUi() {
 		if(mAdapter == null) {
-			AnimationUtils.animateAlpha(progressBar, true);
 			api.getRestaurants().subscribe(new Action1<RestaurantsResponse>() {
 				@Override
 				public void call(final RestaurantsResponse restaurants) {
 					mAdapter = new RestaurantsAdapter(getActivity(), restaurants.getItems());
-					AnimationUtils.animateAlpha(progressBar, false, new Runnable() {
-						@Override
-						public void run() {
-							initList();
-						}
-					});
+					initList();
 				}
 			}, new OmnomBaseErrorHandler(this) {
 				@Override
 				protected void onThrowable(final Throwable throwable) {
-					AnimationUtils.animateAlpha(progressBar, false);
 					Log.e(TAG, "getRestaurants", throwable);
 				}
 			});
 		} else {
-			ViewUtils.setVisible(progressBar, false);
 			initList();
 		}
 	}
@@ -147,7 +136,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 			}
 		});
 		list.addFooterView(footer);
-		list.setAdapter(mAdapter);
+		final SwingBottomInAnimationAdapter adapter = new SwingBottomInAnimationAdapter(mAdapter);
+		adapter.setAbsListView(list);
+		list.setAdapter(adapter);
 		list.setOnItemClickListener(this);
 		list.setScrollEnabled(true);
 	}
