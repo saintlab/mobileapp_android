@@ -27,8 +27,6 @@ import rx.schedulers.Schedulers;
  */
 public class PollingObservable {
 
-	public static final String STATUS_OK_CONTINUE = "OK_CONTINUE";
-
 	private static void sleep() {
 		SystemClock.sleep(1000);
 	}
@@ -50,7 +48,7 @@ public class PollingObservable {
 						if(entity != null) {
 							final Reader reader = new InputStreamReader(entity.getContent());
 							final CardRegisterPollingResponse response = gson.fromJson(reader, CardRegisterPollingResponse.class);
-							if(!response.getStatus().equals(STATUS_OK_CONTINUE)) {
+							if(!response.getStatus().equals(AcquiringPollingResponse.STATUS_CONTINUE)) {
 								next = response;
 								next.setCardId(cardResponse.getCardId());
 							} else {
@@ -88,7 +86,7 @@ public class PollingObservable {
 						if(entity != null) {
 							final Reader reader = new InputStreamReader(entity.getContent());
 							final CardRegisterPollingResponse response = gson.fromJson(reader, CardRegisterPollingResponse.class);
-							if(!response.getStatus().equals(STATUS_OK_CONTINUE)) {
+							if(!response.getStatus().equals(AcquiringPollingResponse.STATUS_CONTINUE)) {
 								next = response;
 							} else {
 								sleep();

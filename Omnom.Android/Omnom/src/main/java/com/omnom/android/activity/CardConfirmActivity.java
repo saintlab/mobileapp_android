@@ -29,6 +29,7 @@ import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.UserData;
+import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
@@ -294,31 +295,43 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 				                                             new Action1<CardRegisterPollingResponse>() {
 					                                             @Override
 					                                             public void call(CardRegisterPollingResponse response) {
-						                                             mCard.setCardId(response.getCardId());
-						                                             ViewUtils.setVisible(mTextInfo, true);
-						                                             mPanelTop.showProgress(false);
-						                                             mPanelTop.setButtonRightEnabled(true);
-						                                             mPanelTop.setButtonRight(R.string.ready, mVerifyClickListener);
-						                                             final EditText editAmount = mEditAmount.getEditText();
-						                                             editAmount.setEnabled(true);
-						                                             AndroidUtils.showKeyboard(editAmount);
+						                                             if (AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
+							                                             mCard.setCardId(response.getCardId());
+							                                             ViewUtils.setVisible(mTextInfo, true);
+							                                             mPanelTop.showProgress(false);
+							                                             mPanelTop.setButtonRightEnabled(true);
+							                                             mPanelTop.setButtonRight(R.string.ready, mVerifyClickListener);
+							                                             final EditText editAmount = mEditAmount.getEditText();
+							                                             editAmount.setEnabled(true);
+							                                             AndroidUtils.showKeyboard(editAmount);
+						                                             } else {
+							                                             if (response.getError() != null) {
+								                                             processCardRegisterError(response.getError().getDescr());
+							                                             } else {
+								                                             processCardRegisterError(getString(R.string.something_went_wrong_try_again));
+							                                             }
+						                                             }
 						                                             busy(false);
 					                                             }
 				                                             }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					                                             @Override
 					                                             public void onError(Throwable throwable) {
 						                                             Log.w(TAG, throwable.getMessage());
-						                                             ViewUtils.setVisible(mTextInfo, false);
-						                                             mPanelTop.showProgress(false);
-						                                             mEditAmount.setError(R.string.something_went_wrong_try_agint);
-						                                             mPanelTop.setButtonRightEnabled(true);
-						                                             mPanelTop.setButtonRightDrawable(
-								                                             R.drawable.ic_repeat_small,
-								                                             mRegisterClickListener);
-						                                             mEditAmount.getEditText().setEnabled(false);
-						                                             busy(false);
+							                                         processCardRegisterError(getString(R.string.something_went_wrong_try_again));
 					                                             }
 				                                             });
+	}
+
+	private void processCardRegisterError(final String errorMessage) {
+		ViewUtils.setVisible(mTextInfo, false);
+		mPanelTop.showProgress(false);
+		mEditAmount.setError(errorMessage);
+		mPanelTop.setButtonRightEnabled(true);
+		mPanelTop.setButtonRightDrawable(
+				R.drawable.ic_repeat_small,
+				mRegisterClickListener);
+		mEditAmount.getEditText().setEnabled(false);
+		busy(false);
 	}
 
 	public void verifyCard() {
