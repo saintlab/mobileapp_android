@@ -21,6 +21,7 @@ import java.math.RoundingMode;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 /**
  * Created by Ch3D on 11.11.2014.
@@ -42,6 +43,9 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 	@InjectView(R.id.picker)
 	protected NumberPicker mPicker;
 
+	@InjectView(R.id.txt_question)
+	protected TextView mTxtQuestion;
+
 	@InjectView(R.id.txt_info)
 	protected TextView mTxtInfo;
 
@@ -60,6 +64,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
+		CalligraphyUtils.applyFontToTextView(getActivity(), mTxtQuestion, "fonts/Futura-OSF-Omnom-Regular.otf");
 		mPicker.setMinValue(1);
 		mPicker.setMaxValue(40);
 		mPicker.setOnValueChangedListener(this);
