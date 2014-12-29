@@ -225,6 +225,12 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		mFirstStart = false;
 	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+		AndroidUtils.hideKeyboard(this);
+	}
+
 	@OnClick(R.id.btn_request_code)
 	protected void onRequestCode() {
 		mRequestCodeSubscription =

@@ -64,6 +64,18 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// workaround for https://code.google.com/p/android/issues/detail?id=2373
+		// omnom issue: https://github.com/saintlab/mobileapp_android/issues/224
+		if(!isTaskRoot()) {
+			Intent intent = getIntent();
+			String action = intent.getAction();
+			if(intent.hasCategory(Intent.CATEGORY_LAUNCHER) && action != null && action.equals(Intent.ACTION_MAIN)) {
+				finish();
+				return;
+			}
+		}
+
 		if (savedInstanceState == null) {
 			enteringFragment = EnteringFragment.newInstance();
 			if (skipSplash) {
