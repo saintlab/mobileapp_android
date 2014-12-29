@@ -6,7 +6,7 @@ import com.omnom.android.auth.UserData;
 /**
  * Created by Ch3D on 22.12.2014.
  */
-public abstract class DecodeMixpanelEvent extends BaseMixpanelEvent {
+abstract class DecodeMixpanelEvent extends AbstractBaseMixpanelEvent {
 	public static final String METHODE_BLUETOOTH = "bluetooth";
 
 	public static final String METHODE_QR = "qr";
