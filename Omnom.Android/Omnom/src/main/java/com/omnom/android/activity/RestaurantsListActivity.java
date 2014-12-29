@@ -199,8 +199,10 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		refreshView.setEnabled(true);
 		panelTop.setTranslationY(0);
 		list.setTranslationY(0);
-		mAdapter.setSelected(-1);
-		mAdapter.notifyDataSetChanged();
+		if(mAdapter != null) {
+			mAdapter.setSelected(-1);
+			mAdapter.notifyDataSetChanged();
+		}
 		if(nextView != null) {
 			nextView.setAlpha(1);
 		}
