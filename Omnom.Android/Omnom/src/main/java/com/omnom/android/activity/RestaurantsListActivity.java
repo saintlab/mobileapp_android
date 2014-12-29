@@ -84,7 +84,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@OnClick(R.id.img_qr)
 	public void doQrShortcut() {
-		ValidateActivityShortcut.start(this, R.anim.slide_in_up_short, R.anim.fake_fade_out_long, EXTRA_LOADER_ANIMATION_SCALE_UP);
+		ValidateActivityShortcut.start(this, R.anim.fake_fade_in_instant, R.anim.slide_out_down, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
 
 	@OnClick(R.id.img_profile)
@@ -212,7 +212,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@Override
 	public void finish() {
 		super.finish();
-		overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+		overridePendingTransition(android.R.anim.fade_in, R.anim.slide_out_down);
 	}
 
 	@Override
