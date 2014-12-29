@@ -7,6 +7,8 @@ import android.os.Build;
 import android.view.View;
 
 import com.omnom.android.R;
+import com.omnom.android.beacon.BeaconFilter;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.BeaconRecord;
@@ -192,6 +194,13 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                           });
 			}
 		});
+	}
+
+	private void reportMixPanel(final TableDataResponse tableDataResponse) {
+		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
+								  OnTableMixpanelEvent.createEventBluetooth(getUserData(),
+										                                    tableDataResponse.getRestaurantId(),
+		                                                                    tableDataResponse.getId()));
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)

@@ -47,6 +47,7 @@ import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.BillViewMixpanelEvent;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
 import com.omnom.android.mixpanel.model.SplitWay;
@@ -753,7 +754,7 @@ public class OrderFragment extends Fragment {
 
 	private void sendBillViewEvent(String requestId, UserData user, Order order) {
 		MixpanelEvent billViewEvent = new BillViewMixpanelEvent(UserHelper.getUserData(getActivity()), requestId, order, user);
-		OmnomApplication.getMixPanelHelper(getActivity()).track(billViewEvent);
+		OmnomApplication.getMixPanelHelper(getActivity()).track(MixPanelHelper.Project.OMNOM, billViewEvent);
 	}
 
 	private void initAmount() {

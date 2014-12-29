@@ -2,7 +2,6 @@ package com.omnom.android.activity.base;
 
 import android.util.Log;
 
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.UserResponse;
@@ -49,26 +48,26 @@ public abstract class BaseOmnomFragmentActivity extends BaseFragmentActivity {
 				final Long timeDiff = TimeUnit.SECONDS.toMillis(serverTime) - currentTime;
 				app.cacheUserProfile(new UserProfile(userResponse));
 				mixPanelHelper.setTimeDiff(timeDiff);
-				mixPanelHelper.track(new AppLaunchMixpanelEvent(userResponse.getUser()));
+				mixPanelHelper.track(MixPanelHelper.Project.OMNOM, new AppLaunchMixpanelEvent(userResponse.getUser()));
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
 				Log.w(TAG, throwable.getMessage());
-				mixPanelHelper.track(new AppLaunchMixpanelEvent(UserHelper.getUserData(BaseOmnomFragmentActivity.this)));
+				mixPanelHelper.track(MixPanelHelper.Project.OMNOM, new AppLaunchMixpanelEvent(UserHelper.getUserData(BaseOmnomFragmentActivity.this)));
 			}
 		});
 	}
 
 	@Override
 	protected void onDestroy() {
-		getMixPanel().flush();
+		getMixPanelHelper().flush();
 		OmnomObservable.unsubscribe(mUserSubscription);
 		super.onDestroy();
 	}
 
-	public final MixpanelAPI getMixPanel() {
-		return OmnomApplication.getMixPanel(this);
+	public final MixPanelHelper getMixPanelHelper() {
+		return OmnomApplication.getMixPanelHelper(this);
 	}
 
 	protected boolean isBusy() {

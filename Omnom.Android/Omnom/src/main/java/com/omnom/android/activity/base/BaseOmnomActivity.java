@@ -17,9 +17,6 @@ import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.observable.OmnomObservable;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -46,10 +43,6 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 
 	private Subscription mUserSubscription;
 
-	public final MixpanelAPI getMixPanel() {
-		return OmnomApplication.getMixPanel(this);
-	}
-
 	public final MixPanelHelper getMixPanelHelper() {
 		return OmnomApplication.getMixPanelHelper(this);
 	}
@@ -70,13 +63,13 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 			public void call(UserResponse userResponse) {
 				correctMixpanelTime(userResponse.getTime() == null ? 0 : userResponse.getTime());
 				app.cacheUserProfile(new UserProfile(userResponse));
-				mixPanelHelper.track(new AppLaunchMixpanelEvent(userResponse.getUser()));
+				mixPanelHelper.track(MixPanelHelper.Project.OMNOM, new AppLaunchMixpanelEvent(userResponse.getUser()));
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
 				Log.w(TAG, throwable.getMessage());
-				mixPanelHelper.track(new AppLaunchMixpanelEvent(UserHelper.getUserData(BaseOmnomActivity.this)));
+				mixPanelHelper.track(MixPanelHelper.Project.OMNOM, new AppLaunchMixpanelEvent(UserHelper.getUserData(BaseOmnomActivity.this)));
 			}
 		});
 	}
@@ -90,26 +83,9 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 		}
 	}
 
-	protected final void track(final String eventName, final Object o) {
-		final String s = mGson.toJson(o);
-		try {
-			getMixPanel().track(eventName, new JSONObject(s));
-		} catch(JSONException e) {
-			Log.e(TAG_MIXPANEL, "track", e);
-		}
-	}
-
-	protected final void track(final String eventName, final String s) {
-		try {
-			getMixPanel().track(eventName, new JSONObject(s));
-		} catch(JSONException e) {
-			Log.e(TAG_MIXPANEL, "track", e);
-		}
-	}
-
 	@Override
 	protected void onDestroy() {
-		getMixPanel().flush();
+		getMixPanelHelper().flush();
 		OmnomObservable.unsubscribe(mUserSubscription);
 		super.onDestroy();
 	}

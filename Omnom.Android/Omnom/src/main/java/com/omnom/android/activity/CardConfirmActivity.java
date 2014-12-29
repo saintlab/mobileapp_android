@@ -61,6 +61,7 @@ import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
 import static butterknife.ButterKnife.findById;
+import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 public class CardConfirmActivity extends BaseOmnomFragmentActivity
@@ -348,11 +349,11 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 <<<<<<< HEAD
 =======
 	private void reportMixPanelSuccess(final CardInfo cardInfo) {
-		OmnomApplication.getMixPanelHelper(this).track(new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed));
+		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed));
 	}
 
 	private void reportMixPanelFail(final CardInfo cardInfo, final AcquiringResponseError error) {
-		OmnomApplication.getMixPanelHelper(this).track(new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed, error));
+		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed, error));
 	}
 
 >>>>>>> #211 log acquiring events to mixpanel with information about card

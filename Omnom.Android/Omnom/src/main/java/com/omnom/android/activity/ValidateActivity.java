@@ -19,13 +19,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.restaurateur.api.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
@@ -665,24 +665,18 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	 */
 	private void reportMixPanel(UserResponse userResponse) {
 		final UserData user = userResponse.getUser();
-		final MixpanelAPI mixPanel = getMixPanel();
-
-		if(user == null || mixPanel == null) {
-			// fail fast NPE check
-			return;
-		}
 
 		switch(mType) {
 			case ConfirmPhoneActivity.TYPE_LOGIN:
-				getMixPanelHelper().trackUserLogin(this, user);
+				getMixPanelHelper().trackUserLogin(MixPanelHelper.Project.ALL, this, user);
 				break;
 
 			case ConfirmPhoneActivity.TYPE_REGISTER:
-				getMixPanelHelper().trackUserRegister(this, user);
+				getMixPanelHelper().trackUserRegister(MixPanelHelper.Project.ALL, this, user);
 				break;
 
 			case TYPE_DEFAULT:
-				getMixPanelHelper().trackUserDefault(this, user);
+				getMixPanelHelper().trackUserDefault(MixPanelHelper.Project.ALL, this, user);
 				break;
 		}
 	}
