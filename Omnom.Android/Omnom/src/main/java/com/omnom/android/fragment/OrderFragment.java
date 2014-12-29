@@ -1024,13 +1024,13 @@ public class OrderFragment extends Fragment {
 
 	private void editMode(final boolean isActive) {
 		isEditMode = isActive;
-		final boolean orderControlsEnabled = !isActive;
+		final boolean orderControlsEnabled = !isActive && isMenuVisible();
 		list.setSwipeEnabled(orderControlsEnabled);
 		ViewUtils.setVisible(mHeader, orderControlsEnabled);
-		if(mFooterView1 != null) {
+		if (mFooterView1 != null) {
 			mFooterView1.findViewById(R.id.btn_bill_split).setEnabled(orderControlsEnabled);
 		}
-		if(mFooterView2 != null) {
+		if (mFooterView2 != null) {
 			mFooterView2.findViewById(R.id.txt_edit).setEnabled(orderControlsEnabled);
 			mFooterView2.findViewById(R.id.txt_cancel).setEnabled(orderControlsEnabled);
 		}

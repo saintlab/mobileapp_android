@@ -17,6 +17,9 @@ import com.omnom.android.R;
  * Created by Ch3D on 18.12.2014.
  */
 public class AmountEditText extends EditText {
+
+	public static final int AMOUNT_UPPER_LIMIT = 999999;
+
 	public AmountEditText(final Context context) {
 		super(context);
 		init();
@@ -89,20 +92,43 @@ public class AmountEditText extends EditText {
 			public void afterTextChanged(Editable s) {
 				removeTextChangedListener(this);
 				String str = s.toString();
+				// TODO: refactor the following code to make it readable
 				if(str.endsWith(".") || str.endsWith(",")) {
 					getText().delete(getSelectionEnd() - 1, getSelectionEnd());
 					setSelection(getSelectionEnd() - 1);
 					return;
 				}
+				// Add currency suffics if necessary
 				final String currencySuffix = getCurrencySuffix();
 				if(!str.endsWith(currencySuffix)) {
 					str = str + currencySuffix;
 				}
+				// Remove leading zero in case of integer value
 				if (str.length() > 2 && str.charAt(0) == '0') {
 					str = str.substring(1);
 				}
+				// Add leading zero if the amount is empty or starts with floating point
 				if(str.equals(currencySuffix) || str.startsWith(".") || str.startsWith(",")) {
 					str = "0" + str;
+				}
+				// If amount exceeds upper limit make it equals to it
+				double amount;
+				try {
+					amount = Double.parseDouble(str.substring(0, str.length() - 1));
+				} catch (NumberFormatException e) {
+					amount = 0;
+				}
+				if (amount > AMOUNT_UPPER_LIMIT) {
+					str = AMOUNT_UPPER_LIMIT + currencySuffix;
+				} else {
+					// Reduce number of digits after floating point if it exceeds 2
+					int floatingPointIndex = str.indexOf(".");
+					if (floatingPointIndex == -1) {
+						floatingPointIndex = str.indexOf(",");
+					}
+					if (floatingPointIndex > 0 && str.length() > floatingPointIndex + 4) {
+						str = str.substring(0, floatingPointIndex + 3) + currencySuffix;
+					}
 				}
 				setText(str);
 				setSelection(str.length() - 1);
