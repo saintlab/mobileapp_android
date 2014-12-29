@@ -15,7 +15,6 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.activity.base.BaseOmnomActivity;
-import com.omnom.android.mixpanel.model.CardAddedMixpanelEvent;
 import com.omnom.android.utils.CardDataTextWatcher;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
@@ -263,7 +262,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	private CardInfo createCardInfo() {
 		final String pan = CardUtils.preparePan(mEditCardNumber.getText().toString());
-		final String expDate = CardUtils.prepareExpDare(mEditCardExpDate.getText().toString());
+		final String expDate = CardUtils.prepareExpDate(mEditCardExpDate.getText().toString());
 		final String cvv = mEditCardCvv.getText().toString();
 		final String holder = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getCardHolder();
 		return CardInfo.create(pan, expDate, cvv, holder);
@@ -273,12 +272,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		if(!validate()) {
 			return;
 		}
-		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER, mAmount);
-		reportMixPanel();
-	}
-
-	private void reportMixPanel() {
-		OmnomApplication.getMixPanelHelper(this).track(new CardAddedMixpanelEvent(getUserData(), mScanUsed, mCheckSaveCard.isChecked()));
+		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER, mAmount, mScanUsed);
 	}
 
 	private void doPay() {

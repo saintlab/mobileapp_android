@@ -9,7 +9,7 @@ import com.omnom.android.utils.utils.AmountHelper;
 /**
  * Created by mvpotter on 21/11/14.
  */
-public final class BillViewMixpanelEvent extends BaseMixpanelEvent {
+public final class BillViewMixpanelEvent extends AbstractBaseMixpanelEvent {
 
 	@Expose
 	private String requestId;

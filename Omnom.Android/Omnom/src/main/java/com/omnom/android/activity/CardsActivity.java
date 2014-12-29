@@ -29,10 +29,11 @@ import com.omnom.android.acquiring.AcquiringResponseException;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.UserData;
+import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.fragment.OrderFragment;
-import com.omnom.android.mixpanel.model.SimpleMixpanelEvent;
+import com.omnom.android.mixpanel.model.acquiring.CardDeletedMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.cards.Card;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
@@ -66,8 +67,6 @@ import rx.functions.Func1;
 public class CardsActivity extends BaseOmnomActivity {
 
 	public static final int RESULT_PAY = 10;
-
-	public static final String EVENT_CARD_DELETED = "card_deleted";
 
 	private static final String TAG = CardsActivity.class.getSimpleName();
 
@@ -284,8 +283,7 @@ public class CardsActivity extends BaseOmnomActivity {
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		UserData userData = UserData.create(OmnomApplication.get(getActivity()).getUserProfile().getUser());
 		String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
-		final CardInfo cardInfo = CardInfo.create(getActivity(), card.getExternalCardId(), cvv);
-		reportMixPanel();
+		final CardInfo cardInfo = CardInfo.create(getActivity(), card.getExternalCardId(), card.getMaskedPan(), cvv);
 		mDeleteCardSubscription = AndroidObservable.bindActivity(this, mAcquiring.deleteCard(acquiringData, userData, cardInfo))
 		                                           .flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
 				                                           Observable<CardDeleteResponse>>() {
@@ -293,22 +291,26 @@ public class CardsActivity extends BaseOmnomActivity {
 			                                           public Observable<CardDeleteResponse> call(com.omnom.android.acquiring.mailru
 					                                                                                      .response.CardDeleteResponse
 					                                                                                      cardDeleteResponse) {
-				                                           if(cardDeleteResponse.isSuccess()) {
+				                                           if (cardDeleteResponse.isSuccess()) {
+					                                           reportMixPanelSuccess(cardInfo);
 					                                           return api.deleteCard(card.getId());
 				                                           } else {
+					                                           if (cardDeleteResponse.getError() != null) {
+						                                           reportMixPanelFail(cardInfo, cardDeleteResponse.getError());
+					                                           }
 					                                           throw new AcquiringResponseException(cardDeleteResponse.getError());
 				                                           }
 			                                           }
 		                                           }).subscribe(new Action1<CardDeleteResponse>() {
 					@Override
 					public void call(CardDeleteResponse cardDeleteResponse) {
-						if(cardDeleteResponse.isSuccess()) {
+						if (cardDeleteResponse.isSuccess()) {
 							onRemoveSuccess(card);
 						} else {
-							if(cardDeleteResponse.getError() != null) {
+							if (cardDeleteResponse.getError() != null) {
 								cardRemovalError();
-							} else if(cardDeleteResponse.hasErrors()) {
-								if(cardDeleteResponse.hasCommonError()) {
+							} else if (cardDeleteResponse.hasErrors()) {
+								if (cardDeleteResponse.hasCommonError()) {
 									cardRemovalError(cardDeleteResponse.getErrors().getCommon());
 								}
 							}
@@ -323,8 +325,12 @@ public class CardsActivity extends BaseOmnomActivity {
 				});
 	}
 
-	private void reportMixPanel() {
-		getMixPanelHelper().track(new SimpleMixpanelEvent(getUserData(), EVENT_CARD_DELETED));
+	private void reportMixPanelSuccess(final CardInfo cardInfo) {
+		getMixPanelHelper().track(new CardDeletedMixpanelEvent(getUserData(), cardInfo));
+	}
+
+	private void reportMixPanelFail(final CardInfo cardInfo, final AcquiringResponseError error) {
+		getMixPanelHelper().track(new CardDeletedMixpanelEvent(getUserData(), cardInfo, error));
 	}
 
 	private void onRemoveSuccess(final Card card) {
@@ -450,8 +456,9 @@ public class CardsActivity extends BaseOmnomActivity {
 	@OnClick(R.id.btn_pay)
 	protected void onPay() {
 		final String cardId = getPreferences().getCardId(this);
+		final Card card = ((CardsAdapter) mList.getAdapter()).getSelectedCard();
 		String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
-		final CardInfo cardInfo = CardInfo.create(this, cardId, cvv);
+		final CardInfo cardInfo = CardInfo.create(this, cardId, card.getMaskedPan(), cvv);
 		pay(cardInfo);
 	}
 

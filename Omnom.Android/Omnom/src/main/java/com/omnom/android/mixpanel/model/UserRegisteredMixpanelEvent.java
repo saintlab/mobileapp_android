@@ -7,7 +7,7 @@ import com.omnom.android.auth.UserData;
 /**
  * Created by xCh3Dx on 20.12.2014.
  */
-public class UserRegisteredMixpanelEvent extends BaseMixpanelEvent {
+public class UserRegisteredMixpanelEvent extends AbstractBaseMixpanelEvent {
 
 	public static final String EVENT_NAME = "user_registered";
 

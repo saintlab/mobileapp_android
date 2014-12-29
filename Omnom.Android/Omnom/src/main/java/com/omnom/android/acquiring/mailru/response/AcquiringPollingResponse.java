@@ -21,6 +21,9 @@ public class AcquiringPollingResponse {
 	@Expose
 	private String url;
 
+	@Expose
+	private AcquiringResponseError error;
+
 	public String getStatus() {
 		return status;
 	}
@@ -35,6 +38,14 @@ public class AcquiringPollingResponse {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public AcquiringResponseError getError() {
+		return error;
+	}
+
+	public void setError(AcquiringResponseError error) {
+		this.error = error;
 	}
 
 	@Override

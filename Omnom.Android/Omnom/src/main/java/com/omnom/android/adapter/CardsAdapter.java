@@ -73,6 +73,8 @@ public class CardsAdapter extends BaseAdapter {
 
 	private int mLastAnimated = -1;
 
+	private Card mSelectedItem;
+
 	public CardsAdapter(final Context context, List<? extends Card> cards, boolean isDemo) {
 		mContext = context;
 		mIsDemo = isDemo;
@@ -104,6 +106,10 @@ public class CardsAdapter extends BaseAdapter {
 	@Override
 	public long getItemId(final int position) {
 		return 0;
+	}
+
+	public Card getSelectedCard() {
+		return mSelectedItem;
 	}
 
 	public void remove(final Card card) {
@@ -139,6 +145,7 @@ public class CardsAdapter extends BaseAdapter {
 		final boolean isSelected = !TextUtils.isEmpty(cardId) && cardId.equals(item.getExternalCardId());
 
 		if(isSelected || mIsDemo) {
+			mSelectedItem = item;
 			holder.root.setBackgroundColor(mColorSelected);
 			holder.txtCardNumber.setTextColor(Color.WHITE);
 			holder.txtType.setTextColor(Color.WHITE);

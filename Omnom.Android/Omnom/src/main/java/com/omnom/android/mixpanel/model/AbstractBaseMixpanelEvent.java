@@ -8,13 +8,13 @@ import com.omnom.android.auth.UserData;
 /**
  * Created by Ch3D on 22.12.2014.
  */
-public abstract class BaseMixpanelEvent implements MixpanelEvent {
+public abstract class AbstractBaseMixpanelEvent implements MixpanelEvent {
 
 	@Nullable
 	@Expose
 	private UserData omnUser;
 
-	public BaseMixpanelEvent(@Nullable UserData userData) {
+	public AbstractBaseMixpanelEvent(@Nullable UserData userData) {
 		omnUser = userData;
 	}
 
