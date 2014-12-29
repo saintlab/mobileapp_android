@@ -44,7 +44,7 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 	}
 
 	@Override
-	protected void handleEmpty() {
+	protected void handleEmptyResponse() {
 		onWrongQr();
 	}
 

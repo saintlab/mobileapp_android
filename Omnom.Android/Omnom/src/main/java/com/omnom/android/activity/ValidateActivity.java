@@ -750,7 +750,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			final int size = restaurants.size();
 			switch(size) {
 				case 0:
-					handleEmpty();
+					handleEmptyResponse();
 					break;
 
 				case 1:
@@ -776,7 +776,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		});
 	}
 
-	protected void handleEmpty() {
+	protected void handleEmptyResponse() {
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override
@@ -787,13 +787,24 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	protected void handleRestaurant(final Restaurant restaurant) {
-		final List<TableDataResponse> tables = restaurant.tables();
-		if(tables != null && tables.size() == 1) {
-			final TableDataResponse table = tables.get(0);
-			reportMixPanel(table);
-			onDataLoaded(restaurant, table);
+
+		if(RestaurantHelper.hasOnlyTable(restaurant)) {
+			loader.stopProgressAnimation();
+			loader.updateProgressMax(new Runnable() {
+				@Override
+				public void run() {
+					final TableDataResponse table = restaurant.tables().get(0);
+					reportMixPanel(table);
+					onDataLoaded(restaurant, table);
+				}
+			});
 		} else {
-			onDataLoaded(restaurant, null);
+			// TODO: Discuss with team
+			// onDataLoaded(restaurant, null);
+			// or
+			//ValidateActivityCamera.start(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
+			//                             EXTRA_LOADER_ANIMATION_SCALE_UP, ConfirmPhoneActivity.TYPE_DEFAULT);
+			handleEmptyResponse();
 		}
 	}
 
