@@ -3,6 +3,7 @@ package com.omnom.android.activity;
 import android.content.Intent;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,13 +42,13 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	}
 
 	public static void start(BaseOmnomActivity activity, boolean finish) {
-		activity.start(new Intent(activity, RestaurantsListActivity.class), R.anim.fade_in, R.anim.fade_out, finish);
+		activity.start(new Intent(activity, RestaurantsListActivity.class), R.anim.slide_in_up, R.anim.fake_fade_out_long, finish);
 	}
 
 	public static void start(BaseOmnomActivity activity, List<Restaurant> restaurants) {
 		final Intent intent = new Intent(activity, RestaurantsListActivity.class);
 		intent.putParcelableArrayListExtra(EXTRA_RESTAURANTS, new ArrayList<Parcelable>(restaurants));
-		activity.start(intent, R.anim.fade_in, R.anim.fade_out, true);
+		activity.start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, true);
 	}
 
 	@InjectView(R.id.panel_top)
@@ -61,6 +62,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@InjectView(R.id.img_profile)
 	protected ImageView imgProfile;
+
+	@InjectView(R.id.swipe_refresh)
+	protected SwipeRefreshLayout refreshView;
 
 	@Inject
 	RestaurateurObeservableApi api;
@@ -80,7 +84,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@OnClick(R.id.img_qr)
 	public void doQrShortcut() {
-		ValidateActivityShortcut.start(this, R.anim.slide_in_right, R.anim.slide_out_left, EXTRA_LOADER_ANIMATION_SCALE_UP);
+		ValidateActivityShortcut.start(this, R.anim.slide_in_up_short, R.anim.fake_fade_out_long, EXTRA_LOADER_ANIMATION_SCALE_UP);
 	}
 
 	@OnClick(R.id.img_profile)
@@ -106,22 +110,34 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@Override
 	public void initUi() {
+		refreshView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override
+			public void onRefresh() {
+				refresh();
+			}
+		});
 		if(mAdapter == null) {
-			api.getRestaurants().subscribe(new Action1<RestaurantsResponse>() {
-				@Override
-				public void call(final RestaurantsResponse restaurants) {
-					mAdapter = new RestaurantsAdapter(getActivity(), restaurants.getItems());
-					initList();
-				}
-			}, new OmnomBaseErrorHandler(this) {
-				@Override
-				protected void onThrowable(final Throwable throwable) {
-					Log.e(TAG, "getRestaurants", throwable);
-				}
-			});
+			refresh();
 		} else {
 			initList();
 		}
+	}
+
+	private void refresh() {
+		api.getRestaurants().subscribe(new Action1<RestaurantsResponse>() {
+			@Override
+			public void call(final RestaurantsResponse restaurants) {
+				mAdapter = new RestaurantsAdapter(getActivity(), restaurants.getItems());
+				initList();
+				refreshView.setRefreshing(false);
+			}
+		}, new OmnomBaseErrorHandler(this) {
+			@Override
+			protected void onThrowable(final Throwable throwable) {
+				Log.e(TAG, "getRestaurants", throwable);
+				refreshView.setRefreshing(false);
+			}
+		});
 	}
 
 	private void initList() {
@@ -141,6 +157,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(this);
 		list.setScrollEnabled(true);
+		refreshView.setEnabled(true);
 	}
 
 	@Override
@@ -158,6 +175,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		list.animate().translationYBy(-panelTop.getHeight()).start();
 		nextView = list.getChildAt(position + 1);
 		list.setScrollEnabled(false);
+		refreshView.setEnabled(false);
 		if(nextView != null) {
 			nextView.animate().alpha(0).start();
 		}
@@ -178,6 +196,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		super.onStop();
 		mItemClicked = false;
 		list.setScrollEnabled(true);
+		refreshView.setEnabled(true);
 		panelTop.setTranslationY(0);
 		list.setTranslationY(0);
 		mAdapter.setSelected(-1);
