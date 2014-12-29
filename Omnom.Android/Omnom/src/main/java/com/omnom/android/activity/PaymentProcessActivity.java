@@ -27,6 +27,7 @@ import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.mixpanel.model.acquiring.PaymentMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
@@ -313,12 +314,15 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	}
 
 	private void reportMixPanelSuccess() {
-		getMixPanelHelper().track(new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
-		getMixPanelHelper().trackRevenue(String.valueOf(getUserData().getId()), mDetails, mBillData);
+		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
+								  new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
+		getMixPanelHelper().trackRevenue(MixPanelHelper.Project.OMNOM,
+										 String.valueOf(getUserData().getId()), mDetails, mBillData);
 	}
 
 	private void reportMixPanelFail(final AcquiringResponseError error) {
-		getMixPanelHelper().track(new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
+		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
+								  new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
 														   mCardInfo, error));
 	}
 

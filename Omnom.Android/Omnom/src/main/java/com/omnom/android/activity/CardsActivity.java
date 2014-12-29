@@ -64,6 +64,8 @@ import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
+import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM;
+
 public class CardsActivity extends BaseOmnomActivity {
 
 	public static final int RESULT_PAY = 10;
@@ -326,11 +328,11 @@ public class CardsActivity extends BaseOmnomActivity {
 	}
 
 	private void reportMixPanelSuccess(final CardInfo cardInfo) {
-		getMixPanelHelper().track(new CardDeletedMixpanelEvent(getUserData(), cardInfo));
+		getMixPanelHelper().track(OMNOM, new CardDeletedMixpanelEvent(getUserData(), cardInfo));
 	}
 
 	private void reportMixPanelFail(final CardInfo cardInfo, final AcquiringResponseError error) {
-		getMixPanelHelper().track(new CardDeletedMixpanelEvent(getUserData(), cardInfo, error));
+		getMixPanelHelper().track(OMNOM, new CardDeletedMixpanelEvent(getUserData(), cardInfo, error));
 	}
 
 	private void onRemoveSuccess(final Card card) {

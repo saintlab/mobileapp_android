@@ -46,12 +46,12 @@ public class MixpanelGCMReceiver extends GCMReceiver {
 			if(MPConfig.DEBUG) {
 				Log.d(LOGTAG, "Registering GCM ID: " + registration);
 			}
-			OmnomApplication.getMixPanel(context).getPeople().setPushRegistrationId(registration);
+			OmnomApplication.getMixPanelHelper(context).setPushRegistrationId(registration);
 		} else if(intent.getStringExtra("unregistered") != null) {
 			if(MPConfig.DEBUG) {
 				Log.d(LOGTAG, "Unregistering from GCM");
 			}
-			OmnomApplication.getMixPanel(context).getPeople().clearPushRegistrationId();
+			OmnomApplication.getMixPanelHelper(context).clearPushRegistrationId();
 		}
 	}
 

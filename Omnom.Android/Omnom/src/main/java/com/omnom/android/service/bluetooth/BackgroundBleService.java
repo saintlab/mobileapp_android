@@ -24,6 +24,8 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.EnteringActivity;
 import com.omnom.android.beacon.BeaconFilter;
+import com.omnom.android.mixpanel.MixPanelHelper;
+import com.omnom.android.mixpanel.model.MixpanelEvent;
 import com.omnom.android.mixpanel.model.RestaurantEnterMixpanelEvent;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.preferences.PreferenceHelperAdapter;
@@ -267,14 +269,11 @@ public class BackgroundBleService extends Service {
 					public void call(TableDataResponse tableDataResponse) {
 						final BackgroundBleService context = BackgroundBleService.this;
 
-						OmnomApplication.getMixPanel(context).identify(String.valueOf(userProfile.getUser().getId()));
-						OmnomApplication.getMixPanelHelper(context).track(RestaurantEnterMixpanelEvent
-								                                                  .createEventBluetooth(UserHelper
-										                                                                        .getUserData(
-												                                                                        context),
-
-								                                                                        tableDataResponse,
-								                                                                        beacon));
+						OmnomApplication.getMixPanelHelper(context).identify(String.valueOf(userProfile.getUser().getId()));
+						final MixpanelEvent event = RestaurantEnterMixpanelEvent.createEventBluetooth(UserHelper.getUserData(context),
+								tableDataResponse,
+								beacon);
+						OmnomApplication.getMixPanelHelper(context).track(MixPanelHelper.Project.OMNOM, event);
 					}
 				}, new Action1<Throwable>() {
 					@Override

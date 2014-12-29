@@ -8,6 +8,8 @@ import java.util.Arrays;
 
 import rx.functions.Action1;
 
+import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM_ANDROID;
+
 /**
  * Created by Ch3D on 03.10.2014.
  */
@@ -22,8 +24,8 @@ public class ObservableUtils {
 
 		@Override
 		public void call(Throwable throwable) {
-			OmnomApplication.getMixPanelHelper(mContext).track("!Error." + throwable.getMessage(),
-																Arrays.toString(throwable.getStackTrace()));
+			OmnomApplication.getMixPanelHelper(mContext).track(OMNOM_ANDROID, "!Error." + throwable.getMessage(),
+															   Arrays.toString(throwable.getStackTrace()));
 			onError(throwable);
 		}
 
