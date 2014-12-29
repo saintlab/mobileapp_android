@@ -33,6 +33,7 @@
 
     <com.omnom.android.utils.view.OmnomListView
         android:id="@android:id/list"
+        android:background="@drawable/bg_order_items"
         android:layout_width="match_parent"
         android:layout_height="@dimen/order_items_list_height_collapsed"
         android:layout_marginTop="48dp"
