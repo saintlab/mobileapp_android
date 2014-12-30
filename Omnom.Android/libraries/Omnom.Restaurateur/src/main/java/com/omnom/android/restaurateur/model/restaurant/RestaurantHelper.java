@@ -106,20 +106,20 @@ public class RestaurantHelper {
 		}
 	}
 
+	public static boolean isMenuEnabled(final Restaurant restaurant) {
+		return hasSettings(restaurant) && restaurant.getSettings().hasMenu();
+	}
+
 	public static boolean isPromoEnabled(final Restaurant restaurant) {
-		if(restaurant == null) {
-			return false;
-		}
-		// TODO: Implement when backend will be ready
-		return false;
+		return hasSettings(restaurant) && restaurant.getSettings().hasPromo();
 	}
 
 	public static boolean isWaiterEnabled(final Restaurant restaurant) {
-		if(restaurant == null) {
-			return false;
-		}
-		// TODO: Implement when backend will be ready
-		return false;
+		return hasSettings(restaurant) && restaurant.getSettings().hasWaiterCall();
+	}
+
+	private static boolean hasSettings(final Restaurant restaurant) {
+		return restaurant != null && restaurant.getSettings() != null;
 	}
 
 	public static String getBackground(final Restaurant restaurant, final DisplayMetrics displayMetrics) {

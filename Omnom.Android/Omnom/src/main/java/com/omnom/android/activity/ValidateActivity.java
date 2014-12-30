@@ -682,8 +682,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	private void configureScreen(final Restaurant restaurant) {
-		final boolean promoEnabled = RestaurantHelper.isPromoEnabled(restaurant);
-		final boolean waiterEnabled = RestaurantHelper.isWaiterEnabled(restaurant);
+		// FIXME: uncomment the code below when promo is implemented
+		final boolean promoEnabled = false; //RestaurantHelper.isPromoEnabled(restaurant);
+		// FIXME: uncomment the code below when waiter call is implemented
+		final boolean waiterEnabled = false; //RestaurantHelper.isWaiterEnabled(restaurant);
 
 		if(bottomView == null) {
 			stubBottomMenu.setLayoutResource(waiterEnabled ? R.layout.layout_bill_waiter : R.layout.layout_bill);

@@ -23,6 +23,9 @@ public abstract class Restaurant implements Parcelable {
 	public abstract String authCode();
 
 	@Nullable
+	public abstract Settings settings();
+
+	@Nullable
 	public abstract String description();
 
 	@Nullable
