@@ -55,7 +55,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
-import retrofit.http.HEAD;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -65,14 +64,14 @@ import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 public class CardConfirmActivity extends BaseOmnomFragmentActivity
-							     implements PayOnceFragment.OnPayListener,
-											PayOnceFragment.VisibilityListener {
-
-	private static final String TAG = CardConfirmActivity.class.getSimpleName();
+		implements PayOnceFragment.OnPayListener,
+		           PayOnceFragment.VisibilityListener {
 
 	public static final int TYPE_BIND_CONFIRM = 0;
 
 	public static final int TYPE_CONFIRM = 1;
+
+	private static final String TAG = CardConfirmActivity.class.getSimpleName();
 
 	@SuppressLint("NewApi")
 	public static void startAddConfirm(BaseOmnomActivity activity, final CardInfo card, int code,
@@ -164,7 +163,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (savedInstanceState == null) {
+		if(savedInstanceState == null) {
 			payOnceFragment = PayOnceFragment.newInstance(mAmount, mType);
 		}
 	}
@@ -205,10 +204,10 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		}
 		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		addKeyboardListener(activityRootView);
-		if (mAmount == 0) {
+		if(mAmount == 0) {
 			int height = (int) getResources().getDimension(R.dimen.pay_once_fragment_height_small);
 			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-																					   height);
+			                                                                           height);
 			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 			fragmentContainer.setLayoutParams(layoutParams);
 		}
@@ -290,7 +289,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	}
 
 	private void registerCard() {
-		if (isBusy()) {
+		if(isBusy()) {
 			return;
 		}
 		mPanelTop.showProgress(true);
@@ -305,7 +304,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 				                                             new Action1<CardRegisterPollingResponse>() {
 					                                             @Override
 					                                             public void call(CardRegisterPollingResponse response) {
-						                                             if (AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
+						                                             if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
 							                                             reportMixPanelSuccess(mCard);
 							                                             mCard.setCardId(response.getCardId());
 							                                             ViewUtils.setVisible(mTextInfo, true);
@@ -316,11 +315,13 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 							                                             editAmount.setEnabled(true);
 							                                             AndroidUtils.showKeyboard(editAmount);
 						                                             } else {
-							                                             if (response.getError() != null) {
+							                                             if(response.getError() != null) {
 								                                             reportMixPanelFail(mCard, response.getError());
 								                                             processCardRegisterError(response.getError().getDescr());
 							                                             } else {
-								                                             processCardRegisterError(getString(R.string.something_went_wrong_try_agint));
+								                                             processCardRegisterError(getString(
+										                                             R.string.something_went_wrong_try_again
+								                                                                               ));
 							                                             }
 						                                             }
 						                                             busy(false);
@@ -329,7 +330,8 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 					                                             @Override
 					                                             public void onError(Throwable throwable) {
 						                                             Log.w(TAG, throwable.getMessage());
-						                                             processCardRegisterError(getString(R.string.something_went_wrong_try_agint));
+						                                             processCardRegisterError(getString(
+								                                             R.string.something_went_wrong_try_again));
 					                                             }
 				                                             });
 	}
@@ -346,19 +348,18 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		busy(false);
 	}
 
-<<<<<<< HEAD
-=======
 	private void reportMixPanelSuccess(final CardInfo cardInfo) {
-		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed));
+		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo,
+		                                                                                 mScanUsed));
 	}
 
 	private void reportMixPanelFail(final CardInfo cardInfo, final AcquiringResponseError error) {
-		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed, error));
+		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed,
+		                                                                                 error));
 	}
 
->>>>>>> #211 log acquiring events to mixpanel with information about card
 	public void verifyCard() {
-		if (isBusy()) {
+		if(isBusy()) {
 			return;
 		}
 		if(mCard == null) {
@@ -372,7 +373,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		double amount;
 		try {
 			amount = Double.parseDouble(filterAmount);
-		} catch (NumberFormatException e) {
+		} catch(NumberFormatException e) {
 			Log.d(TAG, "Invalid double value: \"" + filterAmount + "\"");
 			amount = 0;
 		}
@@ -412,14 +413,14 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		ClickableSpan clickableSpan = new ClickableSpan() {
 			@Override
 			public void onClick(View widget) {
-				if (!isKeyboardVisible) {
+				if(!isKeyboardVisible) {
 					showPayOnceFragment();
 				} else {
 					AndroidUtils.hideKeyboard(mEditAmount.getEditText(), new ResultReceiver(new Handler()) {
 						@Override
 						protected void onReceiveResult(int resultCode, Bundle resultData) {
 							super.onReceiveResult(resultCode, resultData);
-							if (resultCode == InputMethodManager.RESULT_HIDDEN ||
+							if(resultCode == InputMethodManager.RESULT_HIDDEN ||
 									resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN) {
 								showPayOnceFragment();
 							}
@@ -430,26 +431,26 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		};
 		int noSmsLength = getResources().getString(R.string.no_sms).length();
 		spannableString.setSpan(clickableSpan, spannableString.length() - noSmsLength, spannableString.length(),
-				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		spannableString.setSpan(colorSpan, spannableString.length() - noSmsLength, spannableString.length(),
-				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		return spannableString;
 	}
 
 	private void showPayOnceFragment() {
 		mEditAmount.getEditText().setEnabled(false);
 		getSupportFragmentManager().beginTransaction()
-				.addToBackStack(null)
-				.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
-									 R.anim.slide_in_up, R.anim.slide_out_down)
-				.replace(R.id.fragment_container, payOnceFragment)
-				.commit();
+		                           .addToBackStack(null)
+		                           .setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
+		                                                R.anim.slide_in_up, R.anim.slide_out_down)
+		                           .replace(R.id.fragment_container, payOnceFragment)
+		                           .commit();
 		AnimationUtils.animateAlpha(transparentPanel, true);
 	}
 
 	@Override
 	public void pay() {
-		if (mType == TYPE_BIND_CONFIRM) {
+		if(mType == TYPE_BIND_CONFIRM) {
 			Intent intent = new Intent();
 			intent.putExtra(EXTRA_CARD_DATA, mCard);
 			setResult(CardsActivity.RESULT_PAY, intent);
@@ -461,21 +462,21 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void onVisibilityChanged(boolean isVisible) {
-		if (!isVisible) {
+		if(!isVisible) {
 			AndroidUtils.showKeyboard(mEditAmount.getEditText());
 		}
 	}
 
 	@Override
 	public void onBackPressed() {
-		if (payOnceFragment != null && payOnceFragment.isVisible()) {
+		if(payOnceFragment != null && payOnceFragment.isVisible()) {
 			mEditAmount.getEditText().setEnabled(true);
 			AnimationUtils.animateAlpha(transparentPanel, false);
 			getSupportFragmentManager().beginTransaction()
-					.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
-									     R.anim.slide_in_up, R.anim.slide_out_down)
-					.detach(payOnceFragment)
-					.commit();
+			                           .setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
+			                                                R.anim.slide_in_up, R.anim.slide_out_down)
+			                           .detach(payOnceFragment)
+			                           .commit();
 		}
 		super.onBackPressed();
 	}

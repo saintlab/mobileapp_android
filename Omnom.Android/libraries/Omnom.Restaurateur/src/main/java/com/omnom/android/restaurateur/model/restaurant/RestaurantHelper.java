@@ -107,19 +107,19 @@ public class RestaurantHelper {
 	}
 
 	public static boolean isMenuEnabled(final Restaurant restaurant) {
-		return hasSettings(restaurant) && restaurant.getSettings().hasMenu();
+		return hasSettings(restaurant) && restaurant.settings().hasMenu();
 	}
 
 	public static boolean isPromoEnabled(final Restaurant restaurant) {
-		return hasSettings(restaurant) && restaurant.getSettings().hasPromo();
+		return hasSettings(restaurant) && restaurant.settings().hasPromo();
 	}
 
 	public static boolean isWaiterEnabled(final Restaurant restaurant) {
-		return hasSettings(restaurant) && restaurant.getSettings().hasWaiterCall();
+		return hasSettings(restaurant) && restaurant.settings().hasWaiterCall();
 	}
 
 	private static boolean hasSettings(final Restaurant restaurant) {
-		return restaurant != null && restaurant.getSettings() != null;
+		return restaurant != null && restaurant.settings() != null;
 	}
 
 	public static String getBackground(final Restaurant restaurant, final DisplayMetrics displayMetrics) {

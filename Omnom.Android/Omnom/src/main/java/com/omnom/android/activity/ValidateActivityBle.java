@@ -7,7 +7,6 @@ import android.os.Build;
 import android.view.View;
 
 import com.omnom.android.R;
-import com.omnom.android.beacon.BeaconFilter;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
@@ -145,14 +144,6 @@ public class ValidateActivityBle extends ValidateActivity {
 		                                         });
 	}
 
-	@Override
-	protected void reportMixPanel(final TableDataResponse table) {
-		if(table == null) {
-			return;
-		}
-		getMixPanelHelper().track(OnTableMixpanelEvent.createEventBluetooth(getUserData(), table.getRestaurantId(), table.getId()));
-	}
-
 	private void readBeacons() {
 		scanBleDevices(true, new Runnable() {
 			@Override
@@ -196,7 +187,11 @@ public class ValidateActivityBle extends ValidateActivity {
 		});
 	}
 
-	private void reportMixPanel(final TableDataResponse tableDataResponse) {
+	@Override
+	protected void reportMixPanel(final TableDataResponse tableDataResponse) {
+		if(tableDataResponse == null) {
+			return;
+		}
 		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 								  OnTableMixpanelEvent.createEventBluetooth(getUserData(),
 										                                    tableDataResponse.getRestaurantId(),
