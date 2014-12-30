@@ -105,68 +105,83 @@
         omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf"
         android:text="@string/title_plus_tips"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/panel_linear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
         android:layout_centerHorizontal="true"
         android:layout_above="@id/txt_tips_title"
         android:layout_marginBottom="@dimen/panel_payment_margin_bottom"
-        android:gravity="center">
+        android:gravity="center_vertical">
 
         <ImageButton
             android:id="@+id/btn_cancel"
             android:layout_width="34dp"
             android:layout_height="34dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="24dp"
             android:scaleType="fitXY"
             android:padding="8dp"
             android:cropToPadding="true"
             android:background="@null"
             android:src="@drawable/ic_cancel_editing_button"
-            android:visibility="invisible"/>
+            android:visibility="invisible"
+            android:contentDescription="@null"/>
 
-        <com.omnom.android.view.AmountEditText
-            android:id="@+id/edit_payment_amount"
-            android:layout_width="0dp"
+        <FrameLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:inputType="numberDecimal"
-            android:imeOptions="actionDone"
-            android:singleLine="true"
-            android:textSize="@dimen/font_order_amont_edit"
-            android:textColor="?android:textColorPrimaryInverse"
-            android:textCursorDrawable="@drawable/cursor_amount"
-            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+            android:layout_toLeftOf="@+id/btn_apply"
+            android:layout_toRightOf="@+id/btn_cancel"
+            android:layout_centerInParent="true">
 
-        <TextView
-            android:id="@+id/txt_custom_tips"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textSize="@dimen/font_xxlarge"
-            android:textColor="?android:textColorPrimaryInverse"
-            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-            android:background="@drawable/textfield_default_mtrl_white"
-            android:visibility="gone"/>
+            <com.omnom.android.view.AmountEditText
+                android:id="@+id/edit_payment_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="@dimen/order_amount_field_min_width"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
+                android:textSize="@dimen/font_order_amont_edit"
+                android:textColor="?android:textColorPrimaryInverse"
+                android:textCursorDrawable="@drawable/cursor_amount"
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+
+            <TextView
+                android:id="@+id/txt_custom_tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="@dimen/order_amount_field_min_width"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textSize="@dimen/font_xxlarge"
+                android:textColor="?android:textColorPrimaryInverse"
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+                android:background="@drawable/textfield_default_mtrl_white"
+                android:visibility="gone"/>
+
+        </FrameLayout>
 
         <ImageButton
             android:id="@+id/btn_apply"
             android:layout_width="34dp"
             android:layout_height="34dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_marginRight="24dp"
             android:scaleType="fitXY"
             android:background="@null"
             android:src="@drawable/ic_done_editing_button"
-            android:visibility="invisible"/>
+            android:visibility="invisible"
+            android:contentDescription="@null"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/txt_already_paid"

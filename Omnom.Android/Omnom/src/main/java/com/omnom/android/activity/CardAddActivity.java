@@ -6,7 +6,9 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -15,7 +17,6 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.activity.base.BaseOmnomActivity;
-import com.omnom.android.mixpanel.model.CardAddedMixpanelEvent;
 import com.omnom.android.utils.CardDataTextWatcher;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
@@ -37,6 +38,12 @@ import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
 
 public class CardAddActivity extends BaseOmnomActivity implements TextListener {
+
+	public static final int TYPE_BIND = 0;
+
+	public static final int TYPE_BIND_OR_PAY = 1;
+
+	public static final int TYPE_ENTER_AND_PAY = 2;
 
 	private static final int REQUEST_CODE_CARD_IO = 101;
 
@@ -67,9 +74,10 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	}
 
 	@SuppressLint("NewApi")
-	public static void start(Activity activity, double amount, int code) {
+	public static void start(Activity activity, double amount, int type, int code) {
 		final Intent intent = new Intent(activity, CardAddActivity.class);
 		intent.putExtra(EXTRA_ORDER_AMOUNT, amount);
+		intent.putExtra(EXTRA_TYPE, type);
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
 			                                                    R.anim.slide_in_right,
@@ -130,6 +138,8 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	private Validator cvvValidator;
 
+	private int mType;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -148,11 +158,8 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 				finish();
 			}
 		});
-
-		if(mAmount == 0) {
-			ViewUtils.setVisible(mCheckSaveCard, false);
-		}
-
+		mCheckSaveCard.setChecked(mType != TYPE_ENTER_AND_PAY);
+		ViewUtils.setVisible(mCheckSaveCard, mType == TYPE_BIND_OR_PAY);
 		setUpCardEditFields();
 	}
 
@@ -186,6 +193,17 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		mEditCardNumber.setError(false);
 		mEditCardExpDate.setError(false);
 		mEditCardCvv.setError(false);
+
+		mEditCardCvv.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
+				if(actionId == EditorInfo.IME_ACTION_DONE) {
+					mPanelTop.getBtnRight().callOnClick();
+					return true;
+				}
+				return false;
+			}
+		});
 	}
 
 	@Override
@@ -263,7 +281,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	private CardInfo createCardInfo() {
 		final String pan = CardUtils.preparePan(mEditCardNumber.getText().toString());
-		final String expDate = CardUtils.prepareExpDare(mEditCardExpDate.getText().toString());
+		final String expDate = CardUtils.prepareExpDate(mEditCardExpDate.getText().toString());
 		final String cvv = mEditCardCvv.getText().toString();
 		final String holder = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getCardHolder();
 		return CardInfo.create(pan, expDate, cvv, holder);
@@ -273,12 +291,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		if(!validate()) {
 			return;
 		}
-		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER, mAmount);
-		reportMixPanel();
-	}
-
-	private void reportMixPanel() {
-		OmnomApplication.getMixPanelHelper(this).track(new CardAddedMixpanelEvent(getUserData(), mScanUsed, mCheckSaveCard.isChecked()));
+		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER, mAmount, mScanUsed);
 	}
 
 	private void doPay() {
@@ -355,6 +368,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	@Override
 	protected void handleIntent(Intent intent) {
 		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);
+		mType = intent.getIntExtra(EXTRA_TYPE, TYPE_BIND);
 	}
 
 }

@@ -33,8 +33,13 @@ public class CardInfo implements Parcelable {
 	};
 
 	public static CardInfo create(final Context context, final String id, final String testCvv) {
+		return create(context, id, StringUtils.EMPTY_STRING, testCvv);
+	}
+
+	public static CardInfo create(final Context context, final String id, final String pan, final String testCvv) {
 		final CardInfo cardInfo = new CardInfo();
 		cardInfo.setCardId(id);
+		cardInfo.pan = pan;
 		cardInfo.cvv = testCvv;
 		return cardInfo;
 	}
@@ -161,7 +166,7 @@ public class CardInfo implements Parcelable {
 		} else {
 			cardInfo.put("pan", pan);
 			cardInfo.put("exp_date", expDate);
-			cardInfo.put("add_card", "1");
+			cardInfo.put("add_card", "0");
 		}
 
 		if(!TextUtils.isEmpty(cvv)) {

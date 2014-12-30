@@ -60,8 +60,6 @@ public class OrderItemsAdapter extends BaseAdapter {
 
 	private List<OrderItem> mItems;
 
-	private SparseBooleanArrayParcelable mStates;
-
 	public OrderItemsAdapter(final Context context, final List<OrderItem> orders, boolean addFakeView) {
 		this(context, orders, new SparseBooleanArrayParcelable(), addFakeView);
 	}
@@ -153,7 +151,7 @@ public class OrderItemsAdapter extends BaseAdapter {
 			holder.txtPrice.setTextColor(COLOR_TEXT_SELECTED);
 		} else {
 			ViewUtils.setVisible(holder.divider, position != getCount() - 1);
-			convertView.setBackgroundColor(mContext.getResources().getColor(android.R.color.white));
+			convertView.setBackgroundColor(mContext.getResources().getColor(android.R.color.transparent));
 			holder.txtTitle.setTextColor(COLOR_TEXT_NORMAL);
 			holder.txtPrice.setTextColor(mColorPriceNormal);
 		}

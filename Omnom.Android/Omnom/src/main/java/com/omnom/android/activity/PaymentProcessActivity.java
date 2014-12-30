@@ -24,10 +24,12 @@ import com.omnom.android.acquiring.mailru.model.MailRuExtra;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
+import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
-import com.omnom.android.mixpanel.model.PaymentSuccessMixpanelEvent;
+import com.omnom.android.mixpanel.model.acquiring.PaymentMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
@@ -212,7 +214,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					} else if(response.getErrors() != null) {
 						Log.w(TAG, response.getErrors().toString());
 					}
-					onPayError();
+					onUnknownError();
 				}
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
@@ -244,7 +246,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 			                                    public void call(final AcquiringResponse response) {
 				                                    if(response.getError() != null) {
 					                                    Log.w(TAG, response.getError().toString());
-					                                    onPayError();
+					                                    onPayError(response.getError());
 				                                    } else {
 					                                    mTransactionUrl = response.getUrl();
 					                                    checkResult(response);
@@ -280,13 +282,13 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
 			onPayOk(response);
 		} else {
-			onPayError();
+			onPayError(response.getError());
 		}
 	}
 
 	private void onPayOk(AcquiringPollingResponse response) {
 		Log.d(TAG, "status = " + response.getStatus());
-		reportMixPanel();
+		reportMixPanelSuccess();
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override
@@ -301,18 +303,27 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		});
 	}
 
-	private void reportMixPanel() {
-		getMixPanelHelper().track(new PaymentSuccessMixpanelEvent(getUserData(), mDetails, mBillId));
-		getMixPanelHelper().trackRevenue(String.valueOf(getUserData().getId()), mDetails, mBillData);
-	}
-
-	private void onPayError() {
+	private void onPayError(final AcquiringResponseError error) {
+		reportMixPanelFail(error);
 		loader.showProgress(false);
 		mErrorHelper.showPaymentDeclined(finishOnClick());
 	}
 
 	private void onUnknownError() {
 		mErrorHelper.showUnknownError(finishOnClick());
+	}
+
+	private void reportMixPanelSuccess() {
+		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
+								  new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
+		getMixPanelHelper().trackRevenue(MixPanelHelper.Project.OMNOM,
+										 String.valueOf(getUserData().getId()), mDetails, mBillData);
+	}
+
+	private void reportMixPanelFail(final AcquiringResponseError error) {
+		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
+								  new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
+														   mCardInfo, error));
 	}
 
 	private View.OnClickListener finishOnClick() {

@@ -9,6 +9,7 @@ import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -129,7 +130,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private void reportMixPanel(final TableDataResponse tableDataResponse) {
 		if(tableDataResponse != null) {
-			getMixPanelHelper().track(OnTableMixpanelEvent.createEventQr(getUserData(), tableDataResponse.getRestaurantId(),
+			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
+									  OnTableMixpanelEvent.createEventQr(getUserData(), tableDataResponse.getRestaurantId(),
 			                                                             tableDataResponse.getId()));
 		}
 	}

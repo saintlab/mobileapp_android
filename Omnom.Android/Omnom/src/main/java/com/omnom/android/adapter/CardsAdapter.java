@@ -67,11 +67,15 @@ public class CardsAdapter extends BaseAdapter {
 
 	private int mColorPanDefault;
 
+	private int mColorTypeDefault;
+
 	private int mColorPanUnregistered;
 
 	private boolean mIsDemo;
 
 	private int mLastAnimated = -1;
+
+	private Card mSelectedItem;
 
 	public CardsAdapter(final Context context, List<? extends Card> cards, boolean isDemo) {
 		mContext = context;
@@ -88,6 +92,7 @@ public class CardsAdapter extends BaseAdapter {
 		mDrawableRight = mContext.getResources().getDrawable(R.drawable.ic_card_active);
 		mColorSelected = mContext.getResources().getColor(R.color.card_selected);
 		mColorPanDefault = mContext.getResources().getColor(R.color.card_number_default);
+		mColorTypeDefault = mContext.getResources().getColor(R.color.card_type_default);
 		mColorPanUnregistered = mContext.getResources().getColor(R.color.card_unregistered);
 	}
 
@@ -104,6 +109,10 @@ public class CardsAdapter extends BaseAdapter {
 	@Override
 	public long getItemId(final int position) {
 		return 0;
+	}
+
+	public Card getSelectedCard() {
+		return mSelectedItem;
 	}
 
 	public void remove(final Card card) {
@@ -139,6 +148,7 @@ public class CardsAdapter extends BaseAdapter {
 		final boolean isSelected = !TextUtils.isEmpty(cardId) && cardId.equals(item.getExternalCardId());
 
 		if(isSelected || mIsDemo) {
+			mSelectedItem = item;
 			holder.root.setBackgroundColor(mColorSelected);
 			holder.txtCardNumber.setTextColor(Color.WHITE);
 			holder.txtType.setTextColor(Color.WHITE);
@@ -147,7 +157,7 @@ public class CardsAdapter extends BaseAdapter {
 		} else {
 			holder.root.setBackgroundColor(Color.TRANSPARENT);
 			holder.txtCardNumber.setTextColor(mColorPanDefault);
-			holder.txtType.setTextColor(mColorPanDefault);
+			holder.txtType.setTextColor(mColorTypeDefault);
 			holder.txtConfirm.setText(StringUtils.EMPTY_STRING);
 			holder.txtConfirm.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
 		}
