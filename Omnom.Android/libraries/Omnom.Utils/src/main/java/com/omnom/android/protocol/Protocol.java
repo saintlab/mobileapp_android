@@ -4,10 +4,10 @@ package com.omnom.android.protocol;
  * Created by Ch3D on 11.08.2014.
  */
 public interface Protocol {
-	public static final String HEADER_X_MOBILE_VENDOR = "x-mobile-vendor";
-	public static final String HEADER_X_MOBILE_MODEL = "x-mobile-model";
-	public static final String HEADER_X_MOBILE_OS_VERSION = "x-mobile-os-version";
-	public static final String HEADER_X_MOBILE_PLATFORM = "x-mobile-platform";
+	public static final String HEADER_X_MOBILE_VENDOR = "X-Mobile-Vendor";
+	public static final String HEADER_X_MOBILE_MODEL = "X-Mobile-Model";
+	public static final String HEADER_X_MOBILE_OS_VERSION = "X-Mobile-Os-Version";
+	public static final String HEADER_X_MOBILE_PLATFORM = "X-Mobile-Platform";
 
 	public static final String FIELD_ID = "id";
 	public static final String FIELD_LOGIN = "login";
