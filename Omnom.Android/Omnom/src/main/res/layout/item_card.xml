@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -21,7 +23,8 @@
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:textAppearance="?android:textAppearance"
-            android:textColor="@color/card_selected" />
+            android:textColor="@color/card_selected"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
         <TextView
             android:id="@+id/txt_type"

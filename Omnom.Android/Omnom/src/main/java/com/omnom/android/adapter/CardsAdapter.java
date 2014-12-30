@@ -67,6 +67,8 @@ public class CardsAdapter extends BaseAdapter {
 
 	private int mColorPanDefault;
 
+	private int mColorTypeDefault;
+
 	private int mColorPanUnregistered;
 
 	private boolean mIsDemo;
@@ -90,6 +92,7 @@ public class CardsAdapter extends BaseAdapter {
 		mDrawableRight = mContext.getResources().getDrawable(R.drawable.ic_card_active);
 		mColorSelected = mContext.getResources().getColor(R.color.card_selected);
 		mColorPanDefault = mContext.getResources().getColor(R.color.card_number_default);
+		mColorTypeDefault = mContext.getResources().getColor(R.color.card_type_default);
 		mColorPanUnregistered = mContext.getResources().getColor(R.color.card_unregistered);
 	}
 
@@ -154,7 +157,7 @@ public class CardsAdapter extends BaseAdapter {
 		} else {
 			holder.root.setBackgroundColor(Color.TRANSPARENT);
 			holder.txtCardNumber.setTextColor(mColorPanDefault);
-			holder.txtType.setTextColor(mColorPanDefault);
+			holder.txtType.setTextColor(mColorTypeDefault);
 			holder.txtConfirm.setText(StringUtils.EMPTY_STRING);
 			holder.txtConfirm.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
 		}

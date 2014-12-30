@@ -108,6 +108,12 @@ public class LoginActivity extends BaseOmnomActivity {
 	}
 
 	@Override
+	protected void onPause() {
+		super.onPause();
+		AndroidUtils.hideKeyboard(this);
+	}
+
+	@Override
 	protected void handleIntent(Intent intent) {
 	}
 

@@ -8,7 +8,7 @@
     <string name="enter">Вход</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="entering_pay_with_phone">Оплатить счёт через телефон</string>
-    <string name="entering_call_waiter">Вызвать официанта в любой момент</string>
+    <string name="entering_call_waiter">Вызвать официанта\nв любой момент</string>
     <string name="entering_split_bill">Разделить счёт между друзьями</string>
     <string name="name">Имя</string>
     <string name="email">Почта</string>
@@ -37,6 +37,7 @@
     <string name="overall">Итого: </string>
     <string name="order_paid">Оплачено: %1$s</string>
     <string name="pay_amount">Оплатить %1$s</string>
+    <string name="enter_card_data">Ввести карту</string>
     <string name="amount_is_too_high">Сумма слишком большая</string>
     <string name="pay">Оплатить</string>
     <string name="refuse">Отказаться</string>
@@ -68,7 +69,7 @@
     <string name="wrong_checksum">Введена неверная проверочная сумма.\nЗагляните в последнее SMS.
         Там должно\nбыть сообщение от банка. Введите\nсумму из SMS. <u>Если SMS нет?</u></string>
     <string name="no_sms">Если SMS нет?</string>
-    <string name="something_went_wrong_try_agint">Что-то пошло не так.\nПовторите попытку</string>
+    <string name="something_went_wrong_try_again">Что-то пошло не так.\nПовторите попытку</string>
     <string name="repeat">Повторить</string>
     <string name="payment_success">Платёж принят</string>
     <string name="sms_sent_to_waiter">Официант получил sms с суммой чаевых.</string>

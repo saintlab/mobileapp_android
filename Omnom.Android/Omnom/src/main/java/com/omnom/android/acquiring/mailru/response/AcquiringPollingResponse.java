@@ -14,6 +14,10 @@ public class AcquiringPollingResponse {
 	 * Error status for mail acquiring.
 	 */
 	public static final String STATUS_ERR = "ERR_FINISH";
+	/**
+	 * Result is not ready yet. Continue to check.
+	 */
+	public static final String STATUS_CONTINUE = "OK_CONTINUE";
 
 	@Expose
 	private String status;

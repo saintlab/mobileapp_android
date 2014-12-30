@@ -70,6 +70,10 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	public static final int RESULT_PAY = 10;
 
+	public static final int RESULT_ENTER_CARD_AND_PAY = 11;
+
+	public static final String EVENT_CARD_DELETED = "card_deleted";
+
 	private static final String TAG = CardsActivity.class.getSimpleName();
 
 	private static final int REQUEST_CODE_CARD_CONFIRM = 100;
@@ -406,7 +410,7 @@ public class CardsActivity extends BaseOmnomActivity {
 	private boolean selectCard(final CardsAdapter cardsAdapter, final String selectedCardId) {
 		boolean isSelected;
 		// open CardAddActivity if no card registered on bill payment
-		if(cardsAdapter.isEmpty()) {
+		if (cardsAdapter.isEmpty()) {
 			if(mDetails != null && isPaymentRequest) {
 				onAdd();
 			}
@@ -474,19 +478,22 @@ public class CardsActivity extends BaseOmnomActivity {
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		isPaymentRequest = false;
-		if(resultCode == RESULT_OK) {
-			if(requestCode == REQUEST_PAYMENT) {
+		if (resultCode == RESULT_OK) {
+			if (requestCode == REQUEST_PAYMENT) {
 				setResult(RESULT_OK);
 				finish();
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
 			}
-		} else if(resultCode == RESULT_PAY && data != null) {
+		} else if (resultCode == RESULT_PAY && data != null) {
 			CardInfo cardInfo = data.getParcelableExtra(EXTRA_CARD_DATA);
 			if(cardInfo != null) {
 				pay(cardInfo);
 			} else {
 				Log.w(TAG, "Card info is null");
 			}
+		} else if (resultCode == RESULT_ENTER_CARD_AND_PAY) {
+			CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : 0,
+								  CardAddActivity.TYPE_ENTER_AND_PAY, REQUEST_CODE_CARD_ADD);
 		}
 	}
 
@@ -501,7 +508,12 @@ public class CardsActivity extends BaseOmnomActivity {
 	}
 
 	public void onAdd() {
-		CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : 0, REQUEST_CODE_CARD_ADD);
+		int type = CardAddActivity.TYPE_BIND;
+		if (mDetails != null) {
+			type = CardAddActivity.TYPE_BIND_OR_PAY;
+		}
+		CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : 0,
+							  type, REQUEST_CODE_CARD_ADD);
 	}
 
 	@Override

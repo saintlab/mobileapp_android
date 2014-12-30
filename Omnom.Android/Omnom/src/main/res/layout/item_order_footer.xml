@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/activity_horizontal_margin_small"
             android:gravity="center"
-            omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf"/>
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
     </LinearLayout>
 

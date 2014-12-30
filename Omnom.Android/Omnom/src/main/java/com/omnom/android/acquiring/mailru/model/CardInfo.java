@@ -166,7 +166,7 @@ public class CardInfo implements Parcelable {
 		} else {
 			cardInfo.put("pan", pan);
 			cardInfo.put("exp_date", expDate);
-			cardInfo.put("add_card", "1");
+			cardInfo.put("add_card", "0");
 		}
 
 		if(!TextUtils.isEmpty(cvv)) {
