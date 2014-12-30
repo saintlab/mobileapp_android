@@ -224,6 +224,14 @@ public class AndroidUtils {
 		}
 	}
 
+	public static int getAppVersionCode(Context context) {
+		try {
+			return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
+		} catch(PackageManager.NameNotFoundException e) {
+			return 0;
+		}
+	}
+
 	public static String getInstallId(Context context) {
 		return getAndroidId(context) + getDeviceId(context) + getSerialNumber();
 	}

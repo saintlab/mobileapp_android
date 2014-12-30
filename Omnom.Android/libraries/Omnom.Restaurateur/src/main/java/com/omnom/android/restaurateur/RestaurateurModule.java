@@ -37,7 +37,7 @@ public class RestaurateurModule {
 	RestaurateurObeservableApi providerLinkerApi() {
 		return RestaurateurDataProvider.create(
 				mContext.getString(mEndpointResId),
-				new BaseRequestInterceptor() {
+				new BaseRequestInterceptor(mContext) {
 					@Override
 					public void intercept(RequestFacade request) {
 						super.intercept(request);
