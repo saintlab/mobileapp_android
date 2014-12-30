@@ -897,8 +897,12 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void cancelSplit(boolean resetAmount) {
+		cancelSplit(resetAmount, false);
+	}
+
+	private void cancelSplit(boolean resetAmount, boolean force) {
 		mSplitWay = SplitWay.WASNT_USED;
-		if(isEditMode) {
+		if(isEditMode && !force) {
 			return;
 		}
 		amountModified(false);
@@ -1046,7 +1050,7 @@ public class OrderFragment extends Fragment {
 
 	protected void doApply(View v) {
 		if(mMode == MODE_AMOUNT) {
-			cancelSplit(false);
+			cancelSplit(false, true);
 			mApply = true;
 			AndroidUtils.hideKeyboard(getActivity());
 			mPaymentTitleChanged = true;
