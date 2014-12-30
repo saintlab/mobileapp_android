@@ -40,6 +40,14 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private static final String ACTION_LAUNCH_HASHCODE = "com.omnom.android.action.launch_hashcode";
 
+	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
+		final Intent intent = new Intent(context, ValidateActivityCamera.class);
+		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
+		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
+		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
+		return intent;
+	}
+
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, final int userEnterType) {
 		Intent intent = createIntent(context, animationType, false, userEnterType);
 		if(context instanceof ConfirmPhoneActivity) {
@@ -49,21 +57,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 		context.start(intent, enterAnim, exitAnim, false);
 	}
 
-	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
-		final Intent intent = new Intent(context, ValidateActivityCamera.class);
-		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
-		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
-		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
-		return intent;
-	}
-
-	public static void start(BaseFragmentActivity context, Uri data) {
-		final Intent intent = new Intent(context, ValidateActivityCamera.class);
-		intent.setData(data);
-		intent.setAction(ACTION_LAUNCH_HASHCODE);
-		intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
-		intent.putExtra(EXTRA_DEMO_MODE, false);
-		intent.putExtra(EXTRA_CONFIRM_TYPE, ValidateActivity.TYPE_DEFAULT);
+	public static void start(final BaseFragmentActivity context, final Uri data) {
+		final Intent intent = createIntent(context, EXTRA_LOADER_ANIMATION_SCALE_DOWN, false, ValidateActivity.TYPE_DEFAULT);
+		intent.setData(data).setAction(ACTION_LAUNCH_HASHCODE);
 		context.start(intent, R.anim.fake_fade_in, R.anim.fake_fade_out_instant, true);
 	}
 
@@ -90,7 +86,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 	protected void startLoader() {
 		clearErrors(true);
 
-		if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction()) && isHashcodeLaunch()) {
+		if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction()) && isExternalLaunch()) {
 			findTableForQr(mData.toString());
 			return;
 		}
@@ -107,7 +103,10 @@ public class ValidateActivityCamera extends ValidateActivity {
 		OmnomQRCaptureActivity.start(this, tableNumber, tableId, REQUEST_CODE_SCAN_QR);
 	}
 
-	private boolean isHashcodeLaunch() {return mData != null;}
+	/**
+	 * @return <code>true</code> if app was launched by an extrenal qr/link
+	 */
+	private boolean isExternalLaunch() {return mData != null;}
 
 	@Override
 	protected void onDestroy() {
@@ -216,8 +215,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 								if(!TextUtils.isEmpty(decodeResponse.getError())) {
 									mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
 								} else {
-									if(isHashcodeLaunch()) {
-										handleHashcodeResult(decodeResponse);
+									if(isExternalLaunch()) {
+										handleExternalLaunchResult(decodeResponse);
 									} else {
 										handleDecodeResponse(decodeResponse);
 									}
@@ -226,12 +225,11 @@ public class ValidateActivityCamera extends ValidateActivity {
 						}, onError);
 	}
 
-	private void handleHashcodeResult(final RestaurantResponse decodeResponse) {
+	private void handleExternalLaunchResult(final RestaurantResponse decodeResponse) {
 		if(decodeResponse.hasOnlyRestuarant()) {
 			final Restaurant restaurant = decodeResponse.getRestaurants().get(0);
 			if(RestaurantHelper.hasOnlyTable(restaurant)) {
-				final TableDataResponse table = restaurant.tables().get(0);
-				onDataLoaded(restaurant, table, RestaurantHelper.hasOrders(restaurant));
+				onDataLoaded(restaurant, restaurant.tables().get(0), RestaurantHelper.hasOrders(restaurant));
 				return;
 			}
 
