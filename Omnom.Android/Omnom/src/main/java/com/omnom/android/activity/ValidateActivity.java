@@ -28,7 +28,7 @@ import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
-import com.omnom.android.restaurateur.api.Protocol;
+import com.omnom.android.protocol.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.UserProfile;
