@@ -131,15 +131,13 @@
 
         </activity>
 
-<<<<<<< HEAD
         <activity
             android:name=".activity.ValidateActivityShortcut"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden" />
-=======
->>>>>>> bc9cca52958e7797d2bfd2f790a6a4fc1df1f59e
+        
         <activity
             android:name=".activity.OrdersActivity"
             android:screenOrientation="portrait"

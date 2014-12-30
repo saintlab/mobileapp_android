@@ -7,10 +7,6 @@ import android.os.Build;
 import android.view.View;
 
 import com.omnom.android.R;
-<<<<<<< HEAD
-=======
-import com.omnom.android.beacon.BeaconFilter;
->>>>>>> bc9cca52958e7797d2bfd2f790a6a4fc1df1f59e
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
