@@ -302,15 +302,15 @@ public class CardsActivity extends BaseOmnomActivity {
 		                                           }).subscribe(new Action1<CardDeleteResponse>() {
 					@Override
 					public void call(CardDeleteResponse cardDeleteResponse) {
-						if(cardDeleteResponse.isSuccess()) {
+						if (cardDeleteResponse.isSuccess()) {
 							onRemoveSuccess(card);
 						} else {
-							if(cardDeleteResponse.getError() != null) {
+							if (cardDeleteResponse.getError() != null) {
+								cardRemovalError(cardDeleteResponse.getError());
+							} else if (cardDeleteResponse.hasErrors() && cardDeleteResponse.hasCommonError()) {
+								cardRemovalError(cardDeleteResponse.getErrors().getCommon());
+							} else {
 								cardRemovalError();
-							} else if(cardDeleteResponse.hasErrors()) {
-								if(cardDeleteResponse.hasCommonError()) {
-									cardRemovalError(cardDeleteResponse.getErrors().getCommon());
-								}
 							}
 						}
 					}
@@ -345,7 +345,7 @@ public class CardsActivity extends BaseOmnomActivity {
 	}
 
 	private void cardRemovalError(String message) {
-		Log.w(TAG, message);
+		Log.w(TAG, "error = " + message);
 		if(message != null) {
 			Toast.makeText(this, getString(R.string.unable_to_remove_card_number_try_againt_later, message),
 			               Toast.LENGTH_LONG).show();
