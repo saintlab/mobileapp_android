@@ -12,6 +12,7 @@ import com.omnom.android.acquiring.mailru.response.AcquiringTransactionExtendedR
 import com.omnom.android.acquiring.mailru.response.AcquiringTransactionResponse;
 import com.omnom.android.acquiring.mailru.response.CardDeleteResponse;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
+import com.omnom.android.protocol.BaseRequestInterceptor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,9 @@ import rx.schedulers.Schedulers;
 public class AcquiringProxyMailRu implements AcquiringServiceMailRu {
 
 	private final Context mContext;
+
 	private final Gson gson;
+
 	private final AcquiringServiceMailRu mAcquiringService;
 
 	public AcquiringProxyMailRu(Context context) {
@@ -38,6 +41,7 @@ public class AcquiringProxyMailRu implements AcquiringServiceMailRu {
 		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		RestAdapter mRestAdapter = new RestAdapter.Builder().setEndpoint(context.getString(R.string.acquiring_mailru_acquiring_base_url))
+		                                                    .setRequestInterceptor(new BaseRequestInterceptor(mContext))
 		                                                    .setLogLevel(logLevel).setConverter(new GsonConverter(gson)).build();
 		mAcquiringService = mRestAdapter.create(AcquiringServiceMailRu.class);
 	}

@@ -1,5 +1,6 @@
 package com.omnom.android.restaurateur.api;
 
+import com.omnom.android.protocol.Protocol;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
