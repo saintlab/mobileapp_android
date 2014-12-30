@@ -4,6 +4,9 @@ package com.omnom.android.protocol;
  * Created by Ch3D on 11.08.2014.
  */
 public interface Protocol {
+	public static final String HEADER_X_CURRENT_APP_BUILD = "X-Current-App-Build";
+	public static final String HEADER_X_CURRENT_APP_VERSION = "X-Current-App-Version";
+
 	public static final String HEADER_X_MOBILE_VENDOR = "X-Mobile-Vendor";
 	public static final String HEADER_X_MOBILE_MODEL = "X-Mobile-Model";
 	public static final String HEADER_X_MOBILE_OS_VERSION = "X-Mobile-Os-Version";

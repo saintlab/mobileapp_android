@@ -34,7 +34,7 @@ public class WicketAuthenticator implements AuthService {
 		final RestAdapter mRestAdapter = new RestAdapter.Builder()
 				.setRxSupport(new AuthRxSupport())
 				.setEndpoint(endpoint)
-				.setRequestInterceptor(new BaseRequestInterceptor())
+				.setRequestInterceptor(new BaseRequestInterceptor(mContext))
 				.setLogLevel(logLevel).setConverter(new GsonConverter(gson)).build();
 		authService = mRestAdapter.create(AuthService.class);
 	}

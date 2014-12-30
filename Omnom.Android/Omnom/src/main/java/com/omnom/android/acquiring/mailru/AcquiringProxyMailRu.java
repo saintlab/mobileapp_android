@@ -41,7 +41,7 @@ public class AcquiringProxyMailRu implements AcquiringServiceMailRu {
 		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		RestAdapter mRestAdapter = new RestAdapter.Builder().setEndpoint(context.getString(R.string.acquiring_mailru_acquiring_base_url))
-		                                                    .setRequestInterceptor(new BaseRequestInterceptor())
+		                                                    .setRequestInterceptor(new BaseRequestInterceptor(mContext))
 		                                                    .setLogLevel(logLevel).setConverter(new GsonConverter(gson)).build();
 		mAcquiringService = mRestAdapter.create(AcquiringServiceMailRu.class);
 	}
