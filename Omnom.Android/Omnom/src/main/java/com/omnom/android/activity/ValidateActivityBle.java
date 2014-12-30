@@ -11,6 +11,7 @@ import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.BeaconRecord;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
+import com.omnom.android.restaurateur.model.decode.RssiRecord;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
@@ -72,6 +73,7 @@ public class ValidateActivityBle extends ValidateActivity {
 							record = BeaconRecord.create(beacon);
 							mBeacons.add(record);
 						}
+						record.addRssi(new RssiRecord(beacon.getRssi(), System.currentTimeMillis()));
 					}
 				});
 			}
