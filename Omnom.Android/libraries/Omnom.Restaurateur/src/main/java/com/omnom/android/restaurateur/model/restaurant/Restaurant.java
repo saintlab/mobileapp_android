@@ -49,6 +49,9 @@ public class Restaurant implements Parcelable {
 	@Expose
 	private int rssiThreshold;
 
+	@Expose
+	private Settings settings;
+
 	public Restaurant(String id, String title, String authCode, String descr, Decoration decoration, Address address, String phone) {
 		this.id = id;
 		this.title = title;
@@ -68,6 +71,7 @@ public class Restaurant implements Parcelable {
 		address = in.readParcelable(Address.class.getClassLoader());
 		schedules = in.readParcelable(Schedules.class.getClassLoader());
 		phone = in.readString();
+		settings = in.readParcelable(Settings.class.getClassLoader());
 	}
 
 	public String getId() {
@@ -125,6 +129,7 @@ public class Restaurant implements Parcelable {
 		dest.writeParcelable(address, flags);
 		dest.writeParcelable(schedules, flags);
 		dest.writeString(phone);
+		dest.writeParcelable(settings, flags);
 	}
 
 	public Address getAddress() {
@@ -158,5 +163,9 @@ public class Restaurant implements Parcelable {
 
 	public void setPhone(final String phone) {
 		this.phone = phone;
+	}
+
+	public Settings getSettings() {
+		return settings;
 	}
 }

@@ -753,8 +753,11 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void sendBillViewEvent(String requestId, UserData user, Order order) {
-		MixpanelEvent billViewEvent = new BillViewMixpanelEvent(UserHelper.getUserData(getActivity()), requestId, order, user);
-		OmnomApplication.getMixPanelHelper(getActivity()).track(MixPanelHelper.Project.OMNOM, billViewEvent);
+		final OrdersActivity activity = (OrdersActivity) getActivity();
+		if (!activity.isDemo()) {
+			MixpanelEvent billViewEvent = new BillViewMixpanelEvent(UserHelper.getUserData(getActivity()), requestId, order, user);
+			OmnomApplication.getMixPanelHelper(getActivity()).track(MixPanelHelper.Project.OMNOM, billViewEvent);
+		}
 	}
 
 	private void initAmount() {

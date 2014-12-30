@@ -1,6 +1,6 @@
 package com.omnom.android.restaurateur.retrofit;
 
-import com.omnom.android.restaurateur.api.Protocol;
+import com.omnom.android.protocol.Protocol;
 import com.omnom.android.restaurateur.model.ResponseBase;
 
 import retrofit.RequestInterceptor;
