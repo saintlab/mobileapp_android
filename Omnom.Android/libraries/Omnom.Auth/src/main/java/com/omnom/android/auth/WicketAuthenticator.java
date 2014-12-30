@@ -10,6 +10,7 @@ import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.auth.retrofit.AuthRxSupport;
+import com.omnom.android.protocol.BaseRequestInterceptor;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
@@ -22,6 +23,7 @@ import rx.schedulers.Schedulers;
  */
 public class WicketAuthenticator implements AuthService {
 	private final AuthService authService;
+
 	private Context mContext;
 
 	public WicketAuthenticator(final Context context, final String endpoint) {
@@ -32,6 +34,7 @@ public class WicketAuthenticator implements AuthService {
 		final RestAdapter mRestAdapter = new RestAdapter.Builder()
 				.setRxSupport(new AuthRxSupport())
 				.setEndpoint(endpoint)
+				.setRequestInterceptor(new BaseRequestInterceptor())
 				.setLogLevel(logLevel).setConverter(new GsonConverter(gson)).build();
 		authService = mRestAdapter.create(AuthService.class);
 	}

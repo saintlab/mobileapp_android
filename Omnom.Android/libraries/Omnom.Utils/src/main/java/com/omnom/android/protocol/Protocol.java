@@ -1,4 +1,4 @@
-package com.omnom.android.restaurateur.api;
+package com.omnom.android.protocol;
 
 /**
  * Created by Ch3D on 11.08.2014.
