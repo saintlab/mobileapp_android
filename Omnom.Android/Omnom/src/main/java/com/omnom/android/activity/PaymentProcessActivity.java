@@ -314,16 +314,20 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	}
 
 	private void reportMixPanelSuccess() {
-		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-								  new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
-		getMixPanelHelper().trackRevenue(MixPanelHelper.Project.OMNOM,
-										 String.valueOf(getUserData().getId()), mDetails, mBillData);
+		if (!mIsDemo) {
+			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
+								      new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
+			getMixPanelHelper().trackRevenue(MixPanelHelper.Project.OMNOM,
+											 String.valueOf(getUserData().getId()), mDetails, mBillData);
+		}
 	}
 
 	private void reportMixPanelFail(final AcquiringResponseError error) {
-		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-								  new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
-														   mCardInfo, error));
+		if (!mIsDemo) {
+			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
+									  new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
+									  mCardInfo, error));
+		}
 	}
 
 	private View.OnClickListener finishOnClick() {
