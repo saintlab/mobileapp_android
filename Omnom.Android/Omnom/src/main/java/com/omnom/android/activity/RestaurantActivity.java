@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 
 import com.omnom.android.R;
@@ -21,13 +22,18 @@ import butterknife.OnClick;
 
 public class RestaurantActivity extends BaseOmnomActivity {
 
-	public static void start(BaseOmnomActivity activity, Restaurant restaurant) {
-		start(activity, restaurant, false);
+	public static void start(BaseOmnomActivity activity, Restaurant restaurant, final int topTranslation) {
+		start(activity, restaurant, false, topTranslation);
 	}
 
 	public static void start(BaseOmnomActivity activity, Restaurant restaurant, boolean finish) {
+		start(activity, restaurant, finish, 0);
+	}
+
+	public static void start(BaseOmnomActivity activity, Restaurant restaurant, boolean finish, final int topTranslation) {
 		final Intent intent = new Intent(activity, RestaurantActivity.class);
 		intent.putExtra(EXTRA_RESTAURANT, restaurant);
+		intent.putExtra(EXTRA_TRANSLATION_TOP, topTranslation);
 		activity.start(intent, finish);
 	}
 
@@ -36,9 +42,14 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	@InjectView(R.id.btn_call)
 	protected Button btnCall;
 
+	@InjectView(R.id.img_cover)
+	protected View viewCover;
+
 	private Restaurant mRestaurant;
 
 	private boolean mFinishing = false;
+
+	private int mTopTranslation;
 
 	@OnClick(R.id.txt_reserve)
 	protected void doReserve() {
@@ -85,6 +96,7 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	@Override
 	protected void handleIntent(final Intent intent) {
 		mRestaurant = intent.getParcelableExtra(EXTRA_RESTAURANT);
+		mTopTranslation = intent.getIntExtra(EXTRA_TRANSLATION_TOP, 0);
 	}
 
 	@Override
@@ -101,7 +113,7 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		}
 
 		final int translationY = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);
-		mRestaurantViewHolder.minimize(translationY);
+		mRestaurantViewHolder.minimize(translationY - mTopTranslation);
 		btnCall.animate().alpha(0).start();
 
 		AnimationUtils.animateAlpha(findViewById(R.id.panel_bottom), false);
