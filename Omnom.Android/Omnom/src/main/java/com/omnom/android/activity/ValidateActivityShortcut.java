@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
+import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.activity.BaseActivity;
@@ -21,6 +22,10 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
 		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
 		return intent;
+	}
+
+	public static void start(BaseActivity context) {
+		start(context, R.anim.fake_fade_in_instant, R.anim.slide_out_down, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
 
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType) {

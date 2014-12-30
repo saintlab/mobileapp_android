@@ -50,7 +50,7 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	@OnClick(R.id.txt_im_inside)
 	protected void doImInside() {
 		if(!mFinishing) {
-			// TODO: Implement
+			ValidateActivityShortcut.start(this);
 		}
 	}
 
