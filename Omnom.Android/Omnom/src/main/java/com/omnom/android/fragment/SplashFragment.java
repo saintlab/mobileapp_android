@@ -3,6 +3,7 @@ package com.omnom.android.fragment;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.EnteringActivity;
 import com.omnom.android.activity.ValidateActivity;
+import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -122,7 +124,7 @@ public class SplashFragment extends Fragment {
 		imgMultiply.setRadius(getResources().getDimensionPixelSize(R.dimen.loader_size_huge) / 2);
 	}
 
-	public void animateValidation() {
+	public void animateValidation(final Uri data) {
 		if(!mAnimate) {
 			return;
 		}
@@ -147,8 +149,12 @@ public class SplashFragment extends Fragment {
 					@Override
 					public void run() {
 						if(isAdded() && !activity.isFinishing()) {
-							ValidateActivity.start(activity, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
-							                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, activity.getType());
+							if(data != null) {
+								ValidateActivityCamera.start(activity, data);
+							} else {
+								ValidateActivity.start(activity, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
+								                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, activity.getType());
+							}
 						}
 					}
 				}, animationDuration);
@@ -158,6 +164,10 @@ public class SplashFragment extends Fragment {
 			activity.getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
 		}
 		mAnimate = false;
+	}
+
+	public void animateValidation() {
+		animateValidation(null);
 	}
 
 	/**
@@ -265,5 +275,4 @@ public class SplashFragment extends Fragment {
 		getActivity().getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
 		mAnimate = false;
 	}
-
 }
