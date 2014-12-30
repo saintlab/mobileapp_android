@@ -1,6 +1,8 @@
 package com.omnom.android.activity;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -14,6 +16,7 @@ import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
@@ -32,6 +35,18 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private static final String TAG = ValidateActivityCamera.class.getSimpleName();
 
+	private static final String ACTION_LAUNCH_HASHCODE = "com.omnom.android.action.launch_hashcode";
+
+	public static void start(BaseFragmentActivity context, Uri data) {
+		final Intent intent = new Intent(context, ValidateActivityCamera.class);
+		intent.setData(data);
+		intent.setAction(ACTION_LAUNCH_HASHCODE);
+		intent.putExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
+		intent.putExtra(EXTRA_DEMO_MODE, false);
+		intent.putExtra(EXTRA_CONFIRM_TYPE, ValidateActivity.TYPE_DEFAULT);
+		context.start(intent, R.anim.fake_fade_in, R.anim.fake_fade_out_instant, true);
+	}
+
 	@Inject
 	protected RestaurateurObeservableApi api;
 
@@ -41,9 +56,22 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private Subscription mValidateSubscribtion;
 
+	private Uri mData;
+
+	@Override
+	protected void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		mData = getIntent().getData();
+	}
+
 	@Override
 	protected void startLoader() {
 		clearErrors(true);
+
+		if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction()) && mData != null) {
+			findTableForQr(mData.toString());
+			return;
+		}
 
 		if(BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
 			// findTableForQr("http://www.riston.ru/wishes"); // mehico
@@ -131,7 +159,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 	private void reportMixPanel(final TableDataResponse tableDataResponse) {
 		if(tableDataResponse != null) {
 			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-									  OnTableMixpanelEvent.createEventQr(getUserData(), tableDataResponse.getRestaurantId(),
+			                          OnTableMixpanelEvent.createEventQr(getUserData(), tableDataResponse.getRestaurantId(),
 			                                                             tableDataResponse.getId()));
 		}
 	}
