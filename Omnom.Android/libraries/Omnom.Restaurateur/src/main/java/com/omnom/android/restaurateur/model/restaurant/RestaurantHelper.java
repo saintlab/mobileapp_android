@@ -136,4 +136,12 @@ public class RestaurantHelper {
 	public static boolean hasOnlyTable(final Restaurant restaurant) {
 		return restaurant != null && restaurant.tables() != null && restaurant.tables().size() == 1;
 	}
+
+	public static boolean hasOrders(final Restaurant restaurant) {
+		return restaurant != null && restaurant.orders() != null && restaurant.orders().size() > 0;
+	}
+
+	public static boolean hasTables(final Restaurant restaurant) {
+		return restaurant != null && restaurant.tables() != null && restaurant.tables().size() > 0;
+	}
 }

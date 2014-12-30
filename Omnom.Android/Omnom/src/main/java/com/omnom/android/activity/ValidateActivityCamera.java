@@ -17,6 +17,8 @@ import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
@@ -36,6 +38,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private static final String TAG = ValidateActivityCamera.class.getSimpleName();
 
+	private static final String ACTION_LAUNCH_HASHCODE = "com.omnom.android.action.launch_hashcode";
+
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, final int userEnterType) {
 		Intent intent = createIntent(context, animationType, false, userEnterType);
 		if(context instanceof ConfirmPhoneActivity) {
@@ -44,8 +48,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 		}
 		context.start(intent, enterAnim, exitAnim, false);
 	}
-
-	private static final String ACTION_LAUNCH_HASHCODE = "com.omnom.android.action.launch_hashcode";
 
 	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
 		final Intent intent = new Intent(context, ValidateActivityCamera.class);
@@ -88,7 +90,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 	protected void startLoader() {
 		clearErrors(true);
 
-		if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction()) && mData != null) {
+		if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction()) && isHashcodeLaunch()) {
 			findTableForQr(mData.toString());
 			return;
 		}
@@ -104,6 +106,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 		final String tableId = mTable != null ? mTable.getId() : null;
 		OmnomQRCaptureActivity.start(this, tableNumber, tableId, REQUEST_CODE_SCAN_QR);
 	}
+
+	private boolean isHashcodeLaunch() {return mData != null;}
 
 	@Override
 	protected void onDestroy() {
@@ -212,20 +216,31 @@ public class ValidateActivityCamera extends ValidateActivity {
 								if(!TextUtils.isEmpty(decodeResponse.getError())) {
 									mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
 								} else {
-									handleDecodeResponse(decodeResponse);
+									if(isHashcodeLaunch()) {
+										handleHashcodeResult(decodeResponse);
+									} else {
+										handleDecodeResponse(decodeResponse);
+									}
 								}
 							}
 						}, onError);
 	}
 
-	private void onWrongQr() {
-		startErrorTransition();
-		mErrorHelper.showWrongQrError(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				startLoader();
+	private void handleHashcodeResult(final RestaurantResponse decodeResponse) {
+		if(decodeResponse.hasOnlyRestuarant()) {
+			final Restaurant restaurant = decodeResponse.getRestaurants().get(0);
+			if(RestaurantHelper.hasOnlyTable(restaurant)) {
+				final TableDataResponse table = restaurant.tables().get(0);
+				onDataLoaded(restaurant, table, RestaurantHelper.hasOrders(restaurant));
+				return;
 			}
-		});
+
+			if(decodeResponse.hasTables()) {
+				RestaurantActivity.start(this, restaurant, true);
+				return;
+			}
+		}
+		handleDecodeResponse(decodeResponse);
 	}
 
 	@Override
