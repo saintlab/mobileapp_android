@@ -1,6 +1,5 @@
 package com.omnom.android.restaurateur.model.restaurant;
 
-import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
