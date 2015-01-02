@@ -28,11 +28,11 @@ public class BeaconRssiProviderSimple implements BeaconRssiProvider {
 
 	@Override
 	public void updateRssiThreshold(Restaurant restaurant) {
-		api.getRestaurant(restaurant.getId()).flatMap(new Func1<Restaurant, Observable<Restaurant>>() {
+		api.getRestaurant(restaurant.id()).flatMap(new Func1<Restaurant, Observable<Restaurant>>() {
 			@Override
 			public Observable<Restaurant> call(Restaurant restaurant) {
-				if(restaurant.getRssiThreshold() != DEFAULT_RSSI_THRESHOLD) {
-					return api.setRssiThreshold(restaurant.getId(), DEFAULT_RSSI_THRESHOLD);
+				if(restaurant.rssiThreshold() != DEFAULT_RSSI_THRESHOLD) {
+					return api.setRssiThreshold(restaurant.id(), DEFAULT_RSSI_THRESHOLD);
 				} else {
 					return Observable.empty();
 				}
@@ -40,7 +40,7 @@ public class BeaconRssiProviderSimple implements BeaconRssiProvider {
 		}).subscribe(new Action1<Restaurant>() {
 			@Override
 			public void call(final Restaurant updatedRestaurant) {
-				if(updatedRestaurant == null || updatedRestaurant.getRssiThreshold() != DEFAULT_RSSI_THRESHOLD) {
+				if(updatedRestaurant == null || updatedRestaurant.rssiThreshold() != DEFAULT_RSSI_THRESHOLD) {
 					Log.d(TAG, "Unable to change rssi threshold : " + updatedRestaurant);
 				}
 			}

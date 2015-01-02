@@ -19,7 +19,7 @@ public class RestaurantHelper {
 	public static final String COLOR_PREFIX = "#";
 
 	public static String getAddress(final Context context, final Restaurant restaurant) {
-		final Address address = restaurant.getAddress();
+		final Address address = restaurant.address();
 		if(address != null) {
 			final String floor = !TextUtils.isEmpty(address.getFloor())
 					? address.getFloor() + context.getString(R.string.floor_suffix) : StringUtils.EMPTY_STRING;
@@ -33,7 +33,7 @@ public class RestaurantHelper {
 	}
 
 	public static String getAddressSmall(final Context context, final Restaurant restaurant) {
-		final Address address = restaurant.getAddress();
+		final Address address = restaurant.address();
 		if(address != null) {
 			return StringUtils.concat(context.getString(R.string.restaurant_address_delimiter),
 			                          address.getStreet(),
@@ -43,14 +43,14 @@ public class RestaurantHelper {
 	}
 
 	public static String getLogo(Restaurant restaurant) {
-		if(restaurant != null && restaurant.getDecoration() != null) {
-			return restaurant.getDecoration().getLogo();
+		if(restaurant != null && restaurant.decoration() != null) {
+			return restaurant.decoration().getLogo();
 		}
 		return StringUtils.EMPTY_STRING;
 	}
 
 	public static int getBackgroundColor(Restaurant restaurant) {
-		final String decorationBg = restaurant.getDecoration().getBackgroundColor();
+		final String decorationBg = restaurant.decoration().getBackgroundColor();
 		if(!decorationBg.startsWith(COLOR_PREFIX)) {
 			return Color.parseColor(COLOR_PREFIX + decorationBg);
 		} else {
@@ -81,7 +81,7 @@ public class RestaurantHelper {
 	 * @see java.util.Calendar#SUNDAY
 	 */
 	public static DailySchedule getDailySchedule(Restaurant restaurant, int weekDay) {
-		final Schedules schedules = restaurant.getSchedules();
+		final Schedules schedules = restaurant.schedules();
 		if(schedules == null) {
 			return DailySchedule.NULL;
 		}
@@ -107,25 +107,41 @@ public class RestaurantHelper {
 	}
 
 	public static boolean isMenuEnabled(final Restaurant restaurant) {
-		return hasSettings(restaurant) && restaurant.getSettings().hasMenu();
+		return hasSettings(restaurant) && restaurant.settings().hasMenu();
 	}
 
 	public static boolean isPromoEnabled(final Restaurant restaurant) {
-		return hasSettings(restaurant) && restaurant.getSettings().hasPromo();
+		return hasSettings(restaurant) && restaurant.settings().hasPromo();
 	}
 
 	public static boolean isWaiterEnabled(final Restaurant restaurant) {
-		return hasSettings(restaurant) && restaurant.getSettings().hasWaiterCall();
+		return hasSettings(restaurant) && restaurant.settings().hasWaiterCall();
 	}
 
 	private static boolean hasSettings(final Restaurant restaurant) {
-		return restaurant != null && restaurant.getSettings() != null;
+		return restaurant != null && restaurant.settings() != null;
 	}
 
 	public static String getBackground(final Restaurant restaurant, final DisplayMetrics displayMetrics) {
-		if(restaurant != null && restaurant.getDecoration() != null) {
-			return restaurant.getDecoration().getBackgroundImage() + "?w=" + displayMetrics.widthPixels;
+		if(restaurant != null && restaurant.decoration() != null) {
+			final String backgroundImage = restaurant.decoration().getBackgroundImage();
+			if(TextUtils.isEmpty(backgroundImage)) {
+				return StringUtils.EMPTY_STRING;
+			}
+			return backgroundImage + "?w=" + displayMetrics.widthPixels;
 		}
 		return StringUtils.EMPTY_STRING;
+	}
+
+	public static boolean hasOnlyTable(final Restaurant restaurant) {
+		return restaurant != null && restaurant.tables() != null && restaurant.tables().size() == 1;
+	}
+
+	public static boolean hasOrders(final Restaurant restaurant) {
+		return restaurant != null && restaurant.orders() != null && restaurant.orders().size() > 0;
+	}
+
+	public static boolean hasTables(final Restaurant restaurant) {
+		return restaurant != null && restaurant.tables() != null && restaurant.tables().size() > 0;
 	}
 }

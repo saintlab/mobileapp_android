@@ -240,6 +240,7 @@ public class MixPanelHelper {
 		execute(project, new Command() {
 			@Override
 			public void execute(final MixpanelAPI api) {
+				api.identify(id);
 				api.getPeople().identify(id);
 				api.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
 			}

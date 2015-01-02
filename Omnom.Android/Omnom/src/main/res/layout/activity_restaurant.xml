@@ -1,15 +1,16 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="none"
-            android:fillViewport="true">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <FrameLayout
+    <ScrollView xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        android:fillViewport="true">
 
         <LinearLayout
+            android:id="@+id/main_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -20,9 +21,18 @@
                 android:id="@+id/img_cover"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/restaurant_cover_height_large"
-                android:scaleType="centerCrop"/>
+                android:scaleType="centerCrop" />
 
-            <include layout="@layout/view_restaurant_info"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:gravity="center|top">
+
+                <include layout="@layout/view_restaurant_info" />
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btn_call"
@@ -32,9 +42,10 @@
                 android:paddingBottom="@dimen/activity_vertical_margin_xsmall"
                 android:paddingLeft="@dimen/activity_horizontal_margin_large"
                 android:paddingRight="@dimen/activity_horizontal_margin_large"
-                android:background="@drawable/bg_rounded_bordered_black_disabled"/>
+                android:background="@drawable/bg_rounded_bordered_black_disabled" />
 
             <LinearLayout
+                android:id="@+id/panel_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin_large"
@@ -48,36 +59,39 @@
                     android:text="@string/reserve_table"
                     android:drawablePadding="@dimen/drawable_padding_default"
                     android:drawableTop="@drawable/ic_reserve_table"
-                    style="@style/TextView.Restaurant.Landing"/>
+                    android:enabled="false"
+                    style="@style/TextView.Restaurant.Landing" />
 
                 <TextView
                     android:id="@+id/txt_im_inside"
                     android:text="@string/im_inside_restaurant"
                     android:drawablePadding="@dimen/drawable_padding_default"
                     android:drawableTop="@drawable/ic_im_inside"
-                    style="@style/TextView.Restaurant.Landing"/>
+                    style="@style/TextView.Restaurant.Landing" />
 
                 <TextView
                     android:id="@+id/txt_order"
                     android:text="@string/make_an_order"
                     android:drawablePadding="@dimen/drawable_padding_default"
                     android:drawableTop="@drawable/ic_make_order"
-                    style="@style/TextView.Restaurant.Landing"/>
+                    android:enabled="false"
+                    style="@style/TextView.Restaurant.Landing" />
             </LinearLayout>
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/btn_close"
-            android:src="@drawable/ic_cross_white"
-            style="@style/ImageView.Clickable.Cropped"/>
+    </ScrollView>
 
-        <Button
-            android:id="@+id/btn_demo"
-            android:layout_gravity="right"
-            android:padding="@dimen/activity_vertical_margin"
-            style="@style/Button.Demo.White"/>
+    <ImageView
+        android:id="@+id/btn_close"
+        android:src="@drawable/ic_cross_white"
+        style="@style/ImageView.Clickable.Cropped" />
 
-    </FrameLayout>
+    <Button
+        android:id="@+id/btn_demo"
+        android:layout_gravity="right"
+        android:padding="@dimen/activity_vertical_margin"
+        style="@style/Button.Demo.White" />
 
-</ScrollView>
+</FrameLayout>
+

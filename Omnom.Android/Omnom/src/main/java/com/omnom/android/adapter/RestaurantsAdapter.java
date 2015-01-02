@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.ViewCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.Calendar;
 import java.util.List;
@@ -56,22 +58,27 @@ public class RestaurantsAdapter extends BaseAdapter {
 		}
 
 		public void bindData(final Context context, final Restaurant item, Drawable placeholder, int weekDay) {
-			OmnomApplication.getPicasso(context)
-			                .load(RestaurantHelper.getBackground(item, context.getResources().getDisplayMetrics()))
-			                .placeholder(placeholder)
-			                .into(imgCover);
+			final String background = RestaurantHelper.getBackground(item, context.getResources().getDisplayMetrics());
+			if(!TextUtils.isEmpty(background)) {
+				OmnomApplication.getPicasso(context)
+				                .load(background)
+				                .placeholder(placeholder)
+				                .into(imgCover);
+			} else {
+				imgCover.setImageDrawable(placeholder);
+			}
 
-			txtTitle.setText(item.getTitle());
-			txtAddress.setText(RestaurantHelper.getAddressSmall(context, item));
-			txtDistance.setText("~50м");
+			txtTitle.setText(item.title());
+			final String addressSmall = RestaurantHelper.getAddressSmall(context, item);
+			if(!TextUtils.isEmpty(addressSmall)) {
+				ViewUtils.setVisible(txtAddress, true);
+				txtAddress.setText(addressSmall);
+			} else {
+				ViewUtils.setVisible(txtAddress, false);
+			}
+			// TODO: Implement
+			// txtDistance.setText("~50м");
 			txtSchedule.setText(RestaurantHelper.getOpenedTime(context, item, weekDay));
-		}
-
-		public void minimize(final int translationY) {
-			imgCover.animate().translationYBy(translationY).start();
-			txtTitle.animate().translationYBy(translationY).start();
-			panelAddress.animate().translationYBy(translationY).start();
-			txtSchedule.animate().translationYBy(translationY).start();
 		}
 	}
 
@@ -132,7 +139,9 @@ public class RestaurantsAdapter extends BaseAdapter {
 				ViewCompat.setHasTransientState(convertView, true);
 				convertView.animate().alpha(0).start();
 			} else {
-				ViewCompat.setHasTransientState(convertView, false);
+				if(ViewCompat.hasTransientState(convertView)) {
+					ViewCompat.setHasTransientState(convertView, false);
+				}
 			}
 		} else {
 			if(convertView.getAlpha() != 1.0f) {
@@ -140,7 +149,9 @@ public class RestaurantsAdapter extends BaseAdapter {
 				convertView.setAlpha(0);
 				convertView.animate().alpha(1).start();
 			} else {
-				ViewCompat.setHasTransientState(convertView, false);
+				if(ViewCompat.hasTransientState(convertView)) {
+					ViewCompat.setHasTransientState(convertView, false);
+				}
 			}
 		}
 	}

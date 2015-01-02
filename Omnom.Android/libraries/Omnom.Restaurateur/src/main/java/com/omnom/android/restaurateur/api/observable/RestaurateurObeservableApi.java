@@ -8,6 +8,9 @@ import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.config.Config;
+import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
+import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
+import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
@@ -32,17 +35,21 @@ public interface RestaurateurObeservableApi {
 
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
 
+	public Observable<RestaurantResponse> decode(BeaconDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
+
+	public Observable<RestaurantResponse> decode(QrDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
+
 	public Observable<TableDataResponse> bind(String restaurantId,
-	                                             int tableNumber,
-	                                             String qrData,
-	                                             Beacon beacon,
-	                                             Beacon oldBeacon);
+	                                          int tableNumber,
+	                                          String qrData,
+	                                          Beacon beacon,
+	                                          Beacon oldBeacon);
 
 	public Observable<TableDataResponse> bind(String id,
-	                                             int tableNumber,
-	                                             String qrData,
-	                                             BeaconDataResponse beaconData,
-	                                             Beacon beacon);
+	                                          int tableNumber,
+	                                          String qrData,
+	                                          BeaconDataResponse beaconData,
+	                                          Beacon beacon);
 
 	public Observable<BeaconDataResponse> bindBeacon(String restaurantId,
 	                                                 int tableNumber,

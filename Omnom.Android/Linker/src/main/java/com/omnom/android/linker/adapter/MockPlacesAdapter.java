@@ -73,9 +73,9 @@ public class MockPlacesAdapter extends ArrayAdapter<Restaurant> {
 	}
 
 	private void bindView(Restaurant item, final ViewHolder holder) {
-		holder.name.setText(item.getTitle());
+		holder.name.setText(item.title());
 		holder.location.setText(RestaurantHelper.getAddress(getContext(), item));
-		holder.type.setText(item.getDescription());
+		holder.type.setText(item.description());
 		final ImageView logo = holder.logo;
 		final String logoUrl = RestaurantHelper.getLogo(item);
 		if(!TextUtils.isEmpty(logoUrl)) {

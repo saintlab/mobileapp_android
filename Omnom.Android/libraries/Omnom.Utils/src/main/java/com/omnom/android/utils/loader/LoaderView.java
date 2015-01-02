@@ -304,14 +304,14 @@ public class LoaderView extends FrameLayout {
 
 	public void scaleUp(final long duration, final Runnable endCallback) {
 		AnimationUtils.scale(mImgLoader,
-							 mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
-							 duration, endCallback);
+		                     mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
+		                     duration, endCallback);
 	}
 
 	public void scaleUp(final Runnable endCallback) {
 		AnimationUtils.scale(mImgLoader,
 		                     mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
-							 endCallback);
+		                     endCallback);
 	}
 
 	@DebugLog
@@ -535,10 +535,12 @@ public class LoaderView extends FrameLayout {
 			return;
 		}
 
+		final int paddingLogo = getResources().getDimensionPixelSize(R.dimen.loader_logo_padding);
+
 		RequestCreator requestCreator = Picasso.with(getContext())
 		                                       .load(logo)
 		                                       .placeholder(placeholderResId)
-		                                       .resize(loaderSize, loaderSize)
+		                                       .resize(loaderSize - paddingLogo, loaderSize - paddingLogo)
 		                                       .centerInside();
 		mTarget = new Target() {
 			@Override

@@ -298,7 +298,7 @@ public class BindActivity extends BaseActivity {
 		}
 		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
-		mBuildBeaconsSubscribtion = AndroidObservable.bindActivity(this, api.buildBeacon(mRestaurant.getId(), tableNumber,
+		mBuildBeaconsSubscribtion = AndroidObservable.bindActivity(this, api.buildBeacon(mRestaurant.id(), tableNumber,
 		                                                                                 mBeacon.getIdValue(0))).subscribe(
 				new RestaurateurObservable.AuthAwareOnNext<BeaconDataResponse>(getActivity()) {
 					@Override
@@ -565,11 +565,11 @@ public class BindActivity extends BaseActivity {
 
 	private boolean isSameRestaurant(final TableDataResponse tableData) {
 		if(BuildConfig.DEBUG) {
-			if(mRestaurant == null || TextUtils.isEmpty(mRestaurant.getId())) {
+			if(mRestaurant == null || TextUtils.isEmpty(mRestaurant.id())) {
 				throw new RuntimeException("Restaurant cannot be null and shall have non-empty id");
 			}
 		}
-		return mRestaurant.getId().equals(tableData.getRestaurantId());
+		return mRestaurant.id().equals(tableData.getRestaurantId());
 	}
 
 	private void onErrorQrCheck(final int number) {
@@ -769,7 +769,7 @@ public class BindActivity extends BaseActivity {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						mApiBindingSubscription = AndroidObservable.bindActivity(getActivity(), api.bind(mRestaurant.getId(),
+						mApiBindingSubscription = AndroidObservable.bindActivity(getActivity(), api.bind(mRestaurant.id(),
 						                                                                                 mLoader.getTableNumber(),
 						                                                                                 mQrData, mBeaconData, mBeacon))
 						                                           .subscribe(new Action1<ResponseBase>() {

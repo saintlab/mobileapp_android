@@ -6,32 +6,31 @@ import android.bluetooth.BluetoothDevice;
 import android.os.Build;
 import android.view.View;
 
-import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.beacon.BeaconFilter;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
-import com.omnom.android.preferences.PreferenceHelper;
-import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
-import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
+import com.omnom.android.restaurateur.model.decode.BeaconRecord;
+import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
+import com.omnom.android.restaurateur.model.decode.RssiRecord;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 import hugo.weaving.DebugLog;
-import rx.Observable;
+import retrofit.RetrofitError;
+import retrofit.http.HEAD;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
-import rx.functions.Func1;
 
 public class ValidateActivityBle extends ValidateActivity {
 
@@ -43,13 +42,11 @@ public class ValidateActivityBle extends ValidateActivity {
 
 	private BeaconParser parser;
 
-	private ArrayList<Beacon> mBeacons = new ArrayList<Beacon>();
+	private LinkedList<BeaconRecord> mBeacons = new LinkedList<BeaconRecord>();
 
 	private Subscription mValidateSubscribtion;
 
 	private Subscription mFindBeaconSubscription;
-
-	private Crouton mCrouton;
 
 	@Override
 	public void initUi() {
@@ -63,8 +60,6 @@ public class ValidateActivityBle extends ValidateActivity {
 		parser = new BeaconParser();
 		parser.setBeaconLayout(getResources().getString(R.string.redbear_beacon_layout));
 		mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
-			BeaconFilter mFilter = new BeaconFilter(OmnomApplication.get(getActivity()));
-
 			@Override
 			@DebugLog
 			public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
@@ -72,13 +67,32 @@ public class ValidateActivityBle extends ValidateActivity {
 					@Override
 					public void run() {
 						final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
-						if(mFilter.check(beacon)) {
-							mBeacons.add(beacon);
+						if(beacon == null) {
+							return;
 						}
+						BeaconRecord record = find(mBeacons, beacon);
+						if(record == null) {
+							record = BeaconRecord.create(beacon);
+							mBeacons.add(record);
+						}
+						record.addRssi(new RssiRecord(beacon.getRssi(), System.currentTimeMillis()));
 					}
 				});
 			}
 		};
+	}
+
+	private BeaconRecord find(final LinkedList<BeaconRecord> beacons, final Beacon beacon) {
+		final Iterator<BeaconRecord> iterator = beacons.iterator();
+		while(iterator.hasNext()) {
+			final BeaconRecord next = iterator.next();
+			if(next.getUuid().equals(beacon.getIdValue(0))
+					&& next.getMajor().equals(beacon.getIdValue(1))
+					&& next.getMinor().equals(beacon.getIdValue(2))) {
+				return next;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -135,77 +149,50 @@ public class ValidateActivityBle extends ValidateActivity {
 		scanBleDevices(true, new Runnable() {
 			@Override
 			public void run() {
-				final OmnomApplication application = OmnomApplication.get(getActivity());
-				final BeaconFilter filter = new BeaconFilter(application);
-				final List<Beacon> nearBeacons = filter.filterBeacons(mBeacons);
-				final int size = nearBeacons.size();
-				application.cacheBeacon(null);
-				if(size == 0) {
-					startErrorTransition();
-					updateDarkProfile(true);
-					mErrorHelper.showErrorDemo(LoaderError.WEAK_SIGNAL, mInternetErrorClickListener);
-				} else if(size > 1) {
-					startErrorTransition();
-					updateDarkProfile(true);
-					mErrorHelper.showError(LoaderError.TWO_BEACONS, mInternetErrorClickListener);
-				} else if(size == 1) {
-					final Beacon beacon = nearBeacons.get(0);
-					application.cacheBeacon(new BeaconFindRequest(beacon));
-					final TableDataResponse[] table = new TableDataResponse[1];
-					mFindBeaconSubscription = AndroidObservable.bindActivity(getActivity(),
-					                                                         api.findBeacon(beacon)
-					                                                            .flatMap(
-							                                                            new Func1<TableDataResponse,
-									                                                            Observable<Restaurant>>() {
-								                                                            @Override
-								                                                            public Observable<Restaurant> call
-										                                                            (TableDataResponse tableDataResponse) {
-									                                                            if(tableDataResponse.hasAuthError()) {
-										                                                            EnteringActivity.start(
-												                                                            ValidateActivityBle.this, true);
-										                                                            throw new RuntimeException(
-												                                                            "Wrong auth token");
-									                                                            } else if(tableDataResponse.hasErrors()) {
-										                                                            startErrorTransition();
-										                                                            updateDarkProfile(true);
-										                                                            mErrorHelper.showErrorDemo(
-												                                                            LoaderError.WEAK_SIGNAL,
-												                                                            mInternetErrorClickListener);
-										                                                            return Observable.empty();
-									                                                            } else {
-										                                                            table[0] = tableDataResponse;
-										                                                            reportMixPanel(tableDataResponse);
-										                                                            return api.getRestaurant(
-												                                                            tableDataResponse
-														                                                            .getRestaurantId(),
-												                                                            mPreloadBackgroundFunction);
-									                                                            }
-								                                                            }
-							                                                            }))
-					                                           .subscribe(
-							                                           new Action1<Restaurant>() {
-								                                           @Override
-								                                           public void call(final Restaurant restaurant) {
-									                                           onDataLoaded(restaurant, table[0]);
-									                                           ((PreferenceHelper) getPreferences()).saveBeacon(
-											                                           getActivity(), beacon);
-								                                           }
-							                                           },
-							                                           new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-								                                           @Override
-								                                           protected void onError(final Throwable throwable) {
-									                                           startErrorTransition();
-									                                           mErrorHelper.showErrorDemo(
-											                                           LoaderError.NO_CONNECTION_TRY,
-											                                           mInternetErrorClickListener);
-								                                           }
-							                                           });
-				}
+				mFindBeaconSubscription = AndroidObservable.bindActivity(ValidateActivityBle.this,
+				                                                         api.decode(new BeaconDecodeRequest(
+						                                                         getResources().getInteger(
+								                                                         R.integer.ble_scan_duration),
+						                                                         Collections.unmodifiableList(mBeacons)
+				                                                         ), mPreloadBackgroundFunction)
+				                                                        )
+				                                           .subscribe(new Action1<RestaurantResponse>() {
+					                                           @Override
+					                                           public void call(final RestaurantResponse response) {
+						                                           if(response.hasErrors()) {
+							                                           startErrorTransition();
+							                                           mErrorHelper.showErrorDemo(
+									                                           LoaderError.BACKEND_ERROR,
+									                                           mInternetErrorClickListener);
+						                                           } else {
+							                                           handleDecodeResponse(response);
+						                                           }
+					                                           }
+				                                           }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					                                           @Override
+					                                           protected void onError(final Throwable throwable) {
+						                                           if(throwable instanceof RetrofitError) {
+							                                           startErrorTransition();
+							                                           mErrorHelper.showErrorDemo(
+									                                           LoaderError.BACKEND_ERROR,
+									                                           mInternetErrorClickListener);
+						                                           } else {
+							                                           startErrorTransition();
+							                                           mErrorHelper.showErrorDemo(
+									                                           LoaderError.NO_CONNECTION_TRY,
+									                                           mInternetErrorClickListener);
+						                                           }
+					                                           }
+				                                           });
 			}
 		});
 	}
 
-	private void reportMixPanel(final TableDataResponse tableDataResponse) {
+	@Override
+	protected void reportMixPanel(final TableDataResponse tableDataResponse) {
+		if(tableDataResponse == null) {
+			return;
+		}
 		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 								  OnTableMixpanelEvent.createEventBluetooth(getUserData(),
 										                                    tableDataResponse.getRestaurantId(),
