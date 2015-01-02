@@ -590,7 +590,11 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		UserProfileActivity.startSliding(this, tableNumber, tableId);
 	}
 
-	protected final void onDataLoaded(final Restaurant restaurant, @Nullable TableDataResponse table) {
+	protected void onDataLoaded(final Restaurant restaurant, @Nullable TableDataResponse table) {
+		onDataLoaded(restaurant, table, false);
+	}
+
+	protected void onDataLoaded(final Restaurant restaurant, final TableDataResponse table, final boolean forwardToBill) {
 		final OmnomApplication app = OmnomApplication.get(getActivity());
 
 		if(table == null) {
@@ -618,6 +622,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				ViewUtils.setVisible(getPanelBottom(), true);
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
 				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
+				if(forwardToBill) {
+					onBill(findViewById(R.id.btn_bill));
+				}
 			}
 		});
 	}
@@ -783,7 +790,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	protected void handleRestaurant(final Restaurant restaurant) {
-
 		if(RestaurantHelper.hasOnlyTable(restaurant)) {
 			loader.stopProgressAnimation();
 			loader.updateProgressMax(new Runnable() {

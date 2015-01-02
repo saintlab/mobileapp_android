@@ -2,6 +2,8 @@ package com.omnom.android.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -15,8 +17,11 @@ import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
@@ -33,6 +38,16 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private static final String TAG = ValidateActivityCamera.class.getSimpleName();
 
+	private static final String ACTION_LAUNCH_HASHCODE = "com.omnom.android.action.launch_hashcode";
+
+	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
+		final Intent intent = new Intent(context, ValidateActivityCamera.class);
+		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
+		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
+		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
+		return intent;
+	}
+
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, final int userEnterType) {
 		Intent intent = createIntent(context, animationType, false, userEnterType);
 		if(context instanceof ConfirmPhoneActivity) {
@@ -42,12 +57,10 @@ public class ValidateActivityCamera extends ValidateActivity {
 		context.start(intent, enterAnim, exitAnim, false);
 	}
 
-	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
-		final Intent intent = new Intent(context, ValidateActivityCamera.class);
-		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
-		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
-		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
-		return intent;
+	public static void start(final BaseFragmentActivity context, final Uri data) {
+		final Intent intent = createIntent(context, EXTRA_LOADER_ANIMATION_SCALE_DOWN, false, ValidateActivity.TYPE_DEFAULT);
+		intent.setData(data).setAction(ACTION_LAUNCH_HASHCODE);
+		context.start(intent, R.anim.fake_fade_in, R.anim.fake_fade_out_instant, true);
 	}
 
 	@Inject
@@ -61,10 +74,22 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private int mOutAnimation;
 
+	private Uri mData;
+
+	@Override
+	protected void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		mData = getIntent().getData();
+	}
 
 	@Override
 	protected void startLoader() {
 		clearErrors(true);
+
+		if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction()) && isExternalLaunch()) {
+			findTableForQr(mData.toString());
+			return;
+		}
 
 		if(BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
 			// findTableForQr("http://www.riston.ru/wishes"); // mehico
@@ -77,6 +102,11 @@ public class ValidateActivityCamera extends ValidateActivity {
 		final String tableId = mTable != null ? mTable.getId() : null;
 		OmnomQRCaptureActivity.start(this, tableNumber, tableId, REQUEST_CODE_SCAN_QR);
 	}
+
+	/**
+	 * @return <code>true</code> if app was launched by an extrenal qr/link
+	 */
+	private boolean isExternalLaunch() {return mData != null;}
 
 	@Override
 	protected void onDestroy() {
@@ -166,7 +196,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 	protected void reportMixPanel(final TableDataResponse tableDataResponse) {
 		if(tableDataResponse != null) {
 			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-									  OnTableMixpanelEvent.createEventQr(getUserData(), tableDataResponse.getRestaurantId(),
+			                          OnTableMixpanelEvent.createEventQr(getUserData(), tableDataResponse.getRestaurantId(),
 			                                                             tableDataResponse.getId()));
 		}
 	}
@@ -185,20 +215,30 @@ public class ValidateActivityCamera extends ValidateActivity {
 								if(!TextUtils.isEmpty(decodeResponse.getError())) {
 									mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
 								} else {
-									handleDecodeResponse(decodeResponse);
+									if(isExternalLaunch()) {
+										handleExternalLaunchResult(decodeResponse);
+									} else {
+										handleDecodeResponse(decodeResponse);
+									}
 								}
 							}
 						}, onError);
 	}
 
-	private void onWrongQr() {
-		startErrorTransition();
-		mErrorHelper.showWrongQrError(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				startLoader();
+	private void handleExternalLaunchResult(final RestaurantResponse decodeResponse) {
+		if(decodeResponse.hasOnlyRestuarant()) {
+			final Restaurant restaurant = decodeResponse.getRestaurants().get(0);
+			if(RestaurantHelper.hasOnlyTable(restaurant)) {
+				onDataLoaded(restaurant, restaurant.tables().get(0), RestaurantHelper.hasOrders(restaurant));
+				return;
 			}
-		});
+
+			if(decodeResponse.hasTables()) {
+				RestaurantActivity.start(this, restaurant, true);
+				return;
+			}
+		}
+		handleDecodeResponse(decodeResponse);
 	}
 
 	@Override

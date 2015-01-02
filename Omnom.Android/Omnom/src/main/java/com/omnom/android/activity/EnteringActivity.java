@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -67,15 +68,26 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	 */
 	private int mType = ValidateActivity.TYPE_DEFAULT;
 
+	private Uri mData;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		final Intent intent = getIntent();
+		final String action = intent.getAction();
+
+		if(Intent.ACTION_VIEW.equals(action)) {
+			mData = intent.getData();
+			boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
+			if(mData != null && hasToken) {
+				skipSplash = false;
+			}
+		}
+
 		// workaround for https://code.google.com/p/android/issues/detail?id=2373
 		// omnom issue: https://github.com/saintlab/mobileapp_android/issues/224
 		if(!isTaskRoot()) {
-			Intent intent = getIntent();
-			String action = intent.getAction();
 			if(intent.hasCategory(Intent.CATEGORY_LAUNCHER) && action != null && action.equals(Intent.ACTION_MAIN)) {
 				finish();
 				return;
@@ -105,6 +117,10 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 
 		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
 		if(splashFragment != null) {
+			if(mData != null && hasToken) {
+				splashFragment.animateValidation(mData);
+				return;
+			}
 			if(hasToken) {
 				splashFragment.animateValidation();
 			} else {

@@ -35,6 +35,8 @@ import rx.functions.Action1;
 
 public class RestaurantsListActivity extends BaseOmnomActivity implements AdapterView.OnItemClickListener {
 
+	public static final int SCROLL_DURATION = 200;
+
 	private static final String TAG = RestaurantsListActivity.class.getSimpleName();
 
 	public static void start(BaseOmnomActivity activity) {
@@ -169,26 +171,45 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 		mItemClicked = true;
 		mAdapter.setSelected(position);
-		list.smoothScrollToPositionFromTop(position, 0);
-		selectedImgCover = (ImageView) view.findViewById(R.id.img_cover);
-		panelTop.animate().translationYBy(-panelTop.getHeight()).start();
-		list.animate().translationYBy(-panelTop.getHeight()).start();
-		nextView = list.getChildAt(position + 1);
-		list.setScrollEnabled(false);
-		refreshView.setEnabled(false);
-		if(nextView != null) {
-			nextView.animate().alpha(0).start();
-		}
-		AnimationUtils.scaleHeight(selectedImgCover, getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_large),
-		                           new Runnable() {
-			                           @Override
-			                           public void run() {
-				                           list.requestLayout();
-				                           final Restaurant item = (Restaurant) mAdapter.getItem(position);
-				                           RestaurantActivity.start(RestaurantsListActivity.this, item);
-				                           mItemClicked = false;
-			                           }
-		                           });
+		list.smoothScrollToPositionFromTop(position, 0, SCROLL_DURATION);
+
+		postDelayed(SCROLL_DURATION, new Runnable() {
+			@Override
+			public void run() {
+				selectedImgCover = (ImageView) view.findViewById(R.id.img_cover);
+				final int height = panelTop.getHeight();
+				panelTop.animate().translationYBy(-height).start();
+
+				final int listTranslation;
+				final int topTranslation;
+				if(position + 2 == list.getCount()) {
+					footer.animate().alpha(0).start();
+					topTranslation = -view.getTop();
+					listTranslation = -height;
+				} else {
+					topTranslation = 0;
+					listTranslation = -height;
+				}
+				refreshView.animate().translationYBy(listTranslation + topTranslation).start();
+
+				nextView = list.getChildAt(position + 1);
+				list.setScrollEnabled(false);
+				refreshView.setEnabled(false);
+				if(nextView != null) {
+					nextView.animate().alpha(0).start();
+				}
+				AnimationUtils.scaleHeight(selectedImgCover, getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_large),
+				                           new Runnable() {
+					                           @Override
+					                           public void run() {
+						                           list.requestLayout();
+						                           final Restaurant item = (Restaurant) mAdapter.getItem(position);
+						                           RestaurantActivity.start(RestaurantsListActivity.this, item, topTranslation);
+						                           mItemClicked = false;
+					                           }
+				                           });
+			}
+		});
 	}
 
 	@Override
@@ -198,7 +219,10 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		list.setScrollEnabled(true);
 		refreshView.setEnabled(true);
 		panelTop.setTranslationY(0);
-		list.setTranslationY(0);
+		if(footer.getAlpha() < 1) {
+			footer.animate().alpha(1).start();
+		}
+		refreshView.setTranslationY(0);
 		if(mAdapter != null) {
 			mAdapter.setSelected(-1);
 			mAdapter.notifyDataSetChanged();

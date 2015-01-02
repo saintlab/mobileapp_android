@@ -21,7 +21,16 @@
                 android:layout_height="@dimen/restaurant_cover_height_large"
                 android:scaleType="centerCrop" />
 
-            <include layout="@layout/view_restaurant_info" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:gravity="center|top">
+
+                <include layout="@layout/view_restaurant_info" />
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btn_call"

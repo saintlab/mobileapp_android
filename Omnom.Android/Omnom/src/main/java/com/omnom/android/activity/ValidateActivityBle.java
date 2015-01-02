@@ -27,6 +27,7 @@ import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
 import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
+import retrofit.http.HEAD;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -189,6 +190,9 @@ public class ValidateActivityBle extends ValidateActivity {
 
 	@Override
 	protected void reportMixPanel(final TableDataResponse tableDataResponse) {
+		if(tableDataResponse == null) {
+			return;
+		}
 		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 								  OnTableMixpanelEvent.createEventBluetooth(getUserData(),
 										                                    tableDataResponse.getRestaurantId(),
