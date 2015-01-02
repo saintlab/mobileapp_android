@@ -229,7 +229,12 @@ public class ValidateActivityCamera extends ValidateActivity {
 		if(decodeResponse.hasOnlyRestuarant()) {
 			final Restaurant restaurant = decodeResponse.getRestaurants().get(0);
 			if(RestaurantHelper.hasOnlyTable(restaurant)) {
-				onDataLoaded(restaurant, restaurant.tables().get(0), RestaurantHelper.hasOrders(restaurant));
+				onDataLoaded(restaurant, restaurant.tables().get(0), RestaurantHelper.hasOrders(restaurant),
+				             decodeResponse.getRequestId());
+				// TODO: For debug purposes
+				//if(BuildConfig.DEBUG) {
+				//onDataLoaded(restaurant, restaurant.tables().get(0), true, decodeResponse.getRequestId());
+				//}
 				return;
 			}
 

@@ -82,13 +82,13 @@ public class OrdersActivity extends BaseOmnomFragmentActivity {
 	public void onPayment(final PaymentSocketEvent event) {
 		final Order order = event.getPaymentData().getOrder();
 		final int position = replaceOrder(orders, order);
-		if (order != null && position >= 0 && mPagerAdapter != null) {
+		if(order != null && position >= 0 && mPagerAdapter != null) {
 			mPagerAdapter.updateOrders(orders);
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					final Fragment currentFragment = findFragmentByPosition(position);
-					if (currentFragment != null) {
+					if(currentFragment != null) {
 						((OrderFragment) currentFragment).onPayment(order);
 					}
 				}
@@ -104,7 +104,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity {
 	 */
 	public Fragment findFragmentByPosition(int position) {
 		Fragment fragment = null;
-		if (mPager != null && mPagerAdapter != null) {
+		if(mPager != null && mPagerAdapter != null) {
 			fragment = getSupportFragmentManager().findFragmentByTag(
 					"android:switcher:" + mPager.getId() + ":" + mPagerAdapter.getItemId(position));
 		}
@@ -198,7 +198,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity {
 
 	public int getOrdersCount() {
 		int count = 0;
-		if (mPagerAdapter != null) {
+		if(mPagerAdapter != null) {
 			count = mPagerAdapter.getCount();
 		}
 		return count;
@@ -220,10 +220,10 @@ public class OrdersActivity extends BaseOmnomFragmentActivity {
 	}
 
 	public ObjectAnimator getFragmentAnimation(int pos, boolean show) {
-		if (mPagerAdapter != null) {
+		if(mPagerAdapter != null) {
 			final OrderFragment fragment = (OrderFragment) getSupportFragmentManager()
 					.findFragmentByTag(TAG_ANDROID_SWITCHER + mPager.getId() + TAG_SWITCHER_DELIMITER + mPagerAdapter.getItemId(pos));
-			if (fragment != null) {
+			if(fragment != null) {
 				final View view = fragment.getFragmentView();
 				final int startAlpha = show ? 0 : 1;
 				final int endAlpha = show ? 1 : 0;
@@ -257,16 +257,16 @@ public class OrdersActivity extends BaseOmnomFragmentActivity {
 
 	private int replaceOrder(final List<Order> orders, final Order orderToReplace) {
 		int position = -1;
-		if (orders == null || orderToReplace == null) {
+		if(orders == null || orderToReplace == null) {
 			return position;
 		}
-		for (int i = 0; i < orders.size(); i++) {
-			if (orders.get(i).getId().equals(orderToReplace.getId())) {
+		for(int i = 0; i < orders.size(); i++) {
+			if(orders.get(i).getId().equals(orderToReplace.getId())) {
 				position = i;
 				break;
 			}
 		}
-		if (position >= 0) {
+		if(position >= 0) {
 			final Order originalOrder = orders.get(position);
 			orderToReplace.setTips(originalOrder.getTips());
 			orders.set(position, orderToReplace);
