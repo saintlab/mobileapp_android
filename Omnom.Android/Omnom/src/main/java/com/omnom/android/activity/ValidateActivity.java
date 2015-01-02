@@ -55,6 +55,7 @@ import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -332,6 +333,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		});
 		mErrorHelper = new OmnomErrorHelper(loader, txtError, btnErrorRepeat, txtErrorRepeat, btnDemo, errorViews);
 
+		updateUserData(OmnomApplication.get(getActivity()));
+
 		mAcquiringConfigSubscribtion = AndroidObservable.bindActivity(this, api.getConfig()).subscribe(new Action1<Config>() {
 			@Override
 			public void call(Config config) {
@@ -520,6 +523,14 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		loader.hideLogo(new Runnable() {
 			@Override
 			public void run() {
+
+				System.err.println(">>>>!!!!!");
+				try {
+					throw new RuntimeException(">!>!>!>!>!>!");
+				} catch(RuntimeException e) {
+					Log.e(OrdersActivity.class.getSimpleName(), "showOrders", e);
+				}
+
 				loader.scaleUp(getResources().getInteger(R.integer.default_animation_duration_medium), new Runnable() {
 					@Override
 					public void run() {
@@ -591,11 +602,12 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	protected void onDataLoaded(final Restaurant restaurant, @Nullable TableDataResponse table) {
-		onDataLoaded(restaurant, table, false);
+		onDataLoaded(restaurant, table, false, StringUtils.EMPTY_STRING);
 	}
 
-	protected void onDataLoaded(final Restaurant restaurant, final TableDataResponse table, final boolean forwardToBill) {
-		final OmnomApplication app = OmnomApplication.get(getActivity());
+	protected void onDataLoaded(final Restaurant restaurant, final TableDataResponse table,
+	                            final boolean forwardToBill,
+	                            final String requestId) {
 
 		if(table == null) {
 			RestaurantActivity.start(this, restaurant, true);
@@ -607,7 +619,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 		mPaymentListener.initTableSocket(mTable);
 
-		updateUserData(app);
 		onNewGuest(mTable);
 		animateRestaurantLogo(restaurant);
 		animateRestaurantBackground(restaurant);
@@ -623,7 +634,12 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
 				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
 				if(forwardToBill) {
-					onBill(findViewById(R.id.btn_bill));
+					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
+						@Override
+						public void run() {
+							showOrders(Collections.EMPTY_LIST, requestId);
+						}
+					});
 				}
 			}
 		});
@@ -662,7 +678,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
-				// Do nothing
+				Log.e(TAG, "updateUserData", throwable);
 			}
 		});
 	}

@@ -76,15 +76,9 @@ public class RestaurantsAdapter extends BaseAdapter {
 			} else {
 				ViewUtils.setVisible(txtAddress, false);
 			}
-			txtDistance.setText("~50м");
+			// TODO: Implement
+			// txtDistance.setText("~50м");
 			txtSchedule.setText(RestaurantHelper.getOpenedTime(context, item, weekDay));
-		}
-
-		public void minimize(final int translationY) {
-			imgCover.animate().translationYBy(translationY).start();
-			txtTitle.animate().translationYBy(translationY).start();
-			panelAddress.animate().translationYBy(translationY).start();
-			txtSchedule.animate().translationYBy(translationY).start();
 		}
 	}
 

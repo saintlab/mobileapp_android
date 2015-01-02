@@ -6,6 +6,7 @@ import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ScrollView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
@@ -44,6 +45,12 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.img_cover)
 	protected View viewCover;
+
+	@InjectView(R.id.scroll)
+	protected ScrollView scrollView;
+
+	@InjectView(R.id.main_content)
+	protected View viewMain;
 
 	private Restaurant mRestaurant;
 
@@ -112,12 +119,17 @@ public class RestaurantActivity extends BaseOmnomActivity {
 			return;
 		}
 
-		final int translationY = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);
-		mRestaurantViewHolder.minimize(translationY - mTopTranslation);
+		scrollView.smoothScrollTo(0, 0);
+
+		final View panelBottom = findViewById(R.id.panel_bottom);
+		final int topBarHeight = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);
+		final int translationY = topBarHeight - mTopTranslation;
+
+		btnCall.animate().translationYBy(translationY);
 		btnCall.animate().alpha(0).start();
-
-		AnimationUtils.animateAlpha(findViewById(R.id.panel_bottom), false);
-
+		panelBottom.animate().translationYBy(translationY);
+		viewMain.animate().translationYBy(translationY);
+		AnimationUtils.animateAlpha(panelBottom, false);
 		AnimationUtils
 				.scaleHeight(mRestaurantViewHolder.imgCover, getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_small),
 				             new Runnable() {
