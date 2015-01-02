@@ -229,7 +229,7 @@ public class BackgroundBleService extends Service {
 						public Observable<ResponseBase> call(final Restaurant restaurant) {
 							if(restaurant != null) {
 								showNotification(beacon, restaurant);
-								return api.newGuest(restaurant.getId(), table[0].getId());
+								return api.newGuest(restaurant.id(), table[0].getId());
 							}
 							return Observable.empty();
 						}
@@ -313,7 +313,7 @@ public class BackgroundBleService extends Service {
 	private void showNotification(final Beacon beacon, @Nullable final Restaurant restaurant) {
 		cacheBeacon(beacon);
 		final String content =
-				restaurant != null ? getString(R.string.welcome_to_, restaurant.getTitle()) : getString(R.string.omnom_works_here);
+				restaurant != null ? getString(R.string.welcome_to_, restaurant.title()) : getString(R.string.omnom_works_here);
 
 		final Notification notification =
 				new Notification.Builder(this).setSmallIcon(R.drawable.ic_app).setContentTitle(getString(R.string.app_name))

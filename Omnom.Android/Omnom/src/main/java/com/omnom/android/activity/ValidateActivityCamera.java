@@ -1,5 +1,6 @@
 package com.omnom.android.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
@@ -12,8 +13,10 @@ import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
-import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
+import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
@@ -21,16 +24,31 @@ import com.omnom.android.utils.utils.AndroidUtils;
 
 import javax.inject.Inject;
 
-import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
-import rx.functions.Func1;
 
 public class ValidateActivityCamera extends ValidateActivity {
 	public static final String DEVICE_ID_GENYMOTION = "000000000000000";
 
 	private static final String TAG = ValidateActivityCamera.class.getSimpleName();
+
+	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, final int userEnterType) {
+		Intent intent = createIntent(context, animationType, false, userEnterType);
+		if(context instanceof ConfirmPhoneActivity) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		}
+		context.start(intent, enterAnim, exitAnim, false);
+	}
+
+	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
+		final Intent intent = new Intent(context, ValidateActivityCamera.class);
+		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
+		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
+		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
+		return intent;
+	}
 
 	@Inject
 	protected RestaurateurObeservableApi api;
@@ -40,6 +58,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 	private String mQrData;
 
 	private Subscription mValidateSubscribtion;
+
+	private int mOutAnimation;
+
 
 	@Override
 	protected void startLoader() {
@@ -62,7 +83,20 @@ public class ValidateActivityCamera extends ValidateActivity {
 		super.onDestroy();
 		OmnomObservable.unsubscribe(mCheckQrSubscribtion);
 		OmnomObservable.unsubscribe(mValidateSubscribtion);
+	}
 
+	@Override
+	protected void handleIntent(final Intent intent) {
+		super.handleIntent(intent);
+		mOutAnimation = intent.getIntExtra(EXTRA_ANIMATION_EXIT, -1);
+	}
+
+	@Override
+	public void finish() {
+		super.finish();
+		if(mOutAnimation == EXTRA_ANIMATION_SLIDE_OUT_RIGHT) {
+			overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+		}
 	}
 
 	@Override
@@ -108,7 +142,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 			                                         @Override
 			                                         public void call(Boolean hasNoErrors) {
 				                                         if(hasNoErrors) {
-					                                         loadTable(mQrData, table);
+					                                         loadTable(mQrData);
 				                                         } else {
 					                                         reportMixPanel(table[0]);
 					                                         startErrorTransition();
@@ -128,7 +162,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	}
 
-	private void reportMixPanel(final TableDataResponse tableDataResponse) {
+	@Override
+	protected void reportMixPanel(final TableDataResponse tableDataResponse) {
 		if(tableDataResponse != null) {
 			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 									  OnTableMixpanelEvent.createEventQr(getUserData(), tableDataResponse.getRestaurantId(),
@@ -136,28 +171,34 @@ public class ValidateActivityCamera extends ValidateActivity {
 		}
 	}
 
-	private void loadTable(final String mQrData, final TableDataResponse[] table) {
+	private void loadTable(final String mQrData) {
 		mCheckQrSubscribtion = AndroidObservable
-				.bindActivity(this, api.checkQrCode(mQrData).flatMap(new Func1<TableDataResponse, Observable<Restaurant>>() {
-					@Override
-					public Observable<Restaurant> call(TableDataResponse tableDataResponse) {
-						table[0] = tableDataResponse;
-						if(tableDataResponse.hasAuthError()) {
-							throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
-							                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED, tableDataResponse.getError()));
-						}
-						if(!TextUtils.isEmpty(tableDataResponse.getError())) {
-							mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
-							return Observable.empty();
-						}
-						return api.getRestaurant(tableDataResponse.getRestaurantId(), mPreloadBackgroundFunction);
-					}
-				})).subscribe(new Action1<Restaurant>() {
-					@Override
-					public void call(final Restaurant restaurant) {
-						onDataLoaded(restaurant, table[0]);
-					}
-				}, onError);
+				.bindActivity(this, api.decode(new QrDecodeRequest(mQrData), mPreloadBackgroundFunction)).subscribe(
+						new Action1<RestaurantResponse>() {
+							@Override
+							public void call(final RestaurantResponse decodeResponse) {
+								if(decodeResponse.hasAuthError()) {
+									throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
+									                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
+									                                             decodeResponse.getError()));
+								}
+								if(!TextUtils.isEmpty(decodeResponse.getError())) {
+									mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
+								} else {
+									handleDecodeResponse(decodeResponse);
+								}
+							}
+						}, onError);
+	}
+
+	private void onWrongQr() {
+		startErrorTransition();
+		mErrorHelper.showWrongQrError(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				startLoader();
+			}
+		});
 	}
 
 	@Override

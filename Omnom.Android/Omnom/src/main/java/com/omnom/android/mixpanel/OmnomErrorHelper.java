@@ -42,4 +42,12 @@ public class OmnomErrorHelper extends ErrorHelper {
 															error.getEventName());
 		OmnomApplication.getMixPanelHelper(mLoader.getContext()).track(MixPanelHelper.Project.OMNOM_ANDROID, event);
 	}
+
+	public void showUnknownPlace() {
+
+	}
+
+	public void showWrongQrError(View.OnClickListener onClickListener) {
+		showError(LoaderError.UNKNOWN_QR_CODE, onClickListener);
+	}
 }

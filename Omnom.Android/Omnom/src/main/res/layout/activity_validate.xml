@@ -5,12 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/error_bg_layer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
     <LinearLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
