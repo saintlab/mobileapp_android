@@ -6,6 +6,7 @@ import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ScrollView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
@@ -44,6 +45,9 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.img_cover)
 	protected View viewCover;
+
+	@InjectView(R.id.scroll)
+	protected ScrollView scrollView;
 
 	@InjectView(R.id.main_content)
 	protected View viewMain;
@@ -114,6 +118,8 @@ public class RestaurantActivity extends BaseOmnomActivity {
 			finishSimple();
 			return;
 		}
+
+		scrollView.smoothScrollTo(0, 0);
 
 		final View panelBottom = findViewById(R.id.panel_bottom);
 		final int topBarHeight = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);

@@ -9,7 +9,7 @@
     <color name="profile_hint">#aaa</color>
 
     <color name="info_hint">#7f000000</color>
-    <color name="order_item_price">#7d7d7d</color>
+    <color name="order_item_price">#337d7d7d</color>
     <color name="order_item_unselected">#d1d1d1</color>
 
     <color name="light_blue">#488ee1</color>
