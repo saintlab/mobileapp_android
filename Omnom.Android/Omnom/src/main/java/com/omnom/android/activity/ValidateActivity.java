@@ -47,6 +47,7 @@ import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -144,7 +145,11 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
-		final Intent intent = new Intent(context, hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
+
+		final Class validateActivityBleClass = AndroidUtils.isLollipop() ?
+				ValidateActivityBle21.class : ValidateActivityBle.class;
+
+		final Intent intent = new Intent(context, hasBle ? validateActivityBleClass : ValidateActivityCamera.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
 		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);

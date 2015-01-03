@@ -17,7 +17,7 @@ repositories {
 apply plugin: 'hugo'
 
 android {
-    compileSdkVersion 19
+    compileSdkVersion 21
     buildToolsVersion '20.0.0'
 
     packagingOptions {
@@ -28,7 +28,7 @@ android {
     defaultConfig {
         applicationId "com.omnom.android.linker"
         minSdkVersion 18
-        targetSdkVersion 19
+        targetSdkVersion 21
         versionCode 35
         versionName "0.1.35"
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
