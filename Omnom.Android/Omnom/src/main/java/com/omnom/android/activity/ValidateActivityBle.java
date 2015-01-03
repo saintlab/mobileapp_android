@@ -18,6 +18,7 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
+import com.omnom.android.utils.utils.AndroidUtils;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,7 +28,6 @@ import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
 import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
-import retrofit.http.HEAD;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -36,13 +36,13 @@ public class ValidateActivityBle extends ValidateActivity {
 
 	private static final String TAG = ValidateActivityBle.class.getSimpleName();
 
+	protected BluetoothAdapter mBluetoothAdapter;
+
+	protected BeaconParser parser;
+
+	protected LinkedList<BeaconRecord> mBeacons = new LinkedList<BeaconRecord>();
+
 	private BluetoothAdapter.LeScanCallback mLeScanCallback;
-
-	private BluetoothAdapter mBluetoothAdapter;
-
-	private BeaconParser parser;
-
-	private LinkedList<BeaconRecord> mBeacons = new LinkedList<BeaconRecord>();
 
 	private Subscription mValidateSubscribtion;
 
@@ -51,11 +51,13 @@ public class ValidateActivityBle extends ValidateActivity {
 	@Override
 	public void initUi() {
 		super.initUi();
-		initBle();
+		if(AndroidUtils.isKitKat()) {
+			initBle();
+		}
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-	private void initBle() {
+	protected void initBle() {
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		parser = new BeaconParser();
 		parser.setBeaconLayout(getResources().getString(R.string.redbear_beacon_layout));
@@ -82,7 +84,7 @@ public class ValidateActivityBle extends ValidateActivity {
 		};
 	}
 
-	private BeaconRecord find(final LinkedList<BeaconRecord> beacons, final Beacon beacon) {
+	protected BeaconRecord find(final LinkedList<BeaconRecord> beacons, final Beacon beacon) {
 		final Iterator<BeaconRecord> iterator = beacons.iterator();
 		while(iterator.hasNext()) {
 			final BeaconRecord next = iterator.next();
@@ -146,7 +148,7 @@ public class ValidateActivityBle extends ValidateActivity {
 	}
 
 	private void readBeacons() {
-		scanBleDevices(true, new Runnable() {
+		final Runnable endCallback = new Runnable() {
 			@Override
 			public void run() {
 				mFindBeaconSubscription = AndroidObservable.bindActivity(ValidateActivityBle.this,
@@ -185,7 +187,10 @@ public class ValidateActivityBle extends ValidateActivity {
 					                                           }
 				                                           });
 			}
-		});
+		};
+		if(AndroidUtils.isKitKat()) {
+			scanBleDevices(true, endCallback);
+		}
 	}
 
 	@Override
@@ -194,13 +199,13 @@ public class ValidateActivityBle extends ValidateActivity {
 			return;
 		}
 		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-								  OnTableMixpanelEvent.createEventBluetooth(getUserData(),
-										                                    tableDataResponse.getRestaurantId(),
+		                          OnTableMixpanelEvent.createEventBluetooth(getUserData(),
+		                                                                    tableDataResponse.getRestaurantId(),
 		                                                                    tableDataResponse.getId()));
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-	private void scanBleDevices(final boolean enable, final Runnable endCallback) {
+	protected void scanBleDevices(final boolean enable, final Runnable endCallback) {
 		if(enable) {
 			mBeacons.clear();
 			findViewById(android.R.id.content).postDelayed(new Runnable() {
