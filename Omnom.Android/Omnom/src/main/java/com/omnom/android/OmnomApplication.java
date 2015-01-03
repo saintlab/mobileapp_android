@@ -13,9 +13,9 @@ import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.AuthMixpanelModule;
 import com.omnom.android.modules.BeaconModule;
 import com.omnom.android.modules.OmnomApplicationModule;
+import com.omnom.android.modules.RestuarateurMixpanelModule;
 import com.omnom.android.preferences.JsonPreferenceProvider;
 import com.omnom.android.preferences.PreferenceHelperAdapter;
-import com.omnom.android.restaurateur.RestaurateurModule;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.config.Config;
@@ -79,7 +79,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		return Arrays.asList(new AndroidModule(this),
 		                     new OmnomApplicationModule(),
 		                     new BeaconModule(this),
-		                     new RestaurateurModule(this, R.string.endpoint_restaurateur),
+		                     new RestuarateurMixpanelModule(this, R.string.endpoint_restaurateur, mixPanelHelper),
 		                     new AcquiringModuleMailRuMixpanel(this, mixPanelHelper),
 		                     new AuthMixpanelModule(this, R.string.endpoint_auth, mixPanelHelper));
 	}

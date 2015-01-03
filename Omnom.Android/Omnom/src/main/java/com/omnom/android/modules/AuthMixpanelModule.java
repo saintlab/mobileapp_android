@@ -3,8 +3,8 @@ package com.omnom.android.modules;
 import android.content.Context;
 
 import com.omnom.android.auth.AuthService;
-import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.interceptors.mixpanel.WicketMixpanelAuthenticator;
+import com.omnom.android.mixpanel.MixPanelHelper;
 
 import javax.inject.Singleton;
 

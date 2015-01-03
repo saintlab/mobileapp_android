@@ -104,8 +104,7 @@ public class MixPanelHelper {
 
 	public void track(final Project project, final String event, final Object request) {
 		try {
-			final JSONObject json = new JSONObject();
-			json.put(KEY_DATA, mGson.toJson(request));
+			final JSONObject json = new JSONObject(mGson.toJson(request));
 			track(project, event, json);
 		} catch(JSONException e) {
 			Log.e(TAG, "track", e);
