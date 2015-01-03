@@ -51,4 +51,5 @@ public interface Extras extends Preferences {
 
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_UP = 0;
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_DOWN = 1;
+	public static final int EXTRA_LOADER_ANIMATION_FIXED = 2;
 }

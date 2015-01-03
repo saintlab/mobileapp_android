@@ -310,10 +310,19 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected void onStart() {
 		super.onStart();
 		if(mFirstRun) {
-			if(mAnimationType == EXTRA_LOADER_ANIMATION_SCALE_DOWN) {
-				loader.scaleDown();
-			} else {
-				loader.setSize(0, 0);
+			switch(mAnimationType) {
+				case EXTRA_LOADER_ANIMATION_SCALE_DOWN:
+				case EXTRA_LOADER_ANIMATION_FIXED:
+					loader.scaleDown();
+					break;
+
+				case EXTRA_LOADER_ANIMATION_SCALE_UP:
+					loader.setSize(0, 0);
+					break;
+
+				default:
+					loader.setSize(0, 0);
+					break;
 			}
 		}
 	}
@@ -817,12 +826,20 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				}
 			});
 		} else {
-			// TODO: Discuss with team
-			// onDataLoaded(restaurant, null);
-			// or
-			//ValidateActivityCamera.start(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
-			//                             EXTRA_LOADER_ANIMATION_SCALE_UP, ConfirmPhoneActivity.TYPE_DEFAULT);
-			handleEmptyResponse();
+			loader.stopProgressAnimation();
+			loader.updateProgressMax(new Runnable() {
+				@Override
+				public void run() {
+					loader.showProgress(false, true, new Runnable() {
+						@Override
+						public void run() {
+							ValidateActivityCamera.start(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
+							                             EXTRA_LOADER_ANIMATION_FIXED, ConfirmPhoneActivity.TYPE_DEFAULT);
+							finish();
+						}
+					});
+				}
+			}, false);
 		}
 	}
 

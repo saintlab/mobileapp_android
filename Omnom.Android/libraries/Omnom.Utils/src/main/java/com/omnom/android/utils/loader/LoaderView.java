@@ -269,6 +269,14 @@ public class LoaderView extends FrameLayout {
 		}
 	}
 
+	public void showProgress(final boolean visible, boolean animate, Runnable callback) {
+		if(animate) {
+			AnimationUtils.animateAlpha(mProgressBar, visible, callback);
+		} else {
+			ViewUtils.setVisible(mProgressBar, visible);
+		}
+	}
+
 	public void scaleDown(final Runnable scaleDownUpdate) {
 		scaleDown(scaleDownUpdate, null);
 	}
@@ -385,8 +393,14 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void updateProgress(final int progress) {
+		updateProgress(progress, true);
+	}
+
+	public void updateProgress(final int progress, boolean hideWhenDone) {
 		final boolean progressVisible = progress < mProgressBar.getMax();
-		showProgress(progress > 0 && progressVisible, !progressVisible);
+		if(hideWhenDone) {
+			showProgress(progress > 0 && progressVisible, !progressVisible);
+		}
 		mProgressBar.setProgress(progress);
 	}
 
@@ -448,13 +462,17 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public ValueAnimator updateProgressMax(final Runnable callback) {
+		return updateProgressMax(callback, true);
+	}
+
+	public ValueAnimator updateProgressMax(final Runnable callback, final boolean hideWhenDone) {
 		mProgressAnimator = ValueAnimator.ofInt(mProgressBar.getProgress(), mProgressBar.getMax());
 		mProgressAnimator.setDuration(getResources().getInteger(R.integer.default_animation_duration_medium));
 		mProgressAnimator.setInterpolator(new AccelerateInterpolator());
 		mProgressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
-				updateProgress((Integer) animation.getAnimatedValue());
+				updateProgress((Integer) animation.getAnimatedValue(), hideWhenDone);
 			}
 		});
 		mProgressAnimator.addListener(new AnimatorListenerAdapter() {
