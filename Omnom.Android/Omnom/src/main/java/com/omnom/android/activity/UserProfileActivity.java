@@ -217,6 +217,11 @@ public class UserProfileActivity extends BaseOmnomActivity {
 		overridePendingTransition(R.anim.fake_fade_out_short, R.anim.slide_out_down);
 	}
 
+	@OnClick(R.id.panel_table_number)
+	public void onChangeTable() {
+		ValidateActivityShortcut.start(this);
+	}
+
 	@OnClick(R.id.btn_bottom)
 	public void onLogout() {
 		final AlertDialog alertDialog = AndroidUtils.showDialog(this, R.string.are_you_to_quit,
