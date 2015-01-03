@@ -5,6 +5,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.AnimRes;
 
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.activity.helper.ActivityHelper;
@@ -94,6 +95,11 @@ public abstract class BaseListActivity extends ListActivity implements OmnomActi
 	@Override
 	public void start(final Intent intent, final int animIn, final int animOut, final boolean finish) {
 		mHelper.start(intent, animIn, animOut, finish);
+	}
+
+	@Override
+	public void startForResult(Intent intent, @AnimRes int animIn, @AnimRes int animOut, int code) {
+		mHelper.startForResult(intent, animIn, animOut, code);
 	}
 
 	@Override

@@ -44,6 +44,12 @@ public class ActivityHelperICS extends ActivityHelperBase {
 	}
 
 	@Override
+	public void startForResult(final Intent intent, final int animIn, final int animOut,int code) {
+		mActivity.getActivity().startActivityForResult(intent, code);
+		mActivity.getActivity().overridePendingTransition(animIn, animOut);
+	}
+
+	@Override
 	public void start(Intent intent, int animIn, int aninOut, boolean finish) {
 		mActivity.getActivity().startActivity(intent);
 		mActivity.getActivity().overridePendingTransition(animIn, aninOut);

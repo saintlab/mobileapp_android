@@ -28,6 +28,12 @@ public class ActivityHelperJB extends ActivityHelperBase {
 	}
 
 	@Override
+	public void startForResult(final Intent intent, final int animIn, final int animOut, int code) {
+		ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation(mActivity.getActivity(), animIn, animOut);
+		mActivity.getActivity().startActivityForResult(intent, code, activityOptions.toBundle());
+	}
+
+	@Override
 	public void start(Class<?> cls, int animIn, int aninOut, boolean finish) {
 		Intent intent = new Intent(mActivity.getActivity(), cls);
 		if(Build.VERSION.SDK_INT >= 16) {

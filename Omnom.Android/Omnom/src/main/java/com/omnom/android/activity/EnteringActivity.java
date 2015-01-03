@@ -52,6 +52,14 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 		return intent;
 	}
 
+	public static void startNewTable(final BaseActivity context) {
+		final Intent intent = new Intent(context, EnteringActivity.class);
+		intent.putExtra(EXTRA_DURATION_SPLASH, 0);
+		intent.putExtra(EXTRA_SKIP_SPLASH, false);
+		intent.putExtra(EXTRA_SCAN_QR, true);
+		context.start(intent, false);
+	}
+
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
 
@@ -69,6 +77,12 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	private int mType = ValidateActivity.TYPE_DEFAULT;
 
 	private Uri mData;
+
+	/**
+	 * Whether user should be forwarded to QR code scanning
+	 * Usual case - changing table
+	 */
+	private boolean mForwardToScan = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +108,7 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 			}
 		}
 
-		if (savedInstanceState == null) {
+		if(savedInstanceState == null) {
 			enteringFragment = EnteringFragment.newInstance();
 			if(skipSplash) {
 				getSupportFragmentManager().beginTransaction()
@@ -103,7 +117,7 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 				showPanelBottom(false);
 			} else {
 				// During initial setup, plug in the details fragment.
-				splashFragment = SplashFragment.newInstance(durationSplash);
+				splashFragment = SplashFragment.newInstance(durationSplash, mForwardToScan);
 				getSupportFragmentManager().beginTransaction()
 				                           .replace(R.id.fragment_container, splashFragment)
 				                           .commit();
@@ -145,6 +159,7 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 		durationSplash = intent.getIntExtra(EXTRA_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
 		skipSplash = intent.getBooleanExtra(EXTRA_SKIP_SPLASH, false);
 		mType = intent.getIntExtra(EXTRA_CONFIRM_TYPE, ValidateActivity.TYPE_DEFAULT);
+		mForwardToScan = intent.getBooleanExtra(EXTRA_SCAN_QR, false);
 	}
 
 	@OnClick(R.id.btn_register)

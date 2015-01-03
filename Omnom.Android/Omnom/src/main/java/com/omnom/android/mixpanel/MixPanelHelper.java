@@ -30,6 +30,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class MixPanelHelper {
 
+	public static enum Project {
+		ALL, OMNOM, OMNOM_ANDROID
+	}
+
+	private interface Command {
+		void execute(MixpanelAPI api);
+	}
+
 	public static final String USER_ID = "id";
 
 	public static final String USER_NAME = "$name";
@@ -105,6 +113,16 @@ public class MixPanelHelper {
 	public void track(final Project project, final String event, final Object request) {
 		try {
 			final JSONObject json = new JSONObject(mGson.toJson(request));
+			track(project, event, json);
+		} catch(JSONException e) {
+			Log.e(TAG, "track", e);
+		}
+	}
+
+	public void track(final Project project, final String event, final String data) {
+		final JSONObject json = new JSONObject();
+		try {
+			json.put(KEY_DATA, data);
 			track(project, event, json);
 		} catch(JSONException e) {
 			Log.e(TAG, "track", e);
@@ -271,14 +289,14 @@ public class MixPanelHelper {
 	}
 
 	private void execute(final Project project, final Command command) {
-		if (mMixpanelApiMap == null || mMixpanelApiMap.isEmpty()) {
+		if(mMixpanelApiMap == null || mMixpanelApiMap.isEmpty()) {
 			Log.w(TAG, "mMixpanelApiMap is not set");
 			return;
 		}
-		if (project == Project.ALL) {
+		if(project == Project.ALL) {
 			Collection<MixpanelAPI> mixpanelAPIs = mMixpanelApiMap.values();
-			for (MixpanelAPI api: mixpanelAPIs) {
-				if (api != null) {
+			for(MixpanelAPI api : mixpanelAPIs) {
+				if(api != null) {
 					command.execute(api);
 				} else {
 					Log.w(TAG, "Mixpanel api is null for project " + project.name());
@@ -286,20 +304,12 @@ public class MixPanelHelper {
 			}
 		} else {
 			MixpanelAPI api = mMixpanelApiMap.get(project);
-			if (api != null) {
+			if(api != null) {
 				command.execute(api);
 			} else {
 				Log.w(TAG, "Mixpanel API is not set for project " + project.name());
 			}
 		}
-	}
-
-	private interface Command {
-		void execute(MixpanelAPI api);
-	}
-
-	public static enum Project {
-		ALL, OMNOM, OMNOM_ANDROID
 	}
 
 }

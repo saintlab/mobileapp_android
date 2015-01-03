@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.AnimRes;
 import android.support.v4.app.FragmentActivity;
 import android.view.MenuItem;
 
@@ -22,10 +23,10 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  * Created by Ch3D on 31.07.2014.
  */
 public abstract class BaseFragmentActivity extends FragmentActivity implements OmnomActivity, Extras {
-	private ActivityHelper mHelper;
-
 	@Inject
 	protected Bus mBus;
+
+	private ActivityHelper mHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +110,11 @@ public abstract class BaseFragmentActivity extends FragmentActivity implements O
 
 	public void start(Intent intent, int animIn, int animOut, boolean finish) {
 		mHelper.start(intent, animIn, animOut, finish);
+	}
+
+	@Override
+	public void startForResult(Intent intent, @AnimRes int animIn, @AnimRes int animOut, int code) {
+		mHelper.startForResult(intent, animIn, animOut, code);
 	}
 
 	@Override

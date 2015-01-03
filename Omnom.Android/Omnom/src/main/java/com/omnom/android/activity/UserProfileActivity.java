@@ -44,14 +44,18 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseOmnomActivity {
 
+	public static final int REQUEST_CODE_USER_DATA = 200;
+
 	private static final String TAG = UserProfileActivity.class.getSimpleName();
+
+	public static final int RESULT_CODE_CHANGE_TABLE = 201;
 
 	public static void startSliding(OmnomActivity activity, final int tableNumber, final String tableId) {
 		final Intent intent = new Intent(activity.getActivity(), UserProfileActivity.class);
 		intent.putExtra(EXTRA_ANIMATE, false);
 		intent.putExtra(EXTRA_TABLE_NUMBER, tableNumber);
 		intent.putExtra(EXTRA_TABLE_ID, tableId);
-		activity.start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
+		activity.startForResult(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, REQUEST_CODE_USER_DATA);
 	}
 
 	@InjectView(R.id.img_user)
@@ -196,8 +200,8 @@ public class UserProfileActivity extends BaseOmnomActivity {
 			mImgUser.setPadding(padding, padding, padding, padding);
 		} else {
 			OmnomApplication.getPicasso(this).load(url).placeholder(getPlaceholderDrawable(dimension))
-			       .resize(dimension, dimension).centerCrop()
-			       .transform(RoundTransformation.create(dimension, 0)).into(mImgUser);
+			                .resize(dimension, dimension).centerCrop()
+			                .transform(RoundTransformation.create(dimension, 0)).into(mImgUser);
 		}
 	}
 
@@ -215,6 +219,14 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	public void finish() {
 		UserProfileActivity.super.finish();
 		overridePendingTransition(R.anim.fake_fade_out_short, R.anim.slide_out_down);
+	}
+
+	@OnClick(R.id.panel_table_number)
+	public void onChangeTable() {
+		setResult(RESULT_CODE_CHANGE_TABLE);
+		finish();
+		overridePendingTransition(R.anim.fake_fade_in, R.anim.slide_out_down);
+		EnteringActivity.startNewTable(this);
 	}
 
 	@OnClick(R.id.btn_bottom)

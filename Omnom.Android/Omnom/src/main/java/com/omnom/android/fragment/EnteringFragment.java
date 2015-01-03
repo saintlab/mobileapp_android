@@ -26,7 +26,8 @@ public class EnteringFragment extends Fragment {
 	protected ViewPager mPager;
 
 	public static EnteringFragment newInstance() {
-		return new EnteringFragment();
+		final EnteringFragment enteringFragment = new EnteringFragment();
+		return enteringFragment;
 	}
 
 	@Override
