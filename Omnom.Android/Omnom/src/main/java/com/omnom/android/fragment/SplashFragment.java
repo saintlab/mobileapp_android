@@ -50,10 +50,13 @@ public class SplashFragment extends Fragment {
 
 	private static final String ARG_DURATION_SPLASH = "durationSplash";
 
-	public static SplashFragment newInstance(final int durationSplash) {
+	private static final String ARG_FORWARD_QR_SCAN = "qr_scan_forward";
+
+	public static SplashFragment newInstance(final int durationSplash, final boolean forwardToScan) {
 		final SplashFragment fragment = new SplashFragment();
 		final Bundle args = new Bundle();
 		args.putInt(ARG_DURATION_SPLASH, durationSplash);
+		args.putBoolean(ARG_FORWARD_QR_SCAN, forwardToScan);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -88,11 +91,14 @@ public class SplashFragment extends Fragment {
 
 	private LaunchListener mLaunchListener;
 
+	private boolean mForwardToQr = false;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if(getArguments() != null) {
 			durationSplash = getArguments().getInt(ARG_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
+			mForwardToQr = getArguments().getBoolean(ARG_FORWARD_QR_SCAN, false);
 		}
 	}
 
@@ -149,7 +155,7 @@ public class SplashFragment extends Fragment {
 					@Override
 					public void run() {
 						if(isAdded() && !activity.isFinishing()) {
-							if(data != null) {
+							if(data != null || mForwardToQr) {
 								ValidateActivityCamera.start(activity, data);
 							} else {
 								ValidateActivity.start(activity, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,

@@ -36,4 +36,5 @@ public interface ActivityHelper {
 
 	void onPause();
 
+	void startForResult(Intent intent, int animIn, int animOut, int code);
 }

@@ -523,14 +523,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		loader.hideLogo(new Runnable() {
 			@Override
 			public void run() {
-
-				System.err.println(">>>>!!!!!");
-				try {
-					throw new RuntimeException(">!>!>!>!>!>!");
-				} catch(RuntimeException e) {
-					Log.e(OrdersActivity.class.getSimpleName(), "showOrders", e);
-				}
-
 				loader.scaleUp(getResources().getInteger(R.integer.default_animation_duration_medium), new Runnable() {
 					@Override
 					public void run() {
@@ -570,6 +562,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == UserProfileActivity.REQUEST_CODE_USER_DATA && resultCode == UserProfileActivity.RESULT_CODE_CHANGE_TABLE) {
+			finish();
+		}
 		if(requestCode == REQUEST_CODE_ORDERS && resultCode == RESULT_OK) {
 			if(mRestaurant != null) {
 				// The following delay is required due to different behavior on different devices.
