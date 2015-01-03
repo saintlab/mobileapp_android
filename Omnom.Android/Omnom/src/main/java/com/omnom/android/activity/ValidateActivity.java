@@ -47,6 +47,7 @@ import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -144,7 +145,11 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
-		final Intent intent = new Intent(context, hasBle ? ValidateActivityBle.class : ValidateActivityCamera.class);
+
+		final Class validateActivityBleClass = AndroidUtils.isLollipop() ?
+				ValidateActivityBle21.class : ValidateActivityBle.class;
+
+		final Intent intent = new Intent(context, hasBle ? validateActivityBleClass : ValidateActivityCamera.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
 		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
@@ -305,10 +310,19 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	protected void onStart() {
 		super.onStart();
 		if(mFirstRun) {
-			if(mAnimationType == EXTRA_LOADER_ANIMATION_SCALE_DOWN) {
-				loader.scaleDown();
-			} else {
-				loader.setSize(0, 0);
+			switch(mAnimationType) {
+				case EXTRA_LOADER_ANIMATION_SCALE_DOWN:
+				case EXTRA_LOADER_ANIMATION_FIXED:
+					loader.scaleDown();
+					break;
+
+				case EXTRA_LOADER_ANIMATION_SCALE_UP:
+					loader.setSize(0, 0);
+					break;
+
+				default:
+					loader.setSize(0, 0);
+					break;
 			}
 		}
 	}
@@ -523,14 +537,6 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		loader.hideLogo(new Runnable() {
 			@Override
 			public void run() {
-
-				System.err.println(">>>>!!!!!");
-				try {
-					throw new RuntimeException(">!>!>!>!>!>!");
-				} catch(RuntimeException e) {
-					Log.e(OrdersActivity.class.getSimpleName(), "showOrders", e);
-				}
-
 				loader.scaleUp(getResources().getInteger(R.integer.default_animation_duration_medium), new Runnable() {
 					@Override
 					public void run() {
@@ -570,6 +576,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == UserProfileActivity.REQUEST_CODE_USER_DATA && resultCode == UserProfileActivity.RESULT_CODE_CHANGE_TABLE) {
+			finish();
+		}
 		if(requestCode == REQUEST_CODE_ORDERS && resultCode == RESULT_OK) {
 			if(mRestaurant != null) {
 				// The following delay is required due to different behavior on different devices.
@@ -817,12 +826,20 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				}
 			});
 		} else {
-			// TODO: Discuss with team
-			// onDataLoaded(restaurant, null);
-			// or
-			//ValidateActivityCamera.start(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
-			//                             EXTRA_LOADER_ANIMATION_SCALE_UP, ConfirmPhoneActivity.TYPE_DEFAULT);
-			handleEmptyResponse();
+			loader.stopProgressAnimation();
+			loader.updateProgressMax(new Runnable() {
+				@Override
+				public void run() {
+					loader.showProgress(false, true, new Runnable() {
+						@Override
+						public void run() {
+							ValidateActivityCamera.start(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
+							                             EXTRA_LOADER_ANIMATION_FIXED, ConfirmPhoneActivity.TYPE_DEFAULT);
+							finish();
+						}
+					});
+				}
+			}, false);
 		}
 	}
 

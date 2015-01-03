@@ -14,6 +14,8 @@ public interface OmnomActivity {
 
 	void start(Intent intent, int animIn, int animOut, boolean finish);
 
+	void startForResult(Intent intent, int animIn, int animOut, int code);
+
 	void start(Class<?> cls);
 
 	void start(Class<?> cls, boolean finish);

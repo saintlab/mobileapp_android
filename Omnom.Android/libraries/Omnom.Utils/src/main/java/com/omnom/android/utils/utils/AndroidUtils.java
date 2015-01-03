@@ -302,6 +302,10 @@ public class AndroidUtils {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
 	}
 
+	public static boolean isLollipop() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+	}
+
 	public static boolean isKitKat() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 	}
