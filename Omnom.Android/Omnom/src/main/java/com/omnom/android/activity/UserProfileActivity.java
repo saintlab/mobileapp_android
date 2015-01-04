@@ -224,7 +224,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@OnClick(R.id.panel_table_number)
 	public void onChangeTable() {
 		setResult(RESULT_CODE_CHANGE_TABLE);
-		finish();
+		UserProfileActivity.super.finish();
 		overridePendingTransition(R.anim.fake_fade_in, R.anim.slide_out_down);
 		EnteringActivity.startNewTable(this);
 	}
