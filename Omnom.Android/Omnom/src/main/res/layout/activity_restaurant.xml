@@ -87,11 +87,5 @@
         android:src="@drawable/ic_cross_white"
         style="@style/ImageView.Clickable.Cropped" />
 
-    <Button
-        android:id="@+id/btn_demo"
-        android:layout_gravity="right"
-        android:padding="@dimen/activity_vertical_margin"
-        style="@style/Button.Demo.White" />
-
 </FrameLayout>
 

@@ -56,7 +56,7 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 		final Intent intent = new Intent(context, EnteringActivity.class);
 		intent.putExtra(EXTRA_DURATION_SPLASH, 0);
 		intent.putExtra(EXTRA_SKIP_SPLASH, false);
-		intent.putExtra(EXTRA_SCAN_QR, true);
+		intent.putExtra(EXTRA_CHANGE_TABLE, true);
 		context.start(intent, false);
 	}
 
@@ -82,7 +82,7 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	 * Whether user should be forwarded to QR code scanning
 	 * Usual case - changing table
 	 */
-	private boolean mForwardToScan = false;
+	private boolean mForwardValiation = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +117,7 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 				showPanelBottom(false);
 			} else {
 				// During initial setup, plug in the details fragment.
-				splashFragment = SplashFragment.newInstance(durationSplash, mForwardToScan);
+				splashFragment = SplashFragment.newInstance(durationSplash, mForwardValiation);
 				getSupportFragmentManager().beginTransaction()
 				                           .replace(R.id.fragment_container, splashFragment)
 				                           .commit();
@@ -159,7 +159,7 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 		durationSplash = intent.getIntExtra(EXTRA_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
 		skipSplash = intent.getBooleanExtra(EXTRA_SKIP_SPLASH, false);
 		mType = intent.getIntExtra(EXTRA_CONFIRM_TYPE, ValidateActivity.TYPE_DEFAULT);
-		mForwardToScan = intent.getBooleanExtra(EXTRA_SCAN_QR, false);
+		mForwardValiation = intent.getBooleanExtra(EXTRA_CHANGE_TABLE, false);
 	}
 
 	@OnClick(R.id.btn_register)
