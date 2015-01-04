@@ -18,7 +18,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_DEMO_MODE = "com.omnom.android.mode.demo";
 	public static final String EXTRA_DURATION_SPLASH = "com.omnom.android.mode.duration_splash";
 	public static final String EXTRA_SKIP_SPLASH = "com.omnom.android.mode.skip_splash";
-	public static final String EXTRA_SCAN_QR = "com.omnom.android.mode.scan_qr";
+	public static final String EXTRA_CHANGE_TABLE = "com.omnom.android.table.change";
 	public static final String EXTRA_ANIMATE = "com.omnom.android.linker.activity.animate";
 	public static final String EXTRA_TABLE_NUMBER = "com.omnom.android.restaurant.table_number";
 	public static final String EXTRA_TABLE_ID = "com.omnom.android.restaurant.table_id";
@@ -52,4 +52,7 @@ public interface Extras extends Preferences {
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_UP = 0;
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_DOWN = 1;
 	public static final int EXTRA_LOADER_ANIMATION_FIXED = 2;
+
+	public static final int REQUEST_CODE_CHANGE_TABLE = 2000;
+	public static final int RESULT_CODE_TABLE_CHANGED = 2001;
 }

@@ -39,6 +39,10 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private static final String TAG = RestaurantsListActivity.class.getSimpleName();
 
+	private static final int SLIDE_LEFT = 0;
+
+	private static final int SLIDE_UP = 1;
+
 	public static void start(BaseOmnomActivity activity) {
 		start(activity, false);
 	}
@@ -51,6 +55,12 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		final Intent intent = new Intent(activity, RestaurantsListActivity.class);
 		intent.putParcelableArrayListExtra(EXTRA_RESTAURANTS, new ArrayList<Parcelable>(restaurants));
 		activity.start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, true);
+	}
+
+	public static void startLeft(final ValidateActivity activity) {
+		final Intent intent = new Intent(activity, RestaurantsListActivity.class);
+		intent.putExtra(EXTRA_ANIMATE, SLIDE_LEFT);
+		activity.startForResult(intent, R.anim.slide_in_left, R.anim.slide_out_right, REQUEST_CODE_CHANGE_TABLE);
 	}
 
 	@InjectView(R.id.panel_top)
@@ -84,6 +94,8 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private View footer;
 
+	private int mAnimation;
+
 	@OnClick(R.id.img_qr)
 	public void doQrShortcut() {
 		ValidateActivityShortcut.start(this, R.anim.fake_fade_in_instant, R.anim.slide_out_down, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
@@ -104,6 +116,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@Override
 	protected void handleIntent(final Intent intent) {
+		mAnimation = intent.getIntExtra(EXTRA_ANIMATE, -1);
 		if(getIntent().hasExtra(EXTRA_RESTAURANTS)) {
 			mRestaurants = getIntent().getParcelableArrayListExtra(EXTRA_RESTAURANTS);
 			mAdapter = new RestaurantsAdapter(this, mRestaurants);
@@ -213,6 +226,15 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	}
 
 	@Override
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == REQUEST_CODE_CHANGE_TABLE && resultCode == RESULT_CODE_TABLE_CHANGED) {
+			setResult(RESULT_CODE_TABLE_CHANGED);
+			RestaurantsListActivity.super.finish();
+		}
+	}
+
+	@Override
 	protected void onStop() {
 		super.onStop();
 		mItemClicked = false;
@@ -236,7 +258,11 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@Override
 	public void finish() {
 		super.finish();
-		overridePendingTransition(android.R.anim.fade_in, R.anim.slide_out_down);
+		if(mAnimation == SLIDE_LEFT) {
+			overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+		} else {
+			overridePendingTransition(android.R.anim.fade_in, R.anim.slide_out_down);
+		}
 	}
 
 	@Override

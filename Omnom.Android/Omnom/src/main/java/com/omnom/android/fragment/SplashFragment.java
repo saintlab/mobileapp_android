@@ -50,13 +50,13 @@ public class SplashFragment extends Fragment {
 
 	private static final String ARG_DURATION_SPLASH = "durationSplash";
 
-	private static final String ARG_FORWARD_QR_SCAN = "qr_scan_forward";
+	private static final String ARG_CHANGING_TABLE = "table_change_forward";
 
-	public static SplashFragment newInstance(final int durationSplash, final boolean forwardToScan) {
+	public static SplashFragment newInstance(final int durationSplash, final boolean forwardValidation) {
 		final SplashFragment fragment = new SplashFragment();
 		final Bundle args = new Bundle();
 		args.putInt(ARG_DURATION_SPLASH, durationSplash);
-		args.putBoolean(ARG_FORWARD_QR_SCAN, forwardToScan);
+		args.putBoolean(ARG_CHANGING_TABLE, forwardValidation);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -91,14 +91,14 @@ public class SplashFragment extends Fragment {
 
 	private LaunchListener mLaunchListener;
 
-	private boolean mForwardToQr = false;
+	private boolean mChangeTable = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if(getArguments() != null) {
 			durationSplash = getArguments().getInt(ARG_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
-			mForwardToQr = getArguments().getBoolean(ARG_FORWARD_QR_SCAN, false);
+			mChangeTable = getArguments().getBoolean(ARG_CHANGING_TABLE, false);
 		}
 	}
 
@@ -155,11 +155,11 @@ public class SplashFragment extends Fragment {
 					@Override
 					public void run() {
 						if(isAdded() && !activity.isFinishing()) {
-							if(data != null || mForwardToQr) {
-								ValidateActivityCamera.start(activity, data);
-							} else {
+							if(data == null || mChangeTable) {
 								ValidateActivity.start(activity, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
 								                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, activity.getType());
+							} else {
+								ValidateActivityCamera.start(activity, data);
 							}
 						}
 					}
@@ -274,8 +274,9 @@ public class SplashFragment extends Fragment {
 		getActivity().findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				mLaunchListener.launchEnteringScreen();
-
+				if(isAdded() && !getActivity().isFinishing()) {
+					mLaunchListener.launchEnteringScreen();
+				}
 			}
 		}, getResources().getInteger(R.integer.splash_screen_timeout));
 		getActivity().getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);

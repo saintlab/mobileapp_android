@@ -31,7 +31,7 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
 		Intent intent = createIntent(context, animationType, false, ConfirmPhoneActivity.TYPE_DEFAULT);
 		intent.putExtra(EXTRA_ANIMATION_EXIT, EXTRA_ANIMATION_SLIDE_OUT_RIGHT);
-		context.start(intent, enterAnim, exitAnim, false);
+		context.startForResult(intent, enterAnim, exitAnim, REQUEST_CODE_CHANGE_TABLE);
 	}
 
 	@Override
@@ -45,6 +45,7 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 			onWrongQr();
 		} else {
 			super.handleRestaurant(restaurant);
+			setResult(RESULT_CODE_TABLE_CHANGED);
 		}
 	}
 
