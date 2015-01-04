@@ -44,18 +44,14 @@ import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
 public class UserProfileActivity extends BaseOmnomActivity {
 
-	public static final int REQUEST_CODE_USER_DATA = 200;
-
 	private static final String TAG = UserProfileActivity.class.getSimpleName();
-
-	public static final int RESULT_CODE_CHANGE_TABLE = 201;
 
 	public static void startSliding(OmnomActivity activity, final int tableNumber, final String tableId) {
 		final Intent intent = new Intent(activity.getActivity(), UserProfileActivity.class);
 		intent.putExtra(EXTRA_ANIMATE, false);
 		intent.putExtra(EXTRA_TABLE_NUMBER, tableNumber);
 		intent.putExtra(EXTRA_TABLE_ID, tableId);
-		activity.startForResult(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, REQUEST_CODE_USER_DATA);
+		activity.startForResult(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, REQUEST_CODE_CHANGE_TABLE);
 	}
 
 	@InjectView(R.id.img_user)
@@ -223,7 +219,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.panel_table_number)
 	public void onChangeTable() {
-		setResult(RESULT_CODE_CHANGE_TABLE);
+		setResult(RESULT_CODE_TABLE_CHANGED);
 		UserProfileActivity.super.finish();
 		overridePendingTransition(R.anim.fake_fade_in, R.anim.slide_out_down);
 		EnteringActivity.startNewTable(this);

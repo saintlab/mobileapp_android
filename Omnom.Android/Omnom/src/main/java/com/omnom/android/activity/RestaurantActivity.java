@@ -35,7 +35,10 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		final Intent intent = new Intent(activity, RestaurantActivity.class);
 		intent.putExtra(EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(EXTRA_TRANSLATION_TOP, topTranslation);
-		activity.start(intent, finish);
+		activity.startForResult(intent,
+		                        com.omnom.android.utils.R.anim.fade_in,
+		                        com.omnom.android.utils.R.anim.fake_fade_out,
+		                        REQUEST_CODE_CHANGE_TABLE);
 	}
 
 	protected RestaurantsAdapter.RestaurantViewHolder mRestaurantViewHolder;
@@ -97,6 +100,15 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	protected void handleIntent(final Intent intent) {
 		mRestaurant = intent.getParcelableExtra(EXTRA_RESTAURANT);
 		mTopTranslation = intent.getIntExtra(EXTRA_TRANSLATION_TOP, 0);
+	}
+
+	@Override
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == REQUEST_CODE_CHANGE_TABLE && resultCode == RESULT_CODE_TABLE_CHANGED) {
+			setResult(RESULT_CODE_TABLE_CHANGED);
+			RestaurantActivity.super.finish();
+		}
 	}
 
 	@Override

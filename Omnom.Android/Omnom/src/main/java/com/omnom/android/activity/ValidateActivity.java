@@ -135,6 +135,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		}
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		context.start(intent, enterAnim, exitAnim, !isDemo);
 	}
 
@@ -202,6 +203,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.img_profile)
 	protected ImageView imgProfile;
+
+	@InjectView(R.id.btn_previous)
+	protected ImageView imgPrevious;
 
 	@InjectView(R.id.txt_demo_leave)
 	protected TextView txtLeave;
@@ -337,6 +341,14 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 		bgTransitionDrawable.setCrossFadeEnabled(true);
 		contentView.setBackgroundDrawable(bgTransitionDrawable);
+
+		imgPrevious.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				RestaurantsListActivity.startLeft(ValidateActivity.this);
+			}
+		});
+
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -500,6 +512,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 									                                       loader.showProgress(false);
 									                                       configureScreen(mRestaurant);
 									                                       updateLightProfile(!mIsDemo);
+									                                       ViewUtils.setVisible(imgPrevious, !mIsDemo);
 									                                       ViewUtils.setVisible(txtLeave, mIsDemo);
 									                                       ViewUtils.setVisible(getPanelBottom(), true);
 								                                       }
@@ -576,7 +589,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(requestCode == UserProfileActivity.REQUEST_CODE_USER_DATA && resultCode == UserProfileActivity.RESULT_CODE_CHANGE_TABLE) {
+		if(requestCode == REQUEST_CODE_CHANGE_TABLE && resultCode == RESULT_CODE_TABLE_CHANGED) {
 			finish();
 		}
 		if(requestCode == REQUEST_CODE_ORDERS && resultCode == RESULT_OK) {
@@ -592,6 +605,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 							public void run() {
 								ViewUtils.setVisible(getPanelBottom(), true);
 								updateLightProfile(!mIsDemo);
+								ViewUtils.setVisible(imgPrevious, !mIsDemo);
 								ViewUtils.setVisible(txtLeave, mIsDemo);
 								loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
 								loader.showLogo();
@@ -638,6 +652,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			public void run() {
 				configureScreen(mRestaurant);
 				updateLightProfile(!mIsDemo);
+				ViewUtils.setVisible(imgPrevious, !mIsDemo);
 				ViewUtils.setVisible(txtLeave, mIsDemo);
 				ViewUtils.setVisible(getPanelBottom(), true);
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())

@@ -52,4 +52,7 @@ public interface Extras extends Preferences {
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_UP = 0;
 	public static final int EXTRA_LOADER_ANIMATION_SCALE_DOWN = 1;
 	public static final int EXTRA_LOADER_ANIMATION_FIXED = 2;
+
+	public static final int REQUEST_CODE_CHANGE_TABLE = 2000;
+	public static final int RESULT_CODE_TABLE_CHANGED = 2001;
 }
