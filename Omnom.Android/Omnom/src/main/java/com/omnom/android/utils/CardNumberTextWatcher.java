@@ -33,6 +33,10 @@ public class CardNumberTextWatcher extends CardDataTextWatcher {
 		mView.removeTextChangedListener(this);
 		final String text = s.toString().replace(DELIMITER_CARD_NUMBER, StringUtils.EMPTY_STRING);
 
+		// remember previous cursor position
+		int oldSelectionEnd = mView.getSelectionEnd();
+		final int i1 = mView.length();
+
 		// append delimiters
 		final StringBuilder formatted = new StringBuilder();
 		int count = 0;
@@ -47,17 +51,19 @@ public class CardNumberTextWatcher extends CardDataTextWatcher {
 			}
 		}
 
-		// remember previous cursor position
-		final int oldSelectionEnd = mView.getSelectionEnd();
-
 		mView.setText(formatted.toString());
 
-		// if there was a character deletion - do not move cursor
-		// otherwise move cursor to the end of the string
-		if(mDeleteCharacter && (oldSelectionEnd < formatted.length())) {
-			mView.setSelection(oldSelectionEnd);
-		} else {
+		// if cursor is at the end of the string - move it to new end
+		if(i1 == oldSelectionEnd) {
 			mView.setSelection(formatted.length());
+		} else {
+			// if there was a character deletion - do not move cursor
+			// otherwise move cursor to the end of the string
+			if(mDeleteCharacter || (oldSelectionEnd < formatted.length())) {
+				mView.setSelection(oldSelectionEnd);
+			} else {
+				mView.setSelection(formatted.length());
+			}
 		}
 
 		// move cursor and focus to the next view
