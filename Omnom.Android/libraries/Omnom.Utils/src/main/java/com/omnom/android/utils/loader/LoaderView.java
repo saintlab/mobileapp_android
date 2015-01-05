@@ -73,7 +73,7 @@ public class LoaderView extends FrameLayout {
 
 	private int loaderSize;
 
-	private int currentColor = -1;
+	private int currentColor = getResources().getColor(R.color.loader_bg);
 
 	private List<View> translationViews = new LinkedList<View>();
 

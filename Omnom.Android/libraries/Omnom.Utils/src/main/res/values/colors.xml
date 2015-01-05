@@ -1,10 +1,8 @@
 <resources>
     <color name="loader_hint_text_color">#99ffffff</color>
-    <color name="loader_bg">#aa16a5d7</color>
-    <color name="loader_bg_transparent">#aa16a5d7</color>
-
+    <color name="loader_bg">#CE1200</color>
+    <color name="loader_bg_transparent">#CE1200</color>
     <color name="error_red">#D0021B</color>
     <color name="error_bg_white_transparent">#aaffffff</color>
-
     <color name="transparent">#00000000</color>
 </resources>
