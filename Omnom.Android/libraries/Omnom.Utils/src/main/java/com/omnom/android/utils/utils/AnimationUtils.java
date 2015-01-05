@@ -103,13 +103,15 @@ public class AnimationUtils {
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
-	public static void translateUp(final Context context, final Iterable<View> views, final int translation, final Runnable endCallback, final long duration) {
+	public static void translateUp(final Context context, final Iterable<View> views, final int translation, final Runnable endCallback,
+	                               final long duration) {
 		final AnimationBuilder builder = AnimationBuilder.create(context, 0, -translation);
 		builder.setDuration(duration);
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
-	public static void translateDown(final Context context, final Iterable<View> views, final int translation, final Runnable endCallback) {
+	public static void translateDown(final Context context, final Iterable<View> views, final int translation,
+	                                 final Runnable endCallback) {
 		final AnimationBuilder builder = AnimationBuilder.create(context, -translation, 0);
 		prepareTranslation(views, endCallback, builder).start();
 	}
@@ -170,12 +172,20 @@ public class AnimationUtils {
 	}
 
 	public static void scaleHeight(final View view, int height, Runnable endCallback) {
-		AnimationBuilder.create(view.getContext(), view.getMeasuredHeight(), height).addListener(new AnimationBuilder.UpdateLisetener() {
-			@Override
-			public void invoke(ValueAnimator animation) {
-				ViewUtils.setHeight(view, (Integer) animation.getAnimatedValue());
-			}
-		}).onEnd(endCallback).build().start();
+		scaleHeight(view, height, endCallback, view.getResources().getInteger(R.integer.default_animation_duration_long));
+	}
+
+	public static void scaleHeight(final View view, int height, Runnable endCallback, final long duration) {
+		final AnimationBuilder animationBuilder = AnimationBuilder.create(view.getContext(), view.getMeasuredHeight(), height).addListener(
+				new AnimationBuilder
+						.UpdateLisetener() {
+					@Override
+					public void invoke(ValueAnimator animation) {
+						ViewUtils.setHeight(view, (Integer) animation.getAnimatedValue());
+					}
+				});
+		animationBuilder.setDuration(duration);
+		animationBuilder.onEnd(endCallback).build().start();
 	}
 
 	public static void scaleHeight(final View view, int height, long duration) {

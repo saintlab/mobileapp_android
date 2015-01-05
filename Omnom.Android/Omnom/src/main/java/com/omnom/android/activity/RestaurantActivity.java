@@ -130,10 +130,10 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		final int topBarHeight = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);
 		final int translationY = topBarHeight - mTopTranslation;
 
-		btnCall.animate().translationYBy(translationY);
+		btnCall.animate().translationYBy(translationY).start();
 		btnCall.animate().alpha(0).start();
-		panelBottom.animate().translationYBy(translationY);
-		viewMain.animate().translationYBy(translationY);
+		panelBottom.animate().translationYBy(translationY).start();
+		viewMain.animate().translationYBy(translationY).start();
 		AnimationUtils.animateAlpha(panelBottom, false);
 		AnimationUtils
 				.scaleHeight(mRestaurantViewHolder.imgCover, getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_small),
@@ -142,7 +142,7 @@ public class RestaurantActivity extends BaseOmnomActivity {
 					             public void run() {
 						             finishSimple();
 					             }
-				             });
+				             }, getResources().getInteger(R.integer.default_animation_duration_medium));
 	}
 
 	private void finishSimple() {

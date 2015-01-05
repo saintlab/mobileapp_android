@@ -181,48 +181,57 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 			// skip item selection
 			return;
 		}
+		final int height = panelTop.getHeight();
 
 		mItemClicked = true;
 		mAdapter.setSelected(position);
+		mAdapter.notifyDataSetChanged();
 		list.smoothScrollToPositionFromTop(position, 0, SCROLL_DURATION);
+		panelTop.animate().translationYBy(-height).start();
+		selectedImgCover = (ImageView) view.findViewById(R.id.img_cover);
 
-		postDelayed(SCROLL_DURATION, new Runnable() {
-			@Override
-			public void run() {
-				selectedImgCover = (ImageView) view.findViewById(R.id.img_cover);
-				final int height = panelTop.getHeight();
-				panelTop.animate().translationYBy(-height).start();
-
-				final int listTranslation;
-				final int topTranslation;
-				if(position + 2 == list.getCount()) {
-					footer.animate().alpha(0).start();
-					topTranslation = -view.getTop();
-					listTranslation = -height;
-				} else {
-					topTranslation = 0;
-					listTranslation = -height;
+		if(position + 2 == list.getCount()) {
+			postDelayed(SCROLL_DURATION, new Runnable() {
+				@Override
+				public void run() {
+					animateRestaurant(position, view, height, true);
 				}
-				refreshView.animate().translationYBy(listTranslation + topTranslation).start();
+			});
+		} else {
+			animateRestaurant(position, view, height, false);
+		}
+	}
 
-				nextView = list.getChildAt(position + 1);
-				list.setScrollEnabled(false);
-				refreshView.setEnabled(false);
-				if(nextView != null) {
-					nextView.animate().alpha(0).start();
-				}
-				AnimationUtils.scaleHeight(selectedImgCover, getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_large),
-				                           new Runnable() {
-					                           @Override
-					                           public void run() {
-						                           list.requestLayout();
-						                           final Restaurant item = (Restaurant) mAdapter.getItem(position);
-						                           RestaurantActivity.start(RestaurantsListActivity.this, item, topTranslation);
-						                           mItemClicked = false;
-					                           }
-				                           });
-			}
-		});
+	private void animateRestaurant(final int position, final View view, final int height, boolean isLast) {
+		final int listTranslation;
+		final int topTranslation;
+		if(isLast) {
+			footer.animate().alpha(0).start();
+			topTranslation = -view.getTop();
+			listTranslation = -height;
+		} else {
+			topTranslation = 0;
+			listTranslation = -height;
+		}
+		refreshView.animate().translationYBy(listTranslation + topTranslation).start();
+
+		nextView = list.getChildAt(position + 1);
+		list.setScrollEnabled(false);
+		refreshView.setEnabled(false);
+		if(nextView != null) {
+			nextView.animate().alpha(0).start();
+		}
+		AnimationUtils.scaleHeight(selectedImgCover, getResources().getDimensionPixelSize(
+				                           R.dimen.restaurant_cover_height_large),
+		                           new Runnable() {
+			                           @Override
+			                           public void run() {
+				                           list.requestLayout();
+				                           final Restaurant item = (Restaurant) mAdapter.getItem(position);
+				                           RestaurantActivity.start(RestaurantsListActivity.this, item, topTranslation);
+				                           mItemClicked = false;
+			                           }
+		                           }, getResources().getInteger(R.integer.default_animation_duration_medium));
 	}
 
 	@Override
