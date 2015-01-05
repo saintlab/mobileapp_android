@@ -124,8 +124,9 @@ public class ErrorHelper {
 		showError(LoaderError.PAYMENT_DECLINED, onClickListener);
 	}
 
-	public void showNoOrders(View.OnClickListener onClickListener) {
+	public void showNoOrders(View.OnClickListener onClickListener, final int tableNumber) {
 		showError(LoaderError.NO_ORDERS, onClickListener);
+		mTxtError.setText(mLoader.getContext().getResources().getString(R.string.there_are_no_orders_on_table_number, String.valueOf(tableNumber)));
 	}
 
 	public void showLocationError() {

@@ -135,7 +135,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		}
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		if(!isDemo) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		}
 		context.start(intent, enterAnim, exitAnim, !isDemo);
 	}
 
@@ -452,6 +454,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	public void onBill(final View v) {
 		v.setEnabled(false);
 		hideProfile();
+		ViewUtils.setVisible(imgPrevious, false);
 		ViewUtils.setVisible(getPanelBottom(), false);
 		ViewUtils.setVisible(txtLeave, false);
 		loader.setLogo(R.drawable.ic_bill_white_normal);
@@ -503,6 +506,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 							                                       showOrders(ordersResponse.getOrders(), ordersResponse.getRequestId());
 						                                       } else {
 							                                       startErrorTransition();
+
+							                                       final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
 							                                       mErrorHelper.showNoOrders(new View.OnClickListener() {
 								                                       @Override
 								                                       public void onClick(View v) {
@@ -516,7 +521,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 									                                       ViewUtils.setVisible(txtLeave, mIsDemo);
 									                                       ViewUtils.setVisible(getPanelBottom(), true);
 								                                       }
-							                                       });
+							                                       }, tableNumber);
 						                                       }
 					                                       }
 				                                       });

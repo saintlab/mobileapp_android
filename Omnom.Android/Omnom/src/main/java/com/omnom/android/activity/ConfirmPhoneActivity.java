@@ -74,10 +74,10 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 		@Override
 		public boolean onKey(View v, int keyCode, KeyEvent event) {
-			if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DEL) {
+			if(event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DEL) {
 				final int nextFocusLeftId = mEditText.getNextFocusLeftId();
 				mEditText.setText(StringUtils.EMPTY_STRING);
-				if (nextFocusLeftId != View.NO_ID) {
+				if(nextFocusLeftId != View.NO_ID) {
 					EditText editText = (EditText) findViewById(nextFocusLeftId);
 					editText.setText(StringUtils.EMPTY_STRING);
 					editText.requestFocus();
@@ -156,6 +156,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	}
 
 	private void doConfirm() {
+		btnRequestCode.setEnabled(false);
 		mConfirmSubscription = AndroidObservable.bindActivity(this, getObservable()).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(final AuthResponse authResponse) {
@@ -173,6 +174,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 					final Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
 					panelDigits.startAnimation(animation);
 				}
+				btnRequestCode.setEnabled(true);
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override

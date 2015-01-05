@@ -23,16 +23,7 @@
                 android:layout_height="@dimen/restaurant_cover_height_large"
                 android:scaleType="centerCrop" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:gravity="center|top">
-
-                <include layout="@layout/view_restaurant_info" />
-            </LinearLayout>
+            <include layout="@layout/view_restaurant_info" />
 
             <Button
                 android:id="@+id/btn_call"
@@ -44,39 +35,9 @@
                 android:paddingRight="@dimen/activity_horizontal_margin_large"
                 android:background="@drawable/bg_rounded_bordered_black_disabled" />
 
-            <LinearLayout
-                android:id="@+id/panel_bottom"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/activity_vertical_margin_large"
-                android:paddingBottom="@dimen/activity_vertical_margin_large"
-                android:paddingLeft="@dimen/activity_horizontal_margin_large"
-                android:paddingRight="@dimen/activity_horizontal_margin_large"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/txt_reserve"
-                    android:text="@string/reserve_table"
-                    android:drawablePadding="@dimen/drawable_padding_default"
-                    android:drawableTop="@drawable/ic_reserve_table"
-                    android:enabled="false"
-                    style="@style/TextView.Restaurant.Landing" />
-
-                <TextView
-                    android:id="@+id/txt_im_inside"
-                    android:text="@string/im_inside_restaurant"
-                    android:drawablePadding="@dimen/drawable_padding_default"
-                    android:drawableTop="@drawable/ic_im_inside"
-                    style="@style/TextView.Restaurant.Landing" />
-
-                <TextView
-                    android:id="@+id/txt_order"
-                    android:text="@string/make_an_order"
-                    android:drawablePadding="@dimen/drawable_padding_default"
-                    android:drawableTop="@drawable/ic_make_order"
-                    android:enabled="false"
-                    style="@style/TextView.Restaurant.Landing" />
-            </LinearLayout>
+                android:layout_height="144dp" />
 
         </LinearLayout>
 
@@ -86,6 +47,39 @@
         android:id="@+id/btn_close"
         android:src="@drawable/ic_cross_white"
         style="@style/ImageView.Clickable.Cropped" />
+
+    <LinearLayout
+        android:id="@+id/panel_bottom"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_vertical_margin_small"
+        android:background="@color/white_transparent"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txt_reserve"
+            android:text="@string/reserve_table"
+            android:drawablePadding="@dimen/drawable_padding_default"
+            android:drawableTop="@drawable/ic_reserve_table"
+            android:enabled="false"
+            style="@style/TextView.Restaurant.Landing" />
+
+        <TextView
+            android:id="@+id/txt_im_inside"
+            android:text="@string/im_inside_restaurant"
+            android:drawablePadding="@dimen/drawable_padding_default"
+            android:drawableTop="@drawable/ic_im_inside"
+            style="@style/TextView.Restaurant.Landing" />
+
+        <TextView
+            android:id="@+id/txt_order"
+            android:text="@string/make_an_order"
+            android:drawablePadding="@dimen/drawable_padding_default"
+            android:drawableTop="@drawable/ic_make_order"
+            android:enabled="false"
+            style="@style/TextView.Restaurant.Landing" />
+    </LinearLayout>
 
 </FrameLayout>
 

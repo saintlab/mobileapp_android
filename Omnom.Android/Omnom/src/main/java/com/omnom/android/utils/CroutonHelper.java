@@ -2,6 +2,7 @@ package com.omnom.android.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,6 +64,14 @@ public class CroutonHelper {
 		final Crouton paymentNotification = createPaymentNotification(activity, paymentData);
 		if(paymentNotification != null) {
 			paymentNotification.show();
+			MediaPlayer mediaPlayer = MediaPlayer.create(activity, com.omnom.android.R.raw.pay_done);
+			mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+				@Override
+				public void onCompletion(final MediaPlayer mp) {
+					mp.release();
+				}
+			});
+			mediaPlayer.start();
 		}
 		return paymentNotification;
 	}
