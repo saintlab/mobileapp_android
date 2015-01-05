@@ -506,6 +506,8 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 							                                       showOrders(ordersResponse.getOrders(), ordersResponse.getRequestId());
 						                                       } else {
 							                                       startErrorTransition();
+
+							                                       final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
 							                                       mErrorHelper.showNoOrders(new View.OnClickListener() {
 								                                       @Override
 								                                       public void onClick(View v) {
@@ -519,7 +521,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 									                                       ViewUtils.setVisible(txtLeave, mIsDemo);
 									                                       ViewUtils.setVisible(getPanelBottom(), true);
 								                                       }
-							                                       });
+							                                       }, tableNumber);
 						                                       }
 					                                       }
 				                                       });
