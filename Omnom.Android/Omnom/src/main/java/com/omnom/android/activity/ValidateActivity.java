@@ -454,6 +454,7 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	public void onBill(final View v) {
 		v.setEnabled(false);
 		hideProfile();
+		ViewUtils.setVisible(imgPrevious, false);
 		ViewUtils.setVisible(getPanelBottom(), false);
 		ViewUtils.setVisible(txtLeave, false);
 		loader.setLogo(R.drawable.ic_bill_white_normal);
