@@ -135,7 +135,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		}
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		if(!isDemo) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		}
 		context.start(intent, enterAnim, exitAnim, !isDemo);
 	}
 
