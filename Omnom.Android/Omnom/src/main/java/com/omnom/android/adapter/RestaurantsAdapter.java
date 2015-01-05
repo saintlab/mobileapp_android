@@ -31,6 +31,9 @@ import butterknife.InjectView;
 public class RestaurantsAdapter extends BaseAdapter {
 
 	public static class RestaurantViewHolder {
+
+		public static final int ANIMATION_DURATION = 100;
+
 		@InjectView(R.id.img_cover)
 		public ImageView imgCover;
 
@@ -79,6 +82,13 @@ public class RestaurantsAdapter extends BaseAdapter {
 			// TODO: Implement
 			// txtDistance.setText("~50м");
 			txtSchedule.setText(RestaurantHelper.getOpenedTime(context, item, weekDay));
+		}
+
+		public void alpha(final int alpha) {
+			panelAddress.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
+			txtSchedule.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
+			txtTitle.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
+			imgCover.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
 		}
 	}
 
@@ -137,7 +147,7 @@ public class RestaurantsAdapter extends BaseAdapter {
 		if(mSelectedPosition != -1) {
 			if(mSelectedPosition != position) {
 				ViewCompat.setHasTransientState(convertView, true);
-				convertView.animate().alpha(0).start();
+				holder.alpha(0);
 			} else {
 				if(ViewCompat.hasTransientState(convertView)) {
 					ViewCompat.setHasTransientState(convertView, false);
@@ -145,9 +155,8 @@ public class RestaurantsAdapter extends BaseAdapter {
 			}
 		} else {
 			if(convertView.getAlpha() != 1.0f) {
-				ViewCompat.setHasTransientState(convertView, true);
-				convertView.setAlpha(0);
-				convertView.animate().alpha(1).start();
+				ViewCompat.setHasTransientState(convertView, false);
+				holder.alpha(1);
 			} else {
 				if(ViewCompat.hasTransientState(convertView)) {
 					ViewCompat.setHasTransientState(convertView, false);
