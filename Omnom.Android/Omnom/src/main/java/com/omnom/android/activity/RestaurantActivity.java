@@ -1,5 +1,6 @@
 package com.omnom.android.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.telephony.PhoneNumberUtils;
@@ -10,6 +11,7 @@ import android.widget.ScrollView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -31,14 +33,31 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		start(activity, restaurant, finish, 0);
 	}
 
+	public static void start(BaseOmnomFragmentActivity activity, Restaurant restaurant, boolean finish) {
+		start(activity, restaurant, finish, 0);
+	}
+
 	public static void start(BaseOmnomActivity activity, Restaurant restaurant, boolean finish, final int topTranslation) {
-		final Intent intent = new Intent(activity, RestaurantActivity.class);
-		intent.putExtra(EXTRA_RESTAURANT, restaurant);
-		intent.putExtra(EXTRA_TRANSLATION_TOP, topTranslation);
+		final Intent intent = getIntent(activity, restaurant, topTranslation);
 		activity.startForResult(intent,
 		                        com.omnom.android.utils.R.anim.fade_in,
 		                        com.omnom.android.utils.R.anim.fake_fade_out,
 		                        REQUEST_CODE_CHANGE_TABLE);
+	}
+
+	public static void start(BaseOmnomFragmentActivity activity, Restaurant restaurant, boolean finish, final int topTranslation) {
+		final Intent intent = getIntent(activity, restaurant, topTranslation);
+		activity.startForResult(intent,
+		                        com.omnom.android.utils.R.anim.fade_in,
+		                        com.omnom.android.utils.R.anim.fake_fade_out,
+		                        REQUEST_CODE_CHANGE_TABLE);
+	}
+
+	private static Intent getIntent(final Context context, final Restaurant restaurant, final int topTranslation) {
+		final Intent intent = new Intent(context, RestaurantActivity.class);
+		intent.putExtra(EXTRA_RESTAURANT, restaurant);
+		intent.putExtra(EXTRA_TRANSLATION_TOP, topTranslation);
+		return intent;
 	}
 
 	protected RestaurantsAdapter.RestaurantViewHolder mRestaurantViewHolder;

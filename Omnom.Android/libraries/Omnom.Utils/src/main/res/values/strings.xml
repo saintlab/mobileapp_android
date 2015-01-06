@@ -16,7 +16,9 @@
     <string name="restaurant_closed">Ресторан не работает</string>
     <string name="restaurant_schedule_from_till">с %1$s до %2$s</string>
     <string name="there_are_no_orders_on_this_table">На данном столе нет заказов</string>
-    <string name="there_are_no_orders_on_table_number">На %1$s столе пока нет заказов</string>
+    <string name="there_are_no_orders_on_table_number">Cтол %1$s\nНа этом столе\nпока нет заказов.</string>
+    <string name="there_are_no_orders_additional">Cтол %1$s\nНа этом столе\nпока нет заказов.\nПочему так может быть?</string>
+    <string name="there_are_no_orders_additional_mark">Почему так может быть</string>
     <string name="error_user_not_found">Невозможно получить данные пользователя. Пожалуйста попробуйте позже</string>
     <string name="error_unknown_server_error">Произошла ошибка соединения с сервером. Пожалуйста, попробуйте позже</string>
     <string name="error_no_internet_connection">Вы видите интернет?\nМы — нет.</string>

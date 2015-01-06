@@ -125,17 +125,14 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 			btnCommit.setTag(R.id.edit_amount, amount);
 			btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_ITEMS);
 			final String text = getString(R.string.bill_split_amount_, AmountHelper.format(amount));
+			btnCommit.setClickable(true);
 			AnimationUtils.animateAlpha(viewBehindBtn, true);
-			AnimationUtils.animateAlpha(btnCommit, true, new Runnable() {
-				@Override
-				public void run() {
-					btnCommit.invalidate();
-				}
-			});
+			AnimationUtils.animateAlpha3(btnCommit, true);
 			btnCommit.setText(text);
 		} else {
+			btnCommit.setClickable(false);
 			AnimationUtils.animateAlpha(viewBehindBtn, false);
-			AnimationUtils.animateAlpha(btnCommit, false);
+			AnimationUtils.animateAlpha3(btnCommit, false);
 		}
 	}
 }

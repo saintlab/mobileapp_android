@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.auth.AuthService;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.AppLaunchMixpanelEvent;
@@ -54,7 +55,8 @@ public abstract class BaseOmnomFragmentActivity extends BaseFragmentActivity {
 			@Override
 			public void onError(Throwable throwable) {
 				Log.w(TAG, throwable.getMessage());
-				mixPanelHelper.track(MixPanelHelper.Project.OMNOM, new AppLaunchMixpanelEvent(UserHelper.getUserData(BaseOmnomFragmentActivity.this)));
+				mixPanelHelper.track(MixPanelHelper.Project.OMNOM, new AppLaunchMixpanelEvent(UserHelper.getUserData(
+						BaseOmnomFragmentActivity.this)));
 			}
 		});
 	}
@@ -64,6 +66,10 @@ public abstract class BaseOmnomFragmentActivity extends BaseFragmentActivity {
 		getMixPanelHelper().flush();
 		OmnomObservable.unsubscribe(mUserSubscription);
 		super.onDestroy();
+	}
+
+	protected UserData getUserData() {
+		return UserHelper.getUserData(this);
 	}
 
 	public final MixPanelHelper getMixPanelHelper() {

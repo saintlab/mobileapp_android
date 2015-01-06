@@ -3,6 +3,7 @@ package com.omnom.android.activity;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -42,7 +43,12 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 		context.start(intent, true);
 	}
 
-	private static Intent createIntent(BaseActivity context, int durationSplash, boolean skipSplash) {
+	public static void start(BaseOmnomFragmentActivity context, boolean slipSplash) {
+		final Intent intent = createIntent(context, 0, slipSplash);
+		context.start(intent, true);
+	}
+
+	private static Intent createIntent(Context context, int durationSplash, boolean skipSplash) {
 		final Intent intent = new Intent(context, EnteringActivity.class);
 		intent.putExtra(EXTRA_DURATION_SPLASH, durationSplash);
 		intent.putExtra(EXTRA_SKIP_SPLASH, skipSplash);
