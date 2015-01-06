@@ -2,6 +2,7 @@ package com.omnom.android.activity;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -41,11 +42,23 @@ public class OrdersActivity extends BaseOmnomFragmentActivity {
 
 	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, String requestId,
 	                         final String bgColor, int code, boolean isDemo) {
-		final Intent intent = new Intent(activity, OrdersActivity.class);
+		final Intent intent = getIntent(activity, orders, requestId, bgColor, isDemo);
+		activity.startActivityForResult(intent, code);
+	}
+
+	private static Intent getIntent(final Context context, final ArrayList<Order> orders, final String requestId,
+	                                final String bgColor, final boolean isDemo) {
+		final Intent intent = new Intent(context, OrdersActivity.class);
 		intent.putParcelableArrayListExtra(OrdersActivity.EXTRA_ORDERS, orders);
 		intent.putExtra(OrdersActivity.EXTRA_REQUEST_ID, requestId);
 		intent.putExtra(OrdersActivity.EXTRA_ACCENT_COLOR, bgColor);
 		intent.putExtra(OrdersActivity.EXTRA_DEMO_MODE, isDemo);
+		return intent;
+	}
+
+	public static void start(BaseOmnomFragmentActivity activity, ArrayList<Order> orders, String requestId,
+	                         final String bgColor, int code, boolean isDemo) {
+		final Intent intent = getIntent(activity, orders, requestId, bgColor, isDemo);
 		activity.startActivityForResult(intent, code);
 	}
 

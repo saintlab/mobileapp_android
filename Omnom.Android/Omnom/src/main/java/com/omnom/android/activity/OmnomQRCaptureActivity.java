@@ -1,6 +1,7 @@
 package com.omnom.android.activity;
 
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.View;
 import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.utils.utils.AnimationUtils;
 
 /**
@@ -15,15 +17,9 @@ import com.omnom.android.utils.utils.AnimationUtils;
  */
 public class OmnomQRCaptureActivity extends CaptureActivity {
 
-	private int tableNumber;
-	private String tableId;
-
 	public static void start(final BaseOmnomActivity activity, final int tableNumber, final String tableId, final int code) {
-		final Intent intent = new Intent(activity, OmnomQRCaptureActivity.class);
-		intent.putExtra(CaptureActivity.EXTRA_SHOW_BACK, false);
-		intent.putExtra(CaptureActivity.EXTRA_TABLE_NUMBER, tableNumber);
-		intent.putExtra(CaptureActivity.EXTRA_TABLE_ID, tableId);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+		final Intent intent = getIntent(activity, tableNumber, tableId);
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 			final ActivityOptions activityOptions = ActivityOptions
 					.makeCustomAnimation(activity, com.omnom.android.zxing.R.anim.slide_in_right,
 					                     com.omnom.android.zxing.R.anim.slide_out_left);
@@ -32,6 +28,30 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 			activity.startActivityForResult(intent, code);
 		}
 	}
+
+	private static Intent getIntent(final Context context, final int tableNumber, final String tableId) {
+		final Intent intent = new Intent(context, OmnomQRCaptureActivity.class);
+		intent.putExtra(CaptureActivity.EXTRA_SHOW_BACK, false);
+		intent.putExtra(CaptureActivity.EXTRA_TABLE_NUMBER, tableNumber);
+		intent.putExtra(CaptureActivity.EXTRA_TABLE_ID, tableId);
+		return intent;
+	}
+
+	public static void start(final BaseOmnomFragmentActivity activity, final int tableNumber, final String tableId, final int code) {
+		final Intent intent = getIntent(activity, tableNumber, tableId);
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			final ActivityOptions activityOptions = ActivityOptions
+					.makeCustomAnimation(activity, com.omnom.android.zxing.R.anim.slide_in_right,
+					                     com.omnom.android.zxing.R.anim.slide_out_left);
+			activity.startActivityForResult(intent, code, activityOptions.toBundle());
+		} else {
+			activity.startActivityForResult(intent, code);
+		}
+	}
+
+	private int tableNumber;
+
+	private String tableId;
 
 	@Override
 	public int getLayoutResource() {

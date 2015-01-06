@@ -1,5 +1,6 @@
 package com.omnom.android.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -51,9 +53,23 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		activity.start(new Intent(activity, RestaurantsListActivity.class), R.anim.slide_in_up, R.anim.fake_fade_out_long, finish);
 	}
 
-	public static void start(BaseOmnomActivity activity, List<Restaurant> restaurants) {
-		final Intent intent = new Intent(activity, RestaurantsListActivity.class);
+	public static void start(BaseOmnomFragmentActivity activity, boolean finish) {
+		activity.start(new Intent(activity, RestaurantsListActivity.class), R.anim.slide_in_up, R.anim.fake_fade_out_long, finish);
+	}
+
+	private static Intent getIntent(final Context context, final List<Restaurant> restaurants) {
+		final Intent intent = new Intent(context, RestaurantsListActivity.class);
 		intent.putParcelableArrayListExtra(EXTRA_RESTAURANTS, new ArrayList<Parcelable>(restaurants));
+		return intent;
+	}
+
+	public static void start(BaseOmnomActivity activity, List<Restaurant> restaurants) {
+		final Intent intent = getIntent(activity, restaurants);
+		activity.start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, true);
+	}
+
+	public static void start(BaseOmnomFragmentActivity activity, List<Restaurant> restaurants) {
+		final Intent intent = getIntent(activity, restaurants);
 		activity.start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, true);
 	}
 
