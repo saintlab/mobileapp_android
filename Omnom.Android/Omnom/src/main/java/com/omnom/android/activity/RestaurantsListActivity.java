@@ -250,7 +250,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		list.setScrollEnabled(true);
 		refreshView.setEnabled(true);
 		panelTop.setTranslationY(0);
-		if(footer.getAlpha() < 1) {
+		if(footer != null && footer.getAlpha() < 1) {
 			footer.animate().alpha(1).start();
 		}
 		refreshView.setTranslationY(0);
