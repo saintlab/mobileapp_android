@@ -389,6 +389,8 @@ public class OrderFragment extends Fragment {
 
 	private boolean isAmountModified;
 
+	private View btnEdit;
+
 	public OrderFragment() {
 	}
 
@@ -603,6 +605,13 @@ public class OrderFragment extends Fragment {
 			tipsButtons = Arrays.asList((CompoundButton) btnTips1, (CompoundButton) btnTips2, (CompoundButton) btnTips3);
 			otherTips = (RadioButton) inflate.findViewById(R.id.radio_tips_4);
 			radioGroup = (RadioGroup) inflate.findViewById(R.id.radio_tips);
+			btnEdit = inflate.findViewById(R.id.btn_edit);
+			btnEdit.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(final View v) {
+					AndroidUtils.showKeyboard(editAmount);
+				}
+			});
 
 			viewsAmountHide = new ArrayList<View>();
 			viewsAmountHide.add(btnPay);
@@ -806,9 +815,12 @@ public class OrderFragment extends Fragment {
 					public void onVisibilityChanged(boolean isVisible) {
 						editMode(isVisible);
 						if(mCurrentKeyboardVisility != isVisible) {
-							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA, !isVisible);
+							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA2, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
+
 							ViewUtils.setVisible(radioGroup, !isVisible);
+							ViewUtils.setVisible(btnEdit, !isVisible);
+							ViewUtils.setVisible(btnApply, isVisible);
 
 							list.animate().translationYBy(isVisible ? mListTraslationActive : -mListTraslationActive).start();
 							getPanelPayment().animate().yBy(isVisible ? mPaymentTranslationY : -mPaymentTranslationY).start();

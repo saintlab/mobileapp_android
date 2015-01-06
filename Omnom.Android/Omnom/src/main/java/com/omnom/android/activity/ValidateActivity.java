@@ -21,10 +21,11 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.protocol.Protocol;
@@ -48,7 +49,9 @@ import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
+import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
@@ -77,7 +80,7 @@ import static butterknife.ButterKnife.findById;
 /**
  * Created by Ch3D on 08.10.2014.
  */
-public abstract class ValidateActivity extends BaseOmnomActivity {
+public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	public static final int REQUEST_CODE_ORDERS = 100;
 
@@ -124,6 +127,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		start(context, enterAnim, exitAnim, animationType, true, -1);
 	}
 
+	public static void startDemo(BaseOmnomFragmentActivity context, int enterAnim, int exitAnim, int animationType) {
+		start(context, enterAnim, exitAnim, animationType, true, -1);
+	}
+
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, int userEnterType) {
 		start(context, enterAnim, exitAnim, animationType, false, userEnterType);
 	}
@@ -135,6 +142,15 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		}
+		if(!isDemo) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		}
+		context.start(intent, enterAnim, exitAnim, !isDemo);
+	}
+
+	private static void start(BaseOmnomFragmentActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo,
+	                          final int userEnterType) {
+		Intent intent = createIntent(context, animationType, isDemo, userEnterType);
 		if(!isDemo) {
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		}
@@ -178,6 +194,9 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.txt_error)
 	protected TextView txtError;
+
+	@InjectView(R.id.txt_error_additional)
+	protected TextView txtErrorAdditional;
 
 	@InjectView(R.id.btn_bottom)
 	protected View btnErrorRepeat;
@@ -286,9 +305,10 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 		onBackPressed();
 	}
 
-	protected void clearErrors(boolean animateLogo) {
+	public void clearErrors(boolean animateLogo) {
 		hideProfile();
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
+		ViewUtils.setVisible(txtErrorAdditional, false);
 		if(animateLogo) {
 			if(mRestaurant == null) {
 				loader.animateLogo(R.drawable.ic_fork_n_knife);
@@ -506,12 +526,22 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 							                                       showOrders(ordersResponse.getOrders(), ordersResponse.getRequestId());
 						                                       } else {
 							                                       startErrorTransition();
-
+							                                       final String text = "Почему так может быть?";
+							                                       txtErrorAdditional.setText(text);
+							                                       AndroidUtils.clickify(txtErrorAdditional, text, new ClickSpan
+									                                       .OnClickListener() {
+								                                       @Override
+								                                       public void onClick() {
+									                                       showNoOrdersInfo();
+								                                       }
+							                                       });
+							                                       ViewUtils.setVisible(txtErrorAdditional, true);
 							                                       final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
 							                                       mErrorHelper.showNoOrders(new View.OnClickListener() {
 								                                       @Override
 								                                       public void onClick(View v) {
 									                                       clearErrors(true);
+									                                       ViewUtils.setVisible(txtErrorAdditional, false);
 									                                       loader.animateLogoFast(RestaurantHelper.getLogo(mRestaurant),
 									                                                              R.drawable.ic_bill_white_normal);
 									                                       loader.showProgress(false);
@@ -532,6 +562,19 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 				                                       v.setEnabled(true);
 			                                       }
 		                                       });
+	}
+
+	private void showNoOrdersInfo() {
+		getSupportFragmentManager().beginTransaction()
+		                           .addToBackStack(null)
+		                           .setCustomAnimations(R.anim.slide_in_up,
+		                                                R.anim.slide_out_down,
+		                                                R.anim.slide_in_up,
+		                                                R.anim.slide_out_down)
+		                           .replace(R.id.fragment_container,
+		                                    NoOrdersFragment.newInstance
+				                                    (mTable.getInternalId()))
+		                           .commit();
 	}
 
 	protected void updateLightProfile(final boolean visible) {
@@ -864,4 +907,19 @@ public abstract class ValidateActivity extends BaseOmnomActivity {
 	}
 
 	protected abstract void reportMixPanel(final TableDataResponse tableDataResponse);
+
+	public void changeTable() {
+		clearErrors(true);
+		AnimationUtils.animateAlpha(imgPrevious, false);
+		bottomView.animate().translationY(bottomView.getHeight());
+		loader.animateLogoFast(R.drawable.ic_fork_n_knife);
+		AnimationUtils.animateAlpha(imgProfile, false);
+		postDelayed(850, new Runnable() {
+			@Override
+			public void run() {
+				ValidateActivity.start(ValidateActivity.this, R.anim.fade_in_long, R.anim.fade_out_long, EXTRA_LOADER_ANIMATION_FIXED,
+				                       ConfirmPhoneActivity.TYPE_DEFAULT);
+			}
+		});
+	}
 }
