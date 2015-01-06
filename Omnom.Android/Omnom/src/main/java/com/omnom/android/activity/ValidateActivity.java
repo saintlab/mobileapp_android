@@ -526,15 +526,20 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 							                                       showOrders(ordersResponse.getOrders(), ordersResponse.getRequestId());
 						                                       } else {
 							                                       startErrorTransition();
-							                                       final String text = "Почему так может быть?";
-							                                       txtErrorAdditional.setText(text);
-							                                       AndroidUtils.clickify(txtErrorAdditional, text, new ClickSpan
-									                                       .OnClickListener() {
-								                                       @Override
-								                                       public void onClick() {
-									                                       showNoOrdersInfo();
-								                                       }
-							                                       });
+							                                       txtErrorAdditional.setText(getString(
+									                                       R.string.there_are_no_orders_additional,
+									                                       String.valueOf(mTable.getInternalId())));
+							                                       AndroidUtils.clickify(txtErrorAdditional,
+							                                                             getString(
+									                                                             R.string
+											                                                             .there_are_no_orders_additional_mark),
+							                                                             new ClickSpan
+									                                                             .OnClickListener() {
+								                                                             @Override
+								                                                             public void onClick() {
+									                                                             showNoOrdersInfo();
+								                                                             }
+							                                                             });
 							                                       ViewUtils.setVisible(txtErrorAdditional, true);
 							                                       final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
 							                                       mErrorHelper.showNoOrders(new View.OnClickListener() {
@@ -552,6 +557,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 									                                       ViewUtils.setVisible(getPanelBottom(), true);
 								                                       }
 							                                       }, tableNumber);
+							                                       txtError.setText(StringUtils.EMPTY_STRING);
 						                                       }
 					                                       }
 				                                       });

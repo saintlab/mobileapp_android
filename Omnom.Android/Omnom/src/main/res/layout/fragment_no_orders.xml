@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:text="@string/no_order_info"
             android:textSize="@dimen/font_normal"
-            android:gravity="center"
+            android:gravity="left"
             android:textColor="@color/profile_hint"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
     </LinearLayout>

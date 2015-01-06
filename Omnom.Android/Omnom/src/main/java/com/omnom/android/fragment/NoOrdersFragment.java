@@ -33,6 +33,12 @@ public class NoOrdersFragment extends Fragment {
 		return fragment;
 	}
 
+	@InjectView(R.id.panel_bottom)
+	protected View panelBottom;
+
+	@InjectView(R.id.txt_info)
+	protected TextView txtInfo;
+
 	private int mTableNumber;
 
 	@Override
@@ -42,12 +48,6 @@ public class NoOrdersFragment extends Fragment {
 			mTableNumber = getArguments().getInt(ARG_TABLE_NUMBER);
 		}
 	}
-
-	@InjectView(R.id.panel_bottom)
-	protected View panelBottom;
-
-	@InjectView(R.id.txt_info)
-	protected TextView txtInfo;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -65,7 +65,7 @@ public class NoOrdersFragment extends Fragment {
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		txtInfo.setText(getString(R.string.no_order_info, String.valueOf(mTableNumber)));
-		AndroidUtils.clickify(txtInfo, "тут", new ClickSpan.OnClickListener() {
+		AndroidUtils.clickify(txtInfo, getString(R.string.no_order_info_mark), new ClickSpan.OnClickListener() {
 			@Override
 			public void onClick() {
 				final ValidateActivity activity = (ValidateActivity) getActivity();
