@@ -847,15 +847,15 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			final int size = restaurants.size();
 			switch(size) {
 				case 0:
-					handleEmptyResponse();
+					handleEmptyResponse(response.getRequestId());
 					break;
 
 				case 1:
-					handleRestaurant(restaurants.get(0));
+					handleRestaurant(response.getRequestId(), restaurants.get(0));
 					break;
 
 				default:
-					handleRestaurants(restaurants);
+					handleRestaurants(response.getRequestId(), restaurants);
 					break;
 			}
 		} else {
@@ -863,7 +863,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}
 	}
 
-	protected void handleRestaurants(final List<Restaurant> restaurants) {
+	protected void handleRestaurants(final String requestId, final List<Restaurant> restaurants) {
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override
@@ -873,7 +873,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		});
 	}
 
-	protected void handleEmptyResponse() {
+	protected void handleEmptyResponse(final String requestId) {
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
 			@Override
@@ -883,7 +883,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		});
 	}
 
-	protected void handleRestaurant(final Restaurant restaurant) {
+	protected void handleRestaurant(final String requestId, final Restaurant restaurant) {
 		if(RestaurantHelper.hasOnlyTable(restaurant)) {
 			loader.stopProgressAnimation();
 			loader.updateProgressMax(new Runnable() {

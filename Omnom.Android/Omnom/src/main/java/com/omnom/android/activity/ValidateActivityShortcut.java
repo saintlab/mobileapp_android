@@ -35,28 +35,28 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 	}
 
 	@Override
-	protected void handleRestaurants(final List<Restaurant> restaurants) {
-		onWrongQr();
+	protected void handleRestaurants(final String requestId, final List<Restaurant> restaurants) {
+		onWrongQr(requestId);
 	}
 
 	@Override
-	protected void handleRestaurant(final Restaurant restaurant) {
+	protected void handleRestaurant(final String requestId, final Restaurant restaurant) {
 		if(!RestaurantHelper.hasOnlyTable(restaurant)) {
-			onWrongQr();
+			onWrongQr(requestId);
 		} else {
-			super.handleRestaurant(restaurant);
+			super.handleRestaurant(requestId, restaurant);
 			setResult(RESULT_CODE_TABLE_CHANGED);
 		}
 	}
 
 	@Override
-	protected void handleEmptyResponse() {
-		onWrongQr();
+	protected void handleEmptyResponse(final String requestId) {
+		onWrongQr(requestId);
 	}
 
-	private void onWrongQr() {
+	private void onWrongQr(final String requestId) {
 		startErrorTransition();
-		mErrorHelper.showWrongQrError(new View.OnClickListener() {
+		mErrorHelper.showWrongQrError(requestId, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				startLoader();

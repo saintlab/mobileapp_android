@@ -33,13 +33,17 @@ public class OmnomErrorHelper extends ErrorHelper {
 
 	@Override
 	public void showError(final LoaderError error, final View.OnClickListener onClickListener) {
-		reportMixPanel(error);
+		showError(null, error, onClickListener);
+	}
+
+	public void showError(final String requestId, final LoaderError error, final View.OnClickListener onClickListener) {
+		reportMixPanel(requestId, error);
 		super.showError(error, onClickListener);
 	}
 
-	private void reportMixPanel(final LoaderError error) {
+	private void reportMixPanel(final String requestId, final LoaderError error) {
 		final MixpanelEvent event = new SimpleMixpanelEvent(UserHelper.getUserData(mLoader.getContext()),
-															error.getEventName());
+															error.getEventName(), requestId);
 		OmnomApplication.getMixPanelHelper(mLoader.getContext()).track(MixPanelHelper.Project.OMNOM_ANDROID, event);
 	}
 
@@ -47,7 +51,7 @@ public class OmnomErrorHelper extends ErrorHelper {
 
 	}
 
-	public void showWrongQrError(View.OnClickListener onClickListener) {
-		showError(LoaderError.UNKNOWN_QR_CODE, onClickListener);
+	public void showWrongQrError(final String requestId, View.OnClickListener onClickListener) {
+		showError(requestId, LoaderError.UNKNOWN_QR_CODE, onClickListener);
 	}
 }
