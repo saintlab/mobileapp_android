@@ -29,7 +29,7 @@ public class LoaderError {
 	public static final String EVENT_NO_TABLE = "no_table";
 
 	public static final LoaderError UNKNOWN_QR_CODE =
-			new LoaderError(EVENT_NO_TABLE, R.drawable.ic_no_connection, R.string.error_unknown_qr, R.string.try_once_again,
+			new LoaderError(EVENT_NO_TABLE, R.drawable.ic_no_connection, R.string.error_unknown_qr, R.string.check_again,
 			                R.drawable.ic_repeat_small);
 
 	public static final String BLUETOOTH_DISABLED = "bluetooth_turned_off";
