@@ -13,7 +13,6 @@
     <dimen name="loader_edit_with">200dp</dimen>
     <dimen name="loader_margin_top">-96dp</dimen>
     <dimen name="loader_logo_size">220dp</dimen>
-    <dimen name="loader_logo_padding">24dp</dimen>
     <dimen name="restaurant_logo_size">72dp</dimen>
     <dimen name="loader_progress_thickness">12dp</dimen>
     <item type="dimen" format="float" name="loader_progress_inner_radius">2.265</item>

@@ -414,9 +414,14 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void setSize(int width, int height) {
-		mImgLoader.getLayoutParams().width = width;
-		mImgLoader.getLayoutParams().height = height;
-		mImgLoader.requestLayout();
+		setSize(mImgLoader, width, height);
+		setSize(mImgLogo, width, height);
+	}
+
+	private void setSize(final ImageView imageView, final int width, final int height) {
+		imageView.getLayoutParams().width = width;
+		imageView.getLayoutParams().height = height;
+		imageView.requestLayout();
 	}
 
 	public void stopProgressAnimation() {
@@ -553,12 +558,10 @@ public class LoaderView extends FrameLayout {
 			return;
 		}
 
-		final int paddingLogo = getResources().getDimensionPixelSize(R.dimen.loader_logo_padding);
-
 		RequestCreator requestCreator = Picasso.with(getContext())
 		                                       .load(logo)
 		                                       .placeholder(placeholderResId)
-		                                       .resize(loaderSize - paddingLogo, loaderSize - paddingLogo)
+		                                       .resize(loaderSize, loaderSize)
 		                                       .centerInside();
 		mTarget = new Target() {
 			@Override
