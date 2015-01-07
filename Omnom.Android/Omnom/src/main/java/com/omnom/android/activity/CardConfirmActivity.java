@@ -55,7 +55,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
-import retrofit.http.HEAD;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -185,7 +184,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		mAcquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		mPanelTop.setTitleBig(R.string.card_binding);
 		mPanelTop.setButtonRightEnabled(false);
-		mPanelTop.setButtonRight(R.string.ready, mVerifyClickListener);
+		mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
 		mPanelTop.setButtonLeftDrawable(R.drawable.btn_previous, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -310,7 +309,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 							                                             ViewUtils.setVisible(mTextInfo, true);
 							                                             mPanelTop.showProgress(false);
 							                                             mPanelTop.setButtonRightEnabled(true);
-							                                             mPanelTop.setButtonRight(R.string.ready, mVerifyClickListener);
+							                                             mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
 							                                             final EditText editAmount = mEditAmount.getEditText();
 							                                             editAmount.setEnabled(true);
 							                                             AndroidUtils.showKeyboard(editAmount);
@@ -400,7 +399,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	private void onVerificationError() {
 		ViewUtils.setVisible(mTextInfo, false);
 		mPanelTop.showProgress(false);
-		mPanelTop.setButtonRight(R.string.ready, mVerifyClickListener);
+		mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
 		mEditAmount.setError(getWrongChecksumMessage());
 	}
 
