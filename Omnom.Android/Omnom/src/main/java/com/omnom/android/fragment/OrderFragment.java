@@ -819,8 +819,8 @@ public class OrderFragment extends Fragment {
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
 
 							ViewUtils.setVisible(radioGroup, !isVisible);
-							ViewUtils.setVisible(btnEdit, !isVisible);
-							ViewUtils.setVisible(btnApply, isVisible);
+							ViewUtils.setVisible2(btnEdit, !isVisible);
+							ViewUtils.setVisible2(btnApply, isVisible);
 
 							list.animate().translationYBy(isVisible ? mListTraslationActive : -mListTraslationActive).start();
 							getPanelPayment().animate().yBy(isVisible ? mPaymentTranslationY : -mPaymentTranslationY).start();
@@ -1022,13 +1022,13 @@ public class OrderFragment extends Fragment {
 		ViewUtils.setVisible(txtCustomTips, visible);
 		ViewUtils.setVisible(txtTipsAmountHint, visible);
 
+		ViewUtils.setVisible2(btnApply, visible);
+		ViewUtils.setVisible2(btnEdit, !visible);
 		ViewUtils.setVisible2(radioGroup, !visible);
 		ViewUtils.setVisible2(txtPaymentTitle, !visible);
 		ViewUtils.setVisible2(txtAlreadyPaid, mOrder.getPaidAmount() > 0 && !visible);
 		ViewUtils.setVisible2(txtTipsTitle, !visible);
 		ViewUtils.setVisible2(btnPay, !visible);
-
-		ViewUtils.setVisible2(btnApply, visible);
 
 		btnApply.setAlpha(1.0f);
 		btnApply.invalidate();

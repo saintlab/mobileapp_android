@@ -47,7 +47,7 @@
                 android:text="@string/navigate_qr_code"
                 android:lines="2"
                 android:textSize="@dimen/navigate_qr_text_font_size"
-                omnom:fontPath="fonts/Futura-Omnom-LE-Regular.otf"/>
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
             <FrameLayout
                 android:id="@+id/btn_back"

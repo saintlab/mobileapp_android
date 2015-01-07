@@ -8,7 +8,7 @@
     <string name="enter">Вход</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="entering_pay_with_phone">Оплатить счёт через телефон</string>
-    <string name="entering_call_waiter">Вызвать официанта\nв любой момент</string>
+    <string name="entering_call_waiter">Вызвать официанта\nв&#160;любой момент</string>
     <string name="entering_split_bill">Разделить счёт между друзьями</string>
     <string name="name">Имя</string>
     <string name="email">Почта</string>
@@ -22,7 +22,7 @@
     <string name="invalid_email">Некорректный e-mail</string>
     <string name="proceed">Далее</string>
     <string name="title_activity_confirm_phone">ConfirmPhoneActivity</string>
-    <string name="confirm_code_sms_text">Введите код из SMS,\nприсланного на номер\n%1$s</string>
+    <string name="confirm_code_sms_text">Введите код из&#160;SMS,\nприсланного на&#160;номер\n%1$s</string>
     <string name="request_new_confirmation_code">Выслать новый код</string>
     <string name="create_account">Создать аккаунт</string>
     <string name="ok">OK</string>
@@ -49,7 +49,7 @@
     <string name="tips_another">Другой</string>
     <string name="tips">Чаевые</string>
     <string name="app_version_build">версия %1$s</string>
-    <string name="save_card_data">Сохранить данные карты для следующих платежей</string>
+    <string name="save_card_data">Сохранить данные карты для&#160;следующих платежей</string>
     <string name="add_card">Добавить карту</string>
     <string name="currency_ruble"></string>
     <string name="cardio_app_token">e041fdfc4e9c4c6ba1dbd26969a98d92</string>
@@ -59,28 +59,28 @@
     <string name="card_binding">Привязка карты</string>
     <string name="hint_confirm_amount">00,00 </string>
     <string name="secure_payments">Платежи защищены</string>
-    <string name="card_confirmation_text">Для привязки карты вам нужно подтвердить, что вы её владелец.
-        Мы списали с вашей карты секретную сумму (до 50 руб.), о чём вам должна прийти SMS от банка.
-        Посмотрите в сообщении, сколько списано и укажите сумму в поле выше.</string>
-    <string name="sms_notifications_off">Вероятно, SMS-уведомления не подключены.\nНужно посмотреть
-        последнее списание\nв банковской выписке и узнать сумму.</string>
+    <string name="card_confirmation_text">Для&#160;привязки карты вам нужно подтвердить, что&#160;вы её&#160;владелец.
+        Мы списали с&#160;вашей карты секретную сумму (до&#160;50&#160;руб.), о&#160;чём вам должна прийти SMS от&#160;банка.
+        Посмотрите в&#160;сообщении, сколько списано и&#160;укажите сумму в&#160;поле выше.</string>
+    <string name="sms_notifications_off">Вероятно, SMS-уведомления не&#160;подключены.\nНужно посмотреть
+        последнее списание\nв&#160;банковской выписке и&#160;узнать сумму.</string>
     <string name="pay_once">Если посмотреть сумму списания сейчас\nвозможности нет, вы можете однократно\n
-        оплатить сумму без привязки карты.</string>
-    <string name="wrong_checksum">Введена неверная проверочная сумма.\nЗагляните в последнее SMS.
-        Там должно\nбыть сообщение от банка. Введите\nсумму из SMS. <u>Если SMS нет?</u></string>
+        оплатить сумму без&#160;привязки карты.</string>
+    <string name="wrong_checksum">Введена неверная проверочная сумма.\nЗагляните в&#160;последнее SMS.
+        Там&#160;должно\nбыть сообщение от&#160;банка. Введите\nсумму из&#160;SMS. <u>Если SMS нет?</u></string>
     <string name="no_sms">Если SMS нет?</string>
-    <string name="something_went_wrong_try_again">Что-то пошло не так.\nПовторите попытку</string>
+    <string name="something_went_wrong_try_again">Что-то пошло не&#160;так.\nПовторите попытку</string>
     <string name="repeat">Повторить</string>
     <string name="payment_success">Платёж принят</string>
-    <string name="sms_sent_to_waiter">Официант получил sms с суммой чаевых.</string>
-    <string name="bill_sent_by_email">Счёт отправлен на почту</string>
+    <string name="sms_sent_to_waiter">Официант получил sms с&#160;суммой чаевых.</string>
+    <string name="bill_sent_by_email">Счёт отправлен на&#160;почту</string>
     <string name="title_activity_thanks">ThanksActivity</string>
     <string name="bill_split_amount_">= %1$s</string>
     <string name="bill_number_">Счёт %1$s</string>
     <string name="split_the_bill">Разделить счёт</string>
     <string name="close">Закрыть</string>
     <string name="title_plus_tips">+ Чаевые</string>
-    <string name="your_has_n_orders">На вашем столике\nраздельных счетов: %1$s</string>
+    <string name="your_has_n_orders">На&#160;вашем столике\nраздельных счетов: %1$s</string>
     <string name="demo_mode">Демо-режим</string>
     <string name="login_havent_account_yet">Ещё нет аккаунта? Прошу сюда -</string>
     <string name="login_havent_account_registration">регистрация</string>
@@ -89,12 +89,12 @@
     <string name="quit">Выйти</string>
     <string name="confirm">Подтвердить</string>
     <string name="card_removal_confirmation">Карта %1$s %2$s</string>
-    <string name="unable_to_remove_card_number_try_againt_later">Не удается удалить карту: %1$s\nПожалуйста, попробуйте позже</string>
-    <string name="unable_to_remove_card">Не удается удалить карту</string>
+    <string name="unable_to_remove_card_number_try_againt_later">Не&#160;удается удалить карту: %1$s\nПожалуйста, попробуйте позже</string>
+    <string name="unable_to_remove_card">Не&#160;удается удалить карту</string>
     <string name="delete">Удалить</string>
-    <string name="how_many_guests_will_pay">На скольких гостей делить?</string>
-    <string name="welcome_to_">Добро пожаловать в %1$s</string>
-    <string name="balk_notification_user_paid_">%1$s: оплачено по счету %2$s </string>
+    <string name="how_many_guests_will_pay">На&#160;скольких гостей делить?</string>
+    <string name="welcome_to_">Добро пожаловать в&#160;%1$s</string>
+    <string name="balk_notification_user_paid_">%1$s: оплачено по&#160;счету %2$s </string>
     <string name="title_activity_restaurants_list">RestaurantsListActivity</string>
     <string name="title_activity_restaurant">RestaurantActivity</string>
     <string name="reserve_table">Бронировать\nстолик</string>
@@ -102,14 +102,14 @@
     <string name="make_an_order">Сделать\nзаказ</string>
     <string name="write_to_us">Напишите нам</string>
     <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
-    <string name="navigate_qr_code">Наведитесь на QR-код Omnom.</string>
+    <string name="navigate_qr_code">Наведитесь на&#160;QR-код Omnom.</string>
     <string name="omnom_works_here">Omnom работает здесь</string>
     <string name="send_feedback">Написать отзыв</string>
 
     <string name="no_order_info">
-        Омном отображает все заказы в соответствии с номером стола в ресторане.\nСейчас на %1$s столе открытых заказов нет.\n\nЕсли вы уже
-        сделали заказ, но его ещё не видно, то, вероятно, официант ещё не успел внести его в систему.\nДайте ему пару минут. Если заказ
-        по-прежнему не виден, уточните у официанта, на какой стол заказ записан.\n\nЕсли нужно, измените номер своего стола
+        Омном отображает все&#160;заказы в&#160;соответствии с&#160;номером стола в&#160;ресторане.\nСейчас на&#160;%1$s&#160;столе открытых заказов нет.\n\nЕсли вы уже&#160;
+        сделали заказ, но его ещё не&#160;видно, то,&#160;вероятно, официант ещё не&#160;успел внести его в&#160;систему. Дайте ему пару минут.\nЕсли заказ
+        по-прежнему не&#160;виден, уточните у&#160;официанта, на&#160;какой стол заказ записан.\n\nЕсли нужно, измените номер своего стола.
     </string>
     <string name="no_order_info_mark">измените номер своего стола</string>
 </resources>

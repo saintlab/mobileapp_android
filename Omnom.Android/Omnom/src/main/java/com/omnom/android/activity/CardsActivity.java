@@ -325,7 +325,6 @@ public class CardsActivity extends BaseOmnomActivity {
 				}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					@Override
 					public void onError(Throwable throwable) {
-						Log.w(TAG, throwable.getMessage());
 						cardRemovalError();
 					}
 				});
