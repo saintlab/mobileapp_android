@@ -42,4 +42,6 @@
     <color name="delimiter_color">#33aaaaaa</color>
 
     <color name="secure_payment_color">#33000000</color>
+
+    <color name="show_demo_button_color">#22000000</color>
 </resources>

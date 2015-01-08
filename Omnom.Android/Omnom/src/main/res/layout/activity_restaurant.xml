@@ -18,10 +18,17 @@
             tools:context="com.omnom.android.activity.RestaurantActivity">
 
             <ImageView
-                android:id="@+id/img_cover"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/restaurant_cover_height_large"
-                android:scaleType="centerCrop" />
+                android:id="@+id/btn_close"
+                android:src="@drawable/ic_cross_black"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                style="@style/ImageView.Clickable.Cropped"/>
+
+            <com.omnom.android.utils.loader.LoaderView
+                android:id="@+id/cover"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"/>
 
             <include layout="@layout/view_restaurant_info" />
 
@@ -42,11 +49,6 @@
         </LinearLayout>
 
     </ScrollView>
-
-    <ImageView
-        android:id="@+id/btn_close"
-        android:src="@drawable/ic_cross_white"
-        style="@style/ImageView.Clickable.Cropped" />
 
     <LinearLayout
         android:id="@+id/panel_bottom"

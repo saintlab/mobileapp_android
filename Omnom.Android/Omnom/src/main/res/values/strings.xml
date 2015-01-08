@@ -82,6 +82,7 @@
     <string name="title_plus_tips">+ Чаевые</string>
     <string name="your_has_n_orders">На&#160;вашем столике\nраздельных счетов: %1$s</string>
     <string name="demo_mode">Демо-режим</string>
+    <string name="show_demo_mode">Показать демо-пример</string>
     <string name="login_havent_account_yet">Ещё нет аккаунта? Прошу сюда -</string>
     <string name="login_havent_account_registration">регистрация</string>
     <string name="phone_country_code">+7</string>
@@ -103,6 +104,7 @@
     <string name="write_to_us">Напишите нам</string>
     <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
     <string name="navigate_qr_code">Наведитесь на&#160;QR-код Omnom.</string>
+    <string name="scan_qr">Сканировать QR</string>
     <string name="omnom_works_here">Omnom работает здесь</string>
     <string name="send_feedback">Написать отзыв</string>
 

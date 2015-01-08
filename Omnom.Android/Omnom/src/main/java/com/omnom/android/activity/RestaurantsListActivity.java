@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 import com.omnom.android.R;
@@ -20,10 +22,10 @@ import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
+import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
-import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.SimpleListView;
 
 import java.util.ArrayList;
@@ -36,6 +38,10 @@ import butterknife.OnClick;
 import rx.functions.Action1;
 
 public class RestaurantsListActivity extends BaseOmnomActivity implements AdapterView.OnItemClickListener {
+
+	public static final double LOGO_SCALE_SMALL = 0.47;
+
+	public static final double LOGO_SCALE_LARGE = 0.55;
 
 	public static final int SCROLL_DURATION = 200;
 
@@ -102,7 +108,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@Nullable
 	private ArrayList<Restaurant> mRestaurants;
 
-	private ImageView selectedImgCover;
+	private LoaderView selectedCover;
 
 	private View nextView;
 
@@ -112,7 +118,11 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private int mAnimation;
 
-	@OnClick(R.id.img_qr)
+	private int logoSizeSmall;
+
+	private int logoSizeLarge;
+
+	@OnClick(R.id.txt_qr)
 	public void doQrShortcut() {
 		ValidateActivityShortcut.start(this, R.anim.fake_fade_in_instant, R.anim.slide_out_down, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
@@ -141,6 +151,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@Override
 	public void initUi() {
+		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+		logoSizeSmall = (int) (displayMetrics.widthPixels * LOGO_SCALE_SMALL + 0.5);
+		logoSizeLarge = (int) (displayMetrics.widthPixels * LOGO_SCALE_LARGE + 0.5);
 		refreshView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
@@ -197,6 +210,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 			// skip item selection
 			return;
 		}
+		final int paddingDiff = (int) (getResources().getDimension(R.dimen.image_button_size) +
+								       getResources().getDimension(R.dimen.activity_vertical_margin) * 2 -
+								       getResources().getDimension(R.dimen.activity_vertical_margin_large) + 0.5);
 		final int height = panelTop.getHeight();
 
 		mItemClicked = true;
@@ -204,24 +220,25 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		mAdapter.notifyDataSetChanged();
 		list.smoothScrollToPositionFromTop(position, 0, SCROLL_DURATION);
 		panelTop.animate().translationYBy(-height).start();
-		selectedImgCover = (ImageView) view.findViewById(R.id.img_cover);
+		selectedCover = (LoaderView) view.findViewById(R.id.cover);
 
 		if(position + 2 == list.getCount()) {
 			postDelayed(SCROLL_DURATION, new Runnable() {
 				@Override
 				public void run() {
-					animateRestaurant(position, view, height, true);
+					animateRestaurant(position, view, height, paddingDiff, true);
 				}
 			});
 		} else {
-			animateRestaurant(position, view, height, false);
+			animateRestaurant(position, view, height, paddingDiff, false);
 		}
 	}
 
-	private void animateRestaurant(final int position, final View view, final int height, boolean isLast) {
+	private void animateRestaurant(final int position, final View view, final int height,
+	                               final int paddingDiff, boolean isLast) {
 		final int listTranslation;
 		final int topTranslation;
-		if(isLast) {
+		if (isLast) {
 			footer.animate().alpha(0).start();
 			topTranslation = -view.getTop();
 			listTranslation = -height;
@@ -229,7 +246,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 			topTranslation = 0;
 			listTranslation = -height;
 		}
-		refreshView.animate().translationYBy(listTranslation + topTranslation).start();
+		refreshView.animate().translationYBy(listTranslation + topTranslation + paddingDiff).start();
 
 		nextView = list.getChildAt(position + 1);
 		list.setScrollEnabled(false);
@@ -237,17 +254,21 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		if(nextView != null) {
 			nextView.animate().alpha(0).start();
 		}
-		AnimationUtils.scaleHeight(selectedImgCover, getResources().getDimensionPixelSize(
-				                           R.dimen.restaurant_cover_height_large),
-		                           new Runnable() {
-			                           @Override
-			                           public void run() {
-				                           list.requestLayout();
-				                           final Restaurant item = (Restaurant) mAdapter.getItem(position);
-				                           RestaurantActivity.start(RestaurantsListActivity.this, item, topTranslation);
-				                           mItemClicked = false;
-			                           }
-		                           }, getResources().getInteger(R.integer.default_animation_duration_medium));
+		final int duration = getResources().getInteger(R.integer.default_animation_duration_medium);
+		AnimationUtils.scale(selectedCover, logoSizeLarge, duration, new Runnable() {
+			@Override
+			public void run() {
+			}
+		});
+		selectedCover.scaleUp(duration, logoSizeLarge, true, new Runnable() {
+			@Override
+			public void run() {
+				list.requestLayout();
+				final Restaurant item = (Restaurant) mAdapter.getItem(position);
+				RestaurantActivity.start(RestaurantsListActivity.this, item, topTranslation);
+				mItemClicked = false;
+			}
+		});
 	}
 
 	@Override
@@ -277,7 +298,12 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		if(nextView != null) {
 			nextView.setAlpha(1);
 		}
-		ViewUtils.setHeight(selectedImgCover, getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_small));
+		if (selectedCover != null) {
+			LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) selectedCover.getLayoutParams();
+			layoutParams.width = logoSizeSmall;
+			layoutParams.height = logoSizeSmall;
+			selectedCover.setSize(logoSizeSmall, logoSizeSmall);
+		}
 	}
 
 	@Override

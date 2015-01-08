@@ -335,6 +335,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+		loader.setLogo(R.drawable.ic_fork_n_knife);
+		loader.setColor(getResources().getColor(R.color.loader_bg));
 		if(mFirstRun) {
 			switch(mAnimationType) {
 				case EXTRA_LOADER_ANIMATION_SCALE_DOWN:
