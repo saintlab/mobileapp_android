@@ -79,10 +79,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.code.gson:gson:2.2.4'
 
-	// auto-parcel
-	compile 'com.github.frankiesardo:auto-parcel:+'
-	apt 'com.github.frankiesardo:auto-parcel-processor:+'
-
     compile 'com.squareup.dagger:dagger:1.2.2'
 	apt 'com.squareup.dagger:dagger-compiler:1.2.2'
     compile 'com.squareup.picasso:picasso:2.3.4'
