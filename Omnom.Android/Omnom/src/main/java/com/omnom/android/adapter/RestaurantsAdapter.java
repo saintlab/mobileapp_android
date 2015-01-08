@@ -2,21 +2,21 @@ package com.omnom.android.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.activity.RestaurantsListActivity;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.Calendar;
@@ -34,11 +34,8 @@ public class RestaurantsAdapter extends BaseAdapter {
 
 		public static final int ANIMATION_DURATION = 100;
 
-		@InjectView(R.id.img_cover)
-		public ImageView imgCover;
-
-		@InjectView(R.id.txt_title)
-		public TextView txtTitle;
+		@InjectView(R.id.cover)
+		public LoaderView cover;
 
 		@InjectView(R.id.panel_linear)
 		public View panelAddress;
@@ -60,18 +57,13 @@ public class RestaurantsAdapter extends BaseAdapter {
 			ButterKnife.inject(this, activity);
 		}
 
-		public void bindData(final Context context, final Restaurant item, Drawable placeholder, int weekDay) {
-			final String background = RestaurantHelper.getBackground(item, context.getResources().getDisplayMetrics());
-			if(!TextUtils.isEmpty(background)) {
-				OmnomApplication.getPicasso(context)
-				                .load(background)
-				                .placeholder(placeholder)
-				                .into(imgCover);
-			} else {
-				imgCover.setImageDrawable(placeholder);
-			}
+		public void bindData(final Context context, final Restaurant item, int weekDay) {
+			cover.setLogo(R.drawable.transparent);
+			final String logo = RestaurantHelper.getLogo(item);
+			cover.showProgress(false);
+			cover.setColor(RestaurantHelper.getBackgroundColor(item));
+			cover.animateLogo(logo, R.drawable.transparent, 0);
 
-			txtTitle.setText(item.title());
 			final String addressSmall = RestaurantHelper.getAddressSmall(context, item);
 			if(!TextUtils.isEmpty(addressSmall)) {
 				ViewUtils.setVisible(txtAddress, true);
@@ -87,8 +79,7 @@ public class RestaurantsAdapter extends BaseAdapter {
 		public void alpha(final int alpha) {
 			panelAddress.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
 			txtSchedule.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
-			txtTitle.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
-			imgCover.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
+			cover.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
 		}
 	}
 
@@ -100,16 +91,20 @@ public class RestaurantsAdapter extends BaseAdapter {
 
 	private final int mWeekDay;
 
-	private final ColorDrawable mPlaceholderDrawable;
-
 	private int mSelectedPosition = -1;
+
+	private int logoSizeSmall;
+
+	private int logoSizeLarge;
 
 	public RestaurantsAdapter(Context context, List<Restaurant> restaurants) {
 		mContext = context;
 		mRestaurants = restaurants;
 		mInflater = LayoutInflater.from(mContext);
 		mWeekDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-		mPlaceholderDrawable = new ColorDrawable(mContext.getResources().getColor(R.color.order_item_price));
+		final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+		logoSizeSmall = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_SMALL + 0.5);
+		logoSizeLarge = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_LARGE + 0.5);
 	}
 
 	@Override
@@ -131,6 +126,12 @@ public class RestaurantsAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if(convertView == null) {
 			convertView = mInflater.inflate(R.layout.item_restaurant, parent, false);
+			final LoaderView loaderView = (LoaderView) convertView.findViewById(R.id.cover);
+			loaderView.resetMargins();
+			LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) loaderView.getLayoutParams();
+			layoutParams.width = logoSizeSmall;
+			layoutParams.height = logoSizeSmall;
+			loaderView.setSize(logoSizeSmall, logoSizeSmall);
 			RestaurantViewHolder holder = new RestaurantViewHolder(convertView);
 			convertView.setTag(holder);
 		}
@@ -143,7 +144,7 @@ public class RestaurantsAdapter extends BaseAdapter {
 		if(holder == null) {
 			return;
 		}
-		holder.bindData(mContext, item, mPlaceholderDrawable, mWeekDay);
+		holder.bindData(mContext, item, mWeekDay);
 		if(mSelectedPosition != -1) {
 			if(mSelectedPosition != position) {
 				ViewCompat.setHasTransientState(convertView, true);

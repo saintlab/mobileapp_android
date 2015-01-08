@@ -30,8 +30,7 @@
         android:layout_height="wrap_content"
         android:minWidth="@dimen/loader_logo_size"
         android:minHeight="@dimen/loader_logo_size"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_fork_n_knife"/>
+        android:scaleType="centerInside"/>
 
     <EditText
         android:id="@+id/edit_table_number"

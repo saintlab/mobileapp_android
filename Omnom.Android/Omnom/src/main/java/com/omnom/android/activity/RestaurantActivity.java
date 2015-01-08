@@ -2,11 +2,12 @@ package com.omnom.android.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import com.omnom.android.R;
@@ -14,6 +15,7 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -65,8 +67,8 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	@InjectView(R.id.btn_call)
 	protected Button btnCall;
 
-	@InjectView(R.id.img_cover)
-	protected View viewCover;
+	@InjectView(R.id.cover)
+	protected LoaderView viewCover;
 
 	@InjectView(R.id.scroll)
 	protected ScrollView scrollView;
@@ -79,6 +81,10 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	private boolean mFinishing = false;
 
 	private int mTopTranslation;
+
+	private int logoSizeSmall;
+
+	private int logoSizeLarge;
 
 	@OnClick(R.id.txt_reserve)
 	protected void doReserve() {
@@ -146,22 +152,29 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		scrollView.smoothScrollTo(0, 0);
 
 		final View panelBottom = findViewById(R.id.panel_bottom);
+		final int paddingDiff = (int) (getResources().getDimension(R.dimen.image_button_size) +
+									   getResources().getDimension(R.dimen.activity_vertical_margin) * 2 -
+									   getResources().getDimension(R.dimen.activity_vertical_margin_large) + 0.5);
 		final int topBarHeight = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);
-		final int translationY = topBarHeight - mTopTranslation;
+		final int translationY = topBarHeight - mTopTranslation - paddingDiff;
 
 		btnCall.animate().translationYBy(translationY).start();
 		btnCall.animate().alpha(0).start();
 		panelBottom.animate().translationYBy(translationY).start();
 		viewMain.animate().translationYBy(translationY).start();
 		AnimationUtils.animateAlpha(panelBottom, false);
-		AnimationUtils
-				.scaleHeight(mRestaurantViewHolder.imgCover, getResources().getDimensionPixelSize(R.dimen.restaurant_cover_height_small),
-				             new Runnable() {
-					             @Override
-					             public void run() {
-						             finishSimple();
-					             }
-				             }, getResources().getInteger(R.integer.default_animation_duration_medium));
+		final int duration = getResources().getInteger(R.integer.default_animation_duration_medium);
+		AnimationUtils.scale(viewCover, logoSizeSmall, duration, new Runnable() {
+			@Override
+			public void run() {
+			}
+		});
+		viewCover.scaleDown(logoSizeSmall, duration, true, new Runnable() {
+			@Override
+			public void run() {
+				finishSimple();
+			}
+		});
 	}
 
 	private void finishSimple() {
@@ -175,10 +188,17 @@ public class RestaurantActivity extends BaseOmnomActivity {
 			finish();
 			return;
 		}
+		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+		logoSizeSmall = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_SMALL + 0.5);
+		logoSizeLarge = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_LARGE + 0.5);
+		viewCover.resetMargins();
+		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) viewCover.getLayoutParams();
+		layoutParams.width = logoSizeLarge;
+		layoutParams.height = logoSizeLarge;
+		viewCover.setSize(logoSizeLarge, logoSizeLarge);
 		final int weekDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 		mRestaurantViewHolder = new RestaurantsAdapter.RestaurantViewHolder(this);
-		final ColorDrawable colorDrawable = new ColorDrawable(getResources().getColor(R.color.order_item_price));
-		mRestaurantViewHolder.bindData(this, mRestaurant, colorDrawable, weekDay);
+		mRestaurantViewHolder.bindData(this, mRestaurant, weekDay);
 		final String phone = mRestaurant.phone();
 		if(!TextUtils.isEmpty(phone)) {
 			btnCall.setText(PhoneNumberUtils.formatNumber(phone));

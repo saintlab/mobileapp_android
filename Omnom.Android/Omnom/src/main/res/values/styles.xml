@@ -220,8 +220,8 @@
     </style>
 
     <style name="ImageView.Clickable.Cropped" parent="Button">
-        <item name="android:layout_width">48dp</item>
-        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_width">@dimen/image_button_size</item>
+        <item name="android:layout_height">@dimen/image_button_size</item>
         <item name="android:padding">@dimen/activity_vertical_margin_small</item>
         <item name="android:cropToPadding">true</item>
         <item name="android:scaleType">centerCrop</item>
@@ -230,7 +230,7 @@
     <style name="Button.Demo">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:text">@string/demo_mode</item>
+        <item name="android:text">@string/show_demo_mode</item>
         <item name="android:textColor">@color/text_color_black</item>
         <item name="android:textSize">@dimen/font_large</item>
         <item name="android:drawableLeft">@drawable/ic_demo</item>

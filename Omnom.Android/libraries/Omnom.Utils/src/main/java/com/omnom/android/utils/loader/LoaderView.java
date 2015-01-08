@@ -147,7 +147,6 @@ public class LoaderView extends FrameLayout {
 		updateProgressSize(loaderSize);
 
 		currentColor = getDefaultBgColor();
-		mImgLogo.setTag(R.id.img_loader, R.drawable.ic_fork_n_knife);
 		translationViews.add(mProgressBar);
 		translationViews.add(mImgLoader);
 		translationViews.add(mImgLogo);
@@ -298,6 +297,18 @@ public class LoaderView extends FrameLayout {
 		AnimationUtils.scale(mImgLoader, size, duration, endAction);
 	}
 
+	public void scaleDown(int size, final long duration, final boolean scaleLogo, final Runnable endAction) {
+		AnimationUtils.scale(mImgLoader, size, duration, endAction);
+		if (scaleLogo) {
+			AnimationUtils.scale(mImgLogo, size, duration, new Runnable() {
+				@Override
+				public void run() {
+
+				}
+			});
+		}
+	}
+
 	public void scaleDown() {
 		setSize(loaderSize, loaderSize);
 	}
@@ -311,9 +322,21 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void scaleUp(final long duration, final Runnable endCallback) {
-		AnimationUtils.scale(mImgLoader,
-		                     mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
-		                     duration, endCallback);
+		scaleUp(duration,
+				mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
+				false, endCallback);
+	}
+
+	public void scaleUp(final long duration, final int size, final boolean scaleLogo, final Runnable endCallback) {
+		AnimationUtils.scale(mImgLoader, size, duration, endCallback);
+		if (scaleLogo) {
+			AnimationUtils.scale(mImgLogo, size, duration, new Runnable() {
+				@Override
+				public void run() {
+
+				}
+			});
+		}
 	}
 
 	public void scaleUp(final Runnable endCallback) {
@@ -353,13 +376,17 @@ public class LoaderView extends FrameLayout {
 		}
 		mImgLogo.setTag(R.id.img_loader, resId);
 		mImgLogo.setTag(R.id.logo_url, null);
-		AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
-			@Override
-			public void run() {
-				mImgLogo.setImageResource(resId);
-				AnimationUtils.animateAlpha(mImgLogo, true, duration);
-			}
-		}, duration);
+		if (duration == 0) {
+			mImgLogo.setImageResource(resId);
+		} else {
+			AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
+				@Override
+				public void run() {
+					mImgLogo.setImageResource(resId);
+					AnimationUtils.animateAlpha(mImgLogo, true, duration);
+				}
+			}, duration);
+		}
 	}
 
 	@DebugLog
@@ -382,6 +409,7 @@ public class LoaderView extends FrameLayout {
 
 	@DebugLog
 	public void setLogo(int resId) {
+		mImgLogo.setTag(R.id.logo_url, null);
 		final Object tag = mImgLogo.getTag(R.id.img_loader);
 		if(tag != null && resId == (Integer) tag) {
 			// skip
@@ -389,7 +417,6 @@ public class LoaderView extends FrameLayout {
 		}
 		mImgLogo.setImageResource(resId);
 		mImgLogo.setTag(R.id.img_loader, resId);
-		mImgLogo.setTag(R.id.logo_url, null);
 	}
 
 	public void updateProgress(final int progress) {
@@ -422,6 +449,16 @@ public class LoaderView extends FrameLayout {
 		imageView.getLayoutParams().width = width;
 		imageView.getLayoutParams().height = height;
 		imageView.requestLayout();
+	}
+
+	public void resetMargins() {
+		resetMargins(mImgLoader);
+		resetMargins(mImgLogo);
+	}
+
+	private  void resetMargins(final View view) {
+		MarginLayoutParams layoutParams = (MarginLayoutParams) view.getLayoutParams();
+		layoutParams.setMargins(0, 0, 0, 0);
 	}
 
 	public void stopProgressAnimation() {
@@ -538,13 +575,17 @@ public class LoaderView extends FrameLayout {
 	@DebugLog
 	public void animateLogo(final Bitmap bitmap, long duration) {
 		mImgLogo.setTag(R.id.img_loader, 0);
-		AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
-			@Override
-			public void run() {
-				mImgLogo.setImageBitmap(bitmap);
-				AnimationUtils.animateAlpha(mImgLogo, true);
-			}
-		}, duration);
+		if (duration == 0) {
+			mImgLogo.setImageBitmap(bitmap);
+		} else {
+			AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
+				@Override
+				public void run() {
+					mImgLogo.setImageBitmap(bitmap);
+					AnimationUtils.animateAlpha(mImgLogo, true);
+				}
+			}, duration);
+		}
 	}
 
 	@DebugLog

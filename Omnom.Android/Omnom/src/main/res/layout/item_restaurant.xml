@@ -5,16 +5,13 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <ImageView
-        android:id="@+id/img_cover"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/restaurant_cover_height_small"
-        android:scaleType="centerCrop" />
+    <com.omnom.android.utils.loader.LoaderView
+        android:id="@+id/cover"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin_large"
+        android:layout_marginBottom="@dimen/activity_vertical_margin" />
 
     <include layout="@layout/view_restaurant_info" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/activity_vertical_margin_large" />
 
 </LinearLayout>

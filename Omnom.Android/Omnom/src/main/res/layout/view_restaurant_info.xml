@@ -3,16 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     tools:showIn="@layout/item_restaurant">
 
-    <TextView
-        android:id="@+id/txt_title"
-        android:paddingTop="@dimen/activity_vertical_margin_small"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxLines="2"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:textSize="@dimen/font_xxlarge" />
-
     <LinearLayout
         android:id="@+id/panel_linear"
         android:layout_width="wrap_content"
