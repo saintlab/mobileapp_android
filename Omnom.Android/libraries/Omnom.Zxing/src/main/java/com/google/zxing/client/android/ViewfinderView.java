@@ -42,8 +42,8 @@ import java.util.List;
  */
 public final class ViewfinderView extends View {
 
-	public static int cadreSize;
-	public static int cadreSizeVisible;
+    private static int cadreSize;
+    private static int cadreSizeVisible;
 
 	private static final int[] SCANNER_ALPHA         = {0, 64, 128, 192, 255, 192, 128, 64};
 	private static final long  ANIMATION_DELAY       = 80L;
@@ -79,7 +79,7 @@ public final class ViewfinderView extends View {
 		laserColor = resources.getColor(android.R.color.transparent/*R.color.viewfinder_laser*/);
 		resultPointColor = resources.getColor(android.R.color.transparent/*R.color.possible_result_points*/);
 
-		cadreColor = context.getResources().getColor(R.color.cadre_border);
+		cadreColor = context.getResources().getColor(R.color.transparent);
 		cadrePaint = new Paint();
 		cadrePaint.setColor(cadreColor);
 

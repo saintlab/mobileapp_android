@@ -21,6 +21,4 @@
     <dimen name="carde_size">75dp</dimen>
     <dimen name="carde_size_visible">8dp</dimen>
 
-    <dimen name="min_frame_width">240dp</dimen>
-
 </resources>

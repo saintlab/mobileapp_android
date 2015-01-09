@@ -5,20 +5,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.TextView;
 
 import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.fragment.QrHintFragment;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ClickSpan;
 
 /**
  * Created by Ch3D on 14.11.2014.
  */
 public class OmnomQRCaptureActivity extends CaptureActivity {
 
-	public static void start(final BaseOmnomActivity activity, final int tableNumber, final String tableId, final int code) {
-		final Intent intent = getIntent(activity, tableNumber, tableId);
+	public static void start(final BaseOmnomActivity activity, final int code) {
+		final Intent intent = getIntent(activity);
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 			final ActivityOptions activityOptions = ActivityOptions
 					.makeCustomAnimation(activity, com.omnom.android.zxing.R.anim.slide_in_right,
@@ -29,16 +34,14 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 		}
 	}
 
-	private static Intent getIntent(final Context context, final int tableNumber, final String tableId) {
+	private static Intent getIntent(final Context context) {
 		final Intent intent = new Intent(context, OmnomQRCaptureActivity.class);
 		intent.putExtra(CaptureActivity.EXTRA_SHOW_BACK, false);
-		intent.putExtra(CaptureActivity.EXTRA_TABLE_NUMBER, tableNumber);
-		intent.putExtra(CaptureActivity.EXTRA_TABLE_ID, tableId);
 		return intent;
 	}
 
-	public static void start(final BaseOmnomFragmentActivity activity, final int tableNumber, final String tableId, final int code) {
-		final Intent intent = getIntent(activity, tableNumber, tableId);
+	public static void start(final BaseOmnomFragmentActivity activity, final int code) {
+		final Intent intent = getIntent(activity);
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 			final ActivityOptions activityOptions = ActivityOptions
 					.makeCustomAnimation(activity, com.omnom.android.zxing.R.anim.slide_in_right,
@@ -48,10 +51,6 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 			activity.startActivityForResult(intent, code);
 		}
 	}
-
-	private int tableNumber;
-
-	private String tableId;
 
 	@Override
 	public int getLayoutResource() {
@@ -61,35 +60,52 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 	@Override
 	protected void initUI() {
 		super.initUI();
-		final View btnDemo = findViewById(R.id.btn_demo);
-		btnDemo.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				ValidateActivity.startDemo(OmnomQRCaptureActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
-				                           EXTRA_LOADER_ANIMATION_SCALE_DOWN);
-			}
-		});
-		final View imgProfile = findViewById(R.id.img_profile);
-		imgProfile.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				UserProfileActivity.startSliding(OmnomQRCaptureActivity.this, tableNumber, tableId);
-			}
-		});
-		final View background = findViewById(R.id.background);
+        final TextView txtHint = (TextView) findViewById(R.id.txt_hint);
+        final View background = findViewById(R.id.background);
+        final View camera = findViewById(R.id.img_camera);
+        AndroidUtils.clickify(txtHint, getString(R.string.navigate_qr_code_mark),
+                new ClickSpan.OnClickListener() {
+                    @Override
+                    public void onClick() {
+                        showHint();
+                    }
+                });
 		postDelayed(2000, new Runnable() {
 			@Override
 			public void run() {
-				AnimationUtils.animateAlpha(background, false);
+				AnimationUtils.animateAlpha(background, false, new Runnable() {
+                    @Override
+                    public void run() {
+                        AnimationUtils.animateBlinking(camera);
+                    }
+                });
 			}
 		});
+
+        final View scanFrame = findViewById(R.id.scan_frame);
+        ViewTreeObserver viewTreeObserver = scanFrame.getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    AndroidUtils.removeOnGlobalLayoutListener(scanFrame, this);
+                    setFramingRectSize(scanFrame.getWidth());
+                    setFramingRectLeftOffset(scanFrame.getLeft());
+                    setFramingRectTopOffset(scanFrame.getTop());
+                }
+            });
+        }
 	}
 
-	@Override
-	protected void handleIntent(Intent intent) {
-		super.handleIntent(intent);
-		tableNumber = intent.getIntExtra(EXTRA_TABLE_NUMBER, 0);
-		tableId = intent.getStringExtra(EXTRA_TABLE_ID);
-	}
+    private void showHint() {
+        getSupportFragmentManager().beginTransaction()
+                .addToBackStack(null)
+                .setCustomAnimations(R.anim.slide_in_up,
+                        R.anim.slide_out_down,
+                        R.anim.slide_in_up,
+                        R.anim.slide_out_down)
+                .replace(R.id.fragment_container, QrHintFragment.newInstance())
+                .commit();
+    }
 
 }

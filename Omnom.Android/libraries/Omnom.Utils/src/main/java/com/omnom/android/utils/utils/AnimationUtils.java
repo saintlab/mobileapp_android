@@ -6,6 +6,9 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 
 import com.omnom.android.utils.R;
 
@@ -209,4 +212,13 @@ public class AnimationUtils {
 		scaleHeight(view, size, duration);
 		scaleWidth(view, size, duration, endCallback);
 	}
+
+    public static void animateBlinking(final View view) {
+        final Animation animation = new AlphaAnimation(1, 0);
+        animation.setDuration(view.getResources().getInteger(R.integer.default_animation_duration_long));
+        animation.setInterpolator(new LinearInterpolator());
+        animation.setRepeatCount(Animation.INFINITE);
+        animation.setRepeatMode(Animation.REVERSE);
+        view.startAnimation(animation);
+    }
 }

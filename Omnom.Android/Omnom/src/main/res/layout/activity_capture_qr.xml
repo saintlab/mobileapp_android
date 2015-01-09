@@ -22,10 +22,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
             <SurfaceView
                 android:id="@+id/preview_view"
                 android:layout_width="match_parent"
@@ -37,17 +33,84 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/bg_wood"/>
 
-            <TextView
-                android:layout_width="@dimen/navigate_qr_text_width"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/navigate_qr_text_margin_top"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:textColor="@color/cadre_border"
-                android:text="@string/navigate_qr_code"
-                android:lines="2"
-                android:textSize="@dimen/navigate_qr_text_font_size"
-                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center"
+                        android:textColor="@color/cadre_border"
+                        android:text="@string/scanning"
+                        android:lines="3"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf"/>
+
+                    <ImageView
+                        android:id="@+id/img_camera"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/camera_icon_red"
+                        android:layout_gravity="center_vertical"
+                        android:layout_margin="@dimen/drawable_padding_default"
+                        android:contentDescription="@null" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:id="@+id/scan_frame"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/scan_frame_red"
+                    android:contentDescription="@null" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/txt_hint"
+                    android:layout_width="@dimen/navigate_qr_text_width"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="@color/cadre_border"
+                    android:textColorLink="@color/cadre_border"
+                    android:text="@string/navigate_qr_code"
+                    android:lines="3"
+                    android:drawableTop="@drawable/ic_shortcut_red"
+                    android:drawablePadding="@dimen/drawable_padding_default"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf"/>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"/>
 
             <FrameLayout
                 android:id="@+id/btn_back"
@@ -59,15 +122,10 @@
                     android:layout_gravity="center"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/btn_back_white"/>
-            </FrameLayout>
+                    android:src="@drawable/btn_back_white"
+                    android:contentDescription="@null" />
 
-            <ImageView
-                android:id="@+id/img_profile"
-                android:layout_margin="@dimen/activity_vertical_margin_xsmall"
-                android:layout_gravity="top|right"
-                android:src="@drawable/ic_profile"
-                style="@style/ImageView.Clickable.Cropped"/>
+            </FrameLayout>
 
             <com.google.zxing.client.android.ViewfinderView
                 android:id="@+id/viewfinder_view"
@@ -257,39 +315,6 @@
                 </LinearLayout>
 
             </LinearLayout>
-
-        </FrameLayout>
-
-        <RelativeLayout
-            android:id="@+id/panel_bottom"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/view_size_default"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="bottom"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:background="@color/white_transparent">
-
-            <LinearLayout
-                android:id="@+id/btn_demo"
-                android:text="@string/demo_mode"
-                android:layout_width="wrap_content"
-                android:gravity="center"
-                style="@style/Button.Bottom"
-                android:layout_alignParentRight="true">
-
-                <TextView
-                    android:text="@string/demo_mode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="@dimen/drawable_padding_default"
-                    android:gravity="center"
-                    android:drawableLeft="@drawable/ic_demo"
-                    android:textAppearance="?android:textAppearanceLarge" />
-
-            </LinearLayout>
-
-        </RelativeLayout>
 
     </RelativeLayout>
 

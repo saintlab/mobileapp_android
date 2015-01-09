@@ -17,19 +17,19 @@ public class LoaderError {
 	public static final String EVENT_UNKNOWN_ERROR = "unknown_error";
 
 	public static final LoaderError UNKNOWN_ERROR =
-			new LoaderError(EVENT_UNKNOWN_ERROR, R.drawable.ic_no_connection, R.string.something_went_wrong,
+			new LoaderError(EVENT_UNKNOWN_ERROR, R.drawable.ic_line_noise, R.string.something_went_wrong,
 							R.string.error_ok, 0);
 
 	public static final String EVENT_BACKEND_ERROR = "backend_error";
 
 	public static final LoaderError BACKEND_ERROR =
-			new LoaderError(EVENT_BACKEND_ERROR, R.drawable.ic_no_connection, R.string.something_went_wrong, R.string.lets_try_again,
+			new LoaderError(EVENT_BACKEND_ERROR, R.drawable.ic_line_noise, R.string.something_went_wrong, R.string.lets_try_again,
 			                R.drawable.ic_repeat_small);
 
 	public static final String EVENT_NO_TABLE = "no_table";
 
 	public static final LoaderError UNKNOWN_QR_CODE =
-			new LoaderError(EVENT_NO_TABLE, R.drawable.ic_no_connection, R.string.error_unknown_qr, R.string.check_again,
+			new LoaderError(EVENT_NO_TABLE, R.drawable.ic_line_noise, R.string.error_unknown_qr, R.string.check_again,
 			                R.drawable.ic_repeat_small);
 
 	public static final String BLUETOOTH_DISABLED = "bluetooth_turned_off";
