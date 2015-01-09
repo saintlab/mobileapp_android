@@ -67,6 +67,7 @@ public class OrdersPagerAdaper extends FragmentPagerAdapter {
 
 	public void updateOrders(final List<Order> orders) {
 		mOrders = orders;
+        notifyDataSetChanged();
 	}
 
 	@Override

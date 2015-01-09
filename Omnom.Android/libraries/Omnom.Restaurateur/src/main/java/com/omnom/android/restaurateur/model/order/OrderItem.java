@@ -28,9 +28,9 @@ public class OrderItem implements Parcelable {
 	@Expose
 	private int quantity;
 	@Expose
-	private int priceTotal;
+	private double priceTotal;
 	@Expose
-	private int pricePerItem;
+	private double pricePerItem;
 	@Expose
 	private String internalId;
 	@Expose
@@ -45,8 +45,8 @@ public class OrderItem implements Parcelable {
 	public OrderItem(Parcel parcel) {
 		guestId = parcel.readString();
 		quantity = parcel.readInt();
-		priceTotal = parcel.readInt();
-		pricePerItem = parcel.readInt();
+		priceTotal = parcel.readDouble();
+		pricePerItem = parcel.readDouble();
 		internalId = parcel.readString();
 		title = parcel.readString();
 		id = parcel.readString();
@@ -57,8 +57,8 @@ public class OrderItem implements Parcelable {
 	public void writeToParcel(Parcel parcel, int flags) {
 		parcel.writeString(guestId);
 		parcel.writeInt(quantity);
-		parcel.writeInt(priceTotal);
-		parcel.writeInt(pricePerItem);
+		parcel.writeDouble(priceTotal);
+		parcel.writeDouble(pricePerItem);
 		parcel.writeString(internalId);
 		parcel.writeString(title);
 		parcel.writeString(id);
@@ -81,19 +81,19 @@ public class OrderItem implements Parcelable {
 		this.quantity = quantity;
 	}
 
-	public int getPriceTotal() {
+	public double getPriceTotal() {
 		return priceTotal;
 	}
 
-	public void setPriceTotal(int priceTotal) {
+	public void setPriceTotal(double priceTotal) {
 		this.priceTotal = priceTotal;
 	}
 
-	public int getPricePerItem() {
+	public double getPricePerItem() {
 		return pricePerItem;
 	}
 
-	public void setPricePerItem(int pricePerItem) {
+	public void setPricePerItem(double pricePerItem) {
 		this.pricePerItem = pricePerItem;
 	}
 

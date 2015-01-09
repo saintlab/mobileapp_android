@@ -13,6 +13,7 @@ import com.google.gson.GsonBuilder;
 import com.omnom.android.BuildConfig;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.PaymentData;
 import com.omnom.android.socket.event.BaseSocketEvent;
 import com.omnom.android.socket.event.ConnectedSocketEvent;
@@ -98,13 +99,17 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 			@Override
 			public void call(final Object... args) {
 				logEvent(SocketEvent.EVENT_ORDER_CREATE, args);
-				post(new OrderCreateSocketEvent());
+                final JSONObject json = (JSONObject) args[0];
+                final Order order = mGson.fromJson(json.toString(), Order.class);
+				post(new OrderCreateSocketEvent(order));
 			}
 		}).on(SocketEvent.EVENT_ORDER_UPDATE, new Emitter.Listener() {
 			@Override
 			public void call(final Object... args) {
 				logEvent(SocketEvent.EVENT_ORDER_UPDATE, args);
-				post(new OrderUpdateSocketEvent());
+                final JSONObject json = (JSONObject) args[0];
+                final Order order = mGson.fromJson(json.toString(), Order.class);
+				post(new OrderUpdateSocketEvent(order));
 			}
 		}).on(SocketEvent.EVENT_ORDER_CLOSE, new Emitter.Listener() {
 			@Override

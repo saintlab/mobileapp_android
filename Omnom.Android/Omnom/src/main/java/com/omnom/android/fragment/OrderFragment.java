@@ -453,9 +453,11 @@ public class OrderFragment extends Fragment {
 		}
 	}
 
-	public void onPayment(final Order order) {
+	public void onOrderUpdate(final Order order) {
 		if (order != null && order.getId().equals(mOrder.getId())) {
 			mOrder = order;
+            mAdapter.updateItems(mOrder.getItems());
+			AndroidUtils.scrollEnd(list);
 			final double paidAmount = order.getPaidAmount();
 			if (txtAlreadyPaid != null) {
 				if (paidAmount > 0) {
@@ -470,6 +472,7 @@ public class OrderFragment extends Fragment {
 				final BigDecimal amount = getEnteredAmount();
 				updatePaymentTipsAmount(amount, tipsButtons);
 			}
+			updateOverallAmount(mFooterView1);
 		}
 	}
 
@@ -855,11 +858,9 @@ public class OrderFragment extends Fragment {
 		mFooterView1 = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer, null, false);
 		list.addFooterView(mFooterView1);
 		final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
-		final TextView txtOverall = (TextView) mFooterView1.findViewById(R.id.txt_overall);
-		final View layoutOverall = mFooterView1.findViewById(R.id.layout_overall);
-		txtOverall.setText(StringUtils.formatCurrencyWithSpace(mOrder.getTotalAmount(), getCurrencySuffix()));
+		updateOverallAmount(mFooterView1);
 		updateFooter(isZoomedIn);
-
+		final View layoutOverall = mFooterView1.findViewById(R.id.layout_overall);
 		layoutOverall.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -879,6 +880,15 @@ public class OrderFragment extends Fragment {
 				}
 			}
 		});
+	}
+
+	private void updateOverallAmount(final View footerView) {
+		if (footerView != null) {
+			final TextView txtOverall = (TextView) mFooterView1.findViewById(R.id.txt_overall);
+			if (txtOverall != null) {
+				txtOverall.setText(AmountHelper.format(mOrder.getTotalAmount()) + getCurrencySuffix());
+			}
+		}
 	}
 
 	private void updateFooter(final boolean isZoomedIn) {
