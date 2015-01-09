@@ -98,9 +98,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 			return;
 		}
 
-		final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
-		final String tableId = mTable != null ? mTable.getId() : null;
-		OmnomQRCaptureActivity.start(this, tableNumber, tableId, REQUEST_CODE_SCAN_QR);
+		OmnomQRCaptureActivity.start(this, REQUEST_CODE_SCAN_QR);
 	}
 
 	/**

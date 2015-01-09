@@ -44,4 +44,6 @@
     <color name="secure_payment_color">#33000000</color>
 
     <color name="show_demo_button_color">#22000000</color>
+
+    <color name="qr_hint_color">#ff737478</color>
 </resources>

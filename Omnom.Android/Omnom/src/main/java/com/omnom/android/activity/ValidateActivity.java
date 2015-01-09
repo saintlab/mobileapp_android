@@ -127,7 +127,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		start(context, enterAnim, exitAnim, animationType, true, -1);
 	}
 
-	public static void startDemo(BaseOmnomFragmentActivity context, int enterAnim, int exitAnim, int animationType) {
+	public static void startDemo(BaseFragmentActivity context, int enterAnim, int exitAnim, int animationType) {
 		start(context, enterAnim, exitAnim, animationType, true, -1);
 	}
 
@@ -148,7 +148,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		context.start(intent, enterAnim, exitAnim, !isDemo);
 	}
 
-	private static void start(BaseOmnomFragmentActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo,
+	private static void start(BaseFragmentActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo,
 	                          final int userEnterType) {
 		Intent intent = createIntent(context, animationType, isDemo, userEnterType);
 		if(!isDemo) {

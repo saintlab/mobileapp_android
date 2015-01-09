@@ -56,7 +56,7 @@ import com.google.zxing.client.android.history.HistoryManager;
 import com.google.zxing.client.android.result.ResultButtonListener;
 import com.google.zxing.client.android.result.ResultHandler;
 import com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever;
-import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.zxing.R;
 
 import java.io.IOException;
@@ -74,7 +74,7 @@ import java.util.Map;
  * @author dswitkin@google.com (Daniel Switkin)
  * @author Sean Owen
  */
-public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callback {
+public class CaptureActivity extends BaseFragmentActivity implements SurfaceHolder.Callback {
 
 	public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
 
@@ -135,6 +135,12 @@ public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callb
 
 	private AmbientLightManager ambientLightManager;
 
+    private int framingRectSize;
+
+    private int framingRectLeftOffset;
+
+    private int framingRectTopOffset;
+
 	ViewfinderView getViewfinderView() {
 		return viewfinderView;
 	}
@@ -191,6 +197,9 @@ public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callb
 		// first launch. That led to bugs where the scanning rectangle was the wrong size and partially
 		// off screen.
 		cameraManager = new CameraManager(getApplication());
+        cameraManager.setFramingRectSize(framingRectSize);
+        cameraManager.setFramingRectLeftOffset(framingRectLeftOffset);
+        cameraManager.setFramingRectTopOffset(framingRectTopOffset);
 
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		viewfinderView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -765,4 +774,26 @@ public class CaptureActivity extends BaseActivity implements SurfaceHolder.Callb
 	public void drawViewfinder() {
 		viewfinderView.drawViewfinder();
 	}
+
+    protected void setFramingRectSize(final int size) {
+        this.framingRectSize = size;
+        if (cameraManager != null) {
+            cameraManager.setFramingRectSize(size);
+        }
+    }
+
+    protected void setFramingRectLeftOffset(final int offset) {
+        this.framingRectLeftOffset = offset;
+        if (cameraManager != null) {
+            cameraManager.setFramingRectLeftOffset(offset);
+        }
+    }
+
+    protected void setFramingRectTopOffset(final int offset) {
+        this.framingRectTopOffset = offset;
+        if (cameraManager != null) {
+            cameraManager.setFramingRectTopOffset(offset);
+        }
+    }
+
 }
