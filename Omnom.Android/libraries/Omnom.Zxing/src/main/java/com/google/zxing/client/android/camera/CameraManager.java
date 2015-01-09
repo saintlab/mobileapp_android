@@ -71,8 +71,7 @@ public final class CameraManager {
 		this.context = context;
 		this.configManager = new CameraConfigurationManager(context);
 		previewCallback = new PreviewCallback(configManager);
-
-        framingRectSize = (int) context.getResources().getDimension(R.dimen.min_frame_width);
+        framingRectSize = MAX_FRAME_WIDTH;
 	}
 
 	/**
