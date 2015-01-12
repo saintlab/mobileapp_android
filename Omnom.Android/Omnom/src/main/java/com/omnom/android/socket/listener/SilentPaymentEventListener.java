@@ -12,7 +12,7 @@ import com.squareup.otto.Subscribe;
  */
 public class SilentPaymentEventListener extends PaymentEventListener {
 	public interface PaymentListener {
-		public void onPaymentEvent(final PaymentSocketEvent event);
+		void onPaymentEvent(PaymentSocketEvent event);
 	}
 
 	private PaymentListener mListener;

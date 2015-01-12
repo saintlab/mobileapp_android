@@ -15,7 +15,12 @@ import com.omnom.android.adapter.OrdersPagerAdaper;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.socket.event.OrderCreateSocketEvent;
+import com.omnom.android.socket.event.OrderUpdateSocketEvent;
 import com.omnom.android.socket.event.PaymentSocketEvent;
+import com.omnom.android.socket.listener.ListenersSet;
+import com.omnom.android.socket.listener.OrderCreateEventListener;
+import com.omnom.android.socket.listener.OrderUpdateEventListener;
 import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -30,7 +35,9 @@ import java.util.List;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class OrdersActivity extends BaseOmnomFragmentActivity {
+public class OrdersActivity extends BaseOmnomFragmentActivity
+                            implements OrderCreateEventListener.OrderCreateListener,
+                                       OrderUpdateEventListener.OrderUpdateListener{
 
 	public static final int REQUEST_CODE_CARDS = 100;
 
@@ -89,25 +96,45 @@ public class OrdersActivity extends BaseOmnomFragmentActivity {
 
 	private boolean mDemo;
 
-	private PaymentEventListener mPaymentListener;
+	private ListenersSet listenersSet;
 
 	@Subscribe
 	public void onPayment(final PaymentSocketEvent event) {
-		final Order order = event.getPaymentData().getOrder();
-		final int position = replaceOrder(orders, order);
-		if(order != null && position >= 0 && mPagerAdapter != null) {
-			mPagerAdapter.updateOrders(orders);
-			getActivity().runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					final Fragment currentFragment = findFragmentByPosition(position);
-					if(currentFragment != null) {
-						((OrderFragment) currentFragment).onPayment(order);
-					}
-				}
-			});
-		}
+	    updateOrder(event.getPaymentData().getOrder());
 	}
+
+    @Override
+    public void onOrderCreateEvent(final OrderCreateSocketEvent event) {
+        if (orders != null) {
+            orders.add(event.getOrder());
+            mPagerAdapter.updateOrders(orders);
+	        final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
+	        if (currentFragment != null && !currentFragment.isDownscaled()) {
+		        showOther(mPager.getCurrentItem(), false);
+	        }
+        }
+    }
+
+    @Override
+    public void onOrderUpdateEvent(final OrderUpdateSocketEvent event) {
+        updateOrder(event.getOrder());
+    }
+
+    private void updateOrder(final Order order) {
+        final int position = replaceOrder(orders, order);
+        if(order != null && position >= 0 && mPagerAdapter != null) {
+            mPagerAdapter.updateOrders(orders);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    final Fragment currentFragment = findFragmentByPosition(position);
+                    if(currentFragment != null) {
+                        ((OrderFragment) currentFragment).onOrderUpdate(order);
+                    }
+                }
+            });
+        }
+    }
 
 	/**
 	 * Returns fragment cached by FragmentPagerAdapter
@@ -127,7 +154,9 @@ public class OrdersActivity extends BaseOmnomFragmentActivity {
 
 	@Override
 	public void initUi() {
-		mPaymentListener = new PaymentEventListener(this);
+        listenersSet = new ListenersSet(new PaymentEventListener(this),
+                       new OrderCreateEventListener(this, this),
+                       new OrderUpdateEventListener(this, this));
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, requestId, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 4.5);
@@ -145,7 +174,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity {
 		if(orders.size() > 0) {
 			final Order order = orders.get(0);
 			if(order != null) {
-				mPaymentListener.initTableSocket(order.getTableId());
+                listenersSet.initTableSocket(order.getTableId());
 			}
 		}
 	}
@@ -153,13 +182,13 @@ public class OrdersActivity extends BaseOmnomFragmentActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mPaymentListener.onPause();
+        listenersSet.onPause();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mPaymentListener.onDestroy();
+		listenersSet.onDestroy();
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.ArrayList;
@@ -156,7 +157,7 @@ public class OrderItemsAdapter extends BaseAdapter {
 			holder.txtPrice.setTextColor(mColorPriceNormal);
 		}
 		holder.txtTitle.setText(item.getTitle());
-		holder.txtPrice.setText(String.valueOf(item.getPricePerItem()));
+		holder.txtPrice.setText(AmountHelper.format(item.getPricePerItem()));
 	}
 
 	public void setSelected(final int position, final boolean selected) {
@@ -186,4 +187,13 @@ public class OrderItemsAdapter extends BaseAdapter {
 	public void setStates(final SparseBooleanArrayParcelable states) {
 		mCheckedStates = states;
 	}
+
+    public void updateItems(final List<OrderItem> items) {
+        if (mItems != null && items != null && mItems.size() != items.size()) {
+            clearSelection();
+        }
+        this.mItems = items;
+        notifyDataSetChanged();
+    }
+
 }

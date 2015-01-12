@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.omnom.android.utils.utils.AmountHelper;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -261,11 +262,11 @@ public class Order implements Parcelable {
 	}
 
 	public double getTotalAmount() {
-		int sum = 0;
+		BigDecimal sum = BigDecimal.ZERO;
 		for(final OrderItem item : items) {
-			sum += item.getPriceTotal();
+			sum = sum.add(BigDecimal.valueOf(item.getPriceTotal()));
 		}
-		return sum;
+		return sum.doubleValue();
 	}
 
 	public double getAmountToPay() {
