@@ -106,12 +106,17 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
     @Override
     public void onOrderCreateEvent(final OrderCreateSocketEvent event) {
         if (orders != null) {
-            orders.add(event.getOrder());
-            mPagerAdapter.updateOrders(orders);
-	        final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
-	        if (currentFragment != null && !currentFragment.isDownscaled()) {
-		        showOther(mPager.getCurrentItem(), false);
-	        }
+	        orders.add(event.getOrder());
+	        getActivity().runOnUiThread(new Runnable() {
+		        @Override
+		        public void run() {
+			        mPagerAdapter.updateOrders(orders);
+			        final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
+			        if (currentFragment != null && !currentFragment.isDownscaled()) {
+				        showOther(mPager.getCurrentItem(), false);
+			        }
+		        }
+	        });
         }
     }
 
@@ -123,10 +128,10 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
     private void updateOrder(final Order order) {
         final int position = replaceOrder(orders, order);
         if(order != null && position >= 0 && mPagerAdapter != null) {
-            mPagerAdapter.updateOrders(orders);
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+	                mPagerAdapter.updateOrders(orders);
                     final Fragment currentFragment = findFragmentByPosition(position);
                     if(currentFragment != null) {
                         ((OrderFragment) currentFragment).onOrderUpdate(order);
