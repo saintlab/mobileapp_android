@@ -128,7 +128,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		UserProfileActivity.startSliding(this, -1, StringUtils.EMPTY_STRING);
 	}
 
-	@OnClick(R.id.btn_demo)
+	@OnClick({R.id.panel_demo, R.id.btn_demo})
 	public void doDemo() {
 		ValidateActivity.startDemo(this,
 		                           R.anim.fake_fade_in_instant,

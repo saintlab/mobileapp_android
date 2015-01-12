@@ -29,7 +29,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -55,14 +54,11 @@ import com.google.zxing.client.android.history.HistoryItem;
 import com.google.zxing.client.android.history.HistoryManager;
 import com.google.zxing.client.android.result.ResultButtonListener;
 import com.google.zxing.client.android.result.ResultHandler;
-import com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.zxing.R;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.Map;
 
@@ -79,8 +75,6 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 	public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
 
 	public static final String EXTRA_SCANNED_URI = "zxing.scan.result";
-
-	public static final String EXTRA_SHOW_BACK = "zxing.capture.show.back";
 
 	private static final String TAG = CaptureActivity.class.getSimpleName();
 
@@ -172,15 +166,7 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 	}
 
 	protected void initUI() {
-		final boolean showBack = getIntent().getBooleanExtra(EXTRA_SHOW_BACK, true);
-		final View btnBack = findViewById(R.id.btn_back);
-		btnBack.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onBackPressed();
-			}
-		});
-		btnBack.setVisibility(showBack ? View.VISIBLE : View.GONE);
+
 	}
 
 	@Override
@@ -205,7 +191,7 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 		viewfinderView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		viewfinderView.setCameraManager(cameraManager);
 
-		resultView = findViewById(R.id.result_view);
+		// resultView = findViewById(R.id.result_view);
 		// statusView = (TextView) findViewById(R.id.status_view);
 
 		handler = null;
@@ -559,57 +545,13 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 			return;
 		}
 
-		// statusView.setVisibility(View.GONE);
 		viewfinderView.setVisibility(View.GONE);
-		resultView.setVisibility(View.VISIBLE);
 
 		ImageView barcodeImageView = (ImageView) findViewById(R.id.barcode_image_view);
 		if(barcode == null) {
 			barcodeImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.launcher_icon));
 		} else {
 			barcodeImageView.setImageBitmap(barcode);
-		}
-
-		TextView formatTextView = (TextView) findViewById(R.id.format_text_view);
-		formatTextView.setText(rawResult.getBarcodeFormat().toString());
-
-		TextView typeTextView = (TextView) findViewById(R.id.type_text_view);
-		typeTextView.setText(resultHandler.getType().toString());
-
-		DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-		TextView timeTextView = (TextView) findViewById(R.id.time_text_view);
-		timeTextView.setText(formatter.format(new Date(rawResult.getTimestamp())));
-
-		TextView metaTextView = (TextView) findViewById(R.id.meta_text_view);
-		View metaTextViewLabel = findViewById(R.id.meta_text_view_label);
-		metaTextView.setVisibility(View.GONE);
-		metaTextViewLabel.setVisibility(View.GONE);
-		Map<ResultMetadataType, Object> metadata = rawResult.getResultMetadata();
-		if(metadata != null) {
-			StringBuilder metadataText = new StringBuilder(20);
-			for(Map.Entry<ResultMetadataType, Object> entry : metadata.entrySet()) {
-				if(DISPLAYABLE_METADATA_TYPES.contains(entry.getKey())) {
-					metadataText.append(entry.getValue()).append('\n');
-				}
-			}
-			if(metadataText.length() > 0) {
-				metadataText.setLength(metadataText.length() - 1);
-				metaTextView.setText(metadataText);
-				metaTextView.setVisibility(View.VISIBLE);
-				metaTextViewLabel.setVisibility(View.VISIBLE);
-			}
-		}
-
-		TextView contentsTextView = (TextView) findViewById(R.id.contents_text_view);
-		contentsTextView.setText(displayContents);
-		int scaledSize = Math.max(22, 32 - displayContents.length() / 4);
-		contentsTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
-
-		TextView supplementTextView = (TextView) findViewById(R.id.contents_supplement_text_view);
-		supplementTextView.setText("");
-		supplementTextView.setOnClickListener(null);
-		if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesActivity.KEY_SUPPLEMENTAL, true)) {
-			SupplementalInfoRetriever.maybeInvokeRetrieval(supplementTextView, resultHandler.getResult(), historyManager, this);
 		}
 
 		int buttonCount = resultHandler.getButtonCount();
@@ -764,7 +706,7 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 	}
 
 	private void resetStatusView() {
-		resultView.setVisibility(View.GONE);
+		// resultView.setVisibility(View.GONE);
 		//statusView.setText(R.string.msg_default_status);
 		//statusView.setVisibility(View.VISIBLE);
 		// viewfinderView.setVisibility(View.VISIBLE);

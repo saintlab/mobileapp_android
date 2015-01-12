@@ -57,6 +57,11 @@ public class ValidateActivityCamera extends ValidateActivity {
 		context.start(intent, enterAnim, exitAnim, false);
 	}
 
+	public static void start(BaseFragmentActivity context, int enterAnim, int exitAnim, int animationType, final int userEnterType) {
+		Intent intent = createIntent(context, animationType, false, userEnterType);
+		context.start(intent, enterAnim, exitAnim, true);
+	}
+
 	public static void start(final BaseFragmentActivity context, final Uri data) {
 		final Intent intent = createIntent(context, EXTRA_LOADER_ANIMATION_SCALE_DOWN, false, ValidateActivity.TYPE_DEFAULT);
 		intent.setData(data).setAction(ACTION_LAUNCH_HASHCODE);

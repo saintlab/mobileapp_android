@@ -937,7 +937,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			@Override
 			public void run() {
 				ValidateActivity.start(ValidateActivity.this, R.anim.fade_in_long, R.anim.fade_out_long, EXTRA_LOADER_ANIMATION_FIXED,
-				                       ConfirmPhoneActivity.TYPE_DEFAULT);
+						ConfirmPhoneActivity.TYPE_DEFAULT);
 			}
 		});
 	}

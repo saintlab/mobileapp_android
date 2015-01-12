@@ -35,9 +35,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 	}
 
 	private static Intent getIntent(final Context context) {
-		final Intent intent = new Intent(context, OmnomQRCaptureActivity.class);
-		intent.putExtra(CaptureActivity.EXTRA_SHOW_BACK, false);
-		return intent;
+		return new Intent(context, OmnomQRCaptureActivity.class);
 	}
 
 	public static void start(final BaseOmnomFragmentActivity activity, final int code) {
@@ -76,7 +74,9 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 				AnimationUtils.animateAlpha(background, false, new Runnable() {
                     @Override
                     public void run() {
-                        AnimationUtils.animateBlinking(camera);
+	                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+		                    AnimationUtils.animateBlinking(camera);
+	                    }
                     }
                 });
 			}
