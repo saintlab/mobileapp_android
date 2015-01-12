@@ -61,14 +61,13 @@
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <RelativeLayout
-        android:id="@+id/panel_bottom"
+        android:id="@+id/btn_demo"
         android:layout_width="match_parent"
         android:layout_height="@dimen/restaurants_topbar_height"
         android:layout_alignParentBottom="true"
-        android:background="@color/show_demo_button_color">
+        android:background="@color/white_transparent">
 
         <Button
-            android:id="@+id/btn_demo"
             android:layout_height="match_parent"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
