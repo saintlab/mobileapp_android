@@ -547,16 +547,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 							                                       mErrorHelper.showNoOrders(new View.OnClickListener() {
 								                                       @Override
 								                                       public void onClick(View v) {
-									                                       clearErrors(true);
-									                                       ViewUtils.setVisible(txtErrorAdditional, false);
-									                                       loader.animateLogoFast(RestaurantHelper.getLogo(mRestaurant),
-									                                                              R.drawable.ic_bill_white_normal);
-									                                       loader.showProgress(false);
-									                                       configureScreen(mRestaurant);
-									                                       updateLightProfile(!mIsDemo);
-									                                       ViewUtils.setVisible(imgPrevious, !mIsDemo);
-									                                       ViewUtils.setVisible(txtLeave, mIsDemo);
-									                                       ViewUtils.setVisible(getPanelBottom(), true);
+									                                       onErrorClose();
 								                                       }
 							                                       }, tableNumber);
 							                                       txtError.setText(StringUtils.EMPTY_STRING);
@@ -568,8 +559,28 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			                                       @Override
 			                                       public void onError(Throwable throwable) {
 				                                       v.setEnabled(true);
+				                                       startErrorTransition();
+				                                       mErrorHelper.showUnknownError(new View.OnClickListener() {
+					                                       @Override
+					                                       public void onClick(View v) {
+														        onErrorClose();
+					                                       }
+				                                       });
 			                                       }
 		                                       });
+	}
+
+	private void onErrorClose() {
+		clearErrors(true);
+		ViewUtils.setVisible(txtErrorAdditional, false);
+		loader.animateLogoFast(RestaurantHelper.getLogo(mRestaurant),
+				R.drawable.ic_bill_white_normal);
+		loader.showProgress(false);
+		configureScreen(mRestaurant);
+		updateLightProfile(!mIsDemo);
+		ViewUtils.setVisible(imgPrevious, !mIsDemo);
+		ViewUtils.setVisible(txtLeave, mIsDemo);
+		ViewUtils.setVisible(getPanelBottom(), true);
 	}
 
 	private void showNoOrdersInfo() {
