@@ -335,7 +335,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		loader.setColor(getResources().getColor(R.color.loader_bg));
 		if(mFirstRun) {
 			switch(mAnimationType) {
 				case EXTRA_LOADER_ANIMATION_SCALE_DOWN:
@@ -357,6 +356,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Override
 	public void initUi() {
 		loader.setLogo(R.drawable.ic_fork_n_knife);
+		loader.setColor(getResources().getColor(R.color.loader_bg));
 		mPaymentListener = new PaymentEventListener(this);
 		bgTransitionDrawable = new com.omnom.android.utils.drawable.TransitionDrawable(
 				getResources().getInteger(R.integer.default_animation_duration_short),

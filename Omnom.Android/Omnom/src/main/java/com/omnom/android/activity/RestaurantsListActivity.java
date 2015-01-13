@@ -247,9 +247,6 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		nextView = list.getChildAt(position + 1);
 		list.setScrollEnabled(false);
 		refreshView.setEnabled(false);
-		if(nextView != null) {
-			nextView.animate().alpha(0).start();
-		}
 		if (selectedCover != null) {
 			final int duration = getResources().getInteger(R.integer.default_animation_duration_medium);
 			AnimationUtils.scale(selectedCover, logoSizeLarge, duration, new Runnable() {
@@ -285,16 +282,13 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		list.setScrollEnabled(true);
 		refreshView.setEnabled(true);
 		panelTop.setTranslationY(0);
-		if(footer != null && footer.getAlpha() < 1) {
+		if (footer != null && footer.getAlpha() < 1) {
 			footer.animate().alpha(1).start();
 		}
 		refreshView.setTranslationY(0);
-		if(mAdapter != null) {
+		if (mAdapter != null) {
 			mAdapter.setSelected(-1);
 			mAdapter.notifyDataSetChanged();
-		}
-		if(nextView != null) {
-			nextView.setAlpha(1);
 		}
 		if (selectedCover != null) {
 			LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) selectedCover.getLayoutParams();

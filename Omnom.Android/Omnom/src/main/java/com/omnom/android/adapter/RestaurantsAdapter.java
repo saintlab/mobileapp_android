@@ -81,6 +81,10 @@ public class RestaurantsAdapter extends BaseAdapter {
 			txtSchedule.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
 			cover.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
 		}
+
+		public float alpha() {
+			return cover.getAlpha();
+		}
 	}
 
 	private final Context mContext;
@@ -155,7 +159,7 @@ public class RestaurantsAdapter extends BaseAdapter {
 				}
 			}
 		} else {
-			if(convertView.getAlpha() != 1.0f) {
+			if(holder.alpha() != 1.0f) {
 				ViewCompat.setHasTransientState(convertView, false);
 				holder.alpha(1);
 			} else {
