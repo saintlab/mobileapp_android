@@ -250,21 +250,23 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		if(nextView != null) {
 			nextView.animate().alpha(0).start();
 		}
-		final int duration = getResources().getInteger(R.integer.default_animation_duration_medium);
-		AnimationUtils.scale(selectedCover, logoSizeLarge, duration, new Runnable() {
-			@Override
-			public void run() {
-			}
-		});
-		selectedCover.scaleUp(duration, logoSizeLarge, true, new Runnable() {
-			@Override
-			public void run() {
-				list.requestLayout();
-				final Restaurant item = (Restaurant) mAdapter.getItem(position);
-				RestaurantActivity.start(RestaurantsListActivity.this, item, topTranslation);
-				mItemClicked = false;
-			}
-		});
+		if (selectedCover != null) {
+			final int duration = getResources().getInteger(R.integer.default_animation_duration_medium);
+			AnimationUtils.scale(selectedCover, logoSizeLarge, duration, new Runnable() {
+				@Override
+				public void run() {
+				}
+			});
+			selectedCover.scaleUp(duration, logoSizeLarge, true, new Runnable() {
+				@Override
+				public void run() {
+					list.requestLayout();
+					final Restaurant item = (Restaurant) mAdapter.getItem(position);
+					RestaurantActivity.start(RestaurantsListActivity.this, item, topTranslation);
+					mItemClicked = false;
+				}
+			});
+		}
 	}
 
 	@Override
