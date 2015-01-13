@@ -123,7 +123,7 @@ public class PayOnceFragment extends Fragment {
 			final String osfFontPath = "fonts/Futura-OSF-Omnom-Regular.otf";
 			CalligraphyUtils.applyFontToTextView(getActivity(), txtSmsNotificationsOff, osfFontPath);
 			CalligraphyUtils.applyFontToTextView(getActivity(), txtPayOnce, osfFontPath);
-			final String text = AmountHelper.format(mAmount) + getActivity().getString(R.string.currency_ruble);
+			final String text = AmountHelper.format(mAmount) + getActivity().getString(R.string.currency_suffix_ruble);
 			if (mType == CardConfirmActivity.TYPE_BIND_CONFIRM) {
 				btnPay.setText(getString(R.string.pay_amount, text));
 			} else {

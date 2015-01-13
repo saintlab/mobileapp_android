@@ -399,7 +399,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private String getCurrencySuffix() {
-		return getString(R.string.currency_ruble);
+		return getString(R.string.currency_suffix_ruble);
 	}
 
 	@Override
@@ -834,7 +834,7 @@ public class OrderFragment extends Fragment {
 								mMode = MODE_AMOUNT;
 								mLastAmount = getEnteredAmount();
 								txtPaymentTitle.setText(R.string.i_m_going_to_pay);
-								editAmount.setSelection(editAmount.getText().length() - 1);
+								editAmount.setSelection(editAmount.getText().length() - getCurrencySuffix().length());
 							} else {
 								if(!mApply) {
 									editAmount.setText(AmountHelper.format(mLastAmount) + getCurrencySuffix());

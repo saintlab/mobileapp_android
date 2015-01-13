@@ -235,6 +235,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 				return false;
 			}
 		});
+		final int suffixLength = getCurrencySuffix().length();
 		editText.addTextChangedListener(new TextWatcher() {
 			public boolean hadComma = false;
 
@@ -266,7 +267,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 				final String text = amount + getCurrencySuffix();
 				editText.setText(text);
-				editText.setSelection(text.length() - 1);
+				editText.setSelection(text.length() - suffixLength);
 				editText.addTextChangedListener(this);
 			}
 		});
@@ -275,8 +276,8 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(hasFocus) {
 					int length = editText.getText().length();
-					if(length >= 2) {
-						editText.setSelection(length - 2);
+					if(length >= suffixLength + 1) {
+						editText.setSelection(length - suffixLength);
 					}
 				}
 			}
@@ -284,7 +285,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	}
 
 	private String getCurrencySuffix() {
-		return getString(R.string.currency_ruble);
+		return getString(R.string.currency_suffix_ruble);
 	}
 
 	private void registerCard() {

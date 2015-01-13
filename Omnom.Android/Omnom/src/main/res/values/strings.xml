@@ -52,6 +52,7 @@
     <string name="save_card_data">Сохранить данные карты для&#160;следующих платежей</string>
     <string name="add_card">Добавить карту</string>
     <string name="currency_ruble"></string>
+    <string name="currency_suffix_ruble">&#160;</string>
     <string name="cardio_app_token">e041fdfc4e9c4c6ba1dbd26969a98d92</string>
     <string name="ready">Готово</string>
     <string name="bind">Привязать</string>
@@ -75,7 +76,7 @@
     <string name="sms_sent_to_waiter">Официант получил sms с&#160;суммой чаевых.</string>
     <string name="bill_sent_by_email">Счёт отправлен на&#160;почту</string>
     <string name="title_activity_thanks">ThanksActivity</string>
-    <string name="bill_split_amount_">= %1$s</string>
+    <string name="bill_split_amount_">= %1$s&#160;</string>
     <string name="bill_number_">Счёт %1$s</string>
     <string name="split_the_bill">Разделить счёт</string>
     <string name="close">Закрыть</string>

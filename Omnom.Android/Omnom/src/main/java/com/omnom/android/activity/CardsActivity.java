@@ -207,7 +207,7 @@ public class CardsActivity extends BaseOmnomActivity {
 		}
 
 		if(mDetails != null) {
-			final String text = AmountHelper.format(mDetails.getAmount()) + getString(R.string.currency_ruble);
+			final String text = AmountHelper.format(mDetails.getAmount()) + getString(R.string.currency_suffix_ruble);
 			mBtnPay.setText(getString(R.string.pay_amount, text));
 			if(!mIsDemo) {
 				mBtnPay.setEnabled(false);

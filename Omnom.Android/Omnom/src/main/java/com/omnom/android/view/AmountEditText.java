@@ -73,7 +73,7 @@ public class AmountEditText extends EditText {
 				final int selectionEnd = getSelectionEnd();
 				final int selectionStart = getSelectionStart();
 				if(selectionStart == selectionEnd && selectionEnd == getText().length()) {
-					setSelection(selectionEnd - 1);
+					setSelection(selectionEnd - getCurrencySuffix().length());
 				}
 				return false;
 			}
@@ -94,8 +94,9 @@ public class AmountEditText extends EditText {
 				String str = s.toString();
 				// TODO: refactor the following code to make it readable
 				if(str.endsWith(".") || str.endsWith(",")) {
-					getText().delete(getSelectionEnd() - 1, getSelectionEnd());
-					setSelection(getSelectionEnd() - 1);
+					final int suffixLength = getCurrencySuffix().length();
+					getText().delete(getSelectionEnd() - suffixLength, getSelectionEnd());
+					setSelection(getSelectionEnd() - suffixLength);
 					return;
 				}
 				// Add currency suffics if necessary
@@ -114,7 +115,7 @@ public class AmountEditText extends EditText {
 				// If amount exceeds upper limit make it equals to it
 				double amount;
 				try {
-					amount = Double.parseDouble(str.substring(0, str.length() - 1));
+					amount = Double.parseDouble(str.substring(0, str.length() - getCurrencySuffix().length()));
 				} catch (NumberFormatException e) {
 					amount = 0;
 				}
@@ -131,7 +132,7 @@ public class AmountEditText extends EditText {
 					}
 				}
 				setText(str);
-				setSelection(str.length() - 1);
+				setSelection(str.length() - getCurrencySuffix().length());
 				addTextChangedListener(this);
 			}
 		});
@@ -151,6 +152,6 @@ public class AmountEditText extends EditText {
 	}
 
 	private String getCurrencySuffix() {
-		return getContext().getString(R.string.currency_ruble);
+		return getContext().getString(R.string.currency_suffix_ruble);
 	}
 }
