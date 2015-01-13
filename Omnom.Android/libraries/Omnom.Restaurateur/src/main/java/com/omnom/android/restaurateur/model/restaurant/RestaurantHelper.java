@@ -36,7 +36,7 @@ public class RestaurantHelper {
 		final Address address = restaurant.address();
 		if(address != null) {
 			final String floor = !TextUtils.isEmpty(address.getFloor())
-					? StringUtils.WHITESPACE + address.getFloor() + StringUtils.WHITESPACE +
+					? StringUtils.WHITESPACE + address.getFloor() + StringUtils.NON_BREAKING_WHITESPACE +
 					  context.getString(R.string.floor_suffix) : StringUtils.EMPTY_STRING;
 			return StringUtils.concat(context.getString(R.string.restaurant_address_delimiter),
 			                          address.getStreet() + StringUtils.WHITESPACE + address.getBuilding(),

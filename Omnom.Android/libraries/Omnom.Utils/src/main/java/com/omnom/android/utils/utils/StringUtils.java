@@ -17,6 +17,8 @@ public class StringUtils {
 
 	public static final String WHITESPACE = " ";
 
+	public static final String NON_BREAKING_WHITESPACE = "\u00A0";
+
 	private static final String TAG = StringUtils.class.getSimpleName();
 
 	public static String concat(String delimiter, String... data) {
