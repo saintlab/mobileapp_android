@@ -316,7 +316,7 @@ public class BackgroundBleService extends Service {
 				restaurant != null ? getString(R.string.welcome_to_, restaurant.title()) : getString(R.string.omnom_works_here);
 
 		final Notification notification =
-				new Notification.Builder(this).setSmallIcon(R.drawable.ic_app).setContentTitle(getString(R.string.app_name))
+				new Notification.Builder(this).setSmallIcon(R.drawable.ic_push).setContentTitle(getString(R.string.app_name))
 				                              .setContentText(content).setContentIntent(getNotificationIntent()).setAutoCancel(true)
 				                              .setDefaults(Notification.DEFAULT_ALL).setOnlyAlertOnce(true).setPriority(
 						Notification.PRIORITY_HIGH).build();
