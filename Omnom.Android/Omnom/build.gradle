@@ -42,8 +42,8 @@ android {
         applicationId "com.omnom.android"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 43
-        versionName "0.2.7"
+        versionCode 44
+        versionName "0.2.8"
     }
 
     signingConfigs {
