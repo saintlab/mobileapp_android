@@ -35,9 +35,12 @@ public class RestaurantHelper {
 	public static String getAddressSmall(final Context context, final Restaurant restaurant) {
 		final Address address = restaurant.address();
 		if(address != null) {
+			final String floor = !TextUtils.isEmpty(address.getFloor())
+					? StringUtils.WHITESPACE + address.getFloor() + StringUtils.WHITESPACE +
+					  context.getString(R.string.floor_suffix) : StringUtils.EMPTY_STRING;
 			return StringUtils.concat(context.getString(R.string.restaurant_address_delimiter),
-			                          address.getStreet(),
-			                          address.getBuilding());
+			                          address.getStreet() + StringUtils.WHITESPACE + address.getBuilding(),
+									  floor);
 		}
 		return StringUtils.EMPTY_STRING;
 	}
