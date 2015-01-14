@@ -75,17 +75,17 @@
                     android:id="@+id/txt_table_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
                     android:drawablePadding="@dimen/drawable_padding_default"
                     android:textColor="@color/blue_bright"
                     android:drawableLeft="@drawable/ic_profile_table_marker"
-                    android:textAppearance="?android:textAppearanceLarge" />
+                    android:textAppearance="?android:textAppearanceLarge"
+                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
-                <ImageView
+                <!--ImageView
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_arrow_right_icon"/>
+                    android:src="@drawable/ic_arrow_right_icon"/-->
 
             </LinearLayout>
 

@@ -27,6 +27,7 @@
     <string name="create_account">Создать аккаунт</string>
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
+    <string name="table_number_format">%1$s Изменить</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_validate">ValidateActivity</string>
     <string name="waiter">Официант</string>

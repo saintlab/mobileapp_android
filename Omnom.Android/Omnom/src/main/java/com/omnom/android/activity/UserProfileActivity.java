@@ -114,7 +114,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 		if(mTableNumber > 0) {
 			ViewUtils.setVisible(panelTableNumber, true);
 			ViewUtils.setVisible(delimiterTableNumber, true);
-			mTxtTableNumber.setText(String.valueOf(mTableNumber));
+			mTxtTableNumber.setText(getString(R.string.table_number_format, String.valueOf(mTableNumber)));
 		} else {
 			ViewUtils.setVisible(panelTableNumber, false);
 			ViewUtils.setVisible(delimiterTableNumber, false);
