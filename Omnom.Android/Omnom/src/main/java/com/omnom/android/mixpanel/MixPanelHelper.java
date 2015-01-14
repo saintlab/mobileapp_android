@@ -260,6 +260,7 @@ public class MixPanelHelper {
 			public void execute(final MixpanelAPI api) {
 				api.identify(id);
 				api.getPeople().identify(id);
+				api.getPeople().set(toJson(user));
 				api.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
 			}
 		});
