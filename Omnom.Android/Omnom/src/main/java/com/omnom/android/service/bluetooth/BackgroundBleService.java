@@ -268,7 +268,6 @@ public class BackgroundBleService extends Service {
 					@Override
 					public void call(TableDataResponse tableDataResponse) {
 						final BackgroundBleService context = BackgroundBleService.this;
-
 						OmnomApplication.getMixPanelHelper(context).identify(String.valueOf(userProfile.getUser().getId()));
 						final MixpanelEvent event = RestaurantEnterMixpanelEvent.createEventBluetooth(UserHelper.getUserData(context),
 								tableDataResponse,

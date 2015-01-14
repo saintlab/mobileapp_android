@@ -44,7 +44,7 @@ public class MixPanelHelper {
 
 	public static final String USER_NICK = "nick";
 
-	public static final String USER_BIRTHDAY = "birthday";
+	public static final String USER_BIRTHDAY = "$birthday";
 
 	public static final String USER_EMAIL = "$email";
 
@@ -213,7 +213,7 @@ public class MixPanelHelper {
 		}
 	}
 
-	public void trackUserLogin(final Project project, Context context, UserData user) {
+	public void trackUserLogin(final Project project, Context context, final UserData user) {
 		if(user == null) {
 			return;
 		}
@@ -224,6 +224,7 @@ public class MixPanelHelper {
 			public void execute(final MixpanelAPI api) {
 				api.identify(id);
 				api.getPeople().identify(id);
+				api.getPeople().set(toJson(user));
 				api.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
 			}
 		});
