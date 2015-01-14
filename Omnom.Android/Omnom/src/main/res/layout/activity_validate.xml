@@ -32,7 +32,8 @@
                 android:textColor="@android:color/secondary_text_light"
                 android:textStyle="bold"
                 android:textIsSelectable="true"
-                android:textAppearance="?android:textAppearanceLarge"/>
+                android:textAppearance="?android:textAppearanceLarge"
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
             <TextView
                 android:id="@+id/txt_error_additional"
@@ -47,7 +48,8 @@
                 android:textIsSelectable="true"
                 android:visibility="gone"
                 android:textColorLink="@android:color/secondary_text_light"
-                android:textAppearance="?android:textAppearanceLarge"/>
+                android:textAppearance="?android:textAppearanceLarge"
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
             <LinearLayout
                 android:id="@+id/panel_errors"
