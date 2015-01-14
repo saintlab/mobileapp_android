@@ -406,4 +406,8 @@ public class AndroidUtils {
         }
     }
 
+	public static boolean hasLightSensor(final Context context){
+		return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_LIGHT);
+	}
+
 }

@@ -3,12 +3,19 @@ package com.omnom.android.activity;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
+import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.android.CaptureActivity;
+import com.google.zxing.client.android.Intents;
+import com.google.zxing.client.android.PreferencesActivity;
+import com.google.zxing.client.android.camera.FrontLightMode;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
@@ -35,7 +42,11 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 	}
 
 	private static Intent getIntent(final Context context) {
-		return new Intent(context, OmnomQRCaptureActivity.class);
+		Intent intent = new Intent(context, OmnomQRCaptureActivity.class);
+		intent.setAction(Intents.Scan.ACTION);
+		intent.putExtra(Intents.Scan.FORMATS, BarcodeFormat.QR_CODE.name());
+		intent.putExtra(Intents.Scan.SAVE_HISTORY, false);
+		return intent;
 	}
 
 	public static void start(final BaseOmnomFragmentActivity activity, final int code) {
@@ -48,6 +59,19 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 		} else {
 			activity.startActivityForResult(intent, code);
 		}
+	}
+
+	@Override
+	public void onCreate(Bundle icicle) {
+		super.onCreate(icicle);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences.Editor editor = prefs.edit();
+		if (AndroidUtils.hasLightSensor(this)) {
+			editor.putString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, FrontLightMode.AUTO.name());
+		} else {
+			editor.putString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, FrontLightMode.ON.name());
+		}
+		editor.apply();
 	}
 
 	@Override
