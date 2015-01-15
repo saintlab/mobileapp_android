@@ -19,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +57,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import butterknife.Optional;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
@@ -112,7 +112,7 @@ public class CardsActivity extends BaseOmnomActivity {
 	public static void start(final Activity activity, final String tableId) {
 		final Intent intent = new Intent(activity, CardsActivity.class);
 		intent.putExtra(EXTRA_TABLE_ID, tableId);
-		startActivity(activity, intent, 0);
+		startActivity(activity, intent, -1);
 	}
 
 	@SuppressLint("NewApi")
@@ -139,6 +139,7 @@ public class CardsActivity extends BaseOmnomActivity {
 	@InjectView(R.id.footer)
 	protected LinearLayout cardsFooter;
 
+	@Optional
 	@InjectView(R.id.btn_pay)
 	protected Button mBtnPay;
 
@@ -176,7 +177,15 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	@Override
 	public int getLayoutResource() {
-		return R.layout.activity_cards;
+		// There is an issue with SDK 4.0.4 (15). If we change layout properties from code
+		// a number of controls become hidden. It is not reproduced on further version of SDK.
+		// Thus, as a solution the view is duplicated and changed to have appropriate layout.
+		// https://github.com/saintlab/mobileapp_android/issues/262
+		if (getIntent().getParcelableExtra(Extras.EXTRA_PAYMENT_DETAILS) == null) {
+			return R.layout.activity_cards_profile;
+		} else {
+			return R.layout.activity_cards;
+		}
 	}
 
 	@Override
@@ -212,16 +221,15 @@ public class CardsActivity extends BaseOmnomActivity {
 			mPaymentListener = new PaymentEventListener(this);
 		}
 
-		if(mDetails != null) {
+		if(mDetails != null && mBtnPay != null) {
 			final String text = AmountHelper.format(mDetails.getAmount()) + getString(R.string.currency_suffix_ruble);
 			mBtnPay.setText(getString(R.string.pay_amount, text));
+			GradientDrawable sd = (GradientDrawable) mBtnPay.getBackground();
+			sd.setColor(getResources().getColor(R.color.btn_pay_green));
+			sd.invalidateSelf();
 			if(!mIsDemo) {
 				mBtnPay.setEnabled(false);
 			}
-		} else {
-			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) cardsFooter.getLayoutParams();
-			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-			ViewUtils.setVisible(mBtnPay, false);
 		}
 
 		mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -258,9 +266,6 @@ public class CardsActivity extends BaseOmnomActivity {
 			}
 		});
 
-		GradientDrawable sd = (GradientDrawable) mBtnPay.getBackground();
-		sd.setColor(getResources().getColor(R.color.btn_pay_green));
-		sd.invalidateSelf();
 	}
 
 	private void askForRemoval(final Card card) {
@@ -353,7 +358,9 @@ public class CardsActivity extends BaseOmnomActivity {
 	private void updateCardsSelection(CardsAdapter adapter, Card card) {
 		final String selectedId = mPreferences.getCardId(getActivity());
 		if(card.getExternalCardId().equals(selectedId)) {
-			mBtnPay.setEnabled(selectCard(adapter, selectedId));
+			if (mBtnPay != null) {
+				mBtnPay.setEnabled(selectCard(adapter, selectedId));
+			}
 		}
 	}
 
@@ -398,7 +405,9 @@ public class CardsActivity extends BaseOmnomActivity {
 							                                      mList.setAdapter(new CardsAdapter(getActivity(), cardsList, false));
 							                                      boolean isSelected = selectCard((CardsAdapter) mList.getAdapter(),
 							                                                                      mPreferences.getCardId(getActivity()));
-							                                      mBtnPay.setEnabled(isSelected);
+							                                      if (mBtnPay != null) {
+								                                      mBtnPay.setEnabled(isSelected);
+							                                      }
 							                                      mPanelTop.showProgress(false);
 							                                      mPanelTop.showButtonRight(true);
 						                                      }
@@ -464,6 +473,7 @@ public class CardsActivity extends BaseOmnomActivity {
 		return cardToSelect;
 	}
 
+	@Optional
 	@OnClick(R.id.btn_pay)
 	protected void onPay() {
 		final String cardId = getPreferences().getCardId(this);
