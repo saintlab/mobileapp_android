@@ -34,7 +34,7 @@
                 omnom:imeOptions="actionDone"
                 omnom:inputType="numberDecimal"
                 omnom:font="regular_le"
-                omnom:maxLength="6"
+                omnom:maxLength="7"
                 omnom:editTextWidth="180dp"
                 omnom:textSize="@dimen/font_large"
                 omnom:errorTextSize="@dimen/font_small"
