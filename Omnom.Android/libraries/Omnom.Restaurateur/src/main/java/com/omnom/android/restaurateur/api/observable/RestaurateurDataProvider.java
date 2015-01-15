@@ -46,7 +46,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by Ch3D on 11.08.2014.
  */
-public class RestaurateurDataProvider implements RestaurateurObeservableApi {
+public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	public static RestaurateurDataProvider create(final String dataEndPoint, final RequestInterceptor interceptor) {
 		// final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;

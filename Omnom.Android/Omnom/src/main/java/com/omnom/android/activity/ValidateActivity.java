@@ -29,7 +29,7 @@ import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.protocol.Protocol;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.config.Config;
@@ -232,7 +232,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	protected TextView txtLeave;
 
 	@Inject
-	protected RestaurateurObeservableApi api;
+	protected RestaurateurObservableApi api;
 
 	protected OmnomErrorHelper mErrorHelper;
 

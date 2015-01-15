@@ -26,7 +26,7 @@ import rx.functions.Func1;
 /**
  * Created by Ch3D on 11.08.2014.
  */
-public interface RestaurateurObeservableApi {
+public interface RestaurateurObservableApi {
 	public Observable<Restaurant> getRestaurant(String restaurantId);
 
 	Observable<Restaurant> getRestaurant(String restaurantId, Func1<Restaurant, Restaurant> funcMap);

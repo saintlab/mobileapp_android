@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import com.omnom.android.protocol.BaseRequestInterceptor;
 import com.omnom.android.protocol.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurDataProvider;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.utils.AuthTokenProvider;
 
 import javax.inject.Singleton;
@@ -43,7 +43,7 @@ public class RestaurateurModule {
 
 	@Provides
 	@Singleton
-	RestaurateurObeservableApi providerLinkerApi() {
+	RestaurateurObservableApi providerLinkerApi() {
 		return RestaurateurDataProvider.create(
 				mContext.getString(mEndpointResId),
 				new BaseRequestInterceptor(mContext) {

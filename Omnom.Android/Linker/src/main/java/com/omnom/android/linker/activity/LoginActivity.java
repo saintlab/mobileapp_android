@@ -17,7 +17,7 @@ import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.linker.BuildConfig;
 import com.omnom.android.linker.R;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -124,7 +124,7 @@ public class LoginActivity extends BaseActivity {
 	protected LinkerApplication app;
 
 	@Inject
-	protected RestaurateurObeservableApi api;
+	protected RestaurateurObservableApi api;
 
 	@Inject
 	protected AuthService authenticator;

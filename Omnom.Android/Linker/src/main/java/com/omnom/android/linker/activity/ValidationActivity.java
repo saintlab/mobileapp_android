@@ -18,7 +18,7 @@ import com.omnom.android.linker.R;
 import com.omnom.android.linker.activity.bind.BindActivity;
 import com.omnom.android.linker.activity.restaurant.RestaurantsListActivity;
 import com.omnom.android.protocol.Protocol;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
@@ -72,7 +72,7 @@ public class ValidationActivity extends BaseActivity {
 	@InjectView(R.id.panel_bottom)
 	protected View panelBottom;
 	@Inject
-	protected RestaurateurObeservableApi api;
+	protected RestaurateurObservableApi api;
 
 	@Inject
 	protected AuthService mAuthenticator;

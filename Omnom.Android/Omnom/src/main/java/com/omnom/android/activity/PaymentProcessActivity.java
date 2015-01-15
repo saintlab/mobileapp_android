@@ -30,7 +30,7 @@ import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.mixpanel.model.acquiring.PaymentMixpanelEvent;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
@@ -76,7 +76,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	}
 
 	@Inject
-	protected RestaurateurObeservableApi api;
+	protected RestaurateurObservableApi api;
 
 	@Inject
 	protected Acquiring mAcquiring;

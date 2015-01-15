@@ -20,7 +20,7 @@ import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.UserProfileHelper;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.drawable.RoundTransformation;
@@ -79,7 +79,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	protected TextView mTxtTableNumber;
 
 	@Inject
-	protected RestaurateurObeservableApi api;
+	protected RestaurateurObservableApi api;
 
 	private Subscription profileSubscription;
 
@@ -97,9 +97,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.btn_my_cards)
 	protected void onMyCards() {
-		final Intent intent = new Intent(this, CardsActivity.class);
-		intent.putExtra(EXTRA_TABLE_ID, mTableId);
-		startActivity(intent);
+		CardsActivity.start(this, mTableId);
 	}
 
 	@OnClick(R.id.btn_feedback)

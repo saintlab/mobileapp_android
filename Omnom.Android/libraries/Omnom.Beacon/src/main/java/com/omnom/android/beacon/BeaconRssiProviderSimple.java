@@ -2,7 +2,7 @@ package com.omnom.android.beacon;
 
 import android.util.Log;
 
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.utils.BaseOmnomApplication;
 
@@ -20,7 +20,7 @@ public class BeaconRssiProviderSimple implements BeaconRssiProvider {
 	private static final String TAG = BeaconRssiProviderSimple.class.getSimpleName();
 
 	@Inject
-	protected RestaurateurObeservableApi api;
+	protected RestaurateurObservableApi api;
 
 	public BeaconRssiProviderSimple(final BaseOmnomApplication app) {
 		app.inject(this);

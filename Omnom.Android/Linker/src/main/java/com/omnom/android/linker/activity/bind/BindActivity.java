@@ -32,7 +32,7 @@ import com.omnom.android.linker.activity.UserProfileActivity;
 import com.omnom.android.linker.loader.LinkerLoaderError;
 import com.omnom.android.linker.service.BluetoothLeService;
 import com.omnom.android.linker.service.CharacteristicHolder;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -142,7 +142,7 @@ public class BindActivity extends BaseActivity {
 	protected List<View> errorViews;
 
 	@Inject
-	protected RestaurateurObeservableApi api;
+	protected RestaurateurObservableApi api;
 
 	@Inject
 	protected BeaconRssiProvider rssiProvider;

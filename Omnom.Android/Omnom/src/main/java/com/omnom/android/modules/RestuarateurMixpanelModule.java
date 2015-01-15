@@ -8,7 +8,7 @@ import com.omnom.android.interceptors.mixpanel.RestaurateurMixpanelProxy;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.protocol.BaseRequestInterceptor;
 import com.omnom.android.protocol.Protocol;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.utils.AuthTokenProvider;
 
 import javax.inject.Singleton;
@@ -46,7 +46,7 @@ public class RestuarateurMixpanelModule {
 
 	@Provides
 	@Singleton
-	RestaurateurObeservableApi providerLinkerApi() {
+	RestaurateurObservableApi providerLinkerApi() {
 		return RestaurateurMixpanelProxy.create(
 				mContext.getString(mEndpointResId),
 				new BaseRequestInterceptor(mContext) {

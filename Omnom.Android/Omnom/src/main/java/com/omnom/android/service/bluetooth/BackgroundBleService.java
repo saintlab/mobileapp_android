@@ -29,7 +29,7 @@ import com.omnom.android.mixpanel.model.MixpanelEvent;
 import com.omnom.android.mixpanel.model.RestaurantEnterMixpanelEvent;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.preferences.PreferenceHelperAdapter;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.ResponseBase;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -85,7 +85,7 @@ public class BackgroundBleService extends Service {
 	public Callback mLeScanCallback;
 
 	@Inject
-	protected RestaurateurObeservableApi api;
+	protected RestaurateurObservableApi api;
 
 	private BluetoothAdapter mBluetoothAdapter;
 

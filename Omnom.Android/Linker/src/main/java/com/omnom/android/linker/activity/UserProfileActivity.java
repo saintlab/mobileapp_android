@@ -15,10 +15,10 @@ import com.omnom.android.auth.UserProfileHelper;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.linker.LinkerApplication;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.utils.drawable.RoundTransformation;
 import com.omnom.android.utils.drawable.RoundedDrawable;
 import com.omnom.android.linker.R;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -83,7 +83,7 @@ public class UserProfileActivity extends BaseActivity {
 	protected List<View> mTxtViews;
 
 	@Inject
-	protected RestaurateurObeservableApi api;
+	protected RestaurateurObservableApi api;
 
 	@Inject
 	protected AuthService authenticator;

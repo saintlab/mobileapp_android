@@ -34,7 +34,7 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.model.acquiring.CardDeletedMixpanelEvent;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.cards.Card;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
@@ -109,6 +109,12 @@ public class CardsActivity extends BaseOmnomActivity {
 		startActivity(activity, intent, code);
 	}
 
+	public static void start(final Activity activity, final String tableId) {
+		final Intent intent = new Intent(activity, CardsActivity.class);
+		intent.putExtra(EXTRA_TABLE_ID, tableId);
+		startActivity(activity, intent, 0);
+	}
+
 	@SuppressLint("NewApi")
 	private static void startActivity(final Activity activity, final Intent intent, final int code) {
 		if(AndroidUtils.isJellyBean()) {
@@ -122,7 +128,7 @@ public class CardsActivity extends BaseOmnomActivity {
 	}
 
 	@Inject
-	protected RestaurateurObeservableApi api;
+	protected RestaurateurObservableApi api;
 
 	@Inject
 	protected Acquiring mAcquiring;

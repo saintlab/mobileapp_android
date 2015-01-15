@@ -18,7 +18,7 @@ import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.utils.loader.LoaderView;
@@ -97,7 +97,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	protected SwipeRefreshLayout refreshView;
 
 	@Inject
-	RestaurateurObeservableApi api;
+	RestaurateurObservableApi api;
 
 	private RestaurantsAdapter mAdapter;
 

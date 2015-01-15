@@ -14,7 +14,7 @@ import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObeservableApi;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -69,7 +69,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 	}
 
 	@Inject
-	protected RestaurateurObeservableApi api;
+	protected RestaurateurObservableApi api;
 
 	private Subscription mCheckQrSubscribtion;
 
