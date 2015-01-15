@@ -92,7 +92,7 @@ public class PreferenceHelper implements PreferenceProvider {
 
 	@Override
 	public String getUserProfileJson(Context context) {
-		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).getString(CONFIG, StringUtils.EMPTY_STRING);
+		return context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).getString(USER_PROFILE, StringUtils.EMPTY_STRING);
 	}
 
 	@Override
