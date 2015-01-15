@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -56,15 +57,13 @@ public class MixPanelHelper {
 
 	public static final String KEY_DATA = "data";
 
-	public static final String KEY_DEVICE_TIMESTAMP = "device_timestamp";
-
 	public static final String KEY_TIMESTAMP = "timestamp";
 
 	public static final String MIXPANEL_PUSH_ID = "1021785355576";
 
 	private static final String TAG = MixPanelHelper.class.getSimpleName();
 
-	private static final String TIMESTAMP_FORMAT = "{yyyy-MM-dd'T'HH:mm:ssZ}";
+	private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
 	public static final SimpleDateFormat sSimpleDateFormatter = new SimpleDateFormat(TIMESTAMP_FORMAT);
 
@@ -81,6 +80,7 @@ public class MixPanelHelper {
 	public MixPanelHelper(Map<Project, MixpanelAPI> apiMap) {
 		mMixpanelApiMap = apiMap;
 		mGson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+        sSimpleDateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 
 	public void identify(final String id) {
@@ -206,7 +206,6 @@ public class MixPanelHelper {
 			final Long currentTime = System.currentTimeMillis();
 			final Long timestamp = currentTime + timeDiff;
 			json.put(KEY_MIXPANEL_TIME, TimeUnit.MILLISECONDS.toSeconds(timestamp));
-			json.put(KEY_DEVICE_TIMESTAMP, sSimpleDateFormatter.format(new Date(currentTime)));
 			json.put(KEY_TIMESTAMP, sSimpleDateFormatter.format(new Date(timestamp)));
 		} catch(JSONException e) {
 			Log.e(TAG, "track", e);
