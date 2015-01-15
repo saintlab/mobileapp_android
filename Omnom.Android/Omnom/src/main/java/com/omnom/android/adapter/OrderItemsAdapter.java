@@ -13,6 +13,7 @@ import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.utils.AmountHelper;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.ArrayList;
@@ -152,7 +153,7 @@ public class OrderItemsAdapter extends BaseAdapter {
 			holder.txtPrice.setTextColor(COLOR_TEXT_SELECTED);
 		} else {
 			ViewUtils.setVisible(holder.divider, position != getCount() - 1);
-			holder.divider.setBackground(mContext.getResources().getDrawable(R.drawable.divider_list_padding));
+			AndroidUtils.setBackground(holder.divider, mContext.getResources().getDrawable(R.drawable.divider_list_padding));
 			convertView.setBackgroundColor(mContext.getResources().getColor(android.R.color.transparent));
 			holder.txtTitle.setTextColor(COLOR_TEXT_NORMAL);
 			holder.txtPrice.setTextColor(mColorPriceNormal);

@@ -398,13 +398,23 @@ public class AndroidUtils {
 
 	}
 
+	@SuppressWarnings("deprecation")
     public static void removeOnGlobalLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener listener){
-        if (Build.VERSION.SDK_INT < 16) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
         } else {
             v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
         }
     }
+
+	@SuppressWarnings("deprecation")
+	public static void setBackground(View v, Drawable drawable){
+		if(Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+			v.setBackgroundDrawable(drawable);
+		} else {
+			v.setBackground(drawable);
+		}
+	}
 
 	public static boolean hasLightSensor(final Context context){
 		return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_LIGHT);

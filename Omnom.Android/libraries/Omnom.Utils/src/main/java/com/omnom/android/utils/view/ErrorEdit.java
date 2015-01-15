@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.omnom.android.utils.R;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -182,7 +183,7 @@ public class ErrorEdit extends LinearLayout {
 		errorTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mErrorTextSize);
 
 		btnClear = (Button) view.findViewById(R.id.btn_clear);
-		btnClear.setBackgroundDrawable(mClearDrawable);
+		AndroidUtils.setBackground(btnClear, mClearDrawable);
 		btnClear.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
