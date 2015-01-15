@@ -26,7 +26,6 @@ import android.view.SurfaceHolder;
 
 import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.client.android.camera.open.OpenCameraInterface;
-import com.omnom.android.zxing.R;
 
 import java.io.IOException;
 
@@ -62,16 +61,10 @@ public final class CameraManager {
 	 */
 	private final PreviewCallback previewCallback;
 
-    private int framingRectSize;
-    private int framingRectLeftOffset;
-    private int framingRectTopOffset;
-
-
 	public CameraManager(Context context) {
 		this.context = context;
 		this.configManager = new CameraConfigurationManager(context);
 		previewCallback = new PreviewCallback(configManager);
-        framingRectSize = MAX_FRAME_WIDTH;
 	}
 
 	/**
@@ -229,39 +222,17 @@ public final class CameraManager {
 				return null;
 			}
 
-			int width = findDesiredDimensionInRange(screenResolution.x, framingRectSize, framingRectSize);
-			// make findView square sized
-//			int height = findDesiredDimensionInRange(screenResolution.y, MIN_FRAME_HEIGHT, MAX_FRAME_HEIGHT);
-			int height = width;
-
-			int leftOffset = (screenResolution.x - width) / 2;
-			int topOffset = (screenResolution.y - height) / 4;
-
-            if (framingRectLeftOffset > 0) {
-                leftOffset = framingRectLeftOffset;
-            }
-            if (framingRectTopOffset > 0) {
-                topOffset = framingRectTopOffset;
-            }
-
-			// move findView topper
-			//int topOffset = (screenResolution.y - height) / 4;
-			framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
+			final int size = findDesiredDimensionInRange(screenResolution.x, MAX_FRAME_WIDTH, MAX_FRAME_WIDTH);
+			int leftOffset = (screenResolution.x - size) / 2;
+			int topOffset = (screenResolution.y - size) / 4;
+			framingRect = new Rect(leftOffset, topOffset, leftOffset + size, topOffset + size);
 			Log.d(TAG, "Calculated framing rect: " + framingRect);
 		}
 		return framingRect;
 	}
 
-    public void setFramingRectSize(final int size) {
-        this.framingRectSize = size;
-    }
-
-    public void setFramingRectLeftOffset(final int offset) {
-        this.framingRectLeftOffset = offset;
-    }
-
-    public void setFramingRectTopOffset(final int offset) {
-        this.framingRectTopOffset = offset;
+    public void setFraming(final Rect rect) {
+        this.framingRect = rect;
     }
 
 	private static int findDesiredDimensionInRange(int resolution, int hardMin, int hardMax) {

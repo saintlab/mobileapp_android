@@ -24,6 +24,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -129,11 +130,7 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 
 	private AmbientLightManager ambientLightManager;
 
-    private int framingRectSize;
-
-    private int framingRectLeftOffset;
-
-    private int framingRectTopOffset;
+    private Rect framingRect;
 
 	ViewfinderView getViewfinderView() {
 		return viewfinderView;
@@ -183,9 +180,7 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 		// first launch. That led to bugs where the scanning rectangle was the wrong size and partially
 		// off screen.
 		cameraManager = new CameraManager(getApplication());
-        cameraManager.setFramingRectSize(framingRectSize);
-        cameraManager.setFramingRectLeftOffset(framingRectLeftOffset);
-        cameraManager.setFramingRectTopOffset(framingRectTopOffset);
+        cameraManager.setFraming(framingRect);
 
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		viewfinderView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -717,24 +712,10 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 		viewfinderView.drawViewfinder();
 	}
 
-    protected void setFramingRectSize(final int size) {
-        this.framingRectSize = size;
+    protected void setFramingRect(final Rect rect) {
+        this.framingRect = rect;
         if (cameraManager != null) {
-            cameraManager.setFramingRectSize(size);
-        }
-    }
-
-    protected void setFramingRectLeftOffset(final int offset) {
-        this.framingRectLeftOffset = offset;
-        if (cameraManager != null) {
-            cameraManager.setFramingRectLeftOffset(offset);
-        }
-    }
-
-    protected void setFramingRectTopOffset(final int offset) {
-        this.framingRectTopOffset = offset;
-        if (cameraManager != null) {
-            cameraManager.setFramingRectTopOffset(offset);
+            cameraManager.setFraming(rect);
         }
     }
 

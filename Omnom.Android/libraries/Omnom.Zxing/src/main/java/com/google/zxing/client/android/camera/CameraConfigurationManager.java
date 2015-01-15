@@ -70,12 +70,7 @@ final class CameraConfigurationManager {
 			}
 		});
 
-		if(supportedPreviewSizes != null && supportedPreviewSizes.size() > 0) {
-			Camera.Size size = supportedPreviewSizes.get(0);
-			cameraResolution = new Point(size.width, size.height);
-		} else {
-			cameraResolution = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolution);
-		}
+		cameraResolution = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolution);
 		Log.i(TAG, "Camera resolution: " + cameraResolution);
 	}
 

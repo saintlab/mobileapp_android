@@ -3,7 +3,12 @@ package com.omnom.android.activity;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.os.Build;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
@@ -11,6 +16,8 @@ import android.widget.TextView;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.Intents;
+import com.google.zxing.client.android.PreferencesActivity;
+import com.google.zxing.client.android.camera.FrontLightMode;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
@@ -57,6 +64,15 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 	}
 
 	@Override
+	public void onCreate(Bundle icicle) {
+		super.onCreate(icicle);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, FrontLightMode.OFF.name());
+		editor.apply();
+	}
+
+	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_capture_qr;
 	}
@@ -95,9 +111,8 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
                 @Override
                 public void onGlobalLayout() {
                     AndroidUtils.removeOnGlobalLayoutListener(scanFrame, this);
-                    setFramingRectSize(scanFrame.getWidth());
-                    setFramingRectLeftOffset(scanFrame.getLeft());
-                    setFramingRectTopOffset(scanFrame.getTop());
+	                final DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+	                setFramingRect(new Rect(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels));
                 }
             });
         }
