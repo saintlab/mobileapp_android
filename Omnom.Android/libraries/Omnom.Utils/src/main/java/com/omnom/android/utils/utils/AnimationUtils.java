@@ -36,6 +36,9 @@ public class AnimationUtils {
 	}
 
 	public static void animateAlpha(final View view, final boolean visible, final Runnable callback, long duration) {
+		if (view == null) {
+			return;
+		}
 		final Boolean tag = (Boolean) view.getTag();
 		if(tag != null && tag == visible) {
 			view.post(callback);
@@ -60,6 +63,9 @@ public class AnimationUtils {
 	}
 
 	public static void animateAlpha3(final View view, final boolean visible) {
+		if (view == null) {
+			return;
+		}
 		final Boolean tag = (Boolean) view.getTag();
 		if(tag != null && tag == visible) {
 			// skip
@@ -84,6 +90,9 @@ public class AnimationUtils {
 	}
 
 	public static void animateAlpha2(final View view, final boolean visible, final Runnable callback, long duration) {
+		if (view == null) {
+			return;
+		}
 		view.setAlpha(visible ? 0 : 1);
 		if(visible) {
 			ViewUtils.setVisible2(view, visible);
