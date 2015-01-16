@@ -21,7 +21,7 @@ public class PaymentMixpanelEvent extends AbstractAcquiringMixpanelEvent {
 
 	private final String restaurantId;
 
-	private final int tip;
+	private final int tipsSum;
 
 	private final String tipsWay;
 
@@ -45,7 +45,7 @@ public class PaymentMixpanelEvent extends AbstractAcquiringMixpanelEvent {
 		orderId = details.getOrderId();
 		tableId = details.getTableId();
 		restaurantId = details.getRestaurantName();
-		tip = details.getTip();
+        tipsSum = details.getTip();
 		tipValue = details.getTipValue();
 		tipsWay = TipsWay.values()[details.getTipsWay()].name();
 		splitWay = SplitWay.values()[details.getSplitWay()].name();
