@@ -18,6 +18,7 @@
             style="@style/ImageView.Clickable.Cropped" />
 
         <LinearLayout
+            android:id="@+id/scan_qr"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:orientation="horizontal"
@@ -28,7 +29,9 @@
 
             <ImageView
                 android:id="@+id/img_qr"
-                android:layout_margin="@dimen/activity_vertical_margin_xsmall"
+                android:layout_marginTop="@dimen/activity_vertical_margin_xsmall"
+                android:layout_marginLeft="@dimen/activity_vertical_margin_xsmall"
+                android:layout_marginBottom="@dimen/activity_vertical_margin_xsmall"
                 android:src="@drawable/ic_shortcut"
                 style="@style/ImageView.Clickable.Cropped"
                 android:contentDescription="@null" />
