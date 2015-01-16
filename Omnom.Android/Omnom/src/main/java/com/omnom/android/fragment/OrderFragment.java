@@ -522,17 +522,24 @@ public class OrderFragment extends Fragment {
 		return as;
 	}
 
-	public void downscale() {
+	public void downscale(final boolean isAnimated) {
 		initFooter(false);
 		if(mFooterView2 != null) {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
 			ViewUtils.setVisible(billSplit2, false);
 		}
 		ViewUtils.setVisible(mHeader, false);
-		AnimationUtils.animateAlpha3(getPanelPayment(), false);
 		list.setSwipeEnabled(false);
-		getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0).start();
-		AnimationUtils.animateAlpha(txtTitle, true);
+		if (isAnimated) {
+			AnimationUtils.animateAlpha3(getPanelPayment(), false);
+			getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0).start();
+			AnimationUtils.animateAlpha(txtTitle, true);
+		} else {
+			ViewUtils.setVisible(getPanelPayment(), false);
+			ViewUtils.setVisible(txtTitle, true);
+			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
+			mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
+		}
 	}
 
 	public View getPanelPayment() {
@@ -1236,6 +1243,10 @@ public class OrderFragment extends Fragment {
 	public boolean isInSplitMode() {
 		final Fragment splitFragment = getFragmentManager().findFragmentByTag(BillSplitFragment.TAG);
 		return splitFragment != null;
+	}
+
+	public Order getOrder() {
+		return mOrder;
 	}
 
 	public String getOrderId() {

@@ -115,7 +115,9 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 			@Override
 			public void call(final Object... args) {
 				logEvent(SocketEvent.EVENT_ORDER_CLOSE, args);
-				post(new OrderCloseSocketEvent());
+				final JSONObject json = (JSONObject) args[0];
+				final Order order = mGson.fromJson(json.toString(), Order.class);
+				post(new OrderCloseSocketEvent(order));
 			}
 		});
 		mBus = new Bus(ThreadEnforcer.ANY);

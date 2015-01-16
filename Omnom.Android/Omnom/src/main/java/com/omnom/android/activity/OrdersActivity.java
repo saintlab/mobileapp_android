@@ -15,10 +15,12 @@ import com.omnom.android.adapter.OrdersPagerAdaper;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.socket.event.OrderCloseSocketEvent;
 import com.omnom.android.socket.event.OrderCreateSocketEvent;
 import com.omnom.android.socket.event.OrderUpdateSocketEvent;
 import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.socket.listener.ListenersSet;
+import com.omnom.android.socket.listener.OrderCloseEventListener;
 import com.omnom.android.socket.listener.OrderCreateEventListener;
 import com.omnom.android.socket.listener.OrderUpdateEventListener;
 import com.omnom.android.socket.listener.PaymentEventListener;
@@ -37,7 +39,8 @@ import butterknife.OnClick;
 
 public class OrdersActivity extends BaseOmnomFragmentActivity
                             implements OrderCreateEventListener.OrderCreateListener,
-                                       OrderUpdateEventListener.OrderUpdateListener{
+                                       OrderUpdateEventListener.OrderUpdateListener,
+									   OrderCloseEventListener.OrderCloseListener {
 
 	public static final int REQUEST_CODE_CARDS = 100;
 
@@ -111,6 +114,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 		        @Override
 		        public void run() {
 			        mPagerAdapter.updateOrders(orders);
+			        mTextInfo.setText(getString(R.string.your_has_n_orders, mPagerAdapter.getCount()));
 			        final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
 			        if (currentFragment != null && !currentFragment.isDownscaled()) {
 				        showOther(mPager.getCurrentItem(), false);
@@ -124,6 +128,11 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
     public void onOrderUpdateEvent(final OrderUpdateSocketEvent event) {
         updateOrder(event.getOrder());
     }
+
+	@Override
+	public void onOrderCloseEvent(final OrderCloseSocketEvent event) {
+		closeOrder(event.getOrder());
+	}
 
     private void updateOrder(final Order order) {
         final int position = replaceOrder(orders, order);
@@ -140,6 +149,36 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
             });
         }
     }
+
+	public void closeOrder(final Order order) {
+		if (orders != null) {
+			final int removedItemIndex = orders.indexOf(order);
+			orders.remove(order);
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					if (orders.size() == 0) {
+						close();
+						return;
+					}
+					final int currentItemIndex = mPager.getCurrentItem();
+					final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
+					// Return from current bill view if it is opened
+					if (currentFragment != null &&
+							order.getId().equals(currentFragment.getOrderId()) &&
+							!currentFragment.isDownscaled()) {
+						mPager.setEnabled(true);
+						currentFragment.downscale(false);
+					}
+
+					mPagerAdapter.updateOrders(orders, removedItemIndex);
+					mPager.setCurrentItem(currentItemIndex >= orders.size() ? orders.size() - 1 : currentItemIndex);
+					showOther(mPager.getCurrentItem(), orders.size() > 1);
+					mTextInfo.setText(getString(R.string.your_has_n_orders, mPagerAdapter.getCount()));
+				}
+			});
+		}
+	}
 
 	/**
 	 * Returns fragment cached by FragmentPagerAdapter
@@ -161,7 +200,8 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 	public void initUi() {
         listenersSet = new ListenersSet(new PaymentEventListener(this),
                        new OrderCreateEventListener(this, this),
-                       new OrderUpdateEventListener(this, this));
+                       new OrderUpdateEventListener(this, this),
+		               new OrderCloseEventListener(this, this));
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, requestId, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 4.5);
@@ -229,7 +269,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 				}
 				mPager.setEnabled(true);
 				showOther(mPager.getCurrentItem(), true);
-				currentFragment.downscale();
+				currentFragment.downscale(true);
 				AnimationUtils.animateAlpha(mTextInfo, true);
 				AnimationUtils.animateAlpha(mIndicator, true);
 				ViewUtils.setVisible(mBtnClose, true);

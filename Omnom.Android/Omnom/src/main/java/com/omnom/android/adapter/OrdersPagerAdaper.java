@@ -24,6 +24,8 @@ public class OrdersPagerAdaper extends FragmentPagerAdapter {
 
 	private int mLastAnimated = -1;
 
+	private int removedItemIndex = -1;
+
 	public OrdersPagerAdaper(FragmentManager fm, List<Order> orders, String requestId, final int bgColor) {
 		super(fm);
 		mOrders = orders;
@@ -42,6 +44,15 @@ public class OrdersPagerAdaper extends FragmentPagerAdapter {
 
 	@Override
 	public int getItemPosition(final Object object) {
+		if (object instanceof OrderFragment) {
+			final Order order = ((OrderFragment) object).getOrder();
+			final int orderIndex = mOrders.indexOf(order);
+			if (orderIndex == -1 || removedItemIndex > -1 && removedItemIndex <= orderIndex) {
+				return POSITION_NONE;
+			} else {
+				return POSITION_UNCHANGED;
+			}
+		}
 		return super.getItemPosition(object);
 	}
 
@@ -65,9 +76,28 @@ public class OrdersPagerAdaper extends FragmentPagerAdapter {
 		return fragment;
 	}
 
+	@Override
+	public long getItemId(int position) {
+		if (position >= 0 && position < mOrders.size()) {
+			return mOrders.get(position).getId().hashCode() + position;
+		}
+		return position;
+	}
+
+	@Override
+	public void finishUpdate(ViewGroup container) {
+		super.finishUpdate(container);
+		removedItemIndex = -1;
+	}
+
 	public void updateOrders(final List<Order> orders) {
+		updateOrders(orders, -1);
+	}
+
+	public void updateOrders(final List<Order> orders, int removedItemIndex) {
+		this.removedItemIndex = removedItemIndex;
 		mOrders = orders;
-        notifyDataSetChanged();
+		notifyDataSetChanged();
 	}
 
 	@Override
