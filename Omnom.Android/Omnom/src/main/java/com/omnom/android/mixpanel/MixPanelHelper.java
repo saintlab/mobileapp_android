@@ -15,6 +15,7 @@ import com.omnom.android.mixpanel.model.UserRegisteredMixpanelEvent;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.utils.utils.AndroidUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -112,7 +114,13 @@ public class MixPanelHelper {
 
 	public void track(final Project project, final String event, final Object request) {
 		try {
-			final JSONObject json = new JSONObject(mGson.toJson(request));
+			JSONObject json;
+			if (request instanceof List) {
+				json = new JSONObject();
+				json.put("list", new JSONArray(mGson.toJson(request)));
+			} else {
+				json = new JSONObject(mGson.toJson(request));
+			}
 			track(project, event, json);
 		} catch(JSONException e) {
 			Log.e(TAG, "track", e);
