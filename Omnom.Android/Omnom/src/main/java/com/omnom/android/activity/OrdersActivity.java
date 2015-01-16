@@ -207,6 +207,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_CARDS && resultCode == RESULT_OK) {
 			close();
 		}

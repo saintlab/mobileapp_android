@@ -52,14 +52,8 @@ public class AnimationUtils {
 		view.setTag(visible);
 		view.animate().setDuration(duration).
 				setInterpolator(new AccelerateDecelerateInterpolator()).
-				    setListener(new AnimatorListenerAdapter() {
-					    @Override
-					    public void onAnimationEnd(Animator animation) {
-						    if(callback != null) {
-							    view.post(callback);
-						    }
-					    }
-				    }).alpha(visible ? 1 : 0).start();
+				setListener(new OmnomAnimatorListenerAdapter(view, callback)).
+				alpha(visible ? 1 : 0).start();
 	}
 
 	public static void animateAlpha3(final View view, final boolean visible) {
@@ -100,14 +94,8 @@ public class AnimationUtils {
 		view.setTag(visible);
 		view.animate().setDuration(duration).
 				setInterpolator(new AccelerateDecelerateInterpolator()).
-				    setListener(new AnimatorListenerAdapter() {
-					    @Override
-					    public void onAnimationEnd(Animator animation) {
-						    if(callback != null) {
-							    view.post(callback);
-						    }
-					    }
-				    }).alpha(visible ? 1 : 0).start();
+				setListener(new OmnomAnimatorListenerAdapter(view, callback)).
+				alpha(visible ? 1 : 0).start();
 	}
 
 	public static void translateUp(final Context context, final Iterable<View> views, final int translation, final Runnable endCallback) {
@@ -230,4 +218,29 @@ public class AnimationUtils {
         animation.setRepeatMode(Animation.REVERSE);
         view.startAnimation(animation);
     }
+
+	/**
+	 * Restricts that on animation end callback is launched only once.
+	 */
+	private static class OmnomAnimatorListenerAdapter extends AnimatorListenerAdapter {
+
+		private final View view;
+		private final Runnable callback;
+		private boolean isCallbackLaunched;
+
+		public OmnomAnimatorListenerAdapter(final View view, final Runnable callback) {
+			this.view = view;
+			this.callback = callback;
+			isCallbackLaunched = false;
+		}
+
+		@Override
+		public void onAnimationEnd(Animator animation) {
+			if(callback != null && !isCallbackLaunched) {
+				view.post(callback);
+				isCallbackLaunched = true;
+			}
+		}
+	}
+
 }

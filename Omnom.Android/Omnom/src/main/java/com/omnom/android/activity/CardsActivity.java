@@ -492,6 +492,7 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 		isPaymentRequest = false;
 		if (resultCode == RESULT_OK) {
 			if (requestCode == REQUEST_PAYMENT) {

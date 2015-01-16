@@ -347,6 +347,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 		if(resultCode == RESULT_OK && requestCode == REQUEST_THANKS) {
 			setResult(RESULT_OK);
 			finish();

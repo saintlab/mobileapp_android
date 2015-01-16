@@ -433,6 +433,7 @@ public class BindActivity extends BaseActivity {
 
 	@Override
 	protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 		if(resultCode == RESULT_OK) {
 			if(requestCode == REQUEST_CODE_ENABLE_BLUETOOTH) {
 				clearErrors();
