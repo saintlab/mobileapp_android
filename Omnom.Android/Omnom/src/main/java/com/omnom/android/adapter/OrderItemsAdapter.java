@@ -146,8 +146,13 @@ public class OrderItemsAdapter extends BaseAdapter {
 			return;
 		}
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
-		if(mCheckedStates.get(position)) {
-			holder.divider.setBackgroundColor(mContext.getResources().getColor(android.R.color.white));
+		if (mCheckedStates.get(position)) {
+			final int nextPosition = position + 1;
+			if (mCheckedStates.get(nextPosition)) {
+				AndroidUtils.setBackground(holder.divider, mContext.getResources().getDrawable(R.drawable.divider_list_padding_green));
+			} else {
+				AndroidUtils.setBackground(holder.divider, mContext.getResources().getDrawable(R.drawable.divider_list_padding_white));
+			}
 			convertView.setBackgroundColor(mContext.getResources().getColor(R.color.btn_pay_green));
 			holder.txtTitle.setTextColor(COLOR_TEXT_SELECTED);
 			holder.txtPrice.setTextColor(COLOR_TEXT_SELECTED);
