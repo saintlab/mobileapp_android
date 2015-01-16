@@ -462,7 +462,9 @@ public class OrderFragment extends Fragment {
 			if (txtAlreadyPaid != null) {
 				if (paidAmount > 0) {
 					txtAlreadyPaid.setText(getString(R.string.already_paid, AmountHelper.format(paidAmount) + getCurrencySuffix()));
-					ViewUtils.setVisible2(txtAlreadyPaid, true);
+					if (!isEditMode) {
+						ViewUtils.setVisible2(txtAlreadyPaid, true);
+					}
 				} else {
 					ViewUtils.setVisible2(txtAlreadyPaid, false);
 				}
