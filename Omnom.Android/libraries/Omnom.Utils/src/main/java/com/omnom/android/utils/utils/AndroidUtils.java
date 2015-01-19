@@ -80,6 +80,7 @@ public class AndroidUtils {
 		if((m == null) || !(m instanceof LinkMovementMethod)) {
 			view.setMovementMethod(LinkMovementMethod.getInstance());
 		}
+		view.setHighlightColor(view.getResources().getColor(android.R.color.transparent));
 	}
 
 	public static void sendFeedbackEmail(final Context context,@StringRes int resId) {
