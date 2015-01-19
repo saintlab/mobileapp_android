@@ -21,6 +21,7 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
 		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
+		intent.putExtra(EXTRA_SKIP_VIEW_RENDERING, true);
 		return intent;
 	}
 

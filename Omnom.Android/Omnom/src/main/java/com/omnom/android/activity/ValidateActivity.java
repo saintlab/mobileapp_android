@@ -248,6 +248,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	protected boolean mIsDemo = false;
 
+	protected boolean mSkipViewRendering = false;
+
 	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBackgroundFunction;
 
 	/**
@@ -277,18 +279,21 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	protected void handleIntent(Intent intent) {
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 		mIsDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
+		mSkipViewRendering = intent.getBooleanExtra(EXTRA_SKIP_VIEW_RENDERING, false);
 		mType = intent.getIntExtra(EXTRA_CONFIRM_TYPE, TYPE_DEFAULT);
 	}
 
 	@Override
 	protected void onPostResume() {
 		super.onPostResume();
-		postDelayed(getResources().getInteger(R.integer.default_animation_duration_quick), new Runnable() {
-			@Override
-			public void run() {
-				validate();
-			}
-		});
+		if (!mSkipViewRendering) {
+			postDelayed(getResources().getInteger(R.integer.default_animation_duration_quick), new Runnable() {
+				@Override
+				public void run() {
+					validate();
+				}
+			});
+		}
 	}
 
 	@Override
@@ -450,6 +455,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			public void onPrepareLoad(Drawable placeHolderDrawable) {
 			}
 		};
+
+		if (mSkipViewRendering) {
+			startLoader();
+		}
 	}
 
 	protected void validate() {
