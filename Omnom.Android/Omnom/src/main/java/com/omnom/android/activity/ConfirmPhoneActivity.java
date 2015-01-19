@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.response.AuthResponse;
@@ -161,7 +162,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 			@Override
 			public void call(final AuthResponse authResponse) {
 				if(!authResponse.hasError()) {
-					getPreferences().setAuthToken(getActivity(), authResponse.getToken());
+					((OmnomApplication) getApplication()).cacheAuthToken(authResponse.getToken());
 					topPanel.setContentVisibility(false, false);
 					finish();
 					EnteringActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, 0, type);

@@ -22,6 +22,7 @@ import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
 import com.omnom.android.utils.preferences.PreferenceProvider;
+import com.omnom.android.utils.utils.StringUtils;
 import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
 
@@ -159,9 +160,18 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		return !activityStack.isEmpty();
 	}
 
+	public void cacheAuthToken(final String token) {
+		preferenceHelper.setAuthToken(this, token);
+	}
+
 	@Override
 	public String getAuthToken() {
 		return preferenceHelper.getAuthToken(this);
+	}
+
+	public void logout() {
+		preferenceHelper.setAuthToken(this, StringUtils.EMPTY_STRING);
+		cacheUserProfile(null);
 	}
 
 	@Override

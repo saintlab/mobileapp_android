@@ -1,6 +1,6 @@
 package com.omnom.android.utils.observable;
 
-import android.content.Context;
+import android.app.Activity;
 import android.support.annotation.Nullable;
 
 import com.omnom.android.utils.utils.UserDataHolder;
@@ -16,17 +16,17 @@ import rx.functions.Action1;
  */
 public abstract class BaseErrorHandler implements Action1<Throwable> {
 
-	protected Context mContext;
+	protected Activity mActivity;
 
 	@Nullable
 	protected UserDataHolder mDataHolder;
 
-	public BaseErrorHandler(Context context) {
-		mContext = context;
+	public BaseErrorHandler(Activity activity) {
+		mActivity = activity;
 	}
 
-	public BaseErrorHandler(Context context, UserDataHolder dataHolder) {
-		mContext = context;
+	public BaseErrorHandler(Activity activity, UserDataHolder dataHolder) {
+		mActivity = activity;
 		mDataHolder = dataHolder;
 	}
 

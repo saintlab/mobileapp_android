@@ -74,6 +74,26 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 		});
 	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+		final OmnomApplication app = OmnomApplication.get(getActivity());
+		if (app.getUserProfile() == null) {
+			final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(this);
+			final String token = app.getAuthToken();
+			mUserSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
+				@Override
+				public void call(UserResponse userResponse) {
+					app.cacheUserProfile(new UserProfile(userResponse));
+					final Long currentTime = System.currentTimeMillis();
+					final Long serverTime = userResponse.getTime() == null ? 0 : userResponse.getTime();
+					final Long timeDiff = TimeUnit.SECONDS.toMillis(serverTime) - currentTime;
+					mixPanelHelper.setTimeDiff(timeDiff);
+				}
+			});
+		}
+	}
+
 	protected void correctMixpanelTime(final long serverTime) {
 		final Long currentTime = System.currentTimeMillis();
 		final MixPanelHelper mixPanelHelper = getMixPanelHelper();

@@ -133,7 +133,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 						@Override
 						public void call(UserResponse response) {
 							if(response.hasError() && UserProfileHelper.hasAuthError(response)) {
-								getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
+								((OmnomApplication) getApplication()).logout();
 								forwardToIntro();
 								return;
 							}
@@ -251,7 +251,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 			@Override
 			public void call(AuthResponse authResponseBase) {
 				if(!authResponseBase.hasError()) {
-					getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
+					((OmnomApplication) getApplication()).logout();
 					forwardToIntro();
 				} else {
 					showToast(getActivity(), R.string.error_unknown_server_error);

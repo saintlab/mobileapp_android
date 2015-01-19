@@ -1,6 +1,6 @@
 package com.omnom.android.linker.activity;
 
-import android.content.Context;
+import android.app.Activity;
 
 import com.omnom.android.linker.LinkerApplication;
 import com.omnom.android.utils.observable.BaseErrorHandler;
@@ -11,17 +11,17 @@ import com.omnom.android.utils.utils.UserDataHolder;
  * Created by Ch3D on 06.10.2014.
  */
 public abstract class LinkerBaseErrorHandler extends BaseErrorHandler {
-	public LinkerBaseErrorHandler(Context context) {
-		super(context);
+	public LinkerBaseErrorHandler(Activity activity) {
+		super(activity);
 	}
 
-	public LinkerBaseErrorHandler(Context context, UserDataHolder dataHolder) {
-		super(context, dataHolder);
+	public LinkerBaseErrorHandler(Activity activity, UserDataHolder dataHolder) {
+		super(activity, dataHolder);
 	}
 
 	@Override
 	protected void onTokenExpired() {
-		LinkerApplication.get(mContext).getPreferences().setAuthToken(mContext, StringUtils.EMPTY_STRING);
-		LoginActivity.start(mContext, mDataHolder);
+		LinkerApplication.get(mActivity).getPreferences().setAuthToken(mActivity, StringUtils.EMPTY_STRING);
+		LoginActivity.start(mActivity, mDataHolder);
 	}
 }

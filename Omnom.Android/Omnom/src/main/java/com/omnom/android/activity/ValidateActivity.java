@@ -108,7 +108,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 				}
 			}
 			if(throwable instanceof AuthServiceException) {
-				getPreferences().setAuthToken(getActivity(), StringUtils.EMPTY_STRING);
+				((OmnomApplication) getApplication()).logout();
 				EnteringActivity.start(ValidateActivity.this, true);
 				return;
 			}
