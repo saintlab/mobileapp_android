@@ -11,6 +11,9 @@ import hugo.weaving.DebugLog;
  * Created by Ch3D on 31.07.2014.
  */
 public class StringUtils {
+
+	private static final String TAG = StringUtils.class.getSimpleName();
+
 	public static final String EMPTY_STRING = "";
 
 	public static final String CURRENCY_DELIMITER = ".";
@@ -19,7 +22,7 @@ public class StringUtils {
 
 	public static final String NON_BREAKING_WHITESPACE = "\u00A0";
 
-	private static final String TAG = StringUtils.class.getSimpleName();
+	private static final int METERS_IN_KILOMETER = 1000;
 
 	public static String concat(String delimiter, String... data) {
 		final StringBuilder sb = new StringBuilder();
@@ -121,4 +124,19 @@ public class StringUtils {
 			return 0;
 		}
 	}
+
+	/**
+	 * Formats distance to be displayed in meters or in kilometers if distance is long enough.
+	 *
+	 * @param distance distance in meters
+	 * @return distance in meters or kilometers
+	 */
+	public static String formatDistance(final double distance) {
+		if ((int) distance / METERS_IN_KILOMETER > 0) {
+			return String.format("~%.2fкм", (distance / METERS_IN_KILOMETER));
+		} else {
+			return String.format("~%dм", (int) distance);
+		}
+	}
+
 }

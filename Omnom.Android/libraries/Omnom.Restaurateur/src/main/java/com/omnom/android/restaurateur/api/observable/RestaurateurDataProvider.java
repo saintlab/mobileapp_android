@@ -210,6 +210,11 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	}
 
 	@Override
+	public Observable<RestaurantsResponse> getRestaurants(double latitude, double longitude) {
+		return mDataService.getRestaurants(latitude, longitude).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid) {
 		return mDataService.buildBeacon(new BeaconBuildRequest(uuid, String.valueOf(tableNumber), restaurantId))
 		                   .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());

@@ -3,7 +3,10 @@ package com.omnom.android.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v4.view.ViewCompat;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +20,7 @@ import com.omnom.android.activity.RestaurantsListActivity;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.loader.LoaderView;
+import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.Calendar;
@@ -40,11 +44,8 @@ public class RestaurantsAdapter extends BaseAdapter {
 		@InjectView(R.id.panel_linear)
 		public View panelAddress;
 
-		@InjectView(R.id.txt_address)
-		public TextView txtAddress;
-
-		@InjectView(R.id.txt_distance)
-		public TextView txtDistance;
+		@InjectView(R.id.txt_info)
+		public TextView txtInfo;
 
 		@InjectView(R.id.txt_schedule)
 		public TextView txtSchedule;
@@ -66,13 +67,20 @@ public class RestaurantsAdapter extends BaseAdapter {
 
 			final String addressSmall = RestaurantHelper.getAddressSmall(context, item);
 			if(!TextUtils.isEmpty(addressSmall)) {
-				ViewUtils.setVisible(txtAddress, true);
-				txtAddress.setText(addressSmall);
+				ViewUtils.setVisible(txtInfo, true);
+				txtInfo.setText(addressSmall);
+				if (item.distance() != null) {
+					final String distance = StringUtils.formatDistance(item.distance());
+					final String addressWithDistance = addressSmall + " " + distance;
+					SpannableString s = SpannableString.valueOf(addressWithDistance);
+					s.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.info_hint)),
+							addressWithDistance.indexOf(distance), addressWithDistance.length(),
+							Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+					txtInfo.setText(s);
+				}
 			} else {
-				ViewUtils.setVisible(txtAddress, false);
+				ViewUtils.setVisible(txtInfo, false);
 			}
-			// TODO: Implement
-			// txtDistance.setText("~50м");
 			txtSchedule.setText(RestaurantHelper.getOpenedTime(context, item, weekDay));
 		}
 
@@ -172,5 +180,7 @@ public class RestaurantsAdapter extends BaseAdapter {
 
 	public void setSelected(final int position) {
 		mSelectedPosition = position;
+		notifyDataSetChanged();
 	}
+
 }

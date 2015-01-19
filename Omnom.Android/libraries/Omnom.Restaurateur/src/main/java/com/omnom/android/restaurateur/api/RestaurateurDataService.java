@@ -63,6 +63,10 @@ public interface RestaurateurDataService {
 	@GET("/restaurants")
 	Observable<RestaurantsResponse> getRestaurants();
 
+	@GET("/restaurants")
+	Observable<RestaurantsResponse> getRestaurants(@Query(Protocol.FIELD_LATITUDE) double latitude,
+	                                               @Query(Protocol.FIELD_LONGITUDE) double longitude);
+
 	@GET("/restaurants/{id}")
 	Observable<Restaurant> getRestaurant(@Path(Protocol.FIELD_ID) String restaurantId);
 

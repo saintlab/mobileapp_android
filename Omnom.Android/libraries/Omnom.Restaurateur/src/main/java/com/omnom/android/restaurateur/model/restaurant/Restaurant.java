@@ -38,6 +38,11 @@ public abstract class Restaurant implements Parcelable {
 	public abstract Address address();
 
 	@Nullable
+	public abstract Location location();
+
+	@Nullable
+	public abstract Double distance();
+
 	public abstract int rssiThreshold();
 
 	@Nullable

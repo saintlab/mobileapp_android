@@ -33,6 +33,8 @@ public interface RestaurateurObservableApi {
 
 	public Observable<RestaurantsResponse> getRestaurants();
 
+	public Observable<RestaurantsResponse> getRestaurants(double latitude, double longitude);
+
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
 
 	public Observable<RestaurantResponse> decode(BeaconDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);

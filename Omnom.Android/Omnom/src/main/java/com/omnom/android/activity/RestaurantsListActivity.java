@@ -2,6 +2,7 @@ package com.omnom.android.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -24,16 +25,20 @@ import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.LocationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.view.SimpleListView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.Observable;
 import rx.functions.Action1;
 
 public class RestaurantsListActivity extends BaseOmnomActivity implements AdapterView.OnItemClickListener {
@@ -141,6 +146,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		mAnimation = intent.getIntExtra(EXTRA_ANIMATE, -1);
 		if(getIntent().hasExtra(EXTRA_RESTAURANTS)) {
 			mRestaurants = getIntent().getParcelableArrayListExtra(EXTRA_RESTAURANTS);
+			Collections.sort(mRestaurants, new RestaurantsComparator());
 			mAdapter = new RestaurantsAdapter(this, mRestaurants);
 		}
 	}
@@ -164,9 +170,17 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	}
 
 	private void refresh() {
-		api.getRestaurants().subscribe(new Action1<RestaurantsResponse>() {
+		final Location currentLocation = LocationUtils.getLastKnownLocation(getActivity());
+		Observable<RestaurantsResponse> restaurantsObservable;
+		if (currentLocation != null) {
+			restaurantsObservable = api.getRestaurants(currentLocation.getLatitude(), currentLocation.getLongitude());
+		} else {
+			restaurantsObservable = api.getRestaurants();
+		}
+		restaurantsObservable.subscribe(new Action1<RestaurantsResponse>() {
 			@Override
 			public void call(final RestaurantsResponse restaurants) {
+				Collections.sort(restaurants.getItems(), new RestaurantsComparator());
 				mAdapter = new RestaurantsAdapter(getActivity(), restaurants.getItems());
 				initList();
 				refreshView.setRefreshing(false);
@@ -213,7 +227,6 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 		mItemClicked = true;
 		mAdapter.setSelected(position);
-		mAdapter.notifyDataSetChanged();
 		list.smoothScrollToPositionFromTop(position, 0, SCROLL_DURATION);
 		panelTop.animate().translationYBy(-height).start();
 		selectedCover = (LoaderView) view.findViewById(R.id.cover);
@@ -288,7 +301,6 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		refreshView.setTranslationY(0);
 		if (mAdapter != null) {
 			mAdapter.setSelected(-1);
-			mAdapter.notifyDataSetChanged();
 		}
 		if (selectedCover != null) {
 			LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) selectedCover.getLayoutParams();
@@ -312,4 +324,22 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	public int getLayoutResource() {
 		return R.layout.activity_restaurants_list;
 	}
+
+	private class RestaurantsComparator implements Comparator<Restaurant> {
+
+		@Override
+		public int compare(Restaurant lhs, Restaurant rhs) {
+			if (lhs.distance() == null && rhs.distance() == null) {
+				return 0;
+			} else if (lhs.distance() == null) {
+				return -1;
+			} else if (rhs.distance() == null) {
+				return 1;
+			}
+
+			return (int) (lhs.distance() - rhs.distance()) * 10;
+		}
+
+	}
+
 }

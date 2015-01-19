@@ -12,20 +12,12 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/txt_address"
+            android:id="@+id/txt_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textAppearance="?android:textAppearanceLarge" />
 
-        <TextView
-            android:id="@+id/txt_distance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/restaurant_distance_padding"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="@color/info_hint"
-            android:visibility="gone"/>
     </LinearLayout>
 
     <TextView

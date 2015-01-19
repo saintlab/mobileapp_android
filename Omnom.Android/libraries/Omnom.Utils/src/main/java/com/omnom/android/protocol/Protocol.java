@@ -31,6 +31,9 @@ public interface Protocol {
 	public static final String FIELD_MAJOR_ID_OLD = "old_major";
 	public static final String FIELD_MINOR_ID_OLD = "old_minor";
 
+	public static final String FIELD_LATITUDE = "latitude";
+	public static final String FIELD_LONGITUDE = "longitude";
+
 	public static final String FIELD_QR_DATA = "qr";
 	public static final String HEADER_AUTH_TOKEN = "X-Authentication-Token";
 	public static final String X_REQUEST_ID = "X-Request-ID";

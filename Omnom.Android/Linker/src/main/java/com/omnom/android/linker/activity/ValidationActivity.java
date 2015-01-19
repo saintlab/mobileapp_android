@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -29,6 +30,7 @@ import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.loader.LoaderView;
+import com.omnom.android.utils.utils.LocationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.UserDataHolder;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -313,7 +315,7 @@ public class ValidationActivity extends BaseActivity {
 									}
 									final String token = response.getToken();
 									getPreferences().setAuthToken(getActivity(), token);
-									return Observable.combineLatest(api.getRestaurants(),
+									return Observable.combineLatest(getRestaurantsObservable(),
 									                                mAuthenticator.getUser(token),
 									                                new Func2<RestaurantsResponse, UserResponse, RestaurantsResponse>() {
 										                                @Override
@@ -340,7 +342,7 @@ public class ValidationActivity extends BaseActivity {
 						                                            throw new AuthServiceException(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
 						                                                                           userProfile.getError());
 					                                            }
-					                                            return api.getRestaurants();
+					                                            return getRestaurantsObservable();
 				                                            }
 			                                            })
 			                                            .subscribe(new RestaurateurObservable.AuthAwareOnNext<RestaurantsResponse>(getActivity
@@ -351,6 +353,18 @@ public class ValidationActivity extends BaseActivity {
 				                                            }
 			                                            }, onError);
 		}
+	}
+
+	private Observable<RestaurantsResponse> getRestaurantsObservable() {
+		final Location currentLocation = LocationUtils.getLastKnownLocation(getActivity());
+		Observable<RestaurantsResponse> restaurantsObservable;
+		if (currentLocation != null) {
+			restaurantsObservable = api.getRestaurants(currentLocation.getLatitude(), currentLocation.getLongitude());
+		} else {
+			restaurantsObservable = api.getRestaurants();
+		}
+
+		return restaurantsObservable;
 	}
 
 	private void onRestaurantsLoaded(RestaurantsResponse result) {

@@ -241,6 +241,17 @@ public class RestaurateurMixpanelProxy extends RestaurateurDataProvider {
 	}
 
 	@Override
+	public Observable<RestaurantsResponse> getRestaurants(double latitude, double longitude) {
+		mMixHelper.track(OMNOM_ANDROID, "restarateur.getRestaurants ->", latitude + " " + longitude);
+		return super.getRestaurants(latitude, longitude).doOnNext(new Action1<RestaurantsResponse>() {
+			@Override
+			public void call(RestaurantsResponse response) {
+				mMixHelper.track(OMNOM_ANDROID, "restarateur.getRestaurants <-", response);
+			}
+		});
+	}
+
+	@Override
 	public Observable<RestaurantsResponse> getRestaurants() {
 		mMixHelper.track(OMNOM_ANDROID, "restarateur.getRestaurants ->", StringUtils.EMPTY_STRING);
 		return super.getRestaurants().doOnNext(new Action1<RestaurantsResponse>() {
