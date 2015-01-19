@@ -158,12 +158,12 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		final int topBarHeight = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);
 		final int translationY = topBarHeight - mTopTranslation - paddingDiff;
 
-		btnCall.animate().translationYBy(translationY).start();
-		btnCall.animate().alpha(0).start();
-		panelBottom.animate().translationYBy(translationY).start();
-		viewMain.animate().translationYBy(translationY).start();
-		AnimationUtils.animateAlpha(panelBottom, false);
 		final int duration = getResources().getInteger(R.integer.default_animation_duration_medium);
+		btnCall.animate().translationYBy(translationY).setDuration(duration).start();
+		btnCall.animate().alpha(0).setDuration(duration).start();
+		panelBottom.animate().translationYBy(translationY).setDuration(duration).start();
+		viewMain.animate().translationYBy(translationY).setDuration(duration).start();
+		AnimationUtils.animateAlpha(panelBottom, false, duration);
 		AnimationUtils.scale(viewCover, logoSizeSmall, duration, new Runnable() {
 			@Override
 			public void run() {

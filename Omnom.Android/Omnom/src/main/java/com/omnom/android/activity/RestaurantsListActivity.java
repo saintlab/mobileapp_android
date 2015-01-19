@@ -101,6 +101,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@InjectView(R.id.swipe_refresh)
 	protected SwipeRefreshLayout refreshView;
 
+	@InjectView(R.id.panel_demo)
+	protected View panelDemo;
+
 	@Inject
 	RestaurateurObservableApi api;
 
@@ -247,21 +250,24 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	                               final int paddingDiff, boolean isLast) {
 		final int listTranslation;
 		final int topTranslation;
+		final int duration = getResources().getInteger(R.integer.default_animation_duration_medium);
 		if (isLast) {
-			footer.animate().alpha(0).start();
+			footer.animate().alpha(0).setDuration(duration).start();
 			topTranslation = -view.getTop();
 			listTranslation = -height;
 		} else {
 			topTranslation = 0;
 			listTranslation = -height;
 		}
-		refreshView.animate().translationYBy(listTranslation + topTranslation + paddingDiff).start();
-
+		refreshView.animate()
+				.translationYBy(listTranslation + topTranslation + paddingDiff)
+				.setDuration(duration)
+				.start();
+		panelDemo.animate().alpha(0).setDuration(duration).start();
 		nextView = list.getChildAt(position + 1);
 		list.setScrollEnabled(false);
 		refreshView.setEnabled(false);
 		if (selectedCover != null) {
-			final int duration = getResources().getInteger(R.integer.default_animation_duration_medium);
 			AnimationUtils.scale(selectedCover, logoSizeLarge, duration, new Runnable() {
 				@Override
 				public void run() {
@@ -302,6 +308,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		if (mAdapter != null) {
 			mAdapter.setSelected(-1);
 		}
+		panelDemo.animate().alpha(1).start();
 		if (selectedCover != null) {
 			LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) selectedCover.getLayoutParams();
 			layoutParams.width = logoSizeSmall;
