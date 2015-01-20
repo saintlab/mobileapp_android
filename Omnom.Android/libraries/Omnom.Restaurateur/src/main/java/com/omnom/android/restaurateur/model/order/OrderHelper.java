@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import com.omnom.android.utils.utils.AmountHelper;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,6 +42,9 @@ public class OrderHelper {
 	 * @return recommended tips for specified button position
 	 */
 	public static int getTipsValue(final Order order, final BigDecimal amount, final int position) {
+		if (order.getTips() == null) {
+			return 5 * (position + 1);
+		}
 		List<TipsValue> tipsValues = order.getTips().getValues();
 		int tipsValue;
 		if (isPercentTips(order, amount)) {
@@ -49,11 +53,18 @@ public class OrderHelper {
 			final int thresholdIndex = getThresholdIndex(order, amount);
 			tipsValue = (int) Math.round(AmountHelper.toDouble(tipsValues.get(position).getAmounts().get(thresholdIndex)));
 		}
+
 		return tipsValue;
 	}
 
 	private static int getThresholdIndex(final Order order, final BigDecimal amount) {
-		List<Integer> thresholds = order.getTips().getThresholds();
+		List<Integer> thresholds;
+		if (order.getTips() == null) {
+			thresholds = new ArrayList<Integer>();
+			thresholds.add(Integer.MAX_VALUE);
+		} else {
+			thresholds = order.getTips().getThresholds();
+		}
 		int thresholdIndex = thresholds.size();
 		for (int i = 0; i < thresholds.size(); i++) {
 			final int thresholdValue = (int) Math.round(AmountHelper.toDouble(thresholds.get(i)));
@@ -74,7 +85,7 @@ public class OrderHelper {
 	 */
 	public static boolean isPercentTips(final @Nullable Order order, final @Nullable BigDecimal amount) {
 		if(order == null || amount == null || order.getTips() == null) {
-			return false;
+			return true;
 		}
 		List<Integer> thresholds = order.getTips().getThresholds();
 		int maxThreshold = (int) Math.round(AmountHelper.toDouble(thresholds.get(thresholds.size() - 1)));

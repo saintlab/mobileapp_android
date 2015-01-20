@@ -15,6 +15,7 @@ import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
+import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -29,6 +30,7 @@ import com.omnom.android.utils.utils.AndroidUtils;
 
 import javax.inject.Inject;
 
+import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -38,7 +40,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private static final String TAG = ValidateActivityCamera.class.getSimpleName();
 
+	private static final String ACTION_LAUNCH_QR = "com.omnom.android.action.launch_qr";
 	private static final String ACTION_LAUNCH_HASHCODE = "com.omnom.android.action.launch_hashcode";
+	private static final String QR_URL_PATH_PREFIX = "/qr/";
 
 	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
 		final Intent intent = new Intent(context, ValidateActivityCamera.class);
@@ -64,7 +68,12 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	public static void start(final BaseFragmentActivity context, final Uri data) {
 		final Intent intent = createIntent(context, EXTRA_LOADER_ANIMATION_SCALE_DOWN, false, ValidateActivity.TYPE_DEFAULT);
-		intent.setData(data).setAction(ACTION_LAUNCH_HASHCODE);
+		intent.setData(data);
+		if (data.toString().contains(QR_URL_PATH_PREFIX)) {
+			intent.setAction(ACTION_LAUNCH_QR);
+		} else {
+			intent.setAction(ACTION_LAUNCH_HASHCODE);
+		}
 		context.start(intent, R.anim.fake_fade_in, R.anim.fake_fade_out_instant, true);
 	}
 
@@ -91,15 +100,17 @@ public class ValidateActivityCamera extends ValidateActivity {
 	protected void startLoader() {
 		clearErrors(true);
 
-		if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction()) && isExternalLaunch()) {
-			findTableForQr(mData.toString());
+		if(isExternalLaunch() &&
+				(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction()) ||
+				 ACTION_LAUNCH_QR.equals(getIntent().getAction()))) {
+			findTable(mData.getLastPathSegment());
 			return;
 		}
 
 		if(BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
-			// findTableForQr("http://www.riston.ru/wishes"); // mehico
-			findTableForQr("http://m.2gis.ru/os/"); // mehico
-			// findTableForQr("http://omnom.menu/qr/00e7232a4d9d2533e7fa503620c4431b"); // shashlikoff
+			// findTable("http://www.riston.ru/wishes"); // mehico
+			findTable("http://m.2gis.ru/os/"); // mehico
+			// findTable("http://omnom.menu/qr/00e7232a4d9d2533e7fa503620c4431b"); // shashlikoff
 			return;
 		}
 
@@ -141,7 +152,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 			super.validate();
 		} else if(mRestaurant == null || mTable == null) {
 			clearErrors(true);
-			findTableForQr(mQrData);
+			findTable(mQrData);
 		}
 	}
 
@@ -156,14 +167,14 @@ public class ValidateActivityCamera extends ValidateActivity {
 					}
 				});
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
-				findTableForQr(mQrData);
+				findTable(mQrData);
 			} else {
 				finish();
 			}
 		}
 	}
 
-	private void findTableForQr(final String mQrData) {
+	private void findTable(final String tableData) {
 		final TableDataResponse[] table = new TableDataResponse[1];
 
 		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
@@ -175,7 +186,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 			                                         @Override
 			                                         public void call(Boolean hasNoErrors) {
 				                                         if(hasNoErrors) {
-					                                         loadTable(mQrData);
+					                                         loadTable(tableData);
 				                                         } else {
 					                                         reportMixPanel(table[0]);
 					                                         startErrorTransition();
@@ -204,9 +215,15 @@ public class ValidateActivityCamera extends ValidateActivity {
 		}
 	}
 
-	private void loadTable(final String mQrData) {
+	private void loadTable(final String data) {
+		Observable<RestaurantResponse> restaurantObservable;
+		if (ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction())) {
+			restaurantObservable = api.decode(new HashDecodeRequest(data), mPreloadBackgroundFunction);
+		} else {
+			restaurantObservable = api.decode(new QrDecodeRequest(data), mPreloadBackgroundFunction);
+		}
 		mCheckQrSubscribtion = AndroidObservable
-				.bindActivity(this, api.decode(new QrDecodeRequest(mQrData), mPreloadBackgroundFunction)).subscribe(
+				.bindActivity(this, restaurantObservable).subscribe(
 						new Action1<RestaurantResponse>() {
 							@Override
 							public void call(final RestaurantResponse decodeResponse) {
@@ -231,20 +248,19 @@ public class ValidateActivityCamera extends ValidateActivity {
 	private void handleExternalLaunchResult(final RestaurantResponse decodeResponse) {
 		if(decodeResponse.hasOnlyRestuarant()) {
 			final Restaurant restaurant = decodeResponse.getRestaurants().get(0);
-			if(RestaurantHelper.hasOnlyTable(restaurant)) {
-				onDataLoaded(restaurant, restaurant.tables().get(0), RestaurantHelper.hasOrders(restaurant),
-				             decodeResponse.getRequestId());
+			if(RestaurantHelper.hasOnlyTable(restaurant) ||
+					(!RestaurantHelper.hasTables(restaurant) && RestaurantHelper.hasOrders(restaurant))) {
+				onDataLoaded(restaurant, RestaurantHelper.getTable(restaurant), RestaurantHelper.hasOrders(restaurant),
+						decodeResponse.getRequestId());
 				// TODO: For debug purposes
 				//if(BuildConfig.DEBUG) {
 				//onDataLoaded(restaurant, restaurant.tables().get(0), true, decodeResponse.getRequestId());
 				//}
-				return;
+			} else if(decodeResponse.hasTables()) {
+				RestaurantActivity.start(this, restaurant, true);
 			}
 
-			if(decodeResponse.hasTables()) {
-				RestaurantActivity.start(this, restaurant, true);
-				return;
-			}
+			return;
 		}
 		handleDecodeResponse(decodeResponse);
 	}

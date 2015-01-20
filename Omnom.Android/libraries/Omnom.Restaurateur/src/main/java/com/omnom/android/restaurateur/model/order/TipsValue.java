@@ -30,6 +30,11 @@ public class TipsValue implements Parcelable {
 	@Expose
 	private int percent;
 
+	public TipsValue(final int percent) {
+		this.percent = percent;
+		amounts = new ArrayList<Integer>();
+	}
+
 	public TipsValue(Parcel parcel) {
 		amounts = new ArrayList<Integer>();
 		parcel.readList(amounts, List.class.getClassLoader());

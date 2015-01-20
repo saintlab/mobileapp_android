@@ -6,9 +6,12 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import com.omnom.android.restaurateur.R;
+import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.schedule.DailySchedule;
+import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -146,5 +149,19 @@ public class RestaurantHelper {
 
 	public static boolean hasTables(final Restaurant restaurant) {
 		return restaurant != null && restaurant.tables() != null && restaurant.tables().size() > 0;
+	}
+
+	public static TableDataResponse getTable(final Restaurant restaurant) {
+		TableDataResponse table = null;
+		if (hasOnlyTable(restaurant)) {
+			table = restaurant.tables().get(0);
+		} else if (!hasTables(restaurant) && hasOrders(restaurant)) {
+			final Order order = restaurant.orders().get(0);
+			// TODO: add internal table id if necessary
+			table = new TableDataResponse(order.getTableId(), 0,
+										  new ArrayList<String>(), restaurant.id());
+		}
+
+		return table;
 	}
 }

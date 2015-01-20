@@ -9,6 +9,7 @@ import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
+import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
@@ -40,6 +41,8 @@ public interface RestaurateurObservableApi {
 	public Observable<RestaurantResponse> decode(BeaconDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
 
 	public Observable<RestaurantResponse> decode(QrDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
+
+	public Observable<RestaurantResponse> decode(HashDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
 
 	public Observable<TableDataResponse> bind(String restaurantId,
 	                                          int tableNumber,

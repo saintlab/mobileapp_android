@@ -59,7 +59,6 @@ import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -737,7 +736,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 						@Override
 						public void run() {
-							showOrders(Collections.EMPTY_LIST, requestId);
+							showOrders(restaurant.orders(), requestId);
 						}
 					});
 				}

@@ -87,7 +87,12 @@
                     android:pathPrefix="/qr/" />
                 <data
                     android:scheme="http"
-                    android:host="omnom.menu" />
+                    android:host="omnom.menu"
+                    android:pathPattern=".*"/>
+                <data
+                    android:scheme="http"
+                    android:host="www.omnom.menu"
+                    android:pathPattern=".*"/>
 
                 <data
                     android:scheme="https"
@@ -95,7 +100,12 @@
                     android:pathPrefix="/qr/" />
                 <data
                     android:scheme="https"
-                    android:host="www.omnom.menu" />
+                    android:host="www.omnom.menu"
+                    android:pathPattern=".*"/>
+                <data
+                    android:scheme="https"
+                    android:host="omnom.menu"
+                    android:pathPattern=".*"/>
             </intent-filter>
         </activity>
         <activity

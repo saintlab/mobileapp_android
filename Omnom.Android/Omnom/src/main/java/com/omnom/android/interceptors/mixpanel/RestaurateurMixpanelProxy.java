@@ -16,6 +16,7 @@ import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
+import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
@@ -276,6 +277,18 @@ public class RestaurateurMixpanelProxy extends RestaurateurDataProvider {
 
 	@Override
 	public Observable<RestaurantResponse> decode(final QrDecodeRequest request, final Func1<RestaurantResponse,
+			RestaurantResponse> funcMap) {
+		mMixHelper.track(OMNOM_ANDROID, "restarateur.decode ->", request);
+		return super.decode(request, funcMap).doOnNext(new Action1<RestaurantResponse>() {
+			@Override
+			public void call(RestaurantResponse response) {
+				mMixHelper.track(OMNOM_ANDROID, "restarateur.decode <-", response);
+			}
+		});
+	}
+
+	@Override
+	public Observable<RestaurantResponse> decode(final HashDecodeRequest request, final Func1<RestaurantResponse,
 			RestaurantResponse> funcMap) {
 		mMixHelper.track(OMNOM_ANDROID, "restarateur.decode ->", request);
 		return super.decode(request, funcMap).doOnNext(new Action1<RestaurantResponse>() {
