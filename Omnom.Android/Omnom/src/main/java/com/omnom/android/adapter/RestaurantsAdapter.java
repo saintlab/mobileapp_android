@@ -2,7 +2,6 @@ package com.omnom.android.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v4.view.ViewCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -159,22 +158,10 @@ public class RestaurantsAdapter extends BaseAdapter {
 		holder.bindData(mContext, item, mWeekDay);
 		if(mSelectedPosition != -1) {
 			if(mSelectedPosition != position) {
-				ViewCompat.setHasTransientState(convertView, true);
 				holder.alpha(0);
-			} else {
-				if(ViewCompat.hasTransientState(convertView)) {
-					ViewCompat.setHasTransientState(convertView, false);
-				}
 			}
-		} else {
-			if(holder.alpha() != 1.0f) {
-				ViewCompat.setHasTransientState(convertView, false);
-				holder.alpha(1);
-			} else {
-				if(ViewCompat.hasTransientState(convertView)) {
-					ViewCompat.setHasTransientState(convertView, false);
-				}
-			}
+		} else if(holder.alpha() != 1.0f) {
+			holder.alpha(1);
 		}
 	}
 
