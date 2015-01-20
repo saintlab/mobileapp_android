@@ -52,7 +52,7 @@
                         android:textColor="@color/cadre_border"
                         android:text="@string/scanning"
                         android:lines="3"
-                        android:textAppearance="?android:textAppearanceMedium"
+                        android:textAppearance="?android:textAppearanceLarge"
                         omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf"/>
 
                     <ImageView

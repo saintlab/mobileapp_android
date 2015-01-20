@@ -96,9 +96,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
 				AnimationUtils.animateAlpha(background, false, new Runnable() {
                     @Override
                     public void run() {
-	                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-		                    AnimationUtils.animateBlinking(camera);
-	                    }
+		                AnimationUtils.animateBlinking(camera);
                     }
                 });
 			}
