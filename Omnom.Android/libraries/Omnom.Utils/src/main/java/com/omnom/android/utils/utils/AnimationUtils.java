@@ -205,6 +205,15 @@ public class AnimationUtils {
 	}
 
 	@DebugLog
+	public static void scale(final View view, int size, long duration) {
+		scale(view, size, duration, new Runnable() {
+			@Override
+			public void run() {
+			}
+		});
+	}
+
+	@DebugLog
 	public static void scale(final View view, int size, long duration, Runnable endCallback) {
 		scaleHeight(view, size, duration);
 		scaleWidth(view, size, duration, endCallback);

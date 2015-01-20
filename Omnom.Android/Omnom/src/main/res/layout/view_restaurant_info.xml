@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     tools:showIn="@layout/item_restaurant">
 
     <LinearLayout
@@ -16,7 +17,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textAppearance="?android:textAppearanceLarge" />
+            android:textAppearance="?android:textAppearanceLarge"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
     </LinearLayout>
 
@@ -28,5 +30,7 @@
         android:gravity="center_vertical"
         android:drawableLeft="@drawable/ic_time_schedule"
         android:drawablePadding="@dimen/drawable_padding_default"
-        android:textAppearance="?android:textAppearanceLarge" />
+        android:textAppearance="?android:textAppearanceLarge"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
 </merge>
