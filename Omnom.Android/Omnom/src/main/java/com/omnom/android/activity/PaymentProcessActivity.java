@@ -220,7 +220,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
-				Log.w(TAG, throwable.getMessage());
+				Log.w(TAG, "processPayment", throwable);
 				onUnknownError();
 			}
 		});
@@ -255,7 +255,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		                                    }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			                                    @Override
 			                                    public void onError(Throwable throwable) {
-				                                    Log.w(TAG, throwable.getMessage());
+				                                    Log.w(TAG, "pay", throwable);
 				                                    onUnknownError();
 			                                    }
 		                                    });
@@ -271,7 +271,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		                                      }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			                                      @Override
 			                                      public void onError(Throwable throwable) {
-				                                      Log.w(TAG, throwable.getMessage());
+				                                      Log.w(TAG, "checkResult", throwable);
 				                                      onUnknownError();
 			                                      }
 		                                      });

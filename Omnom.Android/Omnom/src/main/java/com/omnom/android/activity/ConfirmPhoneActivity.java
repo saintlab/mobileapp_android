@@ -180,7 +180,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
-				Log.e(TAG, "doConfirm " + throwable.getMessage());
+				Log.e(TAG, "doConfirm ", throwable);
 				finish();
 			}
 		});
@@ -252,7 +252,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 				}, new Action1<Throwable>() {
 					@Override
 					public void call(Throwable throwable) {
-						Log.w(TAG, throwable.getMessage());
+						Log.w(TAG, "onRequestCode", throwable);
 					}
 				});
 		startRequestCodeTimeout();

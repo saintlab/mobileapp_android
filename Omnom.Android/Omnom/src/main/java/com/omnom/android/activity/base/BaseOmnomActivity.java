@@ -68,7 +68,7 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
-				Log.w(TAG, throwable.getMessage());
+				Log.w(TAG, "onApplicationLaunch", throwable);
 				mixPanelHelper.track(MixPanelHelper.Project.OMNOM, new AppLaunchMixpanelEvent(UserHelper.getUserData(BaseOmnomActivity.this)));
 			}
 		});

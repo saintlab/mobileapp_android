@@ -93,10 +93,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
 		@Override
 		protected void onThrowable(Throwable throwable) {
-			Log.e(TAG, throwable.getMessage());
+			Log.e(TAG, "onError", throwable);
 			loader.stopProgressAnimation(true);
 			if(throwable instanceof RetrofitError) {
-				throwable.printStackTrace();
 				final RetrofitError cause = (RetrofitError) throwable;
 				if(cause.getResponse() != null) {
 					// TODO: Refactor this ugly piece of ... code
@@ -111,7 +110,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 				EnteringActivity.start(ValidateActivity.this, true);
 				return;
 			}
-			throwable.printStackTrace();
+
 			mErrorHelper.showBackendError(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -397,7 +396,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
-				Log.w(TAG, "Unable to load config: " + throwable.getMessage());
+				Log.w(TAG, "Unable to load config: ", throwable);
 			}
 		});
 

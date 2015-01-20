@@ -328,7 +328,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 				                                             }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					                                             @Override
 					                                             public void onError(Throwable throwable) {
-						                                             Log.w(TAG, throwable.getMessage());
+						                                             Log.w(TAG, "registerCard", throwable);
 						                                             processCardRegisterError(getString(
 								                                             R.string.something_went_wrong_try_again));
 					                                             }
@@ -390,7 +390,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		                                           }, new Action1<Throwable>() {
 			                                           @Override
 			                                           public void call(Throwable throwable) {
-				                                           Log.w(TAG, throwable.getMessage());
+				                                           Log.w(TAG, "verifyCard", throwable);
 				                                           onVerificationError();
 				                                           busy(false);
 			                                           }

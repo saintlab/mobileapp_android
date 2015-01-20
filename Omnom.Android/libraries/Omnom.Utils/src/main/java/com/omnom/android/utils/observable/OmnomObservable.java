@@ -72,7 +72,7 @@ public class OmnomObservable {
 		return new Action1<Throwable>() {
 			@Override
 			public void call(Throwable throwable) {
-				Log.w(tag, throwable.getMessage());
+				Log.w(tag, "loggerOnError", throwable);
 			}
 		};
 	}
