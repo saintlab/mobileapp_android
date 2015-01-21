@@ -1,5 +1,6 @@
 package com.omnom.android.activity;
 
+import android.animation.Animator;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
@@ -25,11 +26,14 @@ import com.omnom.android.fragment.QrHintFragment;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ClickSpan;
+import com.omnom.android.utils.utils.ViewUtils;
 
 /**
  * Created by Ch3D on 14.11.2014.
  */
 public class OmnomQRCaptureActivity extends CaptureActivity {
+
+	private static final int LAUNCH_DELAY = 2000;
 
 	public static void start(final BaseOmnomActivity activity, final int code) {
 		final Intent intent = getIntent(activity);
@@ -90,19 +94,25 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
                         showHint();
                     }
                 });
-		postDelayed(2000, new Runnable() {
+		final View scanFrame = findViewById(R.id.scan_frame);
+		final DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+		scanFrame.setTranslationY(-displayMetrics.heightPixels);
+		postDelayed(LAUNCH_DELAY, new Runnable() {
 			@Override
 			public void run() {
-				AnimationUtils.animateAlpha(background, false, new Runnable() {
-                    @Override
-                    public void run() {
-		                AnimationUtils.animateBlinking(camera);
-                    }
-                });
+				final int duration = getResources().getInteger(R.integer.default_animation_duration_medium);
+				scanFrame.animate()
+						.translationYBy(displayMetrics.heightPixels)
+						.setDuration(duration)
+						.start();
+				background.animate()
+						.translationYBy(displayMetrics.heightPixels)
+						.setDuration(duration)
+						.setListener(new LaunchAnimationListener(camera, background))
+						.start();
 			}
 		});
 
-        final View scanFrame = findViewById(R.id.scan_frame);
         ViewTreeObserver viewTreeObserver = scanFrame.getViewTreeObserver();
         if (viewTreeObserver.isAlive()) {
             viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -126,5 +136,37 @@ public class OmnomQRCaptureActivity extends CaptureActivity {
                 .replace(R.id.fragment_container, QrHintFragment.newInstance())
                 .commit();
     }
+
+	private class LaunchAnimationListener implements Animator.AnimatorListener {
+
+		private final View camera;
+		private final View background;
+
+		public LaunchAnimationListener(final View camera, final View background) {
+			this.camera = camera;
+			this.background = background;
+		}
+
+		@Override
+		public void onAnimationStart(Animator animation) {
+
+		}
+
+		@Override
+		public void onAnimationEnd(Animator animation) {
+			ViewUtils.setVisible(background, false);
+			AnimationUtils.animateBlinking(camera);
+		}
+
+		@Override
+		public void onAnimationCancel(Animator animation) {
+
+		}
+
+		@Override
+		public void onAnimationRepeat(Animator animation) {
+
+		}
+	}
 
 }
