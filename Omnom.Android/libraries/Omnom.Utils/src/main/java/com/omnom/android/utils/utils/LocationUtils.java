@@ -9,9 +9,12 @@ import android.location.LocationManager;
  */
 public class LocationUtils {
 
+	public static LocationManager getLocationManager(final Context context) {
+		return (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+	}
+
 	public static Location getLastKnownLocation(final Context context) {
-		final LocationManager locationManager =
-				(LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+		final LocationManager locationManager = getLocationManager(context);
 		Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		if (location == null) {
 			location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);

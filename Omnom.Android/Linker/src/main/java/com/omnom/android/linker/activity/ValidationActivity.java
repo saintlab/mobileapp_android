@@ -4,7 +4,6 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Location;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -24,13 +23,12 @@ import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.table.RestaurateurObservable;
-import com.omnom.android.utils.observable.BaseErrorHandler;
-import com.omnom.android.utils.observable.OmnomObservable;
-import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.ErrorHelper;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.loader.LoaderView;
-import com.omnom.android.utils.utils.LocationUtils;
+import com.omnom.android.utils.observable.BaseErrorHandler;
+import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.UserDataHolder;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -356,15 +354,7 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private Observable<RestaurantsResponse> getRestaurantsObservable() {
-		final Location currentLocation = LocationUtils.getLastKnownLocation(getActivity());
-		Observable<RestaurantsResponse> restaurantsObservable;
-		if (currentLocation != null) {
-			restaurantsObservable = api.getRestaurants(currentLocation.getLatitude(), currentLocation.getLongitude());
-		} else {
-			restaurantsObservable = api.getRestaurants();
-		}
-
-		return restaurantsObservable;
+		return api.getRestaurants();
 	}
 
 	private void onRestaurantsLoaded(RestaurantsResponse result) {

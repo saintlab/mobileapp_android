@@ -3,6 +3,9 @@ package com.omnom.android.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -41,7 +44,7 @@ import butterknife.OnClick;
 import rx.Observable;
 import rx.functions.Action1;
 
-public class RestaurantsListActivity extends BaseOmnomActivity implements AdapterView.OnItemClickListener {
+public class RestaurantsListActivity extends BaseOmnomActivity implements AdapterView.OnItemClickListener, LocationListener {
 
 	public static final double LOGO_SCALE_SMALL = 0.47;
 
@@ -124,6 +127,8 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private int logoSizeLarge;
 
+	private Location currentLocation;
+
 	@OnClick({R.id.img_qr, R.id.txt_qr})
 	public void doQrShortcut() {
 		ValidateActivityShortcut.start(this, R.anim.fake_fade_in_instant, R.anim.slide_out_down, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
@@ -153,6 +158,19 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	}
 
 	@Override
+	protected void onStart() {
+		super.onStart();
+		// It is necessary to update current location for providing correct distance to restaurants.
+		final LocationManager locationManager = LocationUtils.getLocationManager(this);
+		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+		}
+		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+		}
+	}
+
+	@Override
 	public void initUi() {
 		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 		logoSizeSmall = (int) (displayMetrics.widthPixels * LOGO_SCALE_SMALL + 0.5);
@@ -171,7 +189,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	}
 
 	private void refresh() {
-		final Location currentLocation = LocationUtils.getLastKnownLocation(getActivity());
+		if (currentLocation == null) {
+			currentLocation = LocationUtils.getLastKnownLocation(getActivity());
+		}
 		Observable<RestaurantsResponse> restaurantsObservable;
 		if (currentLocation != null) {
 			restaurantsObservable = api.getRestaurants(currentLocation.getLatitude(), currentLocation.getLongitude());
@@ -313,6 +333,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 			selectedCover.setSize(logoSizeSmall, logoSizeSmall);
 			list.setSelection(list.getSelectedItemPosition());
 		}
+		LocationUtils.getLocationManager(this).removeUpdates(this);
 	}
 
 	@Override
@@ -328,6 +349,26 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_restaurants_list;
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		currentLocation = location;
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// unused
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// unused
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// unused
 	}
 
 	private class RestaurantsComparator implements Comparator<Restaurant> {
