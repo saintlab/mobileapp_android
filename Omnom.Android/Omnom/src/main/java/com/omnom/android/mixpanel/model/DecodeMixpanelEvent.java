@@ -12,6 +12,9 @@ abstract class DecodeMixpanelEvent extends AbstractBaseMixpanelEvent {
 	public static final String METHODE_QR = "qr";
 
 	@Expose
+	protected final String restaurantId;
+
+	@Expose
 	protected final String restaurantName;
 
 	@Expose
@@ -20,11 +23,20 @@ abstract class DecodeMixpanelEvent extends AbstractBaseMixpanelEvent {
 	@Expose
 	protected final String method;
 
-	public DecodeMixpanelEvent(UserData userData, String tableId, String restaurantName, String method) {
+	public DecodeMixpanelEvent(UserData userData, String tableId, String restaurantId, String method) {
+		this(userData, tableId, restaurantId, null, method);
+	}
+
+	public DecodeMixpanelEvent(UserData userData, String tableId, String restaurantId, String restaurantName, String method) {
 		super(userData);
 		this.tableId = tableId;
 		this.method = method;
+		this.restaurantId = restaurantId;
 		this.restaurantName = restaurantName;
+	}
+
+	public String getRestaurantId() {
+		return restaurantId;
 	}
 
 	public String getRestaurantName() {

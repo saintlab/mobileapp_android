@@ -9,16 +9,16 @@ public class OnTableMixpanelEvent extends DecodeMixpanelEvent {
 
 	public static final String EVENT_NAME = "restaurant_enter";
 
-	public static OnTableMixpanelEvent createEventBluetooth(UserData userData, String restaurantName, String tableId) {
-		return new OnTableMixpanelEvent(userData, restaurantName, tableId, METHODE_BLUETOOTH);
+	public static OnTableMixpanelEvent createEventBluetooth(UserData userData, String restaurantId, String tableId) {
+		return new OnTableMixpanelEvent(userData, restaurantId, tableId, METHODE_BLUETOOTH);
 	}
 
-	public static OnTableMixpanelEvent createEventQr(UserData userData, String restaurantName, String tableId) {
-		return new OnTableMixpanelEvent(userData, restaurantName, tableId, METHODE_QR);
+	public static OnTableMixpanelEvent createEventQr(UserData userData, String restaurantId, String tableId) {
+		return new OnTableMixpanelEvent(userData, restaurantId, tableId, METHODE_QR);
 	}
 
-	private OnTableMixpanelEvent(UserData userData, String restaurantName, String tableId, String methode) {
-		super(userData, tableId, restaurantName, methode);
+	private OnTableMixpanelEvent(UserData userData, String restaurantId, String tableId, String methode) {
+		super(userData, tableId, restaurantId, methode);
 	}
 
 	@Override

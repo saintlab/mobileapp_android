@@ -25,8 +25,8 @@ public class RestaurantEnterMixpanelEvent extends DecodeMixpanelEvent {
 	@Expose
 	private String beacon;
 
-	private RestaurantEnterMixpanelEvent(UserData userData, String restaurantName, String tableId, String methode, final String id) {
-		super(userData, tableId, restaurantName, methode);
+	private RestaurantEnterMixpanelEvent(UserData userData, String restaurantId, String tableId, String methode, final String id) {
+		super(userData, tableId, restaurantId, methode);
 		this.beacon = id;
 	}
 
