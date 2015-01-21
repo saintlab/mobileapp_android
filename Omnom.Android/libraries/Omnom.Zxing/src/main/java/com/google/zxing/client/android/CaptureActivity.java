@@ -713,10 +713,16 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 	}
 
     protected void setFramingRect(final Rect rect) {
-        this.framingRect = rect;
-        if (cameraManager != null) {
-            cameraManager.setFraming(rect);
-        }
-    }
+		this.framingRect = rect;
+		if (cameraManager != null) {
+			cameraManager.setFraming(rect);
+		}
+	}
+
+	protected void setTorch(final boolean turnOn) {
+		if (cameraManager != null) {
+			cameraManager.setTorch(turnOn);
+		}
+	}
 
 }

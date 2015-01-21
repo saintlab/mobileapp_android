@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
@@ -43,7 +44,6 @@ import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
-import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -107,6 +107,9 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 	@InjectView(R.id.btn_not_scanning)
 	protected View btnNotScanning;
 
+	@InjectView(R.id.scan_frame_container)
+	protected View scanFrameContainer;
+
 	@InjectView(R.id.scan_frame)
 	protected View scanFrame;
 
@@ -119,15 +122,15 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 	@InjectView(R.id.background)
 	protected View background;
 
-	@InjectView(R.id.img_camera)
-	protected View camera;
-
 	@InjectView(R.id.txt_enter_hash)
 	protected TextView txtEnterHash;
 
 	@InjectView(R.id.hash_underline)
 	protected TextView hashUnderline;
 
+	@InjectView(R.id.btn_flash_light)
+	protected ImageView btnFlashLight;
+	
 	@Inject
 	protected RestaurateurObservableApi api;
 
@@ -139,12 +142,14 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 
 	private boolean isBusy = false;
 
+	private boolean isFlashTurnedOn = false;
+	
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = prefs.edit();
-		editor.putString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, FrontLightMode.OFF.name());
+		editor.putString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, FrontLightMode.AUTO.name());
 		editor.apply();
 	}
 
@@ -157,7 +162,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 	protected void initUI() {
 		super.initUI();
 		playLaunchAnimation();
-		intiPreloadBackgroundFunction();
+		initPreloadBackgroundFunction();
 		initEditHash();
 		final TextView txtHint = (TextView) findViewById(R.id.txt_hint);
 		AndroidUtils.clickify(txtHint, getString(R.string.navigate_qr_code_mark),
@@ -167,6 +172,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 						showHint();
 					}
 				});
+		
 	}
 
 	private void initEditHash() {
@@ -215,7 +221,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 		});
 	}
 
-	private void intiPreloadBackgroundFunction() {
+	private void initPreloadBackgroundFunction() {
 		mPreloadBackgroundFunction = new Func1<RestaurantResponse, RestaurantResponse>() {
 			@Override
 			public RestaurantResponse call(final RestaurantResponse decodeResponse) {
@@ -240,19 +246,19 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 
 	private void playLaunchAnimation() {
 		final DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		scanFrame.setTranslationY(-displayMetrics.heightPixels);
+		scanFrameContainer.setTranslationY(-displayMetrics.heightPixels);
 		postDelayed(LAUNCH_DELAY, new Runnable() {
 			@Override
 			public void run() {
 				final int duration = getResources().getInteger(R.integer.default_animation_duration_medium);
-				scanFrame.animate()
+				scanFrameContainer.animate()
 						.translationYBy(displayMetrics.heightPixels)
 						.setDuration(duration)
 						.start();
 				background.animate()
 						.translationYBy(displayMetrics.heightPixels)
 						.setDuration(duration)
-						.setListener(new LaunchAnimationListener(camera, background))
+						.setListener(new LaunchAnimationListener(background))
 						.start();
 
 				launchScanningDelayHandler(btnNotScanning);
@@ -267,7 +273,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 					AndroidUtils.removeOnGlobalLayoutListener(scanFrame, this);
 					final DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 					setFramingRect(new Rect(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels));
-                    btnNotScanning.setTranslationY(btnNotScanning.getHeight());
+					btnNotScanning.setTranslationY(btnNotScanning.getHeight());
 					ViewUtils.setVisible(btnNotScanning, false);
 				}
 			});
@@ -293,6 +299,14 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 	@OnClick(R.id.btn_close)
 	protected void onBtnClose() {
 		closeHashEnterPanel();
+	}
+
+	@OnClick(R.id.btn_flash_light)
+	protected void onBtnFlash() {
+		isFlashTurnedOn = !isFlashTurnedOn;
+		btnFlashLight.setImageResource(isFlashTurnedOn ? R.drawable.ic_flashlight_off :
+														 R.drawable.ic_flashlight_on);
+		setTorch(isFlashTurnedOn);
 	}
 
 	private void showHint() {
@@ -429,11 +443,9 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 
 	private class LaunchAnimationListener implements Animator.AnimatorListener {
 
-		private final View camera;
 		private final View background;
 
-		public LaunchAnimationListener(final View camera, final View background) {
-			this.camera = camera;
+		public LaunchAnimationListener(final View background) {
 			this.background = background;
 		}
 
@@ -445,7 +457,6 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 		@Override
 		public void onAnimationEnd(Animator animation) {
 			ViewUtils.setVisible(background, false);
-			AnimationUtils.animateBlinking(camera);
 		}
 
 		@Override

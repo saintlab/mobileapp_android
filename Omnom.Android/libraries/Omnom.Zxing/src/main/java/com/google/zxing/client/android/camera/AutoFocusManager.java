@@ -114,6 +114,7 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
 				// Have heard RuntimeException reported in Android 4.0.x+; continue?
 				Log.w(TAG, "Unexpected exception while cancelling focusing", re);
 			}
+			focusing = false;
 		}
 	}
 
