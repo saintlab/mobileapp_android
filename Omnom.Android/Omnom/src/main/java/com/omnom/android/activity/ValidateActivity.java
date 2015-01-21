@@ -455,6 +455,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		};
 
 		if (mSkipViewRendering) {
+			mFirstRun = false;
 			startLoader();
 		}
 	}

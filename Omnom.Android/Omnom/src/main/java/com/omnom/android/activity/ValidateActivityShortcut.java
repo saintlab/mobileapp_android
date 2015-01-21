@@ -26,12 +26,11 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 	}
 
 	public static void start(BaseActivity context) {
-		start(context, R.anim.fake_fade_in_instant, R.anim.slide_out_down, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
+		start(context, R.anim.slide_out_left, R.anim.slide_in_right, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
 
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
 		Intent intent = createIntent(context, animationType, false, ConfirmPhoneActivity.TYPE_DEFAULT);
-		intent.putExtra(EXTRA_ANIMATION_EXIT, EXTRA_ANIMATION_SLIDE_OUT_RIGHT);
 		context.startForResult(intent, enterAnim, exitAnim, REQUEST_CODE_CHANGE_TABLE);
 	}
 

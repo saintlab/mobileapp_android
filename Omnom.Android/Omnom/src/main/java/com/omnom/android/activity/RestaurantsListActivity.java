@@ -131,7 +131,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	@OnClick({R.id.img_qr, R.id.txt_qr})
 	public void doQrShortcut() {
-		ValidateActivityShortcut.start(this, R.anim.fake_fade_in_instant, R.anim.slide_out_down, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
+		ValidateActivityShortcut.start(this, R.anim.slide_in_right, R.anim.slide_out_left, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
 
 	@OnClick(R.id.img_profile)
