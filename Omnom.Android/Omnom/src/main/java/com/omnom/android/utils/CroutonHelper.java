@@ -30,7 +30,7 @@ public class CroutonHelper {
 		}
 
 		final View view = LayoutInflater.from(activity).inflate(com.omnom.android.R.layout.layout_balk_notification, null);
-		final Crouton crouton = Crouton.make(activity, view).setConfiguration(getDefaulConfiguration(activity));
+		final Crouton crouton = Crouton.make(activity, view).setConfiguration(getDefaultConfiguration(activity));
 
 		final View.OnClickListener closeListener = new View.OnClickListener() {
 			@Override
@@ -52,7 +52,7 @@ public class CroutonHelper {
 		return crouton;
 	}
 
-	private static Configuration getDefaulConfiguration(Context context) {
+	private static Configuration getDefaultConfiguration(Context context) {
 		if(sConfiguration == null) {
 			final Configuration.Builder b = new Configuration.Builder();
 			b.setDuration(context.getResources().getInteger(R.integer.balk_notification_duration));

@@ -295,6 +295,14 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		if (mPaymentListener != null && mTable != null) {
+			mPaymentListener.initTableSocket(mTable);
+		}
+	}
+
+	@Override
 	protected void onPause() {
 		super.onPause();
 		mPaymentListener.onPause();

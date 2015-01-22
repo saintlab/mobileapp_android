@@ -147,12 +147,6 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		mPaymentListener.onPause();
-	}
-
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if(savedInstanceState != null) {
@@ -164,6 +158,12 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	protected void onStart() {
 		super.onStart();
 		pay(mDetails.getAmount(), mDetails.getTip());
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		mPaymentListener.onPause();
 	}
 
 	@Override

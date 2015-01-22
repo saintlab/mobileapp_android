@@ -24,11 +24,8 @@ public class SilentPaymentEventListener extends PaymentEventListener {
 
 	@Subscribe
 	public void onPaymentEvent(final PaymentSocketEvent event) {
-		mActivity.getActivity().runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mListener.onPaymentEvent(event);
-			}
-		});
+		if (mListener != null) {
+			mListener.onPaymentEvent(event);
+		}
 	}
 }
