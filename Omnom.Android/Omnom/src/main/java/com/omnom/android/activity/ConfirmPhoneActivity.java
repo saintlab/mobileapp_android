@@ -158,7 +158,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	private void doConfirm() {
 		btnRequestCode.setEnabled(false);
-		mConfirmSubscription = AndroidObservable.bindActivity(this, getObservable()).subscribe(new Action1<AuthResponse>() {
+		mConfirmSubscription = AndroidObservable.bindActivity(this, getAuthObservable()).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(final AuthResponse authResponse) {
 				if(!authResponse.hasError()) {
@@ -186,7 +186,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		});
 	}
 
-	private Observable<AuthResponse> getObservable() {
+	private Observable<AuthResponse> getAuthObservable() {
 		Observable<AuthResponse> observable;
 		if(type == TYPE_REGISTER) {
 			observable = authenticator.confirm(phone, getCode());
@@ -244,7 +244,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	@OnClick(R.id.btn_request_code)
 	protected void onRequestCode() {
 		mRequestCodeSubscription =
-				AndroidObservable.bindActivity(this, authenticator.confirmResend(phone)).subscribe(new Action1<AuthResponse>() {
+				AndroidObservable.bindActivity(this, getRequestCodeObservable()).subscribe(new Action1<AuthResponse>() {
 					@Override
 					public void call(AuthResponse authResponse) {
 						// handle result if necessary
@@ -256,6 +256,18 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 					}
 				});
 		startRequestCodeTimeout();
+	}
+
+	private Observable<AuthResponse> getRequestCodeObservable() {
+		Observable<AuthResponse> observable;
+		if(type == TYPE_REGISTER) {
+			observable = authenticator.confirmResend(phone);
+		} else if(type == TYPE_LOGIN) {
+			observable = authenticator.authorizePhone(phone, StringUtils.EMPTY_STRING);
+		} else {
+			throw new RuntimeException("Wrong confirm type = " + type);
+		}
+		return observable;
 	}
 
 	private void startRequestCodeTimeout() {
