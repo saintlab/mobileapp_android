@@ -17,6 +17,7 @@ import auto.parcel.AutoParcel;
 @AutoParcel
 @AutoGson
 public abstract class Restaurant implements Parcelable {
+	@Nullable
 	public abstract String id();
 
 	@Nullable
