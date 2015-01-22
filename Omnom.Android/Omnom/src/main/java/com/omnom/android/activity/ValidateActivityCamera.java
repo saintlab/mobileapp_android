@@ -43,6 +43,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 	private static final String ACTION_LAUNCH_QR = "com.omnom.android.action.launch_qr";
 	private static final String ACTION_LAUNCH_HASHCODE = "com.omnom.android.action.launch_hashcode";
 	private static final String QR_URL_PATH_PREFIX = "/qr/";
+	private static final String SCHEME_OMNOM = "omnom";
+	private static final String QUERY_PARAMETER_HASH = "hash";
 
 	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
 		final Intent intent = new Intent(context, ValidateActivityCamera.class);
@@ -100,10 +102,16 @@ public class ValidateActivityCamera extends ValidateActivity {
 	protected void startLoader() {
 		clearErrors(true);
 
-		if(isExternalLaunch() &&
-				(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction()) ||
-				 ACTION_LAUNCH_QR.equals(getIntent().getAction()))) {
-			findTable(mData.getLastPathSegment());
+		if(isExternalLaunch()) {
+			if (ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction())) {
+				if (mData.getScheme().equals(SCHEME_OMNOM)) {
+					findTable(mData.getQueryParameter(QUERY_PARAMETER_HASH));
+				} else {
+					findTable(mData.getLastPathSegment());
+				}
+			} else if (ACTION_LAUNCH_QR.equals(getIntent().getAction())) {
+				findTable(mData.getLastPathSegment());
+			}
 			return;
 		}
 
