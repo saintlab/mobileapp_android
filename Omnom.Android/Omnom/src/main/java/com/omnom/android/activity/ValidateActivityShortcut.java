@@ -7,6 +7,7 @@ import android.view.View;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.activity.BaseActivity;
 
 import java.util.List;
@@ -35,13 +36,19 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 	}
 
 	@Override
+	protected void handleHashRestaurants(final String requestId, final Restaurant restaurant) {
+		TableDataResponse table = RestaurantHelper.getTable(restaurant);
+		onDataLoaded(restaurant, table, RestaurantHelper.hasOrders(restaurant), requestId);
+	}
+
+	@Override
 	protected void handleRestaurants(final String requestId, final List<Restaurant> restaurants) {
 		onWrongQr(requestId);
 	}
 
 	@Override
 	protected void handleRestaurant(final String requestId, final Restaurant restaurant) {
-		if(!RestaurantHelper.hasOnlyTable(restaurant)) {
+		if(RestaurantHelper.getTable(restaurant) == null) {
 			onWrongQr(requestId);
 		} else {
 			super.handleRestaurant(requestId, restaurant);

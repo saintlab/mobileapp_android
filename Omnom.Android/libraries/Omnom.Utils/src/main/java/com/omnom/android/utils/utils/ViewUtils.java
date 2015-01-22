@@ -67,6 +67,10 @@ public class ViewUtils {
 		return paddingInPixels;
 	}
 
+	public static boolean isVisible(View view) {
+		return view.getVisibility() == View.VISIBLE;
+	}
+
 	public static void setVisible(View view, boolean visible) {
 		if(view != null) {
 			view.setVisibility(visible ? View.VISIBLE : View.GONE);

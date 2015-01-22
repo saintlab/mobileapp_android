@@ -892,6 +892,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}
 	}
 
+	protected void handleHashRestaurants(final String requestId, final Restaurant restaurant) {
+
+	}
+
 	protected void handleRestaurants(final String requestId, final List<Restaurant> restaurants) {
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
@@ -913,12 +917,12 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	}
 
 	protected void handleRestaurant(final String requestId, final Restaurant restaurant) {
-		if(RestaurantHelper.hasOnlyTable(restaurant)) {
+		final TableDataResponse table = RestaurantHelper.getTable(restaurant);
+		if(table != null) {
 			loader.stopProgressAnimation();
 			loader.updateProgressMax(new Runnable() {
 				@Override
 				public void run() {
-					final TableDataResponse table = restaurant.tables().get(0);
 					reportMixPanel(table);
 					onDataLoaded(restaurant, table);
 				}

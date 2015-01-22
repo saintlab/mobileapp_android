@@ -117,9 +117,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 		if(BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
 			// findTable("http://www.riston.ru/wishes"); // mehico
-			findTable("http://m.2gis.ru/os/"); // mehico
+			//findTable("http://m.2gis.ru/os/"); // mehico
 			// findTable("http://omnom.menu/qr/00e7232a4d9d2533e7fa503620c4431b"); // shashlikoff
-			return;
+			//return;
 		}
 
 		OmnomQRCaptureActivity.start(this, REQUEST_CODE_SCAN_QR);
@@ -168,7 +168,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 	protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_SCAN_QR) {
-			if(resultCode == RESULT_OK) {
+			if (resultCode == RESULT_OK) {
 				loader.startProgressAnimation(10000, new Runnable() {
 					@Override
 					public void run() {
@@ -176,6 +176,10 @@ public class ValidateActivityCamera extends ValidateActivity {
 				});
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
 				findTable(mQrData);
+			} else if (resultCode == OmnomQRCaptureActivity.RESULT_RESTAURANT_FOUND) {
+				final String requestId = data.getExtras().getString(EXTRA_REQUEST_ID);
+				final Restaurant restaurant = data.getExtras().getParcelable(EXTRA_RESTAURANT);
+				handleHashRestaurants(requestId, restaurant);
 			} else {
 				finish();
 			}
@@ -254,11 +258,11 @@ public class ValidateActivityCamera extends ValidateActivity {
 						}, onError);
 	}
 
-	private void handleExternalLaunchResult(final RestaurantResponse decodeResponse) {
-		if(decodeResponse.hasOnlyRestuarant()) {
+	protected void handleExternalLaunchResult(final RestaurantResponse decodeResponse) {
+		if(decodeResponse.hasOnlyRestaurant()) {
 			final Restaurant restaurant = decodeResponse.getRestaurants().get(0);
-			if(RestaurantHelper.hasOnlyTable(restaurant) ||
-					(!RestaurantHelper.hasTables(restaurant) && RestaurantHelper.hasOrders(restaurant))) {
+			final TableDataResponse table = RestaurantHelper.getTable(restaurant);
+			if(table != null) {
 				onDataLoaded(restaurant, RestaurantHelper.getTable(restaurant), RestaurantHelper.hasOrders(restaurant),
 						decodeResponse.getRequestId());
 				// TODO: For debug purposes
