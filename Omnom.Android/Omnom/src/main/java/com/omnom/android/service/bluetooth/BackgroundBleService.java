@@ -63,7 +63,7 @@ public class BackgroundBleService extends Service {
 
 	private static final long ALARM_INTERVAL = MINUTE;
 
-	private static final long BEACON_CACHE_INTERVAL = 60 * MINUTE;
+	private static final long BEACON_CACHE_INTERVAL = 2 * 60 * MINUTE;
 
 	private static final String TAG = BackgroundBleService.class.getSimpleName();
 
@@ -261,8 +261,8 @@ public class BackgroundBleService extends Service {
 			return;
 		}
 
+		preferences.saveRestaurantBeacon(this, beacon);
 		if(!preferences.contains(this, restaurantData)) {
-			preferences.saveRestaurantBeacon(this, beacon);
 			if(AndroidUtils.hasConnection(this) && hasAuthToken()) {
 				api.findBeacon(beacon).subscribe(new Action1<TableDataResponse>() {
 					@Override
@@ -340,12 +340,12 @@ public class BackgroundBleService extends Service {
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	private void scheduleAlarmJB() {
-		((AlarmManager) getSystemService(ALARM_SERVICE)).set(AlarmManager.ELAPSED_REALTIME_WAKEUP, getTriggetAt(), getPendingIntent());
+		((AlarmManager) getSystemService(ALARM_SERVICE)).set(AlarmManager.ELAPSED_REALTIME_WAKEUP, getTriggerAt(), getPendingIntent());
 	}
 
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	private void scheduleNextAlarmKK() {
-		((AlarmManager) getSystemService(ALARM_SERVICE)).setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, getTriggetAt(),
+		((AlarmManager) getSystemService(ALARM_SERVICE)).setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, getTriggerAt(),
 		                                                          getPendingIntent());
 	}
 
@@ -364,7 +364,7 @@ public class BackgroundBleService extends Service {
 		}
 	}
 
-	private long getTriggetAt() {
+	private long getTriggerAt() {
 		return SystemClock.elapsedRealtime() + (ALARM_INTERVAL);
 	}
 
