@@ -40,7 +40,8 @@ public class CroutonHelper {
 		};
 
 		final String name = data.getUser().getName();
-		final BigDecimal bd = BigDecimal.valueOf(data.getTransaction().getAmount());
+		final BigDecimal bd = BigDecimal.valueOf(data.getTransaction().getAmount() -
+												 data.getTransaction().getTip());
 		final BigDecimal subtract = bd.divide(DIVIDER);
 		final String msg = activity.getString(com.omnom.android.R.string.balk_notification_user_paid_,
 		                                      name,
