@@ -44,6 +44,12 @@
 -keep public class com.android.vending.licensing.ILicensingService
 -dontnote com.android.vending.licensing.ILicensingService
 
+# Support library
+
+-dontwarn android.support.**
+-keep class android.support.v4.** { *; }
+-keep interface android.support.v4.app.** { *; }
+
 # Explicitly preserve all serialization members. The Serializable interface
 # is only a marker interface, so it wouldn't save them.
 -keepclassmembers class * implements java.io.Serializable {
