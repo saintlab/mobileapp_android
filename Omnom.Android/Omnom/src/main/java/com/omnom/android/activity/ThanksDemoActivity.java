@@ -9,6 +9,7 @@ import com.omnom.android.auth.UserData;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.utils.AmountHelper;
 
 /**
  * Created by Ch3D on 04.12.2014.
@@ -19,15 +20,19 @@ public class ThanksDemoActivity extends ThanksActivity {
 	                         final Order order,
 	                         final int code,
 	                         final int color,
-	                         final double amount) {
+	                         final double amount,
+	                         final int tips) {
 		final Intent intent = new Intent(activity, ThanksDemoActivity.class);
 		intent.putExtra(EXTRA_ACCENT_COLOR, color);
 		intent.putExtra(EXTRA_ORDER, order);
 		intent.putExtra(EXTRA_ORDER_AMOUNT, amount);
+		intent.putExtra(EXTRA_ORDER_TIPS, tips);
 		activity.startActivityForResult(intent, code);
 	}
 
 	private double mAmount;
+
+	private int mTips;
 
 	private boolean mFirstRun = true;
 
@@ -35,6 +40,7 @@ public class ThanksDemoActivity extends ThanksActivity {
 	protected void handleIntent(final Intent intent) {
 		super.handleIntent(intent);
 		mAmount = intent.getDoubleExtra(Extras.EXTRA_ORDER_AMOUNT, -1);
+		mTips = intent.getIntExtra(Extras.EXTRA_ORDER_TIPS, 0);
 	}
 
 	@Override
@@ -45,7 +51,7 @@ public class ThanksDemoActivity extends ThanksActivity {
 				@Override
 				public void run() {
 					final UserData user = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-					mPaymentListener.onPaymentEvent(PaymentSocketEvent.createDemoEvent(user, mAmount));
+					mPaymentListener.onPaymentEvent(PaymentSocketEvent.createDemoEvent(user, mAmount, (int) AmountHelper.toDouble(mTips)));
 					mFirstRun = false;
 				}
 			});

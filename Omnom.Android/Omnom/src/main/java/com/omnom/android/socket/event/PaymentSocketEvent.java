@@ -26,10 +26,10 @@ public class PaymentSocketEvent extends BaseSocketEvent implements Parcelable {
 		}
 	};
 
-	public static PaymentSocketEvent createDemoEvent(UserData userData, double amount) {
+	public static PaymentSocketEvent createDemoEvent(UserData userData, double amount, int tips) {
 		final PaymentData data = new PaymentData();
 		data.setUser(UserHelper.toPaymentUser(userData));
-		data.setTransaction(new Transaction(AmountHelper.toInt(amount), 0));
+		data.setTransaction(new Transaction(AmountHelper.toInt(amount - tips), 0));
 		return new PaymentSocketEvent(data);
 	}
 

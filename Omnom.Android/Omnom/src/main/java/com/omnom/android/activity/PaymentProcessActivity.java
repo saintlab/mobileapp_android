@@ -294,7 +294,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 			@Override
 			public void run() {
 				if(mIsDemo) {
-					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mDetails.getAmount());
+					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mDetails.getAmount(), mDetails.getTip());
 				} else {
 					ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
 				}
