@@ -42,6 +42,8 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.ViewUtils;
+import com.omnom.android.validator.LongValidator;
+import com.omnom.android.validator.Validator;
 
 import java.util.List;
 
@@ -131,6 +133,8 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private BillResponse mBillData;
 
+	private Validator restaurantIdValidator;
+
 	@Override
 	public void initUi() {
 		mPaymentListener = new SilentPaymentEventListener(this, this);
@@ -149,6 +153,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		restaurantIdValidator = new LongValidator();
 		if(savedInstanceState != null) {
 			mTransactionUrl = savedInstanceState.getString(Extras.EXTRA_TRANSACTION_URL);
 		}
@@ -235,7 +240,14 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, double amount,
 	                 int tip) {
-		final ExtraData extra = MailRuExtra.create(tip, billData.getMailRestaurantId());
+		final String mailRestaurantId = billData.getMailRestaurantId();
+		if (!restaurantIdValidator.validate(mailRestaurantId)) {
+			AcquiringResponseError error = new AcquiringResponseError();
+			error.setDescr("Mail restaurant id is invalid: " + mailRestaurantId);
+			onPayError(error);
+			return;
+		}
+		final ExtraData extra = MailRuExtra.create(tip, mailRestaurantId);
 		mBillData = billData;
 		mBillId = billData.getId();
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
