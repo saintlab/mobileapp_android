@@ -197,6 +197,7 @@
                                 android:paddingRight="@dimen/activity_horizontal_margin_small"
                                 android:singleLine="true"
                                 android:maxLength="6"
+                                android:minEms="2"
                                 android:background="@color/transparent"
                                 android:inputType="textNoSuggestions"
                                 android:imeOptions="actionDone"
