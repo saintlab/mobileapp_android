@@ -200,7 +200,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 				                                         if(hasNoErrors) {
 					                                         loadTable(tableData);
 				                                         } else {
-					                                         reportMixPanel(table[0]);
+					                                         reportMixPanel(null, OnTableMixpanelEvent.METHOD_QR, table[0]);
 					                                         startErrorTransition();
 					                                         final View viewById = findViewById(R.id.panel_bottom);
 					                                         if(viewById != null) {
@@ -219,12 +219,12 @@ public class ValidateActivityCamera extends ValidateActivity {
 	}
 
 	@Override
-	protected void reportMixPanel(final TableDataResponse tableDataResponse) {
+	protected void reportMixPanel(final String requestId, final String method, final TableDataResponse tableDataResponse) {
 		if(tableDataResponse != null) {
 			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-			                          OnTableMixpanelEvent.createEventQr(getUserData(),
-					                                                     tableDataResponse.getRestaurantId(),
-					                                                     tableDataResponse.getId()));
+								      OnTableMixpanelEvent.create(requestId, getUserData(),
+										                          tableDataResponse.getRestaurantId(),
+																  tableDataResponse.getId(), method));
 		}
 	}
 
@@ -251,7 +251,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 									if(isExternalLaunch()) {
 										handleExternalLaunchResult(decodeResponse);
 									} else {
-										handleDecodeResponse(decodeResponse);
+										handleDecodeResponse(OnTableMixpanelEvent.METHOD_QR, decodeResponse);
 									}
 								}
 							}
@@ -259,10 +259,15 @@ public class ValidateActivityCamera extends ValidateActivity {
 	}
 
 	protected void handleExternalLaunchResult(final RestaurantResponse decodeResponse) {
+		String method = OnTableMixpanelEvent.METHOD_QR;
+		if (ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction())) {
+			method = OnTableMixpanelEvent.METHOD_HASH;
+		}
 		if(decodeResponse.hasOnlyRestaurant()) {
 			final Restaurant restaurant = decodeResponse.getRestaurants().get(0);
 			final TableDataResponse table = RestaurantHelper.getTable(restaurant);
 			if(table != null) {
+				reportMixPanel(decodeResponse.getRequestId(), method, table);
 				onDataLoaded(restaurant, RestaurantHelper.getTable(restaurant), RestaurantHelper.hasOrders(restaurant),
 						decodeResponse.getRequestId());
 				// TODO: For debug purposes
@@ -275,7 +280,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 			return;
 		}
-		handleDecodeResponse(decodeResponse);
+		handleDecodeResponse(method, decodeResponse);
 	}
 
 	@Override

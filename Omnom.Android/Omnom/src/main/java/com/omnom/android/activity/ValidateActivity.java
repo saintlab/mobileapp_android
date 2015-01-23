@@ -870,7 +870,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		return false;
 	}
 
-	protected final void handleDecodeResponse(final RestaurantResponse response) {
+	protected final void handleDecodeResponse(final String method, final RestaurantResponse response) {
 		final List<Restaurant> restaurants = response.getRestaurants();
 		if(restaurants != null) {
 			final int size = restaurants.size();
@@ -880,7 +880,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 					break;
 
 				case 1:
-					handleRestaurant(response.getRequestId(), restaurants.get(0));
+					handleRestaurant(method, response.getRequestId(), restaurants.get(0));
 					break;
 
 				default:
@@ -916,14 +916,14 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		});
 	}
 
-	protected void handleRestaurant(final String requestId, final Restaurant restaurant) {
+	protected void handleRestaurant(final String method, final String requestId, final Restaurant restaurant) {
 		final TableDataResponse table = RestaurantHelper.getTable(restaurant);
 		if(table != null) {
 			loader.stopProgressAnimation();
 			loader.updateProgressMax(new Runnable() {
 				@Override
 				public void run() {
-					reportMixPanel(table);
+					reportMixPanel(requestId, method, table);
 					onDataLoaded(restaurant, table);
 				}
 			});
@@ -945,7 +945,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}
 	}
 
-	protected abstract void reportMixPanel(final TableDataResponse tableDataResponse);
+	protected abstract void reportMixPanel(final String requestId, final String method, final TableDataResponse tableDataResponse);
 
 	public void changeTable() {
 		clearErrors(true);

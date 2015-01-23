@@ -131,7 +131,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 	@Inject
 	protected RestaurateurObservableApi api;
 
-	private Subscription mCheckQrSubscribtion;
+	private Subscription mCheckQrSubscription;
 
 	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBackgroundFunction;
 
@@ -367,11 +367,11 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		OmnomObservable.unsubscribe(mCheckQrSubscribtion);
+		OmnomObservable.unsubscribe(mCheckQrSubscription);
 	}
 
 	private void loadTable(final String hash) {
-		mCheckQrSubscribtion = AndroidObservable
+		mCheckQrSubscription = AndroidObservable
 				.bindActivity(this, api.decode(new HashDecodeRequest(hash), mPreloadBackgroundFunction)).subscribe(
 						new Action1<RestaurantResponse>() {
 							@Override

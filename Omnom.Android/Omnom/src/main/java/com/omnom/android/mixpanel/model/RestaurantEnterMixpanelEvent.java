@@ -13,20 +13,23 @@ public class RestaurantEnterMixpanelEvent extends DecodeMixpanelEvent {
 
 	public static final String EVENT_NAME = "restaurant_enter";
 
-	public static RestaurantEnterMixpanelEvent createEventBluetooth(UserData userData, TableDataResponse table, Beacon beacon) {
-		return new RestaurantEnterMixpanelEvent(userData, table.getRestaurantId(), table.getId(), METHODE_BLUETOOTH,
+	public static RestaurantEnterMixpanelEvent createEventBluetooth(String requestId, UserData userData, TableDataResponse table, Beacon beacon) {
+		return new RestaurantEnterMixpanelEvent(requestId, userData, table.getRestaurantId(), table.getId(), METHOD_BLUETOOTH,
 		                                        beacon.getEncodeString());
 	}
 
-	public static RestaurantEnterMixpanelEvent createEventQr(UserData userData, TableDataResponse table, String qrData) {
-		return new RestaurantEnterMixpanelEvent(userData, table.getRestaurantId(), table.getId(), METHODE_QR, qrData);
+	public static RestaurantEnterMixpanelEvent createEventQr(String requestId, UserData userData, TableDataResponse table, String qrData) {
+		return new RestaurantEnterMixpanelEvent(requestId, userData, table.getRestaurantId(), table.getId(), METHOD_QR, qrData);
 	}
+
+	@Expose
+	private String requestId;
 
 	@Expose
 	private String beacon;
 
-	private RestaurantEnterMixpanelEvent(UserData userData, String restaurantId, String tableId, String methode, final String id) {
-		super(userData, tableId, restaurantId, methode);
+	private RestaurantEnterMixpanelEvent(String requestId, UserData userData, String restaurantId, String tableId, String methode, final String id) {
+		super(requestId, userData, tableId, restaurantId, methode);
 		this.beacon = id;
 	}
 
