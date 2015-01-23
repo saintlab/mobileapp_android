@@ -241,7 +241,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, double amount,
 	                 int tip) {
 		final String mailRestaurantId = billData.getMailRestaurantId();
-		if (!restaurantIdValidator.validate(mailRestaurantId)) {
+		if (!restaurantIdValidator.validate(mailRestaurantId) && !mIsDemo) {
 			AcquiringResponseError error = new AcquiringResponseError();
 			error.setDescr("Mail restaurant id is invalid: " + mailRestaurantId);
 			onPayError(error);
