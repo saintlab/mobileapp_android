@@ -63,7 +63,7 @@ public class BackgroundBleService extends Service {
 
 	private static final long ALARM_INTERVAL = MINUTE;
 
-	private static final long BEACON_CACHE_INTERVAL = 2 * 60 * MINUTE;
+	private static final long BEACON_CACHE_INTERVAL = 4 * 60 * MINUTE;
 
 	private static final String TAG = BackgroundBleService.class.getSimpleName();
 
