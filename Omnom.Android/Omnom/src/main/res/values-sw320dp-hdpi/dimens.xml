@@ -8,5 +8,5 @@
     <dimen name="card_frame_width">280dp</dimen>
     <dimen name="card_frame_height">160dp</dimen>
     <dimen name="order_payment_tips_title_margin">-24dp</dimen>
-    <dimen name="not_scanning_padding">16dp</dimen>
+    <dimen name="not_scanning_padding">8dp</dimen>
 </resources>

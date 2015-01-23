@@ -40,5 +40,7 @@
     <dimen name="picker_drawable_height">40dp</dimen>
     <dimen name="order_payment_tips_radio_padding_bottom">0dp</dimen>
 
+    <dimen name="not_scanning_padding">16dp</dimen>
+
     <dimen name="pay_once_font_size">16sp</dimen>
 </resources>
