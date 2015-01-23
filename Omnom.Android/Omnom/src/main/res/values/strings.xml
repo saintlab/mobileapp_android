@@ -109,6 +109,9 @@
     <string name="navigate_qr_code_mark">Что это такое</string>
     <string name="scan_qr">Сканировать QR</string>
     <string name="scanning">Сканирование</string>
+    <string name="not_scanning">Не сканирует?</string>
+    <string name="enter_hash">Введите текст с&#160;Omnom-наклейки,\nфлажка или&#160;чека</string>
+    <string name="enter_hash_url">http://omnom.menu/</string>
     <string name="omnom_works_here">Omnom работает здесь</string>
     <string name="send_feedback">Написать отзыв</string>
 

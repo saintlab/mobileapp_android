@@ -1,5 +1,6 @@
 package com.omnom.android.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -36,6 +37,8 @@ public class QrHintFragment extends Fragment {
 	@InjectView(R.id.txt_info)
 	protected TextView txtInfo;
 
+	private FragmentCloseListener mFragmentCloseListener;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_qr_hint, container, false);
@@ -45,6 +48,7 @@ public class QrHintFragment extends Fragment {
 
 	@OnClick(R.id.btn_close)
 	protected void onClose() {
+		mFragmentCloseListener.onFragmentClose();
 		getFragmentManager().popBackStack();
 	}
 
@@ -62,5 +66,23 @@ public class QrHintFragment extends Fragment {
 			}
 		});
 		CalligraphyUtils.applyFontToTextView(getActivity(), txtInfo, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		addOnFragmentCloseListener(activity);
+	}
+
+	private void addOnFragmentCloseListener(Activity activity) {
+		try {
+			mFragmentCloseListener = (FragmentCloseListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString() + " must implement FragmentCloseListener");
+		}
+	}
+
+	public interface FragmentCloseListener {
+		void onFragmentClose();
 	}
 }

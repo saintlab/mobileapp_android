@@ -24,6 +24,7 @@
     <string name="error_no_internet_connection">Вы видите интернет?\nМы — нет.</string>
     <string name="something_went_wrong">Помехи на&#160;линии</string>
     <string name="error_unknown_qr">Неверный QR-код,\nнайдите Omnom.</string>
+    <string name="error_unknown_hash">Указан неверный код</string>
     <string name="error_weak_beacon_signal">Слабый сигнал. Положите телефон в&#160;центр стола пожалуйста</string>
     <string name="error_more_than_one_beacon">Обнаружено несколько маячков. Положите телефон в&#160;центр стола пожалуйста</string>
     <string name="error_server_unavailable_please_try_again">Невозможно получить данные с&#160;сервера. Пожалуйста, попробуйте еще раз</string>

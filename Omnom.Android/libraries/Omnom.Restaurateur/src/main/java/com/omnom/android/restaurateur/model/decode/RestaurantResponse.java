@@ -23,8 +23,8 @@ public class RestaurantResponse extends ResponseBase {
 		this.restaurants = restaurants;
 	}
 
-	public boolean hasOnlyRestuarant() {
-		return restaurants.size() == 1;
+	public boolean hasOnlyRestaurant() {
+		return restaurants != null && restaurants.size() == 1;
 	}
 
 	public boolean hasTables() {
