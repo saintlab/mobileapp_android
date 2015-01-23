@@ -106,17 +106,6 @@
 
             </LinearLayout>
 
-            <FrameLayout
-                android:id="@+id/fragment_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="bottom"/>
-
-            <com.google.zxing.client.android.ViewfinderView
-                android:id="@+id/viewfinder_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
             <TextView
                 android:id="@+id/btn_not_scanning"
                 android:layout_width="match_parent"
@@ -221,6 +210,16 @@
 
             </LinearLayout>
 
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"/>
+
+        <com.google.zxing.client.android.ViewfinderView
+            android:id="@+id/viewfinder_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
     </RelativeLayout>
 
