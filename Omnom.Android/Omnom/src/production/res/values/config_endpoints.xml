@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="endpoint_auth">http://wicket.stand.saintlab.com</string>
-    <string name="endpoint_restaurateur">http://omnom.stand.saintlab.com</string>
+    <string name="endpoint_auth">https://wicket.omnom.menu</string>
+    <string name="endpoint_restaurateur">https://omnom.omnom.menu</string>
 </resources>
