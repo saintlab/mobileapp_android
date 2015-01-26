@@ -541,7 +541,9 @@ public class OrderFragment extends Fragment {
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
 			mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
 		}
-		mAdapter.setIgnoreSelection(true);
+		if (mAdapter != null) {
+			mAdapter.setIgnoreSelection(true);
+		}
 	}
 
 	public View getPanelPayment() {
@@ -767,7 +769,9 @@ public class OrderFragment extends Fragment {
 		list.setSwipeEnabled(true);
 		activity.showOther(mPosition, false);
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, mListTraslationActive).start();
-		mAdapter.setIgnoreSelection(false);
+		if (mAdapter != null) {
+			mAdapter.setIgnoreSelection(false);
+		}
 	}
 
 	public boolean isDownscaled() {
