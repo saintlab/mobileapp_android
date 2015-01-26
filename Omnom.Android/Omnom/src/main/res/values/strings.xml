@@ -20,6 +20,8 @@
     <string name="you_forgot_to_enter_phone">Вы забыли ввести номер телефона</string>
     <string name="you_forgot_to_enter_email">Вы забыли ввести e-mail</string>
     <string name="invalid_email">Некорректный e-mail</string>
+    <string name="error_can_enter">Можно входить. %1$s</string>
+    <string name="can_enter">Можно входить.</string>
     <string name="proceed">Далее</string>
     <string name="title_activity_confirm_phone">ConfirmPhoneActivity</string>
     <string name="confirm_code_sms_text">Введите код из&#160;SMS,\nприсланного на&#160;номер\n%1$s</string>

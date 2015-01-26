@@ -38,6 +38,12 @@ public class LoginActivity extends BaseOmnomActivity {
 		throw new RuntimeException("IMPLEMENT");
 	}
 
+	public static void start(BaseOmnomActivity activity, String phone) {
+		final Intent intent = new Intent(activity, LoginActivity.class);
+		intent.putExtra(EXTRA_PHONE, phone);
+		activity.start(intent, R.anim.slide_in_right, R.anim.slide_out_left, true);
+	}
+
 	@InjectView(R.id.edit_phone)
 	protected ErrorEdit editPhone;
 
@@ -51,6 +57,8 @@ public class LoginActivity extends BaseOmnomActivity {
 	protected TextView txtRegister;
 
 	private boolean mFirstStart = true;
+
+	private String mPhone;
 
 	private Subscription mProceedSubscription;
 
@@ -77,6 +85,8 @@ public class LoginActivity extends BaseOmnomActivity {
 		});
 	}
 
+
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -86,7 +96,10 @@ public class LoginActivity extends BaseOmnomActivity {
 				@Override
 				public void run() {
 					final EditText editText = editPhone.getEditText();
-					final String value = AndroidUtils.getDevicePhoneNumber(getActivity(), R.string.phone_country_code);
+					String value = mPhone;
+					if (value == null) {
+						value = AndroidUtils.getDevicePhoneNumber(getActivity(), R.string.phone_country_code);
+					}
 					editText.setText(value);
 					AndroidUtils.moveCursorEnd(editText);
 					AndroidUtils.showKeyboard(editText);
@@ -115,6 +128,7 @@ public class LoginActivity extends BaseOmnomActivity {
 
 	@Override
 	protected void handleIntent(Intent intent) {
+		mPhone = intent.getStringExtra(EXTRA_PHONE);
 	}
 
 	@OnClick(R.id.txt_register)
