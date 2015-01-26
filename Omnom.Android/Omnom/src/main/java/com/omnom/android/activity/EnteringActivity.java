@@ -16,6 +16,7 @@ import android.view.View;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.helper.ApplicationLaunchListener;
 import com.omnom.android.fragment.EnteringFragment;
 import com.omnom.android.fragment.SplashFragment;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
@@ -28,7 +29,7 @@ import java.util.Arrays;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class EnteringActivity extends BaseOmnomFragmentActivity implements SplashFragment.LaunchListener {
+public class EnteringActivity extends BaseOmnomFragmentActivity implements SplashFragment.LaunchListener, ApplicationLaunchListener {
 
 	private static final String TAG = EnteringActivity.class.getSimpleName();
 
@@ -68,8 +69,6 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
-
-	private int durationSplash;
 
 	private boolean skipSplash;
 
@@ -123,31 +122,11 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 				showPanelBottom(false);
 			} else {
 				// During initial setup, plug in the details fragment.
-				splashFragment = SplashFragment.newInstance(durationSplash, mForwardValiation);
+				splashFragment = SplashFragment.newInstance(mForwardValiation);
 				getSupportFragmentManager().beginTransaction()
 				                           .replace(R.id.fragment_container, splashFragment)
 				                           .commit();
 			}
-		}
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
-		if(splashFragment != null) {
-			if(mData != null && hasToken) {
-				splashFragment.animateValidation(mData);
-				return;
-			}
-			if(hasToken) {
-				splashFragment.animateValidation();
-			} else {
-				splashFragment.animateLogin();
-			}
-		} else {
-			Log.w(TAG, "Splash fragment is null");
 		}
 	}
 
@@ -162,10 +141,15 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 
 	@Override
 	protected void handleIntent(Intent intent) {
-		durationSplash = intent.getIntExtra(EXTRA_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
 		skipSplash = intent.getBooleanExtra(EXTRA_SKIP_SPLASH, false);
 		mType = intent.getIntExtra(EXTRA_CONFIRM_TYPE, ValidateActivity.TYPE_DEFAULT);
 		mForwardValiation = intent.getBooleanExtra(EXTRA_CHANGE_TABLE, false);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		activityHelper.onApplicationLaunch(this);
 	}
 
 	@OnClick(R.id.btn_register)
@@ -213,6 +197,24 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 		showPanelBottom(true);
 	}
 
+	@Override
+	public void onDataLoaded() {
+		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
+		if(splashFragment != null) {
+			if(mData != null && hasToken) {
+				splashFragment.animateValidation(mData);
+				return;
+			}
+			if(hasToken) {
+				splashFragment.animateValidation();
+			} else {
+				splashFragment.animateLogin();
+			}
+		} else {
+			Log.w(TAG, "Splash fragment is null");
+		}
+	}
+
 	private void showPanelBottom(boolean isAnimated) {
 		if(isAnimated) {
 			AnimationUtils.translateUp(getActivity(), Arrays.asList(mPanelBottom),
@@ -233,4 +235,5 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	public int getType() {
 		return mType;
 	}
+
 }

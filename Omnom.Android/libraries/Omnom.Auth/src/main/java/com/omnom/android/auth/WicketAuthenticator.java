@@ -60,6 +60,11 @@ public class WicketAuthenticator implements AuthService {
 	}
 
 	@Override
+	public Observable<AuthResponse> logLocation(double longitude, double latitude, String token) {
+		return authService.logLocation(longitude, latitude, token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
 	public Observable<AuthResponse> authorizePhone(String phone, String code) {
 		return authService.authorizePhone(phone, code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}

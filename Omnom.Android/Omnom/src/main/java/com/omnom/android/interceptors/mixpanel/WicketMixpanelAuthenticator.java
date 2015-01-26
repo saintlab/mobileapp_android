@@ -68,6 +68,21 @@ public class WicketMixpanelAuthenticator extends WicketAuthenticator {
 	}
 
 	@Override
+	public Observable<AuthResponse> logLocation(double longitude, double latitude, String token) {
+		mParams.clear();
+		mParams.put("longitude", String.valueOf(longitude));
+		mParams.put("latitude", String.valueOf(latitude));
+		mParams.put("token", token);
+		mMixHelper.track(OMNOM_ANDROID, "auth.logLocation ->", mParams);
+		return super.logLocation(longitude, latitude, token).doOnNext(new Action1<AuthResponse>() {
+			@Override
+			public void call(AuthResponse response) {
+				mMixHelper.track(OMNOM_ANDROID, "auth.logLocation <-", response);
+			}
+		});
+	}
+
+	@Override
 	public Observable<AuthResponse> authorizePhone(String phone, String code) {
 		mParams.clear();
 		mParams.put("phone", phone);
