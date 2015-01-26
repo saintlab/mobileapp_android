@@ -65,6 +65,7 @@
 
         <activity
             android:name=".activity.EnteringActivity"
+            android:launchMode="singleTask"
             android:icon="@drawable/ic_app"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
