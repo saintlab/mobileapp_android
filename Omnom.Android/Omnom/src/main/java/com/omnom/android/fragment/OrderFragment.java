@@ -42,7 +42,6 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
-import com.omnom.android.adapter.OrderItemsAdapter;
 import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
@@ -383,7 +382,7 @@ public class OrderFragment extends Fragment {
 
 	private int mListHeight;
 
-	private OrderItemsAdapter mAdapter;
+	private OrderItemsAdapterSimple mAdapter;
 
 	private boolean mSplitRunning;
 
@@ -542,6 +541,7 @@ public class OrderFragment extends Fragment {
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
 			mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
 		}
+		mAdapter.setIgnoreSelection(true);
 	}
 
 	public View getPanelPayment() {
@@ -767,6 +767,7 @@ public class OrderFragment extends Fragment {
 		list.setSwipeEnabled(true);
 		activity.showOther(mPosition, false);
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, mListTraslationActive).start();
+		mAdapter.setIgnoreSelection(false);
 	}
 
 	public boolean isDownscaled() {
