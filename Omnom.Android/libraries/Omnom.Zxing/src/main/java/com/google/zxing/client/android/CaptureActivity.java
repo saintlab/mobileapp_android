@@ -385,11 +385,6 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 	}
 
 	@Override
-	public void onApplicationLaunch() {
-		// do nothing
-	}
-
-	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if(resultCode == RESULT_OK) {
 			if(requestCode == HISTORY_REQUEST_CODE) {

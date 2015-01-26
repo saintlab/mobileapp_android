@@ -32,25 +32,26 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 
 	private static final String TAG = EnteringActivity.class.getSimpleName();
 
-	public static void start(BaseActivity context, int enterAnim, int exitAnim, int durationSplash, final int type) {
-		final Intent intent = createIntent(context, durationSplash, false);
+	private static final int DEFAULT_SPLASH_DELAY = 2000;
+
+	public static void start(BaseActivity context, int enterAnim, int exitAnim, int splashDelay, final int type) {
+		final Intent intent = createIntent(context, splashDelay, false);
 		intent.putExtra(EXTRA_CONFIRM_TYPE, type);
 		context.start(intent, enterAnim, exitAnim, true);
 	}
 
-	public static void start(BaseActivity context, boolean slipSplash) {
-		final Intent intent = createIntent(context, 0, slipSplash);
+	public static void start(BaseActivity context, boolean skipSplash) {
+		final Intent intent = createIntent(context, 0, skipSplash);
 		context.start(intent, true);
 	}
 
 	public static void start(BaseOmnomFragmentActivity context, boolean slipSplash) {
-		final Intent intent = createIntent(context, 0, slipSplash);
-		context.start(intent, true);
+		context.start(createIntent(context, 0, slipSplash), true);
 	}
 
-	private static Intent createIntent(Context context, int durationSplash, boolean skipSplash) {
+	private static Intent createIntent(Context context, int splashDelay, boolean skipSplash) {
 		final Intent intent = new Intent(context, EnteringActivity.class);
-		intent.putExtra(EXTRA_DURATION_SPLASH, durationSplash);
+		intent.putExtra(EXTRA_SPLASH_DELAY, splashDelay);
 		intent.putExtra(EXTRA_SKIP_SPLASH, skipSplash);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -60,16 +61,14 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 
 	public static void startNewTable(final BaseActivity context) {
 		final Intent intent = new Intent(context, EnteringActivity.class);
-		intent.putExtra(EXTRA_DURATION_SPLASH, 0);
+		intent.putExtra(EXTRA_SPLASH_DELAY, 0);
 		intent.putExtra(EXTRA_SKIP_SPLASH, false);
-		intent.putExtra(EXTRA_CHANGE_TABLE, true);
+		intent.putExtra(EXTRA_APPLICATION_LAUNCH, false);
 		context.start(intent, false);
 	}
 
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
-
-	private int durationSplash;
 
 	private boolean skipSplash;
 
@@ -82,13 +81,11 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	 */
 	private int mType = ValidateActivity.TYPE_DEFAULT;
 
-	private Uri mData;
+	private int mSplashDelay = DEFAULT_SPLASH_DELAY;
 
-	/**
-	 * Whether user should be forwarded to QR code scanning
-	 * Usual case - changing table
-	 */
-	private boolean mForwardValiation = false;
+	private boolean mIsApplicationLaunch;
+
+	private Uri mData;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -123,31 +120,12 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 				showPanelBottom(false);
 			} else {
 				// During initial setup, plug in the details fragment.
-				splashFragment = SplashFragment.newInstance(durationSplash, mForwardValiation);
+				mIsApplicationLaunch = intent.getBooleanExtra(EXTRA_APPLICATION_LAUNCH, true);
+				splashFragment = SplashFragment.newInstance(mIsApplicationLaunch);
 				getSupportFragmentManager().beginTransaction()
 				                           .replace(R.id.fragment_container, splashFragment)
 				                           .commit();
 			}
-		}
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
-		if(splashFragment != null) {
-			if(mData != null && hasToken) {
-				splashFragment.animateValidation(mData);
-				return;
-			}
-			if(hasToken) {
-				splashFragment.animateValidation();
-			} else {
-				splashFragment.animateLogin();
-			}
-		} else {
-			Log.w(TAG, "Splash fragment is null");
 		}
 	}
 
@@ -163,11 +141,34 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		final boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
+		findViewById(android.R.id.content).postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (splashFragment != null) {
+					if (mData != null && hasToken) {
+						splashFragment.animateValidation(mData);
+						return;
+					}
+					if (hasToken) {
+						splashFragment.animateValidation();
+					} else {
+						splashFragment.animateLogin();
+					}
+				} else {
+					Log.w(TAG, "Splash fragment is null");
+				}
+			}
+		}, mSplashDelay);
+	}
+
+	@Override
 	protected void handleIntent(Intent intent) {
-		durationSplash = intent.getIntExtra(EXTRA_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
 		skipSplash = intent.getBooleanExtra(EXTRA_SKIP_SPLASH, false);
 		mType = intent.getIntExtra(EXTRA_CONFIRM_TYPE, ValidateActivity.TYPE_DEFAULT);
-		mForwardValiation = intent.getBooleanExtra(EXTRA_CHANGE_TABLE, false);
+		mSplashDelay = intent.getIntExtra(EXTRA_SPLASH_DELAY, DEFAULT_SPLASH_DELAY);
 	}
 
 	@OnClick(R.id.btn_register)
@@ -235,4 +236,5 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	public int getType() {
 		return mType;
 	}
+
 }

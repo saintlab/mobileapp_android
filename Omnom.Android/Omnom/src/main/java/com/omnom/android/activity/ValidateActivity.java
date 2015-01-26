@@ -21,15 +21,20 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.acquiring.api.Acquiring;
+import com.omnom.android.acquiring.mailru.AcquiringMailRu;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
+import com.omnom.android.mixpanel.model.AppLaunchMixpanelEvent;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.protocol.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
@@ -43,6 +48,8 @@ import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.service.configuration.ConfigurationResponse;
+import com.omnom.android.service.configuration.ConfigurationService;
 import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
@@ -64,6 +71,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -77,10 +85,10 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
-import rx.schedulers.Schedulers;
 
 import static butterknife.ButterKnife.findById;
+import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM;
+import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM_ANDROID;
 
 /**
  * Created by Ch3D on 08.10.2014.
@@ -169,8 +177,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	public static void start(final BaseFragmentActivity context, final int enterAnim,
 	                         final int exitAnim, final int animationType, final int userEnterType,
-	                         final Uri data) {
-		Intent intent = createIntent(context, animationType, false, userEnterType, data);
+	                         final Uri data, final boolean isApplicationLaunch) {
+		Intent intent = createIntent(context, animationType, false, userEnterType, data, isApplicationLaunch);
 		context.start(intent, enterAnim, exitAnim, true);
 	}
 
@@ -195,6 +203,15 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}
 		return intent;
 	}
+
+	private static Intent createIntent(final Context context, final int animationType,
+	                                   final boolean isDemo, final int userEnterType, final Uri data,
+	                                   final boolean isApplicationLaunch) {
+		Intent intent = createIntent(context, animationType, isDemo, userEnterType, data);
+		intent.putExtra(EXTRA_APPLICATION_LAUNCH, isApplicationLaunch);
+		return intent;
+	}
+
 
 	protected final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
@@ -255,6 +272,12 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Inject
 	protected RestaurateurObservableApi api;
 
+	@Inject
+	protected Acquiring mAcquiring;
+
+	@Inject
+	protected AuthService authenticator;
+
 	protected OmnomErrorHelper mErrorHelper;
 
 	protected Target mTarget;
@@ -278,6 +301,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	 */
 	private int mType;
 
+	private boolean mIsApplicationLaunch;
+
 	protected Uri mData;
 
 	private int mAnimationType;
@@ -296,10 +321,15 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	private PaymentEventListener mPaymentListener;
 
+	private ConfigurationService configurationService;
+
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mData = getIntent().getData();
+		configurationService =
+				new ConfigurationService(this, authenticator, api, mAcquiring,
+										 OmnomApplication.get(getActivity()).getAuthToken());
 	}
 
 	@Override
@@ -308,6 +338,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		mIsDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
 		mSkipViewRendering = intent.getBooleanExtra(EXTRA_SKIP_VIEW_RENDERING, false);
 		mType = intent.getIntExtra(EXTRA_CONFIRM_TYPE, TYPE_DEFAULT);
+		mIsApplicationLaunch = intent.getBooleanExtra(EXTRA_APPLICATION_LAUNCH, false);
 	}
 
 	@Override
@@ -495,52 +526,67 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	private void loadConfigs() {
 		clearErrors(true);
-		loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration), new Runnable() {
+		final int locationUpdateTimeout = ConfigurationService.LOCATION_UPDATE_TIMEOUT;
+		final int validateDuration = getResources().getInteger(R.integer.omnom_validate_duration);
+		loader.startProgressAnimation(locationUpdateTimeout + validateDuration, new Runnable() {
 			@Override
 			public void run() {
 			}
 		});
-		mDataSubscription = AndroidObservable.bindActivity(this, getConfigsObservable()).subscribe(new Action1<Boolean>() {
-			@Override
-			public void call(Boolean success) {
-				final ValidateActivity activity = ValidateActivity.this;
-				if (!BluetoothUtils.hasBleSupport(activity) && !isExternalLaunch()) {
-					loader.stopProgressAnimation();
-					loader.updateProgressMax(new Runnable() {
-						@Override
-						public void run() {
-							RestaurantsListActivity.start(activity,true);
+		mDataSubscription = AndroidObservable.bindActivity(this, configurationService.getConfigurationObservable())
+				.subscribe(new Action1<ConfigurationResponse>() {
+					@Override
+					public void call(ConfigurationResponse configurationResponse) {
+						final ValidateActivity activity = ValidateActivity.this;
+						final UserResponse userResponse = configurationResponse.getUserResponse();
+						correctMixpanelTime(userResponse);
+						reportMixPanel(userResponse);
+						OmnomApplication.get(getActivity()).cacheUserProfile(new UserProfile(userResponse));
+						updateConfiguration(configurationResponse.getConfig());
+						getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
+												  new AppLaunchMixpanelEvent(userResponse.getUser()));
+						if (!BluetoothUtils.hasBleSupport(activity) && !isExternalLaunch()) {
+							loader.stopProgressAnimation();
+							loader.updateProgressMax(new Runnable() {
+								@Override
+								public void run() {
+									RestaurantsListActivity.start(activity,true);
+								}
+							});
+						} else {
+							decode(false);
 						}
-					});
-				} else {
-					decode(false);
-				}
-			}
-		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			@Override
-			public void onError(Throwable throwable) {
-				if (throwable.getCause() instanceof UnknownHostException) {
-					mErrorHelper.showInternetError(loadConfigsErrorListener);
-				} else {
-					mErrorHelper.showUnknownError(loadConfigsErrorListener);
-				}
-				Log.e(TAG, "loadConfigs", throwable);
-			}
-		});
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						if (throwable.getCause() instanceof UnknownHostException) {
+							mErrorHelper.showInternetError(loadConfigsErrorListener);
+						} else {
+							mErrorHelper.showUnknownError(loadConfigsErrorListener);
+						}
+					}
+				});
 	}
 
-	private Observable<Boolean> getConfigsObservable() {
-		final OmnomApplication app = OmnomApplication.get(getActivity());
-		return Observable.zip(authenticator.getUser(app.getAuthToken()), api.getConfig(),
-				new Func2<UserResponse, Config, Boolean>() {
-					@Override
-					public Boolean call(UserResponse userResponse, Config config) {
-						app.cacheConfig(config);
-						app.cacheUserProfile(new UserProfile(userResponse));
-						reportMixPanel(userResponse);
-						return true;
-					}
-				}).subscribeOn(Schedulers.io());
+	private void updateConfiguration(final Config config) {
+		OmnomApplication.get(getActivity()).cacheConfig(config);
+		if (mAcquiring instanceof AcquiringMailRu) {
+			((AcquiringMailRu) mAcquiring).changeEndpoint(config.getAcquiringData().getBaseUrl());
+		}
+		getMixPanelHelper().addApi(OMNOM,
+								   MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
+		getMixPanelHelper().addApi(OMNOM_ANDROID,
+								   MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));
+	}
+
+	private void correctMixpanelTime(final UserResponse userResponse) {
+		final MixPanelHelper mixPanelHelper = getMixPanelHelper();
+		if (mixPanelHelper != null) {
+			final Long timeDiff = TimeUnit.SECONDS.toMillis(userResponse.getServerTime()) -
+								  userResponse.getResponseTime();
+			mixPanelHelper.setTimeDiff(timeDiff);
+		}
 	}
 
 	/**
@@ -557,7 +603,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			loader.scaleDown(null, new Runnable() {
 				@Override
 				public void run() {
-					loadConfigs();
+					if (mIsApplicationLaunch) {
+						loadConfigs();
+					} else {
+						decode(true);
+					}
 				}
 			});
 		}

@@ -6,14 +6,13 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.crashlytics.android.Crashlytics;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.modules.AcquiringModuleMailRuMixpanel;
 import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.AuthMixpanelModule;
 import com.omnom.android.modules.BeaconModule;
 import com.omnom.android.modules.OmnomApplicationModule;
-import com.omnom.android.modules.RestuarateurMixpanelModule;
+import com.omnom.android.modules.RestaurateurMixpanelModule;
 import com.omnom.android.preferences.JsonPreferenceProvider;
 import com.omnom.android.preferences.PreferenceHelperAdapter;
 import com.omnom.android.restaurateur.model.UserProfile;
@@ -28,9 +27,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import dagger.ObjectGraph;
@@ -41,10 +38,6 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
  * Created by Ch3D on 24.09.2014.
  */
 public class OmnomApplication extends BaseOmnomApplication implements AuthTokenProvider {
-
-	private static final String MIXPANEL_OMNOM_TOKEN = "e9386a1100754e8f62565a1b8cda8d8c";
-
-	private static final String MIXPANEL_OMNOM_ANDROID_TOKEN = "36038b10ddd9e23db4a28d0f8c21fd78";
 
 	public static OmnomApplication get(Context context) {
 		return (OmnomApplication) context.getApplicationContext();
@@ -80,7 +73,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		return Arrays.asList(new AndroidModule(this),
 		                     new OmnomApplicationModule(),
 		                     new BeaconModule(this),
-		                     new RestuarateurMixpanelModule(this, R.string.endpoint_restaurateur, mixPanelHelper),
+		                     new RestaurateurMixpanelModule(this, R.string.endpoint_restaurateur, mixPanelHelper),
 		                     new AcquiringModuleMailRuMixpanel(this, mixPanelHelper),
 		                     new AuthMixpanelModule(this, R.string.endpoint_auth, mixPanelHelper));
 	}
@@ -104,11 +97,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		super.onCreate();
 		Fabric.with(this, new Crashlytics());
 		CalligraphyConfig.initDefault("fonts/Futura-OSF-Omnom-Regular.otf", R.attr.fontPath);
-
-		Map<MixPanelHelper.Project, MixpanelAPI> mixpanelAPIMap = new HashMap<MixPanelHelper.Project, MixpanelAPI>();
-		mixpanelAPIMap.put(MixPanelHelper.Project.OMNOM, MixpanelAPI.getInstance(this, MIXPANEL_OMNOM_TOKEN));
-		mixpanelAPIMap.put(MixPanelHelper.Project.OMNOM_ANDROID, MixpanelAPI.getInstance(this, MIXPANEL_OMNOM_ANDROID_TOKEN));
-		mixPanelHelper = new MixPanelHelper(mixpanelAPIMap);
+		mixPanelHelper = new MixPanelHelper();
 
 		objectGraph = ObjectGraph.create(getModules().toArray());
 		for(final Object obj : injectList) {

@@ -1,13 +1,11 @@
 package com.omnom.android.acquiring.mailru.model;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
-import com.omnom.android.R;
 import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.HashMap;
@@ -31,6 +29,8 @@ public class CardInfo implements Parcelable {
 			return new CardInfo[size];
 		}
 	};
+
+	private static final String TEST_CARD_HOLDER = "Omnom";
 
 	@Expose
 	private String pan = StringUtils.EMPTY_STRING;
@@ -83,18 +83,18 @@ public class CardInfo implements Parcelable {
 		dest.writeString(cardId);
 	}
 
-	public static CardInfo createTestCard(Context context) {
+	public static CardInfo createTestCard() {
 		return new Builder()
-				.holder(context.getString(R.string.acquiring_mailru_cardholder))
+				.holder(TEST_CARD_HOLDER)
 				.pan("6011000000000004")
 				.expDate("12.2015")
 				.cvv("123")
 				.build();
 	}
 
-	public static CardInfo createTestCard(Context context, final CreditCard card) {
+	public static CardInfo createTestCard(final CreditCard card) {
 		return new Builder()
-				.holder(context.getString(R.string.acquiring_mailru_cardholder))
+				.holder(TEST_CARD_HOLDER)
 				.pan(card.cardNumber)
 				.expDate(card.expiryMonth + "." + card.expiryYear)
 				.cvv(card.cvv)

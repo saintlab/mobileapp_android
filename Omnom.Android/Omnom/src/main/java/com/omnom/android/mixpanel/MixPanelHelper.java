@@ -79,10 +79,14 @@ public class MixPanelHelper {
 
 	private Long timeDiff = 0L;
 
-	public MixPanelHelper(Map<Project, MixpanelAPI> apiMap) {
-		mMixpanelApiMap = apiMap;
+	public MixPanelHelper() {
+		mMixpanelApiMap = new HashMap<Project, MixpanelAPI>();
 		mGson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-        sSimpleDateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+		sSimpleDateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+	}
+
+	public void addApi(final Project project, final MixpanelAPI api) {
+		mMixpanelApiMap.put(project, api);
 	}
 
 	public void identify(final String id) {
@@ -308,8 +312,8 @@ public class MixPanelHelper {
 	}
 
 	private void execute(final Project project, final Command command) {
-		if(mMixpanelApiMap == null || mMixpanelApiMap.isEmpty()) {
-			Log.w(TAG, "MixpanelApiMap is not set");
+		if(mMixpanelApiMap == null) {
+			Log.w(TAG, "MixpanelApiMap is null");
 			return;
 		}
 		if(project == Project.ALL) {

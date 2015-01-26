@@ -9,8 +9,8 @@ import android.support.v4.app.FragmentActivity;
 import android.view.MenuItem;
 
 import com.omnom.android.utils.Extras;
-import com.omnom.android.utils.activity.helper.ActivityHelper;
 import com.omnom.android.utils.activity.helper.ActivityHelperBase;
+import com.omnom.android.utils.activity.helper.ActivityHelperWithAnimation;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.squareup.otto.Bus;
 
@@ -26,7 +26,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity implements O
 	@Inject
 	protected Bus mBus;
 
-	private ActivityHelper mHelper;
+	private ActivityHelperWithAnimation mHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
