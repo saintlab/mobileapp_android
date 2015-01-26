@@ -1,10 +1,12 @@
 package com.omnom.android.activity;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -103,6 +105,17 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@OnClick(R.id.btn_feedback)
 	protected void onFeedback() {
 		AndroidUtils.sendFeedbackEmail(this, R.string.send_feedback);
+	}
+
+	@OnClick(R.id.btn_facebook)
+	protected void onFacebook() {
+		try {
+			Intent facebookIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.facebook_url_fb)));
+			startActivity(facebookIntent);
+		} catch (ActivityNotFoundException e) {
+			Intent facebookIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.facebook_url_http)));
+			startActivity(facebookIntent);
+		}
 	}
 
 	@Override
