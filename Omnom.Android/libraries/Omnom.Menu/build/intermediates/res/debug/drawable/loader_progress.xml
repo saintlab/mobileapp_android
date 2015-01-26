@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape
+            android:shape="ring"
+            android:innerRadiusRatio="5"
+            android:useLevel="false"
+            android:thicknessRatio="7.0">
+            <solid android:color="@android:color/transparent"/>
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <rotate
+            android:fromDegrees="-90"
+            android:toDegrees="-90">
+            <shape
+                android:shape="ring"
+                android:useLevel="true"
+                android:thickness="@dimen/loader_progress_thickness"
+                android:innerRadiusRatio="@dimen/loader_progress_inner_radius">
+                <solid android:color="@android:color/white"/>
+            </shape>
+        </rotate>
+    </item>
+</layer-list><!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Android/libraries/Omnom.Utils/src/main/res/drawable/loader_progress.xml --><!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Android/libraries/Omnom.Menu/build/intermediates/exploded-aar/Omnom.Android.libraries/Omnom.Utils/unspecified/res/drawable/loader_progress.xml -->

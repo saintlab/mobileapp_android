@@ -26,6 +26,8 @@ import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.fragment.NoOrdersFragment;
+import com.omnom.android.menu.api.observable.MenuObservableApi;
+import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.protocol.Protocol;
@@ -232,6 +234,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Inject
 	protected RestaurateurObservableApi api;
 
+	@Inject
+	protected MenuObservableApi menuApi;
+
 	protected OmnomErrorHelper mErrorHelper;
 
 	protected Target mTarget;
@@ -284,7 +289,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Override
 	protected void onPostResume() {
 		super.onPostResume();
-		if (!mSkipViewRendering) {
+		if(!mSkipViewRendering) {
 			postDelayed(getResources().getInteger(R.integer.default_animation_duration_quick), new Runnable() {
 				@Override
 				public void run() {
@@ -297,7 +302,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (mPaymentListener != null && mTable != null) {
+		if(mPaymentListener != null && mTable != null) {
 			mPaymentListener.initTableSocket(mTable);
 		}
 	}
@@ -462,7 +467,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			}
 		};
 
-		if (mSkipViewRendering) {
+		if(mSkipViewRendering) {
 			mFirstRun = false;
 			startLoader();
 		}
@@ -490,6 +495,22 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	protected abstract void startLoader();
 
 	public void onBill(final View v) {
+		// FIXME: Debug code -> remove when done
+		if(true) {
+			menuApi.getMenu("riba-ris-nsk-at-aura").subscribe(new Action1<MenuResponse>() {
+				@Override
+				public void call(final MenuResponse menuResponse) {
+					// TODO: Handle
+				}
+			}, new Action1<Throwable>() {
+				@Override
+				public void call(final Throwable throwable) {
+					Log.e(TAG, "getMenu()", throwable);
+				}
+			});
+			return;
+		}
+
 		v.setEnabled(false);
 		hideProfile();
 		ViewUtils.setVisible(imgPrevious, false);
@@ -579,7 +600,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 				                                       mErrorHelper.showUnknownError(new View.OnClickListener() {
 					                                       @Override
 					                                       public void onClick(View v) {
-														        onErrorClose();
+						                                       onErrorClose();
 					                                       }
 				                                       });
 			                                       }
@@ -590,7 +611,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		clearErrors(true);
 		ViewUtils.setVisible(txtErrorAdditional, false);
 		loader.animateLogoFast(RestaurantHelper.getLogo(mRestaurant),
-				R.drawable.ic_bill_white_normal);
+		                       R.drawable.ic_bill_white_normal);
 		loader.showProgress(false);
 		configureScreen(mRestaurant);
 		updateLightProfile(!mIsDemo);
@@ -957,7 +978,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			@Override
 			public void run() {
 				ValidateActivity.start(ValidateActivity.this, R.anim.fade_in_long, R.anim.fade_out_long, EXTRA_LOADER_ANIMATION_FIXED,
-						ConfirmPhoneActivity.TYPE_DEFAULT);
+				                       ConfirmPhoneActivity.TYPE_DEFAULT);
 			}
 		});
 	}

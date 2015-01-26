@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/btn_back"
+    android:layout_width="@dimen/view_size_default"
+    android:layout_height="@dimen/view_size_default"
+    tools:showIn="@layout/activity_bind">
+
+    <ImageView
+        android:layout_gravity="center"
+        android:layout_width="@dimen/btn_back_size"
+        android:layout_height="@dimen/btn_back_size"
+        android:src="@drawable/btn_back"/>
+</FrameLayout><!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Android/libraries/Omnom.Utils/src/main/res/layout/view_btn_back.xml -->

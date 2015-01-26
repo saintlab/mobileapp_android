@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transition xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/transparent" />
+    <item android:drawable="@color/error_bg_white_transparent" />
+</transition><!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Android/libraries/Omnom.Utils/src/main/res/drawable/error_background_drawable.xml --><!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Android/libraries/Omnom.Menu/build/intermediates/exploded-aar/Omnom.Android.libraries/Omnom.Utils/unspecified/res/drawable/error_background_drawable.xml -->

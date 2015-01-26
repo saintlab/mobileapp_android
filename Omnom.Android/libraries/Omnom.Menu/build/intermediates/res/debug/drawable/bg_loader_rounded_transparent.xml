@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:startColor="@color/loader_bg_transparent"
+        android:endColor="@color/loader_bg_transparent" />
+</shape>
+<!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Android/libraries/Omnom.Utils/src/main/res/drawable/bg_loader_rounded_transparent.xml --><!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Android/libraries/Omnom.Menu/build/intermediates/exploded-aar/Omnom.Android.libraries/Omnom.Utils/unspecified/res/drawable/bg_loader_rounded_transparent.xml -->

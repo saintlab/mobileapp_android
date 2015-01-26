@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import com.crashlytics.android.Crashlytics;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.menu.MenuModule;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.modules.AcquiringModuleMailRuMixpanel;
 import com.omnom.android.modules.AndroidModule;
@@ -81,6 +82,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		                     new OmnomApplicationModule(),
 		                     new BeaconModule(this),
 		                     new RestuarateurMixpanelModule(this, R.string.endpoint_restaurateur, mixPanelHelper),
+		                     new MenuModule(this, R.string.endpoint_menu),
 		                     new AcquiringModuleMailRuMixpanel(this, mixPanelHelper),
 		                     new AuthMixpanelModule(this, R.string.endpoint_auth, mixPanelHelper));
 	}

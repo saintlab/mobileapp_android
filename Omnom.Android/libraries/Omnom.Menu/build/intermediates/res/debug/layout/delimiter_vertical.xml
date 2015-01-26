@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<View
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="@android:color/darker_gray"
+    tools:showIn="@layout/activity_login"/><!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Android/libraries/Omnom.Utils/src/main/res/layout/delimiter_vertical.xml --><!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Android/libraries/Omnom.Menu/build/intermediates/exploded-aar/Omnom.Android.libraries/Omnom.Utils/unspecified/res/layout/delimiter_vertical.xml -->
