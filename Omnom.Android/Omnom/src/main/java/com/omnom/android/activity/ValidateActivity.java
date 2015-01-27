@@ -494,13 +494,17 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	protected abstract void startLoader();
 
-	public void onBill(final View v) {
-		// FIXME: Debug code -> remove when done
+	@OnClick(R.id.txt_menu)
+	public void onMenu(View v) {
+
 		if(true) {
 			menuApi.getMenu("riba-ris-nsk-at-aura").subscribe(new Action1<MenuResponse>() {
 				@Override
 				public void call(final MenuResponse menuResponse) {
-					// TODO: Handle
+					final Intent intent = new Intent(ValidateActivity.this, MenuActivity.class);
+					intent.putExtra(EXTRA_RESTAURANT_MENU, menuResponse.getMenu());
+					intent.putExtra(EXTRA_RESTAURANT, mRestaurant);
+					start(intent, R.anim.slide_in_right, R.anim.nothing, false);
 				}
 			}, new Action1<Throwable>() {
 				@Override
@@ -510,7 +514,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			});
 			return;
 		}
+	}
 
+	public void onBill(final View v) {
 		v.setEnabled(false);
 		hideProfile();
 		ViewUtils.setVisible(imgPrevious, false);

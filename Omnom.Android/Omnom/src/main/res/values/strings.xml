@@ -128,4 +128,5 @@
         мы узнали ваш стол, а&#160;вы посмотрели счёт или&#160;сделали заказ.\n\nЕсли вы&#160;вне Omnom-заведения, посмотрите, как&#160;работает приложение в&#160;Демо-режиме.
     </string>
     <string name="qr_hint_mark">Демо-режиме</string>
+    <string name="title_activity_menu">MenuActivity</string>
 </resources>

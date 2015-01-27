@@ -28,7 +28,7 @@ public class ItemsSerializer implements JsonSerializer<Items>, JsonDeserializer<
 
 		for(Map.Entry<String, JsonElement> entry : entries) {
 			final Item deserialize = context.deserialize(entry.getValue(), Item.class);
-			items.items().add(deserialize);
+			items.items().put(deserialize.id(), deserialize);
 		}
 		return items;
 	}

@@ -1,5 +1,8 @@
 package com.omnom.android.menu.model;
 
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
+
 import com.omnom.android.utils.generation.AutoGson;
 
 import auto.parcel.AutoParcel;
@@ -9,14 +12,22 @@ import auto.parcel.AutoParcel;
  */
 @AutoParcel
 @AutoGson
-public abstract class Item {
+public abstract class Item implements Parcelable {
+	@Nullable
 	public abstract String id();
 
+	@Nullable
 	public abstract String name();
 
+	@Nullable
 	public abstract String description();
 
+	@Nullable
 	public abstract String photo();
 
+	@Nullable
 	public abstract long price();
+
+	@Nullable
+	public abstract Details details();
 }

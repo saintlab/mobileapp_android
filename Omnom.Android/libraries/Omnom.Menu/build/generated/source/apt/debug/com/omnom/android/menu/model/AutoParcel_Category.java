@@ -21,22 +21,10 @@ final class AutoParcel_Category extends Category {
       List<Child> children) {
     this.id = id;
     this.parentId = parentId;
-    if (name == null) {
-      throw new NullPointerException("Null name");
-    }
     this.name = name;
-    if (description == null) {
-      throw new NullPointerException("Null description");
-    }
     this.description = description;
     this.sort = sort;
-    if (schedule == null) {
-      throw new NullPointerException("Null schedule");
-    }
     this.schedule = schedule;
-    if (children == null) {
-      throw new NullPointerException("Null children");
-    }
     this.children = children;
   }
 
@@ -97,11 +85,11 @@ final class AutoParcel_Category extends Category {
       Category that = (Category) o;
       return (this.id == that.id())
           && (this.parentId == that.parentId())
-          && (this.name.equals(that.name()))
-          && (this.description.equals(that.description()))
+          && ((this.name == null) ? (that.name() == null) : this.name.equals(that.name()))
+          && ((this.description == null) ? (that.description() == null) : this.description.equals(that.description()))
           && (this.sort == that.sort())
-          && (this.schedule.equals(that.schedule()))
-          && (this.children.equals(that.children()));
+          && ((this.schedule == null) ? (that.schedule() == null) : this.schedule.equals(that.schedule()))
+          && ((this.children == null) ? (that.children() == null) : this.children.equals(that.children()));
     }
     return false;
   }
@@ -114,16 +102,55 @@ final class AutoParcel_Category extends Category {
     h *= 1000003;
     h ^= parentId;
     h *= 1000003;
-    h ^= name.hashCode();
+    h ^= (name == null) ? 0 : name.hashCode();
     h *= 1000003;
-    h ^= description.hashCode();
+    h ^= (description == null) ? 0 : description.hashCode();
     h *= 1000003;
     h ^= sort;
     h *= 1000003;
-    h ^= schedule.hashCode();
+    h ^= (schedule == null) ? 0 : schedule.hashCode();
     h *= 1000003;
-    h ^= children.hashCode();
+    h ^= (children == null) ? 0 : children.hashCode();
     return h;
+  }
+
+
+
+  public static final android.os.Parcelable.Creator<Category> CREATOR = new android.os.Parcelable.Creator<Category>() {
+    @Override public Category createFromParcel(android.os.Parcel in) {
+      return new AutoParcel_Category(in);
+    }
+    @Override public Category[] newArray(int size) {
+      return new Category[size];
+    }
+  };
+
+  private final static java.lang.ClassLoader CL = AutoParcel_Category.class.getClassLoader();
+
+  private AutoParcel_Category(android.os.Parcel in) {
+    this(
+      (Integer) in.readValue(CL),
+      (Integer) in.readValue(CL),
+      (String) in.readValue(CL),
+      (String) in.readValue(CL),
+      (Integer) in.readValue(CL),
+      (Schedule) in.readValue(CL),
+      (List<Child>) in.readValue(CL));
+  }
+
+  @Override public void writeToParcel(android.os.Parcel dest, int flags) {
+    dest.writeValue(id);
+    dest.writeValue(parentId);
+    dest.writeValue(name);
+    dest.writeValue(description);
+    dest.writeValue(sort);
+    dest.writeValue(schedule);
+    dest.writeValue(children);
+
+  }
+
+  @Override public int describeContents() {
+    return 0;
   }
 
 }

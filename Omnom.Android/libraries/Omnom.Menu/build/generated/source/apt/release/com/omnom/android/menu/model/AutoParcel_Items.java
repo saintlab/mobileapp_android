@@ -1,20 +1,17 @@
 package com.omnom.android.menu.model;
 
-import java.util.List;
+import java.util.Map;
 
 final class AutoParcel_Items extends Items {
-  private final List<Item> items;
+  private final Map<String, Item> items;
 
   AutoParcel_Items(
-      List<Item> items) {
-    if (items == null) {
-      throw new NullPointerException("Null items");
-    }
+      Map<String, Item> items) {
     this.items = items;
   }
 
   @Override
-  public List<Item> items() {
+  public Map<String, Item> items() {
     return items;
   }
 
@@ -32,7 +29,7 @@ final class AutoParcel_Items extends Items {
     }
     if (o instanceof Items) {
       Items that = (Items) o;
-      return (this.items.equals(that.items()));
+      return ((this.items == null) ? (that.items() == null) : this.items.equals(that.items()));
     }
     return false;
   }
@@ -41,8 +38,35 @@ final class AutoParcel_Items extends Items {
   public int hashCode() {
     int h = 1;
     h *= 1000003;
-    h ^= items.hashCode();
+    h ^= (items == null) ? 0 : items.hashCode();
     return h;
+  }
+
+
+
+  public static final android.os.Parcelable.Creator<Items> CREATOR = new android.os.Parcelable.Creator<Items>() {
+    @Override public Items createFromParcel(android.os.Parcel in) {
+      return new AutoParcel_Items(in);
+    }
+    @Override public Items[] newArray(int size) {
+      return new Items[size];
+    }
+  };
+
+  private final static java.lang.ClassLoader CL = AutoParcel_Items.class.getClassLoader();
+
+  private AutoParcel_Items(android.os.Parcel in) {
+    this(
+      (Map<String, Item>) in.readValue(CL));
+  }
+
+  @Override public void writeToParcel(android.os.Parcel dest, int flags) {
+    dest.writeValue(items);
+
+  }
+
+  @Override public int describeContents() {
+    return 0;
   }
 
 }

@@ -13,21 +13,9 @@ final class AutoParcel_Menu extends Menu {
       Items items,
       Modifiers modifiers,
       List<Category> categories) {
-    if (restaurantId == null) {
-      throw new NullPointerException("Null restaurantId");
-    }
     this.restaurantId = restaurantId;
-    if (items == null) {
-      throw new NullPointerException("Null items");
-    }
     this.items = items;
-    if (modifiers == null) {
-      throw new NullPointerException("Null modifiers");
-    }
     this.modifiers = modifiers;
-    if (categories == null) {
-      throw new NullPointerException("Null categories");
-    }
     this.categories = categories;
   }
 
@@ -68,10 +56,10 @@ final class AutoParcel_Menu extends Menu {
     }
     if (o instanceof Menu) {
       Menu that = (Menu) o;
-      return (this.restaurantId.equals(that.restaurantId()))
-          && (this.items.equals(that.items()))
-          && (this.modifiers.equals(that.modifiers()))
-          && (this.categories.equals(that.categories()));
+      return ((this.restaurantId == null) ? (that.restaurantId() == null) : this.restaurantId.equals(that.restaurantId()))
+          && ((this.items == null) ? (that.items() == null) : this.items.equals(that.items()))
+          && ((this.modifiers == null) ? (that.modifiers() == null) : this.modifiers.equals(that.modifiers()))
+          && ((this.categories == null) ? (that.categories() == null) : this.categories.equals(that.categories()));
     }
     return false;
   }
@@ -80,14 +68,47 @@ final class AutoParcel_Menu extends Menu {
   public int hashCode() {
     int h = 1;
     h *= 1000003;
-    h ^= restaurantId.hashCode();
+    h ^= (restaurantId == null) ? 0 : restaurantId.hashCode();
     h *= 1000003;
-    h ^= items.hashCode();
+    h ^= (items == null) ? 0 : items.hashCode();
     h *= 1000003;
-    h ^= modifiers.hashCode();
+    h ^= (modifiers == null) ? 0 : modifiers.hashCode();
     h *= 1000003;
-    h ^= categories.hashCode();
+    h ^= (categories == null) ? 0 : categories.hashCode();
     return h;
+  }
+
+
+
+  public static final android.os.Parcelable.Creator<Menu> CREATOR = new android.os.Parcelable.Creator<Menu>() {
+    @Override public Menu createFromParcel(android.os.Parcel in) {
+      return new AutoParcel_Menu(in);
+    }
+    @Override public Menu[] newArray(int size) {
+      return new Menu[size];
+    }
+  };
+
+  private final static java.lang.ClassLoader CL = AutoParcel_Menu.class.getClassLoader();
+
+  private AutoParcel_Menu(android.os.Parcel in) {
+    this(
+      (String) in.readValue(CL),
+      (Items) in.readValue(CL),
+      (Modifiers) in.readValue(CL),
+      (List<Category>) in.readValue(CL));
+  }
+
+  @Override public void writeToParcel(android.os.Parcel dest, int flags) {
+    dest.writeValue(restaurantId);
+    dest.writeValue(items);
+    dest.writeValue(modifiers);
+    dest.writeValue(categories);
+
+  }
+
+  @Override public int describeContents() {
+    return 0;
   }
 
 }

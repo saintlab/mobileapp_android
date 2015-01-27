@@ -1,5 +1,8 @@
 package com.omnom.android.menu.model;
 
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
+
 import com.omnom.android.utils.generation.AutoGson;
 
 import auto.parcel.AutoParcel;
@@ -9,7 +12,10 @@ import auto.parcel.AutoParcel;
  */
 @AutoParcel
 @AutoGson
-public abstract class Details {
+public abstract class Details implements Parcelable {
+	@Nullable
 	public abstract int weight();
+
+	@Nullable
 	public abstract int energyTotal();
 }

@@ -53,4 +53,33 @@ final class AutoParcel_Details extends Details {
     return h;
   }
 
+
+
+  public static final android.os.Parcelable.Creator<Details> CREATOR = new android.os.Parcelable.Creator<Details>() {
+    @Override public Details createFromParcel(android.os.Parcel in) {
+      return new AutoParcel_Details(in);
+    }
+    @Override public Details[] newArray(int size) {
+      return new Details[size];
+    }
+  };
+
+  private final static java.lang.ClassLoader CL = AutoParcel_Details.class.getClassLoader();
+
+  private AutoParcel_Details(android.os.Parcel in) {
+    this(
+      (Integer) in.readValue(CL),
+      (Integer) in.readValue(CL));
+  }
+
+  @Override public void writeToParcel(android.os.Parcel dest, int flags) {
+    dest.writeValue(weight);
+    dest.writeValue(energyTotal);
+
+  }
+
+  @Override public int describeContents() {
+    return 0;
+  }
+
 }

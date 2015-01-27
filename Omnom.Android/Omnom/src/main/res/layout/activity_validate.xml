@@ -111,6 +111,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
+
             <Button
                 android:id="@+id/btn_down"
                 android:layout_width="22dp"
@@ -120,6 +121,17 @@
                 android:layout_marginBottom="@dimen/activity_vertical_margin_large"
                 android:background="@drawable/ic_down_button_icon_white"
                 android:visibility="gone"/>
+            
+            <TextView
+                android:id="@+id/txt_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/panel_bottom"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/activity_vertical_margin_large"
+                android:clickable="true"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:text="Меню" />
         </RelativeLayout>
 
     </LinearLayout>

@@ -8,6 +8,8 @@ import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.ConfirmPhoneActivity;
 import com.omnom.android.activity.EnteringActivity;
 import com.omnom.android.activity.LoginActivity;
+import com.omnom.android.activity.MenuActivity;
+import com.omnom.android.activity.MenuSubcategoryActivity;
 import com.omnom.android.activity.OmnomQRCaptureActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.activity.PaymentProcessActivity;
@@ -39,7 +41,7 @@ import dagger.Module;
 		EnteringActivity.class, UserRegisterActivity.class, EnteringActivity.class,
 		ConfirmPhoneActivity.class, LoginActivity.class, ValidateActivityBle.class, ValidateActivityCamera.class,
 		ValidateActivityShortcut.class, ValidateActivityBle.class, ValidateActivityBle21.class, OrdersActivity.class, CardsActivity.class,
-		UserProfileActivity.class,
+		UserProfileActivity.class, MenuActivity.class, MenuSubcategoryActivity.class,
 		CardAddActivity.class,
 		CardConfirmActivity.class, ThanksActivity.class, ThanksDemoActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
 		PaymentProcessActivity.class, RestaurantsListActivity.class, RestaurantActivity.class,
