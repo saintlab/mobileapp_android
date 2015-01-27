@@ -6,7 +6,7 @@
     <dimen name="order_items_list_height_collapsed">140dp</dimen>
     <dimen name="order_fake_item_height">380dp</dimen>
     <dimen name="card_frame_width">280dp</dimen>
-    <dimen name="card_frame_height">160dp</dimen>
+    <dimen name="card_frame_height">165dp</dimen>
     <dimen name="order_payment_tips_title_margin">-24dp</dimen>
     <dimen name="not_scanning_padding">8dp</dimen>
 </resources>

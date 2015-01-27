@@ -137,6 +137,8 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	private boolean mScanUsed;
 
+	private boolean isFirstEdit = true;
+
 	private View.OnClickListener mVerifyClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(final View v) {
@@ -178,7 +180,13 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	@Override
 	public void initUi() {
 		ViewUtils.setVisible(mTextInfo, false);
-		mEditAmount.getEditText().setEnabled(false);
+		final EditText editText = mEditAmount.getEditText();
+		final String text = getString(R.string.hint_confirm_amount);
+		editText.setText(text);
+		editText.setSelection(0);
+		editText.setTextColor(getResources().getColor(R.color.info_hint));
+
+		editText.setEnabled(false);
 		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		mUser = UserData.create(mUserProfile.getUser());
 		mAcquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
@@ -198,7 +206,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		} else {
 			// skip and wait until user submit verification amount
 			ViewUtils.setVisible(mTextInfo, true);
-			mEditAmount.getEditText().setEnabled(true);
+			editText.setEnabled(true);
 			mPanelTop.setButtonRightEnabled(true);
 		}
 		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
@@ -236,6 +244,17 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			}
 		});
 		final int suffixLength = getCurrencySuffix().length();
+		editText.setOnKeyListener(new View.OnKeyListener() {
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if (isFirstEdit) {
+					editText.setText(StringUtils.EMPTY_STRING);
+					editText.setTextColor(getResources().getColor(android.R.color.black));
+					isFirstEdit = false;
+				}
+				return false;
+			}
+		});
 		editText.addTextChangedListener(new TextWatcher() {
 			public boolean hadComma = false;
 
@@ -275,9 +294,13 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(hasFocus) {
-					int length = editText.getText().length();
-					if(length >= suffixLength + 1) {
-						editText.setSelection(length - suffixLength);
+					if (isFirstEdit) {
+						editText.setSelection(0);
+					} else {
+						int length = editText.getText().length();
+						if (length >= suffixLength + 1) {
+							editText.setSelection(length - suffixLength);
+						}
 					}
 				}
 			}

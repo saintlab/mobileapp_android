@@ -155,6 +155,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
+				AndroidUtils.hideKeyboard(mEditCardExpDate);
 				finish();
 			}
 		});

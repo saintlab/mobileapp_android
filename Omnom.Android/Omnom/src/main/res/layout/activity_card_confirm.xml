@@ -4,56 +4,63 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ScrollView
-        android:animateLayoutChanges="true"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical">
 
-        <RelativeLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:omnom="http://schemas.android.com/apk/res-auto"
-            android:animateLayoutChanges="true"
+        <com.omnom.android.view.HeaderView
+            android:id="@+id/panel_top"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="@dimen/view_size_default"
+            android:background="@color/list_header"
+            android:padding="@dimen/activity_horizontal_margin_small"/>
 
-            <com.omnom.android.view.HeaderView
-                android:id="@+id/panel_top"
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true">
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_size_default"
-                android:background="@color/list_header"
-                android:padding="@dimen/activity_horizontal_margin_small"/>
+                android:layout_height="match_parent"
+                android:animateLayoutChanges="true">
 
-            <com.omnom.android.utils.view.ErrorEdit
-                android:id="@+id/edit_amount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/panel_top"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="@dimen/activity_vertical_margin_xlarge"
-                omnom:imeOptions="actionDone"
-                omnom:inputType="numberDecimal"
-                omnom:font="regular_le"
-                omnom:maxLength="7"
-                omnom:editTextWidth="180dp"
-                omnom:textSize="@dimen/font_large"
-                omnom:errorTextSize="@dimen/font_small"
-                omnom:hint="@string/hint_confirm_amount"
-                omnom:textGravity="center"
-                omnom:showClear="false"/>
+                <com.omnom.android.utils.view.ErrorEdit
+                    android:id="@+id/edit_amount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/panel_top"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/activity_vertical_margin_small"
+                    android:gravity="center_horizontal"
+                    omnom:editTextWidth="180dp"
+                    omnom:errorTextSize="@dimen/font_small"
+                    omnom:font="regular_le"
+                    omnom:imeOptions="actionDone"
+                    omnom:inputType="numberDecimal"
+                    omnom:maxLength="7"
+                    omnom:showClear="false"
+                    omnom:textGravity="center"
+                    omnom:textSize="@dimen/font_large"/>
 
-            <TextView
-                android:id="@+id/txt_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/edit_amount"
-                android:padding="@dimen/drawable_padding_default"
-                android:gravity="center"
-                android:text="@string/card_confirmation_text"/>
+                <TextView
+                    android:id="@+id/txt_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/edit_amount"
+                    android:gravity="center"
+                    android:padding="@dimen/drawable_padding_default"
+                    android:text="@string/card_confirmation_text"/>
 
-        </RelativeLayout>
+            </RelativeLayout>
 
-    </ScrollView>
+        </ScrollView>
+
+    </LinearLayout>
+
+
 
     <FrameLayout
         android:id="@+id/transparent_panel"
