@@ -132,6 +132,8 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 
     private Rect framingRect;
 
+	private CameraManager.TorchListener torchListener;
+
 	ViewfinderView getViewfinderView() {
 		return viewfinderView;
 	}
@@ -181,6 +183,7 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 		// off screen.
 		cameraManager = new CameraManager(getApplication());
         cameraManager.setFraming(framingRect);
+        cameraManager.setTorchListener(torchListener);
 
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		viewfinderView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -333,13 +336,6 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 			case KeyEvent.KEYCODE_FOCUS:
 			case KeyEvent.KEYCODE_CAMERA:
 				// Handle these events so they don't launch the Camera app
-				return true;
-			// Use volume up/down to turn on light
-			case KeyEvent.KEYCODE_VOLUME_DOWN:
-				cameraManager.setTorch(false);
-				return true;
-			case KeyEvent.KEYCODE_VOLUME_UP:
-				cameraManager.setTorch(true);
 				return true;
 		}
 		return super.onKeyDown(keyCode, event);
@@ -719,9 +715,16 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 		}
 	}
 
-	protected void setTorch(final boolean turnOn) {
+	protected void setTorchListener(final CameraManager.TorchListener torchListener) {
+		this.torchListener = torchListener;
 		if (cameraManager != null) {
-			cameraManager.setTorch(turnOn);
+			cameraManager.setTorchListener(torchListener);
+		}
+	}
+
+	protected void setTorch(final boolean turnOn, final boolean isManual) {
+		if (cameraManager != null) {
+			cameraManager.setTorch(turnOn, isManual);
 		}
 	}
 
