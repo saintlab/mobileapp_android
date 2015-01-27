@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- From: file:/C:/Projects/omnom/mobileapp_android/Omnom.Android/libraries/Omnom.Menu/build/intermediates/exploded-aar/Omnom.Android.libraries/Omnom.Utils/unspecified/res/values-sw320dp-hdpi-v13/values.xml -->
-    <eat-comment/>
-    <dimen name="view_size_default">48dp</dimen>
-</resources>
