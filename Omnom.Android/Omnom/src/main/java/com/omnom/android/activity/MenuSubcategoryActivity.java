@@ -1,12 +1,12 @@
 package com.omnom.android.activity;
 
 import android.content.Intent;
-import android.widget.ListView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.MenuCategoryItemsAdapter;
 import com.omnom.android.menu.model.Menu;
+import com.omnom.android.utils.view.StickyListView;
 
 import butterknife.InjectView;
 
@@ -16,7 +16,7 @@ import butterknife.InjectView;
 public class MenuSubcategoryActivity extends BaseOmnomFragmentActivity {
 
 	@InjectView(android.R.id.list)
-	protected ListView mListView;
+	protected StickyListView mListView;
 
 	private Menu mMenu;
 
@@ -34,6 +34,9 @@ public class MenuSubcategoryActivity extends BaseOmnomFragmentActivity {
 	public void initUi() {
 		mAdapter = new MenuCategoryItemsAdapter(this, mMenu.categories().get(mPosition), mMenu.items().items());
 		mListView.setAdapter(mAdapter);
+		mListView.setShadowVisible(false);
+		mListView.setDividerHeight(0);
+		mListView.setDivider(null);
 	}
 
 	@Override

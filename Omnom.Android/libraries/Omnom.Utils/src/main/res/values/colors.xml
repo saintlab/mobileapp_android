@@ -5,4 +5,5 @@
     <color name="error_red">#D0021B</color>
     <color name="error_bg_white_transparent">#aaffffff</color>
     <color name="transparent">#00000000</color>
+    <color name="divider_light">#77aaaaaa</color>
 </resources>
