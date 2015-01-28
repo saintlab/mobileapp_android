@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="acquiring_mailru_acquiring_base_url">https://test-cpg.money.mail.ru/api</string>
+    <string name="acquiring_mailru_cardholder">Omnom</string>
+</resources>

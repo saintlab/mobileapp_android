@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="endpoint_auth">http://wicket.staging.saintlab.com</string>
+    <string name="endpoint_restaurateur">http://omnom.staging.saintlab.com</string>
+</resources>

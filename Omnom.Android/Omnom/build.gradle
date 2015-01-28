@@ -30,6 +30,9 @@ android {
         production {
         }
 
+	    staging {
+	    }
+
         laaaab {
         }
     }
@@ -76,6 +79,12 @@ android {
             applicationIdSuffix '.debug'
             resValue "string", "app_name", "Omnom Debug"
         }
+
+	    stageRelease.initWith(buildTypes.release)
+	    stageRelease {
+		    applicationIdSuffix '.staging'
+		    resValue "string", "app_name", "Omnom Staging"
+	    }
     }
 }
 
