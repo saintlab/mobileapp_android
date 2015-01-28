@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="@dimen/activity_vertical_margin_small"
-    android:paddingBottom="@dimen/activity_vertical_margin_small"
     android:baselineAligned="false"
     android:gravity="center">
 
@@ -20,21 +19,32 @@
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
         android:textAppearance="?android:textAppearanceLarge" />
 
+    <ImageView
+        android:id="@+id/img_icon"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/menu_dish_image_height"
+        android:scaleType="centerInside" />
+
     <TextView
         android:id="@+id/txt_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingRight="@dimen/activity_horizontal_margin_medium"
         android:singleLine="true"
         android:ellipsize="end"
-        android:textColor="@color/order_item_price"
+        android:textColor="@color/menu_item_details"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-        android:textAppearance="?android:textAppearanceMedium" />
+        android:textAppearance="?android:textAppearance" />
 
-    <ImageView
-        android:id="@+id/img_icon"
-        android:layout_width="100dp"
-        android:layout_height="100dp" />
+    <Button
+        android:id="@+id/btn_apply"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin_small"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:background="@drawable/btn_rounded_bordered_grey"
+        android:textColor="@drawable/text_color_selector_menu_blue"
+        android:textAppearance="?android:textAppearance"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
     <View
         android:layout_width="match_parent"

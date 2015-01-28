@@ -6,4 +6,13 @@
     <color name="error_bg_white_transparent">#aaffffff</color>
     <color name="transparent">#00000000</color>
     <color name="divider_light">#77aaaaaa</color>
+
+    <color name="menu_item_details">#ffafafaf</color>
+    <color name="menu_item_details_transparent">#59afafaf</color>
+
+    <color name="menu_item_buy_border">#77aaaaaa</color>
+    <color name="menu_item_buy_border_transparent">#33aaaaaa</color>
+
+    <color name="menu_blue">#ff157efb</color>
+    <color name="menu_blue_transparent">#59157efb</color>
 </resources>

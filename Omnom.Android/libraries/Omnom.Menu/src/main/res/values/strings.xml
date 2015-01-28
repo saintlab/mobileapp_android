@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dish_details">%1$s ккал, %2$s гр.</string>
+</resources>

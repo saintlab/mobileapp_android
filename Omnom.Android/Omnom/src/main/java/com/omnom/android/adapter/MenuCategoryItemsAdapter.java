@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import com.omnom.android.menu.model.Child;
 import com.omnom.android.menu.model.Details;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.StickyListView;
 
 import java.util.ArrayList;
@@ -42,6 +44,10 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 	static class ViewHolder {
 		@InjectView(R.id.txt_title)
 		protected TextView txtTitle;
+
+		@InjectView(R.id.btn_apply)
+		@Optional
+		protected Button btnApply;
 
 		@InjectView(R.id.txt_info)
 		@Optional
@@ -206,20 +212,27 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 	private void bindView(final View convertView, final int position, final Item item) {
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
-		if(item instanceof HeaderItem) {
-			holder.txtTitle.setText(item.name());
-		} else {
-			holder.txtTitle.setText(item.name());
+		holder.txtTitle.setText(item.name());
+		if(!(item instanceof HeaderItem)) {
+			bindDetails(item, holder);
+			bindImage(item, holder);
+			holder.btnApply.setText(StringUtils.formatCurrency(item.price(), mContext.getString(R.string.currency_suffix_ruble)));
+		}
+	}
 
-			final Details details = item.details();
-			if(details != null) {
-				holder.txtDetails.setText(details.toString());
-			}
+	private void bindImage(final Item item, final ViewHolder holder) {
+		final String photo = item.photo();
+		if(!TextUtils.isEmpty(photo)) {
+			OmnomApplication.getPicasso(mContext).load(photo).into(holder.imgIcon);
+		}
+	}
 
-			final String photo = item.photo();
-			if(!TextUtils.isEmpty(photo)) {
-				OmnomApplication.getPicasso(mContext).load(photo).into(holder.imgIcon);
-			}
+	private void bindDetails(final Item item, final ViewHolder holder) {
+		final Details details = item.details();
+		final boolean hasDetails = details != null;
+		ViewUtils.setVisible(holder.txtDetails, hasDetails);
+		if(hasDetails) {
+			holder.txtDetails.setText(mContext.getString(R.string.dish_details, details.energyTotal(), details.weight()));
 		}
 	}
 }
