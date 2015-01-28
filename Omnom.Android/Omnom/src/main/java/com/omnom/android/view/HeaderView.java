@@ -121,6 +121,7 @@ public class HeaderView extends RelativeLayout {
 
 	public void setButtonRight(final int resId, OnClickListener listener) {
 		setButton(btnRight, resId, listener);
+		updateTitleRules();
 	}
 
 	public Button getBtnRight() {
@@ -133,10 +134,14 @@ public class HeaderView extends RelativeLayout {
 
 	private void updateTitleRules() {
 		LayoutParams layoutParams = (LayoutParams) txtTitleBig.getLayoutParams();
-		if (ViewUtils.intersect(txtTitleBig, btnRight)) {
+		if (btnRight.getVisibility() == VISIBLE && ViewUtils.intersect(txtTitleBig, btnRight)) {
 			layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
 			layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
 			layoutParams.addRule(RelativeLayout.LEFT_OF, R.id.btn_right);
+		} else {
+			layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+			layoutParams.addRule(RelativeLayout.CENTER_VERTICAL, 0);
+			layoutParams.addRule(RelativeLayout.LEFT_OF, 0);
 		}
 	}
 
@@ -189,18 +194,19 @@ public class HeaderView extends RelativeLayout {
 		if(show) {
 			mBtnRightLastVisibility = btnRight.getVisibility();
 			mBtnRightDrawableLastVisibility = btnRightDrawable.getVisibility();
-			ViewUtils.setVisible(btnRight, !show);
-			ViewUtils.setVisible(btnRightDrawable, !show);
-			ViewUtils.setVisible(progress, show);
+			ViewUtils.setVisible(btnRight, false);
+			ViewUtils.setVisible(btnRightDrawable, false);
+			ViewUtils.setVisible(progress, true);
 		} else {
 			if(mBtnRightLastVisibility == VISIBLE) {
-				ViewUtils.setVisible(btnRight, !show);
+				ViewUtils.setVisible(btnRight, true);
 			}
 			if(mBtnRightDrawableLastVisibility == VISIBLE) {
-				ViewUtils.setVisible(btnRightDrawable, !show);
+				ViewUtils.setVisible(btnRightDrawable, true);
 			}
-			ViewUtils.setVisible(progress, show);
+			ViewUtils.setVisible(progress, false);
 		}
+		updateTitleRules();
 	}
 
 	public void showButtonRight(final boolean show) {
