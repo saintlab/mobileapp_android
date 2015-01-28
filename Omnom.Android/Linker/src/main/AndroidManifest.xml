@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.omnom.android.linker" >
+    package="com.saintlab.android.linker">
 
     <uses-sdk
         android:minSdkVersion="18"
@@ -24,94 +24,85 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
 
-    <android:uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
+    <android:uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <android:uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
+    <android:uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:name="com.omnom.android.linker.LinkerApplication"
+        android:name=".LinkerApplication"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Wood.Blue" >
+        android:theme="@style/Theme.Wood.Blue">
         <activity
-            android:name="com.omnom.android.linker.activity.ValidationActivity"
+            android:name=".activity.ValidationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:excludeFromRecents="true"
-            android:windowSoftInputMode="stateAlwaysHidden" >
-        </activity>
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name="com.omnom.android.linker.activity.bind.BindActivity"
+            android:name=".activity.bind.BindActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" >
-        </activity>
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
         <activity
-            android:name="com.omnom.android.linker.activity.LoginActivity"
+            android:name=".activity.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:noHistory="true"
-            android:windowSoftInputMode="stateAlwaysHidden" >
-        </activity>
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name="com.google.zxing.client.android.CaptureActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Wood" >
-        </activity>
+            android:theme="@style/Theme.Wood" />
         <activity
-            android:name="com.omnom.android.linker.activity.SimpleSplashActivity"
+            android:name=".activity.SimpleSplashActivity"
             android:icon="@drawable/ic_app"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood.Blue"
-            android:windowSoftInputMode="stateAlwaysHidden" >
+            android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.omnom.android.linker.activity.restaurant.RestaurantsListActivity"
+            android:name=".activity.restaurant.RestaurantsListActivity"
             android:label="@string/title_activity_places_list"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White"
-            android:windowSoftInputMode="stateAlwaysHidden" >
-        </activity>
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name="com.omnom.android.linker.activity.restaurant.RestaurantActivity"
+            android:name=".activity.restaurant.RestaurantActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Wood" >
-        </activity>
+            android:theme="@style/Theme.Wood" />
 
         <service
-            android:name="com.omnom.android.linker.service.BluetoothLeService"
+            android:name=".service.BluetoothLeService"
             android:enabled="true"
             android:exported="false" />
 
         <activity
-            android:name="com.omnom.android.linker.activity.UserProfileActivity"
+            android:name=".activity.UserProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <activity
-            android:name="com.omnom.android.linker.activity.restaurant.BeaconsChartActivity"
+            android:name=".activity.restaurant.BeaconsChartActivity"
             android:label="@string/title_activity_beacons_chart"
             android:screenOrientation="landscape"
-            android:theme="@style/Theme.Simple" >
-        </activity>
+            android:theme="@style/Theme.Simple" />
         <activity
-            android:name="com.omnom.android.linker.activity.restaurant.BeaconsListActivity"
+            android:name=".activity.restaurant.BeaconsListActivity"
             android:label="@string/title_activity_beacons_list"
             android:screenOrientation="landscape"
-            android:theme="@style/Theme.White">
-        </activity>
-        <meta-data android:name="com.crashlytics.ApiKey" android:value="80e157ab6e31985057b3080949fbc7c82e4501a4"/>
+            android:theme="@style/Theme.White" />
+
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="80e157ab6e31985057b3080949fbc7c82e4501a4" />
     </application>
 
 </manifest>

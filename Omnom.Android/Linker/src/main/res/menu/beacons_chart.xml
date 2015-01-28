@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.omnom.android.linker.activity.restaurant.BeaconsChartActivity" >
+    tools:context="com.saintlab.android.linker.activity.restaurant.BeaconsChartActivity" >
     <item android:id="@+id/action_start"
         android:title="START"
         android:icon="@android:drawable/ic_media_play"
