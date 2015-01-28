@@ -1,8 +1,5 @@
 package com.omnom.android.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -50,6 +47,7 @@ import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.BitmapUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.StringUtils;
@@ -89,6 +87,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	public static final int TYPE_DEFAULT = -1;
 
 	private static final String TAG = ValidateActivity.class.getSimpleName();
+
+	public static final int BACKGROUND_PREVIEW_WIDTH = 50;
+	public static final int BACKGROUND_PREVIEW_BLUR_RADIUS = 5;
 
 	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
 		@Override
@@ -234,8 +235,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	protected OmnomErrorHelper mErrorHelper;
 
-	protected Target mTarget;
-
 	protected boolean mFirstRun = true;
 
 	@Nullable
@@ -375,7 +374,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 						new ColorDrawable(getResources().getColor(R.color.error_bg_white_transparent))});
 
 		bgTransitionDrawable.setCrossFadeEnabled(true);
-		contentView.setBackgroundDrawable(bgTransitionDrawable);
+		AndroidUtils.setBackground(contentView, bgTransitionDrawable);
 
 		imgPrevious.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -415,7 +414,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 				if(restaurants.size() == 1) {
 					final Restaurant restaurant = restaurants.get(0);
 					if(restaurant != null) {
-						final String bgImgUrl = RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics());
+						final String bgImgUrl = RestaurantHelper.getBackground(restaurant, BACKGROUND_PREVIEW_WIDTH);
 						if(!TextUtils.isEmpty(bgImgUrl)) {
 							try {
 								OmnomApplication.getPicasso(getActivity()).load(bgImgUrl).get();
@@ -426,39 +425,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 					}
 				}
 				return decodeResponse;
-			}
-		};
-
-		mTarget = new Target() {
-			@Override
-			public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
-				final BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
-				drawable.setAlpha(0);
-				final View root = findViewById(R.id.root);
-				root.setBackgroundDrawable(drawable);
-				ValueAnimator va = ValueAnimator.ofInt(0, 255);
-				va.setDuration(getResources().getInteger(R.integer.default_animation_duration_long));
-				va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-					@Override
-					public void onAnimationUpdate(ValueAnimator animation) {
-						drawable.setAlpha((Integer) animation.getAnimatedValue());
-					}
-				});
-				va.addListener(new AnimatorListenerAdapter() {
-					@Override
-					public void onAnimationEnd(Animator animation) {
-						getWindow().getDecorView().setBackgroundDrawable(null);
-					}
-				});
-				va.start();
-			}
-
-			@Override
-			public void onBitmapFailed(Drawable errorDrawable) {
-			}
-
-			@Override
-			public void onPrepareLoad(Drawable placeHolderDrawable) {
 			}
 		};
 
@@ -752,10 +718,53 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		});
 	}
 
+	final Target backgroundTarget = new Target() {
+		@Override
+		public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
+			final BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
+			AnimationUtils.animateDrawable(findViewById(R.id.root), findViewById(R.id.background),
+										   drawable,
+										   getResources().getInteger(R.integer.default_animation_duration_long));
+		}
+
+		@Override
+		public void onBitmapFailed(Drawable errorDrawable) {
+		}
+
+		@Override
+		public void onPrepareLoad(Drawable placeHolderDrawable) {
+		}
+	};
+
+	Restaurant currentRestaurant;
+	final Target previewTarget = new Target() {
+		@Override
+		public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
+			final Bitmap blurredBitmap = BitmapUtils.blur(bitmap, BACKGROUND_PREVIEW_BLUR_RADIUS);
+			final BitmapDrawable drawable = new BitmapDrawable(getResources(), blurredBitmap);
+			AnimationUtils.animateDrawable(getWindow().getDecorView(), findViewById(R.id.root),
+										   drawable,
+										   getResources().getInteger(R.integer.default_animation_duration_quick));
+			OmnomApplication.getPicasso(ValidateActivity.this)
+					.load(RestaurantHelper.getBackground(currentRestaurant,
+														 getResources().getDisplayMetrics().widthPixels))
+					.into(backgroundTarget);
+		}
+
+		@Override
+		public void onBitmapFailed(Drawable errorDrawable) {
+		}
+
+		@Override
+		public void onPrepareLoad(Drawable placeHolderDrawable) {
+		}
+	};
+
 	private void animateRestaurantBackground(final Restaurant restaurant) {
+		currentRestaurant = restaurant;
 		OmnomApplication.getPicasso(this)
-		                .load(RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics()))
-		                .into(mTarget);
+				.load(RestaurantHelper.getBackground(restaurant, BACKGROUND_PREVIEW_WIDTH))
+				.into(previewTarget);
 	}
 
 	private void animateRestaurantLogo(final Restaurant restaurant) {

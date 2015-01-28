@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.utils.loader.LoaderView;
+import com.omnom.android.utils.utils.AndroidUtils;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
@@ -70,7 +71,7 @@ public class EnteringPageFragment extends Fragment {
 		final Drawable drawable = getResources().getDrawable(R.drawable.bg_wood);
 		drawable.mutate();
 		drawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
-		findById(view, R.id.root).setBackgroundDrawable(drawable);
+		AndroidUtils.setBackground(findById(view, R.id.root), drawable);
 		CalligraphyUtils.applyFontToTextView(getActivity(), (TextView) findById(view, R.id.text), "fonts/Futura-OSF-Omnom-Regular.otf");
 		drawable.invalidateSelf();
 		((ImageView) findById(view, R.id.img_icon)).setImageResource(icon);
