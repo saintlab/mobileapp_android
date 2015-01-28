@@ -25,7 +25,7 @@ public class PaymentMixpanelEvent extends AbstractAcquiringMixpanelEvent {
 
 	private final String tipsWay;
 
-	private final String splitWay;
+	private final String split;
 
 	private final int totalAmount;
 
@@ -47,8 +47,8 @@ public class PaymentMixpanelEvent extends AbstractAcquiringMixpanelEvent {
 		restaurantId = details.getRestaurantName();
         tipsSum = details.getTip();
 		tipValue = details.getTipValue();
-		tipsWay = TipsWay.values()[details.getTipsWay()].name();
-		splitWay = SplitWay.values()[details.getSplitWay()].name();
+		tipsWay = TipsWay.values()[details.getTipsWay()].name().toLowerCase();
+		split = SplitWay.values()[details.getSplitWay()].name().toLowerCase();
 		totalAmount = (int) (details.getAmount() * 100);
 	}
 
