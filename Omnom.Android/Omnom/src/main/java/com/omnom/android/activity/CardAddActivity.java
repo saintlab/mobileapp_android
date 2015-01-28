@@ -285,7 +285,13 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		final String expDate = CardUtils.prepareExpDate(mEditCardExpDate.getText().toString());
 		final String cvv = mEditCardCvv.getText().toString();
 		final String holder = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getCardHolder();
-		return CardInfo.create(pan, expDate, cvv, holder);
+		return new CardInfo.Builder()
+						.pan(pan)
+						.mixpanelPan(pan)
+						.expDate(expDate)
+						.cvv(cvv)
+						.holder(holder)
+						.build();
 	}
 
 	private void doBind() {

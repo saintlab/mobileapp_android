@@ -37,7 +37,7 @@ abstract class AbstractAcquiringMixpanelEvent extends AbstractBaseMixpanelEvent 
 	                                      final AcquiringResponseError error) {
 		super(userData);
 		this.cardId = StringUtils.EMPTY_STRING.equals(cardInfo.getCardId()) ? null : cardInfo.getCardId();
-		this.pan = StringUtils.EMPTY_STRING.equals(cardInfo.getPan()) ? null : CardUtils.maskPan(cardInfo.getPan());
+		this.pan = StringUtils.EMPTY_STRING.equals(cardInfo.getMixpanelPan()) ? null : CardUtils.maskPan(cardInfo.getMixpanelPan());
 		if (error != null) {
 			title = getFailName();
 			this.errorCode = error.getCode();

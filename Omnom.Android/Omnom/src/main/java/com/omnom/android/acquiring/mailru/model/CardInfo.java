@@ -32,48 +32,6 @@ public class CardInfo implements Parcelable {
 		}
 	};
 
-	public static CardInfo create(final Context context, final String id, final String testCvv) {
-		return create(context, id, StringUtils.EMPTY_STRING, testCvv);
-	}
-
-	public static CardInfo create(final Context context, final String id, final String pan, final String testCvv) {
-		final CardInfo cardInfo = new CardInfo();
-		cardInfo.setCardId(id);
-		cardInfo.pan = pan;
-		cardInfo.cvv = testCvv;
-		return cardInfo;
-	}
-
-	public static CardInfo create(final String pan, final String expirationDate, final String cvv) {
-		final CardInfo cardInfo = new CardInfo();
-		cardInfo.pan = pan;
-		cardInfo.expDate = expirationDate;
-		cardInfo.cvv = cvv;
-		return cardInfo;
-	}
-
-	public static CardInfo create(String pan, String exp_date, String cvv, String holder) {
-		CardInfo info = create(pan, exp_date, cvv);
-		info.holder = holder;
-		return info;
-	}
-
-	public static CardInfo createTestCard(Context context) {
-		String holder = context.getString(R.string.acquiring_mailru_cardholder);
-		String pan = "6011000000000004";
-		String expDate = "12.2015";
-		String cvv = "123";
-		return create(pan, expDate, cvv, holder);
-	}
-
-	public static CardInfo createTestCard(Context context, final CreditCard card) {
-		String holder = context.getString(R.string.acquiring_mailru_cardholder);
-		String pan = card.cardNumber;
-		String expDate = card.expiryMonth + "." + card.expiryYear;
-		String cvv = card.cvv;
-		return create(pan, expDate, cvv, holder);
-	}
-
 	@Expose
 	private String pan = StringUtils.EMPTY_STRING;
 
@@ -89,50 +47,74 @@ public class CardInfo implements Parcelable {
 	@Expose
 	private String holder = StringUtils.EMPTY_STRING;
 
+	private transient String mixpanelPan;
+
 	private boolean addCard = false;
+
+	private CardInfo() {
+	}
+
+	private CardInfo(final Builder builder) {
+		cardId = builder.cardId;
+		pan = builder.pan;
+		mixpanelPan = builder.mixpanelPan;
+		expDate = builder.expDate;
+		cvv = builder.cvv;
+		holder = builder.holder;
+		addCard = builder.addCard;
+	}
 
 	public CardInfo(Parcel parcel) {
 		pan = parcel.readString();
+		mixpanelPan = parcel.readString();
 		holder = parcel.readString();
 		expDate = parcel.readString();
 		cvv = parcel.readString();
 		cardId = parcel.readString();
 	}
 
-	private CardInfo() {
-	}
-
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
 		dest.writeString(pan);
+		dest.writeString(mixpanelPan);
 		dest.writeString(holder);
 		dest.writeString(expDate);
 		dest.writeString(cvv);
 		dest.writeString(cardId);
 	}
 
+	public static CardInfo createTestCard(Context context) {
+		return new Builder()
+				.holder(context.getString(R.string.acquiring_mailru_cardholder))
+				.pan("6011000000000004")
+				.expDate("12.2015")
+				.cvv("123")
+				.build();
+	}
+
+	public static CardInfo createTestCard(Context context, final CreditCard card) {
+		return new Builder()
+				.holder(context.getString(R.string.acquiring_mailru_cardholder))
+				.pan(card.cardNumber)
+				.expDate(card.expiryMonth + "." + card.expiryYear)
+				.cvv(card.cvv)
+				.build();
+	}
+
 	public String getPan() {
 		return pan;
 	}
 
-	public void setPan(String pan) {
-		this.pan = pan;
+	public String getMixpanelPan() {
+		return mixpanelPan;
 	}
 
 	public String getExpDate() {
 		return expDate;
 	}
 
-	public void setExpDate(String expDate) {
-		this.expDate = expDate;
-	}
-
 	public String getCvv() {
 		return cvv;
-	}
-
-	public void setCvv(String cvv) {
-		this.cvv = cvv;
 	}
 
 	public String getCardId() {
@@ -147,8 +129,12 @@ public class CardInfo implements Parcelable {
 		return addCard;
 	}
 
-	public void setAddCard(boolean addCard) {
-		this.addCard = addCard;
+	public String getHolder() {
+		return holder;
+	}
+
+	public void storeCardId(HashMap<String, String> params) {
+		params.put("card_id", cardId);
 	}
 
 	public void toMap(HashMap<String, String> map) {
@@ -176,18 +162,6 @@ public class CardInfo implements Parcelable {
 		return cardInfo;
 	}
 
-	public String getHolder() {
-		return holder;
-	}
-
-	public void setHolder(String holder) {
-		this.holder = holder;
-	}
-
-	public void storeCardId(HashMap<String, String> params) {
-		params.put("card_id", cardId);
-	}
-
 	@Deprecated
 	public String toGson(Gson gson) {
 		return gson.toJson(this);
@@ -197,4 +171,57 @@ public class CardInfo implements Parcelable {
 	public int describeContents() {
 		return 0;
 	}
+
+	public static class Builder {
+
+		private String cardId = StringUtils.EMPTY_STRING;
+		private String pan = StringUtils.EMPTY_STRING;
+		private String mixpanelPan = StringUtils.EMPTY_STRING;
+		private String expDate = StringUtils.EMPTY_STRING;
+		private String cvv = StringUtils.EMPTY_STRING;
+		private String holder = StringUtils.EMPTY_STRING;
+		private boolean addCard = false;
+
+		public Builder cardId(final String val) {
+			cardId = val;
+			return this;
+		}
+
+		public Builder pan(final String val) {
+			pan = val;
+			return this;
+		}
+
+		public Builder mixpanelPan(final String val) {
+			mixpanelPan = val;
+			return this;
+		}
+
+		public Builder expDate(final String val) {
+			expDate = val;
+			return this;
+		}
+
+		public Builder cvv(final String val) {
+			cvv = val;
+			return this;
+		}
+
+		public Builder holder(final String val) {
+			holder = val;
+			return this;
+		}
+
+		public Builder addCard(final boolean val) {
+			addCard = val;
+			return this;
+		}
+
+		public CardInfo build() {
+			return new CardInfo(this);
+		}
+
+	}
+
+
 }
