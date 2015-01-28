@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        maven { url 'https://maven.fabric.io/repo' }
+        maven { url 'https://maven.fabric.io/public' }
     }
 
     dependencies {
@@ -12,7 +12,7 @@ apply plugin: 'io.fabric'
 apply plugin: 'android-apt'
 
 repositories {
-    maven { url 'https://maven.fabric.io/repo' }
+    maven { url 'https://maven.fabric.io/public' }
 }
 
 apply plugin: 'hugo'
@@ -27,11 +27,11 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.omnom.android.linker"
+        applicationId "com.saintlab.android.linker"
         minSdkVersion 18
         targetSdkVersion 21
-        versionCode 35
-        versionName "0.1.35"
+        versionCode 36
+        versionName "0.1.36"
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
     }
 
@@ -64,13 +64,13 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-            resValue "string", "app_name", "Omnom Linker"
+            resValue "string", "app_name", "Linker"
         }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             applicationIdSuffix '.debug'
-            resValue "string", "app_name", "Omnom Linker Debug"
+            resValue "string", "app_name", "Linker Debug"
         }
     }
 }
@@ -96,7 +96,7 @@ dependencies {
     androidTestCompile('com.jakewharton.espresso:espresso:1.1-r3') {
         exclude group: 'com.squareup.dagger'
     }
-    compile('com.crashlytics.sdk.android:crashlytics:2.0.1@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
         transitive = true;
     }
 }
