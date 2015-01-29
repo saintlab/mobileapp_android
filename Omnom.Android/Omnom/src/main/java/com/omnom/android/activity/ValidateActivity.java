@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -58,6 +60,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,6 +76,8 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 import static butterknife.ButterKnife.findById;
 
@@ -87,6 +92,12 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	 * Used when there is an active auth token during validation process
 	 */
 	public static final int TYPE_DEFAULT = -1;
+
+	public static final String ACTION_LAUNCH_QR = "com.omnom.android.action.launch_qr";
+	public static final String ACTION_LAUNCH_HASHCODE = "com.omnom.android.action.launch_hashcode";
+	public static final String QR_URL_PATH_PREFIX = "/qr/";
+	public static final String SCHEME_OMNOM = "omnom";
+	public static final String QUERY_PARAMETER_HASH = "hash";
 
 	private static final String TAG = ValidateActivity.class.getSimpleName();
 
@@ -115,7 +126,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 				@Override
 				public void onClick(View v) {
 					clearErrors(true);
-					startLoader();
+					decode(true);
 				}
 			});
 		}
@@ -129,13 +140,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		start(context, enterAnim, exitAnim, animationType, true, -1);
 	}
 
-	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, int userEnterType) {
+	public static void start(BaseFragmentActivity context, int enterAnim, int exitAnim, int animationType, int userEnterType) {
 		start(context, enterAnim, exitAnim, animationType, false, userEnterType);
 	}
 
 	private static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo,
 	                          final int userEnterType) {
-		Intent intent = createIntent(context, animationType, isDemo, userEnterType);
+		Intent intent = createIntent(context, animationType, isDemo, userEnterType, null);
 		if(context instanceof ConfirmPhoneActivity) {
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -148,35 +159,46 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	private static void start(BaseFragmentActivity context, int enterAnim, int exitAnim, int animationType, boolean isDemo,
 	                          final int userEnterType) {
-		Intent intent = createIntent(context, animationType, isDemo, userEnterType);
+		Intent intent = createIntent(context, animationType, isDemo, userEnterType, null);
 		if(!isDemo) {
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		}
 		context.start(intent, enterAnim, exitAnim, !isDemo);
 	}
 
-	public static void start(BaseFragmentActivity context, int enterAnim, int exitAnim, int animationType, final int userEnterType) {
-		Intent intent = createIntent(context, animationType, false, userEnterType);
+	public static void start(final BaseFragmentActivity context, final int enterAnim,
+	                         final int exitAnim, final int animationType, final int userEnterType,
+	                         final Uri data) {
+		Intent intent = createIntent(context, animationType, false, userEnterType, data);
 		context.start(intent, enterAnim, exitAnim, true);
 	}
 
-	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
+	private static Intent createIntent(final Context context, final int animationType,
+	                                   final boolean isDemo, final int userEnterType, final Uri data) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
 
 		final Class validateActivityBleClass = AndroidUtils.isLollipop() ?
 				ValidateActivityBle21.class : ValidateActivityBle.class;
 
-		final Intent intent = new Intent(context, hasBle ? validateActivityBleClass : ValidateActivityCamera.class);
+		final Intent intent = new Intent(context, hasBle && data == null ? validateActivityBleClass : ValidateActivityCamera.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
 		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
+		if (data != null) {
+			intent.setData(data);
+			if (data.toString().contains(QR_URL_PATH_PREFIX)) {
+				intent.setAction(ACTION_LAUNCH_QR);
+			} else {
+				intent.setAction(ACTION_LAUNCH_HASHCODE);
+			}
+		}
 		return intent;
 	}
 
 	protected final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			startLoader();
+			decode(true);
 		}
 	};
 
@@ -255,6 +277,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	 */
 	private int mType;
 
+	protected Uri mData;
+
 	private int mAnimationType;
 
 	private boolean mWaiterCalled;
@@ -263,15 +287,19 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	private Subscription mWaiterCallSubscribtion;
 
-	private Subscription mUserSubscription;
-
-	private Subscription mAcquiringConfigSubscribtion;
+	private Subscription mDataSubscription;
 
 	private View bottomView;
 
 	private com.omnom.android.utils.drawable.TransitionDrawable bgTransitionDrawable;
 
 	private PaymentEventListener mPaymentListener;
+
+	@Override
+	protected void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		mData = getIntent().getData();
+	}
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -284,6 +312,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Override
 	protected void onPostResume() {
 		super.onPostResume();
+		startValidation();
+	}
+
+	private void startValidation() {
 		if (!mSkipViewRendering) {
 			postDelayed(getResources().getInteger(R.integer.default_animation_duration_quick), new Runnable() {
 				@Override
@@ -338,8 +370,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		loader.onDestroy();
 		OmnomObservable.unsubscribe(mOrdersSubscription);
 		OmnomObservable.unsubscribe(mWaiterCallSubscribtion);
-		OmnomObservable.unsubscribe(mUserSubscription);
-		OmnomObservable.unsubscribe(mAcquiringConfigSubscribtion);
+		OmnomObservable.unsubscribe(mDataSubscription);
 		mPaymentListener.onDestroy();
 	}
 
@@ -363,6 +394,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			}
 		}
 	}
+
+	private View.OnClickListener loadConfigsErrorListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			loadConfigs();
+		}
+	};
 
 	@Override
 	public void initUi() {
@@ -393,20 +431,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			}
 		});
 		mErrorHelper = new OmnomErrorHelper(loader, txtError, btnErrorRepeat, txtErrorRepeat, btnDemo, errorViews);
-
-		updateUserData(OmnomApplication.get(getActivity()));
-
-		mAcquiringConfigSubscribtion = AndroidObservable.bindActivity(this, api.getConfig()).subscribe(new Action1<Config>() {
-			@Override
-			public void call(Config config) {
-				OmnomApplication.get(getActivity()).cacheConfig(config);
-			}
-		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			@Override
-			public void onError(Throwable throwable) {
-				Log.w(TAG, "Unable to load config: ", throwable);
-			}
-		});
 
 		mPreloadBackgroundFunction = new Func1<RestaurantResponse, RestaurantResponse>() {
 			@Override
@@ -464,9 +488,64 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 		if (mSkipViewRendering) {
 			mFirstRun = false;
-			startLoader();
+			decode(true);
 		}
 	}
+
+	private void loadConfigs() {
+		clearErrors(true);
+		loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration), new Runnable() {
+			@Override
+			public void run() {
+			}
+		});
+		mDataSubscription = AndroidObservable.bindActivity(this, getConfigsObservable()).subscribe(new Action1<Boolean>() {
+			@Override
+			public void call(Boolean success) {
+				final ValidateActivity activity = ValidateActivity.this;
+				if (!BluetoothUtils.hasBleSupport(activity) && !isExternalLaunch()) {
+					loader.stopProgressAnimation();
+					loader.updateProgressMax(new Runnable() {
+						@Override
+						public void run() {
+							RestaurantsListActivity.start(activity,true);
+						}
+					});
+				} else {
+					decode(false);
+				}
+			}
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			@Override
+			public void onError(Throwable throwable) {
+				if (throwable.getCause() instanceof UnknownHostException) {
+					mErrorHelper.showInternetError(loadConfigsErrorListener);
+				} else {
+					mErrorHelper.showUnknownError(loadConfigsErrorListener);
+				}
+				Log.e(TAG, "loadConfigs", throwable);
+			}
+		});
+	}
+
+	private Observable<Boolean> getConfigsObservable() {
+		final OmnomApplication app = OmnomApplication.get(getActivity());
+		return Observable.zip(authenticator.getUser(app.getAuthToken()), api.getConfig(),
+				new Func2<UserResponse, Config, Boolean>() {
+					@Override
+					public Boolean call(UserResponse userResponse, Config config) {
+						app.cacheConfig(config);
+						app.cacheUserProfile(new UserProfile(userResponse));
+						reportMixPanel(userResponse);
+						return true;
+					}
+				}).subscribeOn(Schedulers.io());
+	}
+
+	/**
+	 * @return <code>true</code> if app was launched by an extrenal qr/link
+	 */
+	protected boolean isExternalLaunch() {return mData != null;}
 
 	protected void validate() {
 		if(mFirstRun || mRestaurant == null) {
@@ -477,7 +556,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			loader.scaleDown(null, new Runnable() {
 				@Override
 				public void run() {
-					startLoader();
+					loadConfigs();
 				}
 			});
 		}
@@ -487,7 +566,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		mFirstRun = false;
 	}
 
-	protected abstract void startLoader();
+	protected abstract void decode(boolean startProgressAnimation);
 
 	public void onBill(final View v) {
 		v.setEnabled(false);
@@ -772,22 +851,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	private void onNewGuest(TableDataResponse table) {
 		api.newGuest(table.getRestaurantId(), table.getId())
 		   .subscribe(OmnomObservable.emptyOnNext(), OmnomObservable.loggerOnError(TAG));
-	}
-
-	private void updateUserData(final OmnomApplication app) {
-		final String token = app.getAuthToken();
-		mUserSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
-			@Override
-			public void call(UserResponse userResponse) {
-				reportMixPanel(userResponse);
-				app.cacheUserProfile(new UserProfile(userResponse));
-			}
-		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			@Override
-			public void onError(Throwable throwable) {
-				Log.e(TAG, "updateUserData", throwable);
-			}
-		});
 	}
 
 	/**

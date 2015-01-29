@@ -113,13 +113,15 @@ public class ValidateActivityBle extends ValidateActivity {
 	}
 
 	@Override
-	protected void startLoader() {
-		clearErrors(true);
-		loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration), new Runnable() {
-			@Override
-			public void run() {
-			}
-		});
+	protected void decode(final boolean startProgressAnimation) {
+		if (startProgressAnimation) {
+			clearErrors(true);
+			loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration), new Runnable() {
+				@Override
+				public void run() {
+				}
+			});
+		}
 		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
 		                                                                                 .map(OmnomObservable.getValidationFunc(this,
 		                                                                                                                        mErrorHelper,
