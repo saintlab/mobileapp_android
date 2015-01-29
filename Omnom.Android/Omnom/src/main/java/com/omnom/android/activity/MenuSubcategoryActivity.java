@@ -64,10 +64,10 @@ public class MenuSubcategoryActivity extends BaseOmnomFragmentActivity {
 	public void showAddFragment(final Item item) {
 		getSupportFragmentManager().beginTransaction()
 		                           .addToBackStack(null)
-		                           .setCustomAnimations(R.anim.slide_in_up,
-		                                                R.anim.slide_out_down,
-		                                                R.anim.slide_in_up,
-		                                                R.anim.slide_out_down)
+		                           .setCustomAnimations(R.anim.fade_in,
+		                                                R.anim.nothing_long,
+		                                                R.anim.fade_in,
+		                                                R.anim.nothing_long)
 		                           .replace(R.id.root, AddItemFragment.newInstance(mOrder, item))
 		                           .commit();
 	}

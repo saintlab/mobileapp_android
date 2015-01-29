@@ -13,6 +13,11 @@ import auto.parcel.AutoParcel;
 @AutoParcel
 @AutoGson
 public abstract class UserOrderData implements Parcelable {
+
+	public static UserOrderData create(int amount, Item item) {
+		return new AutoParcel_UserOrderData(amount, item);
+	}
+
 	@Nullable
 	public abstract int amount();
 

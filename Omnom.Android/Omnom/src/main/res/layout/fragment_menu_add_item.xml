@@ -1,15 +1,20 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/transparent_black"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     tools:context="com.omnom.android.fragment.menu.AddItemFragment">
 
     <LinearLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
+        android:layout_margin="4dp"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:orientation="vertical"
@@ -28,28 +33,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:textColor="@android:color/black"
                 android:textAppearance="?android:textAppearanceLarge"
-                android:text="0" />
+                android:text="0"
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
             <Button
                 android:id="@+id/btn_plus"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_toLeftOf="@+id/txt_count"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_toRightOf="@+id/txt_count"
                 android:layout_centerVertical="true"
-                android:background="@drawable/btn_rounded_bordered_grey"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:text="+" />
+                android:background="@drawable/btn_increase"
+                android:textAppearance="?android:textAppearanceLarge" />
 
             <Button
                 android:id="@+id/btn_minus"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_toRightOf="@+id/txt_count"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_toLeftOf="@+id/txt_count"
                 android:layout_centerVertical="true"
-                android:background="@drawable/btn_rounded_bordered_grey"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:text="—" />
+                android:background="@drawable/btn_decrease"
+                android:textAppearance="?android:textAppearanceLarge" />
 
         </RelativeLayout>
 
@@ -60,10 +65,16 @@
             android:background="@color/divider_light" />
 
         <Button
+            android:id="@+id/btn_apply"
             android:layout_width="wrap_content"
-            android:layout_height="32dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:paddingLeft="32dp"
+            android:paddingRight="32dp"
             android:text="@string/button_ok"
             android:textColor="@android:color/white"
+            android:textAppearance="?android:textAppearance"
             android:background="@drawable/btn_rounded_blue" />
 
     </LinearLayout>

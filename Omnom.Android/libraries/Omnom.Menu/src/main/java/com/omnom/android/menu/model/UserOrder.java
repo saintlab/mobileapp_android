@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.omnom.android.utils.generation.AutoGson;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import auto.parcel.AutoParcel;
@@ -15,6 +16,11 @@ import auto.parcel.AutoParcel;
 @AutoGson
 @AutoParcel
 public abstract class UserOrder implements Parcelable {
+
+	public static UserOrder create() {
+		return new AutoParcel_UserOrder(new HashMap<String, UserOrderData>());
+	}
+
 	@Nullable
 	public abstract Map<String, UserOrderData> itemsTable();
 }
