@@ -5,7 +5,10 @@ import android.content.Intent;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.MenuCategoryItemsAdapter;
+import com.omnom.android.fragment.menu.AddItemFragment;
+import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
+import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.utils.view.StickyListView;
 
 import butterknife.InjectView;
@@ -24,6 +27,8 @@ public class MenuSubcategoryActivity extends BaseOmnomFragmentActivity {
 	private int mPosition;
 
 	private MenuCategoryItemsAdapter mAdapter;
+
+	private UserOrder mOrder;
 
 	@Override
 	protected void handleIntent(final Intent intent) {
@@ -54,5 +59,16 @@ public class MenuSubcategoryActivity extends BaseOmnomFragmentActivity {
 	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_menu_subcategory;
+	}
+
+	public void showAddFragment(final Item item) {
+		getSupportFragmentManager().beginTransaction()
+		                           .addToBackStack(null)
+		                           .setCustomAnimations(R.anim.slide_in_up,
+		                                                R.anim.slide_out_down,
+		                                                R.anim.slide_in_up,
+		                                                R.anim.slide_out_down)
+		                           .replace(R.id.root, AddItemFragment.newInstance(mOrder, item))
+		                           .commit();
 	}
 }

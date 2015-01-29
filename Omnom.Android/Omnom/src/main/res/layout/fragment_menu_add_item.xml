@@ -2,26 +2,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/transparent_black"
     tools:context="com.omnom.android.fragment.menu.AddItemFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="2dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:orientation="vertical"
         android:gravity="center"
         android:layout_gravity="bottom"
-        android:showDividers="middle"
-        android:divider="@color/menu_item_buy_border"
-        android:dividerPadding="4dp"
         android:background="@android:color/white">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="48dp">
 
             <TextView
                 android:id="@+id/txt_count"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -50,10 +53,18 @@
 
         </RelativeLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="16dp"
+            android:background="@color/divider_light" />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="32dp"
-            android:text="@string/button_ok" />
+            android:text="@string/button_ok"
+            android:textColor="@android:color/white"
+            android:background="@drawable/btn_rounded_blue" />
 
     </LinearLayout>
 

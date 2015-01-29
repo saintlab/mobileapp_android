@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.activity.MenuSubcategoryActivity;
 import com.omnom.android.menu.model.Category;
 import com.omnom.android.menu.model.Child;
 import com.omnom.android.menu.model.Details;
@@ -33,7 +34,7 @@ import butterknife.Optional;
 /**
  * Created by Ch3D on 27.01.2015.
  */
-public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListView.StickyListAdapter {
+public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListView.StickyListAdapter, View.OnClickListener {
 
 	public static final int VIEW_TYPE_COUNT = 2;
 
@@ -63,7 +64,6 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 	}
 
 	private static class HeaderItem extends Item {
-
 		private Child mCategory;
 
 		HeaderItem(Child subCategory) {
@@ -196,6 +196,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			switch(getItemViewType(position)) {
 				case VIEW_TYPE_ITEM:
 					convertView = mInflater.inflate(R.layout.item_menu_dish, parent, false);
+					convertView.findViewById(R.id.btn_apply).setOnClickListener(this);
 					break;
 
 				case VIEW_TYPE_HEADER:
@@ -217,6 +218,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			bindDetails(item, holder);
 			bindImage(item, holder);
 			holder.btnApply.setText(StringUtils.formatCurrency(item.price(), mContext.getString(R.string.currency_suffix_ruble)));
+			holder.btnApply.setTag(item);
 		}
 	}
 
@@ -233,6 +235,14 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		ViewUtils.setVisible(holder.txtDetails, hasDetails);
 		if(hasDetails) {
 			holder.txtDetails.setText(mContext.getString(R.string.dish_details, details.energyTotal(), details.weight()));
+		}
+	}
+
+	@Override
+	public void onClick(final View v) {
+		if(v.getId() == R.id.btn_apply) {
+			MenuSubcategoryActivity activity = (MenuSubcategoryActivity) mContext;
+			activity.showAddFragment((Item) v.getTag());
 		}
 	}
 }
