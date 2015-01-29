@@ -80,6 +80,12 @@ public class MenuActivity extends BaseOmnomFragmentActivity {
 	}
 
 	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(R.anim.nothing, R.anim.slide_out_right);
+	}
+
+	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_menu;
 	}

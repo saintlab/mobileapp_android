@@ -31,6 +31,12 @@ public class MenuSubcategoryActivity extends BaseOmnomFragmentActivity {
 	}
 
 	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(R.anim.nothing, R.anim.slide_out_right);
+	}
+
+	@Override
 	public void initUi() {
 		mAdapter = new MenuCategoryItemsAdapter(this, mMenu.categories().get(mPosition), mMenu.items().items());
 		mListView.setAdapter(mAdapter);
