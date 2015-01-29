@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.acquiring.AcquiringResponseException;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.UserData;
@@ -50,6 +51,7 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.view.HeaderView;
 
+import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -338,7 +340,6 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 							                                             editAmount.setEnabled(true);
 							                                             AndroidUtils.showKeyboard(editAmount);
 						                                             } else {
-
 							                                             if (response.getError() != null) {
 								                                             reportMixPanelFail(mCard, response.getError());
 								                                             processCardRegisterError(response.getError().getDescr());
@@ -352,10 +353,25 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 					                                             @Override
 					                                             public void onError(Throwable throwable) {
 						                                             Log.w(TAG, "registerCard", throwable);
-						                                             processCardRegisterError(getString(
-								                                             R.string.something_went_wrong_try_again));
+						                                             processCardRegisterError(getCardRegisterErrorMessage(throwable));
 					                                             }
 				                                             });
+	}
+
+	private String getCardRegisterErrorMessage(final Throwable throwable) {
+		String errorMessage = getString(R.string.something_went_wrong_try_again);
+		if (throwable instanceof AcquiringResponseException) {
+			final String code = ((AcquiringResponseException) throwable).getError().getCode();
+			if (code != null) {
+				if (code.equals(AcquiringPollingResponse.ERR_ARGUMENTS)) {
+					errorMessage = getString(R.string.err_arguments);
+				}
+			}
+		} else if (throwable.getCause() instanceof UnknownHostException) {
+			errorMessage = getString(R.string.err_no_internet);
+		}
+
+		return errorMessage;
 	}
 
 	private void processCardRegisterError(final String errorMessage) {
@@ -402,7 +418,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			                                           @Override
 			                                           public void call(AcquiringResponse response) {
 				                                           if(response.getError() != null) {
-					                                           onVerificationError();
+					                                           onVerificationError(getWrongChecksumMessage());
 				                                           } else {
 					                                           mPanelTop.showProgress(false);
 					                                           setResult(RESULT_OK);
@@ -414,17 +430,21 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			                                           @Override
 			                                           public void call(Throwable throwable) {
 				                                           Log.w(TAG, "verifyCard", throwable);
-				                                           onVerificationError();
+				                                           CharSequence errorMessage = getString(R.string.something_went_wrong_try_again);
+				                                           if (throwable.getCause() instanceof UnknownHostException) {
+					                                           errorMessage = getString(R.string.err_no_internet);
+				                                           }
+				                                           onVerificationError(errorMessage);
 				                                           busy(false);
 			                                           }
 		                                           });
 	}
 
-	private void onVerificationError() {
+	private void onVerificationError(final CharSequence errorMessage) {
 		ViewUtils.setVisible(mTextInfo, false);
 		mPanelTop.showProgress(false);
 		mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
-		mEditAmount.setError(getWrongChecksumMessage());
+		mEditAmount.setError(errorMessage);
 	}
 
 	private SpannableString getWrongChecksumMessage() {
