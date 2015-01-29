@@ -1,0 +1,60 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.omnom.android.fragment.menu.AddItemFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_gravity="bottom"
+        android:showDividers="middle"
+        android:divider="@color/menu_item_buy_border"
+        android:dividerPadding="4dp"
+        android:background="@android:color/white">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/txt_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:text="0" />
+
+            <Button
+                android:id="@+id/btn_plus"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_toLeftOf="@+id/txt_count"
+                android:layout_centerVertical="true"
+                android:background="@drawable/btn_rounded_bordered_grey"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:text="+" />
+
+            <Button
+                android:id="@+id/btn_minus"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_toRightOf="@+id/txt_count"
+                android:layout_centerVertical="true"
+                android:background="@drawable/btn_rounded_bordered_grey"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:text="—" />
+
+        </RelativeLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="@string/button_ok" />
+
+    </LinearLayout>
+
+</FrameLayout>

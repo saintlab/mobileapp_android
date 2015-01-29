@@ -9,6 +9,7 @@ import com.omnom.android.menu.model.Menu;
 import com.omnom.android.utils.view.StickyListView;
 
 import butterknife.InjectView;
+import butterknife.OnItemClick;
 
 /**
  * Created by Ch3D on 27.01.2015.
@@ -28,6 +29,11 @@ public class MenuSubcategoryActivity extends BaseOmnomFragmentActivity {
 	protected void handleIntent(final Intent intent) {
 		mMenu = intent.getParcelableExtra(EXTRA_RESTAURANT_MENU);
 		mPosition = intent.getIntExtra(EXTRA_POSITION, -1);
+	}
+
+	@OnItemClick(android.R.id.list)
+	public void onListItemClick(final int position) {
+		// TODO: Open dish details
 	}
 
 	@Override
