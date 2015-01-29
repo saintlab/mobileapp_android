@@ -1,6 +1,7 @@
 package com.omnom.android.utils.utils;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.view.View;
 import android.widget.EditText;
 
@@ -103,6 +104,19 @@ public class ViewUtils {
 		}
 		view.getLayoutParams().height = value;
 		view.requestLayout();
+	}
+
+	/**
+	 * Checks if views are intersect. <br/>
+	 *
+	 * @param v1 first view
+	 * @param v2 second view
+	 * @return true if intersect
+	 */
+	public static boolean intersect(final View v1, final View v2) {
+		Rect rect1 = new Rect(v1.getLeft(), v1.getTop(), v1.getRight(), v1.getBottom());
+		Rect rect2 = new Rect(v2.getLeft(), v2.getTop(), v2.getRight(), v2.getBottom());
+		return Rect.intersects(rect1, rect2);
 	}
 
 }

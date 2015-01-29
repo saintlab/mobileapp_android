@@ -211,15 +211,21 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		mBillSubscription = AndroidObservable.bindActivity(activity, api.bill(request)).subscribe(new Action1<BillResponse>() {
 			@Override
 			public void call(final BillResponse response) {
-				if(!response.hasErrors()) {
+				final String status = response.getStatus();
+				if(BillResponse.STATUS_NEW.equals(status) && !response.hasErrors()) {
 					tryToPay(mCardInfo, response, amount, tip);
 				} else {
+					Log.w(TAG, "processPayment status = " + status);
 					if(response.getError() != null) {
 						Log.w(TAG, response.getError());
 					} else if(response.getErrors() != null) {
 						Log.w(TAG, response.getErrors().toString());
 					}
-					onUnknownError();
+					if (BillResponse.STATUS_PAID.equals(status) || BillResponse.STATUS_ORDER_CLOSED.equals(status)) {
+						onOrderClosed();
+					} else {
+						onUnknownError();
+					}
 				}
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
@@ -323,6 +329,10 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private void onUnknownError() {
 		mErrorHelper.showUnknownError(finishOnClick());
+	}
+
+	private void onOrderClosed() {
+		mErrorHelper.showOrderClosed(finishOnClick());
 	}
 
 	private void reportMixPanelSuccess() {

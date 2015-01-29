@@ -155,6 +155,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
+				AndroidUtils.hideKeyboard(mEditCardExpDate);
 				finish();
 			}
 		});
@@ -284,7 +285,13 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		final String expDate = CardUtils.prepareExpDate(mEditCardExpDate.getText().toString());
 		final String cvv = mEditCardCvv.getText().toString();
 		final String holder = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getCardHolder();
-		return CardInfo.create(pan, expDate, cvv, holder);
+		return new CardInfo.Builder()
+						.pan(pan)
+						.mixpanelPan(pan)
+						.expDate(expDate)
+						.cvv(cvv)
+						.holder(holder)
+						.build();
 	}
 
 	private void doBind() {

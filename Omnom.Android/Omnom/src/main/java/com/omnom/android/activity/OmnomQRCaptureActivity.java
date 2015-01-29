@@ -29,6 +29,7 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.Intents;
 import com.google.zxing.client.android.PreferencesActivity;
+import com.google.zxing.client.android.camera.CameraManager;
 import com.google.zxing.client.android.camera.FrontLightMode;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
@@ -63,7 +64,7 @@ import rx.functions.Func1;
 /**
  * Created by Ch3D on 14.11.2014.
  */
-public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFragment.FragmentCloseListener {
+public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFragment.FragmentCloseListener, CameraManager.TorchListener {
 
 	private static final String TAG = OmnomQRCaptureActivity.class.getSimpleName();
 
@@ -151,6 +152,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, FrontLightMode.AUTO.name());
 		editor.apply();
+		setTorchListener(this);
 	}
 
 	@Override
@@ -304,9 +306,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 	@OnClick(R.id.btn_flash_light)
 	protected void onBtnFlash() {
 		isFlashTurnedOn = !isFlashTurnedOn;
-		btnFlashLight.setImageResource(isFlashTurnedOn ? R.drawable.ic_flashlight_off :
-														 R.drawable.ic_flashlight_on);
-		setTorch(isFlashTurnedOn);
+		setTorch(isFlashTurnedOn, true);
 	}
 
 	private void showHint() {
@@ -439,6 +439,13 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 
 	private void setBusy(boolean isBusy) {
 		this.isBusy = isBusy;
+	}
+
+	@Override
+	public void onTorchStateChange(boolean isTurnedOn) {
+		isFlashTurnedOn = isTurnedOn;
+		btnFlashLight.setImageResource(isFlashTurnedOn ? R.drawable.ic_flashlight_off :
+									   R.drawable.ic_flashlight_on);
 	}
 
 	private class LaunchAnimationListener implements Animator.AnimatorListener {

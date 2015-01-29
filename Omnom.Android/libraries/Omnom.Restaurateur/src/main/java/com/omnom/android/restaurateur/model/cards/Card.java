@@ -1,6 +1,7 @@
 package com.omnom.android.restaurateur.model.cards;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by Ch3D on 27.10.2014.
@@ -29,6 +30,10 @@ public class Card {
 
 	@Expose
 	private String maskedPan;
+
+	@Expose
+	@SerializedName("masked_pan_6_4")
+	private String maskedPanMixpanel;
 
 	@Expose
 	private String confirmedBy;
@@ -102,6 +107,14 @@ public class Card {
 
 	public void setMaskedPan(String maskedPan) {
 		this.maskedPan = maskedPan;
+	}
+
+	public String getMaskedPanMixpanel() {
+		return maskedPanMixpanel;
+	}
+
+	public void setMaskedPanMixpanel(String maskedPanMixpanel) {
+		this.maskedPanMixpanel = maskedPanMixpanel;
 	}
 
 	public String getConfirmedBy() {

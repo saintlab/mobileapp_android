@@ -74,6 +74,8 @@
         Там&#160;должно\nбыть сообщение от&#160;банка. Введите\nсумму из&#160;SMS. <u>Если SMS нет?</u></string>
     <string name="no_sms">Если SMS нет?</string>
     <string name="something_went_wrong_try_again">Что-то пошло не&#160;так.\nПовторите попытку</string>
+    <string name="err_arguments">Пожалуйста, убедитесь в&#160;правильности ввода параметров и&#160;повторите попытку.</string>
+    <string name="err_no_internet">Нет доступа в интернет</string>
     <string name="repeat">Повторить</string>
     <string name="payment_success">Платёж принят</string>
     <string name="sms_sent_to_waiter">Официант получил sms с&#160;суммой чаевых.</string>

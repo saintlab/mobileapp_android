@@ -245,7 +245,10 @@ public class CardsActivity extends BaseOmnomActivity {
 					}
 				} else {
 					String cvv = OmnomApplication.get(activity).getConfig().getAcquiringData().getTestCvv();
-					final CardInfo cardInfo = CardInfo.create(activity, card.getExternalCardId(), cvv);
+					final CardInfo cardInfo = new CardInfo.Builder()
+														.cardId(card.getExternalCardId())
+														.cvv(cvv)
+														.build();
 					CardConfirmActivity.startConfirm(CardsActivity.this, cardInfo, REQUEST_CODE_CARD_CONFIRM,
 					                                 mDetails != null ? mDetails.getAmount() : 0);
 				}
@@ -300,7 +303,12 @@ public class CardsActivity extends BaseOmnomActivity {
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		UserData userData = UserData.create(OmnomApplication.get(getActivity()).getUserProfile().getUser());
 		String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
-		final CardInfo cardInfo = CardInfo.create(getActivity(), card.getExternalCardId(), card.getMaskedPan(), cvv);
+		final CardInfo cardInfo = new CardInfo.Builder()
+											.cardId(card.getExternalCardId())
+											.pan(card.getMaskedPan())
+											.mixpanelPan(card.getMaskedPanMixpanel())
+											.cvv(cvv)
+											.build();
 		mDeleteCardSubscription = AndroidObservable.bindActivity(this, mAcquiring.deleteCard(acquiringData, userData, cardInfo))
 		                                           .flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
 				                                           Observable<CardDeleteResponse>>() {
@@ -477,10 +485,19 @@ public class CardsActivity extends BaseOmnomActivity {
 	@OnClick(R.id.btn_pay)
 	protected void onPay() {
 		final String cardId = getPreferences().getCardId(this);
-		final Card card = ((CardsAdapter) mList.getAdapter()).getSelectedCard();
-		String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
-		final CardInfo cardInfo = CardInfo.create(this, cardId, card.getMaskedPan(), cvv);
-		pay(cardInfo);
+		if (mList != null && mList.getAdapter() != null) {
+			final Card card = ((CardsAdapter) mList.getAdapter()).getSelectedCard();
+			if (card != null) {
+				String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
+				final CardInfo cardInfo = new CardInfo.Builder()
+												.cardId(cardId)
+												.pan(card.getMaskedPan())
+												.mixpanelPan(card.getMaskedPanMixpanel())
+												.cvv(cvv)
+												.build();
+				pay(cardInfo);
+			}
+		}
 	}
 
 	private void pay(final CardInfo cardInfo) {

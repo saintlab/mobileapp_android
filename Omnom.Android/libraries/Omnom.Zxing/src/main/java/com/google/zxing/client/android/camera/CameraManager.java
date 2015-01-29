@@ -55,11 +55,17 @@ public final class CameraManager {
 	private int requestedCameraId = -1;
 	private int requestedFramingRectWidth;
 	private int requestedFramingRectHeight;
+	private boolean isManualTorchChange;
+	private TorchListener mTorchListener;
 	/**
 	 * Preview frames are delivered here, which we pass on to the registered handler. Make sure to
 	 * clear the handler so it will only receive one message.
 	 */
 	private final PreviewCallback previewCallback;
+
+	public interface TorchListener {
+		void onTorchStateChange(boolean isTurnedOn);
+	}
 
 	public CameraManager(Context context) {
 		this.context = context;
@@ -169,23 +175,45 @@ public final class CameraManager {
 		}
 	}
 
+	public void setTorchListener(final TorchListener torchListener) {
+		mTorchListener = torchListener;
+	}
+
+	/**
+	 * Convenience method for {@link com.google.zxing.client.android.CaptureActivity}
+	 *
+	 * @param newSetting if {@code true}, light should be turned on if currently off. And vice versa.
+	 * @param isManualTorchChange true if torch state is changed manually
+	 */
+	public synchronized void setTorch(boolean newSetting, boolean isManualTorchChange) {
+		if (isManualTorchChange) {
+			this.isManualTorchChange = true;
+		}
+		if (newSetting != configManager.getTorchState(camera)) {
+			if (camera != null) {
+				if (autoFocusManager != null) {
+					autoFocusManager.stop();
+				}
+				if (!this.isManualTorchChange || isManualTorchChange) {
+					if (mTorchListener != null) {
+						mTorchListener.onTorchStateChange(newSetting);
+					}
+					configManager.setTorch(camera, newSetting);
+				}
+				if (autoFocusManager != null) {
+					autoFocusManager.start();
+				}
+			}
+		}
+	}
+
 	/**
 	 * Convenience method for {@link com.google.zxing.client.android.CaptureActivity}
 	 *
 	 * @param newSetting if {@code true}, light should be turned on if currently off. And vice versa.
 	 */
 	public synchronized void setTorch(boolean newSetting) {
-		if (newSetting != configManager.getTorchState(camera)) {
-			if (camera != null) {
-				if (autoFocusManager != null) {
-					autoFocusManager.stop();
-				}
-				configManager.setTorch(camera, newSetting);
-				if (autoFocusManager != null) {
-					autoFocusManager.start();
-				}
-			}
-		}
+		setTorch(newSetting, false);
 	}
 
 	/**
