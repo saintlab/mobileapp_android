@@ -18,7 +18,7 @@
     <dimen name="standard_padding">8dip</dimen>
     <dimen name="half_padding">4dip</dimen>
 
-    <dimen name="carde_size">75dp</dimen>
+    <dimen name="carde_size">48dp</dimen>
     <dimen name="carde_size_visible">8dp</dimen>
 
 </resources>

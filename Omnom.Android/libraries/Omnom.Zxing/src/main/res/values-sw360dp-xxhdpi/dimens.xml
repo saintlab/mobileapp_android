@@ -16,7 +16,7 @@
  -->
 <resources>
 
-    <dimen name="carde_size">100dp</dimen>
+    <dimen name="carde_size">48dp</dimen>
     <dimen name="carde_size_visible">8dp</dimen>
 
 </resources>
