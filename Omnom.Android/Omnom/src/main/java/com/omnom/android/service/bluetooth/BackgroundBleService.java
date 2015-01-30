@@ -394,7 +394,9 @@ public class BackgroundBleService extends Service {
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	private void stopScan(final Runnable endCallback) {
-		mBluetoothAdapter.stopLeScan(mLeScanCallback);
+		if (BluetoothUtils.isAdapterStateOn(mBluetoothAdapter)) {
+			mBluetoothAdapter.stopLeScan(mLeScanCallback);
+		}
 		runCallback(endCallback);
 	}
 

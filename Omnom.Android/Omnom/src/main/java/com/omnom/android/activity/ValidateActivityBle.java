@@ -19,6 +19,7 @@ import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.BluetoothUtils;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -221,7 +222,9 @@ public class ValidateActivityBle extends ValidateActivity {
 			}, getResources().getInteger(R.integer.ble_scan_duration));
 			mBluetoothAdapter.startLeScan(mLeScanCallback);
 		} else {
-			mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			if (BluetoothUtils.isAdapterStateOn(mBluetoothAdapter)) {
+				mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			}
 			if(endCallback != null) {
 				endCallback.run();
 			}
