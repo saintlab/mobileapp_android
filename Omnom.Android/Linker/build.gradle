@@ -43,6 +43,9 @@ android {
         stand {
         }
 
+	    staging {
+		}
+
         laaaab {
         }
     }
@@ -72,6 +75,11 @@ android {
             applicationIdSuffix '.debug'
             resValue "string", "app_name", "Linker Debug"
         }
+	    stageRelease.initWith(buildTypes.release)
+	    stageRelease {
+			applicationIdSuffix '.staging'
+			resValue "string", "app_name", "Linker Staging"
+		}
     }
 }
 
