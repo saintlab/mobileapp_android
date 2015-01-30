@@ -30,6 +30,7 @@ import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
+import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.protocol.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
@@ -980,6 +981,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	}
 
 	protected void handleRestaurant(final String method, final String requestId, final Restaurant restaurant) {
+		// User in already in a restaurant there is no need to send them notification
+		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
+		preferences.saveNotificationDetails(this, restaurant.id());
 		final TableDataResponse table = RestaurantHelper.getTable(restaurant);
 		if(table != null) {
 			loader.stopProgressAnimation();

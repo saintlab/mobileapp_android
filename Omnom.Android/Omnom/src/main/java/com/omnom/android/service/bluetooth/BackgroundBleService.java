@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -63,7 +62,9 @@ public class BackgroundBleService extends Service {
 
 	private static final long ALARM_INTERVAL = MINUTE;
 
-	private static final long BEACON_CACHE_INTERVAL = 4 * 60 * MINUTE;
+	private static final long BEACON_CACHE_INTERVAL = 60 * MINUTE;
+
+	private static final long NOTIFICATION_INTERVAL = 4 * 60 * MINUTE;
 
 	private static final String TAG = BackgroundBleService.class.getSimpleName();
 
@@ -294,6 +295,11 @@ public class BackgroundBleService extends Service {
 		preferences.saveBeacon(this, beacon);
 	}
 
+	private void cacheNotificationDetails(final String restaurantId) {
+		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
+		preferences.saveNotificationDetails(this, restaurantId);
+	}
+
 	/**
 	 * @return <code>true</code> if beacon is already handled.
 	 * This means that notification for this beacon already shown.
@@ -303,25 +309,39 @@ public class BackgroundBleService extends Service {
 		final boolean contains = preferences.hasBeacon(this, beacon);
 		if(contains) {
 			final long timestamp = preferences.getBeaconTimestamp(this, beacon);
-			return timestamp < SystemClock.elapsedRealtime() + BEACON_CACHE_INTERVAL;
+			return timestamp + BEACON_CACHE_INTERVAL < SystemClock.elapsedRealtime();
+		}
+		return false;
+	}
+
+	private boolean isNotified(final String restaurantId) {
+		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
+		final boolean contains = preferences.hasNotificationData(this, restaurantId);
+		if(contains) {
+			final long timestamp = preferences.getNotificationTimestamp(this, restaurantId);
+			return timestamp + NOTIFICATION_INTERVAL < SystemClock.elapsedRealtime();
 		}
 		return false;
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-	private void showNotification(final Beacon beacon, @Nullable final Restaurant restaurant) {
+	private void showNotification(final Beacon beacon, final Restaurant restaurant) {
 		cacheBeacon(beacon);
-		final String content =
-				restaurant != null ? getString(R.string.welcome_to_, restaurant.title()) : getString(R.string.omnom_works_here);
+		String restaurantId = restaurant == null ? "undefined" : restaurant.id();
+		if (!isNotified(restaurantId)) {
+			cacheNotificationDetails(restaurantId);
+			final String content =
+					restaurant != null ? getString(R.string.welcome_to_, restaurant.title()) : getString(R.string.omnom_works_here);
 
-		final Notification notification =
-				new Notification.Builder(this).setSmallIcon(R.drawable.ic_push).setContentTitle(getString(R.string.app_name))
-				                              .setContentText(content).setContentIntent(getNotificationIntent()).setAutoCancel(true)
-				                              .setDefaults(Notification.DEFAULT_ALL).setOnlyAlertOnce(true).setPriority(
-						Notification.PRIORITY_HIGH).build();
+			final Notification notification =
+					new Notification.Builder(this).setSmallIcon(R.drawable.ic_push).setContentTitle(getString(R.string.app_name))
+							.setContentText(content).setContentIntent(getNotificationIntent()).setAutoCancel(true)
+							.setDefaults(Notification.DEFAULT_ALL).setOnlyAlertOnce(true).setPriority(
+							Notification.PRIORITY_HIGH).build();
 
-		final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		notificationManager.notify(beacon.getIdValue(0), 0, notification);
+			final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			notificationManager.notify(beacon.getIdValue(0), 0, notification);
+		}
 	}
 
 	private PendingIntent getNotificationIntent() {
