@@ -32,26 +32,29 @@
         android:paddingBottom="@dimen/activity_vertical_margin_small"
         android:orientation="horizontal">
 
-        <EditText
+        <com.omnom.android.view.OmnomEditText
             android:id="@+id/digit_1"
             android:nextFocusForward="@+id/digit_2"
             app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             style="@style/ConfirmCode"/>
 
-        <EditText
+        <com.omnom.android.view.OmnomEditText
             android:id="@+id/digit_2"
+            android:nextFocusLeft="@+id/digit_1"
             android:nextFocusForward="@+id/digit_3"
             app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             style="@style/ConfirmCode"/>
 
-        <EditText
+        <com.omnom.android.view.OmnomEditText
             android:id="@+id/digit_3"
+            android:nextFocusLeft="@+id/digit_2"
             android:nextFocusForward="@+id/digit_4"
             app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             style="@style/ConfirmCode"/>
 
-        <EditText
+        <com.omnom.android.view.OmnomEditText
             android:id="@+id/digit_4"
+            android:nextFocusLeft="@+id/digit_3"
             app:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             style="@style/ConfirmCode"/>
     </LinearLayout>
