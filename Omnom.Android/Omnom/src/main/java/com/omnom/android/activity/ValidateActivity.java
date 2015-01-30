@@ -982,7 +982,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	protected void handleRestaurant(final String method, final String requestId, final Restaurant restaurant) {
 		// User in already in a restaurant there is no need to send them notification
-		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(this).getPreferences();
+		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(getActivity()).getPreferences();
 		preferences.saveNotificationDetails(this, restaurant.id());
 		final TableDataResponse table = RestaurantHelper.getTable(restaurant);
 		if(table != null) {
