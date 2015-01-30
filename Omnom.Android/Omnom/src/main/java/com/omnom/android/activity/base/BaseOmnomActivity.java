@@ -90,6 +90,11 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 					final Long timeDiff = TimeUnit.SECONDS.toMillis(serverTime) - currentTime;
 					mixPanelHelper.setTimeDiff(timeDiff);
 				}
+			}, new Action1<Throwable>() {
+				@Override
+				public void call(Throwable throwable) {
+					Log.e(TAG, "Unable to load user data");
+				}
 			});
 		}
 	}
