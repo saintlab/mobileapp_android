@@ -30,8 +30,8 @@ android {
         applicationId "com.saintlab.android.linker"
         minSdkVersion 18
         targetSdkVersion 21
-        versionCode 36
-        versionName "0.1.36"
+        versionCode 37
+        versionName "0.1.37"
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
     }
 
