@@ -1124,7 +1124,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private TipData getSelectedTips(final BigDecimal amount) {
-		final CompoundButton btn = findById(getActivity(), radioGroup.getCheckedRadioButtonId());
+		final CompoundButton btn = findById(mFragmentView, radioGroup.getCheckedRadioButtonId());
 		return getSelectedTips(amount, btn);
 	}
 
