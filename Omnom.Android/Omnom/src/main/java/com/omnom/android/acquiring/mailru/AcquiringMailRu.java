@@ -21,14 +21,21 @@ import java.util.HashMap;
 
 import rx.Observable;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 /**
  * Created by Ch3D on 23.09.2014.
  */
 public class AcquiringMailRu implements Acquiring {
+
+	public static final int DEFAULT_RETRY_ATTEMPS = 5;
+
 	private static final String TAG = AcquiringMailRu.class.getSimpleName();
+
 	private final Gson gson;
+
 	protected AcquiringServiceMailRu mApiProxy;
+
 	private Context mContext;
 
 	public AcquiringMailRu(final Context context, AcquiringProxyMailRu acquiringProxyMailRu) {
@@ -63,11 +70,17 @@ public class AcquiringMailRu implements Acquiring {
 
 	@Override
 	public Observable<AcquiringPollingResponse> checkResult(final AcquiringResponse acquiringResponse) {
-		return PollingObservable.create(acquiringResponse);
+		return PollingObservable.create(acquiringResponse).retry(new Func2<Integer, Throwable, Boolean>() {
+			@Override
+			public Boolean call(final Integer integer, final Throwable throwable) {
+				return integer - 1 < DEFAULT_RETRY_ATTEMPS;
+			}
+		});
 	}
 
 	@Override
-	public Observable<com.omnom.android.acquiring.mailru.response.CardDeleteResponse> deleteCard(AcquiringData acquiringData, UserData user, CardInfo cardInfo) {
+	public Observable<com.omnom.android.acquiring.mailru.response.CardDeleteResponse> deleteCard(AcquiringData acquiringData,
+	                                                                                             UserData user, CardInfo cardInfo) {
 		final HashMap<String, String> signatureParams = new HashMap<String, String>();
 		acquiringData.getMerchantData().toMap(signatureParams);
 		user.storeLogin(signatureParams);
