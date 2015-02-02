@@ -26,7 +26,7 @@ public class LoaderError {
 			new LoaderError(EVENT_ORDER_CLOSED_ERROR, R.drawable.ic_flying_credit_card, R.string.order_closed,
 					R.string.error_ok, 0);
 
-	public static final String EVENT_BACKEND_ERROR = "backend_error";
+	public static final String EVENT_BACKEND_ERROR = "no_restaurant_connection";
 
 	public static final LoaderError BACKEND_ERROR =
 			new LoaderError(EVENT_BACKEND_ERROR, R.drawable.ic_line_noise, R.string.something_went_wrong, R.string.lets_try_again,

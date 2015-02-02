@@ -20,7 +20,9 @@ import java.util.List;
  */
 public class OmnomErrorHelper extends ErrorHelper {
 
-	public static final List<String> RELEASE_ERRORS = Arrays.asList(LoaderError.EVENT_GEOLOCATION_DISABLED,
+	public static final List<String> RELEASE_ERRORS = Arrays.asList(LoaderError.EVENT_NO_SERVER_CONNECTION,
+																	LoaderError.EVENT_BACKEND_ERROR,
+																	LoaderError.EVENT_GEOLOCATION_DISABLED,
 																	LoaderError.EVENT_LOW_SIGNAL,
 																	LoaderError.BLUETOOTH_DISABLED,
 																	LoaderError.EVENT_NO_TABLE);
