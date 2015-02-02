@@ -5,8 +5,10 @@ import android.support.annotation.Nullable;
 
 import com.omnom.android.utils.generation.AutoGson;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import auto.parcel.AutoParcel;
 
@@ -30,5 +32,18 @@ public abstract class UserOrder implements Parcelable {
 		}
 		final UserOrderData data = itemsTable().get(item.id());
 		return data != null && data.amount() > 0;
+	}
+
+	public BigDecimal getTotalAmount() {
+		BigDecimal result = BigDecimal.ZERO;
+		final Set<Map.Entry<String, UserOrderData>> entries = itemsTable().entrySet();
+		for(Map.Entry<String, UserOrderData> entry : entries) {
+			final UserOrderData value = entry.getValue();
+			if(value != null) {
+				final int amount = value.amount();
+				result = result.add(BigDecimal.valueOf(amount));
+			}
+		}
+		return result;
 	}
 }

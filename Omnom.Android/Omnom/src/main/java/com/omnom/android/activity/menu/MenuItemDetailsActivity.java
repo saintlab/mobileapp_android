@@ -16,11 +16,11 @@ import butterknife.OnClick;
 
 public class MenuItemDetailsActivity extends MenuFragmentActivity {
 
-	public static void start(OmnomActivity activity, UserOrder order, Item item) {
+	public static void start(OmnomActivity activity, UserOrder order, Item item, final int code) {
 		final Intent intent = new Intent(activity.getActivity(), MenuItemDetailsActivity.class);
 		intent.putExtra(EXTRA_ORDER, order);
 		intent.putExtra(EXTRA_MENU_ITEM, item);
-		activity.start(intent, R.anim.slide_in_right, R.anim.nothing, false);
+		activity.startForResult(intent, R.anim.slide_in_right, R.anim.nothing, code);
 	}
 
 	@InjectView(R.id.txt_info_additional)
@@ -32,6 +32,9 @@ public class MenuItemDetailsActivity extends MenuFragmentActivity {
 
 	@Override
 	public void finish() {
+		final Intent data = new Intent();
+		data.putExtra(EXTRA_ORDER_DATA, mOrder.itemsTable().get(mItem.id()));
+		setResult(RESULT_OK, data);
 		super.finish();
 		overridePendingTransition(R.anim.nothing, R.anim.slide_out_right);
 	}

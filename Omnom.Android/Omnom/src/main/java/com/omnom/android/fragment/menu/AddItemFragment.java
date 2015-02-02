@@ -14,10 +14,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.menu.MenuFragmentActivity;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
+import com.squareup.otto.Bus;
+
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -50,6 +52,11 @@ public class AddItemFragment extends Fragment {
 		               .replace(R.id.root, AddItemFragment.newInstance(order, item))
 		               .commit();
 	}
+
+
+
+	@Inject
+	protected Bus mBus;
 
 	@InjectView(R.id.content)
 	protected View contentView;
@@ -162,10 +169,7 @@ public class AddItemFragment extends Fragment {
 	@OnClick(R.id.btn_apply)
 	public void onApply(View v) {
 		if(mOrder != null && mItem != null) {
-			MenuFragmentActivity activity = (MenuFragmentActivity) getActivity();
-			if(activity != null) {
-				activity.updateItem(mItem, mCount);
-			}
+			mBus.post(new OrderUpdateEvent(mItem, mCount));
 		}
 		getFragmentManager().popBackStack();
 	}

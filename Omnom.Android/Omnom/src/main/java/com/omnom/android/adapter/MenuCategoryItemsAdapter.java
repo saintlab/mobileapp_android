@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.menu.MenuSubcategoryActivity;
+import com.omnom.android.fragment.menu.MenuSubcategoryFragment;
 import com.omnom.android.menu.model.Category;
 import com.omnom.android.menu.model.Child;
 import com.omnom.android.menu.model.Details;
@@ -169,7 +170,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		}
 	}
 
-	private final Context mContext;
+	private final MenuSubcategoryFragment mContext;
 
 	private final Category mCategory;
 
@@ -181,12 +182,12 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 	private ArrayList<Item> mInnerItems;
 
-	public MenuCategoryItemsAdapter(Context context, final UserOrder order, Category category, Map<String, Item> items) {
-		mContext = context;
+	public MenuCategoryItemsAdapter(MenuSubcategoryFragment fragment, final UserOrder order, Category category, Map<String, Item> items) {
+		mContext = fragment;
 		mOrder = order;
 		mCategory = category;
 		mItems = items;
-		mInflater = LayoutInflater.from(mContext);
+		mInflater = LayoutInflater.from(fragment.getActivity());
 		initData();
 	}
 
@@ -280,8 +281,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 	@Override
 	public void onClick(final View v) {
 		if(v.getId() == R.id.btn_apply) {
-			MenuSubcategoryActivity activity = (MenuSubcategoryActivity) mContext;
-			activity.showAddFragment((Item) v.getTag());
+			mContext.showAddFragment((Item) v.getTag());
 		}
 	}
 }

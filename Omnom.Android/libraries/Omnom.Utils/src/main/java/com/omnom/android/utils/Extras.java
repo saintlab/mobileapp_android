@@ -35,6 +35,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_CARD_DATA = "com.omnom.android.card.data";
 	public static final String EXTRA_TYPE = "com.omnom.android.type";
 	public static final String EXTRA_ORDER = "com.omnom.android.order";
+	public static final String EXTRA_ORDER_DATA = "com.omnom.android.order.data";
 	public static final String EXTRA_PAYMENT_DETAILS = "com.omnom.android.payment.details";
 	public static final String EXTRA_PAYMENT_EVENT = "com.omnom.android.payment.event";
 	public static final String EXTRA_TRANSACTION_URL = "com.omnom.android.payment.transaction_url";
@@ -61,4 +62,6 @@ public interface Extras extends Preferences {
 
 	public static final int REQUEST_CODE_CHANGE_TABLE = 2000;
 	public static final int RESULT_CODE_TABLE_CHANGED = 2001;
+	public static final int REQUEST_CODE_MENU_ITEM = 5001;
+	public static final int REQUEST_CODE_MENU_SUBCATEGORY = 5002;
 }

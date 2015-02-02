@@ -21,6 +21,7 @@ import java.util.HashMap;
 
 import rx.Observable;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 /**
  * Created by Ch3D on 23.09.2014.
@@ -63,7 +64,12 @@ public class AcquiringMailRu implements Acquiring {
 
 	@Override
 	public Observable<AcquiringPollingResponse> checkResult(final AcquiringResponse acquiringResponse) {
-		return PollingObservable.create(acquiringResponse);
+		return PollingObservable.create(acquiringResponse).retry(new Func2<Integer, Throwable, Boolean>() {
+			@Override
+			public Boolean call(final Integer integer, final Throwable throwable) {
+				return null;
+			}
+		});
 	}
 
 	@Override

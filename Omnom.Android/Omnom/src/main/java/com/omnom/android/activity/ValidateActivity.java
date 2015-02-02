@@ -22,13 +22,14 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
-import com.omnom.android.activity.menu.MenuActivity;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.fragment.NoOrdersFragment;
+import com.omnom.android.fragment.menu.MenuFragment;
 import com.omnom.android.menu.api.observable.MenuObservableApi;
 import com.omnom.android.menu.model.MenuResponse;
+import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.protocol.Protocol;
@@ -279,6 +280,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	private PaymentEventListener mPaymentListener;
 
+	private UserOrder mOrder;
+
 	@Override
 	protected void handleIntent(Intent intent) {
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
@@ -497,24 +500,21 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	@OnClick(R.id.txt_menu)
 	public void onMenu(View v) {
-
-		if(true) {
-			menuApi.getMenu("riba-ris-nsk-at-aura").subscribe(new Action1<MenuResponse>() {
-				@Override
-				public void call(final MenuResponse menuResponse) {
-					final Intent intent = new Intent(ValidateActivity.this, MenuActivity.class);
-					intent.putExtra(EXTRA_RESTAURANT_MENU, menuResponse.getMenu());
-					intent.putExtra(EXTRA_RESTAURANT, mRestaurant);
-					start(intent, R.anim.slide_in_right, R.anim.nothing, false);
-				}
-			}, new Action1<Throwable>() {
-				@Override
-				public void call(final Throwable throwable) {
-					Log.e(TAG, "getMenu()", throwable);
-				}
-			});
-			return;
+		if(mOrder == null) {
+			mOrder = UserOrder.create();
 		}
+		menuApi.getMenu("riba-ris-nsk-at-aura").subscribe(new Action1<MenuResponse>() {
+			@Override
+			public void call(final MenuResponse menuResponse) {
+				// MenuActivity.start(ValidateActivity.this, menuResponse, mRestaurant);
+				MenuFragment.show(getSupportFragmentManager(), mRestaurant, menuResponse.getMenu(), mOrder);
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(final Throwable throwable) {
+				Log.e(TAG, "getMenu()", throwable);
+			}
+		});
 	}
 
 	public void onBill(final View v) {

@@ -14,9 +14,11 @@ import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.MenuCategoriesAdapter;
 import com.omnom.android.menu.model.Menu;
+import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.utils.activity.OmnomActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -24,6 +26,13 @@ import butterknife.InjectView;
 import butterknife.OnItemClick;
 
 public class MenuActivity extends BaseOmnomFragmentActivity {
+
+	public static void start(final OmnomActivity activity, final MenuResponse menuResponse, final Restaurant restaurant) {
+		final Intent intent = new Intent(activity.getActivity(), MenuActivity.class);
+		intent.putExtra(EXTRA_RESTAURANT_MENU, menuResponse.getMenu());
+		intent.putExtra(EXTRA_RESTAURANT, restaurant);
+		activity.start(intent, R.anim.slide_in_right, R.anim.nothing, false);
+	}
 
 	@InjectView(android.R.id.list)
 	protected ListView mListView;
@@ -43,7 +52,18 @@ public class MenuActivity extends BaseOmnomFragmentActivity {
 
 	@OnItemClick(android.R.id.list)
 	public void onListItemClick(final int position) {
-		MenuSubcategoryActivity.start(this, mOrder, mMenu, position);
+		MenuSubcategoryActivity.start(this, mOrder, mMenu, position, REQUEST_CODE_MENU_SUBCATEGORY);
+	}
+
+	@Override
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == REQUEST_CODE_MENU_SUBCATEGORY && resultCode == RESULT_OK) {
+			final UserOrder parcelableExtra = data.getParcelableExtra(EXTRA_ORDER);
+			if(parcelableExtra != null) {
+				mOrder = parcelableExtra;
+			}
+		}
 	}
 
 	@Override
@@ -104,4 +124,5 @@ public class MenuActivity extends BaseOmnomFragmentActivity {
 	public int getLayoutResource() {
 		return R.layout.activity_menu;
 	}
+
 }
