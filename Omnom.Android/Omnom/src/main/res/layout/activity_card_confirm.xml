@@ -31,7 +31,6 @@
                     android:id="@+id/edit_amount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/panel_top"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="@dimen/activity_vertical_margin_small"
                     android:gravity="center_horizontal"
