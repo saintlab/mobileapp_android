@@ -12,12 +12,19 @@ import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.loader.LoaderView;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by Ch3D on 22.12.2014.
  */
 public class OmnomErrorHelper extends ErrorHelper {
+
+	public static final List<String> RELEASE_ERRORS = Arrays.asList(LoaderError.EVENT_GEOLOCATION_DISABLED,
+																	LoaderError.EVENT_LOW_SIGNAL,
+																	LoaderError.BLUETOOTH_DISABLED,
+																	LoaderError.EVENT_NO_TABLE);
+
 	public OmnomErrorHelper(final LoaderView loader, final TextView txtError, final Button btnBottom, final List<View> errorViews) {
 		super(loader, txtError, btnBottom, errorViews);
 	}
@@ -44,7 +51,10 @@ public class OmnomErrorHelper extends ErrorHelper {
 	private void reportMixPanel(final String requestId, final LoaderError error) {
 		final MixpanelEvent event = new SimpleMixpanelEvent(UserHelper.getUserData(mLoader.getContext()),
 															error.getEventName(), requestId);
-		OmnomApplication.getMixPanelHelper(mLoader.getContext()).track(MixPanelHelper.Project.OMNOM_ANDROID, event);
+		final MixPanelHelper.Project project = RELEASE_ERRORS.contains(error.getEventName()) ?
+																MixPanelHelper.Project.OMNOM :
+																MixPanelHelper.Project.OMNOM_ANDROID;
+		OmnomApplication.getMixPanelHelper(mLoader.getContext()).track(project, event);
 	}
 
 	public void showUnknownPlace() {

@@ -44,7 +44,7 @@ public class LoaderError {
 			new LoaderError(BLUETOOTH_DISABLED, R.drawable.ic_bluetooth_white, R.string.error_bluetooth_disabled,
 			                R.string.turn_on_bluetooth, 0);
 
-	public static final String EVENT_GEOLOCATION_DISABLED = "geolocation_disabled";
+	public static final String EVENT_GEOLOCATION_DISABLED = "no_geolocation_permission";
 
 	public static final LoaderError LOCATION_DISABLED =
 			new LoaderError(EVENT_GEOLOCATION_DISABLED, R.drawable.ic_geolocation_white, R.string.error_location_disabled,

@@ -1102,7 +1102,7 @@ public class OrderFragment extends Fragment {
 			updatePaymentTipsAmount(amount);
 		}
 		if(mMode == MODE_TIPS) {
-			mTipsWay = TipsWay.MANUAL_PERCENTAGE;
+			mTipsWay = TipsWay.MANUAL_PERCENTAGES;
 			showCustomTips(false);
 			otherTips.setChecked(true);
 			mCheckedId = otherTips.getId();

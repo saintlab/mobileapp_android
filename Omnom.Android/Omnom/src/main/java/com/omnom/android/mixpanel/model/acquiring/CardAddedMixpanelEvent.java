@@ -14,20 +14,20 @@ public class CardAddedMixpanelEvent extends AbstractAcquiringMixpanelEvent {
 	public static final String FAIL_EVENT_TITLE = "card_added_fail";
 
 	@Expose
-	private final boolean scanUsed;
+	private final boolean scannerUsed;
 
 	@Expose
 	private final boolean cardSaved;
 
 	public CardAddedMixpanelEvent(final UserData userData, final CardInfo cardInfo,
-	                              final boolean scanUsed) {
-		this(userData, cardInfo, scanUsed, null);
+	                              final boolean scannerUsed) {
+		this(userData, cardInfo, scannerUsed, null);
 	}
 
 	public CardAddedMixpanelEvent(final UserData userData, final CardInfo cardInfo,
-	                              final boolean scanUsed, final AcquiringResponseError error) {
+	                              final boolean scannerUsed, final AcquiringResponseError error) {
 		super(userData, cardInfo, error);
-		this.scanUsed = scanUsed;
+		this.scannerUsed = scannerUsed;
 		this.cardSaved = error == null;
 	}
 
