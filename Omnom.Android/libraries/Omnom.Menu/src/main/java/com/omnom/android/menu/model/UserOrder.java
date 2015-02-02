@@ -23,4 +23,12 @@ public abstract class UserOrder implements Parcelable {
 
 	@Nullable
 	public abstract Map<String, UserOrderData> itemsTable();
+
+	public boolean contains(final Item item) {
+		if(itemsTable() == null) {
+			return false;
+		}
+		final UserOrderData data = itemsTable().get(item.id());
+		return data != null && data.amount() > 0;
+	}
 }

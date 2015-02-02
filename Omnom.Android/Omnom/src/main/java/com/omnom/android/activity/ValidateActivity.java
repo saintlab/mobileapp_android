@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.menu.MenuActivity;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;

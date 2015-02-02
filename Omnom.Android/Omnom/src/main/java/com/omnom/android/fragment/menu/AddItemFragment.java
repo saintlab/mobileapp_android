@@ -4,14 +4,17 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.menu.MenuFragmentActivity;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
@@ -21,6 +24,8 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class AddItemFragment extends Fragment {
+
+	public static final int CONTENT_TRANSITION_Y = 400;
 
 	private static final String ARG_ORDER = "order";
 
@@ -35,6 +40,17 @@ public class AddItemFragment extends Fragment {
 		return fragment;
 	}
 
+	public static void show(final FragmentManager fragmentManager, @IdRes final int container, final UserOrder order, final Item item) {
+		fragmentManager.beginTransaction()
+		               .addToBackStack(null)
+		               .setCustomAnimations(R.anim.fade_in,
+		                                    R.anim.nothing_long,
+		                                    R.anim.fade_in,
+		                                    R.anim.nothing_long)
+		               .replace(R.id.root, AddItemFragment.newInstance(order, item))
+		               .commit();
+	}
+
 	@InjectView(R.id.content)
 	protected View contentView;
 
@@ -44,6 +60,8 @@ public class AddItemFragment extends Fragment {
 	@InjectView(R.id.txt_count)
 	protected TextView txtCount;
 
+	private int mCount;
+
 	private int mItemsMax;
 
 	private int mItemsMin;
@@ -51,8 +69,6 @@ public class AddItemFragment extends Fragment {
 	private Item mItem;
 
 	private UserOrder mOrder;
-
-	private int mCount = 1;
 
 	private boolean mFirstStart = true;
 
@@ -66,6 +82,10 @@ public class AddItemFragment extends Fragment {
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mItem = getArguments().getParcelable(ARG_ITEM);
+			if(mItem != null && mOrder != null && mOrder.itemsTable() != null) {
+				final UserOrderData userOrderData = mOrder.itemsTable().get(mItem.id());
+				mCount = userOrderData != null ? userOrderData.amount() : getResources().getInteger(R.integer.menu_order_items_default);
+			}
 		}
 	}
 
@@ -86,7 +106,7 @@ public class AddItemFragment extends Fragment {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		contentView.animate().translationY(400).setListener(new AnimatorListenerAdapter() {
+		contentView.animate().translationY(CONTENT_TRANSITION_Y).setListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
 				rootView.animate().alpha(0).start();
@@ -98,7 +118,7 @@ public class AddItemFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_menu_add_item, container, false);
 		ButterKnife.inject(this, view);
-		contentView.setTranslationY(400);
+		contentView.setTranslationY(CONTENT_TRANSITION_Y);
 		return view;
 	}
 
@@ -107,6 +127,7 @@ public class AddItemFragment extends Fragment {
 		super.onAttach(activity);
 		mItemsMax = getResources().getInteger(R.integer.menu_order_items_max);
 		mItemsMin = getResources().getInteger(R.integer.menu_order_items_min);
+		mCount = getResources().getInteger(R.integer.menu_order_items_default);
 	}
 
 	@Override
@@ -141,7 +162,10 @@ public class AddItemFragment extends Fragment {
 	@OnClick(R.id.btn_apply)
 	public void onApply(View v) {
 		if(mOrder != null && mItem != null) {
-			mOrder.itemsTable().put(mItem.id(), UserOrderData.create(mCount, mItem));
+			MenuFragmentActivity activity = (MenuFragmentActivity) getActivity();
+			if(activity != null) {
+				activity.updateItem(mItem, mCount);
+			}
 		}
 		getFragmentManager().popBackStack();
 	}

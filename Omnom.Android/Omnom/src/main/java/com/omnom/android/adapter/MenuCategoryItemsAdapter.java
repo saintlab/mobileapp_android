@@ -14,11 +14,13 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.activity.MenuSubcategoryActivity;
+import com.omnom.android.activity.menu.MenuSubcategoryActivity;
 import com.omnom.android.menu.model.Category;
 import com.omnom.android.menu.model.Child;
 import com.omnom.android.menu.model.Details;
 import com.omnom.android.menu.model.Item;
+import com.omnom.android.menu.model.MenuItemState;
+import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.StickyListView;
@@ -42,9 +44,13 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 	public static final int VIEW_TYPE_HEADER = 1;
 
-	static class ViewHolder {
+	public static class ViewHolder {
 		@InjectView(R.id.txt_title)
 		protected TextView txtTitle;
+
+		@InjectView(R.id.delimiter)
+		@Optional
+		protected View viewDelimiter;
 
 		@InjectView(R.id.btn_apply)
 		@Optional
@@ -58,9 +64,54 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		@Optional
 		protected ImageView imgIcon;
 
-		private ViewHolder(View convertView) {
+		private MenuItemState mState = MenuItemState.NONE;
+
+		public ViewHolder(View convertView) {
 			ButterKnife.inject(this, convertView);
 		}
+
+		private Context getContext() {return btnApply.getContext();}
+
+		public void bind(final Item item) {
+			if(item == null) {
+				return;
+			}
+			bindDetails(item);
+			bindImage(item);
+			txtTitle.setText(item.name());
+			btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
+			btnApply.setTag(item);
+			if(mState == MenuItemState.ADDED || mState == MenuItemState.ORDERED) {
+				btnApply.setBackgroundResource(R.drawable.btn_rounded_blue);
+			} else {
+				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
+			}
+		}
+
+		public void setDelimiterVisible(final boolean visible) {
+			ViewUtils.setVisible(viewDelimiter, visible);
+		}
+
+		public void updateState(final UserOrder order, final Item item) {
+			mState = order.contains(item) ? MenuItemState.ADDED : MenuItemState.NONE;
+		}
+
+		private void bindImage(final Item item) {
+			final String photo = item.photo();
+			if(!TextUtils.isEmpty(photo)) {
+				OmnomApplication.getPicasso(getContext()).load(photo).into(imgIcon);
+			}
+		}
+
+		private void bindDetails(final Item item) {
+			final Details details = item.details();
+			final boolean hasDetails = details != null;
+			ViewUtils.setVisible(txtDetails, hasDetails);
+			if(hasDetails) {
+				txtDetails.setText(getContext().getString(R.string.dish_details, details.energyTotal(), details.weight()));
+			}
+		}
+
 	}
 
 	private static class HeaderItem extends Item {
@@ -124,10 +175,13 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 	private final LayoutInflater mInflater;
 
+	private UserOrder mOrder;
+
 	private ArrayList<Item> mInnerItems;
 
-	public MenuCategoryItemsAdapter(Context context, Category category, Map<String, Item> items) {
+	public MenuCategoryItemsAdapter(Context context, final UserOrder order, Category category, Map<String, Item> items) {
 		mContext = context;
+		mOrder = order;
 		mCategory = category;
 		mItems = items;
 		mInflater = LayoutInflater.from(mContext);
@@ -213,28 +267,11 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 	private void bindView(final View convertView, final int position, final Item item) {
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
-		holder.txtTitle.setText(item.name());
-		if(!(item instanceof HeaderItem)) {
-			bindDetails(item, holder);
-			bindImage(item, holder);
-			holder.btnApply.setText(StringUtils.formatCurrency(item.price(), mContext.getString(R.string.currency_suffix_ruble)));
-			holder.btnApply.setTag(item);
-		}
-	}
-
-	private void bindImage(final Item item, final ViewHolder holder) {
-		final String photo = item.photo();
-		if(!TextUtils.isEmpty(photo)) {
-			OmnomApplication.getPicasso(mContext).load(photo).into(holder.imgIcon);
-		}
-	}
-
-	private void bindDetails(final Item item, final ViewHolder holder) {
-		final Details details = item.details();
-		final boolean hasDetails = details != null;
-		ViewUtils.setVisible(holder.txtDetails, hasDetails);
-		if(hasDetails) {
-			holder.txtDetails.setText(mContext.getString(R.string.dish_details, details.energyTotal(), details.weight()));
+		if(item instanceof HeaderItem) {
+			holder.txtTitle.setText(item.name());
+		} else {
+			holder.updateState(mOrder, item);
+			holder.bind(item);
 		}
 	}
 
