@@ -79,12 +79,14 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			bindDetails(item);
 			bindImage(item);
 			txtTitle.setText(item.name());
-			btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
+
 			btnApply.setTag(item);
 			if(mState == MenuItemState.ADDED || mState == MenuItemState.ORDERED) {
-				btnApply.setBackgroundResource(R.drawable.btn_rounded_blue);
+				btnApply.setBackgroundResource(R.drawable.btn_wish_added);
+				btnApply.setText(StringUtils.EMPTY_STRING);
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
+				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
 			}
 		}
 
