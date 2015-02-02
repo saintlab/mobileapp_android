@@ -23,6 +23,7 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
@@ -131,6 +132,12 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 
 	@InjectView(R.id.btn_flash_light)
 	protected ImageView btnFlashLight;
+
+	@InjectView(R.id.progress_bar)
+	protected ProgressBar progressBar;
+
+	@InjectView(R.id.img_success)
+	protected View imgSuccess;
 	
 	@Inject
 	protected RestaurateurObservableApi api;
@@ -190,6 +197,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					if (!isBusy() && !editHash.getText().toString().isEmpty()) {
 						setBusy(true);
+						ViewUtils.setVisible(progressBar, true);
 						editHash.setTextColor(getResources().getColor(R.color.enter_hash_color));
 						loadTable(editHash.getText().toString());
 					}
@@ -398,7 +406,8 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 								if(!TextUtils.isEmpty(decodeResponse.getError())) {
 									showError(getString(R.string.error_unknown_hash));
 								} else if (decodeResponse.hasOnlyRestaurant()) {
-									editHash.setTextColor(getResources().getColor(android.R.color.black));
+									ViewUtils.setVisible(progressBar, false);
+									ViewUtils.setVisible(imgSuccess, true);
 									Restaurant restaurant = decodeResponse.getRestaurants().get(0);
 									finish(decodeResponse.getRequestId(), restaurant);
 								} else {
@@ -424,6 +433,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 
 	private void showError(final String message) {
 		setBusy(false);
+		ViewUtils.setVisible(progressBar, false);
 		isError = true;
 		txtEnterHash.setText(message);
 		GradientDrawable drawable = (GradientDrawable) hashUnderline.getBackground();
