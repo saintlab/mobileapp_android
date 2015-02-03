@@ -78,6 +78,7 @@ public class BackgroundBleService extends Service {
 
 		@Override
 		public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
+			bluetoothCrashResolver.notifyScannedDevice(device, this);
 			final Beacon beacon = mParser.fromScanData(scanRecord, rssi, device);
 			mBeacons.add(beacon);
 		}
@@ -89,6 +90,8 @@ public class BackgroundBleService extends Service {
 	protected RestaurateurObservableApi api;
 
 	private BluetoothAdapter mBluetoothAdapter;
+
+	private BluetoothCrashResolver bluetoothCrashResolver;
 
 	private Handler mHandler;
 
@@ -120,11 +123,19 @@ public class BackgroundBleService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		OmnomApplication.get(this).inject(this);
+		bluetoothCrashResolver = new BluetoothCrashResolver(this);
+		bluetoothCrashResolver.start();
 		if(!AndroidUtils.isJellyBeanMR2() || !BluetoothUtils.hasBleSupport(this)) {
 			stopSelf(mStartId);
 			return;
 		}
 		scanBeacons();
+	}
+
+	@Override
+	public void onDestroy() {
+		bluetoothCrashResolver.stop();
+		super.onDestroy();
 	}
 
 	@TargetApi(JELLY_BEAN_MR2)
