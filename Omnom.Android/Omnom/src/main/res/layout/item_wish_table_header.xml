@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/activity_vertical_margin_small"
+    android:baselineAligned="false"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/txt_title"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:textColor="@android:color/black"
+        android:textAppearance="?android:textAppearance"
+        android:text="Блюда на вашем столе"
+        android:drawableRight="@drawable/ic_repeat_small"
+        android:drawablePadding="16dp"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+</FrameLayout>

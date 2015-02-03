@@ -1,0 +1,144 @@
+package com.omnom.android.adapter;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import com.omnom.android.R;
+import com.omnom.android.menu.model.Item;
+import com.omnom.android.menu.model.UserOrderData;
+
+import java.util.List;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
+/**
+ * Created by root on 2/3/15.
+ */
+public class WishListAdapter extends BaseAdapter {
+
+	private static class ViewHolder {
+
+		@InjectView(R.id.txt_title)
+		protected TextView txtTitle;
+
+		@InjectView(R.id.txt_info)
+		protected TextView txtInfo;
+
+		@InjectView(R.id.txt_price)
+		protected TextView txtPrice;
+
+		public ViewHolder(final View convertView) {
+			ButterKnife.inject(this, convertView);
+		}
+	}
+
+	public static final int VIEW_TYPE_COUNT = 4;
+
+	public static final int VIEW_TYPE_WISH_ITEM = 0;
+
+	public static final int VIEW_TYPE_WISH_FOOTER = 1;
+
+	public static final int VIEW_TYPE_TABLE_HEADER = 2;
+
+	public static final int VIEW_TYPE_TABLE_ITEM = 3;
+
+	private final Context mContext;
+
+	private final List<UserOrderData> mWishItems;
+
+	private final List<Item> mTableItems;
+
+	private final LayoutInflater mInflater;
+
+	public WishListAdapter(Context context, List<UserOrderData> wishItems, List<Item> tableItems) {
+		mInflater = LayoutInflater.from(context);
+		mContext = context;
+		mWishItems = wishItems;
+		mTableItems = tableItems;
+	}
+
+	@Override
+	public int getItemViewType(final int position) {
+		if(mWishItems.size() > 0 && position < mWishItems.size()) {
+			return VIEW_TYPE_WISH_ITEM;
+		}
+		if(mWishItems.size() > 0 && position == mWishItems.size()) {
+			return VIEW_TYPE_WISH_FOOTER;
+		}
+		if(position == mWishItems.size() + 1) {
+			return VIEW_TYPE_TABLE_HEADER;
+		}
+		return VIEW_TYPE_TABLE_ITEM;
+	}
+
+	@Override
+	public int getViewTypeCount() {
+		return VIEW_TYPE_COUNT;
+	}
+
+	@Override
+	public int getCount() {
+		int count = 0;
+
+		final int wishSize = mWishItems.size();
+		if(wishSize > 0) {
+			count += wishSize + 1;
+		}
+
+		final int tableItemsSize = mTableItems.size();
+		if(tableItemsSize > 0) {
+			count += tableItemsSize + 1;
+		}
+
+		return count;
+	}
+
+	@Override
+	public Object getItem(final int i) {
+		// TODO:
+		return null;
+	}
+
+	@Override
+	public long getItemId(final int pos) {
+		return pos;
+	}
+
+	@Override
+	public View getView(final int position, View convertView, final ViewGroup parent) {
+		ViewHolder holder;
+		final int viewType = getItemViewType(position);
+		if(convertView == null) {
+			switch(viewType) {
+				case VIEW_TYPE_WISH_ITEM:
+				case VIEW_TYPE_TABLE_ITEM:
+					convertView = mInflater.inflate(R.layout.item_wish, parent, false);
+					holder = new ViewHolder(convertView);
+					convertView.setTag(holder);
+					break;
+
+				case VIEW_TYPE_WISH_FOOTER:
+					convertView = mInflater.inflate(R.layout.item_wish_footer, parent, false);
+					break;
+				case VIEW_TYPE_TABLE_HEADER:
+					convertView = mInflater.inflate(R.layout.item_wish_table_header, parent, false);
+					break;
+			}
+		}
+
+		bindView(convertView, position, viewType, getItem(position));
+		return convertView;
+	}
+
+	private void bindView(final View convertView, final int position, final int itemType, final Object item) {
+		final ViewHolder holder = (ViewHolder) convertView.getTag();
+		if(holder != null && item != null) {
+			// TODO: bind data
+		}
+	}
+}

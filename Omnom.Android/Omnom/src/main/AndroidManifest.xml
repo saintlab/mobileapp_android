@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.omnom.android">
+    package="com.omnom.android" >
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -43,12 +43,12 @@
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Wood.Red">
+        android:theme="@style/Theme.Wood.Red" >
 
         <!-- START: MixPanel GCM Integration -->
         <receiver
             android:name=".mixpanel.MixpanelGCMReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
@@ -71,7 +71,7 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood.Red"
-            android:windowSoftInputMode="stateAlwaysHidden">
+            android:windowSoftInputMode="stateAlwaysHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -248,6 +248,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White"
             android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activity.WishActivity"
+            android:label="@string/title_activity_wish" >
+        </activity>
     </application>
 
 </manifest>
