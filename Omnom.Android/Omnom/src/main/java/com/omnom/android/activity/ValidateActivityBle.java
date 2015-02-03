@@ -7,6 +7,7 @@ import android.os.Build;
 import android.view.View;
 
 import com.omnom.android.R;
+import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
@@ -19,6 +20,7 @@ import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.squareup.otto.Subscribe;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -224,6 +226,11 @@ public class ValidateActivityBle extends ValidateActivity {
 				endCallback.run();
 			}
 		}
+	}
+
+	@Subscribe
+	public void onOrderUpdate(OrderUpdateEvent event) {
+		updateOrderData(event);
 	}
 
 	@Override

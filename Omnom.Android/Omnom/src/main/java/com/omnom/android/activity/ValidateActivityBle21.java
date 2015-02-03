@@ -11,8 +11,10 @@ import android.os.Build;
 import android.util.Log;
 
 import com.omnom.android.R;
+import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.restaurateur.model.decode.BeaconRecord;
 import com.omnom.android.restaurateur.model.decode.RssiRecord;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -88,6 +90,11 @@ public class ValidateActivityBle21 extends ValidateActivityBle {
 				Log.e(TAG, "onScanFailed : code = " + errorCode);
 			}
 		};
+	}
+
+	@Subscribe
+	public void onOrderUpdate(OrderUpdateEvent event) {
+		updateOrderData(event);
 	}
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)

@@ -12,6 +12,7 @@ import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
+import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
@@ -27,6 +28,7 @@ import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
 
@@ -281,6 +283,11 @@ public class ValidateActivityCamera extends ValidateActivity {
 			return;
 		}
 		handleDecodeResponse(method, decodeResponse);
+	}
+
+	@Subscribe
+	public void onOrderUpdate(OrderUpdateEvent event) {
+		updateOrderData(event);
 	}
 
 	@Override

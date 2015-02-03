@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.view.View;
 
 import com.omnom.android.R;
+import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.activity.BaseActivity;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -72,4 +74,10 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 			}
 		});
 	}
+
+	@Subscribe
+	public void onOrderUpdate(OrderUpdateEvent event) {
+		updateOrderData(event);
+	}
+
 }

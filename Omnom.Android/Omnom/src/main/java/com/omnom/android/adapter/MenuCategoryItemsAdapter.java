@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.activity.menu.MenuSubcategoryActivity;
 import com.omnom.android.fragment.menu.MenuSubcategoryFragment;
 import com.omnom.android.menu.model.Category;
 import com.omnom.android.menu.model.Child;

@@ -130,4 +130,5 @@
     <string name="qr_hint_mark">Демо-режиме</string>
     <string name="title_activity_menu">MenuActivity</string>
     <string name="title_activity_menu_item_details">MenuItemDetails</string>
+    <string name="your_order">Ваш заказ</string>
 </resources>

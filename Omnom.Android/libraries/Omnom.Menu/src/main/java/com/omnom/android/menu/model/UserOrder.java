@@ -34,13 +34,13 @@ public abstract class UserOrder implements Parcelable {
 		return data != null && data.amount() > 0;
 	}
 
-	public BigDecimal getTotalAmount() {
+	public BigDecimal getTotalPrice() {
 		BigDecimal result = BigDecimal.ZERO;
 		final Set<Map.Entry<String, UserOrderData>> entries = itemsTable().entrySet();
 		for(Map.Entry<String, UserOrderData> entry : entries) {
 			final UserOrderData value = entry.getValue();
-			if(value != null) {
-				final int amount = value.amount();
+			if(value != null && value.item() != null) {
+				final long amount = value.item().price() * value.amount();
 				result = result.add(BigDecimal.valueOf(amount));
 			}
 		}

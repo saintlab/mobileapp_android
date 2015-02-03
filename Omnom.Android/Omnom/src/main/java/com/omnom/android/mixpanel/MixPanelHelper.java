@@ -8,6 +8,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.BuildConfig;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
@@ -298,6 +299,10 @@ public class MixPanelHelper {
 	}
 
 	private void execute(final Project project, final Command command) {
+		if(BuildConfig.DEBUG) {
+			// skip analytics in debug mode
+			return;
+		}
 		if(mMixpanelApiMap == null || mMixpanelApiMap.isEmpty()) {
 			Log.w(TAG, "mMixpanelApiMap is not set");
 			return;

@@ -11,16 +11,14 @@ import android.widget.AdapterView;
 
 import com.omnom.android.R;
 import com.omnom.android.adapter.MenuCategoryItemsAdapter;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.view.StickyListView;
-import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
-
-import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -28,7 +26,7 @@ import butterknife.InjectView;
 /**
  * Created by Ch3D on 02.02.2015.
  */
-public class MenuSubcategoryFragment extends Fragment {
+public class MenuSubcategoryFragment extends BaseFragment {
 
 	public static void show(final FragmentManager manager, final UserOrder order, final Menu menu, final int position) {
 		manager.beginTransaction()
@@ -55,9 +53,6 @@ public class MenuSubcategoryFragment extends Fragment {
 
 	@InjectView(android.R.id.list)
 	protected StickyListView mListView;
-
-	@Inject
-	protected Bus mBus;
 
 	private UserOrder mOrder;
 
@@ -105,12 +100,12 @@ public class MenuSubcategoryFragment extends Fragment {
 				if(mAdapter == null || mOrder == null) {
 					return;
 				}
-				// MenuItemDetailsActivity.start(MenuSubcategoryActivity.this, mOrder, mAdapter.getItem(position), REQUEST_CODE_MENU_ITEM);
+				MenuItemDetailsFragment.show(getFragmentManager(), mOrder, mAdapter.getItem(position));
 			}
 		});
 	}
 
 	public void showAddFragment(final Item item) {
-		AddItemFragment.show(getFragmentManager(), R.id.fragment_container, mOrder, item);
+		MenuItemAddFragment.show(getFragmentManager(), mOrder, item);
 	}
 }

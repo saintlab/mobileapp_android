@@ -5,6 +5,51 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/btn_previous"
+        android:layout_width="40dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin_small"
+        android:layout_gravity="top|left"
+        android:scaleType="centerInside"
+        android:visibility="gone"
+        android:clickable="true"
+        android:src="@drawable/btn_previous_white" />
+
+    <TextView
+        android:id="@+id/txt_demo_leave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:layout_margin="@dimen/activity_horizontal_margin_medium"
+        android:layout_gravity="top|left"
+        android:background="@drawable/bg_demo_leave"
+        android:text="Выйти из Демо"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:visibility="gone" />
+
+    <com.omnom.android.utils.loader.LoaderView
+        android:id="@+id/loader"
+        omnom:progress_color="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/txt_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="96dp"
+        android:clickable="true"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:layout_gravity="bottom|center_horizontal"
+        android:text="Меню" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom" />
+
     <LinearLayout
         android:id="@+id/content"
         android:layout_width="match_parent"
@@ -121,26 +166,9 @@
                 android:layout_marginBottom="@dimen/activity_vertical_margin_large"
                 android:background="@drawable/ic_down_button_icon_white"
                 android:visibility="gone"/>
-            
-            <TextView
-                android:id="@+id/txt_menu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/panel_bottom"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="@dimen/activity_vertical_margin_large"
-                android:clickable="true"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:text="Меню" />
         </RelativeLayout>
 
     </LinearLayout>
-
-    <com.omnom.android.utils.loader.LoaderView
-        android:id="@+id/loader"
-        omnom:progress_color="@android:color/white"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
     <ImageView
         android:id="@+id/img_profile"
@@ -149,34 +177,5 @@
         android:src="@drawable/ic_profile_white"
         android:visibility="gone"
         style="@style/ImageView.Clickable.Cropped"/>
-
-    <ImageView
-        android:id="@+id/btn_previous"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="@dimen/activity_vertical_margin_small"
-        android:layout_gravity="top|left"
-        android:scaleType="centerInside"
-        android:visibility="gone"
-        android:clickable="true"
-        android:src="@drawable/btn_previous_white" />
-
-    <TextView
-        android:id="@+id/txt_demo_leave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="4dp"
-        android:layout_margin="@dimen/activity_horizontal_margin_medium"
-        android:layout_gravity="top|left"
-        android:background="@drawable/bg_demo_leave"
-        android:text="Выйти из Демо"
-        android:textAppearance="?android:textAppearanceMedium"
-        android:visibility="gone"/>
-
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom"/>
 
 </FrameLayout>

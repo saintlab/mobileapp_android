@@ -6,6 +6,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -27,9 +28,12 @@ import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.fragment.menu.MenuFragment;
+import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.api.observable.MenuObservableApi;
+import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.menu.model.UserOrder;
+import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.protocol.Protocol;
@@ -62,6 +66,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -306,8 +311,37 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		updateWishUi();
 		if(mPaymentListener != null && mTable != null) {
 			mPaymentListener.initTableSocket(mTable);
+		}
+	}
+
+	protected void updateOrderData(final OrderUpdateEvent event) {
+		if(mOrder == null) {
+			return;
+		}
+		final Item item = event.getItem();
+		mOrder.itemsTable().put(item.id(), UserOrderData.create(event.getCount(), item));
+		updateWishUi();
+	}
+
+	private void updateWishUi() {
+		if(mOrder == null) {
+			return;
+		}
+		final BigDecimal totalAmount = mOrder.getTotalPrice();
+		final Button btnOrder = (Button) findViewById(R.id.btn_order);
+		if(mOrder != null && totalAmount.compareTo(BigDecimal.ZERO) > 0) {
+			btnOrder.setEnabled(true);
+			btnOrder.setText(StringUtils.formatCurrency(totalAmount, getString(R.string.currency_suffix_ruble)));
+			btnOrder.setTextColor(Color.WHITE);
+			btnOrder.setBackgroundResource(R.drawable.btn_rounded_blue);
+		} else {
+			btnOrder.setEnabled(false);
+			btnOrder.setTextColor(Color.GRAY);
+			btnOrder.setText(getString(R.string.your_order));
+			btnOrder.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
 		}
 	}
 

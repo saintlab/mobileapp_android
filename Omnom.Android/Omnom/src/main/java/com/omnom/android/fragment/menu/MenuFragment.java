@@ -15,6 +15,7 @@ import android.widget.ListView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.MenuCategoriesAdapter;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.UserOrder;
@@ -22,12 +23,9 @@ import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.Extras;
-import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-
-import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -36,7 +34,7 @@ import butterknife.OnItemClick;
 /**
  * Created by Ch3D on 02.02.2015.
  */
-public class MenuFragment extends Fragment {
+public class MenuFragment extends BaseFragment {
 
 	public static Fragment newInstance(final Menu menu, final Restaurant restaurant, final UserOrder order) {
 		final MenuFragment fragment = new MenuFragment();
@@ -61,9 +59,6 @@ public class MenuFragment extends Fragment {
 
 	@InjectView(android.R.id.list)
 	protected ListView mListView;
-
-	@Inject
-	protected Bus mBus;
 
 	@Nullable
 	private Menu mMenu;
