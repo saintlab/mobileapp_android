@@ -106,6 +106,7 @@ final class CameraConfigurationManager {
 
 		}
 
+		parameters.setRecordingHint(true);
 		parameters.setPreviewSize(cameraResolution.x, cameraResolution.y);
 		parameters.set("orientation", "portrait");
 
