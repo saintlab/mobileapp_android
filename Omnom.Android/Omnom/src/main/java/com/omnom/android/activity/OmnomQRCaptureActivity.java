@@ -281,10 +281,19 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 				@Override
 				public void onGlobalLayout() {
 					AndroidUtils.removeOnGlobalLayoutListener(scanFrame, this);
-					final DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-					setFramingRect(new Rect(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels));
 					btnNotScanning.setTranslationY(btnNotScanning.getHeight());
 					ViewUtils.setVisible(btnNotScanning, false);
+
+					final DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+					final int smallestDimension = Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
+					final int framingRectSize = (smallestDimension + scanFrame.getWidth()) / 2;
+					int[] scanFrameCoordinates = new int[2];
+					scanFrame.getLocationInWindow(scanFrameCoordinates);
+					final int scanFrameHalfSize = scanFrame.getWidth() / 2;
+					final int framingRectHalfSize = framingRectSize / 2;
+					final int left = scanFrameCoordinates[0] + scanFrameHalfSize - framingRectHalfSize;
+					final int top = (displayMetrics.heightPixels + scanFrameCoordinates[1]) + scanFrameHalfSize - framingRectHalfSize;
+					setFramingRect(new Rect(left, top, left + framingRectSize, top + framingRectSize));
 				}
 			});
 		}
