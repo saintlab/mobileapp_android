@@ -2,5 +2,7 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/txt_title"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center" />
+    android:layout_height="?android:listPreferredItemHeight"
+    android:gravity="center"
+    android:textColor="@drawable/text_color_selector_white"
+    android:textAppearance="?android:textAppearanceLarge" />

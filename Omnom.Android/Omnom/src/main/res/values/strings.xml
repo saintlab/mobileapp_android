@@ -128,10 +128,9 @@
         мы узнали ваш стол, а&#160;вы посмотрели счёт или&#160;сделали заказ.\n\nЕсли вы&#160;вне Omnom-заведения, посмотрите, как&#160;работает приложение в&#160;Демо-режиме.
     </string>
     <string name="qr_hint_mark">Демо-режиме</string>
-    <string name="title_activity_menu">MenuActivity</string>
-    <string name="title_activity_menu_item_details">MenuItemDetails</string>
     <string name="your_order">Ваш заказ</string>
     <string name="title_activity_wish">WishActivity</string>
     <string name="wish_clear">Отчистить</string>
     <string name="wish_order">Заказать</string>
+    <string name="menu">Меню</string>
 </resources>

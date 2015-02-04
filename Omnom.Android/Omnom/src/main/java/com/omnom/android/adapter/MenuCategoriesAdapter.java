@@ -68,7 +68,7 @@ public class MenuCategoriesAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder;
 		if(convertView == null) {
-			convertView = mInflater.inflate(R.layout.item_order_item, parent, false);
+			convertView = mInflater.inflate(R.layout.item_menu_category, parent, false);
 			holder = new ViewHolder(convertView);
 			convertView.setTag(holder);
 		}

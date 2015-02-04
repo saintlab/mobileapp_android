@@ -1,6 +1,8 @@
 package com.omnom.android.fragment.menu;
 
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -106,12 +108,17 @@ public class MenuFragment extends BaseFragment {
 		super.onViewCreated(view, savedInstanceState);
 		ButterKnife.inject(this, view);
 		mAdapter = new MenuCategoriesAdapter(getActivity(), mMenu.getFilledCategories());
+		View header = LayoutInflater.from(getActivity()).inflate(R.layout.item_menu_category_header, null);
+		mListView.addHeaderView(header, null, false);
 		mListView.setAdapter(mAdapter);
 
 		mTarget = new Target() {
 			@Override
 			public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
 				final BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
+				drawable.setColorFilter(new PorterDuffColorFilter(
+						getResources().getColor(R.color.menu_transparent_black),
+						PorterDuff.Mode.DARKEN));
 				final View root = view.findViewById(R.id.root);
 				root.setBackgroundDrawable(drawable);
 			}
