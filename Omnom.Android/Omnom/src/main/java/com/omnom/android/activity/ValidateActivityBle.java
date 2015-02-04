@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 
 import com.omnom.android.R;
@@ -52,7 +53,7 @@ public class ValidateActivityBle extends ValidateActivity {
 	@Override
 	public void initUi() {
 		super.initUi();
-		if(AndroidUtils.isKitKat()) {
+		if(AndroidUtils.isJellyBeanMR2()) {
 			initBle();
 		}
 	}
@@ -191,7 +192,7 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                           });
 			}
 		};
-		if(AndroidUtils.isKitKat()) {
+		if(AndroidUtils.isJellyBeanMR2()) {
 			scanBleDevices(true, endCallback);
 		}
 	}
