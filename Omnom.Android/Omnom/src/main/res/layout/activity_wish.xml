@@ -4,11 +4,31 @@
     android:layout_height="match_parent"
     tools:context="com.omnom.android.activity.WishActivity">
 
+    <FrameLayout
+        android:id="@+id/panel_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:background="@color/menu_blue">
+
+        <TextView
+            android:id="@+id/txt_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingLeft="@dimen/header_view_horizontal_margin"
+            android:paddingRight="@dimen/header_view_horizontal_margin"
+            android:textColor="@drawable/text_color_selector_white"
+            android:text="@string/close"
+            android:textAppearance="?android:textAppearanceLarge" />
+
+    </FrameLayout>
+
     <ListView
         android:id="@android:id/list"
         android:divider="@null"
         android:dividerHeight="0dp"
         android:listSelector="@null"
+        android:layout_below="@+id/panel_top"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

@@ -12,13 +12,14 @@ import com.omnom.android.utils.activity.OmnomActivity;
 import java.util.Collections;
 
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 public class WishActivity extends BaseOmnomFragmentActivity {
 
 	public static void start(OmnomActivity activity, UserOrder order, int code) {
 		final Intent intent = new Intent(activity.getActivity(), WishActivity.class);
 		intent.putExtra(EXTRA_ORDER, order);
-		activity.startForResult(intent, R.anim.slide_in_up, R.anim.slide_out_down, code);
+		activity.startForResult(intent, R.anim.slide_in_up, R.anim.nothing_long, code);
 	}
 
 	@InjectView(android.R.id.list)
@@ -27,6 +28,17 @@ public class WishActivity extends BaseOmnomFragmentActivity {
 	private UserOrder mOrder;
 
 	private WishListAdapter mAdapter;
+
+	@OnClick(R.id.txt_close)
+	public void onClose() {
+		finish();
+	}
+
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
+	}
 
 	@Override
 	protected void handleIntent(final Intent intent) {

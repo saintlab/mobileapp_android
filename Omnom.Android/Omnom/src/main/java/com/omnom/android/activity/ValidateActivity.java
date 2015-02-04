@@ -902,8 +902,22 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			}
 		});
 
+		final View btnOrder = findById(bottomView, R.id.btn_order);
+		btnOrder.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				onOrder();
+			}
+		});
+
 		ViewUtils.setVisible(btnDownPromo, promoEnabled);
 		// getPanelBottom().setTranslationY(100);
+	}
+
+	private void onOrder() {
+		if(mOrder != null && mOrder.getSelectedItems().size() > 0) {
+			WishActivity.start(this, mOrder, REQUEST_CODE_WISH_LIST);
+		}
 	}
 
 	public View getPanelBottom() {

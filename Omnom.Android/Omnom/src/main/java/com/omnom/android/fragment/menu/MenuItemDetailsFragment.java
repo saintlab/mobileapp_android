@@ -42,7 +42,7 @@ public class MenuItemDetailsFragment extends BaseFragment {
 		                            R.anim.slide_out_right,
 		                            R.anim.slide_in_right,
 		                            R.anim.slide_out_right)
-		       .add(R.id.fragment_container, MenuItemDetailsFragment.newInstance(order, item))
+		       .add(R.id.root, MenuItemDetailsFragment.newInstance(order, item))
 		       .commit();
 	}
 

@@ -11,6 +11,7 @@ import com.omnom.android.R;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.menu.utils.MenuHelper;
+import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.List;
 
@@ -153,6 +154,9 @@ public class WishListAdapter extends BaseAdapter {
 			if(item instanceof UserOrderData) {
 				final UserOrderData data = (UserOrderData) item;
 				holder.txtTitle.setText(data.item().name());
+
+				final String price = StringUtils.formatCurrency(data.item().price(), mContext.getString(R.string.currency_suffix_ruble));
+				holder.txtPrice.setText(mContext.getString(R.string.wish_items_price_detailed, data.amount(), price));
 				MenuHelper.bindDetails(mContext, data.item().details(), holder.txtInfo);
 			}
 		}
