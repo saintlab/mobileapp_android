@@ -65,7 +65,7 @@ public class MenuItemDetailsFragment extends BaseFragment {
 		if(mOrder == null) {
 			mOrder = UserOrder.create();
 		}
-		return getActivity().getLayoutInflater().inflate(R.layout.activity_menu_item_details, null);
+		return getActivity().getLayoutInflater().inflate(R.layout.fragment_menu_item_details, null);
 	}
 
 	@Override

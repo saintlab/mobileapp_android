@@ -81,7 +81,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable final Bundle bundle) {
-		return getActivity().getLayoutInflater().inflate(R.layout.activity_menu_subcategory, null);
+		return getActivity().getLayoutInflater().inflate(R.layout.fragment_menu_subcategory, null);
 	}
 
 	@Override

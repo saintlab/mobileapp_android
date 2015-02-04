@@ -75,7 +75,9 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 					final String status = args[1].toString();
 					if(status.contains(HandshakeSocketEvent.HANDSHAKE_SUCCESS)) {
 						post(new HandshakeSocketEvent(true));
-						mSocket.emit(SocketEvent.EVENT_JOIN, getRoomId());
+						if(mSocket != null) {
+							mSocket.emit(SocketEvent.EVENT_JOIN, getRoomId());
+						}
 					} else if(status.contains(HandshakeSocketEvent.HANDSHAKE_ERROR)) {
 						post(new HandshakeSocketEvent(false));
 					}
@@ -99,16 +101,16 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 			@Override
 			public void call(final Object... args) {
 				logEvent(SocketEvent.EVENT_ORDER_CREATE, args);
-                final JSONObject json = (JSONObject) args[0];
-                final Order order = mGson.fromJson(json.toString(), Order.class);
+				final JSONObject json = (JSONObject) args[0];
+				final Order order = mGson.fromJson(json.toString(), Order.class);
 				post(new OrderCreateSocketEvent(order));
 			}
 		}).on(SocketEvent.EVENT_ORDER_UPDATE, new Emitter.Listener() {
 			@Override
 			public void call(final Object... args) {
 				logEvent(SocketEvent.EVENT_ORDER_UPDATE, args);
-                final JSONObject json = (JSONObject) args[0];
-                final Order order = mGson.fromJson(json.toString(), Order.class);
+				final JSONObject json = (JSONObject) args[0];
+				final Order order = mGson.fromJson(json.toString(), Order.class);
 				post(new OrderUpdateSocketEvent(order));
 			}
 		}).on(SocketEvent.EVENT_ORDER_CLOSE, new Emitter.Listener() {

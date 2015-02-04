@@ -407,6 +407,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}
 	}
 
+	@OnClick(R.id.btn_previous)
+	public void onPrevious(View v) {
+		RestaurantsListActivity.startLeft(ValidateActivity.this);
+	}
+
 	@Override
 	public void initUi() {
 		loader.setLogo(R.drawable.ic_fork_n_knife);
@@ -419,13 +424,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 		bgTransitionDrawable.setCrossFadeEnabled(true);
 		contentView.setBackgroundDrawable(bgTransitionDrawable);
-
-		imgPrevious.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				RestaurantsListActivity.startLeft(ValidateActivity.this);
-			}
-		});
 
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -552,6 +550,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	}
 
 	public void onBill(final View v) {
+		final int backStackFragmentCount = getSupportFragmentManager().getBackStackEntryCount();
+		if(backStackFragmentCount > 0) {
+			for(int i = 0; i < backStackFragmentCount; i++) {
+				getSupportFragmentManager().popBackStack();
+			}
+		}
+
 		v.setEnabled(false);
 		hideProfile();
 		ViewUtils.setVisible(imgPrevious, false);
@@ -763,7 +768,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	}
 
 	@OnClick(R.id.img_profile)
-	protected void onProfile(View v) {
+	public void onProfile(View v) {
 		final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
 		final String tableId = mTable != null ? mTable.getId() : null;
 		UserProfileActivity.startSliding(this, tableNumber, tableId);

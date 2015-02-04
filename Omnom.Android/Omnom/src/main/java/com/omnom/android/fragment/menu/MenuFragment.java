@@ -12,10 +12,12 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.activity.ValidateActivity;
 import com.omnom.android.adapter.MenuCategoriesAdapter;
 import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.model.Item;
@@ -31,6 +33,7 @@ import com.squareup.picasso.Target;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 /**
@@ -62,6 +65,12 @@ public class MenuFragment extends BaseFragment {
 	@InjectView(android.R.id.list)
 	protected ListView mListView;
 
+	@InjectView(R.id.img_profile)
+	protected ImageView mImgProfile;
+
+	@InjectView(R.id.btn_previous)
+	protected ImageView mImgPrev;
+
 	@Nullable
 	private Menu mMenu;
 
@@ -73,6 +82,19 @@ public class MenuFragment extends BaseFragment {
 	private Target mTarget;
 
 	private Restaurant mRestaurant;
+
+	@OnClick(R.id.img_profile)
+	public void onProfile(View v) {
+		final ValidateActivity activity = (ValidateActivity) getActivity();
+		if(activity != null) {
+			activity.onProfile(v);
+		}
+	}
+
+	@OnClick(R.id.btn_previous)
+	public void onPrevious(View v) {
+		getFragmentManager().popBackStack();
+	}
 
 	@Subscribe
 	public void onOrderUpdate(OrderUpdateEvent event) {
@@ -100,7 +122,7 @@ public class MenuFragment extends BaseFragment {
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable final Bundle bundle) {
-		return getActivity().getLayoutInflater().inflate(R.layout.activity_menu, null);
+		return getActivity().getLayoutInflater().inflate(R.layout.fragment_menu, null);
 	}
 
 	@Override
