@@ -157,6 +157,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity implements QrHintFra
 		super.onCreate(icicle);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, false);
 		editor.putString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, FrontLightMode.AUTO.name());
 		editor.apply();
 		setTorchListener(this);

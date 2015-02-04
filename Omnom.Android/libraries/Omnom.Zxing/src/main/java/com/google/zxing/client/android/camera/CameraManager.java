@@ -94,6 +94,10 @@ public final class CameraManager {
 			}
 			camera = theCamera;
 		}
+		Camera.Parameters parameters = theCamera.getParameters();
+		parameters.set("orientation", "portrait");
+		theCamera.setParameters(parameters);
+		theCamera.setDisplayOrientation(90);
 		theCamera.setPreviewDisplay(holder);
 
 		if (!initialized) {
@@ -106,7 +110,7 @@ public final class CameraManager {
 			}
 		}
 
-		Camera.Parameters parameters = theCamera.getParameters();
+		parameters = theCamera.getParameters();
 		String parametersFlattened = parameters == null ? null : parameters.flatten(); // Save these, temporarily
 		try {
 			configManager.setDesiredCameraParameters(theCamera, false);
@@ -294,16 +298,18 @@ public final class CameraManager {
 				return null;
 			}
 
-			rect.left = rect.left * cameraResolution.y / screenResolution.x;
-			rect.right = rect.right * cameraResolution.y / screenResolution.x;
-			rect.top = rect.top * cameraResolution.x / screenResolution.y;
-			rect.bottom = rect.bottom * cameraResolution.x / screenResolution.y;
+			int cameraX = cameraResolution.y;
+			int cameraY = cameraResolution.x;
+			if (cameraResolution.x < cameraResolution.y) {
+				cameraX = cameraResolution.x;
+				cameraY = cameraResolution.y;
+			}
 
-			// TODO: landscape
-			/*rect.left = rect.left * cameraResolution.x / screenResolution.x;
-			rect.right = rect.right * cameraResolution.x / screenResolution.x;
-			rect.top = rect.top * cameraResolution.y / screenResolution.y;
-			rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;*/
+			rect.left = rect.left * cameraX / screenResolution.x;
+			rect.right = rect.right * cameraX / screenResolution.x;
+			rect.top = rect.top * cameraY / screenResolution.y;
+			rect.bottom = rect.bottom * cameraY / screenResolution.y;
+
 			framingRectInPreview = rect;
 		}
 		return framingRectInPreview;
