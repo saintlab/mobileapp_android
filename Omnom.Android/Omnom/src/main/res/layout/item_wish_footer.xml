@@ -9,34 +9,48 @@
     android:baselineAligned="false"
     android:gravity="center">
 
-    <Button
-        android:id="@+id/btn_clear"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:gravity="center"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:textColor="@color/menu_item_details"
-        android:textAppearance="?android:textAppearance"
-        android:background="@drawable/btn_rounded_bordered_grey"
-        android:text="Отчистить"
-        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/btn_clear"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:gravity="center"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:textColor="@android:color/white"
-        android:textAppearance="?android:textAppearance"
-        android:background="@drawable/btn_rounded_blue"
-        android:text="Заказать"
-        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+        <Button
+            android:id="@+id/btn_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textColor="@drawable/text_color_selector_grey"
+            android:textAppearance="?android:textAppearance"
+            android:background="@drawable/btn_rounded_bordered_grey"
+            android:text="@string/wish_clear"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btn_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textColor="@android:color/white"
+            android:textAppearance="?android:textAppearance"
+            android:background="@drawable/btn_rounded_blue"
+            android:text="@string/wish_order"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    </FrameLayout>
+
 
 </LinearLayout>

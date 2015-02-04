@@ -64,4 +64,5 @@ public interface Extras extends Preferences {
 	public static final int RESULT_CODE_TABLE_CHANGED = 2001;
 	public static final int REQUEST_CODE_MENU_ITEM = 5001;
 	public static final int REQUEST_CODE_MENU_SUBCATEGORY = 5002;
+	public static final int REQUEST_CODE_WISH_LIST = 5002;
 }

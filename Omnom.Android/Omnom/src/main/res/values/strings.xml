@@ -132,4 +132,6 @@
     <string name="title_activity_menu_item_details">MenuItemDetails</string>
     <string name="your_order">Ваш заказ</string>
     <string name="title_activity_wish">WishActivity</string>
+    <string name="wish_clear">Отчистить</string>
+    <string name="wish_order">Заказать</string>
 </resources>

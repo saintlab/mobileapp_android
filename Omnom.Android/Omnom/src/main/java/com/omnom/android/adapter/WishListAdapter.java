@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrderData;
+import com.omnom.android.menu.utils.MenuHelper;
 
 import java.util.List;
 
@@ -21,7 +22,17 @@ import butterknife.InjectView;
  */
 public class WishListAdapter extends BaseAdapter {
 
-	private static class ViewHolder {
+	public static final int VIEW_TYPE_COUNT = 4;
+
+	public static final int VIEW_TYPE_WISH_ITEM = 0;
+
+	public static final int VIEW_TYPE_WISH_FOOTER = 1;
+
+	public static final int VIEW_TYPE_TABLE_HEADER = 2;
+
+	public static final int VIEW_TYPE_TABLE_ITEM = 3;
+
+	static class ViewHolder {
 
 		@InjectView(R.id.txt_title)
 		protected TextView txtTitle;
@@ -36,16 +47,6 @@ public class WishListAdapter extends BaseAdapter {
 			ButterKnife.inject(this, convertView);
 		}
 	}
-
-	public static final int VIEW_TYPE_COUNT = 4;
-
-	public static final int VIEW_TYPE_WISH_ITEM = 0;
-
-	public static final int VIEW_TYPE_WISH_FOOTER = 1;
-
-	public static final int VIEW_TYPE_TABLE_HEADER = 2;
-
-	public static final int VIEW_TYPE_TABLE_ITEM = 3;
 
 	private final Context mContext;
 
@@ -99,8 +100,19 @@ public class WishListAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(final int i) {
-		// TODO:
+	public Object getItem(final int position) {
+		final int viewType = getItemViewType(position);
+		switch(viewType) {
+			case VIEW_TYPE_TABLE_HEADER:
+			case VIEW_TYPE_WISH_FOOTER:
+				return null;
+
+			case VIEW_TYPE_TABLE_ITEM:
+				return mTableItems.get(position - mWishItems.size() + 1);
+
+			case VIEW_TYPE_WISH_ITEM:
+				return mWishItems.get(position);
+		}
 		return null;
 	}
 
@@ -138,7 +150,11 @@ public class WishListAdapter extends BaseAdapter {
 	private void bindView(final View convertView, final int position, final int itemType, final Object item) {
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
 		if(holder != null && item != null) {
-			// TODO: bind data
+			if(item instanceof UserOrderData) {
+				final UserOrderData data = (UserOrderData) item;
+				holder.txtTitle.setText(data.item().name());
+				MenuHelper.bindDetails(mContext, data.item().details(), holder.txtInfo);
+			}
 		}
 	}
 }

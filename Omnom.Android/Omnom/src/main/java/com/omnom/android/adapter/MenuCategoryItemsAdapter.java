@@ -21,6 +21,7 @@ import com.omnom.android.menu.model.Details;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.MenuItemState;
 import com.omnom.android.menu.model.UserOrder;
+import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.StickyListView;
@@ -106,12 +107,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		}
 
 		private void bindDetails(final Item item) {
-			final Details details = item.details();
-			final boolean hasDetails = details != null;
-			ViewUtils.setVisible(txtDetails, hasDetails);
-			if(hasDetails) {
-				txtDetails.setText(getContext().getString(R.string.dish_details, details.energyTotal(), details.weight()));
-			}
+			MenuHelper.bindDetails(getContext(), item.details(), txtDetails);
 		}
 
 	}
