@@ -177,11 +177,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	private static Intent createIntent(final Context context, final int animationType,
 	                                   final boolean isDemo, final int userEnterType, final Uri data) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
+		final Class validateActivityBleClass = AndroidUtils.isLollipop() ? ValidateActivityBle21.class : ValidateActivityBle.class;
+		final boolean isBleReadyDevice = hasBle & AndroidUtils.isJellyBeanMR2();
 
-		final Class validateActivityBleClass = AndroidUtils.isLollipop() ?
-				ValidateActivityBle21.class : ValidateActivityBle.class;
+		final Intent intent = new Intent(context, isBleReadyDevice && data == null ? validateActivityBleClass : ValidateActivityCamera.class);
 
-		final Intent intent = new Intent(context, hasBle && data == null ? validateActivityBleClass : ValidateActivityCamera.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
 		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
