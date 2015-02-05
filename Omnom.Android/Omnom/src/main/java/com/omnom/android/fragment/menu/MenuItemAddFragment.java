@@ -9,13 +9,18 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.adapter.MenuModifiersAdapter;
 import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.model.Item;
+import com.omnom.android.menu.model.Modifiers;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
+
+import java.util.Collections;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -29,23 +34,26 @@ public class MenuItemAddFragment extends BaseFragment {
 
 	private static final String ARG_ITEM = "item";
 
-	public static MenuItemAddFragment newInstance(UserOrder order, Item item) {
+	private static final String ARG_MODIFIERS = "modifiers";
+
+	public static MenuItemAddFragment newInstance(final Modifiers modifiers, UserOrder order, Item item) {
 		final MenuItemAddFragment fragment = new MenuItemAddFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, order);
 		args.putParcelable(ARG_ITEM, item);
+		args.putParcelable(ARG_MODIFIERS, modifiers);
 		fragment.setArguments(args);
 		return fragment;
 	}
 
-	public static void show(final FragmentManager fragmentManager, final UserOrder order, final Item item) {
+	public static void show(final FragmentManager fragmentManager, Modifiers modifiers, final UserOrder order, final Item item) {
 		fragmentManager.beginTransaction()
 		               .addToBackStack(null)
 		               .setCustomAnimations(R.anim.fade_in,
 		                                    R.anim.nothing_long,
 		                                    R.anim.fade_in,
 		                                    R.anim.nothing_long)
-		               .replace(R.id.root, MenuItemAddFragment.newInstance(order, item))
+		               .replace(R.id.root, MenuItemAddFragment.newInstance(modifiers, order, item))
 		               .commit();
 	}
 
@@ -57,6 +65,9 @@ public class MenuItemAddFragment extends BaseFragment {
 
 	@InjectView(R.id.txt_count)
 	protected TextView txtCount;
+
+	@InjectView(android.R.id.list)
+	protected ExpandableListView mExpandableListView;
 
 	private int mCount;
 
@@ -72,6 +83,8 @@ public class MenuItemAddFragment extends BaseFragment {
 
 	private int mDefaultCount;
 
+	private Modifiers mModifiers;
+
 	public MenuItemAddFragment() {
 		// Required empty public constructor
 	}
@@ -82,6 +95,7 @@ public class MenuItemAddFragment extends BaseFragment {
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mItem = getArguments().getParcelable(ARG_ITEM);
+			mModifiers = getArguments().getParcelable(ARG_MODIFIERS);
 			if(mItem != null && mOrder != null && mOrder.itemsTable() != null) {
 				final UserOrderData userOrderData = mOrder.itemsTable().get(mItem.id());
 				mCount = getInitialCount(userOrderData);
@@ -142,6 +156,7 @@ public class MenuItemAddFragment extends BaseFragment {
 
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
+		mExpandableListView.setAdapter(new MenuModifiersAdapter(view.getContext(), mModifiers, Collections.EMPTY_LIST));
 		refreshUi();
 	}
 

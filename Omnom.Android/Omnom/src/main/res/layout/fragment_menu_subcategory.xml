@@ -3,12 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     tools:context="com.omnom.android.activity.menu.MenuActivity">
 
-    <com.omnom.android.utils.view.StickyListView
-        android:id="@android:id/list"
+    <FrameLayout
+        android:background="@android:color/white"
+        android:layout_marginTop="64dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <com.omnom.android.utils.view.StickyListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
 </RelativeLayout>

@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 
 import com.omnom.android.utils.generation.AutoGson;
 
+import java.util.List;
+
 import auto.parcel.AutoParcel;
 
 /**
@@ -21,4 +23,10 @@ public abstract class Modifier implements Parcelable {
 
 	@Nullable
 	public abstract String parent();
+
+	@Nullable
+	public abstract List<String> list();
+
+	@Nullable
+	public abstract String type();
 }

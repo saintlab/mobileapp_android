@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 
 import com.omnom.android.utils.generation.AutoGson;
 
+import java.util.List;
+
 import auto.parcel.AutoParcel;
 
 /**
@@ -24,6 +26,9 @@ public abstract class Item implements Parcelable {
 
 	@Nullable
 	public abstract String photo();
+
+	@Nullable
+	public abstract List<Modifier> modifiers();
 
 	@Nullable
 	public abstract long price();

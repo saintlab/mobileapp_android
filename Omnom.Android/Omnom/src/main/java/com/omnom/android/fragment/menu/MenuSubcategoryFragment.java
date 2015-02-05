@@ -144,12 +144,12 @@ public class MenuSubcategoryFragment extends BaseFragment {
 				if(mAdapter == null || mOrder == null) {
 					return;
 				}
-				MenuItemDetailsFragment.show(getFragmentManager(), mOrder, mAdapter.getItem(position));
+				MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, mAdapter.getItem(position));
 			}
 		});
 	}
 
 	public void showAddFragment(final Item item) {
-		MenuItemAddFragment.show(getFragmentManager(), mOrder, item);
+		MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, item);
 	}
 }

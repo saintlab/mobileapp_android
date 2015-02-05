@@ -64,6 +64,11 @@
             android:layout_margin="@dimen/activity_horizontal_margin_medium"
             android:background="@color/divider_light" />
 
+        <ExpandableListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <Button
             android:id="@+id/btn_apply"
             android:layout_width="wrap_content"

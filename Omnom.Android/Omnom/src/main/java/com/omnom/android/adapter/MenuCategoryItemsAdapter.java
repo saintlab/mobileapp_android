@@ -19,6 +19,7 @@ import com.omnom.android.menu.model.Category;
 import com.omnom.android.menu.model.Details;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.MenuItemState;
+import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.utils.utils.StringUtils;
@@ -26,6 +27,7 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.StickyListView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -160,6 +162,12 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		@Override
 		public String photo() {
 			return StringUtils.EMPTY_STRING;
+		}
+
+		@Nullable
+		@Override
+		public List<Modifier> modifiers() {
+			return Collections.EMPTY_LIST;
 		}
 
 		@Nullable
