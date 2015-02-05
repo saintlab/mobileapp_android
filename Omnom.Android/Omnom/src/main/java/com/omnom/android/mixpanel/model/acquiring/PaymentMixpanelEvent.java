@@ -14,7 +14,7 @@ import com.omnom.android.utils.utils.AmountHelper;
 public class PaymentMixpanelEvent extends AbstractAcquiringMixpanelEvent {
 
 	public static final String EVENT_TITLE = "payment_success";
-	public static final String FAIL_EVENT_TITLE = "payment_fail";
+	public static final String FAIL_EVENT_TITLE = "ERROR_MAIL_CARD_PAY";
 
 	private final String orderId;
 
