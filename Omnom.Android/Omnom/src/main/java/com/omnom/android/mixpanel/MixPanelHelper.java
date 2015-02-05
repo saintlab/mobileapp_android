@@ -137,6 +137,16 @@ public class MixPanelHelper {
 		}
 	}
 
+	public void track(final Project project, final String event, final Object[] data) {
+		final JSONObject json = new JSONObject();
+		try {
+			json.put(KEY_DATA, new JSONArray(mGson.toJson(data)));
+			track(project, event, json);
+		} catch(JSONException e) {
+			Log.e(TAG, "track", e);
+		}
+	}
+
 	public void track(final Project project, final String event, final Map data) {
 		final JSONObject json = new JSONObject(data);
 		try {
