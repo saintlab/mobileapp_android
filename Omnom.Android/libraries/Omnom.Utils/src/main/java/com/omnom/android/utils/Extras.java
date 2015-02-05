@@ -45,6 +45,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_MENU_ITEM = "com.omnom.android.restaurant.menu.item";
 	public static final String EXTRA_RESTAURANT_MENU_CATEGORY = "com.omnom.android.restaurant.menu.category";
 	public static final String EXTRA_POSITION = "com.omnom.android.position";
+	public static final String EXTRA_PIVOT_Y = "com.omnom.android.position.y";
 
 	public static final String EXTRA_CHARACTERISTIC_UUID = "ble.characteristic.uuid";
 	public static final String EXTRA_CHARACTERISTIC_VALUE = "ble.characteristic.value";

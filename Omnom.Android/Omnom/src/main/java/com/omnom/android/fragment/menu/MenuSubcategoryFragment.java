@@ -7,6 +7,9 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 
 import com.omnom.android.R;
@@ -17,6 +20,8 @@ import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.StickyListView;
 import com.squareup.otto.Subscribe;
 
@@ -28,18 +33,18 @@ import butterknife.InjectView;
  */
 public class MenuSubcategoryFragment extends BaseFragment {
 
-	public static void show(final FragmentManager manager, final UserOrder order, final Menu menu, final int position) {
+	public static void show(final FragmentManager manager, final UserOrder order, final Menu menu, final int position, final float ypos) {
 		manager.beginTransaction()
 		       .addToBackStack(null)
-		       .setCustomAnimations(R.anim.slide_in_right,
+		       .setCustomAnimations(R.anim.fold_in,
 		                            R.anim.slide_out_right,
-		                            R.anim.slide_in_right,
+		                            R.anim.fold_in,
 		                            R.anim.slide_out_right)
-		       .add(R.id.fragment_container, MenuSubcategoryFragment.newInstance(order, menu, position))
+		       .add(R.id.fragment_container, MenuSubcategoryFragment.newInstance(order, menu, position, ypos))
 		       .commit();
 	}
 
-	private static Fragment newInstance(final UserOrder order, final Menu menu, final int position) {
+	private static Fragment newInstance(final UserOrder order, final Menu menu, final int position, final float ypos) {
 		assert order != null && menu != null && position >= 0;
 
 		final MenuSubcategoryFragment fragment = new MenuSubcategoryFragment();
@@ -47,6 +52,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 		args.putParcelable(Extras.EXTRA_ORDER, order);
 		args.putParcelable(Extras.EXTRA_RESTAURANT_MENU, menu);
 		args.putInt(Extras.EXTRA_POSITION, position);
+		args.putFloat(Extras.EXTRA_PIVOT_Y, ypos);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -62,11 +68,48 @@ public class MenuSubcategoryFragment extends BaseFragment {
 
 	private MenuCategoryItemsAdapter mAdapter;
 
+	private float mPivotY;
+
 	@Subscribe
 	public void onOrderUpdate(OrderUpdateEvent event) {
 		final Item item = event.getItem();
 		mOrder.itemsTable().put(item.id(), UserOrderData.create(event.getCount(), item));
 		mAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public Animation onCreateAnimation(final int transit, final boolean enter, final int nextAnim) {
+		if(!enter) {
+			AnimationUtils.animateAlpha(mListView, false);
+		}
+
+		final ScaleAnimation scaleAnimation = new ScaleAnimation(1.0f, 1.0f, enter ? 0.0f : 1.0f,
+		                                                         enter ? 1.0f : 0.0f,
+		                                                         Animation.RELATIVE_TO_SELF, 0.5f,
+		                                                         Animation.RELATIVE_TO_SELF, mPivotY);
+		scaleAnimation.setDuration(350);
+		scaleAnimation.setInterpolator(new LinearInterpolator());
+		scaleAnimation.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(final Animation animation) {
+				if(enter) {
+					ViewUtils.setVisible2(mListView, false);
+				}
+			}
+
+			@Override
+			public void onAnimationEnd(final Animation animation) {
+				if(enter) {
+					AnimationUtils.animateAlpha(mListView, true);
+				}
+			}
+
+			@Override
+			public void onAnimationRepeat(final Animation animation) {
+
+			}
+		});
+		return scaleAnimation;
 	}
 
 	@Override
@@ -76,6 +119,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 			mOrder = getArguments().getParcelable(Extras.EXTRA_ORDER);
 			mMenu = getArguments().getParcelable(Extras.EXTRA_RESTAURANT_MENU);
 			mPosition = getArguments().getInt(Extras.EXTRA_POSITION, -1);
+			mPivotY = getArguments().getFloat(Extras.EXTRA_PIVOT_Y, -1);
 		}
 	}
 

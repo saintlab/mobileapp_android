@@ -1,6 +1,9 @@
 package com.omnom.android.fragment.menu;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.BitmapDrawable;
@@ -10,8 +13,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -39,7 +44,7 @@ import butterknife.OnItemClick;
 /**
  * Created by Ch3D on 02.02.2015.
  */
-public class MenuFragment extends BaseFragment {
+public class MenuFragment extends BaseFragment implements FragmentManager.OnBackStackChangedListener {
 
 	public static Fragment newInstance(final Menu menu, final Restaurant restaurant, final UserOrder order) {
 		final MenuFragment fragment = new MenuFragment();
@@ -83,6 +88,10 @@ public class MenuFragment extends BaseFragment {
 
 	private Restaurant mRestaurant;
 
+	private int mTouchPositionY = -1;
+
+	private View mSelectedView;
+
 	@OnClick(R.id.img_profile)
 	public void onProfile(View v) {
 		final ValidateActivity activity = (ValidateActivity) getActivity();
@@ -117,7 +126,18 @@ public class MenuFragment extends BaseFragment {
 
 	@OnItemClick(android.R.id.list)
 	public void onListItemClick(final int position) {
-		MenuSubcategoryFragment.show(getFragmentManager(), mOrder, mMenu, position - mListView.getHeaderViewsCount());
+		final float heightPixels = mListView.getContext().getResources().getDisplayMetrics().heightPixels;
+		final float v = mTouchPositionY / heightPixels;
+		MenuSubcategoryFragment.show(getFragmentManager(), mOrder, mMenu, position - mListView.getHeaderViewsCount(), v);
+		getFragmentManager().addOnBackStackChangedListener(this);
+		mSelectedView = mListView.getChildAt(position);
+		mSelectedView.setBackgroundColor(Color.WHITE);
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		getFragmentManager().removeOnBackStackChangedListener(this);
 	}
 
 	@Override
@@ -133,6 +153,13 @@ public class MenuFragment extends BaseFragment {
 		View header = LayoutInflater.from(getActivity()).inflate(R.layout.item_menu_category_header, null);
 		mListView.addHeaderView(header, null, false);
 		mListView.setAdapter(mAdapter);
+		mListView.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(final View v, final MotionEvent event) {
+				mTouchPositionY = (int) event.getY();
+				return false;
+			}
+		});
 
 		mTarget = new Target() {
 			@Override
@@ -157,5 +184,27 @@ public class MenuFragment extends BaseFragment {
 		OmnomApplication.getPicasso(getActivity())
 		                .load(RestaurantHelper.getBackground(mRestaurant, getResources().getDisplayMetrics()))
 		                .noFade().into(mTarget);
+	}
+
+	@Override
+	public void onBackStackChanged() {
+		if(getFragmentManager() != null && getFragmentManager().getBackStackEntryCount() == 1) {
+			mListView.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					final ValueAnimator colorAnimator = ValueAnimator.ofInt(Color.WHITE, Color.TRANSPARENT);
+					colorAnimator.setDuration(350);
+					colorAnimator.setEvaluator(new ArgbEvaluator());
+					colorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+					colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+						@Override
+						public void onAnimationUpdate(ValueAnimator animation) {
+							mSelectedView.setBackgroundColor((Integer) animation.getAnimatedValue());
+						}
+					});
+					colorAnimator.start();
+				}
+			}, 350);
+		}
 	}
 }
