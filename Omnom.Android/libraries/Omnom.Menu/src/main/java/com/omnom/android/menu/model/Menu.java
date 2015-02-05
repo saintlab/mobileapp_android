@@ -37,7 +37,7 @@ public abstract class Menu implements Parcelable {
 
 		final List<Category> result = new ArrayList<>(categories.size());
 		for(Category category : categories) {
-			if(category.hasChilds()) {
+			if(category.hasChildsOrItems()) {
 				result.add(category);
 			}
 		}

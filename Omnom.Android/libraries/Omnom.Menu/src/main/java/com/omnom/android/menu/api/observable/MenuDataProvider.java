@@ -5,10 +5,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.omnom.android.menu.api.ItemsSerializer;
 import com.omnom.android.menu.api.MenuDataService;
+import com.omnom.android.menu.api.ModifiersSerializer;
 import com.omnom.android.menu.model.Items;
 import com.omnom.android.menu.model.MenuResponse;
+import com.omnom.android.menu.model.Modifiers;
 import com.omnom.android.utils.generation.AutoParcelAdapterFactory;
 
+import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 import rx.Observable;
@@ -20,16 +23,18 @@ import rx.schedulers.Schedulers;
  */
 public class MenuDataProvider implements MenuObservableApi {
 
-	public static MenuDataProvider create(final String dataEndPoint) {
+	public static MenuDataProvider create(final String dataEndPoint, final RequestInterceptor interceptor) {
 		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
 		final Gson gson = new GsonBuilder()
 				.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
 				.registerTypeAdapterFactory(new AutoParcelAdapterFactory())
 				.registerTypeAdapter(Items.class, new ItemsSerializer())
+				.registerTypeAdapter(Modifiers.class, new ModifiersSerializer())
 				.create();
 		final GsonConverter converter = new GsonConverter(gson);
 
-		final RestAdapter mRestAdapter = new RestAdapter.Builder().setEndpoint(dataEndPoint)
+		final RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(interceptor)
+		                                                          .setEndpoint(dataEndPoint)
 		                                                          .setLogLevel(logLevel)
 		                                                          .setConverter(converter).build();
 		return new MenuDataProvider(mRestAdapter.create(MenuDataService.class));

@@ -34,12 +34,18 @@ public abstract class Category implements Parcelable {
 	public abstract Schedule schedule();
 
 	@Nullable
-	public abstract List<Child> children();
+	public abstract List<String> items();
 
-	public boolean hasChilds() {
-		final List<Child> subCategories = children();
+	@Nullable
+	public abstract List<Category> children();
+
+	public boolean hasChildsOrItems() {
+		if(items() != null && items().size() > 0) {
+			return true;
+		}
+		final List<Category> subCategories = children();
 		if(subCategories != null && subCategories.size() > 0) {
-			for(final Child ch : subCategories) {
+			for(final Category ch : subCategories) {
 				final List<String> items = ch.items();
 				if(items != null && items.size() > 0) {
 					return true;

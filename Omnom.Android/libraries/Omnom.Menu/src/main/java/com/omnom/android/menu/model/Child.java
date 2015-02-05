@@ -14,6 +14,7 @@ import auto.parcel.AutoParcel;
  */
 @AutoParcel
 @AutoGson
+@Deprecated
 public abstract class Child implements Parcelable {
 	@Nullable
 	public abstract int id();

@@ -2,6 +2,7 @@ package com.omnom.android.utils.utils;
 
 import android.content.Context;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 
 import java.util.List;
@@ -69,6 +70,14 @@ public class ViewUtils {
 
 	public static boolean isVisible(View view) {
 		return view.getVisibility() == View.VISIBLE;
+	}
+
+	public static void setMargins(View v, int l, int t, int r, int b) {
+		if(v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+			ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+			p.setMargins(l, t, r, b);
+			v.requestLayout();
+		}
 	}
 
 	public static void setVisible(View view, boolean visible) {

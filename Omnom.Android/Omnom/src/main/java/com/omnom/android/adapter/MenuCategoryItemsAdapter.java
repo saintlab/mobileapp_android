@@ -16,7 +16,6 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.fragment.menu.MenuSubcategoryFragment;
 import com.omnom.android.menu.model.Category;
-import com.omnom.android.menu.model.Child;
 import com.omnom.android.menu.model.Details;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.MenuItemState;
@@ -39,11 +38,13 @@ import butterknife.Optional;
  */
 public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListView.StickyListAdapter, View.OnClickListener {
 
-	public static final int VIEW_TYPE_COUNT = 2;
+	public static final int VIEW_TYPE_COUNT = 3;
 
 	public static final int VIEW_TYPE_ITEM = 0;
 
 	public static final int VIEW_TYPE_HEADER = 1;
+
+	public static final int VIEW_TYPE_SUBHEADER = 2;
 
 	public static class ViewHolder {
 		@InjectView(R.id.txt_title)
@@ -66,6 +67,8 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		protected ImageView imgIcon;
 
 		private MenuItemState mState = MenuItemState.NONE;
+
+		private int mDividerPadding;
 
 		public ViewHolder(View convertView) {
 			ButterKnife.inject(this, convertView);
@@ -101,7 +104,9 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 		private void bindImage(final Item item) {
 			final String photo = item.photo();
-			if(!TextUtils.isEmpty(photo)) {
+			final boolean hasPhoto = !TextUtils.isEmpty(photo);
+			ViewUtils.setVisible(imgIcon, hasPhoto);
+			if(hasPhoto) {
 				OmnomApplication.getPicasso(getContext()).load(photo).into(imgIcon);
 			}
 		}
@@ -110,12 +115,26 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			MenuHelper.bindDetails(getContext(), item.details(), txtDetails);
 		}
 
+		public void showDivider(final boolean show) {
+			ViewUtils.setVisible(viewDelimiter, show);
+		}
+
+		public void setDividerPadding(final int dividerPadding) {
+			ViewUtils.setMargins(viewDelimiter, dividerPadding, 0, dividerPadding, 0);
+			// viewDelimiter.setPadding(dividerPadding, 0, dividerPadding, 0);
+		}
+	}
+
+	private static class SubHeaderItem extends HeaderItem {
+		SubHeaderItem(Category subCategory) {
+			super(subCategory);
+		}
 	}
 
 	private static class HeaderItem extends Item {
-		private Child mCategory;
+		protected Category mCategory;
 
-		HeaderItem(Child subCategory) {
+		HeaderItem(Category subCategory) {
 			mCategory = subCategory;
 		}
 
@@ -188,25 +207,36 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 	private void initData() {
 		if(mCategory != null) {
-			final List<Child> childrens = mCategory.children();
-			if(childrens != null && childrens.size() > 0) {
-				int itemsCount = 0;
+			final List<Category> childrens = mCategory.children();
+			mInnerItems = new ArrayList<Item>();
 
-				for(final Child subCategory : childrens) {
-					final List<String> items = subCategory.items();
-					itemsCount += items != null ? items.size() : 0;
+			final List<String> categoryItems = mCategory.items();
+			if(categoryItems != null && categoryItems.size() > 0) {
+				for(final String itemId : categoryItems) {
+					mInnerItems.add(mItems.get(itemId));
 				}
+			}
 
-				mInnerItems = new ArrayList<Item>(childrens.size() + itemsCount);
-				for(final Child subCategory : childrens) {
+			if(childrens != null && childrens.size() > 0) {
+				for(final Category subCategory : childrens) {
 					mInnerItems.add(new HeaderItem(subCategory));
-					final List<String> items = subCategory.items();
-					if(items != null) {
-						for(final String itemId : items) {
-							mInnerItems.add(mItems.get(itemId));
+					addCategoryItems(subCategory);
+					if(subCategory.children() != null && subCategory.children().size() > 0) {
+						for(final Category subSubCategory : subCategory.children()) {
+							mInnerItems.add(new SubHeaderItem(subSubCategory));
+							addCategoryItems(subSubCategory);
 						}
 					}
 				}
+			}
+		}
+	}
+
+	private void addCategoryItems(final Category subCategory) {
+		final List<String> items = subCategory.items();
+		if(items != null) {
+			for(final String itemId : items) {
+				mInnerItems.add(mItems.get(itemId));
 			}
 		}
 	}
@@ -223,7 +253,11 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 	@Override
 	public int getItemViewType(final int position) {
-		return getItem(position) instanceof HeaderItem ? VIEW_TYPE_HEADER : VIEW_TYPE_ITEM;
+		if(getItem(position) instanceof HeaderItem) {
+			return getItem(position) instanceof SubHeaderItem ? VIEW_TYPE_SUBHEADER : VIEW_TYPE_HEADER;
+		} else {
+			return VIEW_TYPE_ITEM;
+		}
 	}
 
 	@Override
@@ -254,6 +288,10 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 				case VIEW_TYPE_HEADER:
 					convertView = mInflater.inflate(R.layout.item_menu_header, parent, false);
 					break;
+
+				case VIEW_TYPE_SUBHEADER:
+					convertView = mInflater.inflate(R.layout.item_menu_subheader, parent, false);
+					break;
 			}
 			holder = new ViewHolder(convertView);
 			convertView.setTag(holder);
@@ -270,6 +308,16 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		} else {
 			holder.updateState(mOrder, item);
 			holder.bind(item);
+			final int padding = ViewUtils.dipToPixels(convertView.getContext(), 16f);
+			if(position == mInnerItems.size() - 1) {
+				holder.showDivider(false);
+			} else if(position + 1 < mInnerItems.size()) {
+				final Item nextItem = mInnerItems.get(position + 1);
+				final boolean isSubheaderNext = nextItem instanceof SubHeaderItem;
+				final boolean isHeaderNext = nextItem instanceof HeaderItem;
+				holder.showDivider(!isSubheaderNext);
+				holder.setDividerPadding(isHeaderNext && !isSubheaderNext ? 0 : padding);
+			}
 		}
 	}
 

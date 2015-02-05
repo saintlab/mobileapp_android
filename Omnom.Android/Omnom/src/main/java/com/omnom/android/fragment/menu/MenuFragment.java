@@ -117,7 +117,7 @@ public class MenuFragment extends BaseFragment {
 
 	@OnItemClick(android.R.id.list)
 	public void onListItemClick(final int position) {
-		MenuSubcategoryFragment.show(getFragmentManager(), mOrder, mMenu, position);
+		MenuSubcategoryFragment.show(getFragmentManager(), mOrder, mMenu, position - mListView.getHeaderViewsCount());
 	}
 
 	@Override

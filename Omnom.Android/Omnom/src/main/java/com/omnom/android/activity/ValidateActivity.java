@@ -535,7 +535,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		if(mOrder == null) {
 			mOrder = UserOrder.create();
 		}
-		menuApi.getMenu("riba-ris-nsk-at-aura").subscribe(new Action1<MenuResponse>() {
+		final String ribaRis = "riba-ris-nsk-at-aura";
+		menuApi.getMenu("saintlab-rkeeper-v6").subscribe(new Action1<MenuResponse>() {
 			@Override
 			public void call(final MenuResponse menuResponse) {
 				// MenuActivity.start(ValidateActivity.this, menuResponse, mRestaurant);
