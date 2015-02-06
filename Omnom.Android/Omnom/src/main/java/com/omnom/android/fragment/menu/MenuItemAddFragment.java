@@ -16,11 +16,13 @@ import com.omnom.android.R;
 import com.omnom.android.adapter.MenuModifiersAdapter;
 import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.model.Item;
+import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.Modifiers;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
+import com.omnom.android.utils.utils.StringUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -84,6 +86,8 @@ public class MenuItemAddFragment extends BaseFragment {
 	private int mDefaultCount;
 
 	private Modifiers mModifiers;
+
+	private MenuModifiersAdapter adapter;
 
 	public MenuItemAddFragment() {
 		// Required empty public constructor
@@ -156,7 +160,17 @@ public class MenuItemAddFragment extends BaseFragment {
 
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
-		mExpandableListView.setAdapter(new MenuModifiersAdapter(view.getContext(), mModifiers, Collections.EMPTY_LIST));
+		final ArrayList<String> idList = new ArrayList<String>();
+		final ArrayList<Modifier> dishModifiers = new ArrayList<Modifier>();
+		idList.add("28-in-saintlab-rkeeper-v6");
+		idList.add("15-in-saintlab-rkeeper-v6");
+		final Modifier modifier = Modifier.create(StringUtils.EMPTY_STRING, "Кухня-1", idList, "select");
+		final Modifier modifier2 = Modifier.create("11-in-saintlab-rkeeper-v6", "checkbox");
+		dishModifiers.add(modifier2);
+		dishModifiers.add(modifier);
+
+		adapter = new MenuModifiersAdapter(view.getContext(), mModifiers, dishModifiers);
+		mExpandableListView.setAdapter(adapter);
 		refreshUi();
 	}
 

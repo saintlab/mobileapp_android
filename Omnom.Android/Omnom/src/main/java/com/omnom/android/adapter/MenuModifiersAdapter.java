@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 
 import com.omnom.android.R;
 import com.omnom.android.menu.model.Modifier;
@@ -40,7 +41,7 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getGroupCount() {
-		return mModifiers.items().size();
+		return mModifierList.size();
 	}
 
 	@Override
@@ -50,7 +51,7 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public Object getGroup(final int groupPosition) {
-		return mModifiers.items().get(groupPosition);
+		return mModifierList.get(groupPosition);
 	}
 
 	@Override
@@ -108,13 +109,20 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter {
 			switch(groupType) {
 				case GROUP_TYPE_EXPANDABLE:
 					convertView = mInflater.inflate(R.layout.item_modifier_group, parent, false);
+
 					break;
 
 				case GROUP_TYPE_UNEXPANDABLE:
-					convertView = mInflater.inflate(R.layout.item_modifier_group, parent, false);
+					convertView = mInflater.inflate(R.layout.item_modifier_item, parent, false);
 					break;
 
 			}
+		}
+
+		final ImageView imgIndicator = (ImageView) convertView.findViewById(R.id.indicator);
+		if(imgIndicator != null) {
+			imgIndicator.animate().rotation(isExpanded ? 0 : 180).start();
+			// imgIndicator.setImageResource(isExpanded ? R.drawable.ic_decrease_qty_normal : R.drawable.ic_increase_qty_normal);
 		}
 
 		bindGroup(convertView, groupPosition, groupType, groupModifier);
@@ -126,9 +134,12 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter {
 	}
 
 	@Override
-	public View getChildView(final int groupPosition, final int childPosition, final boolean isLastChild, final View convertView,
+	public View getChildView(final int groupPosition, final int childPosition, final boolean isLastChild, View convertView,
 	                         final ViewGroup parent) {
-		return null;
+		if(convertView == null) {
+			convertView = mInflater.inflate(R.layout.item_modifier_item, parent, false);
+		}
+		return convertView;
 	}
 
 	@Override
