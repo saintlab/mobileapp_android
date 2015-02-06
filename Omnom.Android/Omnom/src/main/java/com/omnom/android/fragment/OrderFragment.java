@@ -719,6 +719,12 @@ public class OrderFragment extends Fragment {
 			list.animate().translationY(0).start();
 		}
 
+		// It is necessary to turn off hardware optimization for items list
+		// as on scale there are font and hidden dividers artifacts on mdpi devices.
+		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+		if (displayMetrics.densityDpi <= DisplayMetrics.DENSITY_MEDIUM) {
+			list.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		}
 		list.setAdapter(mAdapter);
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
