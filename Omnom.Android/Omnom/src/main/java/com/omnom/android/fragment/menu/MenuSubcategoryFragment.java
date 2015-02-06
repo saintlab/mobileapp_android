@@ -11,10 +11,13 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.adapter.MenuCategoryItemsAdapter;
 import com.omnom.android.fragment.base.BaseFragment;
+import com.omnom.android.menu.model.Category;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.UserOrder;
@@ -27,6 +30,7 @@ import com.squareup.otto.Subscribe;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 /**
  * Created by Ch3D on 02.02.2015.
@@ -46,9 +50,9 @@ public class MenuSubcategoryFragment extends BaseFragment {
 
 	private static Fragment newInstance(final UserOrder order, final Menu menu, final int position, final float ypos) {
 		assert order != null && menu != null && position >= 0;
-
 		final MenuSubcategoryFragment fragment = new MenuSubcategoryFragment();
 		final Bundle args = new Bundle();
+
 		args.putParcelable(Extras.EXTRA_ORDER, order);
 		args.putParcelable(Extras.EXTRA_RESTAURANT_MENU, menu);
 		args.putInt(Extras.EXTRA_POSITION, position);
@@ -59,6 +63,12 @@ public class MenuSubcategoryFragment extends BaseFragment {
 
 	@InjectView(android.R.id.list)
 	protected StickyListView mListView;
+
+	@InjectView(R.id.txt_title)
+	protected TextView mTxtTitle;
+
+	@InjectView(R.id.btn_back)
+	protected ImageView mImgBack;
 
 	private UserOrder mOrder;
 
@@ -81,6 +91,8 @@ public class MenuSubcategoryFragment extends BaseFragment {
 	public Animation onCreateAnimation(final int transit, final boolean enter, final int nextAnim) {
 		if(!enter) {
 			AnimationUtils.animateAlpha(mListView, false);
+			AnimationUtils.animateAlpha(mImgBack, false, 100);
+			AnimationUtils.animateAlpha(mTxtTitle, false, 100);
 		}
 
 		final ScaleAnimation scaleAnimation = new ScaleAnimation(1.0f, 1.0f, enter ? 0.0f : 1.0f,
@@ -94,6 +106,8 @@ public class MenuSubcategoryFragment extends BaseFragment {
 			public void onAnimationStart(final Animation animation) {
 				if(enter) {
 					ViewUtils.setVisible2(mListView, false);
+					ViewUtils.setVisible2(mImgBack, false);
+					ViewUtils.setVisible2(mTxtTitle, false);
 				}
 			}
 
@@ -101,6 +115,8 @@ public class MenuSubcategoryFragment extends BaseFragment {
 			public void onAnimationEnd(final Animation animation) {
 				if(enter) {
 					AnimationUtils.animateAlpha(mListView, true);
+					AnimationUtils.animateAlpha(mImgBack, true);
+					AnimationUtils.animateAlpha(mTxtTitle, true);
 				}
 			}
 
@@ -133,7 +149,10 @@ public class MenuSubcategoryFragment extends BaseFragment {
 		super.onViewCreated(view, savedInstanceState);
 		ButterKnife.inject(this, view);
 
-		mAdapter = new MenuCategoryItemsAdapter(this, mOrder, mMenu.categories().get(mPosition), mMenu.items().items());
+		final Category category = mMenu.categories().get(mPosition);
+		mAdapter = new MenuCategoryItemsAdapter(this, mOrder, category, mMenu.items().items());
+		mTxtTitle.setText(category.name());
+
 		mListView.setAdapter(mAdapter);
 		mListView.setShadowVisible(false);
 		mListView.setDividerHeight(0);
@@ -147,6 +166,13 @@ public class MenuSubcategoryFragment extends BaseFragment {
 				MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, mAdapter.getItem(position));
 			}
 		});
+	}
+
+	@OnClick(R.id.btn_back)
+	public void onClose() {
+		AnimationUtils.animateAlpha(mImgBack, false, 100);
+		AnimationUtils.animateAlpha(mTxtTitle, false, 100);
+		getFragmentManager().popBackStack();
 	}
 
 	public void showAddFragment(final Item item) {

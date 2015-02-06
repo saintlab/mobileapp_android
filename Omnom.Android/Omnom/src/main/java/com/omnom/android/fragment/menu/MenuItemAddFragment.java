@@ -31,7 +31,7 @@ import butterknife.OnClick;
 
 public class MenuItemAddFragment extends BaseFragment {
 
-	public static final int CONTENT_TRANSITION_Y = 400;
+	public static final int CONTENT_TRANSITION_Y = 600;
 
 	private static final String ARG_ORDER = "order";
 
@@ -56,7 +56,7 @@ public class MenuItemAddFragment extends BaseFragment {
 		                                    R.anim.nothing_long,
 		                                    R.anim.fade_in,
 		                                    R.anim.nothing_long)
-		               .replace(R.id.root, MenuItemAddFragment.newInstance(modifiers, order, item))
+		               .add(R.id.root, MenuItemAddFragment.newInstance(modifiers, order, item))
 		               .commit();
 	}
 
@@ -134,7 +134,7 @@ public class MenuItemAddFragment extends BaseFragment {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		contentView.animate().translationY(CONTENT_TRANSITION_Y).setListener(new AnimatorListenerAdapter() {
+		contentView.animate().translationY(rootView.getHeight()).setListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
 				rootView.animate().alpha(0).start();

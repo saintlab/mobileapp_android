@@ -32,6 +32,7 @@ import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -126,10 +127,10 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 
 	@OnItemClick(android.R.id.list)
 	public void onListItemClick(final int position) {
+		getFragmentManager().addOnBackStackChangedListener(this);
 		final float heightPixels = mListView.getContext().getResources().getDisplayMetrics().heightPixels;
 		final float v = mTouchPositionY / heightPixels;
 		MenuSubcategoryFragment.show(getFragmentManager(), mOrder, mMenu, position - mListView.getHeaderViewsCount(), v);
-		getFragmentManager().addOnBackStackChangedListener(this);
 		mSelectedView = mListView.getChildAt(position);
 		mSelectedView.setBackgroundColor(Color.WHITE);
 	}
@@ -150,7 +151,7 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 		super.onViewCreated(view, savedInstanceState);
 		ButterKnife.inject(this, view);
 		mAdapter = new MenuCategoriesAdapter(getActivity(), mMenu.getFilledCategories());
-		View header = LayoutInflater.from(getActivity()).inflate(R.layout.item_menu_category_header, null);
+		View header = LayoutInflater.from(getActivity()).inflate(R.layout.item_menu_categories_header, null);
 		mListView.addHeaderView(header, null, false);
 		mListView.setAdapter(mAdapter);
 		mListView.setOnTouchListener(new View.OnTouchListener() {
@@ -189,6 +190,8 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 	@Override
 	public void onBackStackChanged() {
 		if(getFragmentManager() != null && getFragmentManager().getBackStackEntryCount() == 1) {
+			ViewUtils.setVisible(mImgPrev, true);
+			ViewUtils.setVisible(mImgProfile, true);
 			mListView.postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -205,6 +208,9 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 					colorAnimator.start();
 				}
 			}, 350);
+		} else {
+			ViewUtils.setVisible(mImgPrev, false);
+			ViewUtils.setVisible(mImgProfile, false);
 		}
 	}
 }
