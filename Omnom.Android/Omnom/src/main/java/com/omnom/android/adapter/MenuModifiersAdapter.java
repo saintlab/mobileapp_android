@@ -5,18 +5,58 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.Modifiers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.Optional;
 
 /**
  * Created by Ch3D on 05.02.2015.
  */
-public class MenuModifiersAdapter extends BaseExpandableListAdapter {
+public class MenuModifiersAdapter extends BaseExpandableListAdapter implements CompoundButton.OnCheckedChangeListener {
+
+	static class ChildViewHolder {
+		@InjectView(R.id.txt_title)
+		@Optional
+		protected TextView txtTitle;
+
+		@InjectView(R.id.checkbox)
+		@Optional
+		protected CheckBox cbSelected;
+
+		private CompoundButton.OnCheckedChangeListener mListener;
+
+		ChildViewHolder(View convertView, CompoundButton.OnCheckedChangeListener listener) {
+			mListener = listener;
+			ButterKnife.inject(this, convertView);
+		}
+
+		public void bindChild(final Modifier modifierGroup, final Modifier modifierItem, boolean forceUncheck) {
+			txtTitle.setText(modifierItem.name());
+			cbSelected.setTag(R.id.group, modifierGroup);
+			cbSelected.setTag(R.id.item, modifierItem);
+			cbSelected.setOnCheckedChangeListener(mListener);
+			if(forceUncheck) {
+				cbSelected.setChecked(false);
+			}
+		}
+
+		public void bindGroup(final Modifier modifierGroup) {
+			txtTitle.setText(modifierGroup.name());
+		}
+	}
 
 	private static final int GROUPS_TYPE_COUNT = 2;
 
@@ -25,6 +65,8 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter {
 	private static final int GROUP_TYPE_UNEXPANDABLE = 1;
 
 	private final LayoutInflater mInflater;
+
+	private HashMap<String, Boolean> mSelection = new HashMap<String, Boolean>();
 
 	private Context mContext;
 
@@ -105,24 +147,27 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter {
 		final Modifier groupModifier = (Modifier) getGroup(groupPosition);
 		final int groupType = getGroupType(groupPosition);
 
+		ChildViewHolder holder;
+
 		if(convertView == null) {
 			switch(groupType) {
 				case GROUP_TYPE_EXPANDABLE:
 					convertView = mInflater.inflate(R.layout.item_modifier_group, parent, false);
-
+					holder = new ChildViewHolder(convertView, this);
+					convertView.setTag(holder);
 					break;
 
 				case GROUP_TYPE_UNEXPANDABLE:
 					convertView = mInflater.inflate(R.layout.item_modifier_item, parent, false);
+					holder = new ChildViewHolder(convertView, this);
+					convertView.setTag(holder);
 					break;
-
 			}
 		}
 
 		final ImageView imgIndicator = (ImageView) convertView.findViewById(R.id.indicator);
 		if(imgIndicator != null) {
 			imgIndicator.animate().rotation(isExpanded ? 0 : 180).start();
-			// imgIndicator.setImageResource(isExpanded ? R.drawable.ic_decrease_qty_normal : R.drawable.ic_increase_qty_normal);
 		}
 
 		bindGroup(convertView, groupPosition, groupType, groupModifier);
@@ -130,20 +175,62 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter {
 	}
 
 	private void bindGroup(final View convertView, final int groupPosition, final int groupType, final Modifier groupModifier) {
-
+		final ChildViewHolder holder = (ChildViewHolder) convertView.getTag();
+		if(groupType == GROUP_TYPE_EXPANDABLE) {
+			holder.bindGroup(groupModifier);
+		} else {
+			final Modifier modifier = mModifiers.items().get(groupModifier.id());
+			holder.bindChild(modifier, modifier, false);
+		}
 	}
 
 	@Override
 	public View getChildView(final int groupPosition, final int childPosition, final boolean isLastChild, View convertView,
 	                         final ViewGroup parent) {
+		ChildViewHolder holder;
 		if(convertView == null) {
 			convertView = mInflater.inflate(R.layout.item_modifier_item, parent, false);
+			holder = new ChildViewHolder(convertView, this);
+			convertView.setTag(holder);
 		}
+		bindChild(convertView, groupPosition, childPosition);
 		return convertView;
+	}
+
+	private void bindChild(final View convertView, final int groupPosition, final int childPosition) {
+		final ChildViewHolder holder = (ChildViewHolder) convertView.getTag();
+		final Modifier group = (Modifier) getGroup(groupPosition);
+		final Modifier modifier = (Modifier) getChild(groupPosition, childPosition);
+		final boolean hasSelectionData = mSelection.get(modifier.id()) != null;
+		holder.bindChild(group, modifier, !hasSelectionData || (hasSelectionData && !mSelection.get(modifier.id())));
 	}
 
 	@Override
 	public boolean isChildSelectable(final int groupPosition, final int childPosition) {
 		return false;
+	}
+
+	@Override
+	public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
+		Modifier itemModifier = (Modifier) buttonView.getTag(R.id.item);
+		Modifier groupModifier = (Modifier) buttonView.getTag(R.id.group);
+		if(itemModifier != null) {
+			mSelection.put(itemModifier.id(), isChecked);
+			System.err.println(">>>>> >>>>>> >>>>>");
+			System.err.println(">>>>> before >>>>>");
+			System.err.println(mSelection);
+			if("select".equals(groupModifier.type()) && buttonView.isChecked()) {
+				final ArrayList<String> resetIds = new ArrayList<String>();
+				resetIds.addAll(groupModifier.list());
+				resetIds.remove(itemModifier.id());
+				for(String id : resetIds) {
+					mSelection.remove(id);
+				}
+			}
+			System.err.println(">>>>> after >>>>>");
+			System.err.println(">>>>> >>>>> >>>>>");
+			System.err.println(mSelection);
+		}
+		notifyDataSetChanged();
 	}
 }
