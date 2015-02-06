@@ -1002,8 +1002,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 					loader.showProgress(false, true, new Runnable() {
 						@Override
 						public void run() {
-							ValidateActivityCamera.start(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
-							                             EXTRA_LOADER_ANIMATION_FIXED, ConfirmPhoneActivity.TYPE_DEFAULT);
+							ValidateActivityShortcut.start(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
+							                               EXTRA_LOADER_ANIMATION_FIXED);
 							finish();
 						}
 					});
