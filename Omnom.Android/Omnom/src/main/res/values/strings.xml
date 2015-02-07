@@ -27,6 +27,10 @@
     <string name="create_account">Создать аккаунт</string>
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
+    <string name="order_updated">Этот счёт обновлён заведением</string>
+    <string name="update">Обновить</string>
+    <string name="order_closed">Этот счёт закрыт заведением для&#160;просмотра и&#160;оплаты</string>
+    <string name="exit">Выйти</string>
     <string name="table_number_format">%1$s Обновить</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_validate">ValidateActivity</string>

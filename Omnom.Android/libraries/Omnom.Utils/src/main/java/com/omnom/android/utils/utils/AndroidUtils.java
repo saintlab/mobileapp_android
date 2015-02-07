@@ -252,6 +252,18 @@ public class AndroidUtils {
 		return alertDialog;
 	}
 
+	public static AlertDialog showDialog(Context context, int msg, int okResId,
+	                                     DialogInterface.OnClickListener okListener) {
+		final AlertDialog alertDialog = new AlertDialog.Builder(context)
+															.setMessage(context.getString(msg))
+															.setPositiveButton(okResId, okListener)
+															.create();
+		alertDialog.setCancelable(false);
+		alertDialog.setCanceledOnTouchOutside(false);
+		alertDialog.show();
+		return alertDialog;
+	}
+
 	public static String getAppVersion(Context context) {
 		try {
 			return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
