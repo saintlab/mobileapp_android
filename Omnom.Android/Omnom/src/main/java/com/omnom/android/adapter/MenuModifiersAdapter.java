@@ -1,6 +1,7 @@
 package com.omnom.android.adapter;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,12 @@ import butterknife.Optional;
  */
 public class MenuModifiersAdapter extends BaseExpandableListAdapter implements CompoundButton.OnCheckedChangeListener {
 
+	public static final String TYPE_SELECT = "select";
+
+	public static final String TYPE_MULTISELECT = "multiselect";
+
+	public static final String TYPE_CHECKBOX = "checkbox";
+
 	static class ChildViewHolder {
 		@InjectView(R.id.txt_title)
 		@Optional
@@ -43,8 +50,10 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 			ButterKnife.inject(this, convertView);
 		}
 
-		public void bindChild(final Modifier modifierGroup, final Modifier modifierItem, boolean forceUncheck) {
-			txtTitle.setText(modifierItem.name());
+		public void bindChild(@Nullable final Modifier modifierGroup, @Nullable final Modifier modifierItem, boolean forceUncheck) {
+			if(modifierItem != null) {
+				txtTitle.setText(modifierItem.name());
+			}
 			cbSelected.setTag(R.id.group, modifierGroup);
 			cbSelected.setTag(R.id.item, modifierItem);
 			cbSelected.setOnCheckedChangeListener(mListener);
@@ -109,7 +118,7 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 	@Override
 	public int getGroupType(final int groupPosition) {
 		final Modifier group = (Modifier) getGroup(groupPosition);
-		if("select".equals(group.type()) || "multiselect".equals(group.type())) {
+		if(TYPE_SELECT.equals(group.type()) || TYPE_MULTISELECT.equals(group.type())) {
 			return GROUP_TYPE_EXPANDABLE;
 		}
 		return GROUP_TYPE_UNEXPANDABLE;
@@ -134,6 +143,9 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 	@Override
 	public long getChildId(final int groupPosition, final int childPosition) {
 		final Modifier modifier = (Modifier) getChild(groupPosition, childPosition);
+		if(modifier == null) {
+			return -1;
+		}
 		return modifier.hashCode();
 	}
 
@@ -201,8 +213,10 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 		final ChildViewHolder holder = (ChildViewHolder) convertView.getTag();
 		final Modifier group = (Modifier) getGroup(groupPosition);
 		final Modifier modifier = (Modifier) getChild(groupPosition, childPosition);
-		final boolean hasSelectionData = mSelection.get(modifier.id()) != null;
-		holder.bindChild(group, modifier, !hasSelectionData || (hasSelectionData && !mSelection.get(modifier.id())));
+		if(modifier != null && group != null) {
+			final boolean hasSelectionData = mSelection.get(modifier.id()) != null;
+			holder.bindChild(group, modifier, !hasSelectionData || (hasSelectionData && !mSelection.get(modifier.id())));
+		}
 	}
 
 	@Override
@@ -216,10 +230,7 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 		Modifier groupModifier = (Modifier) buttonView.getTag(R.id.group);
 		if(itemModifier != null) {
 			mSelection.put(itemModifier.id(), isChecked);
-			System.err.println(">>>>> >>>>>> >>>>>");
-			System.err.println(">>>>> before >>>>>");
-			System.err.println(mSelection);
-			if("select".equals(groupModifier.type()) && buttonView.isChecked()) {
+			if(TYPE_SELECT.equals(groupModifier.type()) && buttonView.isChecked()) {
 				final ArrayList<String> resetIds = new ArrayList<String>();
 				resetIds.addAll(groupModifier.list());
 				resetIds.remove(itemModifier.id());
@@ -227,9 +238,6 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 					mSelection.remove(id);
 				}
 			}
-			System.err.println(">>>>> after >>>>>");
-			System.err.println(">>>>> >>>>> >>>>>");
-			System.err.println(mSelection);
 		}
 		notifyDataSetChanged();
 	}
