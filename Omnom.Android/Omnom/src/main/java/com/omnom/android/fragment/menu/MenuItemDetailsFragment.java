@@ -59,6 +59,11 @@ public class MenuItemDetailsFragment extends BaseFragment {
 
 	private Menu mMenu;
 
+	@OnClick(R.id.btn_close)
+	public void onClose() {
+		getFragmentManager().popBackStack();
+	}
+
 	@Override
 	public View onCreateView(final LayoutInflater inflater,
 	                         @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState) {
