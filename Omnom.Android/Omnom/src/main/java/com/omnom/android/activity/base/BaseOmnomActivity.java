@@ -3,7 +3,6 @@ package com.omnom.android.activity.base;
 import android.location.Location;
 import android.os.Bundle;
 
-import com.google.gson.Gson;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.activity.helper.ActivityHelper;
 import com.omnom.android.activity.helper.OmnomActivityHelper;
@@ -20,8 +19,6 @@ import javax.inject.Inject;
  */
 public abstract class BaseOmnomActivity extends BaseActivity {
 
-	private Gson mGson;
-
 	private boolean isBusy;
 
 	@Inject
@@ -37,7 +34,6 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		activityHelper = new OmnomActivityHelper(getActivity(), authenticator);
-		mGson = new Gson();
 	}
 
 	@Override

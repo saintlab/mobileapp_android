@@ -193,7 +193,7 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 		                           .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
 		                                                R.anim.slide_in_right, R.anim.slide_out_left)
 		                           .replace(R.id.fragment_container, enteringFragment)
-		                           .commit();
+		                           .commitAllowingStateLoss();
 		showPanelBottom(true);
 	}
 

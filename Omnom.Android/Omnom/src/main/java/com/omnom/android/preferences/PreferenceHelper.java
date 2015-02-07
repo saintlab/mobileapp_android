@@ -33,16 +33,29 @@ public class PreferenceHelper implements PreferenceProvider {
 		context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE).edit().putString(CARD_ID, externalCardId).apply();
 	}
 
-	public void saveBeacon(final Context context, final Beacon beacon) {
+	public void saveNotificationDetails(final Context context, final String restaurantId) {
 		long timestamp = SystemClock.elapsedRealtime();
-		context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).edit().putLong(beacon.getRestaurantData(), timestamp)
-		       .putLong(beacon.getBluetoothAddress(), timestamp).apply();
+		context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).edit().putLong(restaurantId, timestamp)
+		       .apply();
+	}
+
+	public long getNotificationTimestamp(final Context context, final String restaurantId) {
+		return context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).getLong(restaurantId, -1);
+	}
+
+	public boolean hasNotificationData(final Context context, final String restaurantId) {
+		return context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).contains(restaurantId);
 	}
 
 	public void saveRestaurantBeacon(final Context context, final Beacon beacon) {
 		long timestamp = SystemClock.elapsedRealtime();
-		context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).edit().putLong(beacon.getRestaurantData(), timestamp)
-		       .apply();
+		context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).edit().putLong(beacon.getRestaurantData(), timestamp).apply();
+	}
+
+	public void saveBeacon(final Context context, final Beacon beacon) {
+		long timestamp = SystemClock.elapsedRealtime();
+		context.getSharedPreferences(BEACONS_PREFERENCES, Context.MODE_PRIVATE).edit().putLong(beacon.getBluetoothAddress(), timestamp)
+				.putLong(beacon.getBluetoothAddress(), timestamp).apply();
 	}
 
 	public boolean hasBeacon(final Context context, final Beacon beacon) {

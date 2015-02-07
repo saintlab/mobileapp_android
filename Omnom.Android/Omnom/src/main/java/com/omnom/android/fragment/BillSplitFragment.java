@@ -9,6 +9,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -237,7 +238,11 @@ public class BillSplitFragment extends Fragment {
 		as.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
-				getFragmentManager().beginTransaction().remove(BillSplitFragment.this).commit();
+				FragmentManager fragmentManager = getFragmentManager();
+				if (fragmentManager != null) {
+					fragmentManager.beginTransaction().remove(BillSplitFragment.this).commit();
+				}
+
 			}
 		});
 		as.start();

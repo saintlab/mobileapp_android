@@ -76,6 +76,11 @@ public class OmnomActivityHelper implements ActivityHelper, LocationListener {
 					final Long timeDiff = TimeUnit.SECONDS.toMillis(serverTime) - currentTime;
 					mixPanelHelper.setTimeDiff(timeDiff);
 				}
+			}, new Action1<Throwable>() {
+				@Override
+				public void call(Throwable throwable) {
+					Log.e(TAG, "onStart", throwable);
+				}
 			});
 		}
 	}

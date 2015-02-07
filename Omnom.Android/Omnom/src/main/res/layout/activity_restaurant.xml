@@ -59,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/activity_vertical_margin_small"
-        android:background="@color/white_transparent"
+        android:background="@color/white_transparent_f0"
         android:orientation="horizontal">
 
         <TextView

@@ -3,7 +3,6 @@ package com.omnom.android.mixpanel.model.acquiring;
 import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
-import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.mixpanel.model.AbstractBaseMixpanelEvent;
@@ -18,26 +17,26 @@ abstract class AbstractAcquiringMixpanelEvent extends AbstractBaseMixpanelEvent 
 	private transient String title;
 
 	@Expose
-	protected final String cardId;
+	protected final CardInfo cardInfo;
 
 	@Expose
-	protected final String pan;
+	protected final String errorCode;
 
 	@Expose
-	private final String errorCode;
+	protected final String errorDescr;
 
-	@Expose
-	private final String errorDescr;
-
-	public AbstractAcquiringMixpanelEvent(final @Nullable UserData userData, final CardInfo cardInfo) {
+	public AbstractAcquiringMixpanelEvent(final @Nullable UserData userData,
+	                                      final com.omnom.android.acquiring.mailru.model.CardInfo cardInfo) {
 		this(userData, cardInfo, null);
 	}
 
-	public AbstractAcquiringMixpanelEvent(final @Nullable UserData userData, final CardInfo cardInfo,
+	public AbstractAcquiringMixpanelEvent(final @Nullable UserData userData,
+	                                      final com.omnom.android.acquiring.mailru.model.CardInfo cardInfo,
 	                                      final AcquiringResponseError error) {
 		super(userData);
-		this.cardId = StringUtils.EMPTY_STRING.equals(cardInfo.getCardId()) ? null : cardInfo.getCardId();
-		this.pan = StringUtils.EMPTY_STRING.equals(cardInfo.getMixpanelPan()) ? null : CardUtils.maskPan(cardInfo.getMixpanelPan());
+		String cardId = StringUtils.EMPTY_STRING.equals(cardInfo.getCardId()) ? null : cardInfo.getCardId();
+		String maskedPan = StringUtils.EMPTY_STRING.equals(cardInfo.getMixpanelPan()) ? null : CardUtils.maskPan(cardInfo.getMixpanelPan());
+		this.cardInfo = new CardInfo(cardId, maskedPan);
 		if (error != null) {
 			title = getFailName();
 			this.errorCode = error.getCode();

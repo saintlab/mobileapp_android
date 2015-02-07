@@ -27,6 +27,7 @@ import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
+import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.protocol.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
@@ -177,11 +178,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	private static Intent createIntent(final Context context, final int animationType,
 	                                   final boolean isDemo, final int userEnterType, final Uri data) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
+		final Class validateActivityBleClass = AndroidUtils.isLollipop() ? ValidateActivityBle21.class : ValidateActivityBle.class;
+		final boolean isBleReadyDevice = hasBle & AndroidUtils.isJellyBeanMR2();
 
-		final Class validateActivityBleClass = AndroidUtils.isLollipop() ?
-				ValidateActivityBle21.class : ValidateActivityBle.class;
+		final Intent intent = new Intent(context, isBleReadyDevice && data == null ? validateActivityBleClass : ValidateActivityCamera.class);
 
-		final Intent intent = new Intent(context, hasBle && data == null ? validateActivityBleClass : ValidateActivityCamera.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
 		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
@@ -989,6 +990,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	}
 
 	protected void handleRestaurant(final String method, final String requestId, final Restaurant restaurant) {
+		// User in already in a restaurant there is no need to send them notification
+		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(getActivity()).getPreferences();
+		preferences.saveNotificationDetails(this, restaurant.id());
 		final TableDataResponse table = RestaurantHelper.getTable(restaurant);
 		if(table != null) {
 			loader.stopProgressAnimation();
@@ -1007,8 +1011,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 					loader.showProgress(false, true, new Runnable() {
 						@Override
 						public void run() {
-							ValidateActivityCamera.start(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
-							                             EXTRA_LOADER_ANIMATION_FIXED, ConfirmPhoneActivity.TYPE_DEFAULT);
+							ValidateActivityShortcut.start(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
+							                               EXTRA_LOADER_ANIMATION_FIXED);
 							finish();
 						}
 					});

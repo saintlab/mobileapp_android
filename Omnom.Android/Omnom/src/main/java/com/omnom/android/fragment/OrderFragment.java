@@ -454,27 +454,42 @@ public class OrderFragment extends Fragment {
 
 	public void onOrderUpdate(final Order order) {
 		if (order != null && order.getId().equals(mOrder.getId())) {
-			mOrder = order;
-            mAdapter.updateItems(mOrder.getItems());
-			AndroidUtils.scrollEnd(list);
-			final double paidAmount = order.getPaidAmount();
-			if (txtAlreadyPaid != null) {
-				if (paidAmount > 0) {
-					txtAlreadyPaid.setText(getString(R.string.already_paid, AmountHelper.format(paidAmount) + getCurrencySuffix()));
-					if (!isEditMode) {
-						ViewUtils.setVisible2(txtAlreadyPaid, true);
-					}
-				} else {
-					ViewUtils.setVisible2(txtAlreadyPaid, false);
-				}
+			if (!isDownscaled()) {
+				AndroidUtils.showDialog(getActivity(), R.string.order_updated, R.string.update,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(final DialogInterface dialog,
+							                    final int which) {
+								updateOrder(order);
+							}
+						});
+			} else {
+				updateOrder(order);
 			}
-			if (!isAmountModified && editAmount != null) {
-				editAmount.setText(AmountHelper.format(order.getAmountToPay()) + getCurrencySuffix());
-				final BigDecimal amount = getEnteredAmount();
-				updatePaymentTipsAmount(amount, tipsButtons);
-			}
-			updateOverallAmount(mFooterView1);
 		}
+	}
+
+	private void updateOrder(final Order order) {
+		mOrder = order;
+		mAdapter.updateItems(mOrder.getItems());
+		AndroidUtils.scrollEnd(list);
+		final double paidAmount = order.getPaidAmount();
+		if (txtAlreadyPaid != null) {
+			if (paidAmount > 0) {
+				txtAlreadyPaid.setText(getString(R.string.already_paid, AmountHelper.format(paidAmount) + getCurrencySuffix()));
+				if (!isEditMode) {
+					ViewUtils.setVisible2(txtAlreadyPaid, true);
+				}
+			} else {
+				ViewUtils.setVisible2(txtAlreadyPaid, false);
+			}
+		}
+		if (!isAmountModified && editAmount != null) {
+			editAmount.setText(AmountHelper.format(order.getAmountToPay()) + getCurrencySuffix());
+			final BigDecimal amount = getEnteredAmount();
+			updatePaymentTipsAmount(amount, tipsButtons);
+		}
+		updateOverallAmount(mFooterView1);
 	}
 
 	@Override
@@ -719,6 +734,12 @@ public class OrderFragment extends Fragment {
 			list.animate().translationY(0).start();
 		}
 
+		// It is necessary to turn off hardware optimization for items list
+		// as on scale there are font and hidden dividers artifacts on mdpi devices.
+		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+		if (displayMetrics.densityDpi <= DisplayMetrics.DENSITY_MEDIUM) {
+			list.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		}
 		list.setAdapter(mAdapter);
 		list.setScrollingEnabled(false);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
@@ -1102,7 +1123,7 @@ public class OrderFragment extends Fragment {
 			updatePaymentTipsAmount(amount);
 		}
 		if(mMode == MODE_TIPS) {
-			mTipsWay = TipsWay.MANUAL_PERCENTAGE;
+			mTipsWay = TipsWay.MANUAL_PERCENTAGES;
 			showCustomTips(false);
 			otherTips.setChecked(true);
 			mCheckedId = otherTips.getId();
@@ -1129,7 +1150,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private TipData getSelectedTips(final BigDecimal amount) {
-		final CompoundButton btn = findById(getActivity(), radioGroup.getCheckedRadioButtonId());
+		final CompoundButton btn = findById(mFragmentView, radioGroup.getCheckedRadioButtonId());
 		return getSelectedTips(amount, btn);
 	}
 

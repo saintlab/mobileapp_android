@@ -26,7 +26,7 @@ public class LoaderError {
 			new LoaderError(EVENT_ORDER_CLOSED_ERROR, R.drawable.ic_flying_credit_card, R.string.order_closed,
 					R.string.error_ok, 0);
 
-	public static final String EVENT_BACKEND_ERROR = "backend_error";
+	public static final String EVENT_BACKEND_ERROR = "no_restaurant_connection";
 
 	public static final LoaderError BACKEND_ERROR =
 			new LoaderError(EVENT_BACKEND_ERROR, R.drawable.ic_line_noise, R.string.something_went_wrong, R.string.lets_try_again,
@@ -44,7 +44,7 @@ public class LoaderError {
 			new LoaderError(BLUETOOTH_DISABLED, R.drawable.ic_bluetooth_white, R.string.error_bluetooth_disabled,
 			                R.string.turn_on_bluetooth, 0);
 
-	public static final String EVENT_GEOLOCATION_DISABLED = "geolocation_disabled";
+	public static final String EVENT_GEOLOCATION_DISABLED = "no_geolocation_permission";
 
 	public static final LoaderError LOCATION_DISABLED =
 			new LoaderError(EVENT_GEOLOCATION_DISABLED, R.drawable.ic_geolocation_white, R.string.error_location_disabled,

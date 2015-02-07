@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 
 import com.omnom.android.R;
@@ -19,6 +20,7 @@ import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.BluetoothUtils;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -51,7 +53,7 @@ public class ValidateActivityBle extends ValidateActivity {
 	@Override
 	public void initUi() {
 		super.initUi();
-		if(AndroidUtils.isKitKat()) {
+		if(AndroidUtils.isJellyBeanMR2()) {
 			initBle();
 		}
 	}
@@ -190,7 +192,7 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                           });
 			}
 		};
-		if(AndroidUtils.isKitKat()) {
+		if(AndroidUtils.isJellyBeanMR2()) {
 			scanBleDevices(true, endCallback);
 		}
 	}
@@ -221,7 +223,9 @@ public class ValidateActivityBle extends ValidateActivity {
 			}, getResources().getInteger(R.integer.ble_scan_duration));
 			mBluetoothAdapter.startLeScan(mLeScanCallback);
 		} else {
-			mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			if (BluetoothUtils.isAdapterStateOn(mBluetoothAdapter)) {
+				mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			}
 			if(endCallback != null) {
 				endCallback.run();
 			}
