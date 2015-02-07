@@ -99,8 +99,12 @@ public class AndroidUtils {
 	public static final int MAX_ANIMATION_INCEREMENT = 20;
 
 	public static void showKeyboard(EditText view) {
-		InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 		view.requestFocus();
+		showKeyboard(view.getContext());
+	}
+
+	public static void showKeyboard(Context context) {
+		InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
 
