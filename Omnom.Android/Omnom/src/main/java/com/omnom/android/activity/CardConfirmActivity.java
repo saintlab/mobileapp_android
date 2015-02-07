@@ -46,12 +46,12 @@ import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ErrorUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.view.HeaderView;
 
-import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -367,7 +367,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 					errorMessage = getString(R.string.err_arguments);
 				}
 			}
-		} else if (throwable.getCause() instanceof UnknownHostException) {
+		} else if (ErrorUtils.isConnectionError(throwable)) {
 			errorMessage = getString(R.string.err_no_internet);
 		}
 
@@ -431,7 +431,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			                                           public void call(Throwable throwable) {
 				                                           Log.w(TAG, "verifyCard", throwable);
 				                                           CharSequence errorMessage = getString(R.string.something_went_wrong_try_again);
-				                                           if (throwable.getCause() instanceof UnknownHostException) {
+				                                           if (ErrorUtils.isConnectionError(throwable)) {
 					                                           errorMessage = getString(R.string.err_no_internet);
 				                                           }
 				                                           onVerificationError(errorMessage);

@@ -14,6 +14,7 @@ import com.omnom.android.protocol.BaseRequestInterceptor;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
+import retrofit.http.Field;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -87,5 +88,10 @@ public class WicketAuthenticator implements AuthService {
 	@Override
 	public Observable<AuthResponse> remindPassword(String email) {
 		return authService.remindPassword(email).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<AuthResponse> changePhone(@Field(Protocol.FIELD_PHONE) String phone) {
+		return authService.changePhone(phone).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 }

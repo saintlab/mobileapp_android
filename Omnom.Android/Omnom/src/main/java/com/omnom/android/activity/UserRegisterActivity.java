@@ -23,6 +23,7 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ClickSpan;
+import com.omnom.android.utils.utils.ErrorUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
@@ -236,6 +237,10 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 				}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					@Override
 					public void onError(Throwable throwable) {
+						if (ErrorUtils.isConnectionError(throwable)) {
+							textError.setText(getString(R.string.err_no_internet));
+							ViewUtils.setVisible(textError, true);
+						}
 						topPanel.showProgress(false);
 						Log.e(TAG, "doRegister ", throwable);
 					}

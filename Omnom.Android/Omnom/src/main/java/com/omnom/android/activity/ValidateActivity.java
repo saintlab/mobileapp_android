@@ -53,13 +53,13 @@ import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.BitmapUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.ClickSpan;
+import com.omnom.android.utils.utils.ErrorUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -485,7 +485,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			public void onError(Throwable throwable) {
-				if (throwable.getCause() instanceof UnknownHostException) {
+				if (ErrorUtils.isConnectionError(throwable)) {
 					mErrorHelper.showInternetError(loadConfigsErrorListener);
 				} else {
 					mErrorHelper.showUnknownError(loadConfigsErrorListener);
@@ -552,7 +552,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		                    .subscribe(new Action1<Boolean>() {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
-				                    if(hasNoErrors) {
+				                    if (hasNoErrors) {
 					                    clearErrors(false);
 					                    loadOrders(v);
 				                    } else {

@@ -60,4 +60,8 @@ public interface AuthService {
 	@FormUrlEncoded
 	@POST("/recover")
 	Observable<AuthResponse> remindPassword(@Field(Protocol.FIELD_EMAIL) String email);
+
+	@FormUrlEncoded
+	@POST("/recover")
+	Observable<AuthResponse> changePhone(@Field(Protocol.FIELD_PHONE) String phone);
 }

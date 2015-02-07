@@ -26,10 +26,21 @@
         omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
 
     <TextView
-        android:id="@+id/txt_info"
+        android:id="@+id/txt_change_phone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/edit_phone"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:gravity="left|center_vertical"
+        android:text="@string/phone_changed"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:textColor="@color/light_blue" />
+
+    <TextView
+        android:id="@+id/txt_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_change_phone"
         android:gravity="center"
         android:text="@string/login_havent_account_yet"
         android:textAppearance="?android:textAppearance"

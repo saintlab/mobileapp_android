@@ -95,6 +95,10 @@
     <string name="show_demo_mode">Показать демо-пример</string>
     <string name="login_havent_account_yet">Ещё нет аккаунта? Прошу сюда -</string>
     <string name="login_havent_account_registration">регистрация</string>
+    <string name="change_phone_title">Изменение номера</string>
+    <string name="phone_changed"><u>У меня сменился номер телефона</u></string>
+    <string name="enter_previous_phone_number">Укажите ваш предыдущий\nномер телефона</string>
+    <string name="phone_change_link_is_sent">На вашу почту была выслана\nссылка для&#160;смены номера\nтелефона</string>
     <string name="phone_country_code">+7</string>
     <string name="are_you_to_quit">Вы действительно хотите выйти?</string>
     <string name="quit">Выйти</string>

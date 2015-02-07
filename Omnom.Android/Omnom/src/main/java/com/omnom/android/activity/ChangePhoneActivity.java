@@ -1,6 +1,5 @@
 package com.omnom.android.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -17,66 +16,47 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ErrorUtils;
-import com.omnom.android.utils.utils.StringUtils;
-import com.omnom.android.utils.utils.UserDataHolder;
-import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.view.HeaderView;
 
 import butterknife.InjectView;
-import butterknife.OnClick;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
-public class LoginActivity extends BaseOmnomActivity {
+public class ChangePhoneActivity extends BaseOmnomActivity {
 
 	public static final int ERROR_AUTH_UNKNOWN_USER = 101;
 
-	private static final String TAG = LoginActivity.class.getSimpleName();
+	private static final String TAG = ChangePhoneActivity.class.getSimpleName();
 
-	public static void start(Context context, UserDataHolder dataHolder) {
-		throw new RuntimeException("IMPLEMENT");
-	}
-
-	public static void start(BaseOmnomActivity activity, String phone) {
-		final Intent intent = new Intent(activity, LoginActivity.class);
-		intent.putExtra(EXTRA_PHONE, phone);
-		activity.start(intent, R.anim.slide_in_right, R.anim.slide_out_left, true);
-	}
-
-	@InjectView(R.id.edit_phone)
-	protected ErrorEdit editPhone;
+	private static final int CHANGE_PHONE_SUCCESS_REQUEST = 100;
 
 	@InjectView(R.id.panel_top)
 	protected HeaderView topPanel;
 
-	@InjectView(R.id.txt_change_phone)
-	protected TextView txtChangePhone;
-
-	@InjectView(R.id.txt_info)
-	protected TextView txtInfo;
-
-	@InjectView(R.id.txt_register)
-	protected TextView txtRegister;
+	@InjectView(R.id.edit_phone)
+	protected ErrorEdit editPhone;
 
 	private boolean mFirstStart = true;
-
-	private String mPhone;
 
 	private Subscription mProceedSubscription;
 
 	@Override
 	public void initUi() {
-		topPanel.setTitle(R.string.enter);
+		topPanel.setTitleBig(R.string.change_phone_title);
+		topPanel.setButtonLeftDrawable(R.drawable.ic_action_previous_item, new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
 		topPanel.setButtonRight(R.string.proceed, new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				doProceed();
 			}
 		});
-		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 0);
-		topPanel.setContentVisibility(false, true);
 		editPhone.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
@@ -100,11 +80,7 @@ public class LoginActivity extends BaseOmnomActivity {
 				@Override
 				public void run() {
 					final EditText editText = editPhone.getEditText();
-					String value = mPhone;
-					if (value == null) {
-						value = AndroidUtils.getDevicePhoneNumber(getActivity(), R.string.phone_country_code);
-					}
-					editText.setText(value);
+					editText.setText(getString(R.string.phone_country_code));
 					AndroidUtils.moveCursorEnd(editText);
 					AndroidUtils.showKeyboard(editText);
 				}
@@ -130,43 +106,13 @@ public class LoginActivity extends BaseOmnomActivity {
 		AndroidUtils.hideKeyboard(this);
 	}
 
-	@Override
-	protected void handleIntent(Intent intent) {
-		mPhone = intent.getStringExtra(EXTRA_PHONE);
-	}
-
-	@OnClick(R.id.txt_change_phone)
-	public void doChangePhone() {
-		AndroidUtils.hideKeyboard(editPhone);
-		final Intent intent = new Intent(this, ChangePhoneActivity.class);
-		start(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
-	}
-
-	@OnClick(R.id.txt_register)
-	public void doRegister() {
-		AndroidUtils.hideKeyboard(editPhone);
-		final Intent intent = new Intent(this, UserRegisterActivity.class);
-		intent.putExtra(EXTRA_PHONE, editPhone.getText().toString());
-		start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
-		postDelayed(getResources().getInteger(android.R.integer.config_longAnimTime), new Runnable() {
-			@Override
-			public void run() {
-				LoginActivity.this.finish();
-			}
-		});
-	}
-
 	public void doProceed() {
-		if(!validate() || isBusy()) {
+		if(isBusy()) {
 			return;
 		}
 		busy(true);
 		topPanel.showProgress(true);
-		ViewUtils.setVisible(txtChangePhone, false);
-		ViewUtils.setVisible(txtInfo, false);
-		ViewUtils.setVisible(txtRegister, false);
-		mProceedSubscription = AndroidObservable.bindActivity(this, authenticator.authorizePhone(editPhone.getText(),
-		                                                                                         StringUtils.EMPTY_STRING))
+		mProceedSubscription = AndroidObservable.bindActivity(this, authenticator.changePhone(editPhone.getText()))
 		                                        .subscribe(new Action1<AuthResponse>() {
 			                                        @Override
 			                                        public void call(AuthResponse authResponse) {
@@ -176,22 +122,15 @@ public class LoginActivity extends BaseOmnomActivity {
 							                                        R.integer.default_animation_duration_short), new Runnable() {
 						                                        @Override
 						                                        public void run() {
-							                                        final Intent intent = new Intent(LoginActivity.this,
-							                                                                         ConfirmPhoneActivity.class);
-							                                        intent.putExtra(EXTRA_PHONE, editPhone.getText());
-							                                        intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_LOGIN);
-							                                        start(intent, R.anim.slide_in_right, R.anim.slide_out_left,
-							                                              false);
+							                                        final Intent intent = new Intent(ChangePhoneActivity.this,
+							                                                                         ChangePhoneSuccessActivity.class);
+							                                        startForResult(intent, R.anim.slide_in_right, R.anim.slide_out_left,
+									                                        CHANGE_PHONE_SUCCESS_REQUEST);
 						                                        }
 					                                        });
 				                                        } else {
 					                                        final AuthError error = authResponse.getError();
 					                                        if(error != null) {
-						                                        if(error.getCode() == ERROR_AUTH_UNKNOWN_USER) {
-							                                        ViewUtils.setVisible(txtChangePhone, false);
-							                                        ViewUtils.setVisible(txtInfo, true);
-							                                        ViewUtils.setVisible(txtRegister, true);
-						                                        }
 						                                        editPhone.setError(error.getMessage());
 					                                        }
 					                                        topPanel.showProgress(false);
@@ -201,7 +140,7 @@ public class LoginActivity extends BaseOmnomActivity {
 		                                        }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			                                        @Override
 			                                        public void onError(Throwable throwable) {
-				                                        Log.e(TAG, ":authorizePhone doProceed ", throwable);
+				                                        Log.e(TAG, ":changePhone doProceed ", throwable);
 				                                        if (ErrorUtils.isConnectionError(throwable)) {
 					                                        showError(getString(R.string.err_no_internet));
 				                                        } else {
@@ -225,9 +164,17 @@ public class LoginActivity extends BaseOmnomActivity {
 	}
 
 	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == CHANGE_PHONE_SUCCESS_REQUEST && resultCode == RESULT_OK) {
+			finish();
+		}
+	}
+
+	@Override
 	public void finish() {
 		super.finish();
-		overridePendingTransition(R.anim.fake_fade_out_long, R.anim.slide_out_down);
+		overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 	}
 
 	@Override
@@ -236,13 +183,8 @@ public class LoginActivity extends BaseOmnomActivity {
 		OmnomObservable.unsubscribe(mProceedSubscription);
 	}
 
-	private boolean validate() {
-		// TODO: check
-		return true;
-	}
-
 	@Override
 	public int getLayoutResource() {
-		return R.layout.activity_login;
+		return R.layout.activity_change_phone;
 	}
 }
