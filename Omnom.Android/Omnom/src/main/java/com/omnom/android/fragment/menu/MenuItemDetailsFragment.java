@@ -109,7 +109,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 				final Item item = MenuHelper.getItem(mMenu, recId);
 				holder.updateState(mOrder, item);
-				holder.bind(item);
+				holder.bind(item, false);
 				itemView.setTag(holder);
 				itemView.setTag(R.id.item, item);
 
@@ -124,7 +124,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	private void refresh() {
 		holder.updateState(mOrder, mItem);
-		holder.bind(mItem);
+		holder.bind(mItem, true);
 
 		final int childCount = mPanelRecommendations.getChildCount();
 		for(int i = 0; i < childCount; i++) {
@@ -133,7 +133,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			final Item item = (Item) childAt.getTag(R.id.item);
 			if(holder != null && item != null) {
 				holder.updateState(mOrder, item);
-				holder.bind(item);
+				holder.bind(item, false);
 			}
 		}
 	}

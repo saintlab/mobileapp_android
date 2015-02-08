@@ -157,7 +157,7 @@ public class WishListAdapter extends BaseAdapter {
 
 				final String price = StringUtils.formatCurrency(data.item().price(), mContext.getString(R.string.currency_suffix_ruble));
 				holder.txtPrice.setText(mContext.getString(R.string.wish_items_price_detailed, data.amount(), price));
-				MenuHelper.bindDetails(mContext, data.item().details(), holder.txtInfo);
+				MenuHelper.bindDetails(mContext, data.item().details(), holder.txtInfo, false);
 			}
 		}
 	}

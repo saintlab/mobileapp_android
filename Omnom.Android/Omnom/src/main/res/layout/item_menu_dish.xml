@@ -17,6 +17,7 @@
         android:singleLine="false"
         android:maxLines="2"
         android:ellipsize="end"
+        android:paddingBottom="4dp"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
         android:textAppearance="?android:textAppearanceLarge" />
 
@@ -34,7 +35,7 @@
         android:ellipsize="end"
         android:textColor="@color/menu_item_details"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-        android:textAppearance="?android:textAppearance" />
+        android:textAppearance="?android:textAppearanceSmall" />
 
     <Button
         android:id="@+id/btn_apply"

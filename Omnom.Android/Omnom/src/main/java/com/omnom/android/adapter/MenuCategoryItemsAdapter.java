@@ -78,11 +78,11 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 		private Context getContext() {return btnApply.getContext();}
 
-		public void bind(final Item item) {
+		public void bind(final Item item, boolean detailed) {
 			if(item == null) {
 				return;
 			}
-			bindDetails(item);
+			bindDetails(item, detailed);
 			bindImage(item);
 			txtTitle.setText(item.name());
 
@@ -113,8 +113,8 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			}
 		}
 
-		private void bindDetails(final Item item) {
-			MenuHelper.bindDetails(getContext(), item.details(), txtDetails);
+		private void bindDetails(final Item item, boolean detailed) {
+			MenuHelper.bindDetails(getContext(), item.details(), txtDetails, detailed);
 		}
 
 		public void showDivider(final boolean show) {
@@ -321,7 +321,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			holder.txtTitle.setText(item.name());
 		} else {
 			holder.updateState(mOrder, item);
-			holder.bind(item);
+			holder.bind(item, false);
 			final int padding = ViewUtils.dipToPixels(convertView.getContext(), 16f);
 			if(position == mInnerItems.size() - 1) {
 				holder.showDivider(false);
