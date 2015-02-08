@@ -142,6 +142,12 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 		@Nullable
 		@Override
+		public List<String> recommendations() {
+			return Collections.EMPTY_LIST;
+		}
+
+		@Nullable
+		@Override
 		public String id() {
 			return mCategory.name();
 		}

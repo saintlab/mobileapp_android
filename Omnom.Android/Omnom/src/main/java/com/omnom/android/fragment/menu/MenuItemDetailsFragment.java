@@ -4,9 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.omnom.android.R;
@@ -16,7 +18,10 @@ import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
+
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -25,7 +30,7 @@ import butterknife.OnClick;
 /**
  * Created by Ch3D on 03.02.2015.
  */
-public class MenuItemDetailsFragment extends BaseFragment {
+public class MenuItemDetailsFragment extends BaseFragment implements View.OnClickListener {
 
 	public static Fragment newInstance(Menu menu, final UserOrder order, final Item item) {
 		final MenuItemDetailsFragment fragment = new MenuItemDetailsFragment();
@@ -50,6 +55,9 @@ public class MenuItemDetailsFragment extends BaseFragment {
 
 	@InjectView(R.id.txt_info_additional)
 	protected TextView mTxtAdditional;
+
+	@InjectView(R.id.panel_bottom)
+	protected LinearLayout mPanelRecommendations;
 
 	protected UserOrder mOrder;
 
@@ -85,12 +93,45 @@ public class MenuItemDetailsFragment extends BaseFragment {
 		holder = new MenuCategoryItemsAdapter.ViewHolder(viewRoot);
 		holder.setDelimiterVisible(false);
 		refresh();
-		mTxtAdditional.setText(mItem.description());
+
+		final String description = mItem.description();
+		ViewUtils.setVisible(mTxtAdditional, !TextUtils.isEmpty(description));
+		mTxtAdditional.setText(description);
+
+		final List<String> recommendations = mItem.recommendations();
+		if(recommendations != null && recommendations.size() > 0) {
+			for(String recId : recommendations) {
+				final View itemView = LayoutInflater.from(view.getContext()).inflate(R.layout.item_menu_dish, null, false);
+				MenuCategoryItemsAdapter.ViewHolder holder = new MenuCategoryItemsAdapter.ViewHolder(itemView);
+				final Item item = mMenu.items().items().get(recId);
+				holder.updateState(mOrder, item);
+				holder.bind(item);
+				itemView.setTag(holder);
+				itemView.setTag(R.id.item, item);
+
+				final View btnApply = itemView.findViewById(R.id.btn_apply);
+				btnApply.setOnClickListener(this);
+				btnApply.setTag(R.id.item, item);
+
+				mPanelRecommendations.addView(itemView);
+			}
+		}
 	}
 
 	private void refresh() {
 		holder.updateState(mOrder, mItem);
 		holder.bind(mItem);
+
+		final int childCount = mPanelRecommendations.getChildCount();
+		for(int i = 0; i < childCount; i++) {
+			final View childAt = mPanelRecommendations.getChildAt(i);
+			final MenuCategoryItemsAdapter.ViewHolder holder = (MenuCategoryItemsAdapter.ViewHolder) childAt.getTag();
+			final Item item = (Item) childAt.getTag(R.id.item);
+			if(holder != null && item != null) {
+				holder.updateState(mOrder, item);
+				holder.bind(item);
+			}
+		}
 	}
 
 	@Subscribe
@@ -98,13 +139,21 @@ public class MenuItemDetailsFragment extends BaseFragment {
 		if(event == null || event.getItem() == null) {
 			return;
 		}
-		if(mItem.id().equals(event.getItem().id())) {
-			refresh();
-		}
+		refresh();
 	}
 
 	@OnClick(R.id.btn_apply)
 	public void onApply() {
 		MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, mItem);
+	}
+
+	@Override
+	public void onClick(final View v) {
+		if(v.getId() == R.id.btn_apply) {
+			final Item item = (Item) v.getTag(R.id.item);
+			if(item != null) {
+				MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, item);
+			}
+		}
 	}
 }
