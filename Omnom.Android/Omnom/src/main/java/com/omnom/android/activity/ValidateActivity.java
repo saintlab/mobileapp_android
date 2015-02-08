@@ -740,6 +740,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == REQUEST_CODE_WISH_LIST) {
+			if(resultCode == RESULT_CANCELED) {
+				mOrder = UserOrder.create();
+			}
+		}
 		if(requestCode == REQUEST_CODE_CHANGE_TABLE && resultCode == RESULT_CODE_TABLE_CHANGED) {
 			finish();
 		}

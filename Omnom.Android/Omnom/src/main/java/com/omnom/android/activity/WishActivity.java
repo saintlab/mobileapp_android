@@ -1,6 +1,7 @@
 package com.omnom.android.activity;
 
 import android.content.Intent;
+import android.view.View;
 import android.widget.ListView;
 
 import com.omnom.android.R;
@@ -14,7 +15,7 @@ import java.util.Collections;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class WishActivity extends BaseOmnomFragmentActivity {
+public class WishActivity extends BaseOmnomFragmentActivity implements View.OnClickListener {
 
 	public static void start(OmnomActivity activity, UserOrder order, int code) {
 		final Intent intent = new Intent(activity.getActivity(), WishActivity.class);
@@ -29,6 +30,8 @@ public class WishActivity extends BaseOmnomFragmentActivity {
 
 	private WishListAdapter mAdapter;
 
+	private boolean mClear = false;
+
 	@OnClick(R.id.txt_close)
 	public void onClose() {
 		finish();
@@ -37,6 +40,7 @@ public class WishActivity extends BaseOmnomFragmentActivity {
 	@Override
 	public void finish() {
 		super.finish();
+		setResult(mClear ? RESULT_CANCELED : RESULT_OK);
 		overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 	}
 
@@ -48,12 +52,30 @@ public class WishActivity extends BaseOmnomFragmentActivity {
 
 	@Override
 	public void initUi() {
-		mAdapter = new WishListAdapter(this, mOrder.getSelectedItems(), Collections.EMPTY_LIST);
+		mAdapter = new WishListAdapter(this, mOrder.getSelectedItems(), Collections.EMPTY_LIST, this);
 		mList.setAdapter(mAdapter);
 	}
 
 	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_wish;
+	}
+
+	@Override
+	public void onClick(final View v) {
+		if(v.getId() == R.id.btn_clear) {
+			doClear();
+		}
+		if(v.getId() == R.id.btn_send) {
+
+		}
+	}
+
+	private void doClear() {
+
+		mClear = true;
+		mOrder = UserOrder.create();
+		mAdapter = new WishListAdapter(this, mOrder.getSelectedItems(), Collections.EMPTY_LIST, this);
+		mList.setAdapter(mAdapter);
 	}
 }

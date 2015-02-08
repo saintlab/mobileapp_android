@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     tools:context="com.omnom.android.activity.WishActivity">
 
     <FrameLayout
@@ -27,6 +28,7 @@
         android:id="@android:id/list"
         android:divider="@null"
         android:dividerHeight="0dp"
+        android:animateLayoutChanges="true"
         android:listSelector="@color/transparent"
         android:layout_below="@+id/panel_top"
         android:layout_width="match_parent"

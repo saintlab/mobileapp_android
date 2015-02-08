@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.omnom.android.R;
@@ -57,7 +58,10 @@ public class WishListAdapter extends BaseAdapter {
 
 	private final LayoutInflater mInflater;
 
-	public WishListAdapter(Context context, List<UserOrderData> wishItems, List<Item> tableItems) {
+	private View.OnClickListener mClickListener;
+
+	public WishListAdapter(Context context, List<UserOrderData> wishItems, List<Item> tableItems, View.OnClickListener clickListener) {
+		mClickListener = clickListener;
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
 		mWishItems = wishItems;
@@ -137,7 +141,12 @@ public class WishListAdapter extends BaseAdapter {
 
 				case VIEW_TYPE_WISH_FOOTER:
 					convertView = mInflater.inflate(R.layout.item_wish_footer, parent, false);
+					final Button btnClear = (Button) convertView.findViewById(R.id.btn_clear);
+					btnClear.setOnClickListener(mClickListener);
+					final Button btnSend = (Button) convertView.findViewById(R.id.btn_send);
+					btnSend.setOnClickListener(mClickListener);
 					break;
+
 				case VIEW_TYPE_TABLE_HEADER:
 					convertView = mInflater.inflate(R.layout.item_wish_table_header, parent, false);
 					break;
