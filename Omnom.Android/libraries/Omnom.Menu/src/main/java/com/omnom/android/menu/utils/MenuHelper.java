@@ -5,6 +5,8 @@ import android.widget.TextView;
 
 import com.omnom.android.menu.R;
 import com.omnom.android.menu.model.Details;
+import com.omnom.android.menu.model.Item;
+import com.omnom.android.menu.model.Menu;
 import com.omnom.android.utils.utils.ViewUtils;
 
 /**
@@ -17,5 +19,12 @@ public class MenuHelper {
 		if(hasDetails) {
 			txtDetails.setText(context.getString(R.string.dish_details, details.energyTotal(), details.weight()));
 		}
+	}
+
+	public static Item getItem(final Menu menu, final String recId) {
+		if(menu == null || menu.items() == null || menu.items().items() == null) {
+			return null;
+		}
+		return menu.items().items().get(recId);
 	}
 }

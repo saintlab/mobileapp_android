@@ -17,6 +17,7 @@ import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.UserOrder;
+import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
@@ -105,7 +106,8 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			for(String recId : recommendations) {
 				final View itemView = LayoutInflater.from(view.getContext()).inflate(R.layout.item_menu_dish, null, false);
 				MenuCategoryItemsAdapter.ViewHolder holder = new MenuCategoryItemsAdapter.ViewHolder(itemView);
-				final Item item = mMenu.items().items().get(recId);
+
+				final Item item = MenuHelper.getItem(mMenu, recId);
 				holder.updateState(mOrder, item);
 				holder.bind(item);
 				itemView.setTag(holder);
