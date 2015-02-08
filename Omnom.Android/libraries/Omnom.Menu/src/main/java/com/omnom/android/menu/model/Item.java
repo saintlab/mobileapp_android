@@ -35,4 +35,7 @@ public abstract class Item implements Parcelable {
 
 	@Nullable
 	public abstract Details details();
+
+	@Nullable
+	public abstract List<String> recommendations();
 }
