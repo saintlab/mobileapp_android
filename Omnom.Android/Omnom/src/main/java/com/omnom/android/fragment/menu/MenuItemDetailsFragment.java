@@ -99,7 +99,9 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		mTxtAdditional.setText(description);
 
 		final List<String> recommendations = mItem.recommendations();
-		if(recommendations != null && recommendations.size() > 0) {
+		final boolean hasRecommendations = recommendations != null && recommendations.size() > 0;
+		ViewUtils.setVisible(mPanelRecommendations, hasRecommendations);
+		if(hasRecommendations) {
 			for(String recId : recommendations) {
 				final View itemView = LayoutInflater.from(view.getContext()).inflate(R.layout.item_menu_dish, null, false);
 				MenuCategoryItemsAdapter.ViewHolder holder = new MenuCategoryItemsAdapter.ViewHolder(itemView);
