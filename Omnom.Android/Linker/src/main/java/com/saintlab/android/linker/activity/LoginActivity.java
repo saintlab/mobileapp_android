@@ -15,8 +15,6 @@ import android.widget.TextView;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
-import com.omnom.android.linker.BuildConfig;
-import com.omnom.android.linker.R;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.activity.BaseActivity;
@@ -26,7 +24,9 @@ import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.UserDataHolder;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEditText;
+import com.saintlab.android.linker.BuildConfig;
 import com.saintlab.android.linker.LinkerApplication;
+import com.saintlab.android.linker.R;
 
 import javax.inject.Inject;
 
