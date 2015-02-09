@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/panel_bottom"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:showIn="@layout/item_menu_dish">
+
+    <RelativeLayout
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/menu_header"
+            tools:showIn="@layout/activity_login" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_centerInParent="true"
+            android:textColor="@color/menu_header"
+            android:background="@android:color/white"
+            android:text="Хорошо вместе"
+            android:textAppearance="?android:textAppearance"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    </RelativeLayout>
+
+</LinearLayout>

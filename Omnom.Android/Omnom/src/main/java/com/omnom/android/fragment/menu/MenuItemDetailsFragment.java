@@ -1,5 +1,6 @@
 package com.omnom.android.fragment.menu;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -54,6 +55,51 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		       .commit();
 	}
 
+	public static boolean addRecommendations(final Context context, LinearLayout container, Menu menu, UserOrder order, Item item,
+	                                         View.OnClickListener onClickListener) {
+		removeRecommendations(container);
+
+		final boolean hasRecommendations = item.hasRecommendations();
+		ViewUtils.setVisible(container, hasRecommendations);
+
+		if(hasRecommendations) {
+			final List<String> recommendations = item.recommendations();
+			final LayoutInflater inflater = LayoutInflater.from(context);
+			int index = 0;
+			for(String recId : recommendations) {
+				index++;
+				final View itemView = inflater.inflate(R.layout.item_menu_dish, null, false);
+				MenuCategoryItemsAdapter.ViewHolder holder = new MenuCategoryItemsAdapter.ViewHolder(itemView);
+
+				final Item recommendedItem = MenuHelper.getItem(menu, recId);
+				holder.updateState(order, recommendedItem);
+				holder.bind(recommendedItem, order, menu, false);
+				holder.showDivider(index != recommendations.size());
+
+				itemView.setTag(holder);
+				itemView.setTag(R.id.item, recommendedItem);
+
+				final View btnApply = itemView.findViewById(R.id.btn_apply);
+				btnApply.setOnClickListener(onClickListener);
+				btnApply.setTag(R.id.item, recommendedItem);
+
+				container.addView(itemView);
+			}
+			container.addView(inflater.inflate(R.layout.view_recommendations_footer, null, false));
+		}
+		return hasRecommendations;
+	}
+
+	public static void removeRecommendations(final LinearLayout container) {
+		final int childCount = container.getChildCount();
+		for(int i = 0; i < childCount; i++) {
+			final View childAt = container.getChildAt(i);
+			if(childAt != null && childAt.getId() != R.id.divider) {
+				container.removeView(childAt);
+			}
+		}
+	}
+
 	@InjectView(R.id.txt_info_additional)
 	protected TextView mTxtAdditional;
 
@@ -92,39 +138,19 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		final View viewRoot = view.findViewById(R.id.root);
 		ButterKnife.inject(this, view);
 		holder = new MenuCategoryItemsAdapter.ViewHolder(viewRoot);
-		holder.setDelimiterVisible(false);
+		holder.showDivider(false);
 		refresh();
 
 		final String description = mItem.description();
 		ViewUtils.setVisible(mTxtAdditional, !TextUtils.isEmpty(description));
 		mTxtAdditional.setText(description);
 
-		final List<String> recommendations = mItem.recommendations();
-		final boolean hasRecommendations = recommendations != null && recommendations.size() > 0;
-		ViewUtils.setVisible(mPanelRecommendations, hasRecommendations);
-		if(hasRecommendations) {
-			for(String recId : recommendations) {
-				final View itemView = LayoutInflater.from(view.getContext()).inflate(R.layout.item_menu_dish, null, false);
-				MenuCategoryItemsAdapter.ViewHolder holder = new MenuCategoryItemsAdapter.ViewHolder(itemView);
-
-				final Item item = MenuHelper.getItem(mMenu, recId);
-				holder.updateState(mOrder, item);
-				holder.bind(item, false);
-				itemView.setTag(holder);
-				itemView.setTag(R.id.item, item);
-
-				final View btnApply = itemView.findViewById(R.id.btn_apply);
-				btnApply.setOnClickListener(this);
-				btnApply.setTag(R.id.item, item);
-
-				mPanelRecommendations.addView(itemView);
-			}
-		}
+		addRecommendations(view.getContext(), mPanelRecommendations, mMenu, mOrder, mItem, this);
 	}
 
 	private void refresh() {
 		holder.updateState(mOrder, mItem);
-		holder.bind(mItem, true);
+		holder.bind(mItem, mOrder, mMenu, true);
 
 		final int childCount = mPanelRecommendations.getChildCount();
 		for(int i = 0; i < childCount; i++) {
@@ -133,7 +159,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			final Item item = (Item) childAt.getTag(R.id.item);
 			if(holder != null && item != null) {
 				holder.updateState(mOrder, item);
-				holder.bind(item, false);
+				holder.bind(item, mOrder, mMenu, false);
 			}
 		}
 	}

@@ -156,9 +156,17 @@ public class MenuSubcategoryFragment extends BaseFragment {
 		ButterKnife.inject(this, view);
 
 		final Category category = mMenu.categories().get(mPosition);
-		mAdapter = new MenuCategoryItemsAdapter(this, mOrder, category, mMenu.items().items());
-		mTxtTitle.setText(category.name());
+		mAdapter = new MenuCategoryItemsAdapter(this, mMenu, mOrder, category, mMenu.items().items(), new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				final Item recommendedItem = (Item) v.getTag(R.id.item);
+				if(recommendedItem != null) {
+					showAddFragment(recommendedItem);
+				}
+			}
+		});
 
+		mTxtTitle.setText(category.name());
 		mListView.setAdapter(mAdapter);
 		mListView.setShadowVisible(false);
 		mListView.setDividerHeight(0);

@@ -7,17 +7,21 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.fragment.menu.MenuSubcategoryFragment;
 import com.omnom.android.menu.model.Category;
 import com.omnom.android.menu.model.Details;
 import com.omnom.android.menu.model.Item;
+import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.MenuItemState;
 import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
@@ -49,12 +53,19 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 	public static final int VIEW_TYPE_SUBHEADER = 2;
 
 	public static class ViewHolder {
+		@Nullable
+		private final View.OnClickListener mRecommendationClickListener;
+
 		@InjectView(R.id.txt_title)
 		protected TextView txtTitle;
 
 		@InjectView(R.id.delimiter)
 		@Optional
 		protected View viewDelimiter;
+
+		@InjectView(R.id.stub)
+		@Optional
+		protected ViewStub viewStub;
 
 		@InjectView(R.id.btn_apply)
 		@Optional
@@ -64,40 +75,62 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		@Optional
 		protected TextView txtDetails;
 
+		@InjectView(R.id.root)
+		@Optional
+		protected View root;
+
 		@InjectView(R.id.img_icon)
 		@Optional
 		protected ImageView imgIcon;
 
 		private MenuItemState mState = MenuItemState.NONE;
 
-		private int mDividerPadding;
-
 		public ViewHolder(View convertView) {
+			this(convertView, null);
+		}
+
+		public ViewHolder(final View convertView, final View.OnClickListener recommendationClickListener) {
 			ButterKnife.inject(this, convertView);
+			mRecommendationClickListener = recommendationClickListener;
 		}
 
 		private Context getContext() {return btnApply.getContext();}
 
-		public void bind(final Item item, boolean detailed) {
+		public void bind(final Item item, UserOrder order, Menu menu, boolean detailed) {
 			if(item == null) {
 				return;
 			}
+
 			bindDetails(item, detailed);
 			bindImage(item);
 			txtTitle.setText(item.name());
-
 			btnApply.setTag(item);
-			if(mState == MenuItemState.ADDED || mState == MenuItemState.ORDERED) {
+
+			LinearLayout viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
+			if(viewById != null) {
+				MenuItemDetailsFragment.removeRecommendations(viewById);
+				ViewUtils.setVisible(viewById, false);
+			}
+
+			if(isRecommendationsVisible()) {
 				btnApply.setBackgroundResource(R.drawable.btn_wish_added);
 				btnApply.setText(StringUtils.EMPTY_STRING);
+				if(viewById == null) {
+					if(viewStub != null) {
+						ViewUtils.setVisible(viewStub, true);
+					}
+				}
+				viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
+				MenuItemDetailsFragment.addRecommendations(viewById.getContext(), viewById, menu, order, item,
+				                                           mRecommendationClickListener);
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
 				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
 			}
 		}
 
-		public void setDelimiterVisible(final boolean visible) {
-			ViewUtils.setVisible(viewDelimiter, visible);
+		public boolean isRecommendationsVisible() {
+			return mState == MenuItemState.ADDED || mState == MenuItemState.ORDERED;
 		}
 
 		public void updateState(final UserOrder order, final Item item) {
@@ -206,15 +239,22 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 	private final LayoutInflater mInflater;
 
+	private View.OnClickListener mRecommendationClickListener;
+
+	private Menu mMenu;
+
 	private UserOrder mOrder;
 
 	private ArrayList<Item> mInnerItems;
 
-	public MenuCategoryItemsAdapter(MenuSubcategoryFragment fragment, final UserOrder order, Category category, Map<String, Item> items) {
+	public MenuCategoryItemsAdapter(MenuSubcategoryFragment fragment, Menu menu, final UserOrder order, Category category, Map<String,
+			Item> items, View.OnClickListener recommendationClickListener) {
 		mContext = fragment;
+		mMenu = menu;
 		mOrder = order;
 		mCategory = category;
 		mItems = items;
+		mRecommendationClickListener = recommendationClickListener;
 		mInflater = LayoutInflater.from(fragment.getActivity());
 		initData();
 	}
@@ -307,7 +347,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 					convertView = mInflater.inflate(R.layout.item_menu_subheader, parent, false);
 					break;
 			}
-			holder = new ViewHolder(convertView);
+			holder = new ViewHolder(convertView, mRecommendationClickListener);
 			convertView.setTag(holder);
 		}
 
@@ -321,7 +361,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			holder.txtTitle.setText(item.name());
 		} else {
 			holder.updateState(mOrder, item);
-			holder.bind(item, false);
+			holder.bind(item, mOrder, mMenu, false);
 			final int padding = ViewUtils.dipToPixels(convertView.getContext(), 16f);
 			if(position == mInnerItems.size() - 1) {
 				holder.showDivider(false);
@@ -329,7 +369,11 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 				final Item nextItem = mInnerItems.get(position + 1);
 				final boolean isSubheaderNext = nextItem instanceof SubHeaderItem;
 				final boolean isHeaderNext = nextItem instanceof HeaderItem;
-				holder.showDivider(!isSubheaderNext);
+				if(item.hasRecommendations() && holder.isRecommendationsVisible()) {
+					holder.showDivider(false);
+				} else {
+					holder.showDivider(!isSubheaderNext);
+				}
 				holder.setDividerPadding(isHeaderNext && !isSubheaderNext ? 0 : padding);
 			}
 		}

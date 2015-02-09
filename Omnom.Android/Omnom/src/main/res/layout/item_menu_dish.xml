@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:paddingTop="@dimen/activity_vertical_margin_small"
     android:baselineAligned="false"
+    android:animateLayoutChanges="true"
     android:gravity="center">
 
     <TextView
@@ -48,6 +49,13 @@
         android:textColor="@drawable/text_color_selector_menu_blue"
         android:textAppearance="?android:textAppearance"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    <ViewStub
+        android:id="@+id/stub"
+        android:layout="@layout/layout_recommendations"
+        android:inflatedId="@+id/panel_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <View
         android:id="@+id/delimiter"
