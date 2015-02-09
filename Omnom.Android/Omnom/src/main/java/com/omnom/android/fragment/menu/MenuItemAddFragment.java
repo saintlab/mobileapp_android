@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
+import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.adapter.MenuModifiersAdapter;
 import com.omnom.android.fragment.base.BaseFragment;
@@ -162,7 +163,7 @@ public class MenuItemAddFragment extends BaseFragment {
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
 		List<Modifier> dishModifiers = new ArrayList<Modifier>();
-		if(true) {
+		if(BuildConfig.DEBUG) {
 			// TODO: Debug code - remove it when done
 			final ArrayList<String> idList = new ArrayList<String>();
 			idList.add("28-in-saintlab-rkeeper-v6");
