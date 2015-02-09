@@ -10,6 +10,7 @@ import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.activity.BaseFragmentActivity;
 
 import java.util.List;
 
@@ -32,6 +33,11 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 	}
 
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
+		Intent intent = createIntent(context, animationType, false, ConfirmPhoneActivity.TYPE_DEFAULT);
+		context.startForResult(intent, enterAnim, exitAnim, REQUEST_CODE_CHANGE_TABLE);
+	}
+
+	public static void start(BaseFragmentActivity context, int enterAnim, int exitAnim, int animationType) {
 		Intent intent = createIntent(context, animationType, false, ConfirmPhoneActivity.TYPE_DEFAULT);
 		context.startForResult(intent, enterAnim, exitAnim, REQUEST_CODE_CHANGE_TABLE);
 	}
@@ -68,7 +74,7 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 		mErrorHelper.showWrongQrError(requestId, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				startLoader();
+				decode(true);
 			}
 		});
 	}

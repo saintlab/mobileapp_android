@@ -19,6 +19,8 @@ public class AcquiringPollingResponse {
 	 */
 	public static final String STATUS_CONTINUE = "OK_CONTINUE";
 
+	public static final String ERR_ARGUMENTS = "ERR_ARGUMENTS";
+
 	@Expose
 	private String status;
 

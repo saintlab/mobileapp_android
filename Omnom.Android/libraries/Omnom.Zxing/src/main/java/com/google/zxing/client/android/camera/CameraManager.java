@@ -55,11 +55,17 @@ public final class CameraManager {
 	private int requestedCameraId = -1;
 	private int requestedFramingRectWidth;
 	private int requestedFramingRectHeight;
+	private boolean isManualTorchChange;
+	private TorchListener mTorchListener;
 	/**
 	 * Preview frames are delivered here, which we pass on to the registered handler. Make sure to
 	 * clear the handler so it will only receive one message.
 	 */
 	private final PreviewCallback previewCallback;
+
+	public interface TorchListener {
+		void onTorchStateChange(boolean isTurnedOn);
+	}
 
 	public CameraManager(Context context) {
 		this.context = context;
@@ -88,6 +94,10 @@ public final class CameraManager {
 			}
 			camera = theCamera;
 		}
+		Camera.Parameters parameters = theCamera.getParameters();
+		parameters.set("orientation", "portrait");
+		theCamera.setParameters(parameters);
+		theCamera.setDisplayOrientation(90);
 		theCamera.setPreviewDisplay(holder);
 
 		if (!initialized) {
@@ -100,7 +110,7 @@ public final class CameraManager {
 			}
 		}
 
-		Camera.Parameters parameters = theCamera.getParameters();
+		parameters = theCamera.getParameters();
 		String parametersFlattened = parameters == null ? null : parameters.flatten(); // Save these, temporarily
 		try {
 			configManager.setDesiredCameraParameters(theCamera, false);
@@ -169,23 +179,45 @@ public final class CameraManager {
 		}
 	}
 
+	public void setTorchListener(final TorchListener torchListener) {
+		mTorchListener = torchListener;
+	}
+
+	/**
+	 * Convenience method for {@link com.google.zxing.client.android.CaptureActivity}
+	 *
+	 * @param newSetting if {@code true}, light should be turned on if currently off. And vice versa.
+	 * @param isManualTorchChange true if torch state is changed manually
+	 */
+	public synchronized void setTorch(boolean newSetting, boolean isManualTorchChange) {
+		if (isManualTorchChange) {
+			this.isManualTorchChange = true;
+		}
+		if (newSetting != configManager.getTorchState(camera)) {
+			if (camera != null) {
+				if (autoFocusManager != null) {
+					autoFocusManager.stop();
+				}
+				if (!this.isManualTorchChange || isManualTorchChange) {
+					if (mTorchListener != null) {
+						mTorchListener.onTorchStateChange(newSetting);
+					}
+					configManager.setTorch(camera, newSetting);
+				}
+				if (autoFocusManager != null) {
+					autoFocusManager.start();
+				}
+			}
+		}
+	}
+
 	/**
 	 * Convenience method for {@link com.google.zxing.client.android.CaptureActivity}
 	 *
 	 * @param newSetting if {@code true}, light should be turned on if currently off. And vice versa.
 	 */
 	public synchronized void setTorch(boolean newSetting) {
-		if (newSetting != configManager.getTorchState(camera)) {
-			if (camera != null) {
-				if (autoFocusManager != null) {
-					autoFocusManager.stop();
-				}
-				configManager.setTorch(camera, newSetting);
-				if (autoFocusManager != null) {
-					autoFocusManager.start();
-				}
-			}
-		}
+		setTorch(newSetting, false);
 	}
 
 	/**
@@ -266,16 +298,18 @@ public final class CameraManager {
 				return null;
 			}
 
-			rect.left = rect.left * cameraResolution.y / screenResolution.x;
-			rect.right = rect.right * cameraResolution.y / screenResolution.x;
-			rect.top = rect.top * cameraResolution.x / screenResolution.y;
-			rect.bottom = rect.bottom * cameraResolution.x / screenResolution.y;
+			int cameraX = cameraResolution.y;
+			int cameraY = cameraResolution.x;
+			if (cameraResolution.x < cameraResolution.y) {
+				cameraX = cameraResolution.x;
+				cameraY = cameraResolution.y;
+			}
 
-			// TODO: landscape
-			/*rect.left = rect.left * cameraResolution.x / screenResolution.x;
-			rect.right = rect.right * cameraResolution.x / screenResolution.x;
-			rect.top = rect.top * cameraResolution.y / screenResolution.y;
-			rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;*/
+			rect.left = rect.left * cameraX / screenResolution.x;
+			rect.right = rect.right * cameraX / screenResolution.x;
+			rect.top = rect.top * cameraY / screenResolution.y;
+			rect.bottom = rect.bottom * cameraY / screenResolution.y;
+
 			framingRectInPreview = rect;
 		}
 		return framingRectInPreview;

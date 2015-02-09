@@ -17,13 +17,10 @@ import android.widget.ImageView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.EnteringActivity;
-import com.omnom.android.activity.RestaurantsListActivity;
 import com.omnom.android.activity.ValidateActivity;
-import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
-import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.view.MultiplyImageView;
 
 import java.util.ArrayList;
@@ -157,16 +154,9 @@ public class SplashFragment extends Fragment {
 					@Override
 					public void run() {
 						if(isAdded() && !activity.isFinishing()) {
-							final boolean hasBle = BluetoothUtils.hasBleSupport(activity);
-							if(hasBle && (data == null || mChangeTable)) {
-								ValidateActivity.start(activity, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
-										EXTRA_LOADER_ANIMATION_SCALE_DOWN, activity.getType());
-							} else if (data != null) {
-								// URL case
-								ValidateActivityCamera.start(activity, data);
-							} else {
-								RestaurantsListActivity.start(activity, true);
-							}
+							ValidateActivity.start(activity, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
+												   EXTRA_LOADER_ANIMATION_SCALE_DOWN, activity.getType(), data);
+
 						}
 					}
 				}, animationDuration);

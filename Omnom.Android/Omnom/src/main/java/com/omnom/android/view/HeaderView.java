@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -11,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -76,6 +78,17 @@ public class HeaderView extends RelativeLayout {
 		btnRight.setVisibility(View.GONE);
 		btnLeft.setVisibility(View.GONE);
 		setClickable(true);
+
+		ViewTreeObserver viewTreeObserver = txtTitleBig.getViewTreeObserver();
+		if (viewTreeObserver.isAlive()) {
+			viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+				@Override
+				public void onGlobalLayout() {
+					AndroidUtils.removeOnGlobalLayoutListener(txtTitleBig, this);
+					updateTitleRules();
+				}
+			});
+		}
 	}
 
 	public void setTitle(final int resId) {
@@ -108,6 +121,7 @@ public class HeaderView extends RelativeLayout {
 
 	public void setButtonRight(final int resId, OnClickListener listener) {
 		setButton(btnRight, resId, listener);
+		updateTitleRules();
 	}
 
 	public Button getBtnRight() {
@@ -116,6 +130,19 @@ public class HeaderView extends RelativeLayout {
 
 	public void setButtonLeft(final int resId, OnClickListener listener) {
 		setButton(btnLeft, resId, listener);
+	}
+
+	private void updateTitleRules() {
+		LayoutParams layoutParams = (LayoutParams) txtTitleBig.getLayoutParams();
+		if (btnRight.getVisibility() == VISIBLE && ViewUtils.intersect(txtTitleBig, btnRight)) {
+			layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
+			layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+			layoutParams.addRule(RelativeLayout.LEFT_OF, R.id.btn_right);
+		} else {
+			layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+			layoutParams.addRule(RelativeLayout.CENTER_VERTICAL, 0);
+			layoutParams.addRule(RelativeLayout.LEFT_OF, 0);
+		}
 	}
 
 	private void setButton(Button btn, int resId, final OnClickListener listener) {
@@ -167,18 +194,19 @@ public class HeaderView extends RelativeLayout {
 		if(show) {
 			mBtnRightLastVisibility = btnRight.getVisibility();
 			mBtnRightDrawableLastVisibility = btnRightDrawable.getVisibility();
-			ViewUtils.setVisible(btnRight, !show);
-			ViewUtils.setVisible(btnRightDrawable, !show);
-			ViewUtils.setVisible(progress, show);
+			ViewUtils.setVisible(btnRight, false);
+			ViewUtils.setVisible(btnRightDrawable, false);
+			ViewUtils.setVisible(progress, true);
 		} else {
 			if(mBtnRightLastVisibility == VISIBLE) {
-				ViewUtils.setVisible(btnRight, !show);
+				ViewUtils.setVisible(btnRight, true);
 			}
 			if(mBtnRightDrawableLastVisibility == VISIBLE) {
-				ViewUtils.setVisible(btnRightDrawable, !show);
+				ViewUtils.setVisible(btnRightDrawable, true);
 			}
-			ViewUtils.setVisible(progress, show);
+			ViewUtils.setVisible(progress, false);
 		}
+		updateTitleRules();
 	}
 
 	public void showButtonRight(final boolean show) {

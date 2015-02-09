@@ -27,4 +27,9 @@ public class BluetoothUtils {
 			return BluetoothAdapter.getDefaultAdapter() != null;
 		}
 	}
+
+	public static boolean isAdapterStateOn(final BluetoothAdapter bluetoothAdapter) {
+		return bluetoothAdapter != null && bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON;
+	}
+
 }

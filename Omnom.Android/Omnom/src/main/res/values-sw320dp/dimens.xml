@@ -4,5 +4,5 @@
     -->
     <dimen name="order_items_list_height_collapsed">140dp</dimen>
     <dimen name="card_frame_width">280dp</dimen>
-    <dimen name="card_frame_height">160dp</dimen>
+    <dimen name="card_frame_height">165dp</dimen>
 </resources>

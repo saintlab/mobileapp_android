@@ -7,11 +7,11 @@ import com.omnom.android.auth.UserData;
  * Created by Ch3D on 22.12.2014.
  */
 abstract class DecodeMixpanelEvent extends AbstractBaseMixpanelEvent {
-	public static final String METHOD_BLUETOOTH = "bluetooth";
+	public static final String METHOD_BLUETOOTH = "Bluetooth";
 
-	public static final String METHOD_QR = "qr";
+	public static final String METHOD_QR = "QR";
 
-	public static final String METHOD_HASH = "hash";
+	public static final String METHOD_HASH = "Hash";
 
 	@Expose
 	protected final String requestId;
@@ -26,17 +26,17 @@ abstract class DecodeMixpanelEvent extends AbstractBaseMixpanelEvent {
 	protected final String tableId;
 
 	@Expose
-	protected final String method;
+	protected final String methodUsed;
 
-	public DecodeMixpanelEvent(String requestId, UserData userData, String tableId, String restaurantId, String method) {
-		this(requestId, userData, tableId, restaurantId, null, method);
+	public DecodeMixpanelEvent(String requestId, UserData userData, String tableId, String restaurantId, String methodUsed) {
+		this(requestId, userData, tableId, restaurantId, null, methodUsed);
 	}
 
-	public DecodeMixpanelEvent(String requestId, UserData userData, String tableId, String restaurantId, String restaurantName, String method) {
+	public DecodeMixpanelEvent(String requestId, UserData userData, String tableId, String restaurantId, String restaurantName, String methodUsed) {
 		super(userData);
 		this.requestId = requestId;
 		this.tableId = tableId;
-		this.method = method;
+		this.methodUsed = methodUsed;
 		this.restaurantId = restaurantId;
 		this.restaurantName = restaurantName;
 	}
@@ -54,6 +54,6 @@ abstract class DecodeMixpanelEvent extends AbstractBaseMixpanelEvent {
 	}
 
 	public String getMethod() {
-		return method;
+		return methodUsed;
 	}
 }

@@ -165,6 +165,7 @@ public class ErrorEdit extends LinearLayout {
 		initInputType();
 		initGravity();
 		initFontType();
+		editView.setSelection(0);
 		editView.setImeOptions(mImeOptions);
 		editView.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override

@@ -153,10 +153,12 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 
 	@Override
 	public void initUi() {
-		if(AndroidUtils.isKitKat()) {
-			startBleServiceKK();
-		} else if(AndroidUtils.isJellyBeanMR2()) {
-			startBleServiceJB();
+		if(getResources().getBoolean(R.bool.config_background_ble_enabled)) {
+			if(AndroidUtils.isKitKat()) {
+				startBleServiceKK();
+			} else if(AndroidUtils.isJellyBeanMR2()) {
+				startBleServiceJB();
+			}
 		}
 	}
 
@@ -209,7 +211,7 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 		                           .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
 		                                                R.anim.slide_in_right, R.anim.slide_out_left)
 		                           .replace(R.id.fragment_container, enteringFragment)
-		                           .commit();
+		                           .commitAllowingStateLoss();
 		showPanelBottom(true);
 	}
 
