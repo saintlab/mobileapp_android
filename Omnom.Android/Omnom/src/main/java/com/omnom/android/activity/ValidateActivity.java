@@ -214,6 +214,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@InjectView(R.id.btn_demo)
 	protected View btnDemo;
 
+	@InjectView(R.id.txt_menu)
+	protected TextView txtMenu;
+
 	@InjectView(R.id.btn_down)
 	protected Button btnDownPromo;
 
@@ -562,6 +565,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		v.setEnabled(false);
 		hideProfile();
 		ViewUtils.setVisible(imgPrevious, false);
+		ViewUtils.setVisible(txtMenu, false);
 		ViewUtils.setVisible(getPanelBottom(), false);
 		ViewUtils.setVisible(txtLeave, false);
 		loader.setLogo(R.drawable.ic_bill_white_normal);
@@ -664,6 +668,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		configureScreen(mRestaurant);
 		updateLightProfile(!mIsDemo);
 		ViewUtils.setVisible(imgPrevious, !mIsDemo);
+		ViewUtils.setVisible(txtMenu, true);
 		ViewUtils.setVisible(txtLeave, mIsDemo);
 		ViewUtils.setVisible(getPanelBottom(), true);
 	}
@@ -763,6 +768,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 								ViewUtils.setVisible(getPanelBottom(), true);
 								updateLightProfile(!mIsDemo);
 								ViewUtils.setVisible(imgPrevious, !mIsDemo);
+								ViewUtils.setVisible(txtMenu, true);
 								ViewUtils.setVisible(txtLeave, mIsDemo);
 								loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
 								loader.showLogo();
@@ -810,6 +816,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 				configureScreen(mRestaurant);
 				updateLightProfile(!mIsDemo);
 				ViewUtils.setVisible(imgPrevious, !mIsDemo);
+				ViewUtils.setVisible(txtMenu, true);
 				ViewUtils.setVisible(txtLeave, mIsDemo);
 				ViewUtils.setVisible(getPanelBottom(), true);
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
@@ -1038,6 +1045,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	public void changeTable() {
 		clearErrors(true);
 		AnimationUtils.animateAlpha(imgPrevious, false);
+		AnimationUtils.animateAlpha(txtMenu, false);
 		bottomView.animate().translationY(bottomView.getHeight());
 		loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 		AnimationUtils.animateAlpha(imgProfile, false);

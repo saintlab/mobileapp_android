@@ -48,6 +48,7 @@
         android:textColor="@color/menu_header"
         android:drawableLeft="@drawable/ic_menu"
         android:drawablePadding="@dimen/drawable_padding_default"
+        android:visibility="gone"
         android:textAppearance="?android:textAppearanceLarge" />
 
     <FrameLayout
