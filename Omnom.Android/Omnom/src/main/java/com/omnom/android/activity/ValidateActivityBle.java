@@ -169,7 +169,8 @@ public class ValidateActivityBle extends ValidateActivity {
 									                                           LoaderError.BACKEND_ERROR,
 									                                           mInternetErrorClickListener);
 						                                           } else {
-							                                           handleDecodeResponse(OnTableMixpanelEvent.METHOD_BLUETOOTH, response);
+							                                           handleDecodeResponse(OnTableMixpanelEvent.METHOD_BLUETOOTH,
+							                                                                response);
 						                                           }
 					                                           }
 				                                           }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
@@ -202,8 +203,8 @@ public class ValidateActivityBle extends ValidateActivity {
 		}
 		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 		                          OnTableMixpanelEvent.create(requestId, getUserData(),
-				                          tableDataResponse.getRestaurantId(),
-				                          tableDataResponse.getId(), method));
+		                                                      tableDataResponse.getRestaurantId(),
+		                                                      tableDataResponse.getId(), method));
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)

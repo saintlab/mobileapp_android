@@ -17,6 +17,8 @@ import butterknife.OnClick;
 
 public class WishActivity extends BaseOmnomFragmentActivity implements View.OnClickListener {
 
+	public static int RESULT_CLEARED = 1;
+
 	public static void start(OmnomActivity activity, UserOrder order, int code) {
 		final Intent intent = new Intent(activity.getActivity(), WishActivity.class);
 		intent.putExtra(EXTRA_ORDER, order);
@@ -39,8 +41,8 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	@Override
 	public void finish() {
+		setResult(mClear ? RESULT_CLEARED : RESULT_OK);
 		super.finish();
-		setResult(mClear ? RESULT_CANCELED : RESULT_OK);
 		overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 	}
 
@@ -72,9 +74,8 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	}
 
 	private void doClear() {
-
 		mClear = true;
-		mOrder = UserOrder.create();
+		mOrder.itemsTable().clear();
 		mAdapter = new WishListAdapter(this, mOrder.getSelectedItems(), Collections.EMPTY_LIST, this);
 		mList.setAdapter(mAdapter);
 	}

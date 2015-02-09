@@ -88,6 +88,12 @@ public class MenuSubcategoryFragment extends BaseFragment {
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		mAdapter.notifyDataSetChanged();
+	}
+
+	@Override
 	public Animation onCreateAnimation(final int transit, final boolean enter, final int nextAnim) {
 		if(!enter) {
 			AnimationUtils.animateAlpha(mListView, false);
