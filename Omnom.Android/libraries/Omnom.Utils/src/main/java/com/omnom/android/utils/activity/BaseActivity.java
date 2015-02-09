@@ -8,8 +8,8 @@ import android.support.annotation.AnimRes;
 import android.view.MenuItem;
 
 import com.omnom.android.utils.Extras;
-import com.omnom.android.utils.activity.helper.ActivityHelper;
 import com.omnom.android.utils.activity.helper.ActivityHelperBase;
+import com.omnom.android.utils.activity.helper.ActivityHelperWithAnimation;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.squareup.otto.Bus;
 
@@ -25,7 +25,7 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 	@Inject
 	protected Bus mBus;
 
-	private ActivityHelper mHelper;
+	private ActivityHelperWithAnimation mHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +40,9 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 	}
 
 	@Override
-	public void onApplicationLaunch() {
-		// do nothing
+	protected void onStart() {
+		super.onStart();
+		mHelper.onStart();
 	}
 
 	@Override
@@ -56,6 +57,12 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 		super.onResume();
 		mHelper.onResume();
 		mBus.register(this);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		mHelper.onStop();
 	}
 
 	protected void handleSavedState(Bundle savedInstanceState) {

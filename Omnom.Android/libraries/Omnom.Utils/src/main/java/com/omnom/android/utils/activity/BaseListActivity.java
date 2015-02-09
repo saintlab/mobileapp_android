@@ -8,8 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.AnimRes;
 
 import com.omnom.android.utils.Extras;
-import com.omnom.android.utils.activity.helper.ActivityHelper;
 import com.omnom.android.utils.activity.helper.ActivityHelperBase;
+import com.omnom.android.utils.activity.helper.ActivityHelperWithAnimation;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 
 import butterknife.ButterKnife;
@@ -19,7 +19,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  * Created by Ch3D on 31.07.2014.
  */
 public abstract class BaseListActivity extends ListActivity implements OmnomActivity, Extras {
-	private ActivityHelper mHelper;
+	private ActivityHelperWithAnimation mHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +44,6 @@ public abstract class BaseListActivity extends ListActivity implements OmnomActi
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		mHelper.onPostCreate();
-	}
-
-	@Override
-	public void onApplicationLaunch() {
-		// do nothing
 	}
 
 	@Override

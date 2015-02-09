@@ -30,6 +30,4 @@ public interface OmnomActivity {
 
 	public PreferenceProvider getPreferences();
 
-	public void onApplicationLaunch();
-
 }

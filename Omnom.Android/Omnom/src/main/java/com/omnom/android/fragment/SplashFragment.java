@@ -47,14 +47,11 @@ public class SplashFragment extends Fragment {
 
 	public static final float SCALE_FACTOR_FORK_SMALL = 1 / SCALE_FACTOR_FORK_LARGE;
 
-	private static final String ARG_DURATION_SPLASH = "durationSplash";
-
 	private static final String ARG_CHANGING_TABLE = "table_change_forward";
 
-	public static SplashFragment newInstance(final int durationSplash, final boolean forwardValidation) {
+	public static SplashFragment newInstance(final boolean forwardValidation) {
 		final SplashFragment fragment = new SplashFragment();
 		final Bundle args = new Bundle();
-		args.putInt(ARG_DURATION_SPLASH, durationSplash);
 		args.putBoolean(ARG_CHANGING_TABLE, forwardValidation);
 		fragment.setArguments(args);
 		return fragment;
@@ -86,8 +83,6 @@ public class SplashFragment extends Fragment {
 
 	private boolean mAnimate = true;
 
-	private int durationSplash;
-
 	private LaunchListener mLaunchListener;
 
 	private boolean mChangeTable = false;
@@ -96,7 +91,6 @@ public class SplashFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if(getArguments() != null) {
-			durationSplash = getArguments().getInt(ARG_DURATION_SPLASH, getResources().getInteger(R.integer.splash_screen_timeout));
 			mChangeTable = getArguments().getBoolean(ARG_CHANGING_TABLE, false);
 		}
 	}
@@ -139,29 +133,25 @@ public class SplashFragment extends Fragment {
 		final int dimensionPixelSize = getResources().getDimensionPixelSize(R.dimen.loader_logo_size);
 		final EnteringActivity activity = (EnteringActivity) getActivity();
 
+		AnimationUtils.animateAlpha(imgBill, false, durationShort);
+		AnimationUtils.animateAlpha(imgCards, false, durationShort);
+		AnimationUtils.animateAlpha(imgLogo, false, durationShort);
+		AnimationUtils.animateAlpha(imgRing, false, durationShort);
+		animateMultiply();
+		// transitionDrawable.startTransition(durationShort);
+
+		// AnimationUtils.scaleWidth(imgFork, dimensionPixelSize, durationShort, null);
 		activity.findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				AnimationUtils.animateAlpha(imgBill, false, durationShort);
-				AnimationUtils.animateAlpha(imgCards, false, durationShort);
-				AnimationUtils.animateAlpha(imgLogo, false, durationShort);
-				AnimationUtils.animateAlpha(imgRing, false, durationShort);
-				animateMultiply();
-				// transitionDrawable.startTransition(durationShort);
+				if(isAdded() && !activity.isFinishing()) {
+					ValidateActivity.start(activity, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
+										   EXTRA_LOADER_ANIMATION_SCALE_DOWN, activity.getType(), data);
 
-				// AnimationUtils.scaleWidth(imgFork, dimensionPixelSize, durationShort, null);
-				activity.findViewById(android.R.id.content).postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						if(isAdded() && !activity.isFinishing()) {
-							ValidateActivity.start(activity, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
-												   EXTRA_LOADER_ANIMATION_SCALE_DOWN, activity.getType(), data);
-
-						}
-					}
-				}, animationDuration);
+				}
 			}
-		}, durationSplash);
+		}, animationDuration);
+		
 		if(isAdded()) {
 			activity.getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
 		}

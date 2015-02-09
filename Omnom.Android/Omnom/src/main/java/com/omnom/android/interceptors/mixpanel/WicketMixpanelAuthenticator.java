@@ -2,6 +2,7 @@ package com.omnom.android.interceptors.mixpanel;
 
 import android.content.Context;
 
+import com.omnom.android.auth.Protocol;
 import com.omnom.android.auth.WicketAuthenticator;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
@@ -11,6 +12,7 @@ import com.omnom.android.mixpanel.MixPanelHelper;
 
 import java.util.HashMap;
 
+import retrofit.http.Field;
 import rx.Observable;
 import rx.functions.Action1;
 
@@ -63,6 +65,21 @@ public class WicketMixpanelAuthenticator extends WicketAuthenticator {
 			@Override
 			public void call(UserResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "auth.getUser <-", response);
+			}
+		});
+	}
+
+	@Override
+	public Observable<AuthResponse> logLocation(double longitude, double latitude, String token) {
+		mParams.clear();
+		mParams.put("longitude", String.valueOf(longitude));
+		mParams.put("latitude", String.valueOf(latitude));
+		mParams.put("token", token);
+		mMixHelper.track(OMNOM_ANDROID, "auth.logLocation ->", mParams);
+		return super.logLocation(longitude, latitude, token).doOnNext(new Action1<AuthResponse>() {
+			@Override
+			public void call(AuthResponse response) {
+				mMixHelper.track(OMNOM_ANDROID, "auth.logLocation <-", response);
 			}
 		});
 	}
@@ -131,6 +148,19 @@ public class WicketMixpanelAuthenticator extends WicketAuthenticator {
 			@Override
 			public void call(AuthResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "auth.remindPassword <-", response);
+			}
+		});
+	}
+
+	@Override
+	public Observable<AuthResponse> changePhone(@Field(Protocol.FIELD_PHONE) String phone) {
+		mParams.clear();
+		mParams.put("phone", phone);
+		mMixHelper.track(OMNOM_ANDROID, "auth.changePhone ->", mParams);
+		return super.changePhone(phone).doOnNext(new Action1<AuthResponse>() {
+			@Override
+			public void call(AuthResponse response) {
+				mMixHelper.track(OMNOM_ANDROID, "auth.changePhone <-", response);
 			}
 		});
 	}

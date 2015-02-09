@@ -16,6 +16,7 @@ import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.ErrorUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.UserDataHolder;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -38,11 +39,20 @@ public class LoginActivity extends BaseOmnomActivity {
 		throw new RuntimeException("IMPLEMENT");
 	}
 
+	public static void start(BaseOmnomActivity activity, String phone) {
+		final Intent intent = new Intent(activity, LoginActivity.class);
+		intent.putExtra(EXTRA_PHONE, phone);
+		activity.start(intent, R.anim.slide_in_right, R.anim.slide_out_left, true);
+	}
+
 	@InjectView(R.id.edit_phone)
 	protected ErrorEdit editPhone;
 
 	@InjectView(R.id.panel_top)
 	protected HeaderView topPanel;
+
+	@InjectView(R.id.txt_change_phone)
+	protected TextView txtChangePhone;
 
 	@InjectView(R.id.txt_info)
 	protected TextView txtInfo;
@@ -51,6 +61,8 @@ public class LoginActivity extends BaseOmnomActivity {
 	protected TextView txtRegister;
 
 	private boolean mFirstStart = true;
+
+	private String mPhone;
 
 	private Subscription mProceedSubscription;
 
@@ -77,6 +89,8 @@ public class LoginActivity extends BaseOmnomActivity {
 		});
 	}
 
+
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -86,7 +100,10 @@ public class LoginActivity extends BaseOmnomActivity {
 				@Override
 				public void run() {
 					final EditText editText = editPhone.getEditText();
-					final String value = AndroidUtils.getDevicePhoneNumber(getActivity(), R.string.phone_country_code);
+					String value = mPhone;
+					if (value == null) {
+						value = AndroidUtils.getDevicePhoneNumber(getActivity(), R.string.phone_country_code);
+					}
 					editText.setText(value);
 					AndroidUtils.moveCursorEnd(editText);
 					AndroidUtils.showKeyboard(editText);
@@ -115,6 +132,14 @@ public class LoginActivity extends BaseOmnomActivity {
 
 	@Override
 	protected void handleIntent(Intent intent) {
+		mPhone = intent.getStringExtra(EXTRA_PHONE);
+	}
+
+	@OnClick(R.id.txt_change_phone)
+	public void doChangePhone() {
+		AndroidUtils.hideKeyboard(editPhone);
+		final Intent intent = new Intent(this, ChangePhoneActivity.class);
+		start(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
 	}
 
 	@OnClick(R.id.txt_register)
@@ -137,6 +162,7 @@ public class LoginActivity extends BaseOmnomActivity {
 		}
 		busy(true);
 		topPanel.showProgress(true);
+		ViewUtils.setVisible(txtChangePhone, false);
 		ViewUtils.setVisible(txtInfo, false);
 		ViewUtils.setVisible(txtRegister, false);
 		mProceedSubscription = AndroidObservable.bindActivity(this, authenticator.authorizePhone(editPhone.getText(),
@@ -162,6 +188,7 @@ public class LoginActivity extends BaseOmnomActivity {
 					                                        final AuthError error = authResponse.getError();
 					                                        if(error != null) {
 						                                        if(error.getCode() == ERROR_AUTH_UNKNOWN_USER) {
+							                                        ViewUtils.setVisible(txtChangePhone, false);
 							                                        ViewUtils.setVisible(txtInfo, true);
 							                                        ViewUtils.setVisible(txtRegister, true);
 						                                        }
@@ -174,11 +201,20 @@ public class LoginActivity extends BaseOmnomActivity {
 		                                        }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			                                        @Override
 			                                        public void onError(Throwable throwable) {
-				                                        topPanel.showProgress(false);
-				                                        busy(false);
 				                                        Log.e(TAG, ":authorizePhone doProceed ", throwable);
+				                                        if (ErrorUtils.isConnectionError(throwable)) {
+					                                        showError(getString(R.string.err_no_internet));
+				                                        } else {
+					                                        showError(getString(R.string.something_went_wrong));
+				                                        }
 			                                        }
 		                                        });
+	}
+
+	private void showError(final String message) {
+		editPhone.setError(message);
+		topPanel.showProgress(false);
+		busy(false);
 	}
 
 	@Override

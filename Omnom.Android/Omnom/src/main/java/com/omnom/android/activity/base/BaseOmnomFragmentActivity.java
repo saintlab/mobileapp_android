@@ -1,26 +1,17 @@
 package com.omnom.android.activity.base;
 
-import android.util.Log;
+import android.os.Bundle;
 
 import com.omnom.android.OmnomApplication;
+import com.omnom.android.activity.helper.ActivityHelper;
+import com.omnom.android.activity.helper.OmnomActivityHelper;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.UserData;
-import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.mixpanel.MixPanelHelper;
-import com.omnom.android.mixpanel.model.AppLaunchMixpanelEvent;
-import com.omnom.android.restaurateur.model.UserProfile;
-import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
-import com.omnom.android.utils.observable.OmnomObservable;
-
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
-
-import rx.Subscription;
-import rx.android.observables.AndroidObservable;
-import rx.functions.Action1;
 
 /**
  * Created by Ch3D on 01.10.2014.
@@ -32,64 +23,26 @@ public abstract class BaseOmnomFragmentActivity extends BaseFragmentActivity {
 	@Inject
 	protected AuthService authenticator;
 
-	private Subscription mUserSubscription;
+	protected ActivityHelper activityHelper;
 
 	private boolean isBusy;
 
 	@Override
-	public void onApplicationLaunch() {
-		final OmnomApplication app = OmnomApplication.get(getActivity());
-		final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(this);
-		final String token = app.getAuthToken();
-		mUserSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
-			@Override
-			public void call(UserResponse userResponse) {
-				final Long currentTime = System.currentTimeMillis();
-				final Long serverTime = userResponse.getTime() == null ? 0 : userResponse.getTime();
-				final Long timeDiff = TimeUnit.SECONDS.toMillis(serverTime) - currentTime;
-				app.cacheUserProfile(new UserProfile(userResponse));
-				mixPanelHelper.setTimeDiff(timeDiff);
-				mixPanelHelper.track(MixPanelHelper.Project.OMNOM, new AppLaunchMixpanelEvent(userResponse.getUser()));
-			}
-		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			@Override
-			public void onError(Throwable throwable) {
-				Log.w(TAG, "onApplicationLaunch", throwable);
-				mixPanelHelper.track(MixPanelHelper.Project.OMNOM, new AppLaunchMixpanelEvent(UserHelper.getUserData(
-						BaseOmnomFragmentActivity.this)));
-			}
-		});
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		activityHelper = new OmnomActivityHelper(getActivity(), authenticator);
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		final OmnomApplication app = OmnomApplication.get(getActivity());
-		if (app.getUserProfile() == null) {
-			final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(this);
-			final String token = app.getAuthToken();
-			mUserSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
-				@Override
-				public void call(UserResponse userResponse) {
-					app.cacheUserProfile(new UserProfile(userResponse));
-					final Long currentTime = System.currentTimeMillis();
-					final Long serverTime = userResponse.getTime() == null ? 0 : userResponse.getTime();
-					final Long timeDiff = TimeUnit.SECONDS.toMillis(serverTime) - currentTime;
-					mixPanelHelper.setTimeDiff(timeDiff);
-				}
-			}, new Action1<Throwable>() {
-				@Override
-				public void call(Throwable throwable) {
-					Log.e(TAG, "Unable to load user data");
-				}
-			});
-		}
+		activityHelper.onStart();
 	}
 
 	@Override
 	protected void onDestroy() {
+		activityHelper.onDestroy();
 		getMixPanelHelper().flush();
-		OmnomObservable.unsubscribe(mUserSubscription);
 		super.onDestroy();
 	}
 

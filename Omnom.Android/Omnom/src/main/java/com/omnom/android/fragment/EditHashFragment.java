@@ -111,7 +111,7 @@ public class EditHashFragment extends Fragment {
 				if(restaurants.size() == 1) {
 					final Restaurant restaurant = restaurants.get(0);
 					if(restaurant != null) {
-						final String bgImgUrl = RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics());
+						final String bgImgUrl = RestaurantHelper.getBackground(restaurant, getResources().getDisplayMetrics().widthPixels);
 						if(!TextUtils.isEmpty(bgImgUrl)) {
 							try {
 								OmnomApplication.getPicasso(getActivity()).load(bgImgUrl).get();

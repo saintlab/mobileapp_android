@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -250,6 +251,34 @@ public class AnimationUtils {
 				isCallbackLaunched = true;
 			}
 		}
+	}
+
+	/**
+	 * Performs drawable transition using alpha.
+	 *
+	 * @param backView view from behind
+	 * @param frontView front view
+	 * @param drawable drawable to animate
+	 * @param duration animation duration
+	 */
+	public static void animateDrawable(final View backView, final View frontView, final BitmapDrawable drawable, final int duration) {
+		drawable.setAlpha(0);
+		AndroidUtils.setBackground(frontView, drawable);
+		ValueAnimator va = ValueAnimator.ofInt(0, 255);
+		va.setDuration(duration);
+		va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation) {
+				drawable.setAlpha((Integer) animation.getAnimatedValue());
+			}
+		});
+		va.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				AndroidUtils.setBackground(backView, null);
+			}
+		});
+		va.start();
 	}
 
 }

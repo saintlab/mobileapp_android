@@ -1,0 +1,41 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.omnom.android.view.HeaderView
+        android:id="@+id/panel_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:background="@color/list_header"
+        android:padding="@dimen/activity_horizontal_margin_small"/>
+
+    <TextView
+        android:id="@+id/txt_enter_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/panel_top"
+        android:paddingTop="@dimen/activity_horizontal_margin"
+        android:gravity="center"
+        android:text="@string/enter_previous_phone_number"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textColor="@color/profile_hint" />
+
+    <com.omnom.android.utils.view.ErrorEdit
+        android:id="@+id/edit_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_enter_phone"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingBottom="@dimen/activity_horizontal_margin"
+        omnom:inputType="phone"
+        omnom:textSize="@dimen/font_medium"
+        omnom:font="regular_le"
+        omnom:hint="@string/phone_number"
+        omnom:imeOptions="actionDone"
+        omnom:showClear="true"
+        omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
+
+</RelativeLayout>

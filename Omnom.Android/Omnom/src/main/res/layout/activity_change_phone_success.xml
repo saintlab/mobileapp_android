@@ -1,0 +1,33 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.omnom.android.view.HeaderView
+        android:id="@+id/panel_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:background="@color/list_header"
+        android:padding="@dimen/activity_horizontal_margin_small"/>
+
+    <ImageView
+        android:id="@+id/img_done"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_below="@+id/panel_top"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_done" />
+
+    <TextView
+        android:id="@+id/txt_enter_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img_done"
+        android:gravity="center_horizontal"
+        android:text="@string/phone_change_link_is_sent"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textColor="@color/profile_hint" />
+
+</RelativeLayout>
