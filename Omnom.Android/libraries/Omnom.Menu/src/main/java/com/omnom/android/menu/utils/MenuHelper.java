@@ -14,6 +14,7 @@ import com.omnom.android.utils.utils.ViewUtils;
  * Created by Ch3D on 04.02.2015.
  */
 public class MenuHelper {
+
 	public static void bindDetails(final Context context, Details details, TextView txtDetails, boolean large) {
 		final boolean hasDetails = details != null;
 		StringBuilder sb = new StringBuilder();

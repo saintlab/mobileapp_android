@@ -14,6 +14,8 @@ import auto.parcel.AutoParcel;
 @AutoGson
 public abstract class UserOrderData implements Parcelable {
 
+	public static UserOrderData NULL = create(0, Item.NULL);
+
 	public static UserOrderData create(int amount, Item item) {
 		return new AutoParcel_UserOrderData(amount, item);
 	}

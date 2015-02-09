@@ -18,6 +18,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import hugo.weaving.DebugLog;
 
 /**
  * Created by root on 2/3/15.
@@ -60,6 +61,8 @@ public class WishListAdapter extends BaseAdapter {
 
 	private View.OnClickListener mClickListener;
 
+	private int mCount = -1;
+
 	public WishListAdapter(Context context, List<UserOrderData> wishItems, List<Item> tableItems, View.OnClickListener clickListener) {
 		mClickListener = clickListener;
 		mInflater = LayoutInflater.from(context);
@@ -69,7 +72,15 @@ public class WishListAdapter extends BaseAdapter {
 	}
 
 	@Override
+	@DebugLog
 	public int getItemViewType(final int position) {
+		if(position == mWishItems.size()) {
+			return VIEW_TYPE_WISH_FOOTER;
+		}
+		if(position < mWishItems.size()) {
+			return VIEW_TYPE_WISH_ITEM;
+		}
+
 		if(mWishItems.size() > 0 && position < mWishItems.size()) {
 			return VIEW_TYPE_WISH_ITEM;
 		}
@@ -88,23 +99,26 @@ public class WishListAdapter extends BaseAdapter {
 	}
 
 	@Override
+	@DebugLog
 	public int getCount() {
-		int count = 0;
+		if(mCount == -1) {
+			int count = 0;
+			final int wishSize = mWishItems.size();
+			if(wishSize > 0) {
+				count += wishSize + 1;
+			}
 
-		final int wishSize = mWishItems.size();
-		if(wishSize > 0) {
-			count += wishSize + 1;
+			final int tableItemsSize = mTableItems.size();
+			if(tableItemsSize > 0) {
+				count += tableItemsSize + 1;
+			}
+			mCount = count;
 		}
-
-		final int tableItemsSize = mTableItems.size();
-		if(tableItemsSize > 0) {
-			count += tableItemsSize + 1;
-		}
-
-		return count;
+		return mCount;
 	}
 
 	@Override
+	@DebugLog
 	public Object getItem(final int position) {
 		final int viewType = getItemViewType(position);
 		switch(viewType) {
@@ -122,11 +136,13 @@ public class WishListAdapter extends BaseAdapter {
 	}
 
 	@Override
+	@DebugLog
 	public long getItemId(final int pos) {
 		return pos;
 	}
 
 	@Override
+	@DebugLog
 	public View getView(final int position, View convertView, final ViewGroup parent) {
 		ViewHolder holder;
 		final int viewType = getItemViewType(position);
@@ -157,6 +173,7 @@ public class WishListAdapter extends BaseAdapter {
 		return convertView;
 	}
 
+	@DebugLog
 	private void bindView(final View convertView, final int position, final int itemType, final Object item) {
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
 		if(holder != null && item != null) {

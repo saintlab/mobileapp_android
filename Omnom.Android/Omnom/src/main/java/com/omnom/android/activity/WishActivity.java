@@ -1,38 +1,90 @@
 package com.omnom.android.activity;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
+import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.WishListAdapter;
+import com.omnom.android.menu.model.Item;
+import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
+import com.omnom.android.menu.model.UserOrderData;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
+import com.omnom.android.restaurateur.model.restaurant.ModifierRequestItem;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.restaurant.WishRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishRequestItem;
+import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
 
 import java.util.Collections;
 
+import javax.inject.Inject;
+
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.functions.Action1;
+
+import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 public class WishActivity extends BaseOmnomFragmentActivity implements View.OnClickListener {
 
 	public static int RESULT_CLEARED = 1;
 
-	public static void start(OmnomActivity activity, UserOrder order, int code) {
+	public static void start(OmnomActivity activity, Restaurant restaurant, UserOrder order, int code) {
 		final Intent intent = new Intent(activity.getActivity(), WishActivity.class);
 		intent.putExtra(EXTRA_ORDER, order);
-		activity.startForResult(intent, R.anim.slide_in_up, R.anim.nothing_long, code);
+		intent.putExtra(EXTRA_RESTAURANT, restaurant);
+		activity.startForResult(intent, R.anim.slide_in_up, R.anim.nothing, code);
+	}
+
+	private static WishRequest createWishRequest(Restaurant restaurant, UserOrder order) {
+		final WishRequest wishRequest = new WishRequest();
+		wishRequest.setInternalTableId(RestaurantHelper.getTable(restaurant).getInternalId());
+
+		for(final UserOrderData data : order.getSelectedItems()) {
+			final WishRequestItem item = createWishRequestItem(data);
+			wishRequest.addItem(item);
+		}
+		return wishRequest;
+	}
+
+	private static WishRequestItem createWishRequestItem(final UserOrderData data) {
+		if(data == null || data.item() == null) {
+			return null;
+		}
+		final Item dish = data.item();
+		final WishRequestItem item = new WishRequestItem(dish.id(), data.amount());
+		if(dish.modifiers() != null && dish.modifiers().size() > 0) {
+			for(Modifier modifier : dish.modifiers()) {
+				if(modifier != null) {
+					item.modifiers.add(new ModifierRequestItem(modifier.id()));
+				}
+			}
+		}
+		return item;
 	}
 
 	@InjectView(android.R.id.list)
 	protected ListView mList;
+
+	@Inject
+	protected RestaurateurObservableApi api;
 
 	private UserOrder mOrder;
 
 	private WishListAdapter mAdapter;
 
 	private boolean mClear = false;
+
+	private Restaurant mRestaurant;
+
+	private String TAG = WishActivity.class.getSimpleName();
 
 	@OnClick(R.id.txt_close)
 	public void onClose() {
@@ -50,12 +102,15 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	protected void handleIntent(final Intent intent) {
 		super.handleIntent(intent);
 		mOrder = intent.getParcelableExtra(EXTRA_ORDER);
+		mRestaurant = intent.getParcelableExtra(EXTRA_RESTAURANT);
 	}
 
 	@Override
 	public void initUi() {
 		mAdapter = new WishListAdapter(this, mOrder.getSelectedItems(), Collections.EMPTY_LIST, this);
-		mList.setAdapter(mAdapter);
+		final SwingBottomInAnimationAdapter adapter = new SwingBottomInAnimationAdapter(mAdapter);
+		adapter.setAbsListView(mList);
+		mList.setAdapter(adapter);
 	}
 
 	@Override
@@ -69,8 +124,23 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 			doClear();
 		}
 		if(v.getId() == R.id.btn_send) {
-
+			doWish();
 		}
+	}
+
+	private void doWish() {
+		api.wishes(mRestaurant.id(), createWishRequest(mRestaurant, mOrder)).subscribe(new Action1() {
+			@Override
+			public void call(final Object o) {
+				doClear();
+				showToast(getActivity(), getString(R.string.your_wish_processed));
+			}
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			@Override
+			protected void onError(final Throwable throwable) {
+				Log.e(TAG, "restaurateur.wishes", throwable);
+			}
+		});
 	}
 
 	private void doClear() {

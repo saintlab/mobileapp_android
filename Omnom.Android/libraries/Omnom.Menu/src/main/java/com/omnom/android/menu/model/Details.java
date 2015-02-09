@@ -4,6 +4,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.omnom.android.utils.generation.AutoGson;
+import com.omnom.android.utils.utils.StringUtils;
 
 import auto.parcel.AutoParcel;
 
@@ -13,6 +14,26 @@ import auto.parcel.AutoParcel;
 @AutoParcel
 @AutoGson
 public abstract class Details implements Parcelable {
+
+	public static Details NULL = create(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, StringUtils.EMPTY_STRING);
+
+	public static Details create(int weight,
+	                             int cookingTime,
+	                             int volume,
+	                             int persons,
+	                             int protein100,
+	                             int proteinTotal,
+	                             int fat100,
+	                             int fatTotal,
+	                             int carbohydrate100,
+	                             int carbohydrateTotal,
+	                             int energy100,
+	                             int energyTotal,
+	                             String ingredients) {
+		return new AutoParcel_Details(weight, cookingTime, volume, persons, protein100, proteinTotal, fat100, fatTotal, carbohydrate100,
+		                              carbohydrateTotal, energy100, energyTotal, ingredients);
+	}
+
 	@Nullable
 	public abstract int weight();
 

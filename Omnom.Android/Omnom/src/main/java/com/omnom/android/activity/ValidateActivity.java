@@ -535,8 +535,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		if(mOrder == null) {
 			mOrder = UserOrder.create();
 		}
-		final String ribaRis = "riba-ris-nsk-at-aura";
-		menuApi.getMenu("saintlab-rkeeper-v6").subscribe(new Action1<MenuResponse>() {
+		// final String ribaRis = "riba-ris-nsk-at-aura";
+		// "saintlab-rkeeper-v6"
+		menuApi.getMenu(mRestaurant.id()).subscribe(new Action1<MenuResponse>() {
 			@Override
 			public void call(final MenuResponse menuResponse) {
 				// MenuActivity.start(ValidateActivity.this, menuResponse, mRestaurant);
@@ -927,7 +928,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	private void onOrder() {
 		if(mOrder != null && mOrder.getSelectedItems().size() > 0) {
-			WishActivity.start(this, mOrder, REQUEST_CODE_WISH_LIST);
+			WishActivity.start(this, mRestaurant, mOrder, REQUEST_CODE_WISH_LIST);
 		}
 	}
 
