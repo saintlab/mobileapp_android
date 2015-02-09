@@ -153,10 +153,12 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 
 	@Override
 	public void initUi() {
-		if(AndroidUtils.isKitKat()) {
-			startBleServiceKK();
-		} else if(AndroidUtils.isJellyBeanMR2()) {
-			startBleServiceJB();
+		if(getResources().getBoolean(R.bool.config_background_ble_enabled)) {
+			if(AndroidUtils.isKitKat()) {
+				startBleServiceKK();
+			} else if(AndroidUtils.isJellyBeanMR2()) {
+				startBleServiceJB();
+			}
 		}
 	}
 
