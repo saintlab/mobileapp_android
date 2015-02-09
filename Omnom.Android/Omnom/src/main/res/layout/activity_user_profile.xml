@@ -45,7 +45,7 @@
             <Button
                 android:id="@+id/btn_my_cards"
                 android:text="Мои привязанные карты"
-                style="@style/Button.UserProfile.Data"/>
+                style="@style/Button.UserProfile.Data.Expandable"/>
 
             <include layout="@layout/delimiter_profile_vertical"/>
 
@@ -110,6 +110,19 @@
             <Button
                 android:id="@+id/btn_feedback"
                 android:text="Обратная связь"
+                style="@style/Button.UserProfile.Data">
+            </Button>
+
+            <include layout="@layout/delimiter_profile_vertical"/>
+
+            <Button
+                android:id="@+id/btn_facebook"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:text="facebook/Omnom"
+                android:textColor="@color/blue_bright"
+                android:drawableLeft="@drawable/ic_facebook"
+                android:drawablePadding="@dimen/drawable_padding_default"
                 style="@style/Button.UserProfile.Data">
             </Button>
 

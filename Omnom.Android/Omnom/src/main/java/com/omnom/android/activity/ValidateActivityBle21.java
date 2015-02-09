@@ -13,6 +13,7 @@ import android.util.Log;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.decode.BeaconRecord;
 import com.omnom.android.restaurateur.model.decode.RssiRecord;
+import com.omnom.android.utils.utils.BluetoothUtils;
 
 import java.util.List;
 
@@ -99,7 +100,9 @@ public class ValidateActivityBle21 extends ValidateActivityBle {
 			findViewById(android.R.id.content).postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					scanner.stopScan(mScanCallback);
+					if (BluetoothUtils.isAdapterStateOn(mBluetoothAdapter)) {
+						scanner.stopScan(mScanCallback);
+					}
 					if(endCallback != null) {
 						endCallback.run();
 					}

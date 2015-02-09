@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.omnom.android.acquiring.AcquiringResponseException;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.api.PaymentInfo;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
@@ -128,7 +129,7 @@ public class AcquiringMailRu implements Acquiring {
 				                if(response.getError() == null) {
 					                return PollingObservable.create(response);
 				                } else {
-					                return Observable.error(new RuntimeException(response.getError().toString()));
+					                return Observable.error(new AcquiringResponseException(response.getError()));
 				                }
 			                }
 		                });

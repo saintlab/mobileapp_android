@@ -166,8 +166,11 @@
         <item name="android:paddingRight">@dimen/activity_horizontal_margin_medium</item>
         <item name="android:gravity">left|center_vertical</item>
         <item name="android:textColor">?android:textColorPrimary</item>
-        <item name="android:drawableRight">@drawable/ic_arrow_right_icon</item>
         <item name="android:textAppearance">?android:textAppearanceMedium</item>
+    </style>
+
+    <style name="Button.UserProfile.Data.Expandable">
+        <item name="android:drawableRight">@drawable/ic_arrow_right_icon</item>
     </style>
 
     <style name="TextView.Restaurant">

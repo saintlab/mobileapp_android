@@ -105,6 +105,10 @@ public class ErrorHelper {
 		showError(LoaderError.UNKNOWN_ERROR, onClickListener);
 	}
 
+	public void showOrderClosed(View.OnClickListener onClickListener) {
+		showError(LoaderError.ORDER_CLOSED_ERROR, onClickListener);
+	}
+
 	public void showBackendError(View.OnClickListener onClickListener) {
 		showError(LoaderError.BACKEND_ERROR, onClickListener);
 	}

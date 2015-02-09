@@ -31,6 +31,11 @@
             android:layout_height="match_parent"
             android:background="@drawable/bg_wood" />
 
+        <com.google.zxing.client.android.ViewfinderView
+            android:id="@+id/viewfinder_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -47,11 +52,11 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center"
-                    android:paddingTop="@dimen/activity_horizontal_margin"
-                    android:textColor="@color/cadre_border"
-                    android:text="@string/scanning"
                     android:lines="1"
+                    android:paddingTop="@dimen/activity_horizontal_margin"
+                    android:text="@string/scanning"
                     android:textAppearance="?android:textAppearanceLarge"
+                    android:textColor="@color/cadre_border"
                     omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf" />
 
             </LinearLayout>
@@ -69,20 +74,20 @@
 
                 <ImageView
                     android:id="@+id/btn_flash_light"
-                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                    android:src="@drawable/ic_flashlight_on"
-                    android:contentDescription="@null" />
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_flashlight_on" />
 
                 <ImageView
                     android:id="@+id/scan_frame"
-                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/scan_frame_red"
-                    android:contentDescription="@null" />
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/scan_frame_red" />
 
             </LinearLayout>
 
@@ -96,14 +101,14 @@
                 android:layout_width="@dimen/navigate_qr_text_width"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:drawablePadding="@dimen/drawable_padding_default"
+                android:drawableTop="@drawable/ic_shortcut_red"
                 android:gravity="center"
+                android:lines="3"
+                android:text="@string/navigate_qr_code"
+                android:textAppearance="?android:textAppearanceLarge"
                 android:textColor="@color/cadre_border"
                 android:textColorLink="@color/cadre_border"
-                android:text="@string/navigate_qr_code"
-                android:lines="3"
-                android:drawableTop="@drawable/ic_shortcut_red"
-                android:drawablePadding="@dimen/drawable_padding_default"
-                android:textAppearance="?android:textAppearanceLarge"
                 omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf" />
 
             <Space
@@ -117,118 +122,20 @@
             android:id="@+id/btn_not_scanning"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/not_scanning_padding"
             android:layout_alignParentBottom="true"
-            android:gravity="center"
-            android:text="@string/not_scanning"
-            android:textColor="@color/text_color_black"
-            android:textAppearance="?android:textAppearanceLarge"
             android:background="@android:color/white"
+            android:gravity="center"
+            android:padding="@dimen/not_scanning_padding"
+            android:text="@string/not_scanning"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textColor="@color/text_color_black"
             omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf" />
 
-        <LinearLayout
-            android:id="@+id/panel_enter_hash"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@android:color/white"
-            android:gravity="center"
-            android:layout_alignParentBottom="true"
-            android:visibility="gone">
-
-            <ImageButton
-                android:id="@+id/btn_close"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_horizontal_margin"
-                android:background="@drawable/ic_cross_black"
-                android:contentDescription="@null" />
-
-            <TextView
-                android:id="@+id/txt_enter_hash"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:lines="2"
-                android:text="@string/enter_hash"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:textColor="@color/qr_hint_color"
-                android:textAppearance="?android:textAppearanceMedium"
-                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
-
-            <!-- Scroll view is necessary to prevent the rest of controls to
-                 move when keyboard is shown. -->
-            <ScrollView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/activity_horizontal_margin"
-                    android:gravity="center">
-
-                    <LinearLayout
-                        android:id="@+id/enter_hash"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/activity_horizontal_margin_small"
-                        android:orientation="horizontal"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:lines="1"
-                            android:text="@string/enter_hash_url"
-                            android:textColor="@color/enter_hash_color"
-                            android:textAppearance="?android:textAppearanceMedium"
-                            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
-
-                        <EditText
-                            android:id="@+id/edit_hash"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingRight="@dimen/activity_horizontal_margin_small"
-                            android:singleLine="true"
-                            android:maxLength="6"
-                            android:minEms="2"
-                            android:background="@color/transparent"
-                            android:inputType="textNoSuggestions"
-                            android:imeOptions="actionDone"
-                            android:textAppearance="?android:textAppearanceMedium"
-                            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/hash_underline"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_alignLeft="@+id/enter_hash"
-                        android:layout_alignRight="@+id/enter_hash"
-                        android:background="@drawable/hash_underline"
-                        android:layout_below="@+id/enter_hash" />
-
-                </RelativeLayout>
-
-            </ScrollView>
-
-        </LinearLayout>
-
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom" />
-
-        <com.google.zxing.client.android.ViewfinderView
-            android:id="@+id/viewfinder_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
     </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </merge>

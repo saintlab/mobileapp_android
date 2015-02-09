@@ -7,7 +7,7 @@ import com.omnom.android.auth.UserData;
  */
 public class OnTableMixpanelEvent extends DecodeMixpanelEvent {
 
-	public static final String EVENT_NAME = "restaurant_enter";
+	public static final String EVENT_NAME = "on_table";
 
 	public static OnTableMixpanelEvent create(String requestId, UserData userData, String restaurantId, String tableId, String method) {
 		return new OnTableMixpanelEvent(requestId, userData, restaurantId, tableId, method);

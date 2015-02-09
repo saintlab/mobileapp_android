@@ -22,7 +22,10 @@ import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.ClickSpan;
+import com.omnom.android.utils.utils.ErrorUtils;
 import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.utils.view.ErrorEditText;
 import com.omnom.android.view.HeaderView;
@@ -234,6 +237,10 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 				}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					@Override
 					public void onError(Throwable throwable) {
+						if (ErrorUtils.isConnectionError(throwable)) {
+							textError.setText(getString(R.string.err_no_internet));
+							ViewUtils.setVisible(textError, true);
+						}
 						topPanel.showProgress(false);
 						Log.e(TAG, "doRegister ", throwable);
 					}
@@ -247,12 +254,23 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 			case 102:
 			case 103:
 			case 107:
+				String text = getString(R.string.error_can_enter, error.getMessage());
+				textError.setText(text);
+				AndroidUtils.clickify(textError, getString(R.string.can_enter), new ClickSpan.OnClickListener() {
+					@Override
+					public void onClick() {
+						LoginActivity.start(UserRegisterActivity.this, editPhone.getText());
+					}
+				});
+				ViewUtils.setVisible(textError, true);
+				break;
 			case 109:
 				editPhone.setError(error.getMessage());
 				break;
 
 			default:
 				textError.setText(error.getMessage());
+				ViewUtils.setVisible(textError, true);
 		}
 	}
 
@@ -263,6 +281,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	}
 
 	private boolean validate() {
+		ViewUtils.setVisible(textError, false);
 		final String name = editName.getText();
 		final String email = editEmail.getText();
 		final String phone = editPhone.getText();

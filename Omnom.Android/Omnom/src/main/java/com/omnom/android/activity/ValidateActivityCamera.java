@@ -2,8 +2,6 @@ package com.omnom.android.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -40,12 +38,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private static final String TAG = ValidateActivityCamera.class.getSimpleName();
 
-	private static final String ACTION_LAUNCH_QR = "com.omnom.android.action.launch_qr";
-	private static final String ACTION_LAUNCH_HASHCODE = "com.omnom.android.action.launch_hashcode";
-	private static final String QR_URL_PATH_PREFIX = "/qr/";
-	private static final String SCHEME_OMNOM = "omnom";
-	private static final String QUERY_PARAMETER_HASH = "hash";
-
 	private static Intent createIntent(Context context, int animationType, boolean isDemo, int userEnterType) {
 		final Intent intent = new Intent(context, ValidateActivityCamera.class);
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
@@ -68,17 +60,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 		context.start(intent, enterAnim, exitAnim, true);
 	}
 
-	public static void start(final BaseFragmentActivity context, final Uri data) {
-		final Intent intent = createIntent(context, EXTRA_LOADER_ANIMATION_SCALE_DOWN, false, ValidateActivity.TYPE_DEFAULT);
-		intent.setData(data);
-		if (data.toString().contains(QR_URL_PATH_PREFIX)) {
-			intent.setAction(ACTION_LAUNCH_QR);
-		} else {
-			intent.setAction(ACTION_LAUNCH_HASHCODE);
-		}
-		context.start(intent, R.anim.fake_fade_in, R.anim.fake_fade_out_instant, true);
-	}
-
 	@Inject
 	protected RestaurateurObservableApi api;
 
@@ -90,16 +71,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 	private int mOutAnimation;
 
-	private Uri mData;
-
 	@Override
-	protected void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		mData = getIntent().getData();
-	}
-
-	@Override
-	protected void startLoader() {
+	protected void decode(final boolean startProgressAnimation) {
 		clearErrors(true);
 
 		if(isExternalLaunch()) {
@@ -117,18 +90,13 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 		if(BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
 			// findTable("http://www.riston.ru/wishes"); // mehico
-			//findTable("http://m.2gis.ru/os/"); // mehico
+			findTable("http://m.2gis.ru/os/"); // mehico
 			// findTable("http://omnom.menu/qr/00e7232a4d9d2533e7fa503620c4431b"); // shashlikoff
-			//return;
+			return;
 		}
 
 		OmnomQRCaptureActivity.start(this, REQUEST_CODE_SCAN_QR);
 	}
-
-	/**
-	 * @return <code>true</code> if app was launched by an extrenal qr/link
-	 */
-	private boolean isExternalLaunch() {return mData != null;}
 
 	@Override
 	protected void onDestroy() {

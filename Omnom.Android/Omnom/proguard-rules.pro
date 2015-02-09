@@ -190,3 +190,6 @@
 
 #okio
 -dontwarn okio.**
+
+#mixpanel
+-dontwarn com.mixpanel.**

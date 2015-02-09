@@ -20,6 +20,8 @@
     <string name="you_forgot_to_enter_phone">Вы забыли ввести номер телефона</string>
     <string name="you_forgot_to_enter_email">Вы забыли ввести e-mail</string>
     <string name="invalid_email">Некорректный e-mail</string>
+    <string name="error_can_enter">Можно входить. %1$s</string>
+    <string name="can_enter">Можно входить.</string>
     <string name="proceed">Далее</string>
     <string name="title_activity_confirm_phone">ConfirmPhoneActivity</string>
     <string name="confirm_code_sms_text">Введите код из&#160;SMS,\nприсланного на&#160;номер\n%1$s</string>
@@ -27,6 +29,10 @@
     <string name="create_account">Создать аккаунт</string>
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
+    <string name="order_updated">Этот счёт обновлён заведением</string>
+    <string name="update">Обновить</string>
+    <string name="order_closed">Этот счёт закрыт заведением для&#160;просмотра и&#160;оплаты</string>
+    <string name="exit">Выйти</string>
     <string name="table_number_format">%1$s Обновить</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_validate">ValidateActivity</string>
@@ -72,6 +78,8 @@
         Там&#160;должно\nбыть сообщение от&#160;банка. Введите\nсумму из&#160;SMS. <u>Если SMS нет?</u></string>
     <string name="no_sms">Если SMS нет?</string>
     <string name="something_went_wrong_try_again">Что-то пошло не&#160;так.\nПовторите попытку</string>
+    <string name="err_arguments">Пожалуйста, убедитесь в&#160;правильности ввода параметров и&#160;повторите попытку.</string>
+    <string name="err_no_internet">Нет доступа в интернет</string>
     <string name="repeat">Повторить</string>
     <string name="payment_success">Платёж принят</string>
     <string name="sms_sent_to_waiter">Официант получил sms с&#160;суммой чаевых.</string>
@@ -87,6 +95,10 @@
     <string name="show_demo_mode">Показать демо-пример</string>
     <string name="login_havent_account_yet">Ещё нет аккаунта? Прошу сюда -</string>
     <string name="login_havent_account_registration">регистрация</string>
+    <string name="change_phone_title">Изменение номера</string>
+    <string name="phone_changed"><u>У меня сменился номер телефона</u></string>
+    <string name="enter_previous_phone_number">Укажите ваш предыдущий\nномер телефона</string>
+    <string name="phone_change_link_is_sent">На вашу почту была выслана\nссылка для&#160;смены номера\nтелефона</string>
     <string name="phone_country_code">+7</string>
     <string name="are_you_to_quit">Вы действительно хотите выйти?</string>
     <string name="quit">Выйти</string>
@@ -114,6 +126,8 @@
     <string name="enter_hash_url">http://omnom.menu/</string>
     <string name="omnom_works_here">Omnom работает здесь</string>
     <string name="send_feedback">Написать отзыв</string>
+    <string name="facebook_url_fb">fb://profile/1548920272002383</string>
+    <string name="facebook_url_http">https://www.facebook.com/omnom.menu/</string>
 
     <string name="no_order_info">
         Omnom показывает все&#160;заказы, добавленные к&#160;вашему столу.

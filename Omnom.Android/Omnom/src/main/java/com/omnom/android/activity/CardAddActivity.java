@@ -155,6 +155,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
+				AndroidUtils.hideKeyboard(mEditCardExpDate);
 				finish();
 			}
 		});
@@ -233,7 +234,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		if(mMinimized != minimize) {
 			final int v = (int) ((cameraY - panelY) / 1.5f);
 			if(minimize) {
-				mImgCamera.setBackgroundDrawable(null);
+				AndroidUtils.setBackground(mImgCamera, null);
 				AnimationUtils.animateAlpha(mTextCamera, false);
 				mImgCamera.animate().x(mPanelCard.getMeasuredWidth() - mImgCamera.getMeasuredWidth()).start();
 				mImgCamera.animate().translationYBy(-v).start();
@@ -247,7 +248,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 				mEditCardCvv.animate().translationY(0).start();
 				mEditCardExpDate.animate().translationY(0).start();
 				mEditCardNumber.animate().translationY(0).start();
-				mImgCamera.setBackgroundDrawable(getResources().getDrawable(R.drawable.scan_frame));
+				AndroidUtils.setBackground(mImgCamera, getResources().getDrawable(R.drawable.scan_frame));
 			}
 			mMinimized = minimize;
 		}
@@ -284,7 +285,13 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		final String expDate = CardUtils.prepareExpDate(mEditCardExpDate.getText().toString());
 		final String cvv = mEditCardCvv.getText().toString();
 		final String holder = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getCardHolder();
-		return CardInfo.create(pan, expDate, cvv, holder);
+		return new CardInfo.Builder()
+						.pan(pan)
+						.mixpanelPan(pan)
+						.expDate(expDate)
+						.cvv(cvv)
+						.holder(holder)
+						.build();
 	}
 
 	private void doBind() {

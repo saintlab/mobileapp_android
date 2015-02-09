@@ -47,11 +47,21 @@ public interface AuthService {
 	public Observable<UserResponse> getUser(@Query(Protocol.FIELD_TOKEN) String token);
 
 	@FormUrlEncoded
+	@POST("/user/geo")
+	public Observable<AuthResponse> logLocation(@Field(Protocol.FIELD_LONGITUDE) double longitude,
+	                                            @Field(Protocol.FIELD_LATITUDE) double latitude,
+	                                            @Field(Protocol.FIELD_TOKEN) String token);
+
+	@FormUrlEncoded
 	@POST("/login/simple")
 	Observable<AuthResponse> authenticate(@Field(Protocol.FIELD_LOGIN) String username,
-	                                       @Field(Protocol.FIELD_PASSWORD) String password);
+	                                      @Field(Protocol.FIELD_PASSWORD) String password);
 
 	@FormUrlEncoded
 	@POST("/recover")
 	Observable<AuthResponse> remindPassword(@Field(Protocol.FIELD_EMAIL) String email);
+
+	@FormUrlEncoded
+	@POST("/recover")
+	Observable<AuthResponse> changePhone(@Field(Protocol.FIELD_PHONE) String phone);
 }

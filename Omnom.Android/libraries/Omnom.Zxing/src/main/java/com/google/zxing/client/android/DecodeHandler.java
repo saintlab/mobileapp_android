@@ -81,10 +81,7 @@ public final class DecodeHandler extends Handler {
 				for (int x = 0; x < width; x++)
 					rotatedData[x * height + height - y - 1] = data[x + y * width];
 			}
-			int tmp = width;
-			width = height;
-			height = tmp;
-			source = activity.getCameraManager().buildLuminanceSource(rotatedData, width, height);
+			source = activity.getCameraManager().buildLuminanceSource(rotatedData, height, width);
 		} else {
 			// TODO:
 			source = activity.getCameraManager().buildLuminanceSource(data, width, height);

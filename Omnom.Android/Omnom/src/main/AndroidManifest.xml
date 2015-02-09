@@ -136,6 +136,20 @@
             android:windowSoftInputMode="stateHidden" />
 
         <activity
+            android:name=".activity.ChangePhoneActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White"
+            android:windowSoftInputMode="stateHidden" />
+
+        <activity
+            android:name=".activity.ChangePhoneSuccessActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White"
+            android:windowSoftInputMode="stateHidden" />
+
+        <activity
             android:name=".activity.ValidateActivityBle"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
@@ -219,7 +233,7 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
-            android:windowSoftInputMode="stateAlwaysHidden" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.RestaurantsListActivity"
             android:label="@string/title_activity_restaurants_list"

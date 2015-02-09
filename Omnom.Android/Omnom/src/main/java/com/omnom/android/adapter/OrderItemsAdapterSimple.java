@@ -24,6 +24,8 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 
 	private boolean mHasSelection = false;
 
+	private boolean mIgnoreSelection = false;
+
 	public OrderItemsAdapterSimple(final Context context,
 	                               final List<OrderItem> items,
 	                               final SparseBooleanArrayParcelable states,
@@ -44,7 +46,7 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 		}
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
 		ViewUtils.setVisible(holder.divider, position != getCount() - 1);
-		if(mCheckedStates.get(position - 1) || !mHasSelection) {
+		if(mIgnoreSelection || mCheckedStates.get(position - 1) || !mHasSelection) {
 			holder.txtTitle.setTextColor(mTextColorSelected);
 			holder.txtPrice.setTextColor(mTextColorSelected);
 		} else {
@@ -53,6 +55,10 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 		}
 		holder.txtTitle.setText(item.getTitle());
 		holder.txtPrice.setText(AmountHelper.format(item.getPricePerItem()));
+	}
+
+	public void setIgnoreSelection(boolean ignoreSelection) {
+		this.mIgnoreSelection = ignoreSelection;
 	}
 
 	@Override

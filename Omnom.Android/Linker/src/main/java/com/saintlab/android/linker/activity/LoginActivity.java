@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -14,6 +15,8 @@ import android.widget.TextView;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
+import com.omnom.android.linker.BuildConfig;
+import com.omnom.android.linker.R;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.activity.BaseActivity;
@@ -23,9 +26,7 @@ import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.UserDataHolder;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEditText;
-import com.saintlab.android.linker.BuildConfig;
 import com.saintlab.android.linker.LinkerApplication;
-import com.saintlab.android.linker.R;
 
 import javax.inject.Inject;
 
@@ -207,6 +208,11 @@ public class LoginActivity extends BaseActivity {
 					} else {
 						setError(mEditLogin, mTextLoginError, R.string.error_invalid_email);
 					}
+				}
+			}, new Action1<Throwable>() {
+				@Override
+				public void call(Throwable throwable) {
+					Log.e(TAG, "doRemindPassword", throwable);
 				}
 			});
 		}

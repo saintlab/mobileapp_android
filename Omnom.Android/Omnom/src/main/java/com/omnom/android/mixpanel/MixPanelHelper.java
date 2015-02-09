@@ -41,19 +41,19 @@ public class MixPanelHelper {
 		void execute(MixpanelAPI api);
 	}
 
-	public static final String USER_ID = "id";
+	public static final String USER_ID = "ID";
 
-	public static final String USER_NAME = "$name";
+	public static final String USER_NAME = "name";
 
 	public static final String USER_NICK = "nick";
 
-	public static final String USER_BIRTHDAY = "$birthday";
+	public static final String USER_BIRTHDAY = "birth_date";
 
-	public static final String USER_EMAIL = "$email";
+	public static final String USER_EMAIL = "email";
 
-	public static final String USER_PHONE = "$phone";
+	public static final String USER_PHONE = "phone";
 
-	public static final String USER_CREATED = "$created";
+	public static final String USER_CREATED = "created";
 
 	public static final String KEY_MIXPANEL_TIME = "time";
 
@@ -131,6 +131,16 @@ public class MixPanelHelper {
 		final JSONObject json = new JSONObject();
 		try {
 			json.put(KEY_DATA, data);
+			track(project, event, json);
+		} catch(JSONException e) {
+			Log.e(TAG, "track", e);
+		}
+	}
+
+	public void track(final Project project, final String event, final Object[] data) {
+		final JSONObject json = new JSONObject();
+		try {
+			json.put(KEY_DATA, new JSONArray(mGson.toJson(data)));
 			track(project, event, json);
 		} catch(JSONException e) {
 			Log.e(TAG, "track", e);
@@ -299,7 +309,7 @@ public class MixPanelHelper {
 
 	private void execute(final Project project, final Command command) {
 		if(mMixpanelApiMap == null || mMixpanelApiMap.isEmpty()) {
-			Log.w(TAG, "mMixpanelApiMap is not set");
+			Log.w(TAG, "MixpanelApiMap is not set");
 			return;
 		}
 		if(project == Project.ALL) {

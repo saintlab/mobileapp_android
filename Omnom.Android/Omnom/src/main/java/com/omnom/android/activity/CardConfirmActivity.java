@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.acquiring.AcquiringResponseException;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.UserData;
@@ -45,6 +46,7 @@ import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ErrorUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
@@ -137,6 +139,8 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	private boolean mScanUsed;
 
+	private boolean isFirstEdit = true;
+
 	private View.OnClickListener mVerifyClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(final View v) {
@@ -178,7 +182,13 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	@Override
 	public void initUi() {
 		ViewUtils.setVisible(mTextInfo, false);
-		mEditAmount.getEditText().setEnabled(false);
+		final EditText editText = mEditAmount.getEditText();
+		final String text = getString(R.string.hint_confirm_amount);
+		editText.setText(text);
+		editText.setSelection(0);
+		editText.setTextColor(getResources().getColor(R.color.info_hint));
+
+		editText.setEnabled(false);
 		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		mUser = UserData.create(mUserProfile.getUser());
 		mAcquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
@@ -198,7 +208,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		} else {
 			// skip and wait until user submit verification amount
 			ViewUtils.setVisible(mTextInfo, true);
-			mEditAmount.getEditText().setEnabled(true);
+			editText.setEnabled(true);
 			mPanelTop.setButtonRightEnabled(true);
 		}
 		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
@@ -236,6 +246,17 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			}
 		});
 		final int suffixLength = getCurrencySuffix().length();
+		editText.setOnKeyListener(new View.OnKeyListener() {
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if (isFirstEdit) {
+					editText.setText(StringUtils.EMPTY_STRING);
+					editText.setTextColor(getResources().getColor(android.R.color.black));
+					isFirstEdit = false;
+				}
+				return false;
+			}
+		});
 		editText.addTextChangedListener(new TextWatcher() {
 			public boolean hadComma = false;
 
@@ -275,9 +296,13 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(hasFocus) {
-					int length = editText.getText().length();
-					if(length >= suffixLength + 1) {
-						editText.setSelection(length - suffixLength);
+					if (isFirstEdit) {
+						editText.setSelection(0);
+					} else {
+						int length = editText.getText().length();
+						if (length >= suffixLength + 1) {
+							editText.setSelection(length - suffixLength);
+						}
 					}
 				}
 			}
@@ -315,7 +340,6 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 							                                             editAmount.setEnabled(true);
 							                                             AndroidUtils.showKeyboard(editAmount);
 						                                             } else {
-
 							                                             if (response.getError() != null) {
 								                                             reportMixPanelFail(mCard, response.getError());
 								                                             processCardRegisterError(response.getError().getDescr());
@@ -329,10 +353,25 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 					                                             @Override
 					                                             public void onError(Throwable throwable) {
 						                                             Log.w(TAG, "registerCard", throwable);
-						                                             processCardRegisterError(getString(
-								                                             R.string.something_went_wrong_try_again));
+						                                             processCardRegisterError(getCardRegisterErrorMessage(throwable));
 					                                             }
 				                                             });
+	}
+
+	private String getCardRegisterErrorMessage(final Throwable throwable) {
+		String errorMessage = getString(R.string.something_went_wrong_try_again);
+		if (throwable instanceof AcquiringResponseException) {
+			final String code = ((AcquiringResponseException) throwable).getError().getCode();
+			if (code != null) {
+				if (code.equals(AcquiringPollingResponse.ERR_ARGUMENTS)) {
+					errorMessage = getString(R.string.err_arguments);
+				}
+			}
+		} else if (ErrorUtils.isConnectionError(throwable)) {
+			errorMessage = getString(R.string.err_no_internet);
+		}
+
+		return errorMessage;
 	}
 
 	private void processCardRegisterError(final String errorMessage) {
@@ -379,7 +418,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			                                           @Override
 			                                           public void call(AcquiringResponse response) {
 				                                           if(response.getError() != null) {
-					                                           onVerificationError();
+					                                           onVerificationError(getWrongChecksumMessage());
 				                                           } else {
 					                                           mPanelTop.showProgress(false);
 					                                           setResult(RESULT_OK);
@@ -391,17 +430,21 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 			                                           @Override
 			                                           public void call(Throwable throwable) {
 				                                           Log.w(TAG, "verifyCard", throwable);
-				                                           onVerificationError();
+				                                           CharSequence errorMessage = getString(R.string.something_went_wrong_try_again);
+				                                           if (ErrorUtils.isConnectionError(throwable)) {
+					                                           errorMessage = getString(R.string.err_no_internet);
+				                                           }
+				                                           onVerificationError(errorMessage);
 				                                           busy(false);
 			                                           }
 		                                           });
 	}
 
-	private void onVerificationError() {
+	private void onVerificationError(final CharSequence errorMessage) {
 		ViewUtils.setVisible(mTextInfo, false);
 		mPanelTop.showProgress(false);
 		mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
-		mEditAmount.setError(getWrongChecksumMessage());
+		mEditAmount.setError(errorMessage);
 	}
 
 	private SpannableString getWrongChecksumMessage() {

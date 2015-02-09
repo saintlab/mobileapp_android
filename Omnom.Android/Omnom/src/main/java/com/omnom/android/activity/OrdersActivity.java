@@ -3,6 +3,7 @@ package com.omnom.android.activity;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -131,7 +132,22 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void onOrderCloseEvent(final OrderCloseSocketEvent event) {
-		closeOrder(event.getOrder());
+		final Order order = event.getOrder();
+		final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
+		// Return from current bill view if it is opened
+		if (currentFragment != null && order.getId().equals(currentFragment.getOrderId()) &&
+				!currentFragment.isDownscaled()) {
+			AndroidUtils.showDialog(getActivity(), R.string.order_closed, R.string.exit,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(final DialogInterface dialog,
+						                    final int which) {
+							closeOrder(order);
+						}
+					});
+		} else {
+			closeOrder(order);
+		}
 	}
 
     private void updateOrder(final Order order) {

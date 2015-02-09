@@ -19,13 +19,14 @@
     <color name="link_color">#4a90e2</color>
 
     <color name="white_transparent">#ddffffff</color>
+    <color name="white_transparent_f0">#f0ffffff</color>
     <color name="card_data_hint">#7dffffff</color>
 
     <color name="btn_pay_green">#00c164</color>
 
     <color name="blue_bright">#147DFA</color>
     <color name="blue_bright_pressed">#59147DFA</color>
-    <color name="blue_bright_disabled">#d8d8d8</color>
+    <color name="blue_bright_disabled">#a1a1a1</color>
 
     <color name="card_number_default">#ff000000</color>
     <color name="card_type_default">#7f000000</color>

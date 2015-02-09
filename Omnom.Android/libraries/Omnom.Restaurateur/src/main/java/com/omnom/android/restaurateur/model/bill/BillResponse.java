@@ -7,6 +7,13 @@ import com.omnom.android.restaurateur.model.ResponseBase;
  * Created by Ch3D on 14.10.2014.
  */
 public class BillResponse extends ResponseBase {
+
+	public static final String STATUS_NEW = "new";
+
+	public static final String STATUS_PAID = "paid";
+
+	public static final String STATUS_ORDER_CLOSED = "order_closed";
+
 	@Expose
 	private String restaurantId;
 

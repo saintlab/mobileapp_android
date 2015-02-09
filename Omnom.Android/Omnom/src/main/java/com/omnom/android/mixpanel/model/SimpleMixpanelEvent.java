@@ -8,7 +8,7 @@ import com.omnom.android.auth.UserData;
  */
 public class SimpleMixpanelEvent extends AbstractBaseMixpanelEvent {
 
-	private final String mEventName;
+	private final transient String mEventName;
 
 	@Expose
 	protected final String requestId;

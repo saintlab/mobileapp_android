@@ -69,7 +69,6 @@ final class CameraConfigurationManager {
 
 	void setDesiredCameraParameters(Camera camera, boolean safeMode) {
 		Camera.Parameters parameters = camera.getParameters();
-		camera.setDisplayOrientation(90);
 
 		if(parameters == null) {
 			Log.w(TAG, "Device error: no camera parameters are available. Proceeding without configuration.");
@@ -85,7 +84,6 @@ final class CameraConfigurationManager {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		initializeTorch(parameters, prefs, safeMode);
-
 		CameraConfigurationUtils.setFocus(parameters, prefs.getBoolean(PreferencesActivity.KEY_AUTO_FOCUS, true),
 		                                  prefs.getBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, true), safeMode);
 
@@ -107,7 +105,9 @@ final class CameraConfigurationManager {
 		}
 
 		parameters.setPreviewSize(cameraResolution.x, cameraResolution.y);
-		parameters.set("orientation", "portrait");
+		CameraConfigurationUtils.setBestPreviewFPS(parameters);
+		parameters.set("iso", "auto");
+		parameters.setExposureCompensation(0);
 
 		Log.i(TAG, "Final camera parameters: " + parameters.flatten());
 
