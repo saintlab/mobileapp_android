@@ -31,7 +31,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
@@ -46,6 +45,7 @@ import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
+import com.omnom.android.listener.DecimalKeyListener;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.BillViewMixpanelEvent;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
@@ -62,11 +62,15 @@ import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.OmnomListView;
+import com.omnom.android.view.AmountEditText;
 import com.omnom.android.view.HeaderView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -285,7 +289,7 @@ public class OrderFragment extends Fragment {
 	@InjectView(android.R.id.list)
 	protected OmnomListView list = null;
 
-	protected EditText editAmount;
+	protected AmountEditText editAmount;
 
 	@Nullable
 	protected TextView txtCustomTips;
@@ -390,6 +394,10 @@ public class OrderFragment extends Fragment {
 
 	private View btnEdit;
 
+	private NumberFormat numberFormat;
+
+	private char decimalSeparator;
+
 	public OrderFragment() {
 	}
 
@@ -418,6 +426,24 @@ public class OrderFragment extends Fragment {
 	public void onSplitHide(SplitHideEvent event) {
 		if(event.getOrderId().equals(mOrder.getId())) {
 			mAdapter.notifyDataSetChanged();
+		}
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		updateDecimalSeparator();
+		if (tipsButtons != null) {
+			final BigDecimal amount = getEnteredAmount();
+			updatePaymentTipsAmount(amount, tipsButtons);
+		}
+	}
+
+	private void updateDecimalSeparator() {
+		numberFormat = NumberFormat.getNumberInstance();
+		decimalSeparator = ((DecimalFormat) numberFormat).getDecimalFormatSymbols().getDecimalSeparator();
+		if (editAmount != null) {
+			editAmount.updateSeparator();
 		}
 	}
 
@@ -569,7 +595,7 @@ public class OrderFragment extends Fragment {
 			ViewGroup inflate = (ViewGroup) stubPaymentOptions.inflate();
 			AndroidUtils.applyFont(getActivity(), inflate, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
 
-			editAmount = (EditText) inflate.findViewById(R.id.edit_payment_amount);
+			editAmount = (AmountEditText) inflate.findViewById(R.id.edit_payment_amount);
 			txtCustomTips = (TextView) inflate.findViewById(R.id.txt_custom_tips);
 			txtPaymentTitle = (TextView) inflate.findViewById(R.id.txt_payment_title);
 			txtAlreadyPaid = (TextView) inflate.findViewById(R.id.txt_already_paid);
@@ -651,9 +677,9 @@ public class OrderFragment extends Fragment {
 			viewsAmountShow.add(btnApply);
 			viewsAmountShow.add(btnCancel);
 
+			initAmount();
 			updateCustomTipsText(0);
 			initKeyboardListener();
-			initAmount();
 			initRadioButtons();
 
 			final BigDecimal amount = getEnteredAmount();
@@ -668,7 +694,7 @@ public class OrderFragment extends Fragment {
 	public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 		mFragmentView = view;
 		mFragmentView.setTag("order_page_" + mPosition);
-
+		updateDecimalSeparator();
 		final String billText = getString(R.string.bill_number_, mPosition + 1);
 		if(((OrdersActivity) getActivity()).getOrdersCount() > 1) {
 			mHeader.setTitleBig(billText, new View.OnClickListener() {
@@ -808,6 +834,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void initAmount() {
+		editAmount.setKeyListener(new DecimalKeyListener());
 		editAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
@@ -972,7 +999,8 @@ public class OrderFragment extends Fragment {
 		mAdapter.notifyDataSetChanged();
 		initFooter(true);
 		if(resetAmount) {
-			editAmount.setText(StringUtils.formatCurrency(AmountHelper.format(mOrder.getAmountToPay())));
+			editAmount.setText(StringUtils.formatCurrency(String.valueOf(decimalSeparator),
+														  AmountHelper.format(mOrder.getAmountToPay())));
 			updatePaymentTipsAmount(getEnteredAmount());
 		}
 	}
@@ -1100,11 +1128,15 @@ public class OrderFragment extends Fragment {
 	}
 
 	private BigDecimal getEnteredAmount() {
-		final String filtered = StringUtils.filterAmount(editAmount.getText().toString());
+		final String filtered = StringUtils.filterAmount(editAmount.getText().toString(), decimalSeparator);
 		if(TextUtils.isEmpty(filtered) || !StringUtils.hasDigits(filtered)) {
 			return BigDecimal.ZERO;
 		}
-		return new BigDecimal(filtered);
+		try {
+			return new BigDecimal(numberFormat.parse(filtered).doubleValue());
+		} catch (ParseException e) {
+			return BigDecimal.ZERO;
+		}
 	}
 
 	protected void doApply(View v) {

@@ -38,7 +38,6 @@
                     omnom:errorTextSize="@dimen/font_small"
                     omnom:font="regular_le"
                     omnom:imeOptions="actionDone"
-                    omnom:inputType="numberDecimal"
                     omnom:maxLength="7"
                     omnom:showClear="false"
                     omnom:textGravity="center"

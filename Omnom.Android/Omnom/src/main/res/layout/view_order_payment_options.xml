@@ -143,7 +143,6 @@
                 android:minWidth="@dimen/order_amount_field_min_width"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:inputType="numberDecimal"
                 android:imeOptions="actionDone"
                 android:singleLine="true"
                 android:textSize="@dimen/font_order_amont_edit"
