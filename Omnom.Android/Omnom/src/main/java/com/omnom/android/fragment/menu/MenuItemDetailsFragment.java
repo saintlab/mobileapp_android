@@ -148,7 +148,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	private void refresh() {
 		holder.updateState(mOrder, mItem);
-		holder.bind(mItem, mOrder, mMenu, true, true);
+		holder.bindWithRecommendations(mItem, mOrder, mMenu, true);
 	}
 
 	@Subscribe

@@ -96,6 +96,32 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 		private Context getContext() {return btnApply.getContext();}
 
+		public void bindWithRecommendations(final Item item, UserOrder order, Menu menu, boolean detailed) {
+			if(item == null) {
+				return;
+			}
+
+			bindDetails(item, detailed);
+			bindImage(item);
+			txtTitle.setText(item.name());
+			btnApply.setTag(item);
+
+			LinearLayout viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
+			if(viewById != null) {
+				MenuItemDetailsFragment.removeRecommendations(viewById);
+				ViewUtils.setVisible(viewById, false);
+			}
+
+			if(isRecommendationsVisible()) {
+				btnApply.setBackgroundResource(R.drawable.btn_wish_added);
+				btnApply.setText(StringUtils.EMPTY_STRING);
+			} else {
+				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
+				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
+			}
+			showRecommendations(item, order, menu, viewById);
+		}
+
 		public void bind(final Item item, UserOrder order, Menu menu, boolean detailed, boolean showRecommendations) {
 			if(item == null) {
 				return;
@@ -116,19 +142,23 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 				btnApply.setBackgroundResource(R.drawable.btn_wish_added);
 				btnApply.setText(StringUtils.EMPTY_STRING);
 				if(showRecommendations) {
-					if(viewById == null) {
-						if(viewStub != null) {
-							ViewUtils.setVisible(viewStub, true);
-						}
-					}
-					viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
-					MenuItemDetailsFragment.addRecommendations(viewById.getContext(), viewById, menu, order, item,
-					                                           mRecommendationClickListener);
+					showRecommendations(item, order, menu, viewById);
 				}
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
 				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
 			}
+		}
+
+		private void showRecommendations(final Item item, final UserOrder order, final Menu menu, LinearLayout viewById) {
+			if(viewById == null) {
+				if(viewStub != null) {
+					ViewUtils.setVisible(viewStub, true);
+				}
+			}
+			viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
+			MenuItemDetailsFragment.addRecommendations(viewById.getContext(), viewById, menu, order, item,
+			                                           mRecommendationClickListener);
 		}
 
 		public boolean isRecommendationsVisible() {
