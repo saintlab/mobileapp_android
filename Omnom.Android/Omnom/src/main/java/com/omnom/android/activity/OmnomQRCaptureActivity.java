@@ -102,15 +102,13 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 	@InjectView(R.id.btn_flash_light)
 	protected ImageView btnFlashLight;
 
-	private boolean isFlashTurnedOn = false;
-	
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, false);
-		editor.putString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, FrontLightMode.AUTO.name());
+		editor.putString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, FrontLightMode.OFF.name());
 		editor.apply();
 		setTorchListener(this);
 	}
@@ -146,6 +144,8 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 		
 	}
 
+
+
 	private void showEnterHashPanel() {
 		getSupportFragmentManager().beginTransaction()
 				.addToBackStack(null)
@@ -160,7 +160,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 			fragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss();
 		}
 		AndroidUtils.hideKeyboard(getActivity());
-		launchScanningDelayHandler(btnNotScanning);
+		setNotScanningButtonVisible(true);
 	}
 
 	private void playLaunchAnimation() {
@@ -180,7 +180,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 						.setListener(new LaunchAnimationListener(background))
 						.start();
 
-				launchScanningDelayHandler(btnNotScanning);
+				launchScanningDelayHandler();
 			}
 		});
 
@@ -208,10 +208,11 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 		}
 	}
 
-	private void launchScanningDelayHandler(final View btnNotScanning) {
+	private void launchScanningDelayHandler() {
 		postDelayed(SCAN_DELAY, new Runnable() {
 			@Override
 			public void run() {
+				turnTheLightOn(false);
 				setNotScanningButtonVisible(true);
 			}
 		});
@@ -219,15 +220,25 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 
 	@OnClick(R.id.btn_not_scanning)
 	protected void onNotScanning() {
-		isFlashTurnedOn = false;
-		setTorch(isFlashTurnedOn, true);
+		turnTheLightOff(true);
 		showEnterHashPanel();
 	}
 
 	@OnClick(R.id.btn_flash_light)
 	protected void onBtnFlash() {
-		isFlashTurnedOn = !isFlashTurnedOn;
-		setTorch(isFlashTurnedOn, true);
+		if (getTorchState()) {
+			turnTheLightOff(true);
+		} else {
+			turnTheLightOn(true);
+		}
+	}
+
+	private void turnTheLightOn(final boolean isManual) {
+		setTorch(true, isManual);
+	}
+
+	private void turnTheLightOff(final boolean isManual) {
+		setTorch(false, isManual);
 	}
 
 	private void showHint() {
@@ -281,20 +292,20 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 
 	@Override
 	public void onFragmentClose() {
-		launchScanningDelayHandler(btnNotScanning);
+		setNotScanningButtonVisible(true);
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
+		btnFlashLight.setImageResource(R.drawable.ic_flashlight_on);
 		closeEnterHashPanel();
 	}
 
 	@Override
 	public void onTorchStateChange(boolean isTurnedOn) {
-		isFlashTurnedOn = isTurnedOn;
-		btnFlashLight.setImageResource(isFlashTurnedOn ? R.drawable.ic_flashlight_off :
-									   R.drawable.ic_flashlight_on);
+		btnFlashLight.setImageResource(isTurnedOn ? R.drawable.ic_flashlight_off :
+									                R.drawable.ic_flashlight_on);
 	}
 
 	@Override
