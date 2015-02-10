@@ -1,6 +1,8 @@
 package com.omnom.android.adapter;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +53,30 @@ public class WishListAdapter extends BaseAdapter {
 		}
 	}
 
+	private class UserOrderDataFooter extends UserOrderData {
+		@Nullable
+		@Override
+		public int amount() {
+			return 0;
+		}
+
+		@Nullable
+		@Override
+		public Item item() {
+			return Item.NULL;
+		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(final Parcel dest, final int flags) {
+			// do nothing
+		}
+	}
+
 	private final Context mContext;
 
 	private final List<UserOrderData> mWishItems;
@@ -61,34 +87,24 @@ public class WishListAdapter extends BaseAdapter {
 
 	private View.OnClickListener mClickListener;
 
-	private int mCount = -1;
-
 	public WishListAdapter(Context context, List<UserOrderData> wishItems, List<Item> tableItems, View.OnClickListener clickListener) {
 		mClickListener = clickListener;
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
 		mWishItems = wishItems;
+		mWishItems.add(new UserOrderDataFooter());
 		mTableItems = tableItems;
 	}
 
 	@Override
 	@DebugLog
 	public int getItemViewType(final int position) {
-		if(position == mWishItems.size()) {
+		final Object item = getItem(position);
+		if(item instanceof UserOrderDataFooter) {
 			return VIEW_TYPE_WISH_FOOTER;
 		}
-		if(position < mWishItems.size()) {
+		if(item instanceof UserOrderData) {
 			return VIEW_TYPE_WISH_ITEM;
-		}
-
-		if(mWishItems.size() > 0 && position < mWishItems.size()) {
-			return VIEW_TYPE_WISH_ITEM;
-		}
-		if(mWishItems.size() > 0 && position == mWishItems.size()) {
-			return VIEW_TYPE_WISH_FOOTER;
-		}
-		if(position == mWishItems.size() + 1) {
-			return VIEW_TYPE_TABLE_HEADER;
 		}
 		return VIEW_TYPE_TABLE_ITEM;
 	}
@@ -101,44 +117,23 @@ public class WishListAdapter extends BaseAdapter {
 	@Override
 	@DebugLog
 	public int getCount() {
-		if(mCount == -1) {
-			int count = 0;
-			final int wishSize = mWishItems.size();
-			if(wishSize > 0) {
-				count += wishSize + 1;
-			}
-
-			final int tableItemsSize = mTableItems.size();
-			if(tableItemsSize > 0) {
-				count += tableItemsSize + 1;
-			}
-			mCount = count;
-		}
-		return mCount;
+		return mWishItems.size() + mTableItems.size();
 	}
 
 	@Override
 	@DebugLog
 	public Object getItem(final int position) {
-		final int viewType = getItemViewType(position);
-		switch(viewType) {
-			case VIEW_TYPE_TABLE_HEADER:
-			case VIEW_TYPE_WISH_FOOTER:
-				return null;
-
-			case VIEW_TYPE_TABLE_ITEM:
-				return mTableItems.get(position - mWishItems.size() + 1);
-
-			case VIEW_TYPE_WISH_ITEM:
-				return mWishItems.get(position);
+		final int wishSize = mWishItems.size();
+		if(position < wishSize) {
+			return mWishItems.get(position);
 		}
-		return null;
+		return mTableItems.get(position - wishSize);
 	}
 
 	@Override
 	@DebugLog
 	public long getItemId(final int pos) {
-		return pos;
+		return getItem(pos).hashCode();
 	}
 
 	@Override
@@ -152,15 +147,20 @@ public class WishListAdapter extends BaseAdapter {
 				case VIEW_TYPE_TABLE_ITEM:
 					convertView = mInflater.inflate(R.layout.item_wish, parent, false);
 					holder = new ViewHolder(convertView);
+					convertView.setTag(R.id.item, getItem(position));
 					convertView.setTag(holder);
 					break;
 
 				case VIEW_TYPE_WISH_FOOTER:
 					convertView = mInflater.inflate(R.layout.item_wish_footer, parent, false);
 					final Button btnClear = (Button) convertView.findViewById(R.id.btn_clear);
-					btnClear.setOnClickListener(mClickListener);
 					final Button btnSend = (Button) convertView.findViewById(R.id.btn_send);
+					btnClear.setOnClickListener(mClickListener);
 					btnSend.setOnClickListener(mClickListener);
+					final boolean enabled = mWishItems.size() > 1;
+					btnClear.setEnabled(enabled);
+					btnSend.setEnabled(enabled);
+					convertView.setTag(R.id.item, getItem(position));
 					break;
 
 				case VIEW_TYPE_TABLE_HEADER:
@@ -171,6 +171,11 @@ public class WishListAdapter extends BaseAdapter {
 
 		bindView(convertView, position, viewType, getItem(position));
 		return convertView;
+	}
+
+	@Override
+	public boolean hasStableIds() {
+		return true;
 	}
 
 	@DebugLog
@@ -186,5 +191,10 @@ public class WishListAdapter extends BaseAdapter {
 				MenuHelper.bindDetails(mContext, data.item().details(), holder.txtInfo, false);
 			}
 		}
+	}
+
+	public void remove(final Object tag) {
+		mWishItems.remove(tag);
+		mTableItems.remove(tag);
 	}
 }

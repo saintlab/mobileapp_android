@@ -1,6 +1,7 @@
 package com.omnom.android.activity;
 
 import android.content.Intent;
+import android.support.v4.view.ViewCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -21,6 +22,7 @@ import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishRequestItem;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
+import com.omnom.android.utils.utils.AnimationUtils;
 
 import java.util.Collections;
 
@@ -146,7 +148,24 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	private void doClear() {
 		mClear = true;
 		mOrder.itemsTable().clear();
-		mAdapter = new WishListAdapter(this, mOrder.getSelectedItems(), Collections.EMPTY_LIST, this);
-		mList.setAdapter(mAdapter);
+
+		final int childCount = mList.getChildCount();
+		for(int i = 0; i < childCount - 1; i++) {
+			final View childAt = mList.getChildAt(i);
+			if(childAt != null) {
+				childAt.animate().alpha(0).start();
+				AnimationUtils.scaleHeight(childAt, 0, new Runnable() {
+					@Override
+					public void run() {
+						final Object tag = childAt.getTag(R.id.item);
+						mAdapter.remove(tag);
+						mAdapter.notifyDataSetChanged();
+						childAt.animate().alpha(1).setDuration(0).start();
+						ViewCompat.setHasTransientState(childAt, false);
+					}
+				});
+				ViewCompat.setHasTransientState(childAt, true);
+			}
+		}
 	}
 }
