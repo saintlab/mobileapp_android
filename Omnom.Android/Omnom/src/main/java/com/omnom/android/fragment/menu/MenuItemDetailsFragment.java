@@ -137,31 +137,18 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
 		final View viewRoot = view.findViewById(R.id.root);
 		ButterKnife.inject(this, view);
-		holder = new MenuCategoryItemsAdapter.ViewHolder(viewRoot);
+		holder = new MenuCategoryItemsAdapter.ViewHolder(viewRoot, this);
 		holder.showDivider(false);
 		refresh();
 
 		final String description = mItem.description();
 		ViewUtils.setVisible(mTxtAdditional, !TextUtils.isEmpty(description));
 		mTxtAdditional.setText(description);
-
-		addRecommendations(view.getContext(), mPanelRecommendations, mMenu, mOrder, mItem, this);
 	}
 
 	private void refresh() {
 		holder.updateState(mOrder, mItem);
 		holder.bind(mItem, mOrder, mMenu, true, true);
-
-		final int childCount = mPanelRecommendations.getChildCount();
-		for(int i = 0; i < childCount; i++) {
-			final View childAt = mPanelRecommendations.getChildAt(i);
-			final MenuCategoryItemsAdapter.ViewHolder holder = (MenuCategoryItemsAdapter.ViewHolder) childAt.getTag();
-			final Item item = (Item) childAt.getTag(R.id.item);
-			if(holder != null && item != null) {
-				holder.updateState(mOrder, item);
-				holder.bind(item, mOrder, mMenu, false, false);
-			}
-		}
 	}
 
 	@Subscribe
