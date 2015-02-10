@@ -16,6 +16,7 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true" android:drawable="@drawable/bg_rounded_blue_pressed" />
+    <item android:state_enabled="false" android:drawable="@drawable/bg_rounded_blue_pressed" />
     <item android:drawable="@drawable/bg_rounded_blue_normal" />
 </selector>
 
