@@ -96,7 +96,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 		private Context getContext() {return btnApply.getContext();}
 
-		public void bind(final Item item, UserOrder order, Menu menu, boolean detailed) {
+		public void bind(final Item item, UserOrder order, Menu menu, boolean detailed, boolean showRecommendations) {
 			if(item == null) {
 				return;
 			}
@@ -115,14 +115,16 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			if(isRecommendationsVisible()) {
 				btnApply.setBackgroundResource(R.drawable.btn_wish_added);
 				btnApply.setText(StringUtils.EMPTY_STRING);
-				if(viewById == null) {
-					if(viewStub != null) {
-						ViewUtils.setVisible(viewStub, true);
+				if(showRecommendations) {
+					if(viewById == null) {
+						if(viewStub != null) {
+							ViewUtils.setVisible(viewStub, true);
+						}
 					}
+					viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
+					MenuItemDetailsFragment.addRecommendations(viewById.getContext(), viewById, menu, order, item,
+					                                           mRecommendationClickListener);
 				}
-				viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
-				MenuItemDetailsFragment.addRecommendations(viewById.getContext(), viewById, menu, order, item,
-				                                           mRecommendationClickListener);
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
 				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
@@ -361,7 +363,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			holder.txtTitle.setText(item.name());
 		} else {
 			holder.updateState(mOrder, item);
-			holder.bind(item, mOrder, mMenu, false);
+			holder.bind(item, mOrder, mMenu, false, true);
 			final int padding = ViewUtils.dipToPixels(convertView.getContext(), 16f);
 			if(position == mInnerItems.size() - 1) {
 				holder.showDivider(false);
