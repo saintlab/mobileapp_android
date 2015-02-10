@@ -3,8 +3,6 @@ package com.omnom.android.utils.utils;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.math.BigDecimal;
-
 import hugo.weaving.DebugLog;
 
 /**
@@ -15,8 +13,6 @@ public class StringUtils {
 	private static final String TAG = StringUtils.class.getSimpleName();
 
 	public static final String EMPTY_STRING = "";
-
-	public static final String CURRENCY_DELIMITER = ".";
 
 	public static final String WHITESPACE = " ";
 
@@ -38,36 +34,12 @@ public class StringUtils {
 		return StringUtils.EMPTY_STRING;
 	}
 
-	public static String formatCurrency(BigDecimal value) {
-		return formatCurrency(value.toPlainString());
-	}
-
-	public static String formatCurrency(double value) {
-		return formatCurrency(BigDecimal.valueOf(value));
-	}
-
-	public static String formatCurrency(BigDecimal value, String currency) {
-		return formatCurrency(value.toPlainString(), currency);
-	}
-
-	public static String formatCurrency(double value, String currency) {
-		return formatCurrency(BigDecimal.valueOf(value)) + currency;
-	}
-
-	public static String formatCurrencyWithSpace(double value, String currency) {
-		return formatCurrency(BigDecimal.valueOf(value)) + " " + currency;
-	}
-
-	public static String formatCurrency(String s) {
-		return s.indexOf(".") < 0 ? s : s.replaceAll("0*$", "").replaceAll("\\.$", "");
-	}
-
-	public static String formatCurrency(String s, String currency) {
-		if(s.endsWith(currency)) {
-			s = s.substring(0, s.length() - 1);
+	public static String formatCurrency(final String decimalSeparator, final String s) {
+		String regexDecimalSeparator = decimalSeparator;
+		if (regexDecimalSeparator.equals(".")) {
+			regexDecimalSeparator = "\\.";
 		}
-		String result = s.indexOf(".") < 0 ? s : s.replaceAll("0*$", "").replaceAll("\\.$", "");
-		return result + currency;
+		return s.indexOf(decimalSeparator) < 0 ? s : s.replaceAll("0*$", "").replaceAll(regexDecimalSeparator + "$", "");
 	}
 
 	@DebugLog
@@ -80,11 +52,11 @@ public class StringUtils {
 		return data;
 	}
 
-	public static String filterAmount(final String s) {
+	public static String filterAmount(final String s, final char decimalSymbol) {
 		StringBuilder result = new StringBuilder();
 		for(int i = 0; i < s.length(); i++) {
 			final char c = s.charAt(i);
-			if(Character.isDigit(c) || c == ',' || c == '.') {
+			if(Character.isDigit(c) || c == decimalSymbol) {
 				result.append(c);
 			}
 		}

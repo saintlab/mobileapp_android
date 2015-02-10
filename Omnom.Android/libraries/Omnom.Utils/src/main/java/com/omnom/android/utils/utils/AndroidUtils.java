@@ -46,6 +46,7 @@ import com.omnom.android.utils.R;
 import com.omnom.android.utils.view.ErrorEdit;
 
 import java.lang.reflect.Method;
+import java.util.Locale;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
@@ -431,6 +432,10 @@ public class AndroidUtils {
 		} else {
 			v.setBackground(drawable);
 		}
+	}
+
+	public static Locale getCurrentLocale(final Context context) {
+		return context.getResources().getConfiguration().locale;
 	}
 
 }

@@ -38,12 +38,14 @@ import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.fragment.PayOnceFragment;
+import com.omnom.android.listener.DecimalKeyListener;
 import com.omnom.android.mixpanel.model.acquiring.CardAddedMixpanelEvent;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ErrorUtils;
@@ -52,6 +54,9 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.view.HeaderView;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -61,7 +66,6 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
-import static butterknife.ButterKnife.findById;
 import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
@@ -163,6 +167,10 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	private boolean isKeyboardVisible = false;
 
+	private NumberFormat numberFormat;
+
+	private char decimalSeparator;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -181,14 +189,29 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void initUi() {
-		ViewUtils.setVisible(mTextInfo, false);
+		numberFormat = NumberFormat.getNumberInstance();
+		decimalSeparator = ((DecimalFormat) numberFormat).getDecimalFormatSymbols().getDecimalSeparator();
 		final EditText editText = mEditAmount.getEditText();
-		final String text = getString(R.string.hint_confirm_amount);
-		editText.setText(text);
-		editText.setSelection(0);
-		editText.setTextColor(getResources().getColor(R.color.info_hint));
-
-		editText.setEnabled(false);
+		String amount = editText.getText().toString();
+		final String hint = getString(R.string.hint_confirm_amount);
+		if (amount.isEmpty()) {
+			editText.setText(hint);
+			amount = hint;
+		}
+		final String previousSeparator = AmountHelper.getSeparator(amount);
+		final String currentSeparator = String.valueOf(decimalSeparator);
+		if (previousSeparator != null && !previousSeparator.equals(currentSeparator)) {
+			editText.setText(amount.replace(previousSeparator, currentSeparator));
+		}
+		if (getConfirmAmount() == 0) {
+			editText.setSelection(0);
+			editText.setTextColor(getResources().getColor(R.color.info_hint));
+		} else {
+			isFirstEdit = false;
+			editText.requestFocus();
+			editText.setSelection(amount.length() - getCurrencySuffix().length());
+		}
+		ViewUtils.setVisible(mTextInfo, false);
 		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		mUser = UserData.create(mUserProfile.getUser());
 		mAcquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
@@ -235,6 +258,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	private void initAmount() {
 		final EditText editText = mEditAmount.getEditText();
+		editText.setKeyListener(new DecimalKeyListener());
 		editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
@@ -262,7 +286,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				hadComma = s.toString().contains(StringUtils.CURRENCY_DELIMITER);
+				hadComma = s.toString().contains(String.valueOf(decimalSeparator));
 			}
 
 			@Override
@@ -274,16 +298,16 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 				editText.removeTextChangedListener(this);
 				final String str = s.toString();
 
-				final int separatorIndex = str.indexOf(StringUtils.CURRENCY_DELIMITER);
-				String amount = StringUtils.filterAmount(str);
+				final int separatorIndex = str.indexOf(decimalSeparator);
+				String amount = StringUtils.filterAmount(str, decimalSeparator);
 				final int length = amount.length();
 				if(length == 2 && separatorIndex == -1 && !hadComma) {
-					amount += StringUtils.CURRENCY_DELIMITER;
+					amount += decimalSeparator;
 				}
 
 				if(length == 3 && separatorIndex == -1) {
 					final String last = amount.substring(length - 1, length);
-					amount = amount.replace(last, StringUtils.CURRENCY_DELIMITER + last);
+					amount = amount.replace(last, decimalSeparator + last);
 				}
 
 				final String text = amount + getCurrencySuffix();
@@ -404,15 +428,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		}
 		busy(true);
 		mPanelTop.showProgress(true);
-		final ErrorEdit text = findById(this, R.id.edit_amount);
-		final String filterAmount = StringUtils.filterAmount(text.getText());
-		double amount;
-		try {
-			amount = Double.parseDouble(filterAmount);
-		} catch(NumberFormatException e) {
-			Log.d(TAG, "Invalid double value: \"" + filterAmount + "\"");
-			amount = 0;
-		}
+		double amount = getConfirmAmount();
 		mCardVerifySubscribtion = AndroidObservable.bindActivity(this, mAcquiring.verifyCard(mAcquiringData, mUser, mCard, amount))
 		                                           .subscribe(new Action1<AcquiringResponse>() {
 			                                           @Override
@@ -438,6 +454,19 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 				                                           busy(false);
 			                                           }
 		                                           });
+	}
+
+	private double getConfirmAmount() {
+		final String filterAmount = StringUtils.filterAmount(mEditAmount.getText(), decimalSeparator);
+		double amount;
+		try {
+			amount = numberFormat.parse(filterAmount).doubleValue();
+		} catch(ParseException e) {
+			Log.d(TAG, "Invalid double value: \"" + filterAmount + "\"");
+			amount = 0;
+		}
+
+		return amount;
 	}
 
 	private void onVerificationError(final CharSequence errorMessage) {
