@@ -2,4 +2,5 @@
 <resources>
     <color name="menu_transparent_black">#9c000000</color>
     <color name="menu_header">#f6a723</color>
+    <color name="menu_header_transparent">#59f6a723</color>
 </resources>

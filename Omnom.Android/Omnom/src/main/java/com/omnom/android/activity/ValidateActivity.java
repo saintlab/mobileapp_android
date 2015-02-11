@@ -542,14 +542,18 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	@OnClick(R.id.txt_menu)
 	public void onMenu(View v) {
+		final View viewMenu = findViewById(R.id.txt_menu);
+		viewMenu.setEnabled(false);
 		menuApi.getMenu(mRestaurant.id()).subscribe(new Action1<MenuResponse>() {
 			@Override
 			public void call(final MenuResponse menuResponse) {
+				viewMenu.setEnabled(true);
 				MenuFragment.show(getSupportFragmentManager(), mRestaurant, menuResponse.getMenu(), insureOrder());
 			}
 		}, new Action1<Throwable>() {
 			@Override
 			public void call(final Throwable throwable) {
+				viewMenu.setEnabled(true);
 				Log.e(TAG, "getMenu()", throwable);
 			}
 		});

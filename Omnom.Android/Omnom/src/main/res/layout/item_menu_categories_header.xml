@@ -12,7 +12,7 @@
         android:layout_gravity="center"
         android:text="@string/menu"
         android:textColor="@color/menu_header"
-        android:drawableLeft="@drawable/ic_menu"
+        android:drawableLeft="@drawable/ic_menu_normal"
         android:drawablePadding="@dimen/drawable_padding_default"
         android:textAppearance="?android:textAppearanceLarge" />
 </FrameLayout>
