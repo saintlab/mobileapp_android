@@ -22,7 +22,6 @@ import android.widget.ListView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.activity.ValidateActivity;
 import com.omnom.android.adapter.MenuCategoriesAdapter;
 import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.model.Item;
@@ -71,8 +70,8 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 	@InjectView(android.R.id.list)
 	protected ListView mListView;
 
-	@InjectView(R.id.img_profile)
-	protected ImageView mImgProfile;
+	//@InjectView(R.id.img_profile)
+	//protected ImageView mImgProfile;
 
 	@InjectView(R.id.btn_previous)
 	protected ImageView mImgPrev;
@@ -93,13 +92,13 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 
 	private View mSelectedView;
 
-	@OnClick(R.id.img_profile)
-	public void onProfile(View v) {
-		final ValidateActivity activity = (ValidateActivity) getActivity();
-		if(activity != null) {
-			activity.onProfile(v);
-		}
-	}
+	//@OnClick(R.id.img_profile)
+	//public void onProfile(View v) {
+	//	final ValidateActivity activity = (ValidateActivity) getActivity();
+	//	if(activity != null) {
+	//		activity.onProfile(v);
+	//	}
+	//}
 
 	@OnClick(R.id.btn_previous)
 	public void onPrevious(View v) {
@@ -191,7 +190,7 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 	public void onBackStackChanged() {
 		if(getFragmentManager() != null && getFragmentManager().getBackStackEntryCount() == 1) {
 			ViewUtils.setVisible(mImgPrev, true);
-			ViewUtils.setVisible(mImgProfile, true);
+			// ViewUtils.setVisible(mImgProfile, true);
 			mListView.postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -210,7 +209,7 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 			}, 350);
 		} else {
 			ViewUtils.setVisible(mImgPrev, false);
-			ViewUtils.setVisible(mImgProfile, false);
+			// ViewUtils.setVisible(mImgProfile, false);
 		}
 	}
 }
