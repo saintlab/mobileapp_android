@@ -103,6 +103,9 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	@InjectView(R.id.txt_info_additional)
 	protected TextView mTxtAdditional;
 
+	@InjectView(R.id.txt_info_energy)
+	protected TextView mTxtEnergy;
+
 	@InjectView(R.id.panel_bottom)
 	protected LinearLayout mPanelRecommendations;
 
@@ -144,6 +147,8 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		final String description = mItem.description();
 		ViewUtils.setVisible(mTxtAdditional, !TextUtils.isEmpty(description));
 		mTxtAdditional.setText(description);
+
+		MenuHelper.bindNutritionalValue(view.getContext(), mItem.details(), mTxtEnergy);
 	}
 
 	private void refresh() {

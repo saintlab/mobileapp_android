@@ -47,25 +47,25 @@ public abstract class Details implements Parcelable {
 	public abstract int persons();
 
 	@Nullable
-	public abstract int protein100();
+	public abstract int protein_100();
 
 	@Nullable
 	public abstract int proteinTotal();
 
 	@Nullable
-	public abstract int fat100();
+	public abstract int fat_100();
 
 	@Nullable
 	public abstract int fatTotal();
 
 	@Nullable
-	public abstract int carbohydrate100();
+	public abstract int carbohydrate_100();
 
 	@Nullable
 	public abstract int carbohydrateTotal();
 
 	@Nullable
-	public abstract int energy100();
+	public abstract int energy_100();
 
 	@Nullable
 	public abstract int energyTotal();

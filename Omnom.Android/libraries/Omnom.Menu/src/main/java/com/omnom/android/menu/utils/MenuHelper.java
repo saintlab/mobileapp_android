@@ -2,12 +2,14 @@ package com.omnom.android.menu.utils;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.SparseIntArray;
 import android.widget.TextView;
 
 import com.omnom.android.menu.R;
 import com.omnom.android.menu.model.Details;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
+import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
 /**
@@ -15,12 +17,72 @@ import com.omnom.android.utils.utils.ViewUtils;
  */
 public class MenuHelper {
 
+	public static final String ENERGY_DELIMITER = "|";
+
+	public static void putValue(final SparseIntArray array, int key, int value) {
+		if(value > 0) {
+			array.put(key, value);
+		}
+	}
+
+	public static void bindNutritionalValue(final Context context, Details details, TextView txtDetails) {
+		final String text = getNutritionalString(context, details);
+		final boolean notEmpty = !TextUtils.isEmpty(text);
+		ViewUtils.setVisible(txtDetails, notEmpty);
+		txtDetails.setText(notEmpty ? text : StringUtils.EMPTY_STRING);
+	}
+
+	private static String getNutritionalString(final Context context, final Details details) {
+		final StringBuilder sb = new StringBuilder();
+		final SparseIntArray sparseArray = new SparseIntArray();
+		putValue(sparseArray, R.string.dish_nutritional_calories, details.energy_100());
+		putValue(sparseArray, R.string.dish_nutritional_fat, details.fat_100());
+		putValue(sparseArray, R.string.dish_nutritional_carbohydrates, details.carbohydrate_100());
+		putValue(sparseArray, R.string.dish_nutritional_protein, details.protein_100());
+
+		processSparseData(context, sb, sparseArray, R.string.dish_nutritional_title_100);
+
+		sparseArray.clear();
+		putValue(sparseArray, R.string.dish_nutritional_calories, details.energyTotal());
+		putValue(sparseArray, R.string.dish_nutritional_fat, details.fatTotal());
+		putValue(sparseArray, R.string.dish_nutritional_carbohydrates, details.carbohydrateTotal());
+		putValue(sparseArray, R.string.dish_nutritional_protein, details.proteinTotal());
+
+		processSparseData(context, sb, sparseArray, R.string.dish_nutritional_title_portion);
+
+		return sb.toString();
+	}
+
+	private static void processSparseData(final Context context, final StringBuilder sb, final SparseIntArray data, int titleId) {
+		if(data.size() > 0) {
+			if(sb.length() > 0) {
+				sb.append(StringUtils.NEXT_STRING + StringUtils.NEXT_STRING);
+			}
+			sb.append(context.getString(titleId));
+			sb.append(StringUtils.NEXT_STRING);
+			writeToBuffer(context, sb, data);
+		}
+	}
+
+	private static void writeToBuffer(final Context context, final StringBuilder sb, final SparseIntArray sparse100) {
+		for(int i = 0; i < sparse100.size(); i++) {
+			final int resId = sparse100.keyAt(i);
+			final int value = sparse100.get(resId);
+			if(i > 0) {
+				sb.append(ENERGY_DELIMITER);
+			}
+			sb.append(context.getString(resId, value));
+		}
+	}
+
 	public static void bindDetails(final Context context, Details details, TextView txtDetails, boolean large) {
 		final boolean hasDetails = details != null;
 		StringBuilder sb = new StringBuilder();
 		if(hasDetails) {
-			if(details.energyTotal() > 0 && details.weight() > 0) {
-				sb.append(context.getString(R.string.dish_details, details.energyTotal(), details.weight()));
+			if(details.volume() > 0) {
+				sb.append(context.getString(R.string.dish_details_volume, details.volume()));
+			} else if(details.weight() > 0) {
+				sb.append(context.getString(R.string.dish_details_weight, details.weight()));
 			}
 			if(large) {
 				final int persons = details.persons();
