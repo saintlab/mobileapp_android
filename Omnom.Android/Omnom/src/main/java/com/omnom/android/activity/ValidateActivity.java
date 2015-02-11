@@ -330,11 +330,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	}
 
 	private void updateWishUi() {
-		if(mOrder == null) {
+		final Button btnOrder = (Button) findViewById(R.id.btn_order);
+		if(mOrder == null || btnOrder == null) {
 			return;
 		}
 		final BigDecimal totalAmount = mOrder.getTotalPrice();
-		final Button btnOrder = (Button) findViewById(R.id.btn_order);
 		if(mOrder != null && totalAmount.compareTo(BigDecimal.ZERO) > 0) {
 			btnOrder.setText(StringUtils.formatCurrency(totalAmount, getString(R.string.currency_suffix_ruble)));
 			btnOrder.setTextColor(Color.WHITE);
@@ -415,6 +415,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	@Override
 	public void initUi() {
+		mOrder = insureOrder();
+
 		loader.setLogo(R.drawable.ic_fork_n_knife);
 		loader.setColor(getResources().getColor(R.color.loader_bg));
 		mPaymentListener = new PaymentEventListener(this);
@@ -510,6 +512,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}
 	}
 
+	private UserOrder insureOrder() {
+		if(mOrder == null) {
+			mOrder = UserOrder.create();
+		}
+		return mOrder;
+	}
+
 	protected void validate() {
 		if(mFirstRun || mRestaurant == null) {
 			ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
@@ -533,16 +542,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	@OnClick(R.id.txt_menu)
 	public void onMenu(View v) {
-		if(mOrder == null) {
-			mOrder = UserOrder.create();
-		}
-		// final String ribaRis = "riba-ris-nsk-at-aura";
-		// "saintlab-rkeeper-v6"
 		menuApi.getMenu(mRestaurant.id()).subscribe(new Action1<MenuResponse>() {
 			@Override
 			public void call(final MenuResponse menuResponse) {
-				// MenuActivity.start(ValidateActivity.this, menuResponse, mRestaurant);
-				MenuFragment.show(getSupportFragmentManager(), mRestaurant, menuResponse.getMenu(), mOrder);
+				MenuFragment.show(getSupportFragmentManager(), mRestaurant, menuResponse.getMenu(), insureOrder());
 			}
 		}, new Action1<Throwable>() {
 			@Override
@@ -932,9 +935,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	}
 
 	private void onOrder() {
-		if(mOrder != null) {
-			WishActivity.start(this, mRestaurant, mOrder, REQUEST_CODE_WISH_LIST);
-		}
+		WishActivity.start(this, mRestaurant, insureOrder(), REQUEST_CODE_WISH_LIST);
 	}
 
 	public View getPanelBottom() {
