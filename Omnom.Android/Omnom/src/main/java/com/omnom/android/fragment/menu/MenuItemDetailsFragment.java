@@ -56,7 +56,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	}
 
 	public static boolean addRecommendations(final Context context, LinearLayout container, Menu menu, UserOrder order, Item item,
-	                                         View.OnClickListener onClickListener) {
+	                                         View.OnClickListener onApplyListener, final View.OnClickListener itemClickListener) {
 		removeRecommendations(container);
 
 		final boolean hasRecommendations = item.hasRecommendations();
@@ -68,10 +68,13 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			int index = 0;
 			for(String recId : recommendations) {
 				index++;
-				final View itemView = inflater.inflate(R.layout.item_menu_dish, null, false);
-				MenuCategoryItemsAdapter.ViewHolder holder = new MenuCategoryItemsAdapter.ViewHolder(itemView);
-
 				final Item recommendedItem = MenuHelper.getItem(menu, recId);
+
+				final View itemView = inflater.inflate(R.layout.item_menu_dish, null, false);
+				itemView.setOnClickListener(itemClickListener);
+				itemView.setTag(recommendedItem);
+
+				MenuCategoryItemsAdapter.ViewHolder holder = new MenuCategoryItemsAdapter.ViewHolder(itemView);
 				holder.updateState(order, recommendedItem);
 				holder.bind(recommendedItem, order, menu, false, false);
 				holder.showDivider(index != recommendations.size());
@@ -80,7 +83,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 				itemView.setTag(R.id.item, recommendedItem);
 
 				final View btnApply = itemView.findViewById(R.id.btn_apply);
-				btnApply.setOnClickListener(onClickListener);
+				btnApply.setOnClickListener(onApplyListener);
 				btnApply.setTag(R.id.item, recommendedItem);
 
 				container.addView(itemView);
@@ -140,7 +143,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
 		final View viewRoot = view.findViewById(R.id.root);
 		ButterKnife.inject(this, view);
-		holder = new MenuCategoryItemsAdapter.ViewHolder(viewRoot, this);
+		holder = new MenuCategoryItemsAdapter.ViewHolder(viewRoot, this, null);
 		holder.showDivider(false);
 		refresh();
 

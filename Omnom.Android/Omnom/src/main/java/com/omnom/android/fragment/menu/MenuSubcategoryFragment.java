@@ -164,6 +164,12 @@ public class MenuSubcategoryFragment extends BaseFragment {
 					showAddFragment(recommendedItem);
 				}
 			}
+		}, new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				final Item recommendedItem = (Item) v.getTag(R.id.item);
+				MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, recommendedItem);
+			}
 		});
 
 		mTxtTitle.setText(category.name());

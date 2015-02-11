@@ -85,13 +85,17 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 		private MenuItemState mState = MenuItemState.NONE;
 
+		private View.OnClickListener mClickListener;
+
 		public ViewHolder(View convertView) {
-			this(convertView, null);
+			this(convertView, null, null);
 		}
 
-		public ViewHolder(final View convertView, final View.OnClickListener recommendationClickListener) {
+		public ViewHolder(final View convertView, final View.OnClickListener applyClickListener,
+		                  final View.OnClickListener clickListener) {
 			ButterKnife.inject(this, convertView);
-			mRecommendationClickListener = recommendationClickListener;
+			mRecommendationClickListener = applyClickListener;
+			mClickListener = clickListener;
 		}
 
 		private Context getContext() {return btnApply.getContext();}
@@ -158,7 +162,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			}
 			viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
 			MenuItemDetailsFragment.addRecommendations(viewById.getContext(), viewById, menu, order, item,
-			                                           mRecommendationClickListener);
+			                                           mRecommendationClickListener, mClickListener);
 		}
 
 		public boolean isRecommendationsVisible() {
@@ -273,6 +277,8 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 	private View.OnClickListener mRecommendationClickListener;
 
+	private View.OnClickListener mClickListener;
+
 	private Menu mMenu;
 
 	private UserOrder mOrder;
@@ -280,13 +286,14 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 	private ArrayList<Item> mInnerItems;
 
 	public MenuCategoryItemsAdapter(MenuSubcategoryFragment fragment, Menu menu, final UserOrder order, Category category, Map<String,
-			Item> items, View.OnClickListener recommendationClickListener) {
+			Item> items, View.OnClickListener recommendationClickListener, View.OnClickListener clickListener) {
 		mContext = fragment;
 		mMenu = menu;
 		mOrder = order;
 		mCategory = category;
 		mItems = items;
 		mRecommendationClickListener = recommendationClickListener;
+		mClickListener = clickListener;
 		mInflater = LayoutInflater.from(fragment.getActivity());
 		initData();
 	}
@@ -379,7 +386,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 					convertView = mInflater.inflate(R.layout.item_menu_subheader, parent, false);
 					break;
 			}
-			holder = new ViewHolder(convertView, mRecommendationClickListener);
+			holder = new ViewHolder(convertView, mRecommendationClickListener, mClickListener);
 			convertView.setTag(holder);
 		}
 

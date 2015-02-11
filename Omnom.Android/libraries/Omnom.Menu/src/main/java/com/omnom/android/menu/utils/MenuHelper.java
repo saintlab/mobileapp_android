@@ -33,6 +33,9 @@ public class MenuHelper {
 	}
 
 	private static String getNutritionalString(final Context context, final Details details) {
+		if(details == null) {
+			return StringUtils.EMPTY_STRING;
+		}
 		final StringBuilder sb = new StringBuilder();
 		final SparseIntArray sparseArray = new SparseIntArray();
 		putValue(sparseArray, R.string.dish_nutritional_calories, details.energy_100());
