@@ -134,4 +134,5 @@
     <string name="wish_order">Заказать</string>
     <string name="menu">Меню</string>
     <string name="your_wish_processed">Ваш заказ отправлен!</string>
+    <string name="title_activity_wish_sent">WishSentActivity</string>
 </resources>

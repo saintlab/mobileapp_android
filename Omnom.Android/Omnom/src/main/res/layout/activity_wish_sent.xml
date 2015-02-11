@@ -1,0 +1,36 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/black"
+    android:paddingTop="24dp"
+    tools:context="com.omnom.android.fragment.menu.WishSentFragment">
+
+    <ImageView
+        android:id="@+id/btn_close"
+        android:layout_margin="@dimen/activity_vertical_margin_xsmall"
+        android:layout_gravity="top|center_horizontal"
+        android:src="@drawable/ic_cross_white"
+        style="@style/ImageView.Clickable.Cropped" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="24dp"
+        android:text="Заказ принят\nи обрабатывается"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/font_xlarge"
+        android:textAppearance="?android:textAppearanceLarge" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="24dp"
+        android:text="Выбранные блюда скоро будут\nдобавлены официантом на ваш стол"
+        android:textColor="#ddd"
+        android:textAppearance="?android:textAppearance" />
+
+</LinearLayout>

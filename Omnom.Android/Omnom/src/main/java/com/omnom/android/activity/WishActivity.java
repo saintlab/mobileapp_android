@@ -5,6 +5,7 @@ import android.support.v4.view.ViewCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 import com.omnom.android.R;
@@ -23,6 +24,7 @@ import com.omnom.android.restaurateur.model.restaurant.WishRequestItem;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.Collections;
 
@@ -75,6 +77,9 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	@InjectView(android.R.id.list)
 	protected ListView mList;
 
+	@InjectView(R.id.progress)
+	protected ProgressBar mProgressBar;
+
 	@Inject
 	protected RestaurateurObservableApi api;
 
@@ -109,6 +114,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	@Override
 	public void initUi() {
+		ViewUtils.setVisible(mProgressBar, false);
 		mAdapter = new WishListAdapter(this, mOrder.getSelectedItems(), Collections.EMPTY_LIST, this);
 		final SwingBottomInAnimationAdapter adapter = new SwingBottomInAnimationAdapter(mAdapter);
 		adapter.setAbsListView(mList);
@@ -130,16 +136,28 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		}
 	}
 
+	@Override
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == REQUEST_CODE_WISH_LIST && resultCode == RESULT_OK) {
+			finish();
+		}
+	}
+
 	private void doWish() {
+		AnimationUtils.animateAlpha(mProgressBar, true);
 		api.wishes(mRestaurant.id(), createWishRequest(mRestaurant, mOrder)).subscribe(new Action1() {
 			@Override
 			public void call(final Object o) {
+				ViewUtils.setVisible(mProgressBar, false);
+				WishSentActivity.start(WishActivity.this, REQUEST_CODE_WISH_LIST);
 				doClear();
 				showToast(getActivity(), getString(R.string.your_wish_processed));
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			protected void onError(final Throwable throwable) {
+				ViewUtils.setVisible(mProgressBar, false);
 				Log.e(TAG, "restaurateur.wishes", throwable);
 			}
 		});

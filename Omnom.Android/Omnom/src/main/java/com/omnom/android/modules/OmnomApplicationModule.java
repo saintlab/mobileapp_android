@@ -22,14 +22,15 @@ import com.omnom.android.activity.ValidateActivityBle21;
 import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.activity.ValidateActivityShortcut;
 import com.omnom.android.activity.WishActivity;
+import com.omnom.android.activity.WishSentActivity;
 import com.omnom.android.fragment.BillItemsFragment;
 import com.omnom.android.fragment.BillSplitFragment;
 import com.omnom.android.fragment.BillSplitPersonsFragment;
 import com.omnom.android.fragment.EnteringFragment;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.fragment.SplashFragment;
-import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.MenuFragment;
+import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.fragment.menu.MenuSubcategoryFragment;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
@@ -47,7 +48,7 @@ import dagger.Module;
 		UserProfileActivity.class,
 		CardAddActivity.class,
 		CardConfirmActivity.class, ThanksActivity.class, ThanksDemoActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
-		PaymentProcessActivity.class, RestaurantsListActivity.class, RestaurantActivity.class, WishActivity.class,
+		PaymentProcessActivity.class, RestaurantsListActivity.class, RestaurantActivity.class, WishActivity.class, WishSentActivity.class,
 		/* services */
 		BackgroundBleService.class,
 		/* fragments */
