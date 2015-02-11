@@ -336,12 +336,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		final BigDecimal totalAmount = mOrder.getTotalPrice();
 		final Button btnOrder = (Button) findViewById(R.id.btn_order);
 		if(mOrder != null && totalAmount.compareTo(BigDecimal.ZERO) > 0) {
-			btnOrder.setEnabled(true);
 			btnOrder.setText(StringUtils.formatCurrency(totalAmount, getString(R.string.currency_suffix_ruble)));
 			btnOrder.setTextColor(Color.WHITE);
 			btnOrder.setBackgroundResource(R.drawable.btn_rounded_blue);
 		} else {
-			btnOrder.setEnabled(false);
 			btnOrder.setTextColor(Color.GRAY);
 			btnOrder.setText(getString(R.string.your_order));
 			btnOrder.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
@@ -934,7 +932,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	}
 
 	private void onOrder() {
-		if(mOrder != null && mOrder.getSelectedItems().size() > 0) {
+		if(mOrder != null) {
 			WishActivity.start(this, mRestaurant, mOrder, REQUEST_CODE_WISH_LIST);
 		}
 	}
