@@ -5,11 +5,14 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.omnom.android.BuildConfig;
 import com.omnom.android.OmnomApplication;
+import com.omnom.android.PaymentChecker;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.AcquiringType;
 import com.omnom.android.acquiring.ExtraData;
@@ -61,9 +64,13 @@ import rx.functions.Action1;
  */
 public class PaymentProcessActivity extends BaseOmnomActivity implements SilentPaymentEventListener.PaymentListener {
 
+	public static final int SIMILAR_PAYMENTS_TIMEOUT = 60 * 1000;
+
 	private static final String TAG = PaymentProcessActivity.class.getSimpleName();
 
 	private static final int REQUEST_THANKS = 100;
+
+	public static final String TRANSACTION_ALREADY_PROCESSED_EARLIER = "TRANSACTION_ALREADY_PROCESSED_EARLIER";
 
 	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final Order order, CardInfo cardInfo, final boolean isDemo,
@@ -135,8 +142,12 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private Validator restaurantIdValidator;
 
+	private PaymentChecker mPayChecker;
+
 	@Override
 	public void initUi() {
+		mPayChecker = new PaymentChecker(this);
+
 		mPaymentListener = new SilentPaymentEventListener(this, this);
 		mErrorHelper = new OmnomErrorHelper(loader, txtError, btnBottom, txtBottom, btnDemo, errorViews);
 		loader.scaleDown();
@@ -221,7 +232,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					} else if(response.getErrors() != null) {
 						Log.w(TAG, response.getErrors().toString());
 					}
-					if (BillResponse.STATUS_PAID.equals(status) || BillResponse.STATUS_ORDER_CLOSED.equals(status)) {
+					if(BillResponse.STATUS_PAID.equals(status) || BillResponse.STATUS_ORDER_CLOSED.equals(status)) {
 						onOrderClosed();
 					} else {
 						onUnknownError();
@@ -247,17 +258,44 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, double amount,
 	                 int tip) {
 		final String mailRestaurantId = billData.getMailRestaurantId();
-		if (!restaurantIdValidator.validate(mailRestaurantId) && !mIsDemo) {
+		if(!restaurantIdValidator.validate(mailRestaurantId) && !mIsDemo) {
 			AcquiringResponseError error = new AcquiringResponseError();
 			error.setDescr("Mail restaurant id is invalid: " + mailRestaurantId);
 			onPayError(error);
 			return;
 		}
+
 		final ExtraData extra = MailRuExtra.create(tip, mailRestaurantId);
 		mBillData = billData;
 		mBillId = billData.getId();
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
+
+		mDetails.setBillId(billData.getId());
+
+		final OrderFragment.PaymentDetails prevDetails = mPayChecker.check(mDetails);
+		if(prevDetails != null) {
+			final String prevDetailsTransactionUrl = prevDetails.getTransactionUrl();
+			if(!TextUtils.isEmpty(prevDetailsTransactionUrl)) {
+				AcquiringResponse acquiringResponse = new AcquiringResponse();
+				acquiringResponse.setUrl(prevDetailsTransactionUrl);
+				checkResult(acquiringResponse);
+				mPayChecker.clearCache(prevDetails);
+				return;
+			} else {
+				if(System.currentTimeMillis() - prevDetails.getTransactionTimestmap() < SIMILAR_PAYMENTS_TIMEOUT) {
+					final AcquiringResponseError error = new AcquiringResponseError();
+					error.setCode(TRANSACTION_ALREADY_PROCESSED_EARLIER);
+					error.setDescr(getString(R.string.attempt_to_perform_similar_payment));
+					onSimilarPayment(error);
+					return;
+				}
+			}
+		}
+
+		mDetails.setTransactionTimestmap(System.currentTimeMillis());
+		mPayChecker.onPrePayment(mDetails);
+
 		mPaySubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().pay(acquiringData, paymentInfo))
 		                                    .subscribe(new Action1<AcquiringResponse>() {
 			                                    @Override
@@ -266,7 +304,13 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					                                    Log.w(TAG, response.getError().toString());
 					                                    onPayError(response.getError());
 				                                    } else {
+					                                    // TODO: Remove
+					                                    if(BuildConfig.DEBUG) {
+						                                    throw new NumberFormatException("TEST");
+					                                    }
 					                                    mTransactionUrl = response.getUrl();
+					                                    mDetails.setTransactionUrl(mTransactionUrl);
+					                                    mPayChecker.onPaymentRequested(mDetails);
 					                                    checkResult(response);
 				                                    }
 			                                    }
@@ -277,6 +321,12 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 				                                    onUnknownError();
 			                                    }
 		                                    });
+	}
+
+	private void onSimilarPayment(final AcquiringResponseError error) {
+		reportMixPanelFail(error);
+		loader.showProgress(false);
+		mErrorHelper.showSimilarPaymentDeclined(finishOnClick());
 	}
 
 	private void checkResult(final AcquiringResponse response) {
@@ -304,7 +354,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		}
 	}
 
-	private void onPayOk(AcquiringPollingResponse response) {
+	private void onPayOk(final AcquiringPollingResponse response) {
 		Log.d(TAG, "status = " + response.getStatus());
 		reportMixPanelSuccess();
 		loader.stopProgressAnimation();
@@ -336,19 +386,19 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	}
 
 	private void reportMixPanelSuccess() {
-		if (!mIsDemo) {
+		if(!mIsDemo) {
 			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-								      new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
+			                          new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
 			getMixPanelHelper().trackRevenue(MixPanelHelper.Project.OMNOM,
-											 String.valueOf(getUserData().getId()), mDetails, mBillData);
+			                                 String.valueOf(getUserData().getId()), mDetails, mBillData);
 		}
 	}
 
 	private void reportMixPanelFail(final AcquiringResponseError error) {
-		if (!mIsDemo) {
+		if(!mIsDemo) {
 			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-									  new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
-									  mCardInfo, error));
+			                          new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
+			                                                   mCardInfo, error));
 		}
 	}
 
