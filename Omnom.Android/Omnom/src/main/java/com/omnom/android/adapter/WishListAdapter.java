@@ -97,7 +97,6 @@ public class WishListAdapter extends BaseAdapter {
 	}
 
 	@Override
-	@DebugLog
 	public int getItemViewType(final int position) {
 		final Object item = getItem(position);
 		if(item instanceof UserOrderDataFooter) {
@@ -115,13 +114,11 @@ public class WishListAdapter extends BaseAdapter {
 	}
 
 	@Override
-	@DebugLog
 	public int getCount() {
 		return mWishItems.size() + mTableItems.size();
 	}
 
 	@Override
-	@DebugLog
 	public Object getItem(final int position) {
 		final int wishSize = mWishItems.size();
 		if(position < wishSize) {
@@ -131,7 +128,6 @@ public class WishListAdapter extends BaseAdapter {
 	}
 
 	@Override
-	@DebugLog
 	public long getItemId(final int pos) {
 		return getItem(pos).hashCode();
 	}
@@ -153,13 +149,6 @@ public class WishListAdapter extends BaseAdapter {
 
 				case VIEW_TYPE_WISH_FOOTER:
 					convertView = mInflater.inflate(R.layout.item_wish_footer, parent, false);
-					final Button btnClear = (Button) convertView.findViewById(R.id.btn_clear);
-					final Button btnSend = (Button) convertView.findViewById(R.id.btn_send);
-					btnClear.setOnClickListener(mClickListener);
-					btnSend.setOnClickListener(mClickListener);
-					final boolean enabled = mWishItems.size() > 1;
-					btnClear.setEnabled(enabled);
-					btnSend.setEnabled(enabled);
 					convertView.setTag(R.id.item, getItem(position));
 					break;
 
@@ -180,16 +169,27 @@ public class WishListAdapter extends BaseAdapter {
 
 	@DebugLog
 	private void bindView(final View convertView, final int position, final int itemType, final Object item) {
-		final ViewHolder holder = (ViewHolder) convertView.getTag();
-		if(holder != null && item != null) {
-			if(item instanceof UserOrderData) {
+		switch(itemType) {
+			case VIEW_TYPE_WISH_ITEM:
+				final ViewHolder holder = (ViewHolder) convertView.getTag();
 				final UserOrderData data = (UserOrderData) item;
 				holder.txtTitle.setText(data.item().name());
 
-				final String price = StringUtils.formatCurrency(data.item().price(), mContext.getString(R.string.currency_suffix_ruble));
+				final String price = StringUtils.formatCurrency(data.item().price(), mContext.getString(
+						R.string.currency_suffix_ruble));
 				holder.txtPrice.setText(mContext.getString(R.string.wish_items_price_detailed, data.amount(), price));
 				MenuHelper.bindDetails(mContext, data.item().details(), holder.txtInfo, false);
-			}
+				break;
+
+			case VIEW_TYPE_WISH_FOOTER:
+				final Button btnClear = (Button) convertView.findViewById(R.id.btn_clear);
+				final Button btnSend = (Button) convertView.findViewById(R.id.btn_send);
+				btnClear.setOnClickListener(mClickListener);
+				btnSend.setOnClickListener(mClickListener);
+				final boolean enabled = mWishItems.size() > 1;
+				btnClear.setEnabled(enabled);
+				btnSend.setEnabled(enabled);
+				break;
 		}
 	}
 
