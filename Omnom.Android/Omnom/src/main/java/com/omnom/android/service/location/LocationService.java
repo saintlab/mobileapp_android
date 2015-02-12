@@ -67,6 +67,7 @@ public class LocationService {
 		}
 
 		public void onLocationChanged(final Location location) {
+			locationManager.removeUpdates(this);
 			if (subscriber != null) {
 				subscriber.onNext(location);
 				subscriber.onCompleted();
