@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.omnom.android.BuildConfig;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.PaymentChecker;
 import com.omnom.android.R;
@@ -66,11 +65,11 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	public static final int SIMILAR_PAYMENTS_TIMEOUT = 60 * 1000;
 
+	public static final String TRANSACTION_ALREADY_PROCESSED_EARLIER = "TRANSACTION_ALREADY_PROCESSED_EARLIER";
+
 	private static final String TAG = PaymentProcessActivity.class.getSimpleName();
 
 	private static final int REQUEST_THANKS = 100;
-
-	public static final String TRANSACTION_ALREADY_PROCESSED_EARLIER = "TRANSACTION_ALREADY_PROCESSED_EARLIER";
 
 	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final Order order, CardInfo cardInfo, final boolean isDemo,
@@ -142,6 +141,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private Validator restaurantIdValidator;
 
+	@Nullable
 	private PaymentChecker mPayChecker;
 
 	@Override
@@ -273,28 +273,30 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 		mDetails.setBillId(billData.getId());
 
-		final OrderFragment.PaymentDetails prevDetails = mPayChecker.check(mDetails);
-		if(prevDetails != null) {
-			final String prevDetailsTransactionUrl = prevDetails.getTransactionUrl();
-			if(!TextUtils.isEmpty(prevDetailsTransactionUrl)) {
-				AcquiringResponse acquiringResponse = new AcquiringResponse();
-				acquiringResponse.setUrl(prevDetailsTransactionUrl);
-				checkResult(acquiringResponse);
-				mPayChecker.clearCache(prevDetails);
-				return;
-			} else {
-				if(System.currentTimeMillis() - prevDetails.getTransactionTimestmap() < SIMILAR_PAYMENTS_TIMEOUT) {
-					final AcquiringResponseError error = new AcquiringResponseError();
-					error.setCode(TRANSACTION_ALREADY_PROCESSED_EARLIER);
-					error.setDescr(getString(R.string.attempt_to_perform_similar_payment));
-					onSimilarPayment(error);
+		if(mPayChecker != null) {
+			final OrderFragment.PaymentDetails prevDetails = mPayChecker.check(mDetails);
+			if(prevDetails != null) {
+				final String prevDetailsTransactionUrl = prevDetails.getTransactionUrl();
+				if(!TextUtils.isEmpty(prevDetailsTransactionUrl)) {
+					AcquiringResponse acquiringResponse = new AcquiringResponse();
+					acquiringResponse.setUrl(prevDetailsTransactionUrl);
+					checkResult(acquiringResponse);
+					mPayChecker.clearCache(prevDetails);
 					return;
+				} else {
+					if(System.currentTimeMillis() - prevDetails.getTransactionTimestmap() < SIMILAR_PAYMENTS_TIMEOUT) {
+						final AcquiringResponseError error = new AcquiringResponseError();
+						error.setCode(TRANSACTION_ALREADY_PROCESSED_EARLIER);
+						error.setDescr(getString(R.string.attempt_to_perform_similar_payment));
+						onSimilarPayment(error);
+						return;
+					}
 				}
 			}
-		}
 
-		mDetails.setTransactionTimestmap(System.currentTimeMillis());
-		mPayChecker.onPrePayment(mDetails);
+			mDetails.setTransactionTimestmap(System.currentTimeMillis());
+			mPayChecker.onPrePayment(mDetails);
+		}
 
 		mPaySubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().pay(acquiringData, paymentInfo))
 		                                    .subscribe(new Action1<AcquiringResponse>() {
@@ -304,13 +306,11 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					                                    Log.w(TAG, response.getError().toString());
 					                                    onPayError(response.getError());
 				                                    } else {
-					                                    // TODO: Remove
-					                                    if(BuildConfig.DEBUG) {
-						                                    throw new NumberFormatException("TEST");
-					                                    }
 					                                    mTransactionUrl = response.getUrl();
 					                                    mDetails.setTransactionUrl(mTransactionUrl);
-					                                    mPayChecker.onPaymentRequested(mDetails);
+					                                    if(mPayChecker != null) {
+						                                    mPayChecker.onPaymentRequested(mDetails);
+					                                    }
 					                                    checkResult(response);
 				                                    }
 			                                    }

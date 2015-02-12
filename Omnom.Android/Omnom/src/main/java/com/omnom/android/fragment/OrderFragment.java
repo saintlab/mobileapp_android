@@ -216,7 +216,7 @@ public class OrderFragment extends Fragment {
 					'}';
 		}
 
-		public boolean isSame(PaymentDetails details) {
+		public boolean isSimilar(PaymentDetails details) {
 			return details != null &&
 					getBillId() == details.getBillId() &&
 					getAmount() == details.getAmount() &&

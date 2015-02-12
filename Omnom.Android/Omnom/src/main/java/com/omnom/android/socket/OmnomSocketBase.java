@@ -42,7 +42,7 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 		@Override
 		public final void call(final Object... args) {
 			try {
-			safeCall(args);
+				safeCall(args);
 			} catch(Throwable e) {
 				Log.e(TAG, "SafeEmitterListener.call", e);
 			}
