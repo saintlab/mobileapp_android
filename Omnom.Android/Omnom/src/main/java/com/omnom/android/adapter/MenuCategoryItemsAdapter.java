@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -26,6 +25,7 @@ import com.omnom.android.menu.model.MenuItemState;
 import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.StickyListView;
@@ -63,9 +63,9 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		@Optional
 		protected View viewDelimiter;
 
-		@InjectView(R.id.stub)
-		@Optional
-		protected ViewStub viewStub;
+		//@InjectView(R.id.stub)
+		//@Optional
+		//protected ViewStub viewStub;
 
 		@InjectView(R.id.btn_apply)
 		@Optional
@@ -111,9 +111,13 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			btnApply.setTag(item);
 
 			LinearLayout viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
-			if(viewById != null) {
-				MenuItemDetailsFragment.removeRecommendations(viewById);
-				ViewUtils.setVisible(viewById, false);
+			final boolean b = item.recommendations() != null && item.recommendations().size() + 1 != viewById.getChildCount() && item
+					.hasRecommendations();
+			if(b) {
+				if(viewById != null) {
+					MenuItemDetailsFragment.removeRecommendations(viewById, !isRecommendationsVisible());
+					ViewUtils.setVisible(viewById, false);
+				}
 			}
 
 			if(isRecommendationsVisible()) {
@@ -123,7 +127,9 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
 				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
 			}
-			showRecommendations(item, order, menu, viewById);
+			if(b) {
+				showRecommendations(item, order, menu, viewById);
+			}
 		}
 
 		public void bind(final Item item, UserOrder order, Menu menu, boolean detailed, boolean showRecommendations) {
@@ -137,15 +143,19 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			btnApply.setTag(item);
 
 			LinearLayout viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
-			if(viewById != null) {
-				MenuItemDetailsFragment.removeRecommendations(viewById);
-				ViewUtils.setVisible(viewById, false);
+			final boolean b = item.recommendations() != null && item.recommendations().size() + 1 != viewById.getChildCount() && item
+					.hasRecommendations();
+			if(b) {
+				if(viewById != null) {
+					MenuItemDetailsFragment.removeRecommendations(viewById, !isRecommendationsVisible());
+					ViewUtils.setVisible(viewById, false);
+				}
 			}
 
 			if(isRecommendationsVisible()) {
 				btnApply.setBackgroundResource(R.drawable.btn_wish_added);
 				btnApply.setText(StringUtils.EMPTY_STRING);
-				if(showRecommendations) {
+				if(showRecommendations && b) {
 					showRecommendations(item, order, menu, viewById);
 				}
 			} else {
@@ -155,14 +165,11 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		}
 
 		private void showRecommendations(final Item item, final UserOrder order, final Menu menu, LinearLayout viewById) {
-			if(viewById == null) {
-				if(viewStub != null) {
-					ViewUtils.setVisible(viewStub, true);
-				}
-			}
 			viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
+			ViewUtils.setHeight(viewById, 0);
 			MenuItemDetailsFragment.addRecommendations(viewById.getContext(), viewById, menu, order, item,
 			                                           mRecommendationClickListener, mClickListener);
+			AnimationUtils.scaleHeight(viewById, 500);
 		}
 
 		public boolean isRecommendationsVisible() {

@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
 
@@ -57,12 +59,16 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	public static boolean addRecommendations(final Context context, LinearLayout container, Menu menu, UserOrder order, Item item,
 	                                         View.OnClickListener onApplyListener, final View.OnClickListener itemClickListener) {
-		removeRecommendations(container);
+		final boolean b = item.recommendations() != null && item.recommendations().size() + 1 != container.getChildCount() && item
+				.hasRecommendations();
+		if(b) {
+			removeRecommendations(container, false);
+		}
 
 		final boolean hasRecommendations = item.hasRecommendations();
 		ViewUtils.setVisible(container, hasRecommendations);
 
-		if(hasRecommendations) {
+		if(hasRecommendations && b) {
 			final List<String> recommendations = item.recommendations();
 			final LayoutInflater inflater = LayoutInflater.from(context);
 			int index = 0;
@@ -86,19 +92,40 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 				btnApply.setOnClickListener(onApplyListener);
 				btnApply.setTag(R.id.item, recommendedItem);
 
+				final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+
+				itemView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+
+				final int height = itemView.getMeasuredHeight();
+				ViewUtils.setHeight(itemView, 0);
 				container.addView(itemView);
 			}
-			container.addView(inflater.inflate(R.layout.view_recommendations_footer, null, false));
+			// container.addView(inflater.inflate(R.layout.view_recommendations_footer, null, false));
 		}
 		return hasRecommendations;
 	}
 
-	public static void removeRecommendations(final LinearLayout container) {
-		final int childCount = container.getChildCount();
-		for(int i = 0; i < childCount; i++) {
-			final View childAt = container.getChildAt(i);
-			if(childAt != null && childAt.getId() != R.id.divider) {
-				container.removeView(childAt);
+	public static void removeRecommendations(final LinearLayout container, final boolean animate) {
+		if(animate) {
+			AnimationUtils.scaleHeight(container, 0, new Runnable() {
+				@Override
+				public void run() {
+					final int childCount = container.getChildCount();
+					for(int i = 0; i < childCount; i++) {
+						final View childAt = container.getChildAt(i);
+						if(childAt != null && childAt.getId() != R.id.divider) {
+							container.removeView(childAt);
+						}
+					}
+				}
+			});
+		} else {
+			final int childCount = container.getChildCount();
+			for(int i = 0; i < childCount; i++) {
+				final View childAt = container.getChildAt(i);
+				if(childAt != null && childAt.getId() != R.id.divider) {
+					container.removeView(childAt);
+				}
 			}
 		}
 	}
