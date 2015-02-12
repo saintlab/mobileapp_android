@@ -71,11 +71,6 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		return intent;
 	}
 
-	public static void start(BaseOmnomActivity activity, List<Restaurant> restaurants) {
-		final Intent intent = getIntent(activity, restaurants);
-		activity.start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, true);
-	}
-
 	public static void start(BaseOmnomFragmentActivity activity, List<Restaurant> restaurants) {
 		final Intent intent = getIntent(activity, restaurants);
 		activity.start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, true);

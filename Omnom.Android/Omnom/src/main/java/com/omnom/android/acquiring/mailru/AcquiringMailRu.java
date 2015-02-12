@@ -35,14 +35,19 @@ public class AcquiringMailRu implements Acquiring {
 
 	private final Gson gson;
 
-	protected AcquiringServiceMailRu mApiProxy;
+	protected AcquiringProxyMailRu mApiProxy;
 
 	private Context mContext;
 
-	public AcquiringMailRu(final Context context, AcquiringProxyMailRu acquiringProxyMailRu) {
-		mContext = context;
+	public AcquiringMailRu(AcquiringProxyMailRu acquiringProxyMailRu) {
 		mApiProxy = acquiringProxyMailRu;
 		gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+	}
+
+	public void changeEndpoint(final String url) {
+		if(mApiProxy != null) {
+			mApiProxy.changeEndpoint(url);
+		}
 	}
 
 	@Override

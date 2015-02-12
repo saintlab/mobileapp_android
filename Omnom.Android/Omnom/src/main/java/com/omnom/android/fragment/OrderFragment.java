@@ -164,9 +164,15 @@ public class OrderFragment extends Fragment {
 
 		private String tableId;
 
+		private String mTransactionUrl = StringUtils.EMPTY_STRING;
+
+		private long mTransactionTimestmap = 0;
+
 		private String restaurantName;
 
 		private String orderId;
+
+		private int mBillId;
 
 		public PaymentDetails(Parcel parcel) {
 			mAmount = parcel.readDouble();
@@ -177,6 +183,9 @@ public class OrderFragment extends Fragment {
 			restaurantName = parcel.readString();
 			mTipsWay = parcel.readInt();
 			mSplitWay = parcel.readInt();
+			mTransactionUrl = parcel.readString();
+			mTransactionTimestmap = parcel.readLong();
+			mBillId = parcel.readInt();
 		}
 
 		public PaymentDetails(double amount, int tip, Order order, TipsWay tipsWay, int tipValue, SplitWay splitWay) {
@@ -188,6 +197,31 @@ public class OrderFragment extends Fragment {
 			orderId = order.getId();
 			mTipsWay = tipsWay.ordinal();
 			mSplitWay = splitWay.ordinal();
+		}
+
+		@Override
+		public String toString() {
+			return "PaymentDetails{" +
+					"mAmount=" + mAmount +
+					", mTip=" + mTip +
+					", mTipValue=" + mTipValue +
+					", mTipsWay=" + mTipsWay +
+					", mSplitWay=" + mSplitWay +
+					", tableId='" + tableId + '\'' +
+					", mTransactionUrl='" + mTransactionUrl + '\'' +
+					", mTransactionTimestmap=" + mTransactionTimestmap +
+					", restaurantName='" + restaurantName + '\'' +
+					", orderId='" + orderId + '\'' +
+					", mBillId=" + mBillId +
+					'}';
+		}
+
+		public boolean isSimilar(PaymentDetails details) {
+			return details != null &&
+					getBillId() == details.getBillId() &&
+					getAmount() == details.getAmount() &&
+					getTip() == details.getTip() &&
+					getTipValue() == details.getTipValue();
 		}
 
 		public String getOrderId() {
@@ -233,10 +267,37 @@ public class OrderFragment extends Fragment {
 			dest.writeString(restaurantName);
 			dest.writeInt(mTipsWay);
 			dest.writeInt(mSplitWay);
+			dest.writeString(mTransactionUrl);
+			dest.writeLong(mTransactionTimestmap);
+			dest.writeInt(mBillId);
 		}
 
 		public double getAmount() {
 			return mAmount;
+		}
+
+		public String getTransactionUrl() {
+			return mTransactionUrl;
+		}
+
+		public void setTransactionUrl(final String transactionUrl) {
+			this.mTransactionUrl = transactionUrl;
+		}
+
+		public long getTransactionTimestmap() {
+			return mTransactionTimestmap;
+		}
+
+		public void setTransactionTimestmap(final long transactionTimestmap) {
+			mTransactionTimestmap = transactionTimestmap;
+		}
+
+		public int getBillId() {
+			return mBillId;
+		}
+
+		public void setBillId(final int billId) {
+			mBillId = billId;
 		}
 	}
 
@@ -435,7 +496,7 @@ public class OrderFragment extends Fragment {
 				}
 				mSplitWay = SplitWay.BY_GUESTS;
 			} else if(event.getSplitType() == BillSplitFragment.SPLIT_TYPE_ITEMS) {
-						mCheckedStates = event.getStates();
+				mCheckedStates = event.getStates();
 				mAdapter.setStates(mCheckedStates);
 				mAdapter.notifyDataSetChanged();
 				if(AndroidUtils.hasSelectedItems(mCheckedStates, list.getCount())) {
@@ -453,16 +514,16 @@ public class OrderFragment extends Fragment {
 	}
 
 	public void onOrderUpdate(final Order order) {
-		if (order != null && order.getId().equals(mOrder.getId())) {
-			if (!isDownscaled()) {
+		if(order != null && order.getId().equals(mOrder.getId())) {
+			if(!isDownscaled()) {
 				AndroidUtils.showDialog(getActivity(), R.string.order_updated, R.string.update,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(final DialogInterface dialog,
-							                    final int which) {
-								updateOrder(order);
-							}
-						});
+				                        new DialogInterface.OnClickListener() {
+					                        @Override
+					                        public void onClick(final DialogInterface dialog,
+					                                            final int which) {
+						                        updateOrder(order);
+					                        }
+				                        });
 			} else {
 				updateOrder(order);
 			}
@@ -474,17 +535,17 @@ public class OrderFragment extends Fragment {
 		mAdapter.updateItems(mOrder.getItems());
 		AndroidUtils.scrollEnd(list);
 		final double paidAmount = order.getPaidAmount();
-		if (txtAlreadyPaid != null) {
-			if (paidAmount > 0) {
+		if(txtAlreadyPaid != null) {
+			if(paidAmount > 0) {
 				txtAlreadyPaid.setText(getString(R.string.already_paid, AmountHelper.format(paidAmount) + getCurrencySuffix()));
-				if (!isEditMode) {
+				if(!isEditMode) {
 					ViewUtils.setVisible2(txtAlreadyPaid, true);
 				}
 			} else {
 				ViewUtils.setVisible2(txtAlreadyPaid, false);
 			}
 		}
-		if (!isAmountModified && editAmount != null) {
+		if(!isAmountModified && editAmount != null) {
 			editAmount.setText(AmountHelper.format(order.getAmountToPay()) + getCurrencySuffix());
 			final BigDecimal amount = getEnteredAmount();
 			updatePaymentTipsAmount(amount, tipsButtons);
@@ -546,7 +607,7 @@ public class OrderFragment extends Fragment {
 		}
 		ViewUtils.setVisible(mHeader, false);
 		list.setSwipeEnabled(false);
-		if (isAnimated) {
+		if(isAnimated) {
 			AnimationUtils.animateAlpha3(getPanelPayment(), false);
 			getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0).start();
 			AnimationUtils.animateAlpha(txtTitle, true);
@@ -556,7 +617,7 @@ public class OrderFragment extends Fragment {
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
 			mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
 		}
-		if (mAdapter != null) {
+		if(mAdapter != null) {
 			mAdapter.setIgnoreSelection(true);
 		}
 	}
@@ -737,7 +798,7 @@ public class OrderFragment extends Fragment {
 		// It is necessary to turn off hardware optimization for items list
 		// as on scale there are font and hidden dividers artifacts on mdpi devices.
 		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-		if (displayMetrics.densityDpi <= DisplayMetrics.DENSITY_MEDIUM) {
+		if(displayMetrics.densityDpi <= DisplayMetrics.DENSITY_MEDIUM) {
 			list.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		}
 		list.setAdapter(mAdapter);
@@ -756,8 +817,8 @@ public class OrderFragment extends Fragment {
 			@Override
 			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
 				final OrdersActivity activity = (OrdersActivity) getActivity();
-				if (isDownscaled()) {
-					if (activity.checkFragment(OrderFragment.this)) {
+				if(isDownscaled()) {
+					if(activity.checkFragment(OrderFragment.this)) {
 						zoomInFragment(activity);
 					}
 				} else {
@@ -790,7 +851,7 @@ public class OrderFragment extends Fragment {
 		list.setSwipeEnabled(true);
 		activity.showOther(mPosition, false);
 		getListClickAnimator(FRAGMENT_SCALE_RATIO_X_NORMAL, mListTraslationActive).start();
-		if (mAdapter != null) {
+		if(mAdapter != null) {
 			mAdapter.setIgnoreSelection(false);
 		}
 	}
@@ -801,7 +862,7 @@ public class OrderFragment extends Fragment {
 
 	private void sendBillViewEvent(String requestId, UserData user, Order order) {
 		final OrdersActivity activity = (OrdersActivity) getActivity();
-		if (!activity.isDemo()) {
+		if(!activity.isDemo()) {
 			MixpanelEvent billViewEvent = new BillViewMixpanelEvent(UserHelper.getUserData(getActivity()), requestId, order, user);
 			OmnomApplication.getMixPanelHelper(getActivity()).track(MixPanelHelper.Project.OMNOM, billViewEvent);
 		}
@@ -820,7 +881,7 @@ public class OrderFragment extends Fragment {
 		});
 
 		final double paidAmount = mOrder.getPaidAmount();
-		if (paidAmount > 0) {
+		if(paidAmount > 0) {
 			txtAlreadyPaid.setText(getString(R.string.already_paid, AmountHelper.format(paidAmount) + getCurrencySuffix()));
 			ViewUtils.setVisible2(txtAlreadyPaid, true);
 		} else {
@@ -898,7 +959,7 @@ public class OrderFragment extends Fragment {
 		layoutOverall.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (isDownscaled()) {
+				if(isDownscaled()) {
 					zoomInFragment((OrdersActivity) getActivity());
 				}
 			}
@@ -907,7 +968,7 @@ public class OrderFragment extends Fragment {
 		billSplit.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				if (!isDownscaled()) {
+				if(!isDownscaled()) {
 					splitBill();
 				} else {
 					zoomInFragment((OrdersActivity) getActivity());
@@ -917,9 +978,9 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void updateOverallAmount(final View footerView) {
-		if (footerView != null) {
+		if(footerView != null) {
 			final TextView txtOverall = (TextView) mFooterView1.findViewById(R.id.txt_overall);
-			if (txtOverall != null) {
+			if(txtOverall != null) {
 				txtOverall.setText(AmountHelper.format(mOrder.getTotalAmount()) + getCurrencySuffix());
 			}
 		}
@@ -1090,10 +1151,10 @@ public class OrderFragment extends Fragment {
 		final boolean orderControlsEnabled = !isActive && isMenuVisible();
 		list.setSwipeEnabled(orderControlsEnabled);
 		ViewUtils.setVisible(mHeader, orderControlsEnabled);
-		if (mFooterView1 != null) {
+		if(mFooterView1 != null) {
 			mFooterView1.findViewById(R.id.btn_bill_split).setEnabled(orderControlsEnabled);
 		}
-		if (mFooterView2 != null) {
+		if(mFooterView2 != null) {
 			mFooterView2.findViewById(R.id.txt_edit).setEnabled(orderControlsEnabled);
 			mFooterView2.findViewById(R.id.txt_cancel).setEnabled(orderControlsEnabled);
 		}
@@ -1116,7 +1177,7 @@ public class OrderFragment extends Fragment {
 			txtPaymentTitle.setText(R.string.i_m_going_to_pay);
 			mMode = WRONG_VALUE;
 			final BigDecimal amount = getEnteredAmount();
-			if (amount.compareTo(BigDecimal.valueOf(mOrder.getAmountToPay())) != 0) {
+			if(amount.compareTo(BigDecimal.valueOf(mOrder.getAmountToPay())) != 0) {
 				amountModified(true);
 			}
 			editAmount.setText(AmountHelper.format(amount));

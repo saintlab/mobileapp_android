@@ -13,6 +13,7 @@ import com.omnom.android.acquiring.mailru.response.AcquiringTransactionResponse;
 import com.omnom.android.acquiring.mailru.response.CardDeleteResponse;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
 import com.omnom.android.protocol.BaseRequestInterceptor;
+import com.omnom.android.retrofit.DynamicEndpoint;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,16 +35,23 @@ public class AcquiringProxyMailRu implements AcquiringServiceMailRu {
 
 	private final AcquiringServiceMailRu mAcquiringService;
 
+	private final DynamicEndpoint endpoint;
+
 	public AcquiringProxyMailRu(Context context) {
 		mContext = context;
 
 		// TODO: this code must be the same across all the rest services -> refactore it!
 		final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-		RestAdapter mRestAdapter = new RestAdapter.Builder().setEndpoint(context.getString(R.string.acquiring_mailru_acquiring_base_url))
+		endpoint = new DynamicEndpoint(context.getString(R.string.acquiring_mailru_acquiring_base_url));
+		RestAdapter mRestAdapter = new RestAdapter.Builder().setEndpoint(endpoint)
 		                                                    .setRequestInterceptor(new BaseRequestInterceptor(mContext))
 		                                                    .setLogLevel(logLevel).setConverter(new GsonConverter(gson)).build();
 		mAcquiringService = mRestAdapter.create(AcquiringServiceMailRu.class);
+	}
+
+	public void changeEndpoint(final String url) {
+		endpoint.setUrl(url);
 	}
 
 	@Override

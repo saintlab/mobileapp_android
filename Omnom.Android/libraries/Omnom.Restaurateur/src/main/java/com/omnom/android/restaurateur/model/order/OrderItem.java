@@ -26,7 +26,7 @@ public class OrderItem implements Parcelable {
 	@Expose
 	private String guestId;
 	@Expose
-	private int quantity;
+	private double quantity;
 	@Expose
 	private double priceTotal;
 	@Expose
@@ -44,7 +44,7 @@ public class OrderItem implements Parcelable {
 
 	public OrderItem(Parcel parcel) {
 		guestId = parcel.readString();
-		quantity = parcel.readInt();
+		quantity = parcel.readDouble();
 		priceTotal = parcel.readDouble();
 		pricePerItem = parcel.readDouble();
 		internalId = parcel.readString();
@@ -56,7 +56,7 @@ public class OrderItem implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
 		parcel.writeString(guestId);
-		parcel.writeInt(quantity);
+		parcel.writeDouble(quantity);
 		parcel.writeDouble(priceTotal);
 		parcel.writeDouble(pricePerItem);
 		parcel.writeString(internalId);
@@ -73,11 +73,11 @@ public class OrderItem implements Parcelable {
 		this.guestId = guestId;
 	}
 
-	public int getQuantity() {
+	public double getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(int quantity) {
+	public void setQuantity(double quantity) {
 		this.quantity = quantity;
 	}
 
@@ -145,7 +145,7 @@ public class OrderItem implements Parcelable {
 	@Override
 	public String toString() {
 		return "OrderItem{" +
-				"pricePerItem=" + pricePerItem +
+				"priceTotal=" + priceTotal +
 				", title='" + title + '\'' +
 				'}';
 	}

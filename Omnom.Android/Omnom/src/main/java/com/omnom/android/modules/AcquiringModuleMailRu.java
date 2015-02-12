@@ -26,7 +26,7 @@ public class AcquiringModuleMailRu {
 	@Provides
 	@Singleton
 	public Acquiring provideAcquiring() {
-		return new AcquiringMailRu(mContext, new AcquiringProxyMailRu(mContext));
+		return new AcquiringMailRu(new AcquiringProxyMailRu(mContext));
 	}
 
 	@Provides

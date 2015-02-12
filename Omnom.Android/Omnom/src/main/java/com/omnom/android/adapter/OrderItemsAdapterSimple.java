@@ -6,8 +6,8 @@ import android.view.View;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.List;
@@ -54,7 +54,7 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 			holder.txtPrice.setTextColor(mTextColorDefault);
 		}
 		holder.txtTitle.setText(item.getTitle());
-		holder.txtPrice.setText(AmountHelper.format(item.getPricePerItem()));
+		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPricePerItem()));
 	}
 
 	public void setIgnoreSelection(boolean ignoreSelection) {

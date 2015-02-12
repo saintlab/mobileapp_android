@@ -139,4 +139,13 @@ public class StringUtils {
 		}
 	}
 
+	public static String formatOrderItemPrice(final double quantity, final double pricePerItem) {
+		final String pricePerItemStr = AmountHelper.format(pricePerItem);
+		if (quantity != 1.0) {
+			return String.format("%.1f x %s", quantity, pricePerItemStr);
+		} else {
+			return pricePerItemStr;
+		}
+	}
+
 }
