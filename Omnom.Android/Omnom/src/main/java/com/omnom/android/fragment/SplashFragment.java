@@ -47,13 +47,13 @@ public class SplashFragment extends Fragment {
 
 	public static final float SCALE_FACTOR_FORK_SMALL = 1 / SCALE_FACTOR_FORK_LARGE;
 
-	private static final String ARG_CHANGING_TABLE = "table_change_forward";
+	private static final String ARG_APPLICATION_LAUNCH = "application_launch";
 
-	public static SplashFragment newInstance(final boolean forwardValidation) {
+	public static SplashFragment newInstance(final boolean isApplicationLaunch) {
 		final SplashFragment fragment = new SplashFragment();
-		final Bundle args = new Bundle();
-		args.putBoolean(ARG_CHANGING_TABLE, forwardValidation);
-		fragment.setArguments(args);
+		final Bundle bundle = new Bundle();
+		bundle.putBoolean(ARG_APPLICATION_LAUNCH, isApplicationLaunch);
+		fragment.setArguments(bundle);
 		return fragment;
 	}
 
@@ -85,16 +85,6 @@ public class SplashFragment extends Fragment {
 
 	private LaunchListener mLaunchListener;
 
-	private boolean mChangeTable = false;
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		if(getArguments() != null) {
-			mChangeTable = getArguments().getBoolean(ARG_CHANGING_TABLE, false);
-		}
-	}
-
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -109,7 +99,6 @@ public class SplashFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
 		final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_splash, container, false);
-
 		ButterKnife.inject(this, view);
 		return view;
 	}
@@ -130,7 +119,6 @@ public class SplashFragment extends Fragment {
 
 		final int durationShort = getResources().getInteger(R.integer.default_animation_duration_short);
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
-		final int dimensionPixelSize = getResources().getDimensionPixelSize(R.dimen.loader_logo_size);
 		final EnteringActivity activity = (EnteringActivity) getActivity();
 
 		AnimationUtils.animateAlpha(imgBill, false, durationShort);
@@ -138,20 +126,18 @@ public class SplashFragment extends Fragment {
 		AnimationUtils.animateAlpha(imgLogo, false, durationShort);
 		AnimationUtils.animateAlpha(imgRing, false, durationShort);
 		animateMultiply();
-		// transitionDrawable.startTransition(durationShort);
 
-		// AnimationUtils.scaleWidth(imgFork, dimensionPixelSize, durationShort, null);
 		activity.findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if(isAdded() && !activity.isFinishing()) {
+				if (isAdded() && !activity.isFinishing()) {
 					ValidateActivity.start(activity, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
-										   EXTRA_LOADER_ANIMATION_SCALE_DOWN, activity.getType(), data);
-
+										   EXTRA_LOADER_ANIMATION_SCALE_DOWN, activity.getType(), data,
+										   isApplicationLaunch());
 				}
 			}
 		}, animationDuration);
-		
+
 		if(isAdded()) {
 			activity.getWindow().setBackgroundDrawableResource(R.drawable.bg_wood);
 		}
@@ -160,6 +146,12 @@ public class SplashFragment extends Fragment {
 
 	public void animateValidation() {
 		animateValidation(null);
+	}
+
+	private boolean isApplicationLaunch() {
+		Bundle arguments = getArguments();
+		return arguments != null && arguments.getBoolean(ARG_APPLICATION_LAUNCH);
+
 	}
 
 	/**

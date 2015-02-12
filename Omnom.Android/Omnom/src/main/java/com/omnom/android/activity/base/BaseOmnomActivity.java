@@ -33,7 +33,7 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		activityHelper = new OmnomActivityHelper(getActivity(), authenticator);
+		activityHelper = new OmnomActivityHelper(getActivity());
 	}
 
 	@Override

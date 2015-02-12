@@ -1,6 +1,7 @@
 package com.omnom.android.auth.response;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.omnom.android.auth.UserData;
 
 /**
@@ -11,7 +12,10 @@ public class UserResponse extends AuthResponse {
 	private UserData user;
 
 	@Expose
-	private Long time;
+	@SerializedName("time")
+	private Long serverTime;
+
+	private transient Long responseTime;
 
 	public UserData getUser() {
 		return user;
@@ -21,19 +25,27 @@ public class UserResponse extends AuthResponse {
 		this.user = user;
 	}
 
-	public Long getTime() {
-		return time;
+	public Long getServerTime() {
+		return serverTime;
 	}
 
-	public void setTime(Long time) {
-		this.time = time;
+	public void setServerTime(final Long serverTime) {
+		this.serverTime = serverTime;
+	}
+
+	public Long getResponseTime() {
+		return responseTime;
+	}
+
+	public void setResponseTime(final Long responseTime) {
+		this.responseTime = responseTime;
 	}
 
 	@Override
 	public String toString() {
 		return "UserResponse{" +
 				"user=" + user +
-				", time=" + time +
+				", serverTime=" + serverTime +
 				'}';
 	}
 }

@@ -10,6 +10,7 @@ import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -84,6 +85,17 @@ public class BackgroundBleService extends Service {
 		}
 	}
 
+	public static void stop(final Context ctx) {
+		final Context context = ctx.getApplicationContext();
+		final AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+		if(AndroidUtils.isJellyBeanMR2()) {
+			final Intent intent = new Intent(context, BackgroundBleService.class);
+			final PendingIntent alarmIntent = PendingIntent.getService(context, 0, intent, 0);
+			alarmManager.cancel(alarmIntent);
+			context.stopService(new Intent(context, BackgroundBleService.class));
+		}
+	}
+
 	public Callback mLeScanCallback;
 
 	@Inject
@@ -122,19 +134,25 @@ public class BackgroundBleService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		OmnomApplication.get(this).inject(this);
-		bluetoothCrashResolver = new BluetoothCrashResolver(this);
-		bluetoothCrashResolver.start();
-		if(!AndroidUtils.isJellyBeanMR2() || !BluetoothUtils.hasBleSupport(this)) {
-			stopSelf(mStartId);
-			return;
+		if(!getResources().getBoolean(R.bool.config_background_ble_enabled)) {
+			BackgroundBleService.stop(this);
+		} else {
+			OmnomApplication.get(this).inject(this);
+			bluetoothCrashResolver = new BluetoothCrashResolver(this);
+			bluetoothCrashResolver.start();
+			if(!AndroidUtils.isJellyBeanMR2() || !BluetoothUtils.hasBleSupport(this)) {
+				stopSelf(mStartId);
+				return;
+			}
+			scanBeacons();
 		}
-		scanBeacons();
 	}
 
 	@Override
 	public void onDestroy() {
-		bluetoothCrashResolver.stop();
+		if(bluetoothCrashResolver != null) {
+			bluetoothCrashResolver.stop();
+		}
 		super.onDestroy();
 	}
 
@@ -281,9 +299,10 @@ public class BackgroundBleService extends Service {
 					public void call(TableDataResponse tableDataResponse) {
 						final BackgroundBleService context = BackgroundBleService.this;
 						OmnomApplication.getMixPanelHelper(context).identify(String.valueOf(userProfile.getUser().getId()));
-						final MixpanelEvent event = RestaurantEnterMixpanelEvent.createEventBluetooth(tableDataResponse.getRequestId(), UserHelper.getUserData(context),
-								tableDataResponse,
-								beacon);
+						final MixpanelEvent event = RestaurantEnterMixpanelEvent.createEventBluetooth(tableDataResponse.getRequestId(),
+						                                                                              UserHelper.getUserData(context),
+						                                                                              tableDataResponse,
+						                                                                              beacon);
 						OmnomApplication.getMixPanelHelper(context).track(MixPanelHelper.Project.OMNOM, event);
 					}
 				}, new Action1<Throwable>() {
@@ -339,15 +358,15 @@ public class BackgroundBleService extends Service {
 	private void showNotification(final Beacon beacon, final Restaurant restaurant) {
 		cacheBeacon(beacon);
 		String restaurantId = restaurant == null ? "undefined" : restaurant.id();
-		if (!isNotified(restaurantId)) {
+		if(!isNotified(restaurantId)) {
 			cacheNotificationDetails(restaurantId);
 			final String content =
 					restaurant != null ? getString(R.string.welcome_to_, restaurant.title()) : getString(R.string.omnom_works_here);
 
 			final Notification notification =
 					new Notification.Builder(this).setSmallIcon(R.drawable.ic_push).setContentTitle(getString(R.string.app_name))
-							.setContentText(content).setContentIntent(getNotificationIntent()).setAutoCancel(true)
-							.setDefaults(Notification.DEFAULT_ALL).setOnlyAlertOnce(true).setPriority(
+					                              .setContentText(content).setContentIntent(getNotificationIntent()).setAutoCancel(true)
+					                              .setDefaults(Notification.DEFAULT_ALL).setOnlyAlertOnce(true).setPriority(
 							Notification.PRIORITY_HIGH).build();
 
 			final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -405,7 +424,7 @@ public class BackgroundBleService extends Service {
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	private void stopScan(final Runnable endCallback) {
-		if (BluetoothUtils.isAdapterStateOn(mBluetoothAdapter)) {
+		if(BluetoothUtils.isAdapterStateOn(mBluetoothAdapter)) {
 			mBluetoothAdapter.stopLeScan(mLeScanCallback);
 		}
 		runCallback(endCallback);

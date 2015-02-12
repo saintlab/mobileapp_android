@@ -20,6 +20,10 @@ public class TokensHolder {
 	@SerializedName("MixpanelTokenDebug")
 	private String mixpanelTokenDebug;
 
+	@Expose
+	@SerializedName("MixpanelTokenAndroid")
+	private String mixpanelTokenAndroid;
+
 	public String getCardIOAppToken() {
 		return cardIOAppToken;
 	}
@@ -30,6 +34,10 @@ public class TokensHolder {
 
 	public String getMixpanelTokenDebug() {
 		return mixpanelTokenDebug;
+	}
+
+	public String getMixpanelTokenAndroid() {
+		return mixpanelTokenAndroid;
 	}
 
 }

@@ -31,7 +31,7 @@ public class AcquiringModuleMailRuMixpanel {
 	@Provides
 	@Singleton
 	public Acquiring provideAcquiring() {
-		return new AcquiringMailRu(mContext, new AcquiringMailRuMixpanel(mContext, mHelper));
+		return new AcquiringMailRu(new AcquiringMailRuMixpanel(mContext, mHelper));
 	}
 
 	@Provides
