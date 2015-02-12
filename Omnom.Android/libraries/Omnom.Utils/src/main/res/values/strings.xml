@@ -30,5 +30,7 @@
     <string name="error_more_than_one_beacon">Обнаружено несколько маячков. Положите телефон в&#160;центр стола пожалуйста</string>
     <string name="error_server_unavailable_please_try_again">Невозможно получить данные с&#160;сервера. Пожалуйста, попробуйте еще раз</string>
     <string name="error_payment_declined">Ваш банк отклонил платёж.\nПовторите попытку,\nдобавьте другую карту\nили&#160;оплатите наличными.</string>
+    <string name="error_similar_payment_declined">Произошел сбой при попытке произвести оплату.\nПопробуйте повторить оплату через
+        пару минут</string>
     <string name="email_subject_feedback">Мои мысли про Omnom</string>
 </resources>

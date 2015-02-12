@@ -25,9 +25,9 @@ public class ErrorHelper {
 
 	private static final int LINES_COUNT_TO_APPLY_LEFT_ALIGN = 3;
 
-	private TextView mTxtBottom;
-
 	protected LoaderView mLoader;
+
+	private TextView mTxtBottom;
 
 	private TextView mTxtError;
 
@@ -47,9 +47,9 @@ public class ErrorHelper {
 			@Override
 			public void onGlobalLayout() {
 				final Layout layout = mTxtError.getLayout();
-				if (layout != null) {
+				if(layout != null) {
 					final int linesCount = layout.getLineCount();
-					if (linesCount > LINES_COUNT_TO_APPLY_LEFT_ALIGN) {
+					if(linesCount > LINES_COUNT_TO_APPLY_LEFT_ALIGN) {
 						mTxtError.setGravity(Gravity.START);
 					}
 				}
@@ -73,7 +73,7 @@ public class ErrorHelper {
 			}
 		});
 		mTxtError.setText(error.getErrorId());
-		if (mTxtBottom != null) {
+		if(mTxtBottom != null) {
 			mTxtBottom.setCompoundDrawablesWithIntrinsicBounds(error.getmBtnDrawableId(), 0, 0, 0);
 			mTxtBottom.setText(error.getButtonTextId());
 		}
@@ -124,13 +124,18 @@ public class ErrorHelper {
 		});
 	}
 
+	public void showSimilarPaymentDeclined(final View.OnClickListener onClickListener) {
+		showError(LoaderError.SIMILAR_PAYMENT_DECLINED, onClickListener);
+	}
+
 	public void showPaymentDeclined(View.OnClickListener onClickListener) {
 		showError(LoaderError.PAYMENT_DECLINED, onClickListener);
 	}
 
 	public void showNoOrders(View.OnClickListener onClickListener, final int tableNumber) {
 		showError(LoaderError.NO_ORDERS, onClickListener);
-		mTxtError.setText(mLoader.getContext().getResources().getString(R.string.there_are_no_orders_on_table_number, String.valueOf(tableNumber)));
+		mTxtError.setText(mLoader.getContext().getResources().getString(R.string.there_are_no_orders_on_table_number, String.valueOf(
+				tableNumber)));
 	}
 
 	public void showLocationError() {

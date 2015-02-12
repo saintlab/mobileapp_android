@@ -18,13 +18,13 @@ public class LoaderError {
 
 	public static final LoaderError UNKNOWN_ERROR =
 			new LoaderError(EVENT_UNKNOWN_ERROR, R.drawable.ic_line_noise, R.string.something_went_wrong,
-							R.string.error_ok, 0);
+			                R.string.error_ok, 0);
 
 	public static final String EVENT_ORDER_CLOSED_ERROR = "order_closed";
 
 	public static final LoaderError ORDER_CLOSED_ERROR =
 			new LoaderError(EVENT_ORDER_CLOSED_ERROR, R.drawable.ic_flying_credit_card, R.string.order_closed,
-					R.string.error_ok, 0);
+			                R.string.error_ok, 0);
 
 	public static final String EVENT_BACKEND_ERROR = "no_restaurant_connection";
 
@@ -69,6 +69,11 @@ public class LoaderError {
 	public static final LoaderError PAYMENT_DECLINED =
 			new LoaderError(EVENT_PAYMENT_DECLINED, R.drawable.ic_flying_credit_card,
 			                R.string.error_payment_declined,
+			                R.string.error_ok, 0);
+
+	public static final LoaderError SIMILAR_PAYMENT_DECLINED =
+			new LoaderError(EVENT_PAYMENT_DECLINED, R.drawable.ic_flying_credit_card,
+			                R.string.error_similar_payment_declined,
 			                R.string.error_ok, 0);
 
 	public static final String EVENT_NO_ORDERS = "no_orders";
