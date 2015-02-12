@@ -12,6 +12,12 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.omnom.android.R;
+import com.omnom.android.listener.DecimalKeyListener;
+import com.omnom.android.utils.utils.AmountHelper;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 
 /**
  * Created by Ch3D on 18.12.2014.
@@ -19,6 +25,10 @@ import com.omnom.android.R;
 public class AmountEditText extends EditText {
 
 	public static final int AMOUNT_UPPER_LIMIT = 999999;
+
+	private NumberFormat numberFormat;
+
+	private String decimalSeparator;
 
 	public AmountEditText(final Context context) {
 		super(context);
@@ -36,6 +46,7 @@ public class AmountEditText extends EditText {
 	}
 
 	private void init() {
+		updateSeparator();
 		setCursorVisible(false);
 
 		// disable copy -paste
@@ -93,7 +104,7 @@ public class AmountEditText extends EditText {
 				removeTextChangedListener(this);
 				String str = s.toString();
 				// TODO: refactor the following code to make it readable
-				if(str.endsWith(".") || str.endsWith(",")) {
+				if(str.endsWith(decimalSeparator)) {
 					final int suffixLength = getCurrencySuffix().length();
 					getText().delete(getSelectionEnd() - suffixLength, getSelectionEnd());
 					setSelection(getSelectionEnd() - suffixLength);
@@ -109,26 +120,23 @@ public class AmountEditText extends EditText {
 					str = str.substring(1);
 				}
 				// Add leading zero if the amount is empty or starts with floating point
-				if(str.equals(currencySuffix) || str.startsWith(".") || str.startsWith(",")) {
+				if(str.equals(currencySuffix) || str.startsWith(decimalSeparator)) {
 					str = "0" + str;
 				}
 				// If amount exceeds upper limit make it equals to it
 				double amount;
 				try {
-					amount = Double.parseDouble(str.substring(0, str.length() - getCurrencySuffix().length()));
-				} catch (NumberFormatException e) {
+					amount = numberFormat.parse(str.substring(0, str.length() - getCurrencySuffix().length())).doubleValue();
+				} catch (ParseException e) {
 					amount = 0;
 				}
 				if (amount > AMOUNT_UPPER_LIMIT) {
 					str = AMOUNT_UPPER_LIMIT + currencySuffix;
 				} else {
 					// Reduce number of digits after floating point if it exceeds 2
-					int floatingPointIndex = str.indexOf(".");
-					if (floatingPointIndex == -1) {
-						floatingPointIndex = str.indexOf(",");
-					}
-					if (floatingPointIndex > 0 && str.length() > floatingPointIndex + 4) {
-						str = str.substring(0, floatingPointIndex + 3) + currencySuffix;
+					int decimalSeparatorIndex = str.indexOf(decimalSeparator);
+					if (decimalSeparatorIndex > 0 && str.length() > decimalSeparatorIndex + 4) {
+						str = str.substring(0, decimalSeparatorIndex + 3) + currencySuffix;
 					}
 				}
 				setText(str);
@@ -151,7 +159,19 @@ public class AmountEditText extends EditText {
 		});
 	}
 
+	public void updateSeparator() {
+		numberFormat = NumberFormat.getNumberInstance();
+		decimalSeparator = String.valueOf(((DecimalFormat) numberFormat).getDecimalFormatSymbols().getDecimalSeparator());
+		final String amount = getText().toString();
+		final String previousSeparator = AmountHelper.getSeparator(amount);
+		setKeyListener(new DecimalKeyListener());
+		if (previousSeparator != null && !previousSeparator.equals(decimalSeparator)) {
+			setText(amount.replace(previousSeparator, decimalSeparator));
+		}
+	}
+
 	private String getCurrencySuffix() {
 		return getContext().getString(R.string.currency_suffix_ruble);
 	}
+
 }
