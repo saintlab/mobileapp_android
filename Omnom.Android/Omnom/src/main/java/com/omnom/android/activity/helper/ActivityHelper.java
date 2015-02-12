@@ -8,6 +8,7 @@ import android.location.Location;
 public interface ActivityHelper extends com.omnom.android.utils.activity.helper.ActivityHelper {
 
 	void onApplicationLaunch(ApplicationLaunchListener mListener);
+
 	Location getLocation();
 
 }

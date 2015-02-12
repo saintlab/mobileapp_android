@@ -1,6 +1,7 @@
 package com.omnom.android.auth.retrofit;
 
 import com.omnom.android.auth.response.AuthResponse;
+import com.omnom.android.protocol.Protocol;
 
 import retrofit.RequestInterceptor;
 import retrofit.ResponseWrapper;
@@ -12,8 +13,6 @@ import retrofit.client.Response;
  * Created by mvpotter on 12/5/2014.
  */
 public class AuthRxSupport extends RxSupport {
-
-	private static final String X_REQUEST_ID = "X-Request-ID";
 
 	public AuthRxSupport() {
 		super();
@@ -27,7 +26,7 @@ public class AuthRxSupport extends RxSupport {
 	protected Object modifyResponse(ResponseWrapper wrapper) {
 		Response response = wrapper.getResponse();
 		Object body = wrapper.getResponseBody();
-		String requestId = getHeader(response, X_REQUEST_ID);
+		String requestId = getHeader(response, Protocol.X_REQUEST_ID);
 		if (requestId != null && body instanceof AuthResponse) {
 			((AuthResponse) body).setRequestId(requestId);
 		}

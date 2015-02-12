@@ -32,9 +32,9 @@ import rx.functions.Action1;
  */
 public class OmnomActivityHelper implements ActivityHelper, LocationListener {
 
-	private static final String TAG = OmnomActivityHelper.class.getSimpleName();
-
 	public static final int LOCATION_UPDATE_TIMEOUT = 5000;
+
+	private static final String TAG = OmnomActivityHelper.class.getSimpleName();
 
 	protected final Activity mActivity;
 
@@ -64,24 +64,25 @@ public class OmnomActivityHelper implements ActivityHelper, LocationListener {
 	@Override
 	public void onStart() {
 		final OmnomApplication app = OmnomApplication.get(mActivity);
-		if (app.getUserProfile() == null) {
+		if(app.getUserProfile() == null) {
 			final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(mActivity);
 			final String token = app.getAuthToken();
-			mUserSubscription = AndroidObservable.bindActivity(mActivity, mAuthenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
-				@Override
-				public void call(UserResponse userResponse) {
-					app.cacheUserProfile(new UserProfile(userResponse));
-					final Long currentTime = System.currentTimeMillis();
-					final Long serverTime = userResponse.getTime() == null ? 0 : userResponse.getTime();
-					final Long timeDiff = TimeUnit.SECONDS.toMillis(serverTime) - currentTime;
-					mixPanelHelper.setTimeDiff(timeDiff);
-				}
-			}, new Action1<Throwable>() {
-				@Override
-				public void call(Throwable throwable) {
-					Log.e(TAG, "onStart", throwable);
-				}
-			});
+			mUserSubscription = AndroidObservable.bindActivity(mActivity, mAuthenticator.getUser(token)).subscribe(
+					new Action1<UserResponse>() {
+						@Override
+						public void call(UserResponse userResponse) {
+							app.cacheUserProfile(new UserProfile(userResponse));
+							final Long currentTime = System.currentTimeMillis();
+							final Long serverTime = userResponse.getServerTime() == null ? 0 : userResponse.getServerTime();
+							final Long timeDiff = TimeUnit.SECONDS.toMillis(serverTime) - currentTime;
+							mixPanelHelper.setTimeDiff(timeDiff);
+						}
+					}, new Action1<Throwable>() {
+						@Override
+						public void call(Throwable throwable) {
+							Log.e(TAG, "onStart", throwable);
+						}
+					});
 		}
 	}
 
@@ -119,7 +120,7 @@ public class OmnomActivityHelper implements ActivityHelper, LocationListener {
 
 	@Override
 	public Location getLocation() {
-		if (mCurrentLocation == null) {
+		if(mCurrentLocation == null) {
 			mCurrentLocation = LocationUtils.getLastKnownLocation(mActivity);
 		}
 		return mCurrentLocation;
@@ -129,10 +130,11 @@ public class OmnomActivityHelper implements ActivityHelper, LocationListener {
 		final OmnomApplication app = OmnomApplication.get(mActivity);
 		final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(mActivity);
 		final String token = app.getAuthToken();
-		mUserSubscription = AndroidObservable.bindActivity(mActivity, mAuthenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
+		mUserSubscription = AndroidObservable.bindActivity(mActivity, mAuthenticator.getUser(token)).subscribe(new Action1<UserResponse>
+				() {
 			@Override
 			public void call(UserResponse userResponse) {
-				correctMixpanelTime(userResponse.getTime() == null ? 0 : userResponse.getTime());
+				correctMixpanelTime(userResponse.getServerTime() == null ? 0 : userResponse.getServerTime());
 				app.cacheUserProfile(new UserProfile(userResponse));
 				mixPanelHelper.track(MixPanelHelper.Project.OMNOM, new AppLaunchMixpanelEvent(userResponse.getUser()));
 				logLocation(mListener);
@@ -150,7 +152,7 @@ public class OmnomActivityHelper implements ActivityHelper, LocationListener {
 	private void correctMixpanelTime(final long serverTime) {
 		final Long currentTime = System.currentTimeMillis();
 		final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(mActivity);
-		if (mixPanelHelper != null) {
+		if(mixPanelHelper != null) {
 			final Long timeDiff = TimeUnit.SECONDS.toMillis(serverTime) - currentTime;
 			mixPanelHelper.setTimeDiff(timeDiff);
 		}
@@ -159,7 +161,7 @@ public class OmnomActivityHelper implements ActivityHelper, LocationListener {
 	private void logLocation(final ApplicationLaunchListener mListener) {
 		final OmnomApplication app = OmnomApplication.get(mActivity);
 		final String token = app.getAuthToken();
-		if (getLocation() != null) {
+		if(getLocation() != null) {
 			Observable<AuthResponse> locationObservable = mAuthenticator.logLocation(
 					getLocation().getLongitude(),
 					getLocation().getLatitude(),
@@ -186,17 +188,17 @@ public class OmnomActivityHelper implements ActivityHelper, LocationListener {
 	}
 
 	private void dataLoaded(final ApplicationLaunchListener mListener) {
-		if (mListener != null) {
+		if(mListener != null) {
 			mListener.onDataLoaded();
 		}
 	}
 
 	private void subscribeForLocationUpdates() {
 		final LocationManager locationManager = LocationUtils.getLocationManager(mActivity);
-		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+		if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 		}
-		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+		if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
 		}
 		mActivity.findViewById(android.R.id.content).postDelayed(new Runnable() {

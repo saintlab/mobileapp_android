@@ -1,7 +1,5 @@
 package com.omnom.android.acquiring.mailru;
 
-import android.content.Context;
-
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,13 +27,17 @@ import rx.functions.Func1;
 public class AcquiringMailRu implements Acquiring {
 	private static final String TAG = AcquiringMailRu.class.getSimpleName();
 	private final Gson gson;
-	protected AcquiringServiceMailRu mApiProxy;
-	private Context mContext;
+	protected AcquiringProxyMailRu mApiProxy;
 
-	public AcquiringMailRu(final Context context, AcquiringProxyMailRu acquiringProxyMailRu) {
-		mContext = context;
+	public AcquiringMailRu(AcquiringProxyMailRu acquiringProxyMailRu) {
 		mApiProxy = acquiringProxyMailRu;
 		gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+	}
+
+	public void changeEndpoint(final String url) {
+		if (mApiProxy != null) {
+			mApiProxy.changeEndpoint(url);
+		}
 	}
 
 	@Override

@@ -54,10 +54,6 @@ public class RestaurateurModule {
 						if(!TextUtils.isEmpty(token)) {
 							request.addHeader(Protocol.HEADER_AUTH_TOKEN, token);
 						}
-						request.addHeader(Protocol.HEADER_X_MOBILE_VENDOR, sManufacturer);
-						request.addHeader(Protocol.HEADER_X_MOBILE_MODEL, sModel);
-						request.addHeader(Protocol.HEADER_X_MOBILE_OS_VERSION, sApiLevel);
-						request.addHeader(Protocol.HEADER_X_MOBILE_PLATFORM, PLATFORM_ANDROID);
 					}
 				});
 	}

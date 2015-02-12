@@ -111,7 +111,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 		BigDecimal result = BigDecimal.ZERO;
 		final List<OrderItem> selectedItems = mAdapter.getSelectedItems();
 		for(final OrderItem item : selectedItems) {
-			result = result.add(BigDecimal.valueOf(item.getPricePerItem()));
+			result = result.add(BigDecimal.valueOf(item.getPriceTotal()));
 		}
 		return result;
 	}

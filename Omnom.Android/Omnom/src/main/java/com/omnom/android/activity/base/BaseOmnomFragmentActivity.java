@@ -13,6 +13,8 @@ import com.omnom.android.utils.activity.BaseFragmentActivity;
 
 import javax.inject.Inject;
 
+import retrofit.http.HEAD;
+
 /**
  * Created by Ch3D on 01.10.2014.
  */

@@ -710,6 +710,10 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 		}
 	}
 
+	protected boolean getTorchState() {
+		return cameraManager != null && cameraManager.getTorchState();
+	}
+
 	protected void setTorchListener(final CameraManager.TorchListener torchListener) {
 		this.torchListener = torchListener;
 		if (cameraManager != null) {

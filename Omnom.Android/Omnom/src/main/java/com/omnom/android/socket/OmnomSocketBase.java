@@ -38,6 +38,19 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 
 	private static final String TAG = OmnomSocketBase.class.getSimpleName();
 
+	public abstract class SafeEmitterListener implements Emitter.Listener {
+		@Override
+		public final void call(final Object... args) {
+			try {
+				safeCall(args);
+			} catch(Throwable e) {
+				Log.e(TAG, "SafeEmitterListener.call", e);
+			}
+		}
+
+		public abstract void safeCall(final Object... args);
+	}
+
 	private final Gson mGson;
 
 	private final String mBaseUrl;
@@ -67,9 +80,9 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 
 	public void connect() throws URISyntaxException {
 		mSocket = IO.socket(mBaseUrl);
-		mSocket.on(SocketEvent.EVENT_HANDSHAKE, new Emitter.Listener() {
+		mSocket.on(SocketEvent.EVENT_HANDSHAKE, new SafeEmitterListener() {
 			@Override
-			public void call(Object... args) {
+			public void safeCall(Object... args) {
 				logEvent(SocketEvent.EVENT_HANDSHAKE, args);
 				if(args.length == 2) {
 					final String status = args[1].toString();
@@ -81,39 +94,39 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 					}
 				}
 			}
-		}).on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+		}).on(Socket.EVENT_CONNECT, new SafeEmitterListener() {
 			@Override
-			public void call(final Object... args) {
+			public void safeCall(final Object... args) {
 				logEvent(Socket.EVENT_CONNECT, args);
 				post(new ConnectedSocketEvent());
 			}
-		}).on(SocketEvent.EVENT_PAYMENT, new Emitter.Listener() {
+		}).on(SocketEvent.EVENT_PAYMENT, new SafeEmitterListener() {
 			@Override
-			public void call(final Object... args) {
+			public void safeCall(final Object... args) {
 				logEvent(SocketEvent.EVENT_PAYMENT, args);
 				final JSONObject json = (JSONObject) args[0];
 				final PaymentData paymentData = mGson.fromJson(json.toString(), PaymentData.class);
 				post(new PaymentSocketEvent(paymentData));
 			}
-		}).on(SocketEvent.EVENT_ORDER_CREATE, new Emitter.Listener() {
+		}).on(SocketEvent.EVENT_ORDER_CREATE, new SafeEmitterListener() {
 			@Override
-			public void call(final Object... args) {
+			public void safeCall(final Object... args) {
 				logEvent(SocketEvent.EVENT_ORDER_CREATE, args);
-                final JSONObject json = (JSONObject) args[0];
-                final Order order = mGson.fromJson(json.toString(), Order.class);
+				final JSONObject json = (JSONObject) args[0];
+				final Order order = mGson.fromJson(json.toString(), Order.class);
 				post(new OrderCreateSocketEvent(order));
 			}
-		}).on(SocketEvent.EVENT_ORDER_UPDATE, new Emitter.Listener() {
+		}).on(SocketEvent.EVENT_ORDER_UPDATE, new SafeEmitterListener() {
 			@Override
-			public void call(final Object... args) {
+			public void safeCall(final Object... args) {
 				logEvent(SocketEvent.EVENT_ORDER_UPDATE, args);
-                final JSONObject json = (JSONObject) args[0];
-                final Order order = mGson.fromJson(json.toString(), Order.class);
+				final JSONObject json = (JSONObject) args[0];
+				final Order order = mGson.fromJson(json.toString(), Order.class);
 				post(new OrderUpdateSocketEvent(order));
 			}
-		}).on(SocketEvent.EVENT_ORDER_CLOSE, new Emitter.Listener() {
+		}).on(SocketEvent.EVENT_ORDER_CLOSE, new SafeEmitterListener() {
 			@Override
-			public void call(final Object... args) {
+			public void safeCall(final Object... args) {
 				logEvent(SocketEvent.EVENT_ORDER_CLOSE, args);
 				final JSONObject json = (JSONObject) args[0];
 				final Order order = mGson.fromJson(json.toString(), Order.class);
