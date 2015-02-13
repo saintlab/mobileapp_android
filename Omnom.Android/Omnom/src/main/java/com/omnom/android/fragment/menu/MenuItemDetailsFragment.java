@@ -59,16 +59,10 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	public static boolean addRecommendations(final Context context, LinearLayout container, Menu menu, UserOrder order, Item item,
 	                                         View.OnClickListener onApplyListener, final View.OnClickListener itemClickListener) {
-		final boolean b = item.recommendations() != null && item.recommendations().size() + 1 != container.getChildCount() && item
-				.hasRecommendations();
-		if(b) {
-			removeRecommendations(container, false);
-		}
-
 		final boolean hasRecommendations = item.hasRecommendations();
 		ViewUtils.setVisible(container, hasRecommendations);
 
-		if(hasRecommendations && b) {
+		if(hasRecommendations) {
 			final List<String> recommendations = item.recommendations();
 			final LayoutInflater inflater = LayoutInflater.from(context);
 			int index = 0;
@@ -100,7 +94,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 				ViewUtils.setHeight(itemView, 0);
 				container.addView(itemView);
 			}
-			// container.addView(inflater.inflate(R.layout.view_recommendations_footer, null, false));
+			container.addView(inflater.inflate(R.layout.view_recommendations_footer, null, false));
 		}
 		return hasRecommendations;
 	}

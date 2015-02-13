@@ -52,14 +52,7 @@
     <include
         layout="@layout/layout_recommendations"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <!--<ViewStub
-        android:id="@+id/stub"
-        android:layout="@layout/layout_recommendations"
-        android:inflatedId="@+id/panel_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />-->
+        android:layout_height="wrap_content"/>
 
     <View
         android:id="@+id/delimiter"
