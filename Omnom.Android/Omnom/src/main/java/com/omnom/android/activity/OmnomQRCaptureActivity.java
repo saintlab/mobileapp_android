@@ -212,7 +212,6 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 		postDelayed(SCAN_DELAY, new Runnable() {
 			@Override
 			public void run() {
-				turnTheLightOn(false);
 				setNotScanningButtonVisible(true);
 			}
 		});
