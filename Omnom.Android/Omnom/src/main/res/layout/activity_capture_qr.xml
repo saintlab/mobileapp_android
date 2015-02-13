@@ -34,7 +34,8 @@
         <com.google.zxing.client.android.ViewfinderView
             android:id="@+id/viewfinder_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
 
         <LinearLayout
             android:layout_width="match_parent"
