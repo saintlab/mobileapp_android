@@ -16,14 +16,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/activity_horizontal_margin_small"
-        android:paddingTop="@dimen/activity_horizontal_margin_medium"
+        android:paddingTop="@dimen/activity_vertical_margin_small"
         android:paddingBottom="@dimen/activity_horizontal_margin_medium"
         android:orientation="vertical"
         android:gravity="center"
         android:layout_gravity="bottom"
         android:background="@android:color/white">
 
+        <ImageView
+            android:id="@+id/btn_close"
+            android:scaleType="centerInside"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top|center_horizontal"
+            android:src="@drawable/ic_cross_black" />
+
         <RelativeLayout
+            android:layout_marginTop="@dimen/activity_vertical_margin_small"
             android:layout_width="match_parent"
             android:layout_height="@dimen/view_size_default">
 

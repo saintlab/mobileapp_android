@@ -32,7 +32,7 @@ import butterknife.OnClick;
 
 public class MenuItemAddFragment extends BaseFragment {
 
-	public static final int CONTENT_TRANSITION_Y = 600;
+	public static final int CONTENT_TRANSITION_Y = 800;
 
 	private static final String ARG_ORDER = "order";
 
@@ -149,6 +149,11 @@ public class MenuItemAddFragment extends BaseFragment {
 		ButterKnife.inject(this, view);
 		contentView.setTranslationY(CONTENT_TRANSITION_Y);
 		return view;
+	}
+
+	@OnClick(R.id.btn_close)
+	public void onClose() {
+		getFragmentManager().popBackStack();
 	}
 
 	@Override
