@@ -28,6 +28,7 @@ import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.ViewFilter;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.StickyListView;
 
@@ -162,6 +163,8 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 					if(!recommendationsAdded) {
 						ViewUtils.setVisible(panelRecommendations, true);
 						showRecommendations(item, order, menu);
+					} else {
+						updateRecommendations(order, menu);
 					}
 				} else {
 					if(recommendationsAdded) {
@@ -176,6 +179,24 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
 				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
+			}
+		}
+
+		private void updateRecommendations(final UserOrder order, final Menu menu) {
+			final ArrayList<View> childs = ViewUtils.getChilds(panelRecommendations, new ViewFilter() {
+				@Override
+				public boolean filter(final View v) {
+					return v.getId() != R.id.divider;
+				}
+			});
+
+			for(final View child : childs) {
+				final ViewHolder holder = (ViewHolder) child.getTag();
+				final Item recommendedItem = (Item) child.getTag(R.id.item);
+				if(holder != null && recommendedItem != null) {
+					holder.updateState(order, recommendedItem);
+					holder.bind(recommendedItem, order, menu, false, false);
+				}
 			}
 		}
 

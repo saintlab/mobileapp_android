@@ -127,7 +127,20 @@ public class ViewUtils {
 		return result;
 	}
 
-	public static void removeChilds(final LinearLayout container, final RemovableFilter filter) {
+	public static ArrayList<View> getChilds(final ViewGroup container, final ViewFilter filter) {
+		final ArrayList<View> result = new ArrayList<View>();
+		final int childCount = container.getChildCount();
+
+		for(int i = 0; i < childCount; i++) {
+			final View childAt = container.getChildAt(i);
+			if(filter.filter(childAt)) {
+				result.add(childAt);
+			}
+		}
+		return result;
+	}
+
+	public static void removeChilds(final LinearLayout container, final ViewFilter filter) {
 		for(final View view : getChildViews(container)) {
 			if(filter.filter(view)) {
 				container.removeView(view);

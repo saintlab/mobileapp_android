@@ -21,7 +21,7 @@ import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.utils.AnimationUtils;
-import com.omnom.android.utils.utils.RemovableFilter;
+import com.omnom.android.utils.utils.ViewFilter;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
 
@@ -36,7 +36,7 @@ import butterknife.OnClick;
  */
 public class MenuItemDetailsFragment extends BaseFragment implements View.OnClickListener {
 
-	private static final RemovableFilter sViewFilter = new RemovableFilter() {
+	private static final ViewFilter sViewFilter = new ViewFilter() {
 		@Override
 		public boolean filter(final View v) {
 			return v != null && v.getId() != R.id.divider;
@@ -77,7 +77,6 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 				final View itemView = inflater.inflate(R.layout.item_menu_dish, null, false);
 				itemView.setOnClickListener(itemClickListener);
-				itemView.setTag(recommendedItem);
 
 				MenuCategoryItemsAdapter.ViewHolder holder = new MenuCategoryItemsAdapter.ViewHolder(itemView);
 				holder.updateState(order, recommendedItem);
