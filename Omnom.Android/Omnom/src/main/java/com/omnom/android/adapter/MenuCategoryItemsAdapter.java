@@ -248,13 +248,13 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		}
 	}
 
-	private static class SubHeaderItem extends HeaderItem {
+	public static class SubHeaderItem extends HeaderItem {
 		SubHeaderItem(Category subCategory) {
 			super(subCategory);
 		}
 	}
 
-	private static class HeaderItem extends Item {
+	public static class HeaderItem extends Item {
 		protected Category mCategory;
 
 		HeaderItem(Category subCategory) {

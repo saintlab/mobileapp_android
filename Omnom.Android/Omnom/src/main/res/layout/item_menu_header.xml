@@ -13,6 +13,7 @@
         android:ellipsize="end"
         android:layout_centerInParent="true"
         android:textAppearance="?android:textAppearanceLarge"
+        android:textColor="@android:color/black"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
     <include layout="@layout/delimiter_vertical_light"

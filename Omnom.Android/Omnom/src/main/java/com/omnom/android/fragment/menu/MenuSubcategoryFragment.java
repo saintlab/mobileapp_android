@@ -167,8 +167,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 		}, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				final Item recommendedItem = (Item) v.getTag(R.id.item);
-				MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, recommendedItem);
+				showDetails((Item) v.getTag(R.id.item));
 			}
 		});
 
@@ -183,9 +182,19 @@ public class MenuSubcategoryFragment extends BaseFragment {
 				if(mAdapter == null || mOrder == null) {
 					return;
 				}
-				MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, mAdapter.getItem(position));
+				showDetails(mAdapter.getItem(position));
 			}
 		});
+	}
+
+	private void showDetails(final Item item) {
+		if(item == null) {
+			return;
+		}
+		if(!(item instanceof MenuCategoryItemsAdapter.HeaderItem) &&
+				!(item instanceof MenuCategoryItemsAdapter.SubHeaderItem)) {
+			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item);
+		}
 	}
 
 	@OnClick(R.id.btn_back)
