@@ -49,10 +49,53 @@
         android:textAppearance="?android:textAppearance"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
-    <include
-        layout="@layout/layout_recommendations"
+    <LinearLayout
+        android:id="@+id/panel_bottom"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@android:id/text1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_centerInParent="true"
+                android:textColor="@color/menu_header"
+                android:text="Хорошо вместе"
+                android:textAppearance="?android:textAppearance"
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@android:id/text1"
+                android:layout_height="1dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@color/menu_header" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_toRightOf="@android:id/text1"
+                android:layout_height="1dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@color/menu_header" />
+
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
     <View
         android:id="@+id/delimiter"

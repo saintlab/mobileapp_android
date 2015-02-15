@@ -39,6 +39,7 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.Optional;
+import hugo.weaving.DebugLog;
 
 /**
  * Created by Ch3D on 27.01.2015.
@@ -63,10 +64,6 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		@InjectView(R.id.delimiter)
 		@Optional
 		protected View viewDelimiter;
-
-		//@InjectView(R.id.stub)
-		//@Optional
-		//protected ViewStub viewStub;
 
 		@InjectView(R.id.btn_apply)
 		@Optional
@@ -119,9 +116,12 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 					item.recommendations() != null && item.recommendations().size() + 1 != panelRecommendations.getChildCount() && item
 							.hasRecommendations();
 			if(b) {
-				MenuItemDetailsFragment.removeRecommendations(panelRecommendations, !isRecommendationsVisible());
+				removeRecommendations(panelRecommendations,
+				                      !isRecommendationsVisible());
 				ViewUtils.setVisible(panelRecommendations, false);
-				ViewCompat.setHasTransientState(root, false);
+				if(ViewCompat.hasTransientState(root)) {
+					ViewCompat.setHasTransientState(root, false);
+				}
 			}
 
 			if(isRecommendationsVisible()) {
@@ -146,35 +146,58 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			txtTitle.setText(item.name());
 			btnApply.setTag(item);
 
-			ViewUtils.setVisible(panelRecommendations, showRecommendations);
+			final boolean recommendationsAdded = item.hasRecommendations() &&
+					panelRecommendations.getChildCount() == item.recommendations().size() + 2;
 
-			final boolean addRecommendations =
-					item.hasRecommendations() && item.recommendations().size() + 2 != panelRecommendations.getChildCount();
-
-			if(addRecommendations) {
-				MenuItemDetailsFragment.removeRecommendations(panelRecommendations, !isRecommendationsVisible());
+			if(!showRecommendations) {
 				ViewUtils.setVisible(panelRecommendations, false);
-				ViewCompat.setHasTransientState(root, false);
+			} else {
+				if(!isRecommendationsVisible() && item.hasRecommendations() && !recommendationsAdded) {
+					ViewUtils.setVisible(panelRecommendations, false);
+				}
+			}
+
+			if(showRecommendations) {
+				if(isRecommendationsVisible()) {
+					if(!recommendationsAdded) {
+						ViewUtils.setVisible(panelRecommendations, true);
+						showRecommendations(item, order, menu);
+					}
+				} else {
+					if(recommendationsAdded) {
+						removeRecommendations(panelRecommendations, true);
+					}
+				}
 			}
 
 			if(isRecommendationsVisible()) {
 				btnApply.setBackgroundResource(R.drawable.btn_wish_added);
 				btnApply.setText(StringUtils.EMPTY_STRING);
-				if(showRecommendations && addRecommendations) {
-					showRecommendations(item, order, menu);
-				}
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
 				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
 			}
 		}
 
+		@DebugLog
+		private void removeRecommendations(final LinearLayout container, final boolean animate) {
+			MenuItemDetailsFragment.removeRecommendations(container, animate);
+			if(ViewCompat.hasTransientState(root)) {
+				ViewCompat.setHasTransientState(root, false);
+			}
+		}
+
 		private void showRecommendations(final Item item, final UserOrder order, final Menu menu) {
-			ViewCompat.setHasTransientState(root, true);
+			if(!ViewCompat.hasTransientState(root)) {
+				ViewCompat.setHasTransientState(root, true);
+			}
 			ViewUtils.setHeight(panelRecommendations, 0);
-			MenuItemDetailsFragment.addRecommendations(panelRecommendations.getContext(), panelRecommendations, menu, order, item,
-			                                           mRecommendationClickListener, mClickListener);
-			AnimationUtils.scaleHeight(panelRecommendations, 500);
+			final int height = MenuItemDetailsFragment.addRecommendations(panelRecommendations.getContext(), panelRecommendations, menu,
+			                                                              order,
+			                                                              item,
+			                                                              mRecommendationClickListener, mClickListener);
+			final int dp16px = ViewUtils.dipToPixels(panelRecommendations.getContext(), 16);
+			AnimationUtils.scaleHeight(panelRecommendations, height + (dp16px * 2), 350);
 		}
 
 		public boolean isRecommendationsVisible() {
@@ -393,8 +416,13 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 	}
 
 	@Override
+	public boolean hasStableIds() {
+		return true;
+	}
+
+	@Override
 	public long getItemId(final int position) {
-		return position;
+		return getItem(position).hashCode();
 	}
 
 	@Override

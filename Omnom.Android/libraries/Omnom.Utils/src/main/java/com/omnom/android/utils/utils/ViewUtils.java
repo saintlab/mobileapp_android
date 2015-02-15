@@ -4,7 +4,9 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -114,4 +116,22 @@ public class ViewUtils {
 		view.requestLayout();
 	}
 
+	public static ArrayList<View> getChildViews(final ViewGroup container) {
+		final ArrayList<View> result = new ArrayList<View>();
+		final int childCount = container.getChildCount();
+
+		for(int i = 0; i < childCount; i++) {
+			final View childAt = container.getChildAt(i);
+			result.add(childAt);
+		}
+		return result;
+	}
+
+	public static void removeChilds(final LinearLayout container, final RemovableFilter filter) {
+		for(final View view : getChildViews(container)) {
+			if(filter.filter(view)) {
+				container.removeView(view);
+			}
+		}
+	}
 }
