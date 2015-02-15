@@ -35,7 +35,7 @@ import butterknife.OnClick;
 /**
  * Created by Ch3D on 02.02.2015.
  */
-public class MenuSubcategoryFragment extends BaseFragment {
+public class MenuSubcategoryFragment extends BaseFragment implements View.OnClickListener {
 
 	public static void show(final FragmentManager manager, final UserOrder order, final Menu menu, final int position, final float ypos) {
 		manager.beginTransaction()
@@ -160,7 +160,11 @@ public class MenuSubcategoryFragment extends BaseFragment {
 			@Override
 			public void onClick(final View v) {
 				final Item recommendedItem = (Item) v.getTag(R.id.item);
+				final Integer pos = (Integer) v.getTag(R.id.position);
 				if(recommendedItem != null) {
+					if(pos != null && pos >= 0) {
+						mListView.smoothScrollToPositionFromTop(pos, 0);
+					}
 					showAddFragment(recommendedItem);
 				}
 			}
@@ -207,4 +211,20 @@ public class MenuSubcategoryFragment extends BaseFragment {
 	public void showAddFragment(final Item item) {
 		MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, item);
 	}
+
+	@Override
+	public void onClick(final View v) {
+		if(v.getId() == R.id.btn_apply) {
+			final Integer pos = (Integer) v.getTag(R.id.position);
+			if(pos != null && pos >= 0) {
+				if(pos > 0 && mAdapter.getItemViewType(pos - 1) == MenuCategoryItemsAdapter.VIEW_TYPE_HEADER) {
+					mListView.smoothScrollToPositionFromTop(pos, ViewUtils.dipToPixels(v.getContext(), 48));
+				} else {
+					mListView.smoothScrollToPositionFromTop(pos, 0);
+				}
+			}
+			showAddFragment((Item) v.getTag());
+		}
+	}
+
 }

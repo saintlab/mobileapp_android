@@ -45,7 +45,7 @@ import hugo.weaving.DebugLog;
 /**
  * Created by Ch3D on 27.01.2015.
  */
-public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListView.StickyListAdapter, View.OnClickListener {
+public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListView.StickyListAdapter {
 
 	public static final int VIEW_TYPE_COUNT = 3;
 
@@ -137,7 +137,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			}
 		}
 
-		public void bind(final Item item, UserOrder order, Menu menu, boolean detailed, boolean showRecommendations) {
+		public void bind(final Item item, UserOrder order, Menu menu, int position, boolean detailed, boolean showRecommendations) {
 			if(item == null) {
 				return;
 			}
@@ -146,6 +146,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			bindImage(item);
 			txtTitle.setText(item.name());
 			btnApply.setTag(item);
+			btnApply.setTag(R.id.position, position);
 
 			final boolean recommendationsAdded = item.hasRecommendations() &&
 					panelRecommendations.getChildCount() == item.recommendations().size() + 2;
@@ -195,7 +196,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 				final Item recommendedItem = (Item) child.getTag(R.id.item);
 				if(holder != null && recommendedItem != null) {
 					holder.updateState(order, recommendedItem);
-					holder.bind(recommendedItem, order, menu, false, false);
+					holder.bind(recommendedItem, order, menu, -1, false, false);
 				}
 			}
 		}
@@ -453,7 +454,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			switch(getItemViewType(position)) {
 				case VIEW_TYPE_ITEM:
 					convertView = mInflater.inflate(R.layout.item_menu_dish, parent, false);
-					convertView.findViewById(R.id.btn_apply).setOnClickListener(this);
+					convertView.findViewById(R.id.btn_apply).setOnClickListener(mContext);
 					break;
 
 				case VIEW_TYPE_HEADER:
@@ -478,15 +479,8 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			holder.txtTitle.setText(item.name());
 		} else {
 			holder.updateState(mOrder, item);
-			holder.bind(item, mOrder, mMenu, false, true);
+			holder.bind(item, mOrder, mMenu, position, false, true);
 			holder.bindDivider(convertView, mInnerItems, item, position);
-		}
-	}
-
-	@Override
-	public void onClick(final View v) {
-		if(v.getId() == R.id.btn_apply) {
-			mContext.showAddFragment((Item) v.getTag());
 		}
 	}
 }

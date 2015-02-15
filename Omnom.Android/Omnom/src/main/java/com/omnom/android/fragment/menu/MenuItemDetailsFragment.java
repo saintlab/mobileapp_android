@@ -80,7 +80,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 				MenuCategoryItemsAdapter.ViewHolder holder = new MenuCategoryItemsAdapter.ViewHolder(itemView);
 				holder.updateState(order, recommendedItem);
-				holder.bind(recommendedItem, order, menu, false, false);
+				holder.bind(recommendedItem, order, menu, -1, false, false);
 				holder.showDivider(index != recommendations.size());
 
 				itemView.setTag(holder);
