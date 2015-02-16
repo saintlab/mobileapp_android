@@ -179,10 +179,14 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 						mAdapter.remove(tag);
 						mAdapter.notifyDataSetChanged();
 						childAt.animate().alpha(1).setDuration(0).start();
-						ViewCompat.setHasTransientState(childAt, false);
+						if(ViewCompat.hasTransientState(childAt)) {
+							ViewCompat.setHasTransientState(childAt, false);
+						}
 					}
 				}, getResources().getInteger(R.integer.default_animation_duration_short));
-				ViewCompat.setHasTransientState(childAt, true);
+				if(!ViewCompat.hasTransientState(childAt)) {
+					ViewCompat.setHasTransientState(childAt, true);
+				}
 			}
 		}
 	}

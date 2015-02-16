@@ -3,6 +3,7 @@ package com.omnom.android.adapter;
 import android.content.Context;
 import android.os.Parcel;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.ViewFilter;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.StickyListView;
 
@@ -38,11 +40,12 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.Optional;
+import hugo.weaving.DebugLog;
 
 /**
  * Created by Ch3D on 27.01.2015.
  */
-public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListView.StickyListAdapter, View.OnClickListener {
+public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListView.StickyListAdapter {
 
 	public static final int VIEW_TYPE_COUNT = 3;
 
@@ -63,13 +66,13 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		@Optional
 		protected View viewDelimiter;
 
-		//@InjectView(R.id.stub)
-		//@Optional
-		//protected ViewStub viewStub;
-
 		@InjectView(R.id.btn_apply)
 		@Optional
 		protected Button btnApply;
+
+		@InjectView(R.id.panel_bottom)
+		@Optional
+		protected LinearLayout panelRecommendations;
 
 		@InjectView(R.id.txt_info)
 		@Optional
@@ -110,14 +113,11 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			txtTitle.setText(item.name());
 			btnApply.setTag(item);
 
-			LinearLayout viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
-			final boolean b = item.recommendations() != null && item.recommendations().size() + 1 != viewById.getChildCount() && item
-					.hasRecommendations();
-			if(b) {
-				if(viewById != null) {
-					MenuItemDetailsFragment.removeRecommendations(viewById, !isRecommendationsVisible());
-					ViewUtils.setVisible(viewById, false);
-				}
+			final boolean hasRecommendations = item.hasRecommendations();
+			ViewUtils.setVisible(panelRecommendations, hasRecommendations);
+
+			if(hasRecommendations) {
+				showRecommendations(item, order, menu);
 			}
 
 			if(isRecommendationsVisible()) {
@@ -127,12 +127,9 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
 				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
 			}
-			if(b) {
-				showRecommendations(item, order, menu, viewById);
-			}
 		}
 
-		public void bind(final Item item, UserOrder order, Menu menu, boolean detailed, boolean showRecommendations) {
+		public void bind(final Item item, UserOrder order, Menu menu, int position, boolean detailed, boolean showRecommendations) {
 			if(item == null) {
 				return;
 			}
@@ -141,35 +138,82 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			bindImage(item);
 			txtTitle.setText(item.name());
 			btnApply.setTag(item);
+			btnApply.setTag(R.id.position, position);
 
-			LinearLayout viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
-			final boolean b = item.recommendations() != null && item.recommendations().size() + 1 != viewById.getChildCount() && item
-					.hasRecommendations();
-			if(b) {
-				if(viewById != null) {
-					MenuItemDetailsFragment.removeRecommendations(viewById, !isRecommendationsVisible());
-					ViewUtils.setVisible(viewById, false);
+			final boolean hasRecommendations = item.hasRecommendations();
+
+			final boolean recommendationsAdded = hasRecommendations &&
+					panelRecommendations.getChildCount() == item.recommendations().size() + 2;
+
+			final boolean skipRecommendations = !showRecommendations || !hasRecommendations;
+			if(skipRecommendations) {
+				ViewUtils.setVisible(panelRecommendations, false);
+			} else {
+				if(!isRecommendationsVisible() && hasRecommendations && !recommendationsAdded) {
+					ViewUtils.setVisible(panelRecommendations, false);
+				}
+				if(showRecommendations) {
+					if(isRecommendationsVisible()) {
+						if(!recommendationsAdded) {
+							ViewUtils.setVisible(panelRecommendations, true);
+							showRecommendations(item, order, menu);
+						} else {
+							updateRecommendations(order, menu);
+						}
+					} else {
+						if(recommendationsAdded) {
+							removeRecommendations(panelRecommendations, true);
+						}
+					}
 				}
 			}
 
 			if(isRecommendationsVisible()) {
 				btnApply.setBackgroundResource(R.drawable.btn_wish_added);
 				btnApply.setText(StringUtils.EMPTY_STRING);
-				if(showRecommendations && b) {
-					showRecommendations(item, order, menu, viewById);
-				}
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
 				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
 			}
 		}
 
-		private void showRecommendations(final Item item, final UserOrder order, final Menu menu, LinearLayout viewById) {
-			viewById = (LinearLayout) root.findViewById(R.id.panel_bottom);
-			ViewUtils.setHeight(viewById, 0);
-			MenuItemDetailsFragment.addRecommendations(viewById.getContext(), viewById, menu, order, item,
-			                                           mRecommendationClickListener, mClickListener);
-			AnimationUtils.scaleHeight(viewById, 500);
+		private void updateRecommendations(final UserOrder order, final Menu menu) {
+			final ArrayList<View> childs = ViewUtils.getChilds(panelRecommendations, new ViewFilter() {
+				@Override
+				public boolean filter(final View v) {
+					return v.getId() != R.id.divider;
+				}
+			});
+
+			for(final View child : childs) {
+				final ViewHolder holder = (ViewHolder) child.getTag();
+				final Item recommendedItem = (Item) child.getTag(R.id.item);
+				if(holder != null && recommendedItem != null) {
+					holder.updateState(order, recommendedItem);
+					holder.bind(recommendedItem, order, menu, -1, false, false);
+				}
+			}
+		}
+
+		@DebugLog
+		private void removeRecommendations(final LinearLayout container, final boolean animate) {
+			MenuItemDetailsFragment.removeRecommendations(container, animate);
+			if(ViewCompat.hasTransientState(root)) {
+				ViewCompat.setHasTransientState(root, false);
+			}
+		}
+
+		private void showRecommendations(final Item item, final UserOrder order, final Menu menu) {
+			if(!ViewCompat.hasTransientState(root)) {
+				ViewCompat.setHasTransientState(root, true);
+			}
+			ViewUtils.setHeight(panelRecommendations, 0);
+			final int height = MenuItemDetailsFragment.addRecommendations(panelRecommendations.getContext(), panelRecommendations, menu,
+			                                                              order,
+			                                                              item,
+			                                                              mRecommendationClickListener, mClickListener);
+			final int dp16px = ViewUtils.dipToPixels(panelRecommendations.getContext(), 16);
+			AnimationUtils.scaleHeight(panelRecommendations, height + (dp16px * 2), 350);
 		}
 
 		public boolean isRecommendationsVisible() {
@@ -201,15 +245,32 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			ViewUtils.setMargins(viewDelimiter, dividerPadding, 0, dividerPadding, 0);
 			// viewDelimiter.setPadding(dividerPadding, 0, dividerPadding, 0);
 		}
+
+		public void bindDivider(final View convertView, final ArrayList<Item> innerItems, final Item item, final int position) {
+			final int padding = ViewUtils.dipToPixels(convertView.getContext(), 16f);
+			if(position == innerItems.size() - 1) {
+				showDivider(false);
+			} else if(position + 1 < innerItems.size()) {
+				final Item nextItem = innerItems.get(position + 1);
+				final boolean isSubheaderNext = nextItem instanceof SubHeaderItem;
+				final boolean isHeaderNext = nextItem instanceof HeaderItem;
+				if(item.hasRecommendations() && isRecommendationsVisible()) {
+					showDivider(false);
+				} else {
+					showDivider(!isSubheaderNext);
+				}
+				setDividerPadding(isHeaderNext && !isSubheaderNext ? 0 : padding);
+			}
+		}
 	}
 
-	private static class SubHeaderItem extends HeaderItem {
+	public static class SubHeaderItem extends HeaderItem {
 		SubHeaderItem(Category subCategory) {
 			super(subCategory);
 		}
 	}
 
-	private static class HeaderItem extends Item {
+	public static class HeaderItem extends Item {
 		protected Category mCategory;
 
 		HeaderItem(Category subCategory) {
@@ -371,8 +432,13 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 	}
 
 	@Override
+	public boolean hasStableIds() {
+		return true;
+	}
+
+	@Override
 	public long getItemId(final int position) {
-		return position;
+		return getItem(position).hashCode();
 	}
 
 	@Override
@@ -382,7 +448,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			switch(getItemViewType(position)) {
 				case VIEW_TYPE_ITEM:
 					convertView = mInflater.inflate(R.layout.item_menu_dish, parent, false);
-					convertView.findViewById(R.id.btn_apply).setOnClickListener(this);
+					convertView.findViewById(R.id.btn_apply).setOnClickListener(mContext);
 					break;
 
 				case VIEW_TYPE_HEADER:
@@ -407,28 +473,8 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			holder.txtTitle.setText(item.name());
 		} else {
 			holder.updateState(mOrder, item);
-			holder.bind(item, mOrder, mMenu, false, true);
-			final int padding = ViewUtils.dipToPixels(convertView.getContext(), 16f);
-			if(position == mInnerItems.size() - 1) {
-				holder.showDivider(false);
-			} else if(position + 1 < mInnerItems.size()) {
-				final Item nextItem = mInnerItems.get(position + 1);
-				final boolean isSubheaderNext = nextItem instanceof SubHeaderItem;
-				final boolean isHeaderNext = nextItem instanceof HeaderItem;
-				if(item.hasRecommendations() && holder.isRecommendationsVisible()) {
-					holder.showDivider(false);
-				} else {
-					holder.showDivider(!isSubheaderNext);
-				}
-				holder.setDividerPadding(isHeaderNext && !isSubheaderNext ? 0 : padding);
-			}
-		}
-	}
-
-	@Override
-	public void onClick(final View v) {
-		if(v.getId() == R.id.btn_apply) {
-			mContext.showAddFragment((Item) v.getTag());
+			holder.bind(item, mOrder, mMenu, position, false, true);
+			holder.bindDivider(convertView, mInnerItems, item, position);
 		}
 	}
 }

@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.15.2'
     }
 }
 apply plugin: 'com.android.application'
@@ -42,8 +42,8 @@ android {
         applicationId "com.omnom.android"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 53
-        versionName "0.3.7"
+        versionCode 54
+        versionName "0.3.8"
     }
 
     signingConfigs {
@@ -82,11 +82,11 @@ android {
 dependencies {
     // google
     compile 'com.google.code.gson:gson:2.3'
-    compile 'com.android.support:support-v4:21.0.2'
+    compile 'com.android.support:support-v4:21.0.3'
 
     // auto-parcel
-    compile 'com.github.frankiesardo:auto-parcel:+'
-    apt 'com.github.frankiesardo:auto-parcel-processor:+'
+    compile 'com.github.frankiesardo:auto-parcel:0.2'
+    apt 'com.github.frankiesardo:auto-parcel-processor:0.2'
 
     // socket.io
     // compile 'com.github.nkzawa:socket.io-client:0.3.1@jar'

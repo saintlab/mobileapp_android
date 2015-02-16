@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +21,7 @@ import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ViewFilter;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
 
@@ -35,6 +35,13 @@ import butterknife.OnClick;
  * Created by Ch3D on 03.02.2015.
  */
 public class MenuItemDetailsFragment extends BaseFragment implements View.OnClickListener {
+
+	private static final ViewFilter sViewFilter = new ViewFilter() {
+		@Override
+		public boolean filter(final View v) {
+			return v != null && v.getId() != R.id.divider;
+		}
+	};
 
 	public static Fragment newInstance(Menu menu, final UserOrder order, final Item item) {
 		final MenuItemDetailsFragment fragment = new MenuItemDetailsFragment();
@@ -57,18 +64,10 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		       .commit();
 	}
 
-	public static boolean addRecommendations(final Context context, LinearLayout container, Menu menu, UserOrder order, Item item,
-	                                         View.OnClickListener onApplyListener, final View.OnClickListener itemClickListener) {
-		final boolean b = item.recommendations() != null && item.recommendations().size() + 1 != container.getChildCount() && item
-				.hasRecommendations();
-		if(b) {
-			removeRecommendations(container, false);
-		}
-
-		final boolean hasRecommendations = item.hasRecommendations();
-		ViewUtils.setVisible(container, hasRecommendations);
-
-		if(hasRecommendations && b) {
+	public static int addRecommendations(final Context context, LinearLayout container, Menu menu, UserOrder order, Item item,
+	                                     View.OnClickListener onApplyListener, final View.OnClickListener itemClickListener) {
+		int totalHeight = 0;
+		if(item.hasRecommendations()) {
 			final List<String> recommendations = item.recommendations();
 			final LayoutInflater inflater = LayoutInflater.from(context);
 			int index = 0;
@@ -78,11 +77,10 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 				final View itemView = inflater.inflate(R.layout.item_menu_dish, null, false);
 				itemView.setOnClickListener(itemClickListener);
-				itemView.setTag(recommendedItem);
 
 				MenuCategoryItemsAdapter.ViewHolder holder = new MenuCategoryItemsAdapter.ViewHolder(itemView);
 				holder.updateState(order, recommendedItem);
-				holder.bind(recommendedItem, order, menu, false, false);
+				holder.bind(recommendedItem, order, menu, -1, false, false);
 				holder.showDivider(index != recommendations.size());
 
 				itemView.setTag(holder);
@@ -92,17 +90,14 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 				btnApply.setOnClickListener(onApplyListener);
 				btnApply.setTag(R.id.item, recommendedItem);
 
-				final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-
 				itemView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-
-				final int height = itemView.getMeasuredHeight();
+				totalHeight += itemView.getMeasuredHeight();
 				ViewUtils.setHeight(itemView, 0);
 				container.addView(itemView);
 			}
-			// container.addView(inflater.inflate(R.layout.view_recommendations_footer, null, false));
+			inflater.inflate(R.layout.view_recommendations_footer, container, true);
 		}
-		return hasRecommendations;
+		return totalHeight;
 	}
 
 	public static void removeRecommendations(final LinearLayout container, final boolean animate) {
@@ -110,23 +105,11 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			AnimationUtils.scaleHeight(container, 0, new Runnable() {
 				@Override
 				public void run() {
-					final int childCount = container.getChildCount();
-					for(int i = 0; i < childCount; i++) {
-						final View childAt = container.getChildAt(i);
-						if(childAt != null && childAt.getId() != R.id.divider) {
-							container.removeView(childAt);
-						}
-					}
+					ViewUtils.removeChilds(container, sViewFilter);
 				}
-			});
+			}, 350);
 		} else {
-			final int childCount = container.getChildCount();
-			for(int i = 0; i < childCount; i++) {
-				final View childAt = container.getChildAt(i);
-				if(childAt != null && childAt.getId() != R.id.divider) {
-					container.removeView(childAt);
-				}
-			}
+			ViewUtils.removeChilds(container, sViewFilter);
 		}
 	}
 

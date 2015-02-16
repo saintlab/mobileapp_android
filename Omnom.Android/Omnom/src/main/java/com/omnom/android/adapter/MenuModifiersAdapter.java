@@ -65,6 +65,11 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 		public void bindGroup(final Modifier modifierGroup) {
 			txtTitle.setText(modifierGroup.name());
 		}
+
+		public void alpha(final float alpha, final long duration) {
+			txtTitle.animate().alpha(alpha).setDuration(duration).start();
+			cbSelected.animate().alpha(alpha).setDuration(duration).start();
+		}
 	}
 
 	private static final int GROUPS_TYPE_COUNT = 2;
@@ -204,6 +209,7 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 			convertView = mInflater.inflate(R.layout.item_modifier_item, parent, false);
 			holder = new ChildViewHolder(convertView, this);
 			convertView.setTag(holder);
+			holder.alpha(0, 0);
 		}
 		bindChild(convertView, groupPosition, childPosition);
 		return convertView;
@@ -216,6 +222,7 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 		if(modifier != null && group != null) {
 			final boolean hasSelectionData = mSelection.get(modifier.id()) != null;
 			holder.bindChild(group, modifier, !hasSelectionData || (hasSelectionData && !mSelection.get(modifier.id())));
+			holder.alpha(1, mContext.getResources().getInteger(R.integer.default_animation_duration_quick));
 		}
 	}
 
