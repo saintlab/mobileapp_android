@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthError;
+import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -18,6 +19,8 @@ import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ErrorUtils;
 import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.view.HeaderView;
+
+import javax.inject.Inject;
 
 import butterknife.InjectView;
 import rx.Subscription;
@@ -37,6 +40,9 @@ public class ChangePhoneActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.edit_phone)
 	protected ErrorEdit editPhone;
+
+	@Inject
+	protected AuthService authenticator;
 
 	private boolean mFirstStart = true;
 

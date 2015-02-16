@@ -151,7 +151,25 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	@Override
 	protected void onResume() {
 		super.onResume();
-		activityHelper.onApplicationLaunch(this);
+		final boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
+		findViewById(android.R.id.content).postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (splashFragment != null) {
+					if (mData != null && hasToken) {
+						splashFragment.animateValidation(mData);
+						return;
+					}
+					if (hasToken) {
+						splashFragment.animateValidation();
+					} else {
+						splashFragment.animateLogin();
+					}
+				} else {
+					Log.w(TAG, "Splash fragment is null");
+				}
+			}
+		}, mSplashDelay);
 	}
 
 	@OnClick(R.id.btn_register)
