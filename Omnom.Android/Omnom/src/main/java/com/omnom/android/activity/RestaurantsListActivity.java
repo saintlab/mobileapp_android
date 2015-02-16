@@ -117,7 +117,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private int logoSizeLarge;
 
-	@OnClick({R.id.img_qr, R.id.txt_qr})
+	@OnClick({R.id.scan_qr})
 	public void doQrShortcut() {
 		ValidateActivityShortcut.start(this, R.anim.slide_in_right, R.anim.slide_out_left, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
