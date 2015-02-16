@@ -1,9 +1,6 @@
 package com.omnom.android.fragment.menu;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.BitmapDrawable;
@@ -13,10 +10,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -46,6 +42,12 @@ import butterknife.OnItemClick;
  */
 public class MenuFragment extends BaseFragment implements FragmentManager.OnBackStackChangedListener {
 
+	public static final int DURATION_INCREMENT_MOVE_UP = 75;
+
+	public static final int DURATION_INCREMENT_MOVE_DOWN = 50;
+
+	public static final int TITLE_PADDING_TOP = 8;
+
 	public static Fragment newInstance(final Menu menu, final Restaurant restaurant, final UserOrder order) {
 		final MenuFragment fragment = new MenuFragment();
 		final Bundle args = new Bundle();
@@ -70,9 +72,6 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 	@InjectView(android.R.id.list)
 	protected ListView mListView;
 
-	//@InjectView(R.id.img_profile)
-	//protected ImageView mImgProfile;
-
 	@InjectView(R.id.btn_previous)
 	protected ImageView mImgPrev;
 
@@ -88,17 +87,15 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 
 	private Restaurant mRestaurant;
 
-	private int mTouchPositionY = -1;
-
 	private View mSelectedView;
 
-	//@OnClick(R.id.img_profile)
-	//public void onProfile(View v) {
-	//	final ValidateActivity activity = (ValidateActivity) getActivity();
-	//	if(activity != null) {
-	//		activity.onProfile(v);
-	//	}
-	//}
+	private int mCategoryItemHeight;
+
+	private int mTitleAnimationPadding;
+
+	private LinearInterpolator mInterpolator;
+
+	private int mScreenHeight;
 
 	@OnClick(R.id.btn_previous)
 	public void onPrevious(View v) {
@@ -127,11 +124,35 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 	@OnItemClick(android.R.id.list)
 	public void onListItemClick(final int position) {
 		getFragmentManager().addOnBackStackChangedListener(this);
-		final float heightPixels = mListView.getContext().getResources().getDisplayMetrics().heightPixels;
-		final float v = mTouchPositionY / heightPixels;
-		MenuSubcategoryFragment.show(getFragmentManager(), mOrder, mMenu, position - mListView.getHeaderViewsCount(), v);
 		mSelectedView = mListView.getChildAt(position);
-		mSelectedView.setBackgroundColor(Color.WHITE);
+
+		final float heightPixels = mListView.getContext().getResources().getDisplayMetrics().heightPixels;
+		final int anchorY = mSelectedView.getBottom() + (mCategoryItemHeight / 2);
+		final int ty = -mSelectedView.getBottom() + mCategoryItemHeight + mTitleAnimationPadding;
+
+		mSelectedView.animate().translationY(ty)
+		             .setInterpolator(mInterpolator)
+		             .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_UP)
+		             .start();
+
+		for(int i = position + 1; i <= mListView.getLastVisiblePosition(); i++) {
+			final View v = mListView.getChildAt(i);
+			v.animate().translationY(mScreenHeight - v.getBottom()).alpha(0)
+			 .setInterpolator(mInterpolator)
+			 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_UP)
+			 .start();
+		}
+
+		for(int i = mListView.getFirstVisiblePosition(); i <= position - 1; i++) {
+			final View v = mListView.getChildAt(i);
+			v.animate().translationY(-(v.getTop() + mCategoryItemHeight)).alpha(0)
+			 .setInterpolator(mInterpolator)
+			 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_UP)
+			 .start();
+		}
+
+		final float v = anchorY / heightPixels;
+		MenuSubcategoryFragment.show(getFragmentManager(), mOrder, mMenu, position - mListView.getHeaderViewsCount(), v);
 	}
 
 	@Override
@@ -148,18 +169,18 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
 		ButterKnife.inject(this, view);
+
+		mScreenHeight = getResources().getDisplayMetrics().heightPixels;
+		mCategoryItemHeight = getResources().getDimensionPixelSize(R.dimen.menu_category_height);
+		mTitleAnimationPadding = ViewUtils.dipToPixels(view.getContext(), TITLE_PADDING_TOP);
+		mInterpolator = new LinearInterpolator();
+
 		mAdapter = new MenuCategoriesAdapter(getActivity(), mMenu.getFilledCategories());
 		View header = LayoutInflater.from(getActivity()).inflate(R.layout.item_menu_categories_header, null);
 		mListView.addHeaderView(header, null, false);
 		mListView.setAdapter(mAdapter);
-		mListView.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(final View v, final MotionEvent event) {
-				mTouchPositionY = (int) event.getY();
-				return false;
-			}
-		});
 
 		mTarget = new Target() {
 			@Override
@@ -190,26 +211,31 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 	public void onBackStackChanged() {
 		if(getFragmentManager() != null && getFragmentManager().getBackStackEntryCount() == 1) {
 			ViewUtils.setVisible(mImgPrev, true);
-			// ViewUtils.setVisible(mImgProfile, true);
-			mListView.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					final ValueAnimator colorAnimator = ValueAnimator.ofInt(Color.WHITE, Color.TRANSPARENT);
-					colorAnimator.setDuration(350);
-					colorAnimator.setEvaluator(new ArgbEvaluator());
-					colorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-					colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-						@Override
-						public void onAnimationUpdate(ValueAnimator animation) {
-							mSelectedView.setBackgroundColor((Integer) animation.getAnimatedValue());
-						}
-					});
-					colorAnimator.start();
-				}
-			}, 350);
+
+			final int positionForView = mListView.getPositionForView(mSelectedView);
+
+			for(int i = positionForView + 1; i <= mListView.getLastVisiblePosition(); i++) {
+				final View v = mListView.getChildAt(i);
+				v.animate().translationY(0).alpha(1)
+				 .setInterpolator(mInterpolator)
+				 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_UP)
+				 .start();
+			}
+
+			for(int i = 0; i <= positionForView - 1; i++) {
+				final View v = mListView.getChildAt(i);
+				v.animate().translationY(0).alpha(1)
+				 .setInterpolator(mInterpolator)
+				 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_DOWN)
+				 .start();
+			}
+
+			mSelectedView.animate().translationY(0)
+			             .setInterpolator(mInterpolator)
+			             .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)
+					                          + DURATION_INCREMENT_MOVE_DOWN).start();
 		} else {
 			ViewUtils.setVisible(mImgPrev, false);
-			// ViewUtils.setVisible(mImgProfile, false);
 		}
 	}
 }
