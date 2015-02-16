@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.fragment.model.PaymentDetails;
 import com.omnom.android.utils.utils.StringUtils;
 
 /**
@@ -28,7 +28,7 @@ public class PaymentChecker {
 		mGson = new Gson();
 	}
 
-	private boolean validate(final OrderFragment.PaymentDetails details) {
+	private boolean validate(final PaymentDetails details) {
 		if(details == null) {
 			return false;
 		}
@@ -38,7 +38,7 @@ public class PaymentChecker {
 		return true;
 	}
 
-	public void onPaymentRequested(@Nullable final OrderFragment.PaymentDetails details) {
+	public void onPaymentRequested(@Nullable final PaymentDetails details) {
 		if(validate(details)) {
 			final String strId = String.valueOf(details.getBillId());
 			getPreferences().edit().putString(strId, null).apply();
@@ -50,9 +50,9 @@ public class PaymentChecker {
 	 * @param details
 	 * @return false - if current payment was already processed, true - otherwise.
 	 */
-	public OrderFragment.PaymentDetails check(@Nullable final OrderFragment.PaymentDetails details) {
+	public PaymentDetails check(@Nullable final PaymentDetails details) {
 		if(validate(details)) {
-			final OrderFragment.PaymentDetails prevDetails = getPayment(details.getBillId());
+			final PaymentDetails prevDetails = getPayment(details.getBillId());
 			final boolean same = details.isSimilar(prevDetails);
 			if(same) {
 				return prevDetails;
@@ -62,7 +62,7 @@ public class PaymentChecker {
 	}
 
 	@Nullable
-	private OrderFragment.PaymentDetails getPayment(final int id) {
+	private PaymentDetails getPayment(final int id) {
 		if(id > 0) {
 			final String billId = String.valueOf(id);
 			final String string = getPreferences().getString(billId, StringUtils.EMPTY_STRING);
@@ -70,7 +70,7 @@ public class PaymentChecker {
 				return null;
 			}
 			try {
-				return mGson.fromJson(string, OrderFragment.PaymentDetails.class);
+				return mGson.fromJson(string, PaymentDetails.class);
 			} catch(JsonSyntaxException e) {
 				Log.e(TAG, "getPayment: id = " + id, e);
 				return null;
@@ -81,7 +81,7 @@ public class PaymentChecker {
 
 	private SharedPreferences getPreferences() {return mContext.getSharedPreferences(PAYMENTS, Context.MODE_PRIVATE);}
 
-	public void onPrePayment(@Nullable final OrderFragment.PaymentDetails details) {
+	public void onPrePayment(@Nullable final PaymentDetails details) {
 		if(validate(details)) {
 			final String strId = String.valueOf(details.getBillId());
 			final SharedPreferences preferences = getPreferences();
@@ -90,10 +90,10 @@ public class PaymentChecker {
 		}
 	}
 
-	public void clearCache(@Nullable final OrderFragment.PaymentDetails details) {
+	public void clearCache(@Nullable final PaymentDetails details) {
 		if(validate(details)) {
 			final int billId = details.getBillId();
-			final OrderFragment.PaymentDetails payment = getPayment(billId);
+			final PaymentDetails payment = getPayment(billId);
 			if(payment != null && details.isSimilar(payment)) {
 				getPreferences().edit().remove(String.valueOf(billId)).apply();
 			}

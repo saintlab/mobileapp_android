@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.auth.UserData;
-import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.fragment.model.PaymentDetails;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
 import com.omnom.android.mixpanel.model.UserRegisteredMixpanelEvent;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
@@ -192,7 +192,7 @@ public class MixPanelHelper {
 	}
 
 	public void trackRevenue(final Project project, final String userId,
-	                         final OrderFragment.PaymentDetails details,
+	                         final PaymentDetails details,
 	                         final BillResponse billData) {
 		final int tipValue = details.getTipValue(); // already in kopeks
 		final double totalAmount = details.getAmount() * 100; // translate into kopeks

@@ -28,7 +28,7 @@ import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomActivity;
-import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.fragment.model.PaymentDetails;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.mixpanel.model.acquiring.PaymentMixpanelEvent;
@@ -71,7 +71,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private static final int REQUEST_THANKS = 100;
 
-	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
+	public static void start(final Activity activity, final int code, final PaymentDetails details,
 	                         final Order order, CardInfo cardInfo, final boolean isDemo,
 	                         final int accentColor) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
@@ -118,7 +118,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private Subscription mCheckSubscription;
 
-	private OrderFragment.PaymentDetails mDetails;
+	private PaymentDetails mDetails;
 
 	private Order mOrder;
 
@@ -274,7 +274,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		mDetails.setBillId(billData.getId());
 
 		if(mPayChecker != null) {
-			final OrderFragment.PaymentDetails prevDetails = mPayChecker.check(mDetails);
+			final PaymentDetails prevDetails = mPayChecker.check(mDetails);
 			if(prevDetails != null) {
 				final String prevDetailsTransactionUrl = prevDetails.getTransactionUrl();
 				if(!TextUtils.isEmpty(prevDetailsTransactionUrl)) {

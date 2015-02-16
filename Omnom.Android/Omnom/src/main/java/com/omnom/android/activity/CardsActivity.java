@@ -31,7 +31,7 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.CardsAdapter;
-import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.fragment.model.PaymentDetails;
 import com.omnom.android.mixpanel.model.acquiring.CardDeletedMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.cards.Card;
@@ -99,7 +99,7 @@ public class CardsActivity extends BaseOmnomActivity {
 		}
 	}
 
-	public static void start(final Activity activity, final Order order, final OrderFragment.PaymentDetails details,
+	public static void start(final Activity activity, final Order order, final PaymentDetails details,
 	                         final int accentColor, final int code, boolean isDemo) {
 		final Intent intent = new Intent(activity, CardsActivity.class);
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
@@ -159,7 +159,7 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	private Order mOrder;
 
-	private OrderFragment.PaymentDetails mDetails;
+	private PaymentDetails mDetails;
 
 	private boolean mIsDemo;
 

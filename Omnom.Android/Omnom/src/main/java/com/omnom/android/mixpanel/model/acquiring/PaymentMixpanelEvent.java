@@ -3,7 +3,7 @@ package com.omnom.android.mixpanel.model.acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.auth.UserData;
-import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.fragment.model.PaymentDetails;
 import com.omnom.android.mixpanel.model.SplitWay;
 import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.utils.utils.AmountHelper;
@@ -36,12 +36,12 @@ public class PaymentMixpanelEvent extends AbstractAcquiringMixpanelEvent {
 
 	private final int billId;
 
-	public PaymentMixpanelEvent(UserData userData, final OrderFragment.PaymentDetails details,
+	public PaymentMixpanelEvent(UserData userData, final PaymentDetails details,
 	                            final int billId, final CardInfo cardInfo) {
 		this(userData, details, billId, cardInfo, null);
 	}
 
-	public PaymentMixpanelEvent(UserData userData, final OrderFragment.PaymentDetails details,
+	public PaymentMixpanelEvent(UserData userData, final PaymentDetails details,
 	                            final int billId, final CardInfo cardInfo, final AcquiringResponseError error) {
 		super(userData, cardInfo, error);
 		this.billId = billId;
