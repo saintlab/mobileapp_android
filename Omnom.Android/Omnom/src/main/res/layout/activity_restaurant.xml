@@ -70,7 +70,7 @@
             android:enabled="false"
             style="@style/TextView.Restaurant.Landing" />
 
-        <TextView
+        <com.omnom.android.view.stateful.StatefulTextView
             android:id="@+id/txt_im_inside"
             android:text="@string/im_inside_restaurant"
             android:drawablePadding="@dimen/drawable_padding_default"

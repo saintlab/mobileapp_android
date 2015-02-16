@@ -18,7 +18,7 @@
             style="@style/ImageView.Clickable.Cropped"
             android:contentDescription="@null"/>
 
-        <LinearLayout
+        <com.omnom.android.view.stateful.StatefulLinearLayout
             android:id="@+id/scan_qr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
                 android:duplicateParentState="true"
                 android:textAppearance="?android:textAppearanceMedium"/>
 
-        </LinearLayout>
+        </com.omnom.android.view.stateful.StatefulLinearLayout>
 
     </RelativeLayout>
 

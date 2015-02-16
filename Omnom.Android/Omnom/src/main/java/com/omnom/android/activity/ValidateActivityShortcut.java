@@ -29,7 +29,7 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 	}
 
 	public static void start(BaseActivity context) {
-		start(context, R.anim.slide_out_left, R.anim.slide_in_right, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
+		start(context, R.anim.slide_in_right, R.anim.slide_out_left, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
 
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
