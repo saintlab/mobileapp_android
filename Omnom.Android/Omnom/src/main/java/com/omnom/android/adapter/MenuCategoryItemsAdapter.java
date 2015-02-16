@@ -113,16 +113,11 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			txtTitle.setText(item.name());
 			btnApply.setTag(item);
 
-			final boolean b =
-					item.recommendations() != null && item.recommendations().size() + 1 != panelRecommendations.getChildCount() && item
-							.hasRecommendations();
-			if(b) {
-				removeRecommendations(panelRecommendations,
-				                      !isRecommendationsVisible());
-				ViewUtils.setVisible(panelRecommendations, false);
-				if(ViewCompat.hasTransientState(root)) {
-					ViewCompat.setHasTransientState(root, false);
-				}
+			final boolean hasRecommendations = item.hasRecommendations();
+			ViewUtils.setVisible(panelRecommendations, hasRecommendations);
+
+			if(hasRecommendations) {
+				showRecommendations(item, order, menu);
 			}
 
 			if(isRecommendationsVisible()) {
@@ -131,9 +126,6 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
 				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
-			}
-			if(b) {
-				showRecommendations(item, order, menu);
 			}
 		}
 
@@ -148,28 +140,30 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			btnApply.setTag(item);
 			btnApply.setTag(R.id.position, position);
 
-			final boolean recommendationsAdded = item.hasRecommendations() &&
+			final boolean hasRecommendations = item.hasRecommendations();
+
+			final boolean recommendationsAdded = hasRecommendations &&
 					panelRecommendations.getChildCount() == item.recommendations().size() + 2;
 
-			if(!showRecommendations) {
+			final boolean skipRecommendations = !showRecommendations || !hasRecommendations;
+			if(skipRecommendations) {
 				ViewUtils.setVisible(panelRecommendations, false);
 			} else {
-				if(!isRecommendationsVisible() && item.hasRecommendations() && !recommendationsAdded) {
+				if(!isRecommendationsVisible() && hasRecommendations && !recommendationsAdded) {
 					ViewUtils.setVisible(panelRecommendations, false);
 				}
-			}
-
-			if(showRecommendations) {
-				if(isRecommendationsVisible()) {
-					if(!recommendationsAdded) {
-						ViewUtils.setVisible(panelRecommendations, true);
-						showRecommendations(item, order, menu);
+				if(showRecommendations) {
+					if(isRecommendationsVisible()) {
+						if(!recommendationsAdded) {
+							ViewUtils.setVisible(panelRecommendations, true);
+							showRecommendations(item, order, menu);
+						} else {
+							updateRecommendations(order, menu);
+						}
 					} else {
-						updateRecommendations(order, menu);
-					}
-				} else {
-					if(recommendationsAdded) {
-						removeRecommendations(panelRecommendations, true);
+						if(recommendationsAdded) {
+							removeRecommendations(panelRecommendations, true);
+						}
 					}
 				}
 			}
