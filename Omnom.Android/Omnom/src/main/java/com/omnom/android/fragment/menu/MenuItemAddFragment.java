@@ -21,6 +21,7 @@ import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.Modifiers;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -30,7 +31,8 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class MenuItemAddFragment extends BaseFragment {
+public class MenuItemAddFragment extends BaseFragment implements ExpandableListView.OnGroupCollapseListener, ExpandableListView
+		.OnGroupExpandListener {
 
 	public static final int CONTENT_TRANSITION_Y = 800;
 
@@ -90,6 +92,14 @@ public class MenuItemAddFragment extends BaseFragment {
 	private Modifiers mModifiers;
 
 	private MenuModifiersAdapter adapter;
+
+	private View mView;
+
+	private boolean mBusy = false;
+
+	private int mAnimationDuration;
+
+	private int mModifierHeight;
 
 	public MenuItemAddFragment() {
 		// Required empty public constructor
@@ -167,6 +177,7 @@ public class MenuItemAddFragment extends BaseFragment {
 
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
+		mView = view;
 		List<Modifier> dishModifiers = new ArrayList<Modifier>();
 		if(BuildConfig.DEBUG) {
 			// TODO: Debug code - remove it when done
@@ -181,8 +192,48 @@ public class MenuItemAddFragment extends BaseFragment {
 			dishModifiers = mItem.modifiers();
 		}
 
+		mAnimationDuration = getResources().getInteger(R.integer.default_animation_duration_quick);
+		mModifierHeight = getResources().getDimensionPixelSize(R.dimen.menu_modifier_height);
+
 		adapter = new MenuModifiersAdapter(view.getContext(), mModifiers, dishModifiers);
 		mExpandableListView.setAdapter(adapter);
+		mExpandableListView.setDivider(null);
+		mExpandableListView.setDividerHeight(0);
+
+		mExpandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+			@Override
+			public boolean onGroupClick(ExpandableListView parent, View v, final int groupPosition, long id) {
+				if(mBusy) {
+					// fail fast
+					return true;
+				}
+				mBusy = true;
+
+				final int childrenCount = adapter.getChildrenCount(groupPosition);
+				final int itemsHeight = childrenCount * mModifierHeight;
+				if(mExpandableListView.isGroupExpanded(groupPosition)) {
+					AnimationUtils.scaleHeight(mExpandableListView, mExpandableListView.getHeight() - itemsHeight,
+					                           new Runnable() {
+						                           @Override
+						                           public void run() {
+							                           mExpandableListView.collapseGroup(groupPosition);
+							                           mBusy = false;
+						                           }
+					                           }, mAnimationDuration);
+
+				} else {
+					AnimationUtils.scaleHeight(mExpandableListView, mExpandableListView.getHeight() + itemsHeight,
+					                           new Runnable() {
+						                           @Override
+						                           public void run() {
+							                           mExpandableListView.expandGroup(groupPosition, true);
+							                           mBusy = false;
+						                           }
+					                           }, mAnimationDuration);
+				}
+				return true;
+			}
+		});
 		refreshUi();
 	}
 
@@ -221,4 +272,15 @@ public class MenuItemAddFragment extends BaseFragment {
 	private void refreshUi() {
 		txtCount.setText(Integer.toString(mCount));
 	}
+
+	@Override
+	public void onGroupCollapse(final int groupPosition) {
+		mView.requestLayout();
+	}
+
+	@Override
+	public void onGroupExpand(final int groupPosition) {
+		mView.requestLayout();
+	}
+
 }
