@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.view.View;
 
 import com.google.zxing.client.android.CaptureActivity;
@@ -13,6 +14,7 @@ import com.omnom.android.R;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
+import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
@@ -36,6 +38,8 @@ import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
 
 public class ValidateActivityCamera extends ValidateActivity {
 	public static final String DEVICE_ID_GENYMOTION = "000000000000000";
@@ -240,33 +244,56 @@ public class ValidateActivityCamera extends ValidateActivity {
 	}
 
 	private void loadTable(final String data) {
-		Observable<RestaurantResponse> restaurantObservable;
+		final Observable<RestaurantResponse> restaurantObservable;
 		if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction())) {
 			restaurantObservable = api.decode(new HashDecodeRequest(data), mPreloadBackgroundFunction);
 		} else {
 			restaurantObservable = api.decode(new QrDecodeRequest(data), mPreloadBackgroundFunction);
 		}
+
+		final Observable<Pair<RestaurantResponse, MenuResponse>> pairObservable = restaurantObservable.mergeMap(
+				new Func1<RestaurantResponse, Observable<MenuResponse>>() {
+					@Override
+					public Observable<MenuResponse> call(final RestaurantResponse restaurantResponse) {
+						if(restaurantResponse.hasOnlyRestaurant()) {
+							final Restaurant restaurant = restaurantResponse.getRestaurants().get(0);
+							return menuApi.getMenu(restaurant.id());
+						}
+						return Observable.empty();
+					}
+				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
+					@Override
+					public Pair<RestaurantResponse, MenuResponse> call(final RestaurantResponse restaurant, final MenuResponse menu) {
+						mMenu = menu;
+						return Pair.create(restaurant, menu);
+					}
+				});
+
 		mCheckQrSubscribtion = AndroidObservable
-				.bindActivity(this, restaurantObservable).subscribe(
-						new Action1<RestaurantResponse>() {
-							@Override
-							public void call(final RestaurantResponse decodeResponse) {
-								if(decodeResponse.hasAuthError()) {
-									throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
-									                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
-									                                             decodeResponse.getError()));
-								}
-								if(!TextUtils.isEmpty(decodeResponse.getError())) {
-									mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
-								} else {
-									if(isExternalLaunch()) {
-										handleExternalLaunchResult(decodeResponse);
-									} else {
-										handleDecodeResponse(OnTableMixpanelEvent.METHOD_QR, decodeResponse);
-									}
-								}
+				.bindActivity(this, pairObservable)
+				.subscribe(new Action1<Pair<RestaurantResponse, MenuResponse>>() {
+					@Override
+					public void call(final Pair<RestaurantResponse, MenuResponse> restaurantResponseMenuResponsePair) {
+						if(mMenu != null) {
+							menuCategories.bindData(mMenu.getMenu());
+						}
+						final RestaurantResponse decodeResponse = restaurantResponseMenuResponsePair.first;
+						if(decodeResponse.hasAuthError()) {
+							throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
+							                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
+							                                             decodeResponse.getError()));
+						}
+						if(!TextUtils.isEmpty(decodeResponse.getError())) {
+							mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
+						} else {
+							if(isExternalLaunch()) {
+								handleExternalLaunchResult(decodeResponse);
+							} else {
+								handleDecodeResponse(OnTableMixpanelEvent.METHOD_QR, decodeResponse);
 							}
-						}, onError);
+						}
+					}
+				}, onError);
 	}
 
 	protected void handleExternalLaunchResult(final RestaurantResponse decodeResponse) {

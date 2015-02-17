@@ -85,6 +85,8 @@ public class LoaderView extends FrameLayout {
 
 	private Transformation mScaleTransformation;
 
+	private int mDefaultLoaderSize = -1;
+
 	@SuppressWarnings("UnusedDeclaration")
 	public LoaderView(Context context) {
 		super(context);
@@ -142,8 +144,7 @@ public class LoaderView extends FrameLayout {
 			}
 		};
 
-		final DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
-		loaderSize = (int) (displayMetrics.widthPixels * LOADER_WIDTH_SCALE + 0.5);
+		loaderSize = getLoaderSizeDefault();
 		updateProgressSize(loaderSize);
 
 		currentColor = getDefaultBgColor();
@@ -170,6 +171,14 @@ public class LoaderView extends FrameLayout {
 			public void afterTextChanged(Editable s) {
 			}
 		});
+	}
+
+	public int getLoaderSizeDefault() {
+		if(mDefaultLoaderSize == -1) {
+			final DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+			mDefaultLoaderSize = (int) (displayMetrics.widthPixels * LOADER_WIDTH_SCALE + 0.5);
+		}
+		return mDefaultLoaderSize;
 	}
 
 	private void updateProgressSize(final int loaderSize) {
@@ -299,7 +308,7 @@ public class LoaderView extends FrameLayout {
 
 	public void scaleDown(int size, final long duration, final boolean scaleLogo, final Runnable endAction) {
 		AnimationUtils.scale(mImgLoader, size, duration, endAction);
-		if (scaleLogo) {
+		if(scaleLogo) {
 			AnimationUtils.scale(mImgLogo, size, duration, new Runnable() {
 				@Override
 				public void run() {
@@ -323,13 +332,13 @@ public class LoaderView extends FrameLayout {
 
 	public void scaleUp(final long duration, final Runnable endCallback) {
 		scaleUp(duration,
-				mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
-				false, endCallback);
+		        mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
+		        false, endCallback);
 	}
 
 	public void scaleUp(final long duration, final int size, final boolean scaleLogo, final Runnable endCallback) {
 		AnimationUtils.scale(mImgLoader, size, duration, endCallback);
-		if (scaleLogo) {
+		if(scaleLogo) {
 			AnimationUtils.scale(mImgLogo, size, duration, new Runnable() {
 				@Override
 				public void run() {
@@ -343,6 +352,12 @@ public class LoaderView extends FrameLayout {
 		AnimationUtils.scale(mImgLoader,
 		                     mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
 		                     endCallback);
+	}
+
+	public void scaleUp() {
+		AnimationUtils.scale(mImgLoader,
+		                     mImgLoader.getMeasuredWidth() * getResources().getInteger(R.integer.loader_scale_factor),
+		                     null);
 	}
 
 	@DebugLog
@@ -376,7 +391,7 @@ public class LoaderView extends FrameLayout {
 		}
 		mImgLogo.setTag(R.id.img_loader, resId);
 		mImgLogo.setTag(R.id.logo_url, null);
-		if (duration == 0) {
+		if(duration == 0) {
 			mImgLogo.setImageResource(resId);
 		} else {
 			AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {
@@ -456,7 +471,7 @@ public class LoaderView extends FrameLayout {
 		resetMargins(mImgLogo);
 	}
 
-	private  void resetMargins(final View view) {
+	private void resetMargins(final View view) {
 		MarginLayoutParams layoutParams = (MarginLayoutParams) view.getLayoutParams();
 		layoutParams.setMargins(0, 0, 0, 0);
 	}
@@ -575,7 +590,7 @@ public class LoaderView extends FrameLayout {
 	@DebugLog
 	public void animateLogo(final Bitmap bitmap, long duration) {
 		mImgLogo.setTag(R.id.img_loader, 0);
-		if (duration == 0) {
+		if(duration == 0) {
 			mImgLogo.setImageBitmap(bitmap);
 		} else {
 			AnimationUtils.animateAlpha(mImgLogo, false, new Runnable() {

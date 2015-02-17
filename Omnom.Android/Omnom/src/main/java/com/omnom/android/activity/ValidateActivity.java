@@ -11,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -27,7 +28,6 @@ import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.fragment.NoOrdersFragment;
-import com.omnom.android.fragment.menu.MenuFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.api.observable.MenuObservableApi;
 import com.omnom.android.menu.model.Item;
@@ -62,6 +62,8 @@ import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
+import com.omnom.android.view.MenuCategoriesView;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -88,7 +90,7 @@ import static butterknife.ButterKnife.findById;
 /**
  * Created by Ch3D on 08.10.2014.
  */
-public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
+public abstract class ValidateActivity extends BaseOmnomFragmentActivity implements FragmentManager.OnBackStackChangedListener {
 
 	public static final int REQUEST_CODE_ORDERS = 100;
 
@@ -208,14 +210,17 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@InjectView(R.id.btn_bottom)
 	protected View btnErrorRepeat;
 
+	@InjectView(R.id.sliding_layout)
+	protected SlidingUpPanelLayout slidingPanel;
+
+	@InjectView(R.id.menu_categories)
+	protected MenuCategoriesView menuCategories;
+
 	@InjectView(R.id.txt_bottom)
 	protected TextView txtErrorRepeat;
 
 	@InjectView(R.id.btn_demo)
 	protected View btnDemo;
-
-	@InjectView(R.id.txt_menu)
-	protected TextView txtMenu;
 
 	@InjectView(R.id.btn_down)
 	protected Button btnDownPromo;
@@ -265,6 +270,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBackgroundFunction;
 
+	@Nullable
+	protected MenuResponse mMenu;
+
 	/**
 	 * ConfirmPhoneActivity.TYPE_LOGIN or ConfirmPhoneActivity.TYPE_REGISTER
 	 */
@@ -289,6 +297,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	private PaymentEventListener mPaymentListener;
 
 	private UserOrder mOrder;
+
+	private Object mUserOrder;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -410,12 +420,47 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	@OnClick(R.id.btn_previous)
 	public void onPrevious(View v) {
-		RestaurantsListActivity.startLeft(ValidateActivity.this);
+		if(slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+			collapseSlidingPanel();
+		} else {
+			RestaurantsListActivity.startLeft(ValidateActivity.this);
+		}
+	}
+
+	private void collapseSlidingPanel() {slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);}
+
+	@Override
+	public void onBackPressed() {
+		if(getSupportFragmentManager().getBackStackEntryCount() == 0
+				&& slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+			collapseSlidingPanel();
+		} else {
+			super.onBackPressed();
+		}
 	}
 
 	@Override
 	public void initUi() {
+		getSupportFragmentManager().addOnBackStackChangedListener(this);
+
 		mOrder = insureOrder();
+		slidingPanel.getBackground().setAlpha(0);
+		slidingPanel.setPanelSlideListener(menuCategories);
+		menuCategories.setSlideListener(new MenuCategoriesView.SlideListener() {
+			@Override
+			public void onPanelSlide(final View panel, final float slideOffset) {
+				slidingPanel.getBackground().setAlpha((int) (slideOffset * 255));
+				final float loaderFactor = 1.0f - slideOffset;
+				if(loaderFactor < 0.85f) {
+					AnimationUtils.animateAlpha(imgProfile, false);
+					loader.hideLogo();
+				} else {
+					AnimationUtils.animateAlpha(imgProfile, true);
+					loader.showLogo();
+				}
+				loader.scaleDown((int) (loader.getLoaderSizeDefault() * loaderFactor), 0, null);
+			}
+		});
 
 		loader.setLogo(R.drawable.ic_fork_n_knife);
 		loader.setColor(getResources().getColor(R.color.loader_bg));
@@ -512,7 +557,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}
 	}
 
-	private UserOrder insureOrder() {
+	protected final UserOrder insureOrder() {
 		if(mOrder == null) {
 			mOrder = UserOrder.create();
 		}
@@ -540,25 +585,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	protected abstract void startLoader();
 
-	@OnClick(R.id.txt_menu)
-	public void onMenu(View v) {
-		final View viewMenu = findViewById(R.id.txt_menu);
-		viewMenu.setEnabled(false);
-		menuApi.getMenu(mRestaurant.id()).subscribe(new Action1<MenuResponse>() {
-			@Override
-			public void call(final MenuResponse menuResponse) {
-				viewMenu.setEnabled(true);
-				MenuFragment.show(getSupportFragmentManager(), mRestaurant, menuResponse.getMenu(), insureOrder());
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(final Throwable throwable) {
-				viewMenu.setEnabled(true);
-				Log.e(TAG, "getMenu()", throwable);
-			}
-		});
-	}
-
 	public void onBill(final View v) {
 		final int backStackFragmentCount = getSupportFragmentManager().getBackStackEntryCount();
 		if(backStackFragmentCount > 0) {
@@ -567,11 +593,25 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			}
 		}
 
+		if(slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+			collapseSlidingPanel();
+			postDelayed(getResources().getInteger(R.integer.default_animation_duration_medium), new Runnable() {
+				@Override
+				public void run() {
+					onBillInner(v);
+				}
+			});
+		} else {
+			onBillInner(v);
+		}
+	}
+
+	private void onBillInner(final View v) {
 		v.setEnabled(false);
 		hideProfile();
 		ViewUtils.setVisible(imgPrevious, false);
-		ViewUtils.setVisible(txtMenu, false);
 		ViewUtils.setVisible(getPanelBottom(), false);
+		ViewUtils.setVisible(slidingPanel, false);
 		ViewUtils.setVisible(txtLeave, false);
 		loader.setLogo(R.drawable.ic_bill_white_normal);
 		loader.startProgressAnimation(10000, new Runnable() {
@@ -673,9 +713,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		configureScreen(mRestaurant);
 		updateLightProfile(!mIsDemo);
 		ViewUtils.setVisible(imgPrevious, !mIsDemo);
-		ViewUtils.setVisible(txtMenu, true);
 		ViewUtils.setVisible(txtLeave, mIsDemo);
 		ViewUtils.setVisible(getPanelBottom(), true);
+		ViewUtils.setVisible(slidingPanel, true);
 	}
 
 	private void showNoOrdersInfo() {
@@ -771,9 +811,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 							@Override
 							public void run() {
 								ViewUtils.setVisible(getPanelBottom(), true);
+								ViewUtils.setVisible(slidingPanel, true);
 								updateLightProfile(!mIsDemo);
 								ViewUtils.setVisible(imgPrevious, !mIsDemo);
-								ViewUtils.setVisible(txtMenu, true);
 								ViewUtils.setVisible(txtLeave, mIsDemo);
 								loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
 								loader.showLogo();
@@ -821,9 +861,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 				configureScreen(mRestaurant);
 				updateLightProfile(!mIsDemo);
 				ViewUtils.setVisible(imgPrevious, !mIsDemo);
-				ViewUtils.setVisible(txtMenu, true);
 				ViewUtils.setVisible(txtLeave, mIsDemo);
 				ViewUtils.setVisible(getPanelBottom(), true);
+				ViewUtils.setVisible(slidingPanel, true);
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
 				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
 				if(forwardToBill) {
@@ -1048,7 +1088,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	public void changeTable() {
 		clearErrors(true);
 		AnimationUtils.animateAlpha(imgPrevious, false);
-		AnimationUtils.animateAlpha(txtMenu, false);
 		bottomView.animate().translationY(bottomView.getHeight());
 		loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 		AnimationUtils.animateAlpha(imgProfile, false);
@@ -1059,5 +1098,18 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 				                       ConfirmPhoneActivity.TYPE_DEFAULT);
 			}
 		});
+	}
+
+	public UserOrder getUserOrder() {
+		return insureOrder();
+	}
+
+	@Override
+	public void onBackStackChanged() {
+		if(getSupportFragmentManager() != null && getSupportFragmentManager().getBackStackEntryCount() == 0) {
+			ViewUtils.setVisible(imgPrevious, true);
+		} else {
+			ViewUtils.setVisible(imgPrevious, false);
+		}
 	}
 }

@@ -29,7 +29,6 @@ import com.omnom.android.fragment.BillSplitPersonsFragment;
 import com.omnom.android.fragment.EnteringFragment;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.fragment.SplashFragment;
-import com.omnom.android.fragment.menu.MenuFragment;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.fragment.menu.MenuSubcategoryFragment;
@@ -53,7 +52,7 @@ import dagger.Module;
 		BackgroundBleService.class,
 		/* fragments */
 		SplashFragment.class, EnteringFragment.class,
-		OrderFragment.class, MenuItemAddFragment.class, MenuFragment.class, MenuSubcategoryFragment.class, MenuItemDetailsFragment.class,
+		OrderFragment.class, MenuItemAddFragment.class, MenuSubcategoryFragment.class, MenuItemDetailsFragment.class,
 		BillSplitFragment.class, BillItemsFragment.class, BillSplitPersonsFragment.class},
         complete = false)
 public class OmnomApplicationModule {}
