@@ -63,6 +63,8 @@ public class Order implements Parcelable {
 	private int paidAmount;
 	@Expose
 	private int paidTip;
+	@Expose
+	private List<Transaction> transactions = new ArrayList<Transaction>();
 
 	public Order(final Parcel parcel) {
 		guests = parcel.readInt();
@@ -83,6 +85,7 @@ public class Order implements Parcelable {
 		tips = parcel.readParcelable(OrderTips.class.getClassLoader());
 		paidAmount = parcel.readInt();
 		paidTip = parcel.readInt();
+		parcel.readTypedList(transactions, Transaction.CREATOR);
 	}
 
 	@Override
@@ -105,6 +108,7 @@ public class Order implements Parcelable {
 		parcel.writeParcelable(tips, flags);
 		parcel.writeInt(paidAmount);
 		parcel.writeInt(paidTip);
+		parcel.writeTypedList(transactions);
 	}
 
 	public int getGuests() {
@@ -241,6 +245,14 @@ public class Order implements Parcelable {
 
 	public void setPaidAmount(int paidAmount) {
 		this.paidAmount = paidAmount;
+	}
+
+	public List<Transaction> getTransactions() {
+		return transactions;
+	}
+
+	public void setTransactions(List<Transaction> transactions) {
+		this.transactions = transactions;
 	}
 
 	@Override

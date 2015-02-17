@@ -44,6 +44,10 @@ public class AmountHelper {
 		return format(value.doubleValue());
 	}
 
+	public static String format(final int value) {
+		return format(toDouble(value));
+	}
+
 	public static String format(final double value) {
 		if (value == (long) value) {
 			return String.format("%d", (long) value);

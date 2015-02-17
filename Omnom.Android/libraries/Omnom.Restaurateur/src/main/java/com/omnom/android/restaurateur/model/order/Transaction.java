@@ -23,6 +23,12 @@ public class Transaction implements Parcelable {
 	};
 
 	@Expose
+	private int userId;
+
+	@Expose
+	private int orderId;
+
+	@Expose
 	private int amount;
 
 	@Expose
@@ -37,9 +43,32 @@ public class Transaction implements Parcelable {
 		this.tip = tip;
 	}
 
+	public Transaction(int userId, int amount, int tip) {
+		this(amount, tip);
+		this.userId = userId;
+	}
+
 	public Transaction(Parcel parcel) {
+		userId = parcel.readInt();
+		orderId = parcel.readInt();
 		amount = parcel.readInt();
 		tip = parcel.readInt();
+	}
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
+	public int getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
 	}
 
 	public int getTip() {
@@ -65,6 +94,8 @@ public class Transaction implements Parcelable {
 
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
+		dest.writeInt(userId);
+		dest.writeInt(orderId);
 		dest.writeInt(amount);
 		dest.writeInt(tip);
 	}

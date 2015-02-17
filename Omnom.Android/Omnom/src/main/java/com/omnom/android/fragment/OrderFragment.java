@@ -30,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -40,6 +41,7 @@ import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapterSimple;
+import com.omnom.android.adapter.OrderPayersAdapter;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
@@ -53,6 +55,7 @@ import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
+import com.omnom.android.restaurateur.model.order.Transaction;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.utils.AmountHelper;
@@ -72,7 +75,12 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.inject.Inject;
 
@@ -85,6 +93,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 import static butterknife.ButterKnife.findById;
 
 public class OrderFragment extends Fragment {
+
 	public static final int MODE_AMOUNT = 0;
 
 	public static final int MODE_TIPS = 1;
@@ -108,6 +117,8 @@ public class OrderFragment extends Fragment {
 	public static final int PICKER_MIN_VALUE = 0;
 
 	public static final int PICKER_DEFAULT_VALUE = 10;
+
+	public static final int PAYER_INFO_DELAY = 3000;
 
 	public static class TipData {
 
@@ -296,6 +307,10 @@ public class OrderFragment extends Fragment {
 
 	private char decimalSeparator;
 
+	private Timer timer;
+
+	private TimerTask showPayersTask;
+
 	public OrderFragment() {
 	}
 
@@ -397,17 +412,7 @@ public class OrderFragment extends Fragment {
 		mOrder = order;
 		mAdapter.updateItems(mOrder.getItems());
 		AndroidUtils.scrollEnd(list);
-		final double paidAmount = order.getPaidAmount();
-		if(txtAlreadyPaid != null) {
-			if(paidAmount > 0) {
-				txtAlreadyPaid.setText(getString(R.string.already_paid, AmountHelper.format(paidAmount) + getCurrencySuffix()));
-				if(!isEditMode) {
-					ViewUtils.setVisible2(txtAlreadyPaid, true);
-				}
-			} else {
-				ViewUtils.setVisible2(txtAlreadyPaid, false);
-			}
-		}
+		initPayersList();
 		if(!isAmountModified && editAmount != null) {
 			editAmount.setText(AmountHelper.format(order.getAmountToPay()) + getCurrencySuffix());
 			final BigDecimal amount = getEnteredAmount();
@@ -576,6 +581,7 @@ public class OrderFragment extends Fragment {
 			viewsAmountShow.add(btnCancel);
 
 			initAmount();
+			initPayersList();
 			updateCustomTipsText(0);
 			initKeyboardListener();
 			initRadioButtons();
@@ -744,14 +750,66 @@ public class OrderFragment extends Fragment {
 			}
 		});
 
+		editAmount.setText(AmountHelper.format(mOrder.getAmountToPay()) + getCurrencySuffix());
+	}
+
+	private void initPayersList() {
 		final double paidAmount = mOrder.getPaidAmount();
-		if(paidAmount > 0) {
+		if(txtAlreadyPaid != null && paidAmount > 0) {
 			txtAlreadyPaid.setText(getString(R.string.already_paid, AmountHelper.format(paidAmount) + getCurrencySuffix()));
-			ViewUtils.setVisible2(txtAlreadyPaid, true);
+			final List<Transaction> transactions = mOrder.getTransactions();
+			if (transactions != null && !transactions.isEmpty()) {
+				if (showPayersTask != null) {
+					showPayersTask.cancel();
+				}
+				final List<Transaction> payments = getPayments(transactions);
+				showPayersTask = new ShowPayersTask(payments);
+				timer.schedule(showPayersTask, PAYER_INFO_DELAY, PAYER_INFO_DELAY);
+				txtAlreadyPaid.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						showPaymentsDialog(payments);
+					}
+				});
+			}
+			if(!isEditMode) {
+				ViewUtils.setVisible2(txtAlreadyPaid, true);
+			}
 		} else {
 			ViewUtils.setVisible2(txtAlreadyPaid, false);
 		}
-		editAmount.setText(AmountHelper.format(mOrder.getAmountToPay()) + getCurrencySuffix());
+	}
+
+	private void showPaymentsDialog(final List<Transaction> payments) {
+		ListView listView = new ListView(getActivity());
+		listView.setDivider(null);
+		listView.setPadding((int) getResources().getDimension(R.dimen.activity_horizontal_margin),
+							0,
+							(int) getResources().getDimension(R.dimen.activity_horizontal_margin),
+							(int) getResources().getDimension(R.dimen.activity_horizontal_margin));
+		listView.setAdapter(new OrderPayersAdapter(getActivity(), payments, getCurrencySuffix()));
+		AndroidUtils.showDialog(getActivity(), R.string.already_paid_title, listView,
+				R.string.ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+	}
+
+	private List<Transaction> getPayments(final List<Transaction> transactions) {
+		Map<Integer, Integer> amountByUser = new HashMap<Integer, Integer>();
+		for (Transaction transaction: transactions) {
+			final Integer totalAmount = amountByUser.get(transaction.getUserId());
+			final Integer transactionAmount = transaction.getAmount() - transaction.getTip();
+			amountByUser.put(transaction.getUserId(), totalAmount == null ? transactionAmount : totalAmount + transactionAmount);
+		}
+		List<Transaction> payments = new LinkedList<Transaction>();
+		for (Integer userId: amountByUser.keySet()) {
+			payments.add(new Transaction(userId, amountByUser.get(userId), 0));
+		}
+
+		return payments;
 	}
 
 	private void updatePayButton(final BigDecimal amount, final CompoundButton selectedTipsButton) {
@@ -984,6 +1042,10 @@ public class OrderFragment extends Fragment {
 		getPanelPayment().animate().yBy(visible ? -mTipsTranslationY : mTipsTranslationY).start();
 		editMode(visible);
 
+		if (showPayersTask != null) {
+			showPayersTask.cancel();
+		}
+
 		ViewUtils.setVisible(editAmount, !visible);
 
 		ViewUtils.setVisible(pickerTips, visible);
@@ -1060,6 +1122,7 @@ public class OrderFragment extends Fragment {
 			otherTips.setTag(pickerTips.getValue());
 			final BigDecimal amount = getEnteredAmount();
 			updatePaymentTipsAmount(amount);
+			initPayersList();
 		}
 	}
 
@@ -1076,6 +1139,7 @@ public class OrderFragment extends Fragment {
 			showCustomTips(false);
 			radioGroup.check(mCheckedId);
 			updateTipsButtonState(otherTips);
+			initPayersList();
 		}
 	}
 
@@ -1168,6 +1232,7 @@ public class OrderFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		timer = new Timer();
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mRequestId = getArguments().getString(ARG_REQUEST_ID);
@@ -1175,6 +1240,20 @@ public class OrderFragment extends Fragment {
 			mAnimate = getArguments().getBoolean(ARG_ANIMATE, false);
 			mSingle = getArguments().getBoolean(ARG_SINGLE, false);
 			mPosition = getArguments().getInt(ARG_POSITION);
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		initPayersList();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		if (showPayersTask != null) {
+			showPayersTask.cancel();
 		}
 	}
 
@@ -1213,6 +1292,55 @@ public class OrderFragment extends Fragment {
 
 	private void amountModified(final boolean isModified) {
 		isAmountModified = isModified;
+	}
+
+	private class ShowPayersTask extends TimerTask {
+
+		private static final String PAYER_FORMAT = "%s    %s";
+
+		private final List<Transaction> payments;
+		private int position = 0;
+
+		public ShowPayersTask(final List<Transaction> payments) {
+			this.payments = payments;
+		}
+
+		@Override
+		public void run() {
+			final Activity activity = getActivity();
+			if (activity != null) {
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						if (txtAlreadyPaid != null) {
+							String text;
+							if (position < 0) {
+								text = getString(R.string.already_paid, AmountHelper.format(mOrder.getPaidAmount()) + getCurrencySuffix());
+							} else {
+								final Transaction transaction = payments.get(position);
+								text = String.format(PAYER_FORMAT, transaction.getUserId(),
+										AmountHelper.format(transaction.getAmount()) + getCurrencySuffix());
+							}
+							final String newText = text;
+							AnimationUtils.animateFadeTextChange(
+									txtAlreadyPaid,
+									newText,
+									new Runnable() {
+										@Override
+										public void run() {
+											if (position + 1 == payments.size()) {
+												position = -1;
+											} else {
+												position = (position + 1) % payments.size();
+											}
+										}
+									}, getResources().getInteger(R.integer.default_animation_duration_long));
+						}
+					}
+				});
+			}
+		}
+
 	}
 
 }

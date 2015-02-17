@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingTop="@dimen/activity_horizontal_margin">
+
+    <TextView
+        android:id="@+id/txt_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/txt_amount"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+        />
+
+    <TextView
+        android:id="@+id/txt_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:singleLine="true"
+        android:textColor="@color/info_hint"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+        />
+
+</RelativeLayout>

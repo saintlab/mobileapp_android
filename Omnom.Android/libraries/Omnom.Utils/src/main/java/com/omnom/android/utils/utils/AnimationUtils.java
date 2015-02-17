@@ -10,6 +10,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.widget.TextView;
 
 import com.omnom.android.utils.R;
 
@@ -97,6 +98,17 @@ public class AnimationUtils {
 				setInterpolator(new AccelerateDecelerateInterpolator()).
 				setListener(new OmnomAnimatorListenerAdapter(view, callback)).
 				alpha(visible ? 1 : 0).start();
+	}
+
+	public static void animateFadeTextChange(final TextView textView, final String newText, final Runnable callback, long duration) {
+		final int halfDuration = (int) (duration / 2.0);
+		animateAlpha2(textView, false, new Runnable() {
+			@Override
+			public void run() {
+				textView.setText(newText);
+				animateAlpha2(textView, true, callback, halfDuration);
+			}
+		}, halfDuration);
 	}
 
 	public static void translateUp(final Context context, final Iterable<View> views, final int translation, final Runnable endCallback) {
