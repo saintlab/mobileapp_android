@@ -123,6 +123,15 @@ public class MenuFragment extends BaseFragment implements FragmentManager.OnBack
 
 	@OnItemClick(android.R.id.list)
 	public void onListItemClick(final int position) {
+		if(getFragmentManager() == null) {
+			return;
+		}
+
+		if(getFragmentManager().getBackStackEntryCount() > 1) {
+			// skip click when another fragment is active
+			return;
+		}
+
 		getFragmentManager().addOnBackStackChangedListener(this);
 		mSelectedView = mListView.getChildAt(position);
 
