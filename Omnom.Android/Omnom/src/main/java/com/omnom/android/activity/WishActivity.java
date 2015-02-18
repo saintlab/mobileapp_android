@@ -106,6 +106,8 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	private SwingBottomInAnimationAdapter swAdapter;
 
+	private boolean mOrderChanged = false;
+
 	@OnClick(R.id.txt_close)
 	public void onClose() {
 		finish();
@@ -113,16 +115,25 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	@OnClick(R.id.btn_bill)
 	public void onBill() {
-		setResult(RESULT_BILL | (mClear ? RESULT_CLEARED : RESULT_OK));
+		setResult(RESULT_BILL | (mClear ? RESULT_CLEARED : RESULT_OK), getResultData());
 		super.finish();
 		overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 	}
 
 	@Override
 	public void finish() {
-		setResult(mClear ? RESULT_CLEARED : RESULT_OK);
+		setResult(mClear ? RESULT_CLEARED : RESULT_OK, getResultData());
 		super.finish();
 		overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
+	}
+
+	private Intent getResultData() {
+		if(mOrderChanged) {
+			final Intent data = new Intent();
+			data.putExtra(EXTRA_ORDER, mOrder);
+			return data;
+		}
+		return null;
 	}
 
 	@Override
@@ -160,7 +171,8 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 			case R.id.txt_price:
 				final UserOrderData orderData = (UserOrderData) v.getTag();
-				MenuItemAddFragment.show(getSupportFragmentManager(), R.id.fragment_container, mMenu.modifiers(), mOrder, orderData.item());
+				MenuItemAddFragment.show(getSupportFragmentManager(), R.id.fragment_container, mMenu.modifiers(), mOrder,
+				                         orderData.item());
 				break;
 		}
 	}
@@ -170,6 +182,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		if(mOrder == null) {
 			return;
 		}
+		mOrderChanged = true;
 		final Item item = event.getItem();
 		mOrder.itemsTable().put(item.id(), UserOrderData.create(event.getCount(), item));
 		mAdapter.notifyDataSetChanged();
