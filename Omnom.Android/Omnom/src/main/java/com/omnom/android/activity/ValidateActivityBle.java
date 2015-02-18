@@ -167,6 +167,7 @@ public class ValidateActivityBle extends ValidateActivity {
 					                                           @Override
 					                                           public void call(final Pair<RestaurantResponse, MenuResponse> pair) {
 						                                           bindMenuData();
+						                                           System.err.println(">>>>>>");
 						                                           RestaurantResponse response = pair.first;
 						                                           if(response.hasErrors()) {
 							                                           startErrorTransition();

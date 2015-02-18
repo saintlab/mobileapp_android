@@ -1,5 +1,7 @@
 package com.omnom.android.menu.model;
 
+import android.support.annotation.Nullable;
+
 import com.google.gson.annotations.Expose;
 
 /**
@@ -10,6 +12,7 @@ public class MenuResponse {
 	@Expose
 	private Menu menu;
 
+	@Nullable
 	public Menu getMenu() {
 		return menu;
 	}

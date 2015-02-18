@@ -1126,7 +1126,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 							final Restaurant restaurant = restaurantResponse.getRestaurants().get(0);
 							return menuApi.getMenu(restaurant.id());
 						}
-						return Observable.empty();
+						return Observable.from(new MenuResponse());
 					}
 				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
 					@Override
