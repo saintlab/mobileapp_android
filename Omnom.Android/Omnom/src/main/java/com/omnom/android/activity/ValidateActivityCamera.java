@@ -125,8 +125,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 		}
 
 		if(BuildConfig.DEBUG) {
-			findTable("http://omnom.menu/qr/88cfdcbedcbdf4e4b330824ba9dba92b");
-			return;
+			//findTable("http://omnom.menu/qr/88cfdcbedcbdf4e4b330824ba9dba92b");
+			//return;
 		}
 
 		if(BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {

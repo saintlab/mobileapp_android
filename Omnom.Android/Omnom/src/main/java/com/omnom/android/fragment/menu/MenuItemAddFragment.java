@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
-import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.adapter.MenuModifiersAdapter;
 import com.omnom.android.fragment.base.BaseFragment;
@@ -23,7 +22,6 @@ import com.omnom.android.menu.model.Modifiers;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.utils.utils.AnimationUtils;
-import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -185,18 +183,18 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
 		mView = view;
 		List<Modifier> dishModifiers = new ArrayList<Modifier>();
-		if(BuildConfig.DEBUG) {
-			// TODO: Debug code - remove it when done
-			final ArrayList<String> idList = new ArrayList<String>();
-			idList.add("28-in-saintlab-rkeeper-v6");
-			idList.add("15-in-saintlab-rkeeper-v6");
-			final Modifier modifier = Modifier.create(StringUtils.EMPTY_STRING, "Кухня-1", idList, "multiselect");
-			final Modifier modifier2 = Modifier.create("15-in-saintlab-rkeeper-v6", "checkbox");
-			dishModifiers.add(modifier2);
-			dishModifiers.add(modifier);
-		} else {
+		//if(BuildConfig.DEBUG) {
+		//	// TODO: Debug code - remove it when done
+		//	final ArrayList<String> idList = new ArrayList<String>();
+		//	idList.add("28-in-saintlab-rkeeper-v6");
+		//	idList.add("15-in-saintlab-rkeeper-v6");
+		//	final Modifier modifier = Modifier.create(StringUtils.EMPTY_STRING, "Кухня-1", idList, "multiselect");
+		//	final Modifier modifier2 = Modifier.create("15-in-saintlab-rkeeper-v6", "checkbox");
+		//	dishModifiers.add(modifier2);
+		//	dishModifiers.add(modifier);
+		//} else {
 			dishModifiers = mItem.modifiers();
-		}
+		//}
 
 		mAnimationDuration = getResources().getInteger(R.integer.default_animation_duration_quick);
 		mModifierHeight = getResources().getDimensionPixelSize(R.dimen.menu_modifier_height);

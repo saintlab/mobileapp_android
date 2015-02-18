@@ -86,6 +86,7 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 
 	private Modifiers mModifiers;
 
+	@Nullable
 	private List<Modifier> mModifierList;
 
 	public MenuModifiersAdapter(Context context, Modifiers modifiers, List<Modifier> modifiersList) {
@@ -97,7 +98,7 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 
 	@Override
 	public int getGroupCount() {
-		return mModifierList.size();
+		return mModifierList == null ? 0 : mModifierList.size();
 	}
 
 	@Override
