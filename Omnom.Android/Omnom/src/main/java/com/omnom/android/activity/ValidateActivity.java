@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewStub;
 import android.view.animation.DecelerateInterpolator;
@@ -31,6 +32,7 @@ import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.api.observable.MenuObservableApi;
 import com.omnom.android.menu.model.Item;
+import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
@@ -84,6 +86,7 @@ import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 import static butterknife.ButterKnife.findById;
 
@@ -271,7 +274,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBackgroundFunction;
 
 	@Nullable
-	protected MenuResponse mMenu;
+	protected Menu mMenu;
 
 	/**
 	 * ConfirmPhoneActivity.TYPE_LOGIN or ConfirmPhoneActivity.TYPE_REGISTER
@@ -1030,7 +1033,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 		}
 	}
 
-	protected void handleHashRestaurants(final String requestId, final Restaurant restaurant) {
+	protected void handleHashRestaurants(final String requestId, final Restaurant restaurant, final Menu menu) {
 
 	}
 
@@ -1110,6 +1113,33 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 			ViewUtils.setVisible(imgPrevious, true);
 		} else {
 			ViewUtils.setVisible(imgPrevious, false);
+		}
+	}
+
+	protected Observable<Pair<RestaurantResponse, MenuResponse>> concatMenuObservable(final Observable<RestaurantResponse>
+			                                                                                  restaurantObservable) {
+		return restaurantObservable.mergeMap(
+				new Func1<RestaurantResponse, Observable<MenuResponse>>() {
+					@Override
+					public Observable<MenuResponse> call(final RestaurantResponse restaurantResponse) {
+						if(restaurantResponse.hasOnlyRestaurant()) {
+							final Restaurant restaurant = restaurantResponse.getRestaurants().get(0);
+							return menuApi.getMenu(restaurant.id());
+						}
+						return Observable.empty();
+					}
+				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
+					@Override
+					public Pair<RestaurantResponse, MenuResponse> call(final RestaurantResponse restaurant, final MenuResponse menu) {
+						mMenu = menu.getMenu();
+						return Pair.create(restaurant, menu);
+					}
+				});
+	}
+
+	protected void bindMenuData() {
+		if(mMenu != null) {
+			menuCategories.bindData(mMenu);
 		}
 	}
 }

@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.omnom.android.R;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
+import com.omnom.android.menu.model.Menu;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
@@ -39,9 +40,11 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 	}
 
 	@Override
-	protected void handleHashRestaurants(final String requestId, final Restaurant restaurant) {
+	protected void handleHashRestaurants(final String requestId, final Restaurant restaurant, final Menu menu) {
 		TableDataResponse table = RestaurantHelper.getTable(restaurant);
 		reportMixPanel(requestId, OnTableMixpanelEvent.METHOD_HASH, table);
+		mMenu = menu;
+		bindMenuData();
 		onDataLoaded(restaurant, table, RestaurantHelper.hasOrders(restaurant), requestId);
 	}
 

@@ -14,6 +14,7 @@ import com.omnom.android.R;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
+import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
@@ -38,8 +39,6 @@ import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
 
 public class ValidateActivityCamera extends ValidateActivity {
 	public static final String DEVICE_ID_GENYMOTION = "000000000000000";
@@ -125,10 +124,10 @@ public class ValidateActivityCamera extends ValidateActivity {
 			return;
 		}
 
-		if(BuildConfig.DEBUG) {
-			findTable("http://omnom.menu/qr/a756a5a61fd8edc4d92bb92e8dcd87ea");
-			return;
-		}
+		//if(BuildConfig.DEBUG) {
+		//	findTable("http://omnom.menu/qr/a756a5a61fd8edc4d92bb92e8dcd87ea");
+		//	return;
+		//}
 
 		if(BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
 			// findTable("http://www.riston.ru/wishes"); // mehico
@@ -194,7 +193,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 			} else if(resultCode == OmnomQRCaptureActivity.RESULT_RESTAURANT_FOUND) {
 				final String requestId = data.getExtras().getString(EXTRA_REQUEST_ID);
 				final Restaurant restaurant = data.getExtras().getParcelable(EXTRA_RESTAURANT);
-				handleHashRestaurants(requestId, restaurant);
+				final Menu menu = data.getExtras().getParcelable(EXTRA_RESTAURANT_MENU);
+				handleHashRestaurants(requestId, restaurant, menu);
 			} else {
 				finish();
 			}
@@ -251,38 +251,18 @@ public class ValidateActivityCamera extends ValidateActivity {
 			restaurantObservable = api.decode(new QrDecodeRequest(data), mPreloadBackgroundFunction);
 		}
 
-		final Observable<Pair<RestaurantResponse, MenuResponse>> pairObservable = restaurantObservable.mergeMap(
-				new Func1<RestaurantResponse, Observable<MenuResponse>>() {
-					@Override
-					public Observable<MenuResponse> call(final RestaurantResponse restaurantResponse) {
-						if(restaurantResponse.hasOnlyRestaurant()) {
-							final Restaurant restaurant = restaurantResponse.getRestaurants().get(0);
-							return menuApi.getMenu(restaurant.id());
-						}
-						return Observable.empty();
-					}
-				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
-					@Override
-					public Pair<RestaurantResponse, MenuResponse> call(final RestaurantResponse restaurant, final MenuResponse menu) {
-						mMenu = menu;
-						return Pair.create(restaurant, menu);
-					}
-				});
-
 		mCheckQrSubscribtion = AndroidObservable
-				.bindActivity(this, pairObservable)
+				.bindActivity(this, concatMenuObservable(restaurantObservable))
 				.subscribe(new Action1<Pair<RestaurantResponse, MenuResponse>>() {
 					@Override
 					public void call(final Pair<RestaurantResponse, MenuResponse> restaurantResponseMenuResponsePair) {
-						if(mMenu != null) {
-							menuCategories.bindData(mMenu.getMenu());
-						}
 						final RestaurantResponse decodeResponse = restaurantResponseMenuResponsePair.first;
 						if(decodeResponse.hasAuthError()) {
 							throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
 							                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
 							                                             decodeResponse.getError()));
 						}
+						bindMenuData();
 						if(!TextUtils.isEmpty(decodeResponse.getError())) {
 							mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
 						} else {

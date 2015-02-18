@@ -4,10 +4,12 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
+import android.util.Pair;
 import android.view.View;
 
 import com.omnom.android.R;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
+import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.OnTableMixpanelEvent;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
@@ -30,6 +32,7 @@ import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
 import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
@@ -153,16 +156,18 @@ public class ValidateActivityBle extends ValidateActivity {
 		final Runnable endCallback = new Runnable() {
 			@Override
 			public void run() {
-				mFindBeaconSubscription = AndroidObservable.bindActivity(ValidateActivityBle.this,
-				                                                         api.decode(new BeaconDecodeRequest(
-						                                                         getResources().getInteger(
-								                                                         R.integer.ble_scan_duration),
-						                                                         Collections.unmodifiableList(mBeacons)
-				                                                         ), mPreloadBackgroundFunction)
-				                                                        )
-				                                           .subscribe(new Action1<RestaurantResponse>() {
+				final Observable<RestaurantResponse> decodeObservable = api.decode(new BeaconDecodeRequest(
+						                                                                   getResources().getInteger(
+								                                                                   R.integer.ble_scan_duration),
+						                                                                   Collections.unmodifiableList(mBeacons)),
+				                                                                   mPreloadBackgroundFunction);
+
+				mFindBeaconSubscription = AndroidObservable.bindActivity(ValidateActivityBle.this, concatMenuObservable(decodeObservable))
+				                                           .subscribe(new Action1<Pair<RestaurantResponse, MenuResponse>>() {
 					                                           @Override
-					                                           public void call(final RestaurantResponse response) {
+					                                           public void call(final Pair<RestaurantResponse, MenuResponse> pair) {
+						                                           bindMenuData();
+						                                           RestaurantResponse response = pair.first;
 						                                           if(response.hasErrors()) {
 							                                           startErrorTransition();
 							                                           mErrorHelper.showErrorDemo(
