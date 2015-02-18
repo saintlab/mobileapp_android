@@ -28,8 +28,16 @@
             android:layout_height="28dp"
             android:layout_marginRight="@dimen/header_view_horizontal_margin"
             android:layout_gravity="center_vertical|right"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/panel_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+        <include layout="@layout/layout_bill" />
     </FrameLayout>
 
     <ListView
@@ -39,6 +47,7 @@
         android:animateLayoutChanges="true"
         android:listSelector="@color/transparent"
         android:layout_below="@+id/panel_top"
+        android:layout_above="@+id/panel_bottom"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

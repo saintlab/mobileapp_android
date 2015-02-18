@@ -5,6 +5,8 @@
     <integer name="default_animation_duration_short">350</integer>
     <integer name="default_animation_duration_quick">150</integer>
 
+    <integer name="default_menu_to_bill_step_duration">800</integer>
+
     <integer name="not_scanning_animation_duration">250</integer>
 
     <integer name="listview_animation_delay">500</integer>

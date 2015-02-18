@@ -15,6 +15,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin_large"
         android:paddingRight="@dimen/activity_horizontal_margin_large"
         android:text="@string/your_order"
+        android:visibility="gone"
         android:textColor="@color/profile_hint"
         android:background="@drawable/btn_rounded_bordered_grey"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />

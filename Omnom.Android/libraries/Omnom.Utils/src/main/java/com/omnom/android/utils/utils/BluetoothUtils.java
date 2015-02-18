@@ -3,7 +3,6 @@ package com.omnom.android.utils.utils;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Build;
 
 import hugo.weaving.DebugLog;
@@ -14,7 +13,8 @@ import hugo.weaving.DebugLog;
 public class BluetoothUtils {
 
 	public static boolean hasBleSupport(Context context) {
-		return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
+		//return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
+		return false;
 	}
 
 	@DebugLog

@@ -40,6 +40,10 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	public static int RESULT_CLEARED = 1;
 
+	public static int RESULT_BILL = 2;
+
+	public static int RESULT_OK = 4;
+
 	public static void start(OmnomActivity activity, Restaurant restaurant, UserOrder order, int code) {
 		final Intent intent = new Intent(activity.getActivity(), WishActivity.class);
 		intent.putExtra(EXTRA_ORDER, order);
@@ -96,6 +100,13 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	@OnClick(R.id.txt_close)
 	public void onClose() {
 		finish();
+	}
+
+	@OnClick(R.id.btn_bill)
+	public void onBill() {
+		setResult(RESULT_BILL | (mClear ? RESULT_CLEARED : RESULT_OK));
+		super.finish();
+		overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 	}
 
 	@Override

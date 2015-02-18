@@ -73,6 +73,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -84,6 +85,7 @@ import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -599,34 +601,44 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 	protected abstract void startLoader();
 
 	public void onBill(final View v) {
-		final int backStackFragmentCount = getSupportFragmentManager().getBackStackEntryCount();
-		if(backStackFragmentCount > 0) {
-			for(int i = 0; i < backStackFragmentCount; i++) {
-				getSupportFragmentManager().popBackStack();
-			}
-		}
+		final int fragmentsCount = getSupportFragmentManager().getBackStackEntryCount();
+		final int startDelay = getResources().getInteger(R.integer.default_animation_duration_quick);
+		final int stepDelay = getResources().getInteger(R.integer.default_menu_to_bill_step_duration);
+		final int animationSteps = 2;
 
+		Observable.timer(startDelay, stepDelay, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+		          .take(fragmentsCount + animationSteps)
+		          .subscribe(new Action1<Long>() {
+			          @Override
+			          public void call(final Long aLong) {
+				          if(aLong < fragmentsCount) {
+					          getSupportFragmentManager().popBackStack();
+				          } else {
+					          if(aLong == fragmentsCount) {
+						          onBillStep1(v);
+					          }
+					          if(aLong == fragmentsCount + 1) {
+						          onBillStep2(v);
+					          }
+				          }
+			          }
+		          });
+	}
+
+	private void onBillStep1(final View v) {
 		if(slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
 			collapseSlidingPanel();
-			postDelayed(getResources().getInteger(R.integer.default_animation_duration_medium), new Runnable() {
-				@Override
-				public void run() {
-					onBillInner(v);
-				}
-			});
-		} else {
-			onBillInner(v);
 		}
 	}
 
-	private void onBillInner(final View v) {
+	private void onBillStep2(final View v) {
 		v.setEnabled(false);
 		hideProfile();
 		ViewUtils.setVisible(imgPrevious, false);
 		ViewUtils.setVisible(getPanelBottom(), false);
 		ViewUtils.setVisible(slidingPanel, false);
 		ViewUtils.setVisible(txtLeave, false);
-		loader.setLogo(R.drawable.ic_bill_white_normal);
+		loader.animateLogo(R.drawable.ic_bill_white_normal);
 		loader.startProgressAnimation(10000, new Runnable() {
 			@Override
 			public void run() {
@@ -807,6 +819,12 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 		if(requestCode == REQUEST_CODE_WISH_LIST) {
 			if(resultCode == WishActivity.RESULT_CLEARED) {
 				mOrder.itemsTable().clear();
+			}
+			if((resultCode & WishActivity.RESULT_CLEARED) == WishActivity.RESULT_CLEARED) {
+				mOrder.itemsTable().clear();
+			}
+			if((resultCode & WishActivity.RESULT_BILL) == WishActivity.RESULT_BILL) {
+				onBill(findViewById(R.id.btn_bill));
 			}
 		}
 		if(requestCode == REQUEST_CODE_CHANGE_TABLE && resultCode == RESULT_CODE_TABLE_CHANGED) {
