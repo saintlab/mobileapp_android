@@ -1011,7 +1011,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 	}
 
 	private void onOrder() {
-		WishActivity.start(this, mRestaurant, insureOrder(), REQUEST_CODE_WISH_LIST);
+		WishActivity.start(this, mRestaurant, mMenu, insureOrder(), REQUEST_CODE_WISH_LIST);
 	}
 
 	public View getPanelBottom() {

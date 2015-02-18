@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.menu.model.Item;
+import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.utils.utils.StringUtils;
@@ -79,7 +80,7 @@ public class WishListAdapter extends BaseAdapter {
 
 	private final Context mContext;
 
-	private final List<UserOrderData> mWishItems;
+	private final UserOrder mOrder;
 
 	private final List<Item> mTableItems;
 
@@ -87,12 +88,13 @@ public class WishListAdapter extends BaseAdapter {
 
 	private View.OnClickListener mClickListener;
 
-	public WishListAdapter(Context context, List<UserOrderData> wishItems, List<Item> tableItems, View.OnClickListener clickListener) {
+	private List<UserOrderData> _lazy_selected_data;
+
+	public WishListAdapter(Context context, UserOrder order, List<Item> tableItems, View.OnClickListener clickListener) {
 		mClickListener = clickListener;
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
-		mWishItems = wishItems;
-		mWishItems.add(new UserOrderDataFooter());
+		mOrder = order;
 		mTableItems = tableItems;
 	}
 
@@ -115,14 +117,29 @@ public class WishListAdapter extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		return mWishItems.size() + mTableItems.size();
+		return getSelectedItems().size() + mTableItems.size();
+	}
+
+	private List<UserOrderData> getSelectedItems() {
+		if(_lazy_selected_data == null) {
+			final List<UserOrderData> selectedItems = mOrder.getSelectedItems();
+			selectedItems.add(new UserOrderDataFooter());
+			_lazy_selected_data = selectedItems;
+		}
+		return _lazy_selected_data;
+	}
+
+	@Override
+	public void notifyDataSetChanged() {
+		_lazy_selected_data = null;
+		super.notifyDataSetChanged();
 	}
 
 	@Override
 	public Object getItem(final int position) {
-		final int wishSize = mWishItems.size();
+		final int wishSize = getSelectedItems().size();
 		if(position < wishSize) {
-			return mWishItems.get(position);
+			return getSelectedItems().get(position);
 		}
 		return mTableItems.get(position - wishSize);
 	}
@@ -178,6 +195,8 @@ public class WishListAdapter extends BaseAdapter {
 				final String price = StringUtils.formatCurrency(data.item().price(), mContext.getString(
 						R.string.currency_suffix_ruble));
 				holder.txtPrice.setText(mContext.getString(R.string.wish_items_price_detailed, data.amount(), price));
+				holder.txtPrice.setTag(data);
+				holder.txtPrice.setOnClickListener(mClickListener);
 				MenuHelper.bindDetails(mContext, data.item().details(), holder.txtInfo, false);
 				break;
 
@@ -186,7 +205,7 @@ public class WishListAdapter extends BaseAdapter {
 				final Button btnSend = (Button) convertView.findViewById(R.id.btn_send);
 				btnClear.setOnClickListener(mClickListener);
 				btnSend.setOnClickListener(mClickListener);
-				final boolean enabled = mWishItems.size() > 1;
+				final boolean enabled = getSelectedItems().size() > 1;
 				btnClear.setEnabled(enabled);
 				btnSend.setEnabled(enabled);
 				break;
@@ -194,7 +213,7 @@ public class WishListAdapter extends BaseAdapter {
 	}
 
 	public void remove(final Object tag) {
-		mWishItems.remove(tag);
+		getSelectedItems().remove(tag);
 		mTableItems.remove(tag);
 	}
 }

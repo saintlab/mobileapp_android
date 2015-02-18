@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -53,13 +54,18 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 	}
 
 	public static void show(final FragmentManager fragmentManager, Modifiers modifiers, final UserOrder order, final Item item) {
+		show(fragmentManager, R.id.root, modifiers, order, item);
+	}
+
+	public static void show(final FragmentManager fragmentManager, @IdRes int containerId, Modifiers modifiers, final UserOrder order,
+	                        final Item item) {
 		fragmentManager.beginTransaction()
 		               .addToBackStack(null)
 		               .setCustomAnimations(R.anim.fade_in,
 		                                    R.anim.nothing_long,
 		                                    R.anim.fade_in,
 		                                    R.anim.nothing_long)
-		               .add(R.id.root, MenuItemAddFragment.newInstance(modifiers, order, item))
+		               .add(containerId, MenuItemAddFragment.newInstance(modifiers, order, item))
 		               .commit();
 	}
 

@@ -11,7 +11,10 @@ import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationA
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.WishListAdapter;
+import com.omnom.android.fragment.menu.MenuItemAddFragment;
+import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.Item;
+import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
@@ -25,6 +28,7 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
+import com.squareup.otto.Subscribe;
 
 import java.util.Collections;
 
@@ -44,10 +48,11 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	public static int RESULT_OK = 4;
 
-	public static void start(OmnomActivity activity, Restaurant restaurant, UserOrder order, int code) {
+	public static void start(OmnomActivity activity, Restaurant restaurant, Menu menu, UserOrder order, int code) {
 		final Intent intent = new Intent(activity.getActivity(), WishActivity.class);
 		intent.putExtra(EXTRA_ORDER, order);
 		intent.putExtra(EXTRA_RESTAURANT, restaurant);
+		intent.putExtra(EXTRA_RESTAURANT_MENU, menu);
 		activity.startForResult(intent, R.anim.slide_in_up, R.anim.nothing, code);
 	}
 
@@ -97,6 +102,10 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	private String TAG = WishActivity.class.getSimpleName();
 
+	private Menu mMenu;
+
+	private SwingBottomInAnimationAdapter swAdapter;
+
 	@OnClick(R.id.txt_close)
 	public void onClose() {
 		finish();
@@ -121,15 +130,16 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		super.handleIntent(intent);
 		mOrder = intent.getParcelableExtra(EXTRA_ORDER);
 		mRestaurant = intent.getParcelableExtra(EXTRA_RESTAURANT);
+		mMenu = intent.getParcelableExtra(EXTRA_RESTAURANT_MENU);
 	}
 
 	@Override
 	public void initUi() {
 		ViewUtils.setVisible(mProgressBar, false);
-		mAdapter = new WishListAdapter(this, mOrder.getSelectedItems(), Collections.EMPTY_LIST, this);
-		final SwingBottomInAnimationAdapter adapter = new SwingBottomInAnimationAdapter(mAdapter);
-		adapter.setAbsListView(mList);
-		mList.setAdapter(adapter);
+		mAdapter = new WishListAdapter(this, mOrder, Collections.EMPTY_LIST, this);
+		swAdapter = new SwingBottomInAnimationAdapter(mAdapter);
+		swAdapter.setAbsListView(mList);
+		mList.setAdapter(swAdapter);
 	}
 
 	@Override
@@ -139,12 +149,31 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	@Override
 	public void onClick(final View v) {
-		if(v.getId() == R.id.btn_clear) {
-			doClear();
+		switch(v.getId()) {
+			case R.id.btn_clear:
+				doClear();
+				break;
+
+			case R.id.btn_send:
+				doWish();
+				break;
+
+			case R.id.txt_price:
+				final UserOrderData orderData = (UserOrderData) v.getTag();
+				MenuItemAddFragment.show(getSupportFragmentManager(), R.id.fragment_container, mMenu.modifiers(), mOrder, orderData.item());
+				break;
 		}
-		if(v.getId() == R.id.btn_send) {
-			doWish();
+	}
+
+	@Subscribe
+	public void onOrderUpdate(OrderUpdateEvent event) {
+		if(mOrder == null) {
+			return;
 		}
+		final Item item = event.getItem();
+		mOrder.itemsTable().put(item.id(), UserOrderData.create(event.getCount(), item));
+		mAdapter.notifyDataSetChanged();
+		swAdapter.notifyDataSetChanged();
 	}
 
 	@Override
