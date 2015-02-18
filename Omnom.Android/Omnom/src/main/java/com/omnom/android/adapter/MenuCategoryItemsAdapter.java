@@ -62,6 +62,16 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 		@InjectView(R.id.txt_title)
 		protected TextView txtTitle;
 
+		@InjectView(R.id.txt_description)
+		@Optional
+		@Nullable
+		protected TextView txtDescription;
+
+		@InjectView(R.id.panel_description)
+		@Optional
+		@Nullable
+		protected View panelDescription;
+
 		@InjectView(R.id.delimiter)
 		@Optional
 		protected View viewDelimiter;
@@ -136,6 +146,8 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 
 			bindDetails(item, detailed);
 			bindImage(item);
+			bindDescription(item);
+
 			txtTitle.setText(item.name());
 			btnApply.setTag(item);
 			btnApply.setTag(R.id.position, position);
@@ -174,6 +186,13 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
 				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
+			}
+		}
+
+		private void bindDescription(final Item item) {
+			if(panelDescription != null) {
+				ViewUtils.setVisible(panelDescription, item.hasDescription());
+				txtDescription.setText(item.description() + "..");
 			}
 		}
 

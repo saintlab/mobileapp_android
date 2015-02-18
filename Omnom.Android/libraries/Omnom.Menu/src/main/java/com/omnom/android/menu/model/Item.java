@@ -2,6 +2,7 @@ package com.omnom.android.menu.model;
 
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.omnom.android.utils.generation.AutoGson;
 import com.omnom.android.utils.utils.StringUtils;
@@ -49,6 +50,10 @@ public abstract class Item implements Parcelable {
 
 	@Nullable
 	public abstract List<String> recommendations();
+
+	public boolean hasDescription() {
+		return !TextUtils.isEmpty(description());
+	}
 
 	public boolean hasRecommendations() {
 		return recommendations() != null && recommendations().size() > 0;
