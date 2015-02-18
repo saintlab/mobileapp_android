@@ -347,15 +347,25 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 		if(mOrder == null || btnOrder == null) {
 			return;
 		}
+
 		final BigDecimal totalAmount = mOrder.getTotalPrice();
-		if(mOrder != null && totalAmount.compareTo(BigDecimal.ZERO) > 0) {
+		final boolean hasWishItems = mOrder != null && totalAmount.compareTo(BigDecimal.ZERO) > 0;
+
+		if(hasWishItems) {
+			ViewUtils.setVisible(btnOrder, true);
 			btnOrder.setText(StringUtils.formatCurrency(totalAmount, getString(R.string.currency_suffix_ruble)));
 			btnOrder.setTextColor(Color.WHITE);
 			btnOrder.setBackgroundResource(R.drawable.btn_rounded_blue);
 		} else {
+			ViewUtils.setVisible(btnOrder, false);
 			btnOrder.setTextColor(Color.GRAY);
 			btnOrder.setText(getString(R.string.your_order));
 			btnOrder.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
+		}
+
+		if(bottomView != null) {
+			View btnBill = findById(bottomView, R.id.btn_bill);
+			ViewUtils.setVisible(btnBill, !hasWishItems);
 		}
 	}
 
@@ -979,6 +989,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 
 		ViewUtils.setVisible(btnDownPromo, promoEnabled);
 		// getPanelBottom().setTranslationY(100);
+		updateWishUi();
 	}
 
 	private void onOrder() {
