@@ -488,6 +488,10 @@ public class LoaderView extends FrameLayout {
 		}
 	}
 
+	public ValueAnimator startProgressAnimation(long duration) {
+		return startProgressAnimation(duration, null);
+	}
+
 	public ValueAnimator startProgressAnimation(long duration, final Runnable callback) {
 		final int limit = (mProgressBar.getMax() / 100) * getResources().getInteger(R.integer.loader_limit_percentage);
 		mProgressAnimator = ObjectAnimator.ofInt(0, limit);

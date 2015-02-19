@@ -2,6 +2,7 @@ package com.omnom.android.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -35,6 +36,8 @@ public class MenuCategoriesView extends FrameLayout implements SlidingUpPanelLay
 	public static final int DURATION_INCREMENT_MOVE_DOWN = 50;
 
 	public static final int TITLE_PADDING_TOP = 8;
+
+	private static final String TAG = MenuCategoriesView.class.getSimpleName();
 
 	@InjectView(android.R.id.list)
 	protected OmnomListView mList;
@@ -154,6 +157,10 @@ public class MenuCategoriesView extends FrameLayout implements SlidingUpPanelLay
 	}
 
 	public void bindData(final Menu menu) {
+		if(menu == null || menu.isEmpty()) {
+			Log.d(TAG, "Skip empty menu binding");
+			return;
+		}
 		mMenu = menu;
 		View header = LayoutInflater.from(getContext()).inflate(R.layout.item_menu_categories_header, null);
 		mList.addHeaderView(header, null, false);

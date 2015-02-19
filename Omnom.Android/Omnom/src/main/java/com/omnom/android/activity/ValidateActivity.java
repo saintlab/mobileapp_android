@@ -1026,16 +1026,33 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 	protected boolean validateDemo() {
 		if(mIsDemo) {
 			if(mRestaurant == null || mTable == null) {
-				loader.startProgressAnimation(10000, new Runnable() {
+				loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration));
+				api.getDemoTable().mergeMap(
+						new Func1<List<DemoTableData>, Observable<MenuResponse>>() {
+							@Override
+							public Observable<MenuResponse> call(final List<DemoTableData> demoTableResponse) {
+								if(demoTableResponse.size() > 0) {
+									final DemoTableData demoTableData = demoTableResponse.get(0);
+									if(demoTableData != null && demoTableData.getRestaurant() != null) {
+										return menuApi.getMenu(demoTableData.getRestaurant().id());
+									}
+								}
+								return Observable.from(new MenuResponse());
+							}
+						}, new Func2<List<DemoTableData>, MenuResponse, Pair<List<DemoTableData>, MenuResponse>>() {
+							@Override
+							public Pair<List<DemoTableData>, MenuResponse> call(final List<DemoTableData> restaurant,
+							                                                    final MenuResponse menu) {
+								mMenu = menu.getMenu();
+								return Pair.create(restaurant, menu);
+							}
+						}).subscribe(new Action1<Pair<List<DemoTableData>, MenuResponse>>() {
 					@Override
-					public void run() {
-					}
-				});
-				api.getDemoTable().subscribe(new Action1<List<DemoTableData>>() {
-					@Override
-					public void call(final List<DemoTableData> response) {
-						final DemoTableData data = response.get(0);
+					public void call(final Pair<List<DemoTableData>, MenuResponse> listMenuResponsePair) {
+						final List<DemoTableData> demoTableResponse = listMenuResponsePair.first;
+						final DemoTableData data = demoTableResponse.get(0);
 						onDataLoaded(data.getRestaurant(), data.getTable());
+						bindMenuData();
 					}
 				}, onError);
 				mFirstRun = false;
@@ -1172,8 +1189,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 	}
 
 	protected void bindMenuData() {
-		if(mMenu != null) {
-			menuCategories.bindData(mMenu);
-		}
+		slidingPanel.setTouchEnabled(mMenu != null && !mMenu.isEmpty());
+		menuCategories.bindData(mMenu);
 	}
 }

@@ -43,4 +43,9 @@ public abstract class Menu implements Parcelable {
 		}
 		return result;
 	}
+
+	public boolean isEmpty() {
+		final List<Category> filledCategories = getFilledCategories();
+		return filledCategories == null || filledCategories.size() == 0;
+	}
 }
