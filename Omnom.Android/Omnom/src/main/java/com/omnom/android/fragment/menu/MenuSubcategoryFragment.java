@@ -10,13 +10,12 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
-import android.widget.AdapterView;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 
 import com.omnom.android.R;
 import com.omnom.android.adapter.MenuCategoryItemsAdapter;
 import com.omnom.android.fragment.base.BaseFragment;
-import com.omnom.android.menu.model.Category;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.UserOrder;
@@ -24,7 +23,6 @@ import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
-import com.omnom.android.utils.view.StickyListView;
 import com.squareup.otto.Subscribe;
 
 import butterknife.ButterKnife;
@@ -61,7 +59,7 @@ public class MenuSubcategoryFragment extends BaseFragment implements View.OnClic
 	}
 
 	@InjectView(android.R.id.list)
-	protected StickyListView mListView;
+	protected ExpandableListView mListView;
 
 	@InjectView(R.id.btn_back)
 	protected ImageView mImgBack;
@@ -72,7 +70,7 @@ public class MenuSubcategoryFragment extends BaseFragment implements View.OnClic
 
 	private int mPosition;
 
-	private MenuCategoryItemsAdapter mAdapter;
+	// private MenuCategoryItemsAdapter mAdapter;
 
 	private float mPivotY;
 
@@ -80,13 +78,13 @@ public class MenuSubcategoryFragment extends BaseFragment implements View.OnClic
 	public void onOrderUpdate(OrderUpdateEvent event) {
 		final Item item = event.getItem();
 		mOrder.itemsTable().put(item.id(), UserOrderData.create(event.getCount(), item));
-		mAdapter.notifyDataSetChanged();
+		// mAdapter.notifyDataSetChanged();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		mAdapter.notifyDataSetChanged();
+		// mAdapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -148,39 +146,39 @@ public class MenuSubcategoryFragment extends BaseFragment implements View.OnClic
 		super.onViewCreated(view, savedInstanceState);
 		ButterKnife.inject(this, view);
 
-		final Category category = mMenu.categories().get(mPosition);
-		mAdapter = new MenuCategoryItemsAdapter(this, mMenu, mOrder, category, mMenu.items().items(), new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				final Item recommendedItem = (Item) v.getTag(R.id.item);
-				final Integer pos = (Integer) v.getTag(R.id.position);
-				if(recommendedItem != null) {
-					if(pos != null && pos >= 0) {
-						mListView.smoothScrollToPositionFromTop(pos, 0);
-					}
-					showAddFragment(recommendedItem);
-				}
-			}
-		}, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				showDetails((Item) v.getTag(R.id.item));
-			}
-		});
+		//final Category category = mMenu.categories().get(mPosition);
+		//mAdapter = new MenuCategoryItemsAdapter(this, mMenu, mOrder, category, mMenu.items().items(), new View.OnClickListener() {
+		//	@Override
+		//	public void onClick(final View v) {
+		//		final Item recommendedItem = (Item) v.getTag(R.id.item);
+		//		final Integer pos = (Integer) v.getTag(R.id.position);
+		//		if(recommendedItem != null) {
+		//			if(pos != null && pos >= 0) {
+		//				mListView.smoothScrollToPositionFromTop(pos, 0);
+		//			}
+		//			showAddFragment(recommendedItem);
+		//		}
+		//	}
+		//}, new View.OnClickListener() {
+		//	@Override
+		//	public void onClick(final View v) {
+		//		showDetails((Item) v.getTag(R.id.item));
+		//	}
+		//});
 
-		mListView.setAdapter(mAdapter);
-		mListView.setShadowVisible(false);
-		mListView.setDividerHeight(0);
-		mListView.setDivider(null);
-		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-				if(mAdapter == null || mOrder == null) {
-					return;
-				}
-				showDetails(mAdapter.getItem(position));
-			}
-		});
+		mListView.setAdapter(new MenuAdapterTop(getActivity(), mMenu));
+		// mListView.setShadowVisible(false);
+		//mListView.setDividerHeight(0);
+		//mListView.setDivider(null);
+		//mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		//	@Override
+		//	public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+		//		if(mAdapter == null || mOrder == null) {
+		//			return;
+		//		}
+		//		showDetails(mAdapter.getItem(position));
+		//	}
+		//});
 	}
 
 	private void showDetails(final Item item) {
@@ -205,17 +203,17 @@ public class MenuSubcategoryFragment extends BaseFragment implements View.OnClic
 
 	@Override
 	public void onClick(final View v) {
-		if(v.getId() == R.id.btn_apply) {
-			final Integer pos = (Integer) v.getTag(R.id.position);
-			if(pos != null && pos >= 0) {
-				if(pos > 0 && mAdapter.getItemViewType(pos - 1) == MenuCategoryItemsAdapter.VIEW_TYPE_HEADER) {
-					mListView.smoothScrollToPositionFromTop(pos, ViewUtils.dipToPixels(v.getContext(), 48));
-				} else {
-					mListView.smoothScrollToPositionFromTop(pos, 0);
-				}
-			}
-			showAddFragment((Item) v.getTag());
-		}
+		//if(v.getId() == R.id.btn_apply) {
+		//	final Integer pos = (Integer) v.getTag(R.id.position);
+		//	if(pos != null && pos >= 0) {
+		//		if(pos > 0 && mAdapter.getItemViewType(pos - 1) == MenuCategoryItemsAdapter.VIEW_TYPE_HEADER) {
+		//			mListView.smoothScrollToPositionFromTop(pos, ViewUtils.dipToPixels(v.getContext(), 48));
+		//		} else {
+		//			mListView.smoothScrollToPositionFromTop(pos, 0);
+		//		}
+		//	}
+		//	showAddFragment((Item) v.getTag());
+		//}
 	}
 
 }

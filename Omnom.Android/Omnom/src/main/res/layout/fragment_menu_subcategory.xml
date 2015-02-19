@@ -22,16 +22,11 @@
 
     </RelativeLayout>
 
-    <FrameLayout
+    <ExpandableListView
+        android:id="@android:id/list"
         android:background="@android:color/white"
         android:layout_below="@+id/panel_top"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.omnom.android.utils.view.StickyListView
-            android:id="@android:id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </FrameLayout>
+        android:layout_height="match_parent" />
 
 </RelativeLayout>
