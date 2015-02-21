@@ -179,7 +179,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	@OnClick(R.id.btn_apply)
 	public void onApply() {
-		MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, mItem);
+		MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, mItem, -1);
 	}
 
 	@Override
@@ -187,7 +187,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		if(v.getId() == R.id.btn_apply) {
 			final Item item = (Item) v.getTag(R.id.item);
 			if(item != null) {
-				MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, item);
+				MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, item, -1);
 			}
 		}
 	}

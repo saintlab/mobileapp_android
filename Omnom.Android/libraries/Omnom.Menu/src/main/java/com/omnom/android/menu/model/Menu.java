@@ -48,4 +48,11 @@ public abstract class Menu implements Parcelable {
 		final List<Category> filledCategories = getFilledCategories();
 		return filledCategories == null || filledCategories.size() == 0;
 	}
+
+	public Item findItem(final String id) {
+		if(items() != null && items().items() != null) {
+			return items().items().get(id);
+		}
+		return null;
+	}
 }

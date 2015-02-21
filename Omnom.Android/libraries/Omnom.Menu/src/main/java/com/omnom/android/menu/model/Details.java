@@ -35,7 +35,7 @@ public abstract class Details implements Parcelable {
 	}
 
 	@Nullable
-	public abstract int weight();
+	public abstract double weight();
 
 	@Nullable
 	public abstract int cookingTime();

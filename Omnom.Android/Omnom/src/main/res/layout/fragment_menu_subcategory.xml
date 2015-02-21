@@ -22,11 +22,13 @@
 
     </RelativeLayout>
 
-    <ExpandableListView
-        android:id="@android:id/list"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/content_recyclerview"
+        android:scrollbars="vertical"
         android:background="@android:color/white"
         android:layout_below="@+id/panel_top"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:paddingBottom="2dp" />
 
 </RelativeLayout>

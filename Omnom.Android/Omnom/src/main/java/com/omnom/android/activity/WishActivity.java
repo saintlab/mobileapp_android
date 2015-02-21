@@ -172,7 +172,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 			case R.id.txt_price:
 				final UserOrderData orderData = (UserOrderData) v.getTag();
 				MenuItemAddFragment.show(getSupportFragmentManager(), R.id.fragment_container, mMenu.modifiers(), mOrder,
-				                         orderData.item());
+				                         orderData.item(), -1);
 				break;
 		}
 	}

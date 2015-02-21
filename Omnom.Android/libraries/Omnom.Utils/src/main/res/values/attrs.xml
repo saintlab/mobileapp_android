@@ -5,6 +5,6 @@
     </declare-styleable>
 
     <declare-styleable name="MultiplyImageView">
-        <attr name="color" format="color"/>
+        <attr name="multiplyColor" format="color"/>
     </declare-styleable>
 </resources>

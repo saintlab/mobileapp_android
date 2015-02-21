@@ -10,9 +10,12 @@ public class OrderUpdateEvent {
 
 	private final int mCount;
 
-	public OrderUpdateEvent(final Item item, final int count) {
+	private int mPosition;
+
+	public OrderUpdateEvent(final Item item, final int count, final int position) {
 		mItem = item;
 		mCount = count;
+		mPosition = position;
 	}
 
 	public Item getItem() {
@@ -21,5 +24,9 @@ public class OrderUpdateEvent {
 
 	public int getCount() {
 		return mCount;
+	}
+
+	public int getPosition() {
+		return mPosition;
 	}
 }

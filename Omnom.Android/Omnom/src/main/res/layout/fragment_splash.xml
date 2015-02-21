@@ -11,7 +11,7 @@
         android:src="@drawable/bg_wood"
         android:layout_gravity="center"
         android:scaleType="fitXY"
-        omnom:color="@color/loader_bg"/>
+        omnom:multiplyColor="@color/loader_bg"/>
 
     <ImageView
         android:id="@+id/img_bg"

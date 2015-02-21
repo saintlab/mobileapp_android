@@ -1,4 +1,6 @@
 <resources>
+    <color name="panel_background_grey_light">#f6f6f6</color>
+
     <color name="loader_hint_text_color">#99ffffff</color>
     <color name="loader_bg">#CE1200</color>
     <color name="loader_bg_transparent">#CE1200</color>

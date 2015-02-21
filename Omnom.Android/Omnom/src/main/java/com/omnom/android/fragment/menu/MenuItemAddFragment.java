@@ -39,31 +39,35 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 
 	private static final String ARG_ITEM = "item";
 
+	private static final String ARG_POSITION = "position";
+
 	private static final String ARG_MODIFIERS = "modifiers";
 
-	public static MenuItemAddFragment newInstance(final Modifiers modifiers, UserOrder order, Item item) {
+	public static MenuItemAddFragment newInstance(final Modifiers modifiers, UserOrder order, Item item, int position) {
 		final MenuItemAddFragment fragment = new MenuItemAddFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_ORDER, order);
 		args.putParcelable(ARG_ITEM, item);
+		args.putInt(ARG_POSITION, position);
 		args.putParcelable(ARG_MODIFIERS, modifiers);
 		fragment.setArguments(args);
 		return fragment;
 	}
 
-	public static void show(final FragmentManager fragmentManager, Modifiers modifiers, final UserOrder order, final Item item) {
-		show(fragmentManager, R.id.root, modifiers, order, item);
+	public static void show(final FragmentManager fragmentManager, Modifiers modifiers, final UserOrder order, final Item item,
+	                        int position) {
+		show(fragmentManager, R.id.root, modifiers, order, item, position);
 	}
 
 	public static void show(final FragmentManager fragmentManager, @IdRes int containerId, Modifiers modifiers, final UserOrder order,
-	                        final Item item) {
+	                        final Item item, int position) {
 		fragmentManager.beginTransaction()
 		               .addToBackStack(null)
 		               .setCustomAnimations(R.anim.fade_in,
 		                                    R.anim.nothing_long,
 		                                    R.anim.fade_in,
 		                                    R.anim.nothing_long)
-		               .add(containerId, MenuItemAddFragment.newInstance(modifiers, order, item))
+		               .add(containerId, MenuItemAddFragment.newInstance(modifiers, order, item, position))
 		               .commit();
 	}
 
@@ -105,6 +109,8 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 
 	private int mModifierHeight;
 
+	private int mPosition;
+
 	public MenuItemAddFragment() {
 		// Required empty public constructor
 	}
@@ -115,6 +121,7 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mItem = getArguments().getParcelable(ARG_ITEM);
+			mPosition = getArguments().getInt(ARG_POSITION, -1);
 			mModifiers = getArguments().getParcelable(ARG_MODIFIERS);
 			if(mItem != null && mOrder != null && mOrder.itemsTable() != null) {
 				final UserOrderData userOrderData = mOrder.itemsTable().get(mItem.id());
@@ -193,7 +200,7 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 		//	dishModifiers.add(modifier2);
 		//	dishModifiers.add(modifier);
 		//} else {
-			dishModifiers = mItem.modifiers();
+		dishModifiers = mItem.modifiers();
 		//}
 
 		mAnimationDuration = getResources().getInteger(R.integer.default_animation_duration_quick);
@@ -268,7 +275,7 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 	@OnClick(R.id.btn_apply)
 	public void onApply(View v) {
 		if(mOrder != null && mItem != null) {
-			mBus.post(new OrderUpdateEvent(mItem, mCount));
+			mBus.post(new OrderUpdateEvent(mItem, mCount, mPosition));
 		}
 		getFragmentManager().popBackStack();
 	}

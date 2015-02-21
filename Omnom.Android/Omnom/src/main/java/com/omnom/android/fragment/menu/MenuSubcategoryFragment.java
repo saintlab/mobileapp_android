@@ -4,13 +4,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 
 import com.omnom.android.R;
@@ -25,14 +26,18 @@ import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
 
+import java.util.List;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
+import static com.omnom.android.adapter.MultiLevelRecyclerAdapter.Data;
+
 /**
  * Created by Ch3D on 02.02.2015.
  */
-public class MenuSubcategoryFragment extends BaseFragment implements View.OnClickListener {
+public class MenuSubcategoryFragment extends BaseFragment {
 
 	public static void show(final FragmentManager manager, final UserOrder order, final Menu menu, final int position, final float ypos) {
 		manager.beginTransaction()
@@ -58,8 +63,8 @@ public class MenuSubcategoryFragment extends BaseFragment implements View.OnClic
 		return fragment;
 	}
 
-	@InjectView(android.R.id.list)
-	protected ExpandableListView mListView;
+	@InjectView(R.id.content_recyclerview)
+	protected RecyclerView mListView;
 
 	@InjectView(R.id.btn_back)
 	protected ImageView mImgBack;
@@ -70,15 +75,52 @@ public class MenuSubcategoryFragment extends BaseFragment implements View.OnClic
 
 	private int mPosition;
 
-	// private MenuCategoryItemsAdapter mAdapter;
-
 	private float mPivotY;
 
+	private MenuAdapter mMenuAdapter;
+
+	private LinearLayoutManager mLayoutManager;
+
+	private View.OnClickListener mGroupClickListener;
+
 	@Subscribe
-	public void onOrderUpdate(OrderUpdateEvent event) {
+	public void onOrderUpdate(final OrderUpdateEvent event) {
 		final Item item = event.getItem();
 		mOrder.itemsTable().put(item.id(), UserOrderData.create(event.getCount(), item));
-		// mAdapter.notifyDataSetChanged();
+		mMenuAdapter.notifyItemChanged(event.getPosition());
+
+		if(event.getPosition() > 0 && item.hasRecommendations()) {
+			if(event.getCount() > 0) {
+				final List<String> recommendations = item.recommendations();
+				final int size = recommendations.size();
+				for(int i = 0; i < size; i++) {
+					final String id = recommendations.get(i);
+					final Item recommendation = mMenu.findItem(id);
+					final int indexIncrement = i + 1;
+					final int position = event.getPosition() + indexIncrement;
+					final Data itemData = mMenuAdapter.getItemAt(position);
+					mMenuAdapter.insert(position, i, itemData, new ItemData(itemData.getParent(),
+					                                                        recommendation,
+					                                                        getType(i, size)));
+				}
+			} else {
+				for(final String id : item.recommendations()) {
+					final int position = event.getPosition() + 1;
+					final Data itemData = mMenuAdapter.getItemAt(position);
+					mMenuAdapter.remove(itemData);
+				}
+			}
+		}
+	}
+
+	private int getType(final int i, final int size) {
+		if(i == 0) {
+			return ItemData.TYPE_RECOMMENDATION_TOP;
+		}
+		if(i == size - 1) {
+			return ItemData.TYPE_RECOMMENDATION_BOTTOM;
+		}
+		return ItemData.TYPE_NORMAL;
 	}
 
 	@Override
@@ -146,39 +188,33 @@ public class MenuSubcategoryFragment extends BaseFragment implements View.OnClic
 		super.onViewCreated(view, savedInstanceState);
 		ButterKnife.inject(this, view);
 
-		//final Category category = mMenu.categories().get(mPosition);
-		//mAdapter = new MenuCategoryItemsAdapter(this, mMenu, mOrder, category, mMenu.items().items(), new View.OnClickListener() {
-		//	@Override
-		//	public void onClick(final View v) {
-		//		final Item recommendedItem = (Item) v.getTag(R.id.item);
-		//		final Integer pos = (Integer) v.getTag(R.id.position);
-		//		if(recommendedItem != null) {
-		//			if(pos != null && pos >= 0) {
-		//				mListView.smoothScrollToPositionFromTop(pos, 0);
-		//			}
-		//			showAddFragment(recommendedItem);
-		//		}
-		//	}
-		//}, new View.OnClickListener() {
-		//	@Override
-		//	public void onClick(final View v) {
-		//		showDetails((Item) v.getTag(R.id.item));
-		//	}
-		//});
+		mListView.setHasFixedSize(true);
+		mLayoutManager = new LinearLayoutManager(getActivity());
+		mListView.setLayoutManager(mLayoutManager);
 
-		mListView.setAdapter(new MenuAdapterTop(getActivity(), mMenu));
-		// mListView.setShadowVisible(false);
-		//mListView.setDividerHeight(0);
-		//mListView.setDivider(null);
-		//mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-		//	@Override
-		//	public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-		//		if(mAdapter == null || mOrder == null) {
-		//			return;
-		//		}
-		//		showDetails(mAdapter.getItem(position));
-		//	}
-		//});
+		final MenuData menuData = new MenuData(mMenu);
+		mGroupClickListener = new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				mMenuAdapter.toggleGroup(mListView.getChildPosition(v));
+			}
+		};
+		mMenuAdapter = new MenuAdapter(getActivity(), mMenu, mOrder, mGroupClickListener, new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				int position = mListView.getChildPosition(v);
+				final ItemData itemData = (ItemData) mMenuAdapter.getItemAt(position);
+				showDetails(itemData.getItem());
+			}
+		}, new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				final int position = (Integer) v.getTag(R.id.position);
+				showAddFragment((Item) v.getTag(), position);
+			}
+		});
+		mListView.setAdapter(mMenuAdapter);
+		mMenuAdapter.addAll(menuData.getData());
 	}
 
 	private void showDetails(final Item item) {
@@ -197,23 +233,11 @@ public class MenuSubcategoryFragment extends BaseFragment implements View.OnClic
 		getFragmentManager().popBackStack();
 	}
 
-	public void showAddFragment(final Item item) {
-		MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, item);
-	}
-
-	@Override
-	public void onClick(final View v) {
-		//if(v.getId() == R.id.btn_apply) {
-		//	final Integer pos = (Integer) v.getTag(R.id.position);
-		//	if(pos != null && pos >= 0) {
-		//		if(pos > 0 && mAdapter.getItemViewType(pos - 1) == MenuCategoryItemsAdapter.VIEW_TYPE_HEADER) {
-		//			mListView.smoothScrollToPositionFromTop(pos, ViewUtils.dipToPixels(v.getContext(), 48));
-		//		} else {
-		//			mListView.smoothScrollToPositionFromTop(pos, 0);
-		//		}
-		//	}
-		//	showAddFragment((Item) v.getTag());
-		//}
+	public void showAddFragment(final Item item, int pos) {
+		if(item == null) {
+			return;
+		}
+		MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, item, pos);
 	}
 
 }

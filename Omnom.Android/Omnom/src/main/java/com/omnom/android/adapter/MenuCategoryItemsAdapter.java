@@ -467,7 +467,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 			switch(getItemViewType(position)) {
 				case VIEW_TYPE_ITEM:
 					convertView = mInflater.inflate(R.layout.item_menu_dish, parent, false);
-					convertView.findViewById(R.id.btn_apply).setOnClickListener(mContext);
+					// convertView.findViewById(R.id.btn_apply).setOnClickListener(mContext);
 					break;
 
 				case VIEW_TYPE_HEADER:
