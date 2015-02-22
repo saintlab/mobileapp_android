@@ -17,6 +17,7 @@
         android:text="@string/your_order"
         android:visibility="gone"
         android:textColor="@color/profile_hint"
+        android:textAppearance="?android:textAppearance"
         android:background="@drawable/btn_rounded_bordered_grey"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
