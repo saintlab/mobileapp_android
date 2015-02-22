@@ -31,7 +31,6 @@
             android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@android:id/text1"
             android:layout_height="1dp"
-            android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:background="@color/menu_header" />
 
@@ -42,7 +41,6 @@
             android:layout_toRightOf="@android:id/text1"
             android:layout_height="1dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:background="@color/menu_header" />
 
 

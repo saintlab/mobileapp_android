@@ -190,7 +190,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 				} else {
 					showDivider(!isSubheaderNext);
 				}
-				setDividerPadding(isHeaderNext && !isSubheaderNext ? 0 : padding);
+				// setDividerPadding(isHeaderNext && !isSubheaderNext ? 0 : padding);
 			}
 		}
 	}
