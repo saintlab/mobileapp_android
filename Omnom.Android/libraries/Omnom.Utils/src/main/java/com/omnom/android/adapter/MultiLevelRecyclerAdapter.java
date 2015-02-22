@@ -150,11 +150,14 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		for(int i = 0; i < mData.size(); i++) {
 			final Data data = mData.get(i);
 			if(data.getChildren() != null && data.getChildren().size() > 0) {
-				if(firstItem != data.getRoot()) {
+				if(firstItem != data.getRoot() || data == firstItem) {
 					continue;
 				}
-				if(data.getLevel() >= level) {
+				if(data.getLevel() > level) {
 					level = data.getLevel();
+					if(data.isGroup()) {
+						expandGroup(i);
+					}
 				} else {
 					collapseGroup(i);
 				}

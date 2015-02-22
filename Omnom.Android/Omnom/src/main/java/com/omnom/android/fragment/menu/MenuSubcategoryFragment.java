@@ -190,14 +190,9 @@ public class MenuSubcategoryFragment extends BaseFragment {
 				final Data category = mMenuAdapter.getItemAt(childPosition);
 				mMenuAdapter.toggleGroup(childPosition);
 
-				// if top category - scroll to top
-				// else scroll to new item's position
-				if(category.getLevel() == 0) {
-					mLayoutManager.scrollToPositionWithOffset(0, 0);
-				} else {
-					final int newPos = mMenuAdapter.getItemPosition(category);
-					mLayoutManager.scrollToPositionWithOffset(newPos, 0);
-				}
+				final int newPos = mMenuAdapter.getItemPosition(category);
+				mLayoutManager.scrollToPositionWithOffset(newPos, 0);
+				mMenuAdapter.notifyItemChanged(newPos);
 			}
 		};
 		mMenuAdapter = new MenuAdapter(getActivity(), mMenu, mOrder, mGroupClickListener, new View.OnClickListener() {
