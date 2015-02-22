@@ -11,6 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <View
+        android:id="@+id/menu_gradient"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="304dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_menu_gradient" />
+
     <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
@@ -18,7 +26,8 @@
         android:background="@color/transparent_black"
         android:gravity="bottom"
         sothree:umanoFadeColor="@color/transparent"
-        sothree:umanoPanelHeight="240dp"
+        android:visibility="gone"
+        sothree:umanoPanelHeight="304dp"
         sothree:umanoShadowHeight="0dp">
 
         <View

@@ -218,6 +218,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 	@InjectView(R.id.sliding_layout)
 	protected SlidingUpPanelLayout slidingPanel;
 
+	@InjectView(R.id.menu_gradient)
+	protected View menuGradientPanel;
+
 	@InjectView(R.id.menu_categories)
 	protected MenuCategoriesView menuCategories;
 
@@ -636,7 +639,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 		hideProfile();
 		ViewUtils.setVisible(imgPrevious, false);
 		ViewUtils.setVisible(getPanelBottom(), false);
-		ViewUtils.setVisible(slidingPanel, false);
+		AnimationUtils.animateAlpha(slidingPanel, false);
+		AnimationUtils.animateAlpha(menuGradientPanel, false);
 		ViewUtils.setVisible(txtLeave, false);
 		loader.animateLogo(R.drawable.ic_bill_white_normal);
 		loader.startProgressAnimation(10000, new Runnable() {
@@ -740,7 +744,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 		ViewUtils.setVisible(imgPrevious, !mIsDemo);
 		ViewUtils.setVisible(txtLeave, mIsDemo);
 		ViewUtils.setVisible(getPanelBottom(), true);
-		ViewUtils.setVisible(slidingPanel, true);
+		AnimationUtils.animateAlpha(menuGradientPanel, true);
+		AnimationUtils.animateAlpha(slidingPanel, true);
 	}
 
 	private void showNoOrdersInfo() {
@@ -847,7 +852,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 							@Override
 							public void run() {
 								ViewUtils.setVisible(getPanelBottom(), true);
-								ViewUtils.setVisible(slidingPanel, true);
+								AnimationUtils.animateAlpha(menuGradientPanel, true);
+								AnimationUtils.animateAlpha(slidingPanel, true);
 								updateLightProfile(!mIsDemo);
 								ViewUtils.setVisible(imgPrevious, !mIsDemo);
 								ViewUtils.setVisible(txtLeave, mIsDemo);
@@ -899,7 +905,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 				ViewUtils.setVisible(imgPrevious, !mIsDemo);
 				ViewUtils.setVisible(txtLeave, mIsDemo);
 				ViewUtils.setVisible(getPanelBottom(), true);
-				ViewUtils.setVisible(slidingPanel, true);
+				AnimationUtils.animateAlpha(menuGradientPanel, true);
+				AnimationUtils.animateAlpha(slidingPanel, true);
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
 				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
 				if(forwardToBill) {

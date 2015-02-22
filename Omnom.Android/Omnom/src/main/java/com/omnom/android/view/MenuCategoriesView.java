@@ -100,6 +100,7 @@ public class MenuCategoriesView extends FrameLayout implements SlidingUpPanelLay
 				final int ty = -mSelectedView.getBottom() + mCategoryItemHeight + mTitleAnimationPadding;
 
 				mSelectedView.animate().translationY(ty)
+				             .scaleX(0.8f).scaleY(0.8f)
 				             .setInterpolator(mInterpolator)
 				             .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)
 						                          + DURATION_INCREMENT_MOVE_UP)
@@ -195,6 +196,7 @@ public class MenuCategoriesView extends FrameLayout implements SlidingUpPanelLay
 			}
 
 			mSelectedView.animate().translationY(0)
+			             .scaleX(1).scaleY(1)
 			             .setInterpolator(mInterpolator)
 			             .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)
 					                          + DURATION_INCREMENT_MOVE_DOWN).start();

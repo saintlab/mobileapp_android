@@ -12,6 +12,7 @@
         android:layout_gravity="center"
         android:text="@string/menu"
         android:textColor="@color/menu_header"
+        android:textSize="@dimen/font_larger"
         android:drawableLeft="@drawable/ic_menu_normal"
         android:drawablePadding="@dimen/drawable_padding_default"
         android:textAppearance="?android:textAppearanceLarge" />
