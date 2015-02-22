@@ -62,6 +62,14 @@ public class ItemData implements Data {
 	}
 
 	@Override
+	public Data getRoot() {
+		if(mParent != null) {
+			return mParent.getRoot();
+		}
+		return null;
+	}
+
+	@Override
 	public void setIsGroup(final boolean value) {
 		mIsGroup = value;
 	}
@@ -74,6 +82,11 @@ public class ItemData implements Data {
 	@Override
 	public void remove(final Data item) {
 		// Do nothing
+	}
+
+	@Override
+	public int getLevel() {
+		return 0;
 	}
 
 	public String getName() {

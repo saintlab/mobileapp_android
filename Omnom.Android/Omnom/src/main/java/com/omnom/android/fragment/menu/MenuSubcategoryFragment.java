@@ -186,7 +186,18 @@ public class MenuSubcategoryFragment extends BaseFragment {
 		mGroupClickListener = new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				mMenuAdapter.toggleGroup(mListView.getChildPosition(v));
+				final int childPosition = mListView.getChildPosition(v);
+				final Data category = mMenuAdapter.getItemAt(childPosition);
+				mMenuAdapter.toggleGroup(childPosition);
+
+				// if top category - scroll to top
+				// else scroll to new item's position
+				if(category.getLevel() == 0) {
+					mLayoutManager.scrollToPositionWithOffset(0, 0);
+				} else {
+					final int newPos = mMenuAdapter.getItemPosition(category);
+					mLayoutManager.scrollToPositionWithOffset(newPos, 0);
+				}
 			}
 		};
 		mMenuAdapter = new MenuAdapter(getActivity(), mMenu, mOrder, mGroupClickListener, new View.OnClickListener() {

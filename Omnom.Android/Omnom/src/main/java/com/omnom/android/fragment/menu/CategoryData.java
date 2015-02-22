@@ -88,6 +88,14 @@ public class CategoryData implements Data {
 	}
 
 	@Override
+	public Data getRoot() {
+		if(mParent == null) {
+			return this;
+		}
+		return mParent.getRoot();
+	}
+
+	@Override
 	public void setIsGroup(final boolean value) {
 		mIsGroup = value;
 	}
@@ -106,6 +114,7 @@ public class CategoryData implements Data {
 		return mCategory.name();
 	}
 
+	@Override
 	public int getLevel() {
 		return mLevel;
 	}

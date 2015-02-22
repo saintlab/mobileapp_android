@@ -15,11 +15,15 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 
 		Data getParent();
 
+		Data getRoot();
+
 		void setIsGroup(boolean value);
 
 		void add(Data anchor, Data newItem, final int indexIncrement);
 
 		void remove(Data item);
+
+		int getLevel();
 	}
 
 	private boolean mNotifyOnChange;
@@ -129,6 +133,33 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 
 		notifyItemChanged(position);
 		addAll(position + 1, group);
+
+		int level = firstItem.getLevel();
+		for(int i = 0; i < mData.size(); i++) {
+			final Data data = mData.get(i);
+			if(data == firstItem) {
+				continue;
+			}
+			if(data.getChildren() != null && data.getChildren().size() > 0) {
+				if(data.getLevel() == level/* && firstItem.getRoot() == data.getRoot()*/) {
+					collapseGroup(i);
+				}
+			}
+		}
+
+		for(int i = 0; i < mData.size(); i++) {
+			final Data data = mData.get(i);
+			if(data.getChildren() != null && data.getChildren().size() > 0) {
+				if(firstItem != data.getRoot()) {
+					continue;
+				}
+				if(data.getLevel() >= level) {
+					level = data.getLevel();
+				} else {
+					collapseGroup(i);
+				}
+			}
+		}
 	}
 
 	public void collapseGroup(int position) {
@@ -207,5 +238,9 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		for(int i = 0; i < mData.size(); i++) {
 			collapseGroup(i);
 		}
+	}
+
+	public int getItemPosition(final Data category) {
+		return mData.indexOf(category);
 	}
 }

@@ -317,5 +317,4 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		}
 		throw new RuntimeException("wrong item type");
 	}
-
 }
