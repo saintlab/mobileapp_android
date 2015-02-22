@@ -101,7 +101,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 					final Data itemData = mMenuAdapter.getItemAt(position);
 					mMenuAdapter.insert(position, i, itemData, new ItemData(itemData.getParent(),
 					                                                        recommendation,
-					                                                        getType(i, size)));
+					                                                        ItemData.getType(i, size)));
 				}
 			} else {
 				for(final String id : item.recommendations()) {
@@ -111,16 +111,6 @@ public class MenuSubcategoryFragment extends BaseFragment {
 				}
 			}
 		}
-	}
-
-	private int getType(final int i, final int size) {
-		if(i == 0) {
-			return ItemData.TYPE_RECOMMENDATION_TOP;
-		}
-		if(i == size - 1) {
-			return ItemData.TYPE_RECOMMENDATION_BOTTOM;
-		}
-		return ItemData.TYPE_NORMAL;
 	}
 
 	@Override
@@ -192,7 +182,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 		mLayoutManager = new LinearLayoutManager(getActivity());
 		mListView.setLayoutManager(mLayoutManager);
 
-		final MenuData menuData = new MenuData(mMenu);
+		final MenuData menuData = new MenuData(mMenu, mOrder);
 		mGroupClickListener = new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {

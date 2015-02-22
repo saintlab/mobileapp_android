@@ -3,7 +3,9 @@ package com.omnom.android.fragment.menu;
 import android.support.annotation.Nullable;
 
 import com.omnom.android.menu.model.Category;
+import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
+import com.omnom.android.menu.model.UserOrder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,8 @@ public class CategoryData implements Data {
 
 	private Menu mMenu;
 
+	private UserOrder mOrder;
+
 	private Category mCategory;
 
 	private int mLevel;
@@ -27,9 +31,10 @@ public class CategoryData implements Data {
 
 	private boolean mIsGroup;
 
-	public CategoryData(Data parent, Menu menu, Category category, int level) {
+	public CategoryData(Data parent, Menu menu, UserOrder order, Category category, int level) {
 		mParent = parent;
 		mMenu = menu;
+		mOrder = order;
 		mCategory = category;
 		mLevel = level;
 	}
@@ -44,18 +49,31 @@ public class CategoryData implements Data {
 			mChildren = new ArrayList<Data>();
 			if(mCategory.items() != null) {
 				for(String id : mCategory.items()) {
-					mChildren.add(new ItemData(this, mMenu.findItem(id)));
+					final Item item = mMenu.findItem(id);
+					mChildren.add(new ItemData(this, item));
+					if(mOrder.contains(item) && item.hasRecommendations()) {
+						addRecommendations(item);
+					}
 				}
 			}
 			if(mCategory.children() != null) {
 				for(Category subCategory : mCategory.children()) {
-					final CategoryData categoryData = new CategoryData(this, mMenu, subCategory, mLevel + 1);
+					final CategoryData categoryData = new CategoryData(this, mMenu, mOrder, subCategory, mLevel + 1);
 					categoryData.prepareChildren();
 					mChildren.add(categoryData);
 				}
 			}
 		}
 		return mChildren;
+	}
+
+	private void addRecommendations(final Item item) {
+		final List<String> recommendations = item.recommendations();
+		for(int i = 0; i < recommendations.size(); i++) {
+			final String recId = recommendations.get(i);
+			final Item recommendation = mMenu.findItem(recId);
+			mChildren.add(new ItemData(this, recommendation, ItemData.getType(i, recommendations.size())));
+		}
 	}
 
 	@Override

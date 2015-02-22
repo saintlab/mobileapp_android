@@ -18,6 +18,16 @@ public class ItemData implements Data {
 
 	public static final int TYPE_RECOMMENDATION_BOTTOM = 2;
 
+	public static int getType(final int i, final int size) {
+		if(i == 0) {
+			return TYPE_RECOMMENDATION_TOP;
+		}
+		if(i == size - 1) {
+			return TYPE_RECOMMENDATION_BOTTOM;
+		}
+		return TYPE_NORMAL;
+	}
+
 	private Data mParent;
 
 	private Item mItem;
