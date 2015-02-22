@@ -3,7 +3,7 @@
     <string name="dish_nutritional_title_100">На 100гр.</string>
     <string name="dish_nutritional_title_portion">На процию</string>
 
-    <string name="dish_nutritional_calories">%1$s ккал.</string>
+    <string name="dish_nutritional_calories">%1$s ккал</string>
     <string name="dish_nutritional_protein">Белки %1$s</string>
     <string name="dish_nutritional_fat">Жиры %1$s</string>
     <string name="dish_nutritional_carbohydrates">Углеводы %1$s</string>
