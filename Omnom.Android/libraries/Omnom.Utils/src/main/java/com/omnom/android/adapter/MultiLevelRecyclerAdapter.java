@@ -202,4 +202,10 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		}
 		mNotifyOnChange = notify;
 	}
+
+	public void collapseAll() {
+		for(int i = 0; i < mData.size(); i++) {
+			collapseGroup(i);
+		}
+	}
 }

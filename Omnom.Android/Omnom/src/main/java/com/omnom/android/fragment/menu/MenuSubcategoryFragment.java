@@ -205,6 +205,15 @@ public class MenuSubcategoryFragment extends BaseFragment {
 		});
 		mListView.setAdapter(mMenuAdapter);
 		mMenuAdapter.addAll(menuData.getData());
+
+		mMenuAdapter.collapseAll();
+
+		mListView.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				mMenuAdapter.expandGroup(mPosition);
+			}
+		}, 850);
 	}
 
 	private void showDetails(final Item item) {
