@@ -17,7 +17,7 @@ import com.omnom.android.utils.utils.ViewUtils;
  */
 public class MenuHelper {
 
-	public static final String ENERGY_DELIMITER = "|";
+	public static final String ENERGY_DELIMITER = " \u00B7 ";
 
 	public static void putValue(final SparseIntArray array, int key, int value) {
 		if(value > 0) {

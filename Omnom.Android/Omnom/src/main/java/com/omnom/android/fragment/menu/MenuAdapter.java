@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.adapter.MenuCategoryItemsAdapter;
 import com.omnom.android.adapter.MultiLevelRecyclerAdapter;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
@@ -22,8 +21,6 @@ import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
-
-import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -166,32 +163,6 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 		private void bindDetails(final Item item, boolean detailed) {
 			MenuHelper.bindDetails(getContext(), item.details(), txtDetails, detailed);
-		}
-
-		public void showDivider(final boolean show) {
-			ViewUtils.setVisible(viewDelimiter, show);
-		}
-
-		public void setDividerPadding(final int dividerPadding) {
-			ViewUtils.setMargins(viewDelimiter, dividerPadding, 0, dividerPadding, 0);
-			// viewDelimiter.setPadding(dividerPadding, 0, dividerPadding, 0);
-		}
-
-		public void bindDivider(final View convertView, final ArrayList<Item> innerItems, final Item item, final int position) {
-			final int padding = ViewUtils.dipToPixels(convertView.getContext(), 16f);
-			if(position == innerItems.size() - 1) {
-				showDivider(false);
-			} else if(position + 1 < innerItems.size()) {
-				final Item nextItem = innerItems.get(position + 1);
-				final boolean isSubheaderNext = nextItem instanceof MenuCategoryItemsAdapter.SubHeaderItem;
-				final boolean isHeaderNext = nextItem instanceof MenuCategoryItemsAdapter.HeaderItem;
-				if(item.hasRecommendations() && isRecommendationsVisible()) {
-					showDivider(false);
-				} else {
-					showDivider(!isSubheaderNext);
-				}
-				// setDividerPadding(isHeaderNext && !isSubheaderNext ? 0 : padding);
-			}
 		}
 	}
 
