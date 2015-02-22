@@ -115,7 +115,7 @@
             android:scaleType="centerInside"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_gravity="top|left"
+            android:layout_gravity="top|center_horizontal"
             android:src="@drawable/ic_cross_black" />
 
     </FrameLayout>
