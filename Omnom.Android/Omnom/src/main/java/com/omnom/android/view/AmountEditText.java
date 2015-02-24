@@ -101,8 +101,11 @@ public class AmountEditText extends EditText {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				removeTextChangedListener(this);
 				String str = s.toString();
+				if (str.equals(getContext().getString(R.string.everything_paid))) {
+					return;
+				}
+				removeTextChangedListener(this);
 				// TODO: refactor the following code to make it readable
 				if(str.endsWith(decimalSeparator)) {
 					final int suffixLength = getCurrencySuffix().length();
