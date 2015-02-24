@@ -57,12 +57,17 @@ import static butterknife.ButterKnife.findById;
  */
 public class AndroidUtils {
 
-	public static void clickify(TextView view, final String clickableText,
+    public static void clickify(TextView view, final String clickableText,
+                                final ClickSpan.OnClickListener listener) {
+        clickify(view, true, clickableText, listener);
+    }
+
+	public static void clickify(TextView view, final boolean isUnderlined, final String clickableText,
 	                            final ClickSpan.OnClickListener listener) {
 
 		CharSequence text = view.getText();
 		String string = text.toString();
-		ClickSpan span = new ClickSpan(listener);
+		ClickSpan span = new ClickSpan(isUnderlined, listener);
 
 		int start = string.indexOf(clickableText);
 		int end = start + clickableText.length();

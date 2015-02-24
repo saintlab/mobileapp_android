@@ -123,7 +123,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 		super.initUI();
 		playLaunchAnimation();
 		final TextView txtHint = (TextView) findViewById(R.id.txt_hint);
-		AndroidUtils.clickify(txtHint, getString(R.string.navigate_qr_code_mark),
+		AndroidUtils.clickify(txtHint, false, getString(R.string.navigate_qr_code_mark),
 				new ClickSpan.OnClickListener() {
 					@Override
 					public void onClick() {

@@ -97,20 +97,47 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <TextView
-                android:id="@+id/txt_hint"
-                android:layout_width="@dimen/navigate_qr_text_width"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:drawablePadding="@dimen/drawable_padding_default"
-                android:drawableTop="@drawable/ic_shortcut_red"
-                android:gravity="center"
-                android:lines="3"
-                android:text="@string/navigate_qr_code"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:textColor="@color/cadre_border"
-                android:textColorLink="@color/cadre_border"
-                omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf" />
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/txt_hint"
+                    android:layout_width="@dimen/navigate_qr_text_width"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:drawablePadding="@dimen/drawable_padding_default"
+                    android:drawableTop="@drawable/ic_shortcut_red"
+                    android:gravity="center"
+                    android:lines="3"
+                    android:text="@string/navigate_qr_code"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:textColor="@color/cadre_border"
+                    android:textColorLink="@color/cadre_border"
+                    omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txt_hint"
+                    android:layout_alignLeft="@+id/txt_hint"
+                    android:layout_alignRight="@id/txt_hint"
+                    android:paddingLeft="55dp"
+                    android:paddingRight="53dp"
+                    android:layout_marginTop="-3dp"
+                    >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/cadre_border"
+
+                    />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
 
             <Space
                 android:layout_width="match_parent"
