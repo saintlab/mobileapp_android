@@ -19,10 +19,13 @@
             tools:context="com.omnom.android.activity.RestaurantActivity">
 
             <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:id="@+id/btn_close"
                 android:src="@drawable/ic_cross_black"
                 android:layout_gravity="center_horizontal"
-                android:layout_margin="@dimen/activity_vertical_margin"
+                android:padding="@dimen/activity_vertical_margin"
+                android:layout_margin="@dimen/activity_vertical_margin_small"
                 style="@style/ImageView.Clickable.Cropped"/>
 
             <com.omnom.android.utils.loader.LoaderView
