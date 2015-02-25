@@ -13,54 +13,50 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:omnom="http://schemas.android.com/apk/res-auto">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <SurfaceView
+        android:id="@+id/preview_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_wood" />
+
+    <com.google.zxing.client.android.ViewfinderView
+        android:id="@+id/viewfinder_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
     <RelativeLayout
+        android:id="@+id/capture_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <SurfaceView
-            android:id="@+id/preview_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <FrameLayout
-            android:id="@+id/background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/bg_wood" />
-
-        <com.google.zxing.client.android.ViewfinderView
-            android:id="@+id/viewfinder_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center"
-                    android:lines="1"
-                    android:paddingTop="@dimen/activity_horizontal_margin"
-                    android:text="@string/scanning"
-                    android:textAppearance="?android:textAppearanceLarge"
-                    android:textColor="@color/cadre_border"
-                    omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf" />
-
-            </LinearLayout>
+                android:gravity="center"
+                android:lines="1"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                android:text="@string/scanning"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textColor="@color/cadre_border"
+                omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf" />
 
             <Space
                 android:layout_width="match_parent"
@@ -132,7 +128,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="@color/cadre_border"
-
                     />
 
                 </RelativeLayout>
@@ -166,4 +161,4 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</merge>
+</RelativeLayout>
