@@ -2,6 +2,7 @@ package com.omnom.android.restaurateur.api;
 
 import com.omnom.android.protocol.Protocol;
 import com.omnom.android.restaurateur.model.ResponseBase;
+import com.omnom.android.restaurateur.model.SupportInfoResponse;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconBindRequest;
 import com.omnom.android.restaurateur.model.beacon.BeaconBuildRequest;
@@ -131,4 +132,7 @@ public interface RestaurateurDataService {
 	Observable<Integer> checkBeacon(@Query(Protocol.FIELD_BEACON_UUID) String beaconUuid,
 	                                @Query(Protocol.FIELD_MAJOR_ID) String majorId,
 	                                @Query(Protocol.FIELD_MINOR_ID) String minorId);
+
+	@GET("/support")
+	Observable<SupportInfoResponse> getSupportInfo();
 }

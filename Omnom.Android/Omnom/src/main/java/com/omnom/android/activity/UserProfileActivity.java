@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +25,7 @@ import com.omnom.android.auth.UserProfileHelper;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
+import com.omnom.android.restaurateur.model.SupportInfoResponse;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.drawable.RoundTransformation;
@@ -38,9 +40,13 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
@@ -95,6 +101,8 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	private String mTableId;
 
+	private String supportPhone;
+
 	@Override
 	protected void handleIntent(Intent intent) {
 		mTableNumber = intent.getIntExtra(EXTRA_TABLE_NUMBER, 0);
@@ -104,6 +112,11 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@OnClick(R.id.btn_my_cards)
 	protected void onMyCards() {
 		CardsActivity.start(this, mTableId);
+	}
+
+	@OnClick(R.id.btn_support)
+	protected void onSupport() {
+		AndroidUtils.openDialer(this, supportPhone);
 	}
 
 	@OnClick(R.id.btn_feedback)
@@ -135,43 +148,55 @@ public class UserProfileActivity extends BaseOmnomActivity {
 			ViewUtils.setVisible(delimiterTableNumber, false);
 		}
 
-		final UserProfile userProfile = OmnomApplication.get(getActivity()).getUserProfile();
-		if(userProfile != null && userProfile.getUser() != null) {
-			initUserData(userProfile.getUser(), userProfile.getImageUrl());
-		} else {
-			updateUserImage(StringUtils.EMPTY_STRING);
-			final String token = getPreferences().getAuthToken(this);
-			if(TextUtils.isEmpty(token)) {
-				forwardToIntro();
-				return;
-			}
-			profileSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(
-					new Action1<UserResponse>() {
-						@Override
-						public void call(UserResponse response) {
-							if(response.hasError() && UserProfileHelper.hasAuthError(response)) {
-								((OmnomApplication) getApplication()).logout();
-								forwardToIntro();
-								return;
-							}
-							UserProfile profile = new UserProfile(response);
-							OmnomApplication.get(getActivity()).cacheUserProfile(profile);
-							initUserData(response.getUser(), profile.getImageUrl());
-						}
-					}, new BaseErrorHandler(getActivity()) {
-						@Override
-						protected void onTokenExpired() {
-
-						}
-
-						@Override
-						protected void onThrowable(Throwable throwable) {
-							showToastLong(getActivity(), R.string.error_server_unavailable_please_try_again);
-							Log.e(TAG, "getUserProfile", throwable);
-							finish();
-						}
-					});
+		updateUserImage(StringUtils.EMPTY_STRING);
+		final String token = getPreferences().getAuthToken(this);
+		if(TextUtils.isEmpty(token)) {
+			forwardToIntro();
+			return;
 		}
+		profileSubscription = AndroidObservable.bindActivity(this, getProfileObservable(token)).subscribe(
+				new Action1<Pair<UserResponse, SupportInfoResponse>>() {
+					@Override
+					public void call(Pair<UserResponse, SupportInfoResponse> response) {
+						final UserResponse userResponse = response.first;
+						if(userResponse.hasError() && UserProfileHelper.hasAuthError(userResponse)) {
+							((OmnomApplication) getApplication()).logout();
+							forwardToIntro();
+							return;
+						}
+						UserProfile profile = new UserProfile(userResponse);
+						OmnomApplication.get(getActivity()).cacheUserProfile(profile);
+						initUserData(userResponse.getUser(), profile.getImageUrl());
+
+						final SupportInfoResponse supportInfoResponse = response.second;
+						if (!supportInfoResponse.hasErrors()) {
+							supportPhone = supportInfoResponse.getPhone();
+						}
+					}
+				}, new BaseErrorHandler(getActivity()) {
+					@Override
+					protected void onTokenExpired() {
+
+					}
+
+					@Override
+					protected void onThrowable(Throwable throwable) {
+						showToastLong(getActivity(), R.string.error_server_unavailable_please_try_again);
+						Log.e(TAG, "getUserProfile", throwable);
+						finish();
+					}
+				});
+	}
+
+	private Observable<Pair<UserResponse, SupportInfoResponse>> getProfileObservable(final String token) {
+		return Observable.zip(authenticator.getUser(token), api.getSupportInfo(),
+				new Func2<UserResponse, SupportInfoResponse, Pair<UserResponse, SupportInfoResponse>>() {
+					@Override
+					public Pair<UserResponse, SupportInfoResponse> call(final UserResponse userResponse,
+					                 final SupportInfoResponse supportInfoResponse) {
+						return new Pair<UserResponse, SupportInfoResponse>(userResponse, supportInfoResponse);
+					}
+				}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	private void initAppInfo() {

@@ -145,4 +145,10 @@
     </string>
     <string name="qr_hint_mark">Демо-режиме</string>
     <string name="attempt_to_perform_similar_payment">Повторная попытка оплаты счета</string>
+    <string name="feedback">Обратная связь</string>
+    <string name="support">Звонок в тех.поддержку</string>
+    <string name="facebook_title">facebook/Omnom</string>
+    <string name="about_title">О ПРОГРАММЕ</string>
+    <string name="table">Столик</string>
+    <string name="bound_cards">Мои привязанные карты</string>
 </resources>
