@@ -135,6 +135,21 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+        <TextView
+            android:id="@+id/txt_table"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/image_button_size"
+            android:layout_marginTop="@dimen/activity_vertical_margin_xsmall"
+            android:layout_gravity="top|center_horizontal"
+            android:gravity="center"
+            android:drawableLeft="@drawable/ic_table"
+            android:drawablePadding="@dimen/drawable_padding_default"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/font_large"
+            android:visibility="gone"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+            />
+
         <ImageView
             android:id="@+id/img_profile"
             android:layout_margin="@dimen/activity_vertical_margin_xsmall"
