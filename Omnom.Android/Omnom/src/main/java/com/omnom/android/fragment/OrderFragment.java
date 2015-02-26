@@ -69,7 +69,6 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -1022,8 +1021,9 @@ public class OrderFragment extends Fragment {
 		layoutOverall.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(isDownscaled()) {
-					zoomInFragment((OrdersActivity) getActivity());
+				final OrdersActivity activity = (OrdersActivity) getActivity();
+				if(isDownscaled() && activity.checkFragment(OrderFragment.this)) {
+					zoomInFragment(activity);
 				}
 			}
 		});

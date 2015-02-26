@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
-import com.omnom.android.adapter.OrdersPagerAdaper;
+import com.omnom.android.adapter.OrdersPagerAdapter;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
@@ -88,7 +88,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 	@InjectView(R.id.root)
 	protected View rootView;
 
-	private OrdersPagerAdaper mPagerAdapter;
+	private OrdersPagerAdapter mPagerAdapter;
 
 	private ArrayList<Order> orders = null;
 
@@ -218,7 +218,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
                        new OrderCreateEventListener(this, this),
                        new OrderUpdateEventListener(this, this),
 		               new OrderCloseEventListener(this, this));
-		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, requestId, bgColor);
+		mPagerAdapter = new OrdersPagerAdapter(getSupportFragmentManager(), orders, requestId, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 4.5);
 		mPager.setPageMargin(margin);
