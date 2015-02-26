@@ -97,6 +97,9 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 	@InjectView(R.id.background)
 	protected View background;
 
+	@InjectView(R.id.animation_background)
+	protected View animationBackground;
+
 	@InjectView(R.id.btn_flash_light)
 	protected ImageView btnFlashLight;
 
@@ -109,6 +112,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 		editor.putString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, FrontLightMode.OFF.name());
 		editor.apply();
 		setTorchListener(this);
+		animationBackground.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 	}
 
 	@Override

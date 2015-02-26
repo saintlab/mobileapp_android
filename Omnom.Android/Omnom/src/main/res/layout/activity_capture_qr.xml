@@ -141,6 +141,16 @@
 
         </LinearLayout>
 
+        <!-- The following layout is required to fix issues with QR hint fragment and
+             "Not scanning?" button animations.
+             Due to hardware acceleration it is rendered inappropriately,
+             thus the layout has acceleration turned off and everything works like a charm. -->
+        <FrameLayout
+            android:id="@+id/animation_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparent"/>
+
         <TextView
             android:id="@+id/btn_not_scanning"
             android:layout_width="match_parent"
