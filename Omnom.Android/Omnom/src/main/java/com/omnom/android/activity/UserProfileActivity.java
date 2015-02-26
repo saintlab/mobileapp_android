@@ -13,17 +13,19 @@ import android.util.Pair;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.UserProfileHelper;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.fragment.ChangeTableFragment;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.SupportInfoResponse;
 import com.omnom.android.restaurateur.model.UserProfile;
@@ -33,6 +35,7 @@ import com.omnom.android.utils.drawable.RoundedDrawable;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -51,7 +54,7 @@ import rx.schedulers.Schedulers;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
-public class UserProfileActivity extends BaseOmnomActivity {
+public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 	private static final String TAG = UserProfileActivity.class.getSimpleName();
 
@@ -86,6 +89,9 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.txt_table_number)
 	protected TextView mTxtTableNumber;
+
+	@InjectView(R.id.dark_transparent_background)
+	protected FrameLayout darkTransparentBackground;
 
 	@Inject
 	protected AuthService authenticator;
@@ -252,6 +258,14 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	}
 
 	@Override
+	public void onBackPressed() {
+		if(getSupportFragmentManager().getBackStackEntryCount() != 0) {
+			AnimationUtils.animateAlpha(darkTransparentBackground, false);
+		}
+		super.onBackPressed();
+	}
+
+	@Override
 	public void finish() {
 		UserProfileActivity.super.finish();
 		overridePendingTransition(R.anim.fake_fade_out_short, R.anim.slide_out_down);
@@ -259,6 +273,20 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.panel_table_number)
 	public void onChangeTable() {
+		getSupportFragmentManager()
+				.beginTransaction()
+				.addToBackStack(null)
+				.setCustomAnimations(
+						R.anim.slide_in_up,
+						R.anim.slide_out_down,
+						R.anim.slide_in_up,
+						R.anim.slide_out_down)
+				.replace(R.id.fragment_container, ChangeTableFragment.newInstance(mTableNumber))
+				.commit();
+		AnimationUtils.animateAlpha(darkTransparentBackground, true);
+	}
+
+	public void changeTable() {
 		setResult(RESULT_CODE_TABLE_CHANGED);
 		UserProfileActivity.super.finish();
 		overridePendingTransition(R.anim.fake_fade_in, R.anim.slide_out_down);

@@ -122,8 +122,8 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	@InjectView(R.id.txt_info)
 	protected TextView mTextInfo;
 
-	@InjectView(R.id.transparent_panel)
-	protected FrameLayout transparentPanel;
+	@InjectView(R.id.dark_transparent_background)
+	protected FrameLayout darkTransparentBackground;
 
 	@InjectView(R.id.fragment_container)
 	protected FrameLayout fragmentContainer;
@@ -514,7 +514,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		                                                R.anim.slide_in_up, R.anim.slide_out_down)
 		                           .replace(R.id.fragment_container, payOnceFragment)
 		                           .commit();
-		AnimationUtils.animateAlpha(transparentPanel, true);
+		AnimationUtils.animateAlpha(darkTransparentBackground, true);
 	}
 
 	@Override
@@ -540,7 +540,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	public void onBackPressed() {
 		if(payOnceFragment != null && payOnceFragment.isVisible()) {
 			mEditAmount.getEditText().setEnabled(true);
-			AnimationUtils.animateAlpha(transparentPanel, false);
+			AnimationUtils.animateAlpha(darkTransparentBackground, false);
 			getSupportFragmentManager().beginTransaction()
 			                           .setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
 			                                                R.anim.slide_in_up, R.anim.slide_out_down)
