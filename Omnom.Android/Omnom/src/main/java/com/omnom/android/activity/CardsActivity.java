@@ -27,10 +27,10 @@ import com.omnom.android.R;
 import com.omnom.android.acquiring.AcquiringResponseException;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.adapter.CardsAdapter;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.model.acquiring.CardDeletedMixpanelEvent;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
@@ -301,8 +301,8 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	private void removeCard(final Card card) {
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
-		UserData userData = UserData.create(OmnomApplication.get(getActivity()).getUserProfile().getUser());
-		String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
+		final UserData userData = OmnomApplication.get(getActivity()).getUserProfile().getUser();
+		final String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
 		final CardInfo cardInfo = new CardInfo.Builder()
 											.cardId(card.getExternalCardId())
 											.pan(card.getMaskedPan())

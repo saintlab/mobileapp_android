@@ -4,7 +4,7 @@ import com.omnom.android.acquiring.api.PaymentInfo;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.MailRuExtra;
 import com.omnom.android.acquiring.mailru.model.PaymentInfoMailRu;
-import com.omnom.android.acquiring.mailru.model.UserData;
+import com.omnom.android.auth.UserData;
 
 /**
  * Created by Ch3D on 24.09.2014.
@@ -17,7 +17,7 @@ public class PaymentInfoFactory {
 				                                order.getOrderMsg());
 
 			default:
-				throw new RuntimeException("Not ImplementedЫ");
+				throw new RuntimeException("Not Implemented");
 
 		}
 	}

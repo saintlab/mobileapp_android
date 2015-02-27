@@ -3,10 +3,23 @@ package com.omnom.android.auth;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
+
 /**
  * Created by Ch3D on 03.09.2014.
  */
 public class UserData {
+
+	public static UserData createTestUser() {
+		return create(5, "89833087335");
+	}
+
+	public static UserData create(final int id, final String phone) {
+		UserData userData = new UserData();
+		userData.id = id;
+		userData.phone = phone;
+		return userData;
+	}
 
 	@Expose
 	private int id;
@@ -73,6 +86,14 @@ public class UserData {
 
 	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
+	}
+
+	public void storeLogin(HashMap<String, String> params) {
+		params.put("user_login", String.valueOf(getId()));
+	}
+
+	public void storePhone(HashMap<String, String> params) {
+		params.put("user_phone", getPhone());
 	}
 
 	@Override

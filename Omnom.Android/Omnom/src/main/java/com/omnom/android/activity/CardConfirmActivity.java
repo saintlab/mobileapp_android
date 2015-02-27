@@ -30,13 +30,13 @@ import com.omnom.android.R;
 import com.omnom.android.acquiring.AcquiringResponseException;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.PayOnceFragment;
 import com.omnom.android.listener.DecimalKeyListener;
 import com.omnom.android.mixpanel.model.acquiring.CardAddedMixpanelEvent;
@@ -213,7 +213,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		}
 		ViewUtils.setVisible(mTextInfo, false);
 		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
-		mUser = UserData.create(mUserProfile.getUser());
+		mUser = mUserProfile.getUser();
 		mAcquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		mPanelTop.setTitleBig(R.string.card_binding);
 		mPanelTop.setButtonRightEnabled(false);
@@ -343,10 +343,9 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		}
 		mPanelTop.showProgress(true);
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
-		com.omnom.android.auth.UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		final UserData user = UserData.create(String.valueOf(wicketUser.getId()), wicketUser.getPhone());
+		UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		mCardRegisterSubscription = AndroidObservable.bindActivity(this,
-		                                                           mAcquiring.registerCard(acquiringData, user, mCard)
+		                                                           mAcquiring.registerCard(acquiringData, wicketUser, mCard)
 		                                                                     .delaySubscription(1000, TimeUnit.MILLISECONDS)
 		                                                          )
 		                                             .subscribe(
