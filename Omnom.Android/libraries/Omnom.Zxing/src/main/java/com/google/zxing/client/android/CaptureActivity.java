@@ -34,6 +34,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -217,6 +218,19 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 			// Install the callback and wait for surfaceCreated() to init the camera.
 			surfaceHolder.addCallback(this);
 		}
+
+		surfaceView.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_UP) {
+					final CaptureActivity activity = CaptureActivity.this;
+					if (activity.cameraManager != null) {
+						activity.cameraManager.autoFocus();
+					}
+				}
+				return true;
+			}
+		});
 
 		ambientLightManager.start(cameraManager);
 
@@ -431,7 +445,9 @@ public class CaptureActivity extends BaseFragmentActivity implements SurfaceHold
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+		if (this.cameraManager != null) {
+			this.cameraManager.autoFocus();
+		}
 	}
 
 	/**

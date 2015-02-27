@@ -179,6 +179,12 @@ public final class CameraManager {
 		}
 	}
 
+	public void autoFocus() {
+		if (camera != null) {
+			autoFocusManager.start();
+		}
+	}
+
 	public void setTorchListener(final TorchListener torchListener) {
 		mTorchListener = torchListener;
 	}

@@ -108,7 +108,8 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 		super.onCreate(icicle);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = prefs.edit();
-		editor.putBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, false);
+		editor.putBoolean(PreferencesActivity.KEY_DISABLE_EXPOSURE, true);
+		editor.putBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, true);
 		editor.putString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, FrontLightMode.OFF.name());
 		editor.apply();
 		setTorchListener(this);
