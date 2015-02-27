@@ -39,7 +39,8 @@ import static com.omnom.android.adapter.MultiLevelRecyclerAdapter.Data;
  */
 public class MenuSubcategoryFragment extends BaseFragment {
 
-	public static void show(final FragmentManager manager, final UserOrder order, final Menu menu, final int position, final float ypos) {
+	public static void scaleUp(final FragmentManager manager, final UserOrder order, final Menu menu, final int position,
+	                           final float ypos) {
 		manager.beginTransaction()
 		       .addToBackStack(null)
 		       .setCustomAnimations(R.anim.fold_in,
@@ -47,6 +48,24 @@ public class MenuSubcategoryFragment extends BaseFragment {
 		                            R.anim.fold_in,
 		                            R.anim.slide_out_right)
 		       .add(R.id.fragment_container, MenuSubcategoryFragment.newInstance(order, menu, position, ypos))
+		       .commit();
+	}
+
+	public static void show(final FragmentManager manager, final UserOrder order, final Menu menu) {
+		manager.beginTransaction()
+		       .addToBackStack(null)
+		       .add(R.id.fragment_container, MenuSubcategoryFragment.newInstance(order, menu, -1, -1))
+		       .commit();
+	}
+
+	public static void slideUp(final FragmentManager manager, final UserOrder order, final Menu menu, final int position) {
+		manager.beginTransaction()
+		       .addToBackStack(null)
+		       .setCustomAnimations(R.anim.slide_in_up,
+		                            R.anim.slide_out_down,
+		                            R.anim.slide_in_up,
+		                            R.anim.slide_out_down)
+		       .add(R.id.fragment_container, MenuSubcategoryFragment.newInstance(order, menu, position, -1))
 		       .commit();
 	}
 
@@ -67,7 +86,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 	protected RecyclerView mListView;
 
 	@InjectView(R.id.btn_back)
-	protected ImageView mImgBack;
+	protected ImageView mImgClose;
 
 	private UserOrder mOrder;
 
@@ -82,6 +101,8 @@ public class MenuSubcategoryFragment extends BaseFragment {
 	private LinearLayoutManager mLayoutManager;
 
 	private View.OnClickListener mGroupClickListener;
+
+	private boolean mModeScaleUp = false;
 
 	@Subscribe
 	public void onOrderUpdate(final OrderUpdateEvent event) {
@@ -114,16 +135,14 @@ public class MenuSubcategoryFragment extends BaseFragment {
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		// mAdapter.notifyDataSetChanged();
-	}
-
-	@Override
 	public Animation onCreateAnimation(final int transit, final boolean enter, final int nextAnim) {
+		if(!mModeScaleUp) {
+			return super.onCreateAnimation(transit, enter, nextAnim);
+		}
+
 		if(!enter) {
 			AnimationUtils.animateAlpha(mListView, false);
-			AnimationUtils.animateAlpha(mImgBack, false, 100);
+			AnimationUtils.animateAlpha(mImgClose, false, 100);
 		}
 
 		final ScaleAnimation scaleAnimation = new ScaleAnimation(1.0f, 1.0f, enter ? 0.0f : 1.0f,
@@ -137,7 +156,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 			public void onAnimationStart(final Animation animation) {
 				if(enter) {
 					ViewUtils.setVisible2(mListView, false);
-					ViewUtils.setVisible2(mImgBack, false);
+					ViewUtils.setVisible2(mImgClose, false);
 				}
 			}
 
@@ -145,7 +164,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 			public void onAnimationEnd(final Animation animation) {
 				if(enter) {
 					AnimationUtils.animateAlpha(mListView, true);
-					AnimationUtils.animateAlpha(mImgBack, true);
+					AnimationUtils.animateAlpha(mImgClose, true);
 				}
 			}
 
@@ -165,6 +184,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 			mMenu = getArguments().getParcelable(Extras.EXTRA_RESTAURANT_MENU);
 			mPosition = getArguments().getInt(Extras.EXTRA_POSITION, -1);
 			mPivotY = getArguments().getFloat(Extras.EXTRA_PIVOT_Y, -1);
+			mModeScaleUp = mPivotY > 0;
 		}
 	}
 
@@ -217,6 +237,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 		mListView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
+				AnimationUtils.animateAlpha(mImgClose, true);
 				mMenuAdapter.expandGroup(mPosition);
 			}
 		}, 850);
@@ -234,7 +255,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 
 	@OnClick(R.id.btn_back)
 	public void onClose() {
-		AnimationUtils.animateAlpha(mImgBack, false, 100);
+		AnimationUtils.animateAlpha(mImgClose, false, 100);
 		getFragmentManager().popBackStack();
 	}
 

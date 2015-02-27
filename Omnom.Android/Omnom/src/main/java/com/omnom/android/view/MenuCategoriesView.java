@@ -52,7 +52,7 @@ public class MenuCategoriesView extends FrameLayout implements SlidingUpPanelLay
 
 	private LinearInterpolator mInterpolator;
 
-	private View mSelectedView;
+	// private View mSelectedView;
 
 	private Menu mMenu;
 
@@ -93,39 +93,40 @@ public class MenuCategoriesView extends FrameLayout implements SlidingUpPanelLay
 		mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-				mSelectedView = mList.getChildAt(position);
+				//mSelectedView = mList.getChildAt(position);
+				//
+				//final float heightPixels = mList.getContext().getResources().getDisplayMetrics().heightPixels;
+				//final int anchorY = mSelectedView.getBottom() + (mCategoryItemHeight / 2);
+				//final int ty = -mSelectedView.getBottom() + mCategoryItemHeight + mTitleAnimationPadding;
+				//
+				//mSelectedView.animate().translationY(ty)
+				//             .scaleX(0.8f).scaleY(0.8f)
+				//             .setInterpolator(mInterpolator)
+				//             .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)
+				//		                          + DURATION_INCREMENT_MOVE_UP)
+				//             .start();
 
-				final float heightPixels = mList.getContext().getResources().getDisplayMetrics().heightPixels;
-				final int anchorY = mSelectedView.getBottom() + (mCategoryItemHeight / 2);
-				final int ty = -mSelectedView.getBottom() + mCategoryItemHeight + mTitleAnimationPadding;
+				//for(int i = position + 1; i <= mList.getLastVisiblePosition(); i++) {
+				//	final View v = mList.getChildAt(i);
+				//	v.animate().translationY(mScreenHeight - v.getBottom()).alpha(0)
+				//	 .setInterpolator(mInterpolator)
+				//	 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_UP)
+				//	 .start();
+				//}
+				//
+				//for(int i = mList.getFirstVisiblePosition(); i <= position - 1; i++) {
+				//	final View v = mList.getChildAt(i);
+				//	v.animate().translationY(-(v.getTop() + mCategoryItemHeight)).alpha(0)
+				//	 .setInterpolator(mInterpolator)
+				//	 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_UP)
+				//	 .start();
+				//}
+				//
+				//final float v = anchorY / heightPixels;
+				final float v = 0;
 
-				mSelectedView.animate().translationY(ty)
-				             .scaleX(0.8f).scaleY(0.8f)
-				             .setInterpolator(mInterpolator)
-				             .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)
-						                          + DURATION_INCREMENT_MOVE_UP)
-				             .start();
-
-				for(int i = position + 1; i <= mList.getLastVisiblePosition(); i++) {
-					final View v = mList.getChildAt(i);
-					v.animate().translationY(mScreenHeight - v.getBottom()).alpha(0)
-					 .setInterpolator(mInterpolator)
-					 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_UP)
-					 .start();
-				}
-
-				for(int i = mList.getFirstVisiblePosition(); i <= position - 1; i++) {
-					final View v = mList.getChildAt(i);
-					v.animate().translationY(-(v.getTop() + mCategoryItemHeight)).alpha(0)
-					 .setInterpolator(mInterpolator)
-					 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_UP)
-					 .start();
-				}
-
-				final float v = anchorY / heightPixels;
-
-				MenuSubcategoryFragment.show(getFragmentManager(), validateActivity.getUserOrder(), mMenu,
-				                             position - mList.getHeaderViewsCount(), v);
+				MenuSubcategoryFragment.slideUp(getFragmentManager(), validateActivity.getUserOrder(), mMenu,
+				                                position - mList.getHeaderViewsCount());
 			}
 		});
 	}
@@ -177,29 +178,28 @@ public class MenuCategoriesView extends FrameLayout implements SlidingUpPanelLay
 	@Override
 	public void onBackStackChanged() {
 		if(getFragmentManager() != null && getFragmentManager().getBackStackEntryCount() == 0) {
-			final int positionForView = mList.getPositionForView(mSelectedView);
-
-			for(int i = positionForView + 1; i <= mList.getLastVisiblePosition(); i++) {
-				final View v = mList.getChildAt(i);
-				v.animate().translationY(0).alpha(1)
-				 .setInterpolator(mInterpolator)
-				 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_UP)
-				 .start();
-			}
-
-			for(int i = 0; i <= positionForView - 1; i++) {
-				final View v = mList.getChildAt(i);
-				v.animate().translationY(0).alpha(1)
-				 .setInterpolator(mInterpolator)
-				 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_DOWN)
-				 .start();
-			}
-
-			mSelectedView.animate().translationY(0)
-			             .scaleX(1).scaleY(1)
-			             .setInterpolator(mInterpolator)
-			             .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)
-					                          + DURATION_INCREMENT_MOVE_DOWN).start();
+			// final int positionForView = mList.getPositionForView(mSelectedView);
+			//for(int i = positionForView + 1; i <= mList.getLastVisiblePosition(); i++) {
+			//	final View v = mList.getChildAt(i);
+			//	v.animate().translationY(0).alpha(1)
+			//	 .setInterpolator(mInterpolator)
+			//	 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_UP)
+			//	 .start();
+			//}
+			//
+			//for(int i = 0; i <= positionForView - 1; i++) {
+			//	final View v = mList.getChildAt(i);
+			//	v.animate().translationY(0).alpha(1)
+			//	 .setInterpolator(mInterpolator)
+			//	 .setDuration(getResources().getInteger(R.integer.default_animation_duration_short) + DURATION_INCREMENT_MOVE_DOWN)
+			//	 .start();
+			//}
+			//
+			//mSelectedView.animate().translationY(0)
+			//             .scaleX(1).scaleY(1)
+			//             .setInterpolator(mInterpolator)
+			//             .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)
+			//		                          + DURATION_INCREMENT_MOVE_DOWN).start();
 		}
 	}
 }

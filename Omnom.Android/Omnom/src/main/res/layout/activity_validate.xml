@@ -19,15 +19,29 @@
         android:layout_gravity="bottom"
         android:background="@drawable/bg_menu_gradient" />
 
+    <com.omnom.android.view.SubcategoriesView
+        android:id="@+id/view_subcategories"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="48dp"
+        android:layout_gravity="bottom"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="48dp"
+        android:layout_gravity="bottom" />
+
     <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/transparent_black"
         android:gravity="bottom"
         sothree:umanoFadeColor="@color/transparent"
         android:visibility="gone"
-        sothree:umanoPanelHeight="304dp"
+        sothree:umanoPanelHeight="256dp"
         sothree:umanoShadowHeight="0dp">
 
         <View
@@ -35,8 +49,8 @@
             android:layout_height="wrap_content"
             android:clickable="false" />
 
-        <com.omnom.android.view.MenuCategoriesView
-            android:id="@+id/menu_categories"
+        <com.omnom.android.view.SubcategoriesView
+            android:id="@+id/menu_subcategories"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="48dp"
@@ -77,13 +91,6 @@
         android:text="Выйти из Демо"
         android:textAppearance="?android:textAppearanceMedium"
         android:visibility="gone" />
-
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="48dp"
-        android:layout_gravity="bottom" />
 
     <LinearLayout
         android:id="@+id/content"

@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
@@ -65,6 +66,7 @@ import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.MenuCategoriesView;
+import com.omnom.android.view.SubcategoriesView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -221,8 +223,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 	@InjectView(R.id.menu_gradient)
 	protected View menuGradientPanel;
 
-	@InjectView(R.id.menu_categories)
-	protected MenuCategoriesView menuCategories;
+	@InjectView(R.id.menu_subcategories)
+	protected SubcategoriesView menuCategories;
 
 	@InjectView(R.id.txt_bottom)
 	protected TextView txtErrorRepeat;
@@ -344,6 +346,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 		}
 		final Item item = event.getItem();
 		mOrder.itemsTable().put(item.id(), UserOrderData.create(event.getCount(), item));
+		menuCategories.refresh(event);
 		updateWishUi();
 	}
 
@@ -462,18 +465,19 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 		getSupportFragmentManager().addOnBackStackChangedListener(this);
 
 		mOrder = insureOrder();
-		slidingPanel.getBackground().setAlpha(0);
 		slidingPanel.setPanelSlideListener(menuCategories);
 		menuCategories.setSlideListener(new MenuCategoriesView.SlideListener() {
 			@Override
 			public void onPanelSlide(final View panel, final float slideOffset) {
-				slidingPanel.getBackground().setAlpha((int) (slideOffset * 255));
 				final float loaderFactor = 1.0f - slideOffset;
+
 				if(loaderFactor < 0.85f) {
-					AnimationUtils.animateAlpha(imgProfile, false);
+					AnimationUtils.animateAlpha3(imgProfile, false);
+					AnimationUtils.animateAlpha3(imgPrevious, false);
 					loader.hideLogo();
 				} else {
-					AnimationUtils.animateAlpha(imgProfile, true);
+					AnimationUtils.animateAlpha3(imgProfile, true);
+					AnimationUtils.animateAlpha3(imgPrevious, true);
 					loader.showLogo();
 				}
 				loader.scaleDown((int) (loader.getLoaderSizeDefault() * loaderFactor), 0, null);
@@ -989,6 +993,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 		if(bottomView == null) {
 			stubBottomMenu.setLayoutResource(waiterEnabled ? R.layout.layout_bill_waiter : R.layout.layout_bill);
 			bottomView = stubBottomMenu.inflate();
+			AndroidUtils.applyFont(this, (ViewGroup) bottomView, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
 		}
 
 		if(waiterEnabled) {
@@ -1197,6 +1202,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 
 	protected void bindMenuData() {
 		slidingPanel.setTouchEnabled(mMenu != null && !mMenu.isEmpty());
-		menuCategories.bindData(mMenu);
+		if(mMenu != null) {
+			menuCategories.bind(mMenu, mOrder);
+		}
 	}
+
+	private int getMenuTranslationDefault() {return getResources().getDisplayMetrics().heightPixels - ViewUtils.dipToPixels(this, 304);}
 }

@@ -121,6 +121,9 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 	}
 
 	public void expandGroup(int position) {
+		if(position < 0) {
+			return;
+		}
 		Data firstItem = getItemAt(position);
 
 		if(!firstItem.isGroup()) {
@@ -165,7 +168,22 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		}
 	}
 
+	public void collapseExpandedGroup(int position) {
+		if(position < 0) {
+			return;
+		}
+		Data firstItem = getItemAt(position);
+
+		if(firstItem.getChildren() == null || firstItem.getChildren().isEmpty() || firstItem.isGroup()) {
+			return;
+		}
+		collapseGroup(position);
+	}
+
 	public void collapseGroup(int position) {
+		if(position < 0) {
+			return;
+		}
 		Data firstItem = getItemAt(position);
 
 		if(firstItem.getChildren() == null || firstItem.getChildren().isEmpty()) {
@@ -240,6 +258,12 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 	public void collapseAll() {
 		for(int i = 0; i < mData.size(); i++) {
 			collapseGroup(i);
+		}
+	}
+
+	public void collapseExpandedGroups() {
+		for(int i = 0; i < mData.size(); i++) {
+			collapseExpandedGroup(i);
 		}
 	}
 

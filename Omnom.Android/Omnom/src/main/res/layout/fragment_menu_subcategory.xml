@@ -1,5 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/root"
+    android:id="@+id/root_subcategories"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,6 +11,19 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/menu_margin_top">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="@string/menu"
+            android:layout_centerInParent="true"
+            android:textColor="@color/menu_header"
+            android:textSize="@dimen/font_larger"
+            android:drawableLeft="@drawable/ic_menu_normal"
+            android:drawablePadding="@dimen/drawable_padding_default"
+            android:textAppearance="?android:textAppearanceLarge" />
+
         <ImageView
             android:id="@+id/btn_back"
             android:scaleType="centerInside"
@@ -18,14 +31,16 @@
             android:layout_height="48dp"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
+            android:visibility="gone"
             android:src="@drawable/ic_cross_white" />
 
     </RelativeLayout>
 
     <FrameLayout
+        android:id="@+id/panel_bottom"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="2dp"
+        android:paddingBottom="48dp"
         android:background="@android:color/white"
         android:layout_below="@+id/panel_top">
 
