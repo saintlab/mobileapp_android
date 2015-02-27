@@ -7,9 +7,9 @@
     <string name="registration">Регистрация</string>
     <string name="enter">Вход</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="entering_pay_with_phone">Оплатить счёт через телефон</string>
+    <string name="entering_pay_with_phone">Оплатить счёт\nчерез телефон</string>
     <string name="entering_call_waiter">Вызвать официанта\nв&#160;любой момент</string>
-    <string name="entering_split_bill">Разделить счёт между друзьями</string>
+    <string name="entering_split_bill">Разделить счёт\nмежду друзьями</string>
     <string name="name">Имя</string>
     <string name="email">Почта</string>
     <string name="phone_number">Номер телефона</string>
