@@ -12,6 +12,14 @@
         android:name="android.hardware.camera.flash"
         android:required="false" />
 
+    <meta-data
+        android:name="PW_APPID"
+        android:value="A5748-12C00" />
+
+    <meta-data
+        android:name="PW_PROJECT_ID"
+        android:value="A32780815534" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />

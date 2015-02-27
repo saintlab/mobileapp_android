@@ -3,6 +3,7 @@ package com.omnom.android.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -190,6 +191,23 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
 		return intent;
 	}
+
+	//Registration receiver
+	BroadcastReceiver mBroadcastReceiver = new RegisterBroadcastReceiver() {
+		@Override
+		public void onRegisterActionReceive(Context context, Intent intent) {
+			checkMessage(intent);
+		}
+	};
+
+	//Push message receiver
+	private BroadcastReceiver mReceiver = new BasePushMessageReceiver() {
+		@Override
+		protected void onMessageReceive(Intent intent) {
+			//JSON_DATA_KEY contains JSON payload of push notification.
+			showMessage("push message is " + intent.getExtras().getString(JSON_DATA_KEY));
+		}
+	};
 
 	protected final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
