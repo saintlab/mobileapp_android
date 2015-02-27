@@ -172,7 +172,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 						}
 						UserProfile profile = new UserProfile(userResponse);
 						OmnomApplication.get(getActivity()).cacheUserProfile(profile);
-						initUserData(userResponse.getUser(), profile.getImageUrl());
+						initUserData(userResponse.getUser());
 
 						final SupportInfoResponse supportInfoResponse = response.second;
 						if (!supportInfoResponse.hasErrors()) {
@@ -220,7 +220,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 		OmnomObservable.unsubscribe(logoutSubscription);
 	}
 
-	private void initUserData(UserData user, String imgUrl) {
+	private void initUserData(UserData user) {
 		if(user == null) {
 			showToast(this, R.string.error_user_not_found);
 			finish();
@@ -229,21 +229,25 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 		mTxtInfo.setText(user.getPhone());
 		mTxtLogin.setText(user.getEmail());
 		mTxtUsername.setText(user.getName());
-		updateUserImage(imgUrl);
+		updateUserImage(user.getAvatar());
 	}
 
 	private void updateUserImage(String url) {
 		final int dimension = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
+		final RoundedDrawable placeholderDrawable = getPlaceholderDrawable(dimension);
 		if(TextUtils.isEmpty(url)) {
-			final RoundedDrawable placeholderDrawable = getPlaceholderDrawable(dimension);
 			AndroidUtils.setBackground(mImgUser, placeholderDrawable);
 			mImgUser.setImageDrawable(getResources().getDrawable(R.drawable.ic_defolt_user));
 			final int padding = ViewUtils.dipToPixels(this, 24);
 			mImgUser.setPadding(padding, padding, padding, padding);
 		} else {
-			OmnomApplication.getPicasso(this).load(url).placeholder(getPlaceholderDrawable(dimension))
-			                .resize(dimension, dimension).centerCrop()
-			                .transform(RoundTransformation.create(dimension, 0)).into(mImgUser);
+			AndroidUtils.setBackground(mImgUser, null);
+			mImgUser.setPadding(0, 0, 0, 0);
+			OmnomApplication.getPicasso(this).load(url)
+								.placeholder(placeholderDrawable)
+			                    .resize(dimension, dimension).centerCrop()
+			                    .transform(RoundTransformation.create(dimension, 0))
+								.into(mImgUser);
 		}
 	}
 

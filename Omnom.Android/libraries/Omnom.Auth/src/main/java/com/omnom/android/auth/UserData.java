@@ -36,6 +36,9 @@ public class UserData {
 	@Expose
 	private String phone;
 
+	@Expose
+	private String avatar;
+
 	@SerializedName("birth_date")
 	@Expose
 	private String birthDate;
@@ -78,6 +81,14 @@ public class UserData {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
 	}
 
 	public String getBirthDate() {
