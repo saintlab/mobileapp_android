@@ -1171,6 +1171,7 @@ public class OrderFragment extends Fragment {
 			}
 		});
 		pickerTips.setValue(PICKER_DEFAULT_VALUE);
+		pickerTips.setWrapSelectorWheel(false);
 	}
 
 	private void updateCustomTipsText(final int newVal) {
