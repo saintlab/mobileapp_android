@@ -962,7 +962,7 @@ public class OrderFragment extends Fragment {
 
 	private void updatePayButton(final BigDecimal amount, final TipData tipData) {
         if (btnPay != null) {
-            btnPay.setEnabled(BigDecimal.ZERO.compareTo(amount) >= 0);
+            btnPay.setEnabled(BigDecimal.ZERO.compareTo(amount) <= 0);
             btnPay.setText(getString(R.string.pay_amount, AmountHelper.format(amount.add(tipData.getAmount())) + getCurrencySuffix()));
         }
 	}
