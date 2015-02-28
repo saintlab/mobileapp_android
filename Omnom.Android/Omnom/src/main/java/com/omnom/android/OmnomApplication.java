@@ -13,9 +13,11 @@ import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.AuthMixpanelModule;
 import com.omnom.android.modules.BeaconModule;
 import com.omnom.android.modules.OmnomApplicationModule;
+import com.omnom.android.modules.PushWooshNotificationsModule;
 import com.omnom.android.modules.RestuarateurMixpanelModule;
 import com.omnom.android.preferences.JsonPreferenceProvider;
 import com.omnom.android.preferences.PreferenceHelperAdapter;
+import com.omnom.android.push.PushNotificationManager;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.config.Config;
@@ -32,6 +34,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+
+import javax.inject.Inject;
 
 import dagger.ObjectGraph;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -75,6 +79,9 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	private Picasso _lazy_Picasso;
 
+	@Inject
+	protected PushNotificationManager mPushManager;
+
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
 		                     new OmnomApplicationModule(),
@@ -82,6 +89,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		                     new RestuarateurMixpanelModule(this, R.string.endpoint_restaurateur, mixPanelHelper),
 		                     new MenuModule(this, R.string.endpoint_menu),
 		                     new AcquiringModuleMailRuMixpanel(this, mixPanelHelper),
+		                     new PushWooshNotificationsModule(this),
 		                     new AuthMixpanelModule(this, R.string.endpoint_auth, mixPanelHelper));
 	}
 
@@ -115,6 +123,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		for(final Object obj : injectList) {
 			objectGraph.inject(obj);
 		}
+
 		injectList.clear();
 		inject(this);
 		preferenceHelper = new PreferenceHelperAdapter();
@@ -171,6 +180,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	}
 
 	public void logout() {
+		mPushManager.unregister();
 		preferenceHelper.setAuthToken(this, StringUtils.EMPTY_STRING);
 		cacheUserProfile(null);
 	}

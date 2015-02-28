@@ -12,17 +12,11 @@
         android:name="android.hardware.camera.flash"
         android:required="false" />
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
     <permission
-        android:name="com.omnom.android.permission.C2D_MESSAGE"
+        android:name="${applicationId}.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.omnom.android.permission.C2D_MESSAGE" />
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
 
     <!-- This app has permission to register and receive data message. -->
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
@@ -41,15 +35,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <!-- START: MixPanel GCM Integration -->
-
-    <uses-permission android:name="com.omnom.android.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!-- END: MixPanel GCM Integration -->
     <application
         android:name=".OmnomApplication"
         android:allowBackup="true"
@@ -66,19 +54,6 @@
             android:name="PW_PROJECT_ID"
             android:value="A32780815534" />
 
-        <!-- START: MixPanel GCM Integration -->
-        <receiver
-            android:name=".mixpanel.MixpanelGCMReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-
-                <category android:name="com.omnom.android" />
-            </intent-filter>
-        </receiver>
-        <!-- END: MixPanel GCM Integration -->
-
         <service
             android:name=".service.bluetooth.BackgroundBleService"
             android:enabled="true"
@@ -90,7 +65,9 @@
 
         <activity android:name="com.arellomobile.android.push.MessageActivity" />
 
-        <activity android:name="com.arellomobile.android.push.PushHandlerActivity" />
+        <activity
+            android:name="com.arellomobile.android.push.PushHandlerActivity"
+            android:exported="true" />
 
         <receiver
             android:name="com.google.android.gcm.GCMBroadcastReceiver"
@@ -100,11 +77,17 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <!-- Receives the registration id. -->
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <category android:name="com.omnom.android" />
+                <category android:name="${applicationId}" />
             </intent-filter>
         </receiver>
 
-        <service android:name="com.arellomobile.android.push.PushGCMIntentService" />
+        <!--        <service android:name="com.arellomobile.android.push.PushGCMIntentService" />-->
+
+        <service android:name="com.omnom.android.service.bluetooth.PushWooshService" />
+
+        <meta-data
+            android:name="PW_PUSH_SERVICE"
+            android:value="com.omnom.android.service.bluetooth.PushWooshService" />
 
         <activity
             android:name=".activity.EnteringActivity"
@@ -115,11 +98,17 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood.Red"
             android:windowSoftInputMode="stateAlwaysHidden">
+
+            <!--            <intent-filter>
+                            <action android:name="${applicationId}.MESSAGE" />
+                            <category android:name="android.intent.category.DEFAULT" />
+                        </intent-filter>-->
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -182,12 +171,7 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
-            android:windowSoftInputMode="stateAlwaysHidden">
-            <intent-filter>
-                <action android:name="com.omnom.android.MESSAGE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:windowSoftInputMode="stateAlwaysHidden"></activity>
 
         <activity
             android:name=".activity.ValidateActivityBle21"
@@ -196,10 +180,6 @@
             android:theme="@style/Theme.Wood"
             android:windowSoftInputMode="stateAlwaysHidden">
 
-            <intent-filter>
-                <action android:name="com.omnom.android.MESSAGE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -207,24 +187,14 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
-            android:windowSoftInputMode="stateAlwaysHidden">
-            <intent-filter>
-                <action android:name="com.omnom.android.MESSAGE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:windowSoftInputMode="stateAlwaysHidden"></activity>
 
         <activity
             android:name=".activity.ValidateActivityShortcut"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
-            android:windowSoftInputMode="stateAlwaysHidden">
-            <intent-filter>
-                <action android:name="com.omnom.android.MESSAGE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:windowSoftInputMode="stateAlwaysHidden"></activity>
 
         <activity
             android:name=".activity.OrdersActivity"

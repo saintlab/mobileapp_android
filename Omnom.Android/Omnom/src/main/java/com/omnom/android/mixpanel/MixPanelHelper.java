@@ -233,7 +233,6 @@ public class MixPanelHelper {
 				api.identify(id);
 				api.getPeople().identify(id);
 				api.getPeople().set(toJson(user));
-				api.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
 			}
 		});
 	}
@@ -252,7 +251,6 @@ public class MixPanelHelper {
 				api.getPeople().identify(id);
 				api.getPeople().set(toJson(user));
 				api.getPeople().set(MixPanelHelper.USER_CREATED, MixPanelHelper.formatDate(System.currentTimeMillis()));
-				api.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
 			}
 		});
 	}
@@ -269,7 +267,6 @@ public class MixPanelHelper {
 				api.identify(id);
 				api.getPeople().identify(id);
 				api.getPeople().set(toJson(user));
-				api.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
 			}
 		});
 	}
