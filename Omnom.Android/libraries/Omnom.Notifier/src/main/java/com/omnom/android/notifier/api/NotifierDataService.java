@@ -15,7 +15,7 @@ import rx.Observable;
 public interface NotifierDataService {
 
 	@POST("/notifier/register")
-	public Observable register(@Body RegisterRequest request);
+	public Observable<Object> register(@Body RegisterRequest request);
 
 	@GET("/restaurants/{restaurant_id}/tables/{table_id}/in")
 	public Observable tableIn(@Path(Protocol.FIELD_RESTAURANT_ID) String restId, @Path(Protocol.FIELD_TABLE_ID) String tableId);
@@ -24,5 +24,5 @@ public interface NotifierDataService {
 	public Observable tableOut(@Path(Protocol.FIELD_RESTAURANT_ID) String restId, @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@POST("/notifier/unregister")
-	public Observable unregister();
+	public Observable<Object> unregister();
 }

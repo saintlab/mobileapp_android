@@ -15,6 +15,7 @@ import com.omnom.android.modules.BeaconModule;
 import com.omnom.android.modules.OmnomApplicationModule;
 import com.omnom.android.modules.PushWooshNotificationsModule;
 import com.omnom.android.modules.RestuarateurMixpanelModule;
+import com.omnom.android.notifier.NotifierModule;
 import com.omnom.android.preferences.JsonPreferenceProvider;
 import com.omnom.android.preferences.PreferenceHelperAdapter;
 import com.omnom.android.push.PushNotificationManager;
@@ -63,6 +64,9 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	private final List<Object> injectList = new ArrayList<Object>();
 
+	@Inject
+	protected PushNotificationManager mPushManager;
+
 	private ObjectGraph objectGraph;
 
 	private JsonPreferenceProvider preferenceHelper;
@@ -79,9 +83,6 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	private Picasso _lazy_Picasso;
 
-	@Inject
-	protected PushNotificationManager mPushManager;
-
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
 		                     new OmnomApplicationModule(),
@@ -90,6 +91,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		                     new MenuModule(this, R.string.endpoint_menu),
 		                     new AcquiringModuleMailRuMixpanel(this, mixPanelHelper),
 		                     new PushWooshNotificationsModule(this),
+		                     new NotifierModule(this, R.string.endpoint_restaurateur),
 		                     new AuthMixpanelModule(this, R.string.endpoint_auth, mixPanelHelper));
 	}
 
