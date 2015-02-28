@@ -36,10 +36,12 @@ public class PushNotificationsManagerImpl implements PushNotificationManager, Pu
 		OmnomApplication.get(mContext).inject(this);
 	}
 
+	@Override
 	public void register() {
 		mProvider.register();
 	}
 
+	@Override
 	public void unregister() {
 		mProvider.unregister();
 	}
@@ -49,7 +51,7 @@ public class PushNotificationsManagerImpl implements PushNotificationManager, Pu
 		notifierApi.register(mProvider.getDeviceToken()).subscribe(new Action1() {
 			@Override
 			public void call(final Object o) {
-
+				Log.d(TAG, "onRegistered : " + o);
 			}
 		}, new Action1<Throwable>() {
 			@Override
@@ -61,6 +63,6 @@ public class PushNotificationsManagerImpl implements PushNotificationManager, Pu
 
 	@Override
 	public void onUnregistered() {
-		notifierApi.unregister();
+		Log.d(TAG, "onUnregistered");
 	}
 }

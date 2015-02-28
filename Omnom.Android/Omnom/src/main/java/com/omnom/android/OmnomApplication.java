@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.menu.MenuModule;
@@ -16,6 +17,7 @@ import com.omnom.android.modules.OmnomApplicationModule;
 import com.omnom.android.modules.PushWooshNotificationsModule;
 import com.omnom.android.modules.RestuarateurMixpanelModule;
 import com.omnom.android.notifier.NotifierModule;
+import com.omnom.android.notifier.api.observable.NotifierObservableApi;
 import com.omnom.android.preferences.JsonPreferenceProvider;
 import com.omnom.android.preferences.PreferenceHelperAdapter;
 import com.omnom.android.push.PushNotificationManager;
@@ -39,6 +41,7 @@ import java.util.Stack;
 import javax.inject.Inject;
 
 import dagger.ObjectGraph;
+import rx.functions.Action1;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
@@ -49,6 +52,8 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	private static final String MIXPANEL_OMNOM_TOKEN = "e9386a1100754e8f62565a1b8cda8d8c";
 
 	private static final String MIXPANEL_OMNOM_ANDROID_TOKEN = "36038b10ddd9e23db4a28d0f8c21fd78";
+
+	private static final String TAG = OmnomApplication.class.getSimpleName();
 
 	public static OmnomApplication get(Context context) {
 		return (OmnomApplication) context.getApplicationContext();
@@ -66,6 +71,9 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	@Inject
 	protected PushNotificationManager mPushManager;
+
+	@Inject
+	protected NotifierObservableApi notifierApi;
 
 	private ObjectGraph objectGraph;
 
@@ -182,7 +190,22 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	}
 
 	public void logout() {
-		mPushManager.unregister();
+		notifierApi.unregister().subscribe(new Action1() {
+			@Override
+			public void call(final Object o) {
+				Log.d(TAG, "notifierApi.unregister : " + o);
+				clearUserData();
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(final Throwable throwable) {
+				Log.d(TAG, "notifierApi.unregister", throwable);
+				clearUserData();
+			}
+		});
+	}
+
+	public void clearUserData() {
 		preferenceHelper.setAuthToken(this, StringUtils.EMPTY_STRING);
 		cacheUserProfile(null);
 	}
