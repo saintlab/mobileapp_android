@@ -117,6 +117,7 @@ dependencies {
     compile project(':libraries:Omnom.Zxing')
     compile project(':libraries:Omnom.Utils')
     compile project(':libraries:Omnom.Auth')
+    compile project(':libraries:Omnom.Notifier')
     compile project(':libraries:Omnom.Restaurateur')
     compile project(':libraries:Omnom.Menu')
     compile project(':libraries:SlidingUpPanel:library')
