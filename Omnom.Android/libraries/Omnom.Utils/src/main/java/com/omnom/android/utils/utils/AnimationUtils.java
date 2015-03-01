@@ -19,6 +19,32 @@ import hugo.weaving.DebugLog;
  */
 public class AnimationUtils {
 
+	/**
+	 * Restricts that on animation end callback is launched only once.
+	 */
+	private static class OmnomAnimatorListenerAdapter extends AnimatorListenerAdapter {
+
+		private final View view;
+
+		private final Runnable callback;
+
+		private boolean isCallbackLaunched;
+
+		public OmnomAnimatorListenerAdapter(final View view, final Runnable callback) {
+			this.view = view;
+			this.callback = callback;
+			isCallbackLaunched = false;
+		}
+
+		@Override
+		public void onAnimationEnd(Animator animation) {
+			if(callback != null && !isCallbackLaunched) {
+				view.post(callback);
+				isCallbackLaunched = true;
+			}
+		}
+	}
+
 	public static void animateAlpha(final View view, final boolean visible) {
 		animateAlpha(view, visible, view.getResources().getInteger(R.integer.default_animation_duration_short));
 	}
@@ -36,7 +62,7 @@ public class AnimationUtils {
 	}
 
 	public static void animateAlpha(final View view, final boolean visible, final Runnable callback, long duration) {
-		if (view == null) {
+		if(view == null) {
 			return;
 		}
 		final Boolean tag = (Boolean) view.getTag();
@@ -52,12 +78,12 @@ public class AnimationUtils {
 		view.setTag(visible);
 		view.animate().setDuration(duration).
 				setInterpolator(new AccelerateDecelerateInterpolator()).
-				setListener(new OmnomAnimatorListenerAdapter(view, callback)).
-				alpha(visible ? 1 : 0).start();
+				    setListener(new OmnomAnimatorListenerAdapter(view, callback)).
+				    alpha(visible ? 1 : 0).start();
 	}
 
 	public static void animateAlpha3(final View view, final boolean visible) {
-		if (view == null) {
+		if(view == null) {
 			return;
 		}
 		final Boolean tag = (Boolean) view.getTag();
@@ -65,7 +91,6 @@ public class AnimationUtils {
 			// skip
 			return;
 		}
-
 		view.setAlpha(visible ? 0 : 1);
 		if(visible) {
 			ViewUtils.setVisible(view, visible);
@@ -84,7 +109,7 @@ public class AnimationUtils {
 	}
 
 	public static void animateAlpha2(final View view, final boolean visible, final Runnable callback, long duration) {
-		if (view == null) {
+		if(view == null) {
 			return;
 		}
 		view.setAlpha(visible ? 0 : 1);
@@ -94,8 +119,8 @@ public class AnimationUtils {
 		view.setTag(visible);
 		view.animate().setDuration(duration).
 				setInterpolator(new AccelerateDecelerateInterpolator()).
-				setListener(new OmnomAnimatorListenerAdapter(view, callback)).
-				alpha(visible ? 1 : 0).start();
+				    setListener(new OmnomAnimatorListenerAdapter(view, callback)).
+				    alpha(visible ? 1 : 0).start();
 	}
 
 	public static void translateUp(final Context context, final Iterable<View> views, final int translation, final Runnable endCallback) {
@@ -219,37 +244,13 @@ public class AnimationUtils {
 		scaleWidth(view, size, duration, endCallback);
 	}
 
-    public static void animateBlinking(final View view) {
-        final Animation animation = new AlphaAnimation(1, 0);
-        animation.setDuration(view.getResources().getInteger(R.integer.default_animation_duration_long));
-        animation.setInterpolator(new LinearInterpolator());
-        animation.setRepeatCount(Animation.INFINITE);
-        animation.setRepeatMode(Animation.REVERSE);
-        view.startAnimation(animation);
-    }
-
-	/**
-	 * Restricts that on animation end callback is launched only once.
-	 */
-	private static class OmnomAnimatorListenerAdapter extends AnimatorListenerAdapter {
-
-		private final View view;
-		private final Runnable callback;
-		private boolean isCallbackLaunched;
-
-		public OmnomAnimatorListenerAdapter(final View view, final Runnable callback) {
-			this.view = view;
-			this.callback = callback;
-			isCallbackLaunched = false;
-		}
-
-		@Override
-		public void onAnimationEnd(Animator animation) {
-			if(callback != null && !isCallbackLaunched) {
-				view.post(callback);
-				isCallbackLaunched = true;
-			}
-		}
+	public static void animateBlinking(final View view) {
+		final Animation animation = new AlphaAnimation(1, 0);
+		animation.setDuration(view.getResources().getInteger(R.integer.default_animation_duration_long));
+		animation.setInterpolator(new LinearInterpolator());
+		animation.setRepeatCount(Animation.INFINITE);
+		animation.setRepeatMode(Animation.REVERSE);
+		view.startAnimation(animation);
 	}
 
 }

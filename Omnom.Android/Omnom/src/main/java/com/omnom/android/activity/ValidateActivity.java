@@ -65,7 +65,8 @@ import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
-import com.omnom.android.view.MenuCategoriesView;
+import com.omnom.android.view.PanelSlideListenerAdapter;
+import com.omnom.android.view.PanelSlideListenerSimple;
 import com.omnom.android.view.SubcategoriesView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
@@ -97,7 +98,8 @@ import static butterknife.ButterKnife.findById;
 /**
  * Created by Ch3D on 08.10.2014.
  */
-public abstract class ValidateActivity extends BaseOmnomFragmentActivity implements FragmentManager.OnBackStackChangedListener {
+public abstract class ValidateActivity extends BaseOmnomFragmentActivity
+		implements FragmentManager.OnBackStackChangedListener, SubcategoriesView.OnCollapsedTouchListener {
 
 	public static final int REQUEST_CODE_ORDERS = 100;
 
@@ -448,7 +450,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 		}
 	}
 
-	private void collapseSlidingPanel() {slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);}
+	public void collapseSlidingPanel() {slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);}
 
 	@Override
 	public void onBackPressed() {
@@ -466,7 +468,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 
 		mOrder = insureOrder();
 		slidingPanel.setPanelSlideListener(menuCategories);
-		menuCategories.setSlideListener(new MenuCategoriesView.SlideListener() {
+
+		menuCategories.setOnCollapsedTouchListener(this);
+
+		final PanelSlideListenerAdapter listener = new PanelSlideListenerAdapter();
+		listener.addListener(new PanelSlideListenerSimple() {
 			@Override
 			public void onPanelSlide(final View panel, final float slideOffset) {
 				final float loaderFactor = 1.0f - slideOffset;
@@ -482,7 +488,19 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 				}
 				loader.scaleDown((int) (loader.getLoaderSizeDefault() * loaderFactor), 0, null);
 			}
+
+			@Override
+			public void onPanelCollapsed(final View panel) {
+				setSlidingTouchEnabled(true);
+			}
+
+			@Override
+			public void onPanelExpanded(final View panel) {
+				setSlidingTouchEnabled(false);
+			}
 		});
+		listener.addListener(menuCategories);
+		slidingPanel.setPanelSlideListener(listener);
 
 		loader.setLogo(R.drawable.ic_fork_n_knife);
 		loader.setColor(getResources().getColor(R.color.loader_bg));
@@ -1208,4 +1226,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity impleme
 	}
 
 	private int getMenuTranslationDefault() {return getResources().getDisplayMetrics().heightPixels - ViewUtils.dipToPixels(this, 304);}
+
+	private void setSlidingTouchEnabled(final boolean enabled) {
+		slidingPanel.setTouchEnabled(enabled);
+	}
+
+	@Override
+	public void onCollapsedSubcategoriesTouch() {
+		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+	}
 }

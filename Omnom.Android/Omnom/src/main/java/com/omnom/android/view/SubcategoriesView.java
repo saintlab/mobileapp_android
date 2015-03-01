@@ -3,6 +3,7 @@ package com.omnom.android.view;
 import android.animation.ArgbEvaluator;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.ValidateActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.MenuCategoryItemsAdapter;
 import com.omnom.android.adapter.MultiLevelRecyclerAdapter;
@@ -33,16 +35,22 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
+import hugo.weaving.DebugLog;
 
 /**
  * Created by Ch3D on 26.02.2015.
  */
 public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelLayout.PanelSlideListener {
 
+	public interface OnCollapsedTouchListener {
+		public void onCollapsedSubcategoriesTouch();
+	}
+
 	@InjectView(R.id.content_recyclerview)
 	protected RecyclerView mListView;
 
-	@InjectView(R.id.btn_back)
+	@InjectView(R.id.btn_close_menu)
 	protected ImageView mImgClose;
 
 	@InjectView(R.id.panel_bottom)
@@ -58,15 +66,11 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	private View.OnClickListener mGroupClickListener;
 
-	private MenuCategoriesView.SlideListener mListener;
-
 	private ArgbEvaluator mBackgroundEvaluator;
 
 	private boolean mTouchEnabled = false;
 
-	private boolean mExpanded = false;
-
-	private boolean mGroupsCollapsed;
+	private OnCollapsedTouchListener mCollapsedTouchListener;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public SubcategoriesView(Context context) {
@@ -84,6 +88,10 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	public SubcategoriesView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init(attrs);
+	}
+
+	public void setOnCollapsedTouchListener(OnCollapsedTouchListener collapsedTouchListener) {
+		mCollapsedTouchListener = collapsedTouchListener;
 	}
 
 	private void init(final AttributeSet attrs) {
@@ -138,13 +146,32 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		mMenuAdapter.setCategoriesBackground(Color.TRANSPARENT);
 
 		mListView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+			public Point mPoint = new Point();
+
 			@Override
 			public boolean onInterceptTouchEvent(final RecyclerView rv, final MotionEvent e) {
+				if(!mTouchEnabled) {
+					switch(e.getAction()) {
+						case MotionEvent.ACTION_DOWN:
+							mPoint.set((int) e.getX(), (int) e.getY());
+							break;
+
+						case MotionEvent.ACTION_UP:
+							if(mPoint.equals(new Point((int) e.getX(), (int) e.getY()))) {
+								if(mCollapsedTouchListener != null) {
+									mCollapsedTouchListener.onCollapsedSubcategoriesTouch();
+								}
+							}
+							mPoint.set(-1, -1);
+							break;
+					}
+				}
 				return !mTouchEnabled;
 			}
 
 			@Override
 			public void onTouchEvent(final RecyclerView rv, final MotionEvent e) {
+				// Do nothing
 			}
 		});
 	}
@@ -172,17 +199,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	}
 
 	@Override
+	@DebugLog
 	public void onPanelSlide(final View panel, final float slideOffset) {
-		if(mListener != null) {
-			mListener.onPanelSlide(panel, slideOffset);
-		}
-
-		if(slideOffset < 0.8f && !mGroupsCollapsed) {
-			mMenuAdapter.collapseExpandedGroups();
-			AnimationUtils.animateAlpha3(mImgClose, false);
-			mGroupsCollapsed = true;
-		}
-
 		mMenuAdapter.setTextColor((int) mBackgroundEvaluator.evaluate(slideOffset, Color.WHITE, Color.BLACK));
 		mMenuAdapter.setCategoriesBackground((int) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT,
 		                                                                         getResources().getColor(
@@ -190,23 +208,27 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		mPanelBottom.setBackgroundColor((Integer) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT, Color.WHITE));
 	}
 
-	public void setSlideListener(MenuCategoriesView.SlideListener listener) {
-		mListener = listener;
-	}
-
 	@Override
 	public void onPanelCollapsed(final View panel) {
 		mTouchEnabled = false;
-		mGroupsCollapsed = false;
 		AnimationUtils.animateAlpha3(mImgClose, false);
 	}
 
 	@Override
 	public void onPanelExpanded(final View panel) {
 		mTouchEnabled = true;
-		mGroupsCollapsed = false;
 		AnimationUtils.animateAlpha3(mImgClose, true);
+
 	}
+
+	@OnClick(R.id.btn_close_menu)
+	public void onClose() {
+		mMenuAdapter.collapseExpandedGroups();
+		getActivity().collapseSlidingPanel();
+		AnimationUtils.animateAlpha3(mImgClose, false);
+	}
+
+	private ValidateActivity getActivity() {return ((ValidateActivity) getContext());}
 
 	@Override
 	public void onPanelAnchored(final View panel) {
