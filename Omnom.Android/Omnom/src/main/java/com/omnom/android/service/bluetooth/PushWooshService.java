@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.arellomobile.android.push.DeviceRegistrar;
 import com.arellomobile.android.push.PushGCMIntentService;
-import com.arellomobile.android.push.PushManager;
 import com.omnom.android.R;
 
 /**
@@ -38,12 +37,15 @@ public class PushWooshService extends PushGCMIntentService {
 	}
 
 	private void showNotification(final Context context, final Intent intent) {
-		final String stringExtra = intent.getStringExtra(PushManager.PUSH_RECEIVE_EVENT);
 		NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		final Notification notification = builder.setAutoCancel(true).setContentTitle("TITLE").setContentInfo("INFO").setSmallIcon(
-				R.drawable.ic_app).setDefaults(
-				Notification.DEFAULT_ALL).setTicker("TICKER").build();
+		final Notification notification = builder.setAutoCancel(true)
+		                                         .setContentTitle("TITLE")
+		                                         .setContentInfo("INFO")
+		                                         .setSmallIcon(R.drawable.ic_app)
+		                                         .setDefaults(Notification.DEFAULT_ALL)
+		                                         .setTicker("TICKER")
+		                                         .build();
 		nm.notify(0, notification);
 	}
 
