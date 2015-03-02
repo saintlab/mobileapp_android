@@ -767,11 +767,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	protected abstract void decode(boolean startProgressAnimation);
 
 	public void onBill(final View v) {
-		if(true) {
-			WebActivity.start(this, "http://www.ngs.ru/");
-			return;
-		}
-
 		final int fragmentsCount = getSupportFragmentManager().getBackStackEntryCount();
 		final int startDelay = getResources().getInteger(R.integer.default_animation_duration_quick);
 		final int stepDelay = getResources().getInteger(R.integer.default_menu_to_bill_step_duration);
