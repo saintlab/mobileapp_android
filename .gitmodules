@@ -1,0 +1,3 @@
+[submodule "Omnom.Android/libraries/SlidingUpPanel"]
+        path = Omnom.Android/libraries/SlidingUpPanel
+        url = https://github.com/Ch3D/AndroidSlidingUpPanel
