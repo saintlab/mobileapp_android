@@ -105,7 +105,7 @@ public class UserProfileActivity extends BaseActivity {
 		mAnimDuration = getResources().getInteger(R.integer.user_profile_animation_duration);
 		final UserProfile userProfile = LinkerApplication.get(getActivity()).getUserProfile();
 		if(userProfile != null && userProfile.getUser() != null) {
-			initUserData(userProfile.getUser(), userProfile.getImageUrl());
+			initUserData(userProfile.getUser());
 		} else {
 			updateUserImage(StringUtils.EMPTY_STRING);
 			final String token = getPreferences().getAuthToken(this);
@@ -134,7 +134,7 @@ public class UserProfileActivity extends BaseActivity {
 							}
 							UserProfile profile = new UserProfile(response);
 							LinkerApplication.get(getActivity()).cacheUserProfile(profile);
-							initUserData(response.getUser(), profile.getImageUrl());
+							initUserData(response.getUser());
 						}
 					}, new BaseErrorHandler(getActivity()) {
 						@Override
@@ -159,7 +159,7 @@ public class UserProfileActivity extends BaseActivity {
 		OmnomObservable.unsubscribe(logoutSubscription);
 	}
 
-	private void initUserData(UserData user, String imgUrl) {
+	private void initUserData(UserData user) {
 		if(user == null) {
 			showToast(this, R.string.error_user_not_found);
 			finish();
@@ -168,7 +168,7 @@ public class UserProfileActivity extends BaseActivity {
 		mTxtInfo.setText(user.getPhone());
 		mTxtLogin.setText(user.getEmail());
 		mTxtUsername.setText(user.getName());
-		updateUserImage(imgUrl);
+		updateUserImage(user.getAvatar());
 	}
 
 	private void updateUserImage(String url) {
