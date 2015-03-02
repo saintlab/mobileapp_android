@@ -23,11 +23,11 @@ import com.omnom.android.acquiring.demo.DemoAcquiring;
 import com.omnom.android.acquiring.mailru.OrderInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.MailRuExtra;
-import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
@@ -249,8 +249,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	}
 
 	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final int tip) {
-		final com.omnom.android.auth.UserData cachedUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		final UserData user = UserData.create(String.valueOf(cachedUser.getId()), cachedUser.getPhone());
+		final UserData user = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		pay(billData, card, acquiringData, user, amount, tip);
 	}

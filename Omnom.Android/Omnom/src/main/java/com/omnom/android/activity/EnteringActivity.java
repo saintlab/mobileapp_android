@@ -21,6 +21,7 @@ import com.omnom.android.fragment.EnteringFragment;
 import com.omnom.android.fragment.SplashFragment;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
 import com.omnom.android.utils.activity.BaseActivity;
+import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 
@@ -63,11 +64,19 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	}
 
 	public static void startNewTable(final BaseActivity context) {
+		context.start(getIntent(context), false);
+	}
+
+	public static void startNewTable(final BaseFragmentActivity context) {
+		context.start(getIntent(context), false);
+	}
+
+	private static Intent getIntent(final Context context) {
 		final Intent intent = new Intent(context, EnteringActivity.class);
 		intent.putExtra(EXTRA_SPLASH_DELAY, 0);
 		intent.putExtra(EXTRA_SKIP_SPLASH, false);
 		intent.putExtra(EXTRA_APPLICATION_LAUNCH, false);
-		context.start(intent, false);
+		return intent;
 	}
 
 	@InjectView(R.id.panel_bottom)
@@ -151,7 +160,25 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	@Override
 	protected void onResume() {
 		super.onResume();
-		activityHelper.onApplicationLaunch(this);
+		final boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
+		findViewById(android.R.id.content).postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (splashFragment != null) {
+					if (mData != null && hasToken) {
+						splashFragment.animateValidation(mData);
+						return;
+					}
+					if (hasToken) {
+						splashFragment.animateValidation();
+					} else {
+						splashFragment.animateLogin();
+					}
+				} else {
+					Log.w(TAG, "Splash fragment is null");
+				}
+			}
+		}, mSplashDelay);
 	}
 
 	@OnClick(R.id.btn_register)

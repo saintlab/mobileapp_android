@@ -10,11 +10,11 @@ import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.api.PaymentInfo;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.PaymentInfoMailRu;
-import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.utils.EncryptionUtils;
 

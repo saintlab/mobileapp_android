@@ -13,54 +13,50 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:omnom="http://schemas.android.com/apk/res-auto">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <SurfaceView
+        android:id="@+id/preview_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_wood" />
+
+    <com.google.zxing.client.android.ViewfinderView
+        android:id="@+id/viewfinder_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
     <RelativeLayout
+        android:id="@+id/capture_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <SurfaceView
-            android:id="@+id/preview_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <FrameLayout
-            android:id="@+id/background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/bg_wood" />
-
-        <com.google.zxing.client.android.ViewfinderView
-            android:id="@+id/viewfinder_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center"
-                    android:lines="1"
-                    android:paddingTop="@dimen/activity_horizontal_margin"
-                    android:text="@string/scanning"
-                    android:textAppearance="?android:textAppearanceLarge"
-                    android:textColor="@color/cadre_border"
-                    omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf" />
-
-            </LinearLayout>
+                android:gravity="center"
+                android:lines="1"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                android:text="@string/scanning"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textColor="@color/cadre_border"
+                omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf" />
 
             <Space
                 android:layout_width="match_parent"
@@ -97,20 +93,46 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <TextView
-                android:id="@+id/txt_hint"
-                android:layout_width="@dimen/navigate_qr_text_width"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:drawablePadding="@dimen/drawable_padding_default"
-                android:drawableTop="@drawable/ic_shortcut_red"
-                android:gravity="center"
-                android:lines="3"
-                android:text="@string/navigate_qr_code"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:textColor="@color/cadre_border"
-                android:textColorLink="@color/cadre_border"
-                omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf" />
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/txt_hint"
+                    android:layout_width="@dimen/navigate_qr_text_width"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:drawablePadding="@dimen/drawable_padding_default"
+                    android:drawableTop="@drawable/ic_shortcut_red"
+                    android:gravity="center"
+                    android:lines="3"
+                    android:text="@string/navigate_qr_code"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:textColor="@color/cadre_border"
+                    android:textColorLink="@color/cadre_border"
+                    omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txt_hint"
+                    android:layout_alignLeft="@+id/txt_hint"
+                    android:layout_alignRight="@id/txt_hint"
+                    android:paddingLeft="55dp"
+                    android:paddingRight="53dp"
+                    android:layout_marginTop="-3dp"
+                    >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/cadre_border"
+                    />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
 
             <Space
                 android:layout_width="match_parent"
@@ -118,6 +140,16 @@
                 android:layout_weight="1" />
 
         </LinearLayout>
+
+        <!-- The following layout is required to fix issues with QR hint fragment and
+             "Not scanning?" button animations.
+             Due to hardware acceleration it is rendered inappropriately,
+             thus the layout has acceleration turned off and everything works like a charm. -->
+        <FrameLayout
+            android:id="@+id/animation_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparent"/>
 
         <TextView
             android:id="@+id/btn_not_scanning"
@@ -139,4 +171,4 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</merge>
+</RelativeLayout>

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthError;
+import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.utils.ObservableUtils;
@@ -32,6 +33,8 @@ import com.omnom.android.view.HeaderView;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -74,6 +77,9 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.panel_top)
 	protected HeaderView topPanel;
+
+	@Inject
+	protected AuthService authenticator;
 
 	private boolean mFirstStart = true;
 

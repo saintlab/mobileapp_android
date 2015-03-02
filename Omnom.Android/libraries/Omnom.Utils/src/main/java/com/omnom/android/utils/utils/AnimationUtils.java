@@ -5,11 +5,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Handler;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 
 import com.omnom.android.utils.R;
 
@@ -279,6 +282,58 @@ public class AnimationUtils {
 			}
 		});
 		va.start();
+	}
+
+	public static void smoothScrollToPositionFromTop(final AbsListView view, final int position, final int duration, final Runnable callback) {
+		View child = getChildAtPosition(view, position);
+		// There's no need to scroll if child is already at top or view is already scrolled to its end
+		if ((child != null) && ((child.getTop() == 0) || ((child.getTop() > 0) && !view.canScrollVertically(1)))) {
+			if (callback != null) {
+				view.post(callback);
+			}
+			return;
+		}
+
+		view.setOnScrollListener(new AbsListView.OnScrollListener() {
+			@Override
+			public void onScrollStateChanged(final AbsListView view, final int scrollState) {
+				if (scrollState == SCROLL_STATE_IDLE) {
+					view.setOnScrollListener(null);
+
+					// Fix for scrolling bug
+					new Handler().post(new Runnable() {
+						@Override
+						public void run() {
+							view.setSelection(position);
+							if (callback != null) {
+								view.post(callback);
+							}
+						}
+					});
+				}
+			}
+
+			@Override
+			public void onScroll(final AbsListView view, final int firstVisibleItem, final int visibleItemCount,
+			                     final int totalItemCount) { }
+		});
+
+		// Perform scrolling to position
+		new Handler().post(new Runnable() {
+			@Override
+			public void run() {
+				view.smoothScrollToPositionFromTop(position, 0, duration);
+			}
+		});
+	}
+
+	private static View getChildAtPosition(final AdapterView view, final int position) {
+		final int index = position - view.getFirstVisiblePosition();
+		if ((index >= 0) && (index < view.getChildCount())) {
+			return view.getChildAt(index);
+		} else {
+			return null;
+		}
 	}
 
 }

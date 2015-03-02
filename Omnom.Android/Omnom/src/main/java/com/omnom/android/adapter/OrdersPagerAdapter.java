@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by Ch3D on 10.10.2014.
  */
-public class OrdersPagerAdaper extends FragmentPagerAdapter {
+public class OrdersPagerAdapter extends FragmentPagerAdapter {
 	private List<Order> mOrders;
 
 	private int mBgColor;
@@ -26,7 +26,7 @@ public class OrdersPagerAdaper extends FragmentPagerAdapter {
 
 	private int removedItemIndex = -1;
 
-	public OrdersPagerAdaper(FragmentManager fm, List<Order> orders, String requestId, final int bgColor) {
+	public OrdersPagerAdapter(FragmentManager fm, List<Order> orders, String requestId, final int bgColor) {
 		super(fm);
 		mOrders = orders;
 		mRequestId = requestId;

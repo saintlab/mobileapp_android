@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
+import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -260,6 +261,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	@InjectViews({R.id.txt_error, R.id.panel_errors})
 	protected List<View> errorViews;
+
+	@InjectView(R.id.txt_table)
+	protected TextView txtTable;
 
 	@InjectView(R.id.img_profile)
 	protected ImageView imgProfile;
@@ -712,16 +716,47 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		updateProfile(R.drawable.ic_profile_white, visible);
 	}
 
-	protected void updateDarkProfile(final boolean visible) {
-		updateProfile(R.drawable.ic_profile, visible);
-	}
-
 	private void updateProfile(final int backgroundResource, final boolean visible) {
-		imgProfile.setImageResource(backgroundResource);
-		ViewUtils.setVisible(imgProfile, visible);
+		if (mTable != null) {
+			txtTable.setText(String.valueOf(mTable.getInternalId()));
+			if (visible && !ViewUtils.isVisible(txtTable)) {
+				if (txtTable.getTranslationX() == 0) {
+					ViewUtils.setVisible(imgProfile, true);
+				}
+				ViewTreeObserver viewTreeObserver = imgProfile.getViewTreeObserver();
+				if (viewTreeObserver.isAlive()) {
+					viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+						@Override
+						public void onGlobalLayout() {
+							AndroidUtils.removeOnGlobalLayoutListener(imgProfile, this);
+							final int animationDuration = getResources().getInteger(R.integer.default_animation_duration_long);
+							AnimationUtils.animateAlpha(txtTable, true, new Runnable() {
+								@Override
+								public void run() {
+									final int translation = (imgProfile.getLeft() - txtTable.getLeft()) -
+															(txtTable.getWidth() - imgProfile.getWidth());
+									txtTable.animate()
+											.translationX(translation)
+											.setDuration(animationDuration)
+											.start();
+									AnimationUtils.animateAlpha2(imgProfile, false, null, animationDuration);
+								}
+							}, animationDuration);
+						}
+					});
+				}
+			} else {
+				ViewUtils.setVisible(txtTable, visible);
+			}
+		} else {
+			ViewUtils.setVisible(txtTable, false);
+			imgProfile.setImageResource(backgroundResource);
+			ViewUtils.setVisible(imgProfile, visible);
+		}
 	}
 
 	protected void hideProfile() {
+		ViewUtils.setVisible(txtTable, false);
 		ViewUtils.setVisible(imgProfile, false);
 	}
 
@@ -796,7 +831,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}
 	}
 
-	@OnClick(R.id.img_profile)
+	@OnClick({R.id.img_profile, R.id.txt_table})
 	protected void onProfile(View v) {
 		final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
 		final String tableId = mTable != null ? mTable.getId() : null;
@@ -1079,6 +1114,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		bottomView.animate().translationY(bottomView.getHeight());
 		loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 		AnimationUtils.animateAlpha(imgProfile, false);
+		AnimationUtils.animateAlpha(txtTable, false);
 		postDelayed(850, new Runnable() {
 			@Override
 			public void run() {
