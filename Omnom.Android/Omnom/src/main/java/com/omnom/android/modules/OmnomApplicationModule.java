@@ -32,6 +32,7 @@ import com.omnom.android.fragment.SplashFragment;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.fragment.menu.MenuSubcategoryFragment;
+import com.omnom.android.push.PushNotificationsManagerImpl;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
 
 import dagger.Module;
@@ -39,7 +40,9 @@ import dagger.Module;
 /**
  * Created by Ch3D on 11.08.2014.
  */
-@Module(injects = {OmnomApplication.class,
+@Module(injects = {
+		OmnomApplication.class,
+		PushNotificationsManagerImpl.class,
 		/* activities */
 		EnteringActivity.class, UserRegisterActivity.class, EnteringActivity.class,
 		ConfirmPhoneActivity.class, LoginActivity.class, ValidateActivityBle.class, ValidateActivityCamera.class,

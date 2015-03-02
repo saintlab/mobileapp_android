@@ -310,8 +310,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	private UserOrder mOrder;
 
-	private Object mUserOrder;
-
 	@Override
 	protected void handleIntent(Intent intent) {
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
