@@ -15,6 +15,8 @@ import butterknife.InjectView;
  */
 public class WebActivity extends BaseOmnomActivity {
 
+	public static final String SCHEME_PREFIX_HTTP = "http://";
+
 	public static void start(OmnomActivity context, final String url) {
 		final Intent intent = new Intent(context.getActivity(), WebActivity.class);
 		intent.putExtra(EXTRA_URI, url);
@@ -33,6 +35,9 @@ public class WebActivity extends BaseOmnomActivity {
 			return;
 		}
 		mWebView.clearCache(true);
+		if(!mUriString.startsWith(SCHEME_PREFIX_HTTP)) {
+			mUriString = SCHEME_PREFIX_HTTP + mUriString;
+		}
 		mWebView.loadUrl(mUriString);
 	}
 
