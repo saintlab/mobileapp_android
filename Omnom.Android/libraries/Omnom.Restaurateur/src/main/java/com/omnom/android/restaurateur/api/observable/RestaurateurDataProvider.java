@@ -21,6 +21,7 @@ import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
+import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -29,11 +30,13 @@ import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.restaurateur.model.table.TableItemsResponse;
 import com.omnom.android.restaurateur.retrofit.RestaurateurRxSupport;
 import com.omnom.android.restaurateur.serializer.MailRuSerializer;
 import com.omnom.android.restaurateur.serializer.OrdersResponseSerializer;
 import com.omnom.android.utils.generation.AutoParcelAdapterFactory;
 
+import java.util.Collection;
 import java.util.List;
 
 import altbeacon.beacon.Beacon;
@@ -169,6 +172,12 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	@Override
 	public Observable<OrdersResponse> getOrders(String restaurantId, String tableId) {
 		return mDataService.getOrders(restaurantId, tableId).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<Collection<OrderItem>> getItems(final String restaurantId, final String tableId) {
+		return mDataService.getItems(restaurantId, tableId).subscribeOn(Schedulers.io()).observeOn(
 				AndroidSchedulers.mainThread());
 	}
 

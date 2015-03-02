@@ -60,4 +60,11 @@ public abstract class UserOrder implements Parcelable {
 		}
 		return result;
 	}
+
+	public void addItem(final Item item, int count) {
+		if(item == Item.NULL || item == null) {
+			// skip
+		}
+		itemsTable().put(item.id(), UserOrderData.create(count, item));
+	}
 }
