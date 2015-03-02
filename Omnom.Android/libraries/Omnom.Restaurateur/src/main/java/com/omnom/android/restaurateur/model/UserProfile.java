@@ -24,8 +24,4 @@ public class UserProfile extends AuthResponse {
 		this.user = user;
 	}
 
-	// TODO:
-	public String getImageUrl() {
-		return null;
-	}
 }

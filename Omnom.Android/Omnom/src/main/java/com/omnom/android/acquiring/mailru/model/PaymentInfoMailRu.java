@@ -1,6 +1,7 @@
 package com.omnom.android.acquiring.mailru.model;
 
 import com.omnom.android.acquiring.api.PaymentInfo;
+import com.omnom.android.auth.UserData;
 
 /**
  * Created by Ch3D on 23.09.2014.

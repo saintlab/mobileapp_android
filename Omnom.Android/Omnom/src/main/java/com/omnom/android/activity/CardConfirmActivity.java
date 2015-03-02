@@ -30,13 +30,13 @@ import com.omnom.android.R;
 import com.omnom.android.acquiring.AcquiringResponseException;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.PayOnceFragment;
 import com.omnom.android.listener.DecimalKeyListener;
 import com.omnom.android.mixpanel.model.acquiring.CardAddedMixpanelEvent;
@@ -122,8 +122,8 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	@InjectView(R.id.txt_info)
 	protected TextView mTextInfo;
 
-	@InjectView(R.id.transparent_panel)
-	protected FrameLayout transparentPanel;
+	@InjectView(R.id.dark_transparent_background)
+	protected FrameLayout darkTransparentBackground;
 
 	@InjectView(R.id.fragment_container)
 	protected FrameLayout fragmentContainer;
@@ -213,7 +213,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		}
 		ViewUtils.setVisible(mTextInfo, false);
 		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
-		mUser = UserData.create(mUserProfile.getUser());
+		mUser = mUserProfile.getUser();
 		mAcquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		mPanelTop.setTitleBig(R.string.card_binding);
 		mPanelTop.setButtonRightEnabled(false);
@@ -343,10 +343,9 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		}
 		mPanelTop.showProgress(true);
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
-		com.omnom.android.auth.UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		final UserData user = UserData.create(String.valueOf(wicketUser.getId()), wicketUser.getPhone());
+		UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		mCardRegisterSubscription = AndroidObservable.bindActivity(this,
-		                                                           mAcquiring.registerCard(acquiringData, user, mCard)
+		                                                           mAcquiring.registerCard(acquiringData, wicketUser, mCard)
 		                                                                     .delaySubscription(1000, TimeUnit.MILLISECONDS)
 		                                                          )
 		                                             .subscribe(
@@ -514,7 +513,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		                                                R.anim.slide_in_up, R.anim.slide_out_down)
 		                           .replace(R.id.fragment_container, payOnceFragment)
 		                           .commit();
-		AnimationUtils.animateAlpha(transparentPanel, true);
+		AnimationUtils.animateAlpha(darkTransparentBackground, true);
 	}
 
 	@Override
@@ -540,7 +539,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	public void onBackPressed() {
 		if(payOnceFragment != null && payOnceFragment.isVisible()) {
 			mEditAmount.getEditText().setEnabled(true);
-			AnimationUtils.animateAlpha(transparentPanel, false);
+			AnimationUtils.animateAlpha(darkTransparentBackground, false);
 			getSupportFragmentManager().beginTransaction()
 			                           .setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
 			                                                R.anim.slide_in_up, R.anim.slide_out_down)

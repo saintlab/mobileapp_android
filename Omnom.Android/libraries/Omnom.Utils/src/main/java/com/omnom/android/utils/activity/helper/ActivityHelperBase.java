@@ -33,11 +33,6 @@ public abstract class ActivityHelperBase implements ActivityHelperWithAnimation 
 	}
 
 	@Override
-	public void onApplicationLaunch() {
-
-	}
-
-	@Override
 	public void onStart() {
 
 	}

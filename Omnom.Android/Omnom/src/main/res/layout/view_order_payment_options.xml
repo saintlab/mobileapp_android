@@ -116,13 +116,12 @@
 
         <ImageButton
             android:id="@+id/btn_cancel"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="@dimen/btn_cancel_size"
+            android:layout_height="@dimen/btn_cancel_size"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="24dp"
+            android:padding="@dimen/btn_cancel_padding"
             android:scaleType="fitXY"
-            android:padding="8dp"
             android:cropToPadding="true"
             android:background="@null"
             android:src="@drawable/ic_cancel_editing_button"
@@ -169,11 +168,11 @@
 
         <ImageButton
             android:id="@+id/btn_edit"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="@dimen/btn_edit_size"
+            android:layout_height="@dimen/btn_edit_size"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="24dp"
+            android:padding="@dimen/btn_edit_padding"
             android:scaleType="fitXY"
             android:background="@null"
             android:src="@drawable/ic_edit_sum"
@@ -181,11 +180,11 @@
 
         <ImageButton
             android:id="@+id/btn_apply"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="@dimen/btn_apply_size"
+            android:layout_height="@dimen/btn_apply_size"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="24dp"
+            android:padding="@dimen/btn_apply_padding"
             android:scaleType="fitXY"
             android:background="@null"
             android:src="@drawable/ic_done_editing_button"

@@ -1,7 +1,7 @@
 package com.omnom.android.acquiring.api;
 
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.UserData;
+import com.omnom.android.auth.UserData;
 
 /**
  * Created by Ch3D on 24.09.2014.

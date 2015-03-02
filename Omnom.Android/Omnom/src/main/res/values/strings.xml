@@ -7,9 +7,9 @@
     <string name="registration">Регистрация</string>
     <string name="enter">Вход</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="entering_pay_with_phone">Оплатить счёт через телефон</string>
+    <string name="entering_pay_with_phone">Оплатить счёт\nчерез телефон</string>
     <string name="entering_call_waiter">Вызвать официанта\nв&#160;любой момент</string>
-    <string name="entering_split_bill">Разделить счёт между друзьями</string>
+    <string name="entering_split_bill">Разделить счёт\nмежду друзьями</string>
     <string name="name">Имя</string>
     <string name="email">Почта</string>
     <string name="phone_number">Номер телефона</string>
@@ -53,6 +53,8 @@
     <string name="i_m_going_to_pay">Я оплачу</string>
     <string name="to_be_paid">К оплате</string>
     <string name="already_paid">Уже оплачено: %1$s</string>
+    <string name="everything_paid">Всё оплачено</string>
+    <string name="paid_of">%1$s из %2$s</string>
     <string name="tips_another">Другой</string>
     <string name="tips">Чаевые</string>
     <string name="app_version_build">версия %1$s</string>
@@ -126,7 +128,7 @@
     <string name="enter_hash_url">http://omnom.menu/</string>
     <string name="omnom_works_here">Omnom работает здесь</string>
     <string name="send_feedback">Написать отзыв</string>
-    <string name="facebook_url_fb">fb://profile/1548920272002383</string>
+    <string name="facebook_url_fb">fb://page/1548920272002383</string>
     <string name="facebook_url_http">https://www.facebook.com/omnom.menu/</string>
 
     <string name="no_order_info">
@@ -142,5 +144,21 @@
         мы узнали ваш стол, а&#160;вы посмотрели счёт или&#160;сделали заказ.\n\nЕсли вы&#160;вне Omnom-заведения, посмотрите, как&#160;работает приложение в&#160;Демо-режиме.
     </string>
     <string name="qr_hint_mark">Демо-режиме</string>
+
+    <string name="table_number">Номер стола в Omnom — %1$s</string>
+    <string name="change_table">
+       Важно, чтобы стол был&#160;определён правильно. Это&#160;нужно, чтобы увидеть
+       выставленные вам счета или&#160;сделать заказ.\n\nЕсли есть&#160;сомнения,
+       уточните у&#160;официанта, какой стол использовался при&#160;создании вашего заказа,
+       и&#160;определите свой&#160;стол в&#160;Omnom повторно.
+    </string>
+    <string name="change_table_mark">свой&#160;стол</string>
+
     <string name="attempt_to_perform_similar_payment">Повторная попытка оплаты счета</string>
+    <string name="feedback">Обратная связь</string>
+    <string name="support">Звонок в тех.поддержку</string>
+    <string name="facebook_title">facebook/Omnom</string>
+    <string name="about_title">О ПРОГРАММЕ</string>
+    <string name="table">Столик</string>
+    <string name="bound_cards">Мои привязанные карты</string>
 </resources>

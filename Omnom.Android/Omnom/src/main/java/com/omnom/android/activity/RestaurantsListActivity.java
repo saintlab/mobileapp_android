@@ -1,5 +1,6 @@
 package com.omnom.android.activity;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
@@ -26,6 +27,7 @@ import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.view.SimpleListView;
+import com.omnom.android.view.stateful.StatefulLinearLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,6 +99,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@InjectView(R.id.panel_demo)
 	protected View panelDemo;
 
+	@InjectView(R.id.scan_qr)
+	protected StatefulLinearLayout scanQr;
+
 	@Inject
 	RestaurateurObservableApi api;
 
@@ -117,8 +122,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private int logoSizeLarge;
 
-	@OnClick({R.id.img_qr, R.id.txt_qr})
-	public void doQrShortcut() {
+	@OnClick({R.id.scan_qr})
+	public void doQrShortcut(final StatefulLinearLayout statefulView) {
+		statefulView.setKeepStatePressed(true);
 		ValidateActivityShortcut.start(this, R.anim.slide_in_right, R.anim.slide_out_left, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
 
@@ -161,6 +167,13 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		} else {
 			initList();
 		}
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		scanQr.setKeepStatePressed(false);
+		scanQr.setPressed(false);
 	}
 
 	private void refresh() {
@@ -220,51 +233,81 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 		mItemClicked = true;
 		mAdapter.setSelected(position);
-		list.smoothScrollToPositionFromTop(position, 0, SCROLL_DURATION);
 		selectedCover = (LoaderView) view.findViewById(R.id.cover);
-
-		if(position + 2 == list.getCount()) {
-			postDelayed(SCROLL_DURATION, new Runnable() {
-				@Override
-				public void run() {
-					list.setScrollEnabled(false);
-					refreshView.setEnabled(false);
-					animateRestaurant(position, view, height, paddingDiff, true);
-				}
-			});
-		} else {
-			animateRestaurant(position, view, height, paddingDiff, false);
-		}
+		animateRestaurant(position, view, height, paddingDiff, (position + 2 == list.getCount()));
 	}
 
 	private void animateRestaurant(final int position, final View view, final int height,
-	                               final int paddingDiff, boolean isLast) {
-		final int listTranslation;
-		final int topTranslation;
+	                               final int paddingDiff, final boolean isLast) {
 		final int duration = getResources().getInteger(R.integer.default_animation_duration_short);
-		if (isLast) {
-			footer.animate().alpha(0).setDuration(duration).start();
-			topTranslation = -view.getTop();
-			listTranslation = -height;
-		} else {
-			topTranslation = 0;
-			listTranslation = -height;
-		}
+
 		panelTop.animate().translationYBy(-height).setDuration(duration).start();
-		refreshView.animate()
-				.translationYBy(listTranslation + topTranslation + paddingDiff)
-				.setDuration(duration)
-				.start();
 		panelDemo.animate().alpha(0).setDuration(duration).start();
+		if (!isLast) {
+			animateLogo(duration);
+			animateRefreshView(-height, 0, paddingDiff, duration, position);
+		}
+		AnimationUtils.smoothScrollToPositionFromTop(list, position, SCROLL_DURATION, new Runnable() {
+			@Override
+			public void run() {
+				if(isLast) {
+					final int halfDuration = (int) (duration / 2.0);
+					animateRefreshView(-height, -view.getTop(), paddingDiff, halfDuration, position);
+					list.setScrollEnabled(false);
+					refreshView.setEnabled(false);
+					footer.animate().alpha(0).setDuration(halfDuration).start();
+					animateLogo(halfDuration);
+				}
+			}
+		});
+	}
+
+	private void animateLogo(final int duration) {
 		if (selectedCover != null) {
 			AnimationUtils.scale(selectedCover, logoSizeLarge, duration);
 			selectedCover.scaleUp(duration, logoSizeLarge, true, new Runnable() {
 				@Override
 				public void run() {
-					startRestaurantActivity(position, topTranslation);
+
 				}
 			});
 		}
+	}
+
+	private void animateRefreshView(final int listTranslation, final int topTranslation,
+	                                final int paddingDiff, final int duration,
+	                                final int position) {
+		refreshView.animate()
+				.translationYBy(listTranslation + topTranslation + paddingDiff)
+				.setDuration(duration)
+				.setListener(new Animator.AnimatorListener() {
+
+					private boolean finished = false;
+
+					@Override
+					public void onAnimationStart(Animator animation) {
+
+					}
+
+					@Override
+					public void onAnimationEnd(Animator animation) {
+						if (!finished) {
+							finished = true;
+							startRestaurantActivity(position, topTranslation);
+						}
+					}
+
+					@Override
+					public void onAnimationCancel(Animator animation) {
+
+					}
+
+					@Override
+					public void onAnimationRepeat(Animator animation) {
+
+					}
+				})
+				.start();
 	}
 
 	private void startRestaurantActivity(final int position, final int topTranslation) {

@@ -28,6 +28,7 @@ import android.view.WindowManager;
 import com.google.zxing.client.android.PreferencesActivity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -40,6 +41,7 @@ import java.util.List;
 final class CameraConfigurationManager {
 
 	private static final String TAG = "CameraConfiguration";
+	private static final int MIN_FPS = 10;
 
 	private final Context context;
 
@@ -105,7 +107,7 @@ final class CameraConfigurationManager {
 		}
 
 		parameters.setPreviewSize(cameraResolution.x, cameraResolution.y);
-		CameraConfigurationUtils.setBestPreviewFPS(parameters);
+		setBestPreviewFPS(parameters, MIN_FPS);
 		parameters.set("iso", "auto");
 		parameters.setExposureCompensation(0);
 
@@ -120,6 +122,37 @@ final class CameraConfigurationManager {
 					", but after setting it, preview size is " + afterSize.width + 'x' + afterSize.height);
 			cameraResolution.x = afterSize.width;
 			cameraResolution.y = afterSize.height;
+		}
+	}
+
+	// The method fixes issue with preview brightness for Google Nexus 5 device.
+	// Zxing version that is used limits maximum FPS value and this causes preview issues.
+	private static void setBestPreviewFPS(Camera.Parameters parameters, int minFPS) {
+		List<int[]> supportedPreviewFpsRanges = parameters.getSupportedPreviewFpsRange();
+		Log.i(TAG, "Supported FPS ranges: " + supportedPreviewFpsRanges);
+		if (supportedPreviewFpsRanges != null && !supportedPreviewFpsRanges.isEmpty()) {
+			int[] minimumSuitableFpsRange = null;
+			for (int[] fpsRange : supportedPreviewFpsRanges) {
+				int fpsMax = fpsRange[Camera.Parameters.PREVIEW_FPS_MAX_INDEX];
+				if (fpsMax >= minFPS * 1000 &&
+						(minimumSuitableFpsRange == null ||
+								fpsMax > minimumSuitableFpsRange[Camera.Parameters.PREVIEW_FPS_MAX_INDEX])) {
+					minimumSuitableFpsRange = fpsRange;
+				}
+			}
+			if (minimumSuitableFpsRange == null) {
+				Log.i(TAG, "No suitable FPS range?");
+			} else {
+				int[] currentFpsRange = new int[2];
+				parameters.getPreviewFpsRange(currentFpsRange);
+				if (Arrays.equals(currentFpsRange, minimumSuitableFpsRange)) {
+					Log.i(TAG, "FPS range already set to " + Arrays.toString(minimumSuitableFpsRange));
+				} else {
+					Log.i(TAG, "Setting FPS range to " + Arrays.toString(minimumSuitableFpsRange));
+					parameters.setPreviewFpsRange(minimumSuitableFpsRange[Camera.Parameters.PREVIEW_FPS_MIN_INDEX],
+							minimumSuitableFpsRange[Camera.Parameters.PREVIEW_FPS_MAX_INDEX]);
+				}
+			}
 		}
 	}
 
