@@ -19,6 +19,7 @@ import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.MenuItemState;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -138,7 +139,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 				btnApply.setText(StringUtils.EMPTY_STRING);
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
-				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
+				btnApply.setText(AmountHelper.format(item.price()) + getContext().getString(R.string.currency_suffix_ruble));
 			}
 		}
 

@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +23,9 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
+import com.omnom.android.menu.api.observable.MenuObservableApi;
 import com.omnom.android.menu.model.Menu;
+import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
@@ -40,10 +43,12 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 import static com.omnom.android.utils.Extras.EXTRA_ERROR_AUTHTOKEN_EXPIRED;
 import static com.omnom.android.utils.Extras.EXTRA_ERROR_WRONG_PASSWORD;
@@ -54,7 +59,19 @@ import static com.omnom.android.utils.Extras.EXTRA_ERROR_WRONG_USERNAME;
  */
 public class EditHashFragment extends Fragment {
 
+	public interface EnterHashPanelCloseListener {
+		void onEnterHashPanelClose();
+	}
+
+	public interface TableFoundListener {
+		void onTableFound(String requestId, Restaurant restaurant, Menu menu);
+	}
+
 	private static final String TAG = EditHashFragment.class.getSimpleName();
+
+	public static EditHashFragment newInstance() {
+		return new EditHashFragment();
+	}
 
 	@InjectView(R.id.panel_enter_hash)
 	protected View panelEnterHash;
@@ -77,9 +94,12 @@ public class EditHashFragment extends Fragment {
 	@Inject
 	protected RestaurateurObservableApi api;
 
-	private Subscription mCheckQrSubscription;
+	@Inject
+	protected MenuObservableApi menuApi;
 
 	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBackgroundFunction;
+
+	private Subscription mCheckQrSubscription;
 
 	private EnterHashPanelCloseListener mEnterHashPanelCloseListener;
 
@@ -89,9 +109,8 @@ public class EditHashFragment extends Fragment {
 
 	private boolean isBusy = false;
 
-	public static EditHashFragment newInstance() {
-		return new EditHashFragment();
-	}
+	@Nullable
+	private Menu mMenu;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -137,7 +156,7 @@ public class EditHashFragment extends Fragment {
 	private void addEnterHashPanelCloseListener(Activity activity) {
 		try {
 			mEnterHashPanelCloseListener = (EnterHashPanelCloseListener) activity;
-		} catch (ClassCastException e) {
+		} catch(ClassCastException e) {
 			throw new ClassCastException(activity.toString() + " must implement EnterHashPanelCloseListener");
 		}
 	}
@@ -145,7 +164,7 @@ public class EditHashFragment extends Fragment {
 	private void addTableFoundListener(Activity activity) {
 		try {
 			mTableFoundListener = (TableFoundListener) activity;
-		} catch (ClassCastException e) {
+		} catch(ClassCastException e) {
 			throw new ClassCastException(activity.toString() + " must implement TableFoundListener");
 		}
 	}
@@ -167,8 +186,8 @@ public class EditHashFragment extends Fragment {
 		editHash.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					if (!isBusy() && !editHash.getText().toString().isEmpty()) {
+				if(actionId == EditorInfo.IME_ACTION_DONE) {
+					if(!isBusy() && !editHash.getText().toString().isEmpty()) {
 						setBusy(true);
 						ViewUtils.setVisible(progressBar, true);
 						editHash.setTextColor(getResources().getColor(R.color.enter_hash_color));
@@ -182,7 +201,7 @@ public class EditHashFragment extends Fragment {
 		editHash.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				if (isBusy()) {
+				if(isBusy()) {
 					editHash.removeTextChangedListener(this);
 					editHash.setText(s);
 					editHash.setSelection(s.length());
@@ -197,7 +216,7 @@ public class EditHashFragment extends Fragment {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				if (isError) {
+				if(isError) {
 					onHashChange();
 				}
 			}
@@ -210,33 +229,53 @@ public class EditHashFragment extends Fragment {
 	}
 
 	private void loadTable(final String hash) {
-		mCheckQrSubscription = AndroidObservable
-				.bindActivity(getActivity(), api.decode(new HashDecodeRequest(hash), mPreloadBackgroundFunction)).subscribe(
-						new Action1<RestaurantResponse>() {
-							@Override
-							public void call(final RestaurantResponse decodeResponse) {
-								if(decodeResponse.hasAuthError()) {
-									throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
-											new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
-													decodeResponse.getError()));
-								}
-								if(!TextUtils.isEmpty(decodeResponse.getError())) {
-									showError(getString(R.string.error_unknown_hash));
-								} else if (decodeResponse.hasOnlyRestaurant()) {
-									ViewUtils.setVisible(progressBar, false);
-									ViewUtils.setVisible(imgSuccess, true);
-									Restaurant restaurant = decodeResponse.getRestaurants().get(0);
-									mTableFoundListener.onTableFound(decodeResponse.getRequestId(), restaurant);
-								} else {
-									showError(getString(R.string.error_unknown_hash));
-								}
-							}
-						}, new Action1<Throwable>() {
-							@Override
-							public void call(Throwable throwable) {
-								showError(getString(R.string.something_went_wrong));
-							}
-						});
+
+		final Observable<RestaurantResponse> responseObservable = api.decode(new HashDecodeRequest(hash), mPreloadBackgroundFunction);
+		final Observable<Pair<RestaurantResponse, MenuResponse>> restMenuObservable = responseObservable.mergeMap(
+				new Func1<RestaurantResponse, Observable<MenuResponse>>() {
+					@Override
+					public Observable<MenuResponse> call(final RestaurantResponse restaurantResponse) {
+						if(restaurantResponse.hasOnlyRestaurant()) {
+							final Restaurant restaurant = restaurantResponse.getRestaurants().get(0);
+							return menuApi.getMenu(restaurant.id());
+						}
+						return Observable.from(new MenuResponse());
+					}
+				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
+					@Override
+					public Pair<RestaurantResponse, MenuResponse> call(final RestaurantResponse restaurant, final MenuResponse menu) {
+						mMenu = menu.getMenu();
+						return Pair.create(restaurant, menu);
+					}
+				});
+
+		mCheckQrSubscription = AndroidObservable.bindActivity(getActivity(), restMenuObservable).subscribe(
+				new Action1<Pair<RestaurantResponse, MenuResponse>>() {
+					@Override
+					public void call(final Pair<RestaurantResponse, MenuResponse> response) {
+						final RestaurantResponse decodeResponse = response.first;
+						if(decodeResponse.hasAuthError()) {
+							throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
+							                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
+							                                             decodeResponse.getError()));
+						}
+						if(!TextUtils.isEmpty(decodeResponse.getError())) {
+							showError(getString(R.string.error_unknown_hash));
+						} else if(decodeResponse.hasOnlyRestaurant()) {
+							ViewUtils.setVisible(progressBar, false);
+							ViewUtils.setVisible(imgSuccess, true);
+							Restaurant restaurant = decodeResponse.getRestaurants().get(0);
+							mTableFoundListener.onTableFound(decodeResponse.getRequestId(), restaurant, mMenu);
+						} else {
+							showError(getString(R.string.error_unknown_hash));
+						}
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						showError(getString(R.string.something_went_wrong));
+					}
+				});
 	}
 
 	private void onHashChange() {
@@ -266,14 +305,6 @@ public class EditHashFragment extends Fragment {
 
 	private void setBusy(boolean isBusy) {
 		this.isBusy = isBusy;
-	}
-
-	public interface EnterHashPanelCloseListener {
-		void onEnterHashPanelClose();
-	}
-
-	public interface TableFoundListener {
-		void onTableFound(String requestId, Restaurant restaurant, Menu menu);
 	}
 
 }

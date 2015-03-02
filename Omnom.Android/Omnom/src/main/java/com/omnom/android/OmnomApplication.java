@@ -6,26 +6,17 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
-<<<<<<< HEAD
-import com.crashlytics.android.Crashlytics;
-=======
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.menu.MenuModule;
->>>>>>> omnom_menu
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.modules.AcquiringModuleMailRuMixpanel;
 import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.AuthMixpanelModule;
 import com.omnom.android.modules.BeaconModule;
 import com.omnom.android.modules.OmnomApplicationModule;
-<<<<<<< HEAD
-import com.omnom.android.modules.RestaurateurMixpanelModule;
-=======
 import com.omnom.android.modules.PushWooshNotificationsModule;
-import com.omnom.android.modules.RestuarateurMixpanelModule;
+import com.omnom.android.modules.RestaurateurMixpanelModule;
 import com.omnom.android.notifier.NotifierModule;
 import com.omnom.android.notifier.api.observable.NotifierObservableApi;
->>>>>>> omnom_menu
 import com.omnom.android.preferences.JsonPreferenceProvider;
 import com.omnom.android.preferences.PreferenceHelperAdapter;
 import com.omnom.android.push.PushNotificationManager;
@@ -55,15 +46,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
  */
 public class OmnomApplication extends BaseOmnomApplication implements AuthTokenProvider {
 
-<<<<<<< HEAD
-=======
-	private static final String MIXPANEL_OMNOM_TOKEN = "e9386a1100754e8f62565a1b8cda8d8c";
-
-	private static final String MIXPANEL_OMNOM_ANDROID_TOKEN = "36038b10ddd9e23db4a28d0f8c21fd78";
-
 	private static final String TAG = OmnomApplication.class.getSimpleName();
 
->>>>>>> omnom_menu
 	public static OmnomApplication get(Context context) {
 		return (OmnomApplication) context.getApplicationContext();
 	}
@@ -104,7 +88,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		return Arrays.asList(new AndroidModule(this),
 		                     new OmnomApplicationModule(),
 		                     new BeaconModule(this),
-		                     new RestuarateurMixpanelModule(this, R.string.endpoint_restaurateur, mixPanelHelper),
+		                     new RestaurateurMixpanelModule(this, R.string.endpoint_restaurateur, mixPanelHelper),
 		                     new MenuModule(this, R.string.endpoint_menu),
 		                     new AcquiringModuleMailRuMixpanel(this, mixPanelHelper),
 		                     new PushWooshNotificationsModule(this),

@@ -26,6 +26,7 @@ import com.omnom.android.menu.model.MenuItemState;
 import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewFilter;
@@ -135,7 +136,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 				btnApply.setText(StringUtils.EMPTY_STRING);
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
-				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
+				btnApply.setText(AmountHelper.format(item.price()) + getContext().getString(R.string.currency_suffix_ruble));
 			}
 		}
 
@@ -185,7 +186,7 @@ public class MenuCategoryItemsAdapter extends BaseAdapter implements StickyListV
 				btnApply.setText(StringUtils.EMPTY_STRING);
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
-				btnApply.setText(StringUtils.formatCurrency(item.price(), getContext().getString(R.string.currency_suffix_ruble)));
+				btnApply.setText(AmountHelper.format(item.price()) + getContext().getString(R.string.currency_suffix_ruble));
 			}
 		}
 
