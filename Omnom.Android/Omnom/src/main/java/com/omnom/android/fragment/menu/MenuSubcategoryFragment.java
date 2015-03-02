@@ -20,7 +20,6 @@ import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.UserOrder;
-import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -107,7 +106,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 	@Subscribe
 	public void onOrderUpdate(final OrderUpdateEvent event) {
 		final Item item = event.getItem();
-		mOrder.itemsTable().put(item.id(), UserOrderData.create(event.getCount(), item));
+		mOrder.addItem(item, event.getCount());
 		mMenuAdapter.notifyItemChanged(event.getPosition());
 
 		if(event.getPosition() > 0 && item.hasRecommendations()) {

@@ -12,6 +12,7 @@ import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
+import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
@@ -19,6 +20,7 @@ import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
+import java.util.Collection;
 import java.util.List;
 
 import altbeacon.beacon.Beacon;
@@ -88,6 +90,8 @@ public interface RestaurateurObservableApi {
 	public Observable<Restaurant> getMenu(String restaurantId);
 
 	public Observable<OrdersResponse> getOrders(String restaurantId, String tableId);
+
+	public Observable<Collection<OrderItem>> getItems(String restaurantId, String tableId);
 
 	public Observable<ResponseBase> newGuest(String restaurantId, String tableId);
 

@@ -17,6 +17,7 @@ import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
+import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -27,6 +28,7 @@ import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.RestaurantTablesResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
+import java.util.Collection;
 import java.util.List;
 
 import retrofit.http.Body;
@@ -81,6 +83,10 @@ public interface RestaurateurDataService {
 
 	@GET("/restaurants/{restaurant_id}/tables/{table_id}/orders")
 	Observable<OrdersResponse> getOrders(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
+	                                     @Path(Protocol.FIELD_TABLE_ID) String tableId);
+
+	@GET("/restaurants/{restaurant_id}/tables/{table_id}/items")
+	Observable<Collection<OrderItem>> getItems(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
 	                                     @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@POST("/restaurants/{restaurant_id}/tables/{table_id}/new/guest")

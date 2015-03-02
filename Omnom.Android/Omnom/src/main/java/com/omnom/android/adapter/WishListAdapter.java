@@ -15,8 +15,11 @@ import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.menu.utils.MenuHelper;
+import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.utils.AmountHelper;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -78,11 +81,16 @@ public class WishListAdapter extends BaseAdapter {
 		}
 	}
 
+	private class OrderItemHeader extends OrderItem {
+		public OrderItemHeader() {
+		}
+	}
+
 	private final Context mContext;
 
 	private final UserOrder mOrder;
 
-	private final List<Item> mTableItems;
+	private final ArrayList<OrderItem> mTableItems;
 
 	private final LayoutInflater mInflater;
 
@@ -90,12 +98,15 @@ public class WishListAdapter extends BaseAdapter {
 
 	private List<UserOrderData> _lazy_selected_data;
 
-	public WishListAdapter(Context context, UserOrder order, List<Item> tableItems, View.OnClickListener clickListener) {
+	public WishListAdapter(Context context, UserOrder order, Collection<OrderItem> tableItems, View.OnClickListener clickListener) {
 		mClickListener = clickListener;
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
 		mOrder = order;
-		mTableItems = tableItems;
+		mTableItems = new ArrayList<>(tableItems);
+		if(mTableItems.size() > 0) {
+			mTableItems.add(0, new OrderItemHeader());
+		}
 	}
 
 	@Override
@@ -106,6 +117,9 @@ public class WishListAdapter extends BaseAdapter {
 		}
 		if(item instanceof UserOrderData) {
 			return VIEW_TYPE_WISH_ITEM;
+		}
+		if(item instanceof OrderItemHeader) {
+			return VIEW_TYPE_TABLE_HEADER;
 		}
 		return VIEW_TYPE_TABLE_ITEM;
 	}
@@ -187,6 +201,10 @@ public class WishListAdapter extends BaseAdapter {
 	@DebugLog
 	private void bindView(final View convertView, final int position, final int itemType, final Object item) {
 		switch(itemType) {
+			case VIEW_TYPE_TABLE_HEADER:
+				convertView.findViewById(R.id.btn_refresh).setOnClickListener(mClickListener);
+				break;
+
 			case VIEW_TYPE_WISH_ITEM:
 				final ViewHolder holder = (ViewHolder) convertView.getTag();
 				final UserOrderData data = (UserOrderData) item;
@@ -197,6 +215,19 @@ public class WishListAdapter extends BaseAdapter {
 				holder.txtPrice.setTag(data);
 				holder.txtPrice.setOnClickListener(mClickListener);
 				MenuHelper.bindDetails(mContext, data.item().details(), holder.txtInfo, false);
+				break;
+
+			case VIEW_TYPE_TABLE_ITEM:
+				final ViewHolder tableItemHolder = (ViewHolder) convertView.getTag();
+				final OrderItem orderItem = (OrderItem) item;
+				tableItemHolder.txtTitle.setText(orderItem.getTitle());
+
+				final String itemPrice = AmountHelper.format(orderItem.getPricePerItem()) + mContext.getString(
+						R.string.currency_suffix_ruble);
+				tableItemHolder.txtPrice.setText(itemPrice);
+				tableItemHolder.txtPrice.setTag(orderItem);
+				tableItemHolder.txtPrice.setOnClickListener(mClickListener);
+				MenuHelper.bindDetails(mContext, null, tableItemHolder.txtInfo, false);
 				break;
 
 			case VIEW_TYPE_WISH_FOOTER:
@@ -213,6 +244,5 @@ public class WishListAdapter extends BaseAdapter {
 
 	public void remove(final Object tag) {
 		getSelectedItems().remove(tag);
-		mTableItems.remove(tag);
 	}
 }

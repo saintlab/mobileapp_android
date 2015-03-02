@@ -39,7 +39,6 @@ import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.menu.model.UserOrder;
-import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.mixpanel.model.AppLaunchMixpanelEvent;
@@ -452,6 +451,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	protected void onResume() {
 		super.onResume();
 		updateWishUi();
+		menuCategories.onResume();
 		if(mPaymentListener != null && mTable != null) {
 			mPaymentListener.initTableSocket(mTable);
 		}
@@ -462,7 +462,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			return;
 		}
 		final Item item = event.getItem();
-		mOrder.itemsTable().put(item.id(), UserOrderData.create(event.getCount(), item));
+		mOrder.addItem(item, event.getCount());
 		menuCategories.refresh(event);
 		updateWishUi();
 	}
@@ -1172,7 +1172,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	private void onOrder() {
-		WishActivity.start(this, mRestaurant, mMenu, insureOrder(), REQUEST_CODE_WISH_LIST);
+		WishActivity.start(this, mRestaurant, mTable, mMenu, insureOrder(), REQUEST_CODE_WISH_LIST);
 	}
 
 	public View getPanelBottom() {

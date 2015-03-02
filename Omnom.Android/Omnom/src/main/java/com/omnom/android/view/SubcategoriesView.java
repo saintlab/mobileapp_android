@@ -242,6 +242,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	public void refresh(final OrderUpdateEvent event) {
 		final Item item = event.getItem();
+		mOrder.addItem(item, event.getCount());
 		mMenuAdapter.notifyItemChanged(event.getPosition());
 
 		if(event.getPosition() > 0 && item.hasRecommendations()) {
@@ -265,6 +266,12 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 					mMenuAdapter.remove(itemData);
 				}
 			}
+		}
+	}
+
+	public void onResume() {
+		if(mMenuAdapter != null) {
+			mMenuAdapter.notifyDataSetChanged();
 		}
 	}
 }
