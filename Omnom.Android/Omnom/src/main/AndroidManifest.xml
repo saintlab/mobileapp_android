@@ -291,11 +291,19 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White"
             android:windowSoftInputMode="stateAlwaysHidden" />
+
         <activity
             android:name=".activity.WishSentActivity"
             android:label="@string/title_activity_wish_sent"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Transparent"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity
+            android:name=".activity.WebActivity"
+            android:label="@string/title_activity_wish_sent"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White.Light"
             android:windowSoftInputMode="stateAlwaysHidden" />
     </application>
 

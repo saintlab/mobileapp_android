@@ -23,6 +23,7 @@ import com.omnom.android.activity.ValidateActivityBle;
 import com.omnom.android.activity.ValidateActivityBle21;
 import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.activity.ValidateActivityShortcut;
+import com.omnom.android.activity.WebActivity;
 import com.omnom.android.activity.WishActivity;
 import com.omnom.android.activity.WishSentActivity;
 import com.omnom.android.fragment.BillItemsFragment;
@@ -55,6 +56,7 @@ import dagger.Module;
 		CardAddActivity.class,
 		CardConfirmActivity.class, ThanksActivity.class, ThanksDemoActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
 		PaymentProcessActivity.class, RestaurantsListActivity.class, RestaurantActivity.class, WishActivity.class, WishSentActivity.class,
+		WebActivity.class,
 		/* services */
 		BackgroundBleService.class,
 		/* fragments */
