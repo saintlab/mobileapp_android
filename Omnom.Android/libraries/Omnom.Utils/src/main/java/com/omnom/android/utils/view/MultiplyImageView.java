@@ -74,7 +74,7 @@ public class MultiplyImageView extends ImageView {
 	private void processAttrs(AttributeSet attrs) {
 		final TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.MultiplyImageView, 0, 0);
 		try {
-			mColor = a.getColor(R.styleable.MultiplyImageView_color, getResources().getColor(R.color.loader_bg_transparent));
+			mColor = a.getColor(R.styleable.MultiplyImageView_multiplyColor, getResources().getColor(R.color.loader_bg_transparent));
 		} finally {
 			a.recycle();
 		}

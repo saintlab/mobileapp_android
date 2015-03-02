@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.14.4'
+        classpath 'io.fabric.tools:gradle:1.15.2'
     }
 }
 apply plugin: 'com.android.application'
@@ -89,19 +89,19 @@ android {
 }
 
 dependencies {
+
     // google
     compile 'com.google.code.gson:gson:2.3'
-    compile 'com.android.support:support-v4:21.0.2'
-
+    compile 'com.android.support:support-v4:21.0.3'
     // auto-parcel
-    compile 'com.github.frankiesardo:auto-parcel:+'
-    apt 'com.github.frankiesardo:auto-parcel-processor:+'
-
+    compile 'com.github.frankiesardo:auto-parcel:0.2'
+    apt 'com.github.frankiesardo:auto-parcel-processor:0.2'
     // socket.io
+
     // compile 'com.github.nkzawa:socket.io-client:0.3.1@jar'
+
     // compile 'com.github.nkzawa:engine.io-client:0.3.1@jar'
     compile 'org.java-websocket:Java-WebSocket:1.3.0@jar'
-
     // square
     compile 'com.squareup.dagger:dagger:1.2.2'
     apt 'com.squareup.dagger:dagger-compiler:1.2.2'
@@ -110,11 +110,9 @@ dependencies {
     compile 'com.jakewharton:butterknife:5.1.1'
     compile 'com.squareup.okhttp:okhttp:2.1.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.1.0'
-
     // rx
     compile 'com.netflix.rxjava:rxjava-core:0.19.6'
     compile 'com.netflix.rxjava:rxjava-android:0.19.6'
-
     // other
     compile 'uk.co.chrisjenx:calligraphy:1.2.0'
     compile 'com.nhaarman.listviewanimations:lib-core:3.1.0@aar'
@@ -124,13 +122,15 @@ dependencies {
     compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
         exclude group: 'com.google.android', module: 'support-v4'
     }
-
     compile project(':libraries:Omnom.Altbeacon')
     compile project(':libraries:Omnom.Beacon')
     compile project(':libraries:Omnom.Zxing')
     compile project(':libraries:Omnom.Utils')
     compile project(':libraries:Omnom.Auth')
+    compile project(':libraries:Omnom.Notifier')
     compile project(':libraries:Omnom.Restaurateur')
+    compile project(':libraries:Omnom.Menu')
+    compile project(':libraries:SlidingUpPanel:library')
     compile project(':libraries:Io.Socket.Client')
     compile project(':libraries:Io.Engine.Client')
     androidTestCompile('com.jakewharton.espresso:espresso:1.1-r3') {
@@ -140,4 +140,5 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
         transitive = true;
     }
+    compile files('libs/pushwoosh-2.9.0.jar')
 }

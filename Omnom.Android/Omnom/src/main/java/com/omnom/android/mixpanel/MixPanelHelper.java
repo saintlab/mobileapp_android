@@ -8,6 +8,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.BuildConfig;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
@@ -246,7 +247,6 @@ public class MixPanelHelper {
 				api.identify(id);
 				api.getPeople().identify(id);
 				api.getPeople().set(toJson(user));
-				api.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
 			}
 		});
 	}
@@ -265,7 +265,6 @@ public class MixPanelHelper {
 				api.getPeople().identify(id);
 				api.getPeople().set(toJson(user));
 				api.getPeople().set(MixPanelHelper.USER_CREATED, MixPanelHelper.formatDate(System.currentTimeMillis()));
-				api.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
 			}
 		});
 	}
@@ -282,7 +281,6 @@ public class MixPanelHelper {
 				api.identify(id);
 				api.getPeople().identify(id);
 				api.getPeople().set(toJson(user));
-				api.getPeople().initPushHandling(MixPanelHelper.MIXPANEL_PUSH_ID);
 			}
 		});
 	}
@@ -315,6 +313,13 @@ public class MixPanelHelper {
 		if(mMixpanelApiMap == null) {
 			Log.w(TAG, "MixpanelApiMap is null");
 			return;
+		}
+		if(BuildConfig.DEBUG) {
+			// skip analytics in debug mode
+			return;
+		}
+		if(mMixpanelApiMap == null || mMixpanelApiMap.isEmpty()) {
+			Log.w(TAG, "mMixpanelApiMap is not set");
 		}
 		if(project == Project.ALL) {
 			Collection<MixpanelAPI> mixpanelAPIs = mMixpanelApiMap.values();

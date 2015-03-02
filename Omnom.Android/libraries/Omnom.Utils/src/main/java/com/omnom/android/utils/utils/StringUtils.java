@@ -10,6 +10,8 @@ import hugo.weaving.DebugLog;
  */
 public class StringUtils {
 
+	public static final String NEXT_STRING = "\n";
+
 	private static final String TAG = StringUtils.class.getSimpleName();
 
 	public static final String EMPTY_STRING = "";

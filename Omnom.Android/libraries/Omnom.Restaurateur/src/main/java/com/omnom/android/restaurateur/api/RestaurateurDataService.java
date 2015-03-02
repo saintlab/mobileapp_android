@@ -22,6 +22,7 @@ import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.RestaurantTablesResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
@@ -122,6 +123,10 @@ public interface RestaurateurDataService {
 
 	@GET("/ibeacons/demo")
 	Observable<List<DemoTableData>> getDemoTable();
+
+	@POST("/restaurants/{id}/wishes")
+	Observable<Restaurant> wishes(@Path(Protocol.FIELD_ID) String restaurantId,
+	                              @Body WishRequest request);
 
 	@PUT("/restaurants/{id}")
 	Observable<Restaurant> setRssiThreshold(@Path(Protocol.FIELD_ID) String restaurantId,

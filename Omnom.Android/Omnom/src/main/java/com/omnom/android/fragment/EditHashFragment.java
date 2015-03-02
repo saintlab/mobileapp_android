@@ -22,6 +22,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
+import com.omnom.android.menu.model.Menu;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
@@ -272,7 +273,7 @@ public class EditHashFragment extends Fragment {
 	}
 
 	public interface TableFoundListener {
-		void onTableFound(String requestId, Restaurant restaurant);
+		void onTableFound(String requestId, Restaurant restaurant, Menu menu);
 	}
 
 }

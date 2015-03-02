@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/activity_vertical_margin_small"
+    android:baselineAligned="false"
+    android:gravity="center">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@android:id/text1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:layout_centerInParent="true"
+            android:textColor="@color/menu_header"
+            android:text="Хорошо вместе"
+            android:textAppearance="?android:textAppearance"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@android:id/text1"
+            android:layout_height="1dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/menu_header" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@android:id/text1"
+            android:layout_height="1dp"
+            android:layout_marginLeft="16dp"
+            android:background="@color/menu_header" />
+
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/txt_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+        android:paddingRight="@dimen/activity_horizontal_margin_medium"
+        android:singleLine="false"
+        android:maxLines="2"
+        android:gravity="center"
+        android:ellipsize="end"
+        android:paddingBottom="8dp"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+        android:textAppearance="?android:textAppearanceLarge" />
+
+    <ImageView
+        android:id="@+id/img_icon"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/menu_dish_image_height"
+        android:scaleType="centerCrop" />
+
+    <RelativeLayout
+        android:id="@+id/panel_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin_large"
+        android:paddingRight="@dimen/activity_horizontal_margin_large">
+
+        <TextView
+            android:id="@+id/txt_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textColor="@color/menu_item_details"
+            android:text="ASD ASD AS DAS AS AS ASD asd asd asd asd s"
+            android:paddingRight="28dp"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+            android:textAppearance="?android:textAppearanceSmall" />
+
+        <TextView
+            android:layout_alignRight="@id/txt_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="ещё"
+            android:textColor="@color/menu_blue" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/txt_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textColor="@color/menu_item_details"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+        android:textAppearance="?android:textAppearanceSmall" />
+
+    <Button
+        android:id="@+id/btn_apply"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin_small"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:textColor="@drawable/text_color_selector_menu_blue"
+        android:textAppearance="?android:textAppearance"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    <View
+        android:id="@+id/delimiter"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:background="@color/divider_light" />
+
+</LinearLayout>
