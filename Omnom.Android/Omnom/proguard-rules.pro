@@ -166,6 +166,11 @@
 -keep class com.omnom.android.acquiring.mailru.model.** { *; }
 -keep class com.omnom.android.acquiring.mailru.response.** { *; }
 
+#pushwoosh
+-keep class com.arellomobile.android.** { *; }
+-dontwarn com.amazon.**
+-dontwarn com.arellomobile.android.push.**
+
 #card.io
 -keep class io.card.**
 -keepclassmembers class io.card.** {
