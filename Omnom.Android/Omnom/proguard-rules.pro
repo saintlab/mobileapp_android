@@ -162,7 +162,7 @@
 -keep class com.omnom.android.utils.** { *; }
 -keep class com.omnom.android.restaurateur.** { *; }
 -keep class com.omnom.android.mixpanel.model.** { *; }
--keep com.omnom.android.notifier.model.** { *; }
+-keep class com.omnom.android.notifier.model.** { *; }
 -keep class com.omnom.android.acquiring.mailru.model.** { *; }
 -keep class com.omnom.android.acquiring.mailru.response.** { *; }
 
