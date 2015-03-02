@@ -9,6 +9,7 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.utils.activity.OmnomActivity;
 
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 /**
  * Created by Ch3D on 02.03.2015.
@@ -20,7 +21,7 @@ public class WebActivity extends BaseOmnomActivity {
 	public static void start(OmnomActivity context, final String url) {
 		final Intent intent = new Intent(context.getActivity(), WebActivity.class);
 		intent.putExtra(EXTRA_URI, url);
-		context.start(intent, R.anim.slide_in_up, R.anim.slide_out_down, false);
+		context.start(intent, R.anim.slide_in_up, R.anim.nothing, false);
 	}
 
 	@InjectView(R.id.web_view)
@@ -39,6 +40,17 @@ public class WebActivity extends BaseOmnomActivity {
 			mUriString = SCHEME_PREFIX_HTTP + mUriString;
 		}
 		mWebView.loadUrl(mUriString);
+	}
+
+	@OnClick(R.id.btn_close)
+	public void onClose() {
+		finish();
+	}
+
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 	}
 
 	@Override
