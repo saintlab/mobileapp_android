@@ -22,6 +22,7 @@ import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.UserProfileHelper;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.notifier.api.observable.NotifierObservableApi;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.utils.activity.OmnomActivity;
@@ -37,9 +38,11 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
@@ -82,6 +85,9 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	@Inject
 	protected RestaurateurObservableApi api;
+
+	@Inject
+	protected NotifierObservableApi notifierApi;
 
 	private Subscription profileSubscription;
 
@@ -260,22 +266,30 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	private void quit() {
 		final String token = getPreferences().getAuthToken(this);
-		logoutSubscription = AndroidObservable.bindActivity(this, authenticator.logout(token)).subscribe(new Action1<AuthResponse>() {
+		final Observable logoutObservable = notifierApi.unregister().mergeMap(new Func1<Object, Observable<AuthResponse>>() {
 			@Override
-			public void call(AuthResponse authResponseBase) {
-				if(!authResponseBase.hasError()) {
-					((OmnomApplication) getApplication()).logout();
-					forwardToIntro();
-				} else {
-					showToast(getActivity(), R.string.error_unknown_server_error);
-				}
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				showToast(getActivity(), R.string.error_unknown_server_error);
+			public Observable<AuthResponse> call(final Object o) {
+				return authenticator.logout(token);
 			}
 		});
+		logoutSubscription = AndroidObservable.bindActivity(this, logoutObservable).subscribe(
+				new Action1<AuthResponse>() {
+					@Override
+					public void call(AuthResponse authResponseBase) {
+						if(!authResponseBase.hasError()) {
+							((OmnomApplication) getApplication()).clearUserData();
+							forwardToIntro();
+						} else {
+							showToast(getActivity(), R.string.error_unknown_server_error);
+						}
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						showToast(getActivity(), R.string.error_unknown_server_error);
+					}
+				});
+		// TODO: unregister from push notifier
 	}
 
 	@Override

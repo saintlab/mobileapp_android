@@ -29,13 +29,21 @@ import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.fragment.EditHashFragment;
 import com.omnom.android.fragment.QrHintFragment;
+import com.omnom.android.menu.api.observable.MenuObservableApi;
+import com.omnom.android.menu.model.Menu;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
+import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.ViewUtils;
 
+import javax.inject.Inject;
+
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.Subscription;
+import rx.functions.Func1;
 
 /**
  * Created by Ch3D on 14.11.2014.
@@ -47,13 +55,44 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 											   CameraManager.TorchListener {
 
 	private static final String TAG = OmnomQRCaptureActivity.class.getSimpleName();
+
 	private static final String ENTER_HASH_PANEL = "enter_hash_panel";
 	private static final String QR_HINT = "qr_hint";
 
 	public static final int RESULT_RESTAURANT_FOUND = 2;
 
 	private static final int LAUNCH_DELAY = 2000;
+
 	private static final int SCAN_DELAY = 5000;
+
+	private class LaunchAnimationListener implements Animator.AnimatorListener {
+
+		private final View background;
+
+		public LaunchAnimationListener(final View background) {
+			this.background = background;
+		}
+
+		@Override
+		public void onAnimationStart(Animator animation) {
+
+		}
+
+		@Override
+		public void onAnimationEnd(Animator animation) {
+			ViewUtils.setVisible(background, false);
+		}
+
+		@Override
+		public void onAnimationCancel(Animator animation) {
+
+		}
+
+		@Override
+		public void onAnimationRepeat(Animator animation) {
+
+		}
+	}
 
 	public static void start(final BaseOmnomActivity activity, final int code) {
 		final Intent intent = getIntent(activity);
@@ -102,6 +141,22 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 	@InjectView(R.id.btn_flash_light)
 	protected ImageView btnFlashLight;
 
+	@Inject
+	protected RestaurateurObservableApi api;
+
+	@Inject
+	protected MenuObservableApi menuApi;
+
+	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBackgroundFunction;
+
+	private Subscription mCheckQrSubscription;
+
+	private boolean isError = false;
+
+	private boolean isBusy = false;
+
+	private boolean isFlashTurnedOn = false;
+
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -145,7 +200,6 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 	}
 
 
-
 	private void showEnterHashPanel() {
 		getSupportFragmentManager().beginTransaction()
 				.addToBackStack(null)
@@ -171,21 +225,21 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 			public void run() {
 				final int duration = getResources().getInteger(R.integer.default_animation_duration_medium);
 				scanFrameContainer.animate()
-						.translationYBy(displayMetrics.heightPixels)
-						.setDuration(duration)
-						.start();
+				                  .translationYBy(displayMetrics.heightPixels)
+				                  .setDuration(duration)
+				                  .start();
 				background.animate()
-						.translationYBy(displayMetrics.heightPixels)
-						.setDuration(duration)
-						.setListener(new LaunchAnimationListener(background))
-						.start();
+				          .translationYBy(displayMetrics.heightPixels)
+				          .setDuration(duration)
+				          .setListener(new LaunchAnimationListener(background))
+				          .start();
 
 				launchScanningDelayHandler();
 			}
 		});
 
 		ViewTreeObserver viewTreeObserver = scanFrame.getViewTreeObserver();
-		if (viewTreeObserver.isAlive()) {
+		if(viewTreeObserver.isAlive()) {
 			viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 				@Override
 				public void onGlobalLayout() {
@@ -253,40 +307,40 @@ public class OmnomQRCaptureActivity extends CaptureActivity
     }
 
 	private void setNotScanningButtonVisible(final boolean isVisible) {
-		if (ViewUtils.isVisible(btnNotScanning) == isVisible) {
+		if(ViewUtils.isVisible(btnNotScanning) == isVisible) {
 			return;
 		}
-		if (isVisible) {
+		if(isVisible) {
 			ViewUtils.setVisible(btnNotScanning, true);
 		}
 		final int duration = getResources().getInteger(R.integer.not_scanning_animation_duration);
 		btnNotScanning.animate()
-				.translationYBy(btnNotScanning.getHeight() * (isVisible ? -1 : 1))
-				.setDuration(duration)
-				.setListener(new Animator.AnimatorListener() {
-					@Override
-					public void onAnimationStart(Animator animation) {
+		              .translationYBy(btnNotScanning.getHeight() * (isVisible ? -1 : 1))
+		              .setDuration(duration)
+		              .setListener(new Animator.AnimatorListener() {
+			              @Override
+			              public void onAnimationStart(Animator animation) {
 
-					}
+			              }
 
-					@Override
-					public void onAnimationEnd(Animator animation) {
-						if (!isVisible) {
-							ViewUtils.setVisible(btnNotScanning, false);
-						}
-					}
+			              @Override
+			              public void onAnimationEnd(Animator animation) {
+				              if(!isVisible) {
+					              ViewUtils.setVisible(btnNotScanning, false);
+				              }
+			              }
 
-					@Override
-					public void onAnimationCancel(Animator animation) {
+			              @Override
+			              public void onAnimationCancel(Animator animation) {
 
-					}
+			              }
 
-					@Override
-					public void onAnimationRepeat(Animator animation) {
+			              @Override
+			              public void onAnimationRepeat(Animator animation) {
 
-					}
-				})
-				.start();
+			              }
+		              })
+		              .start();
 	}
 
 	@Override
@@ -313,43 +367,15 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 	}
 
 	@Override
-	public void onTableFound(String requestId, Restaurant restaurant) {
-		finish(requestId, restaurant);
+	public void onTableFound(String requestId, Restaurant restaurant, Menu menu) {
+		finish(requestId, restaurant, menu);
 	}
 
-	private class LaunchAnimationListener implements Animator.AnimatorListener {
-
-		private final View background;
-
-		public LaunchAnimationListener(final View background) {
-			this.background = background;
-		}
-
-		@Override
-		public void onAnimationStart(Animator animation) {
-
-		}
-
-		@Override
-		public void onAnimationEnd(Animator animation) {
-			ViewUtils.setVisible(background, false);
-		}
-
-		@Override
-		public void onAnimationCancel(Animator animation) {
-
-		}
-
-		@Override
-		public void onAnimationRepeat(Animator animation) {
-
-		}
-	}
-
-	private void finish(final String requestId, final Restaurant restaurant) {
+	private void finish(final String requestId, final Restaurant restaurant, Menu menu) {
 		Intent data = new Intent();
 		data.putExtra(EXTRA_REQUEST_ID, requestId);
 		data.putExtra(EXTRA_RESTAURANT, restaurant);
+		data.putExtra(EXTRA_RESTAURANT_MENU, menu);
 		setResult(RESULT_RESTAURANT_FOUND, data);
 		finish();
 	}

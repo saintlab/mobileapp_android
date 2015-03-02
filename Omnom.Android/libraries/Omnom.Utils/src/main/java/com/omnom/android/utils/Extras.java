@@ -36,11 +36,17 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_CARD_DATA = "com.omnom.android.card.data";
 	public static final String EXTRA_TYPE = "com.omnom.android.type";
 	public static final String EXTRA_ORDER = "com.omnom.android.order";
+	public static final String EXTRA_ORDER_DATA = "com.omnom.android.order.data";
 	public static final String EXTRA_PAYMENT_DETAILS = "com.omnom.android.payment.details";
 	public static final String EXTRA_PAYMENT_EVENT = "com.omnom.android.payment.event";
 	public static final String EXTRA_TRANSACTION_URL = "com.omnom.android.payment.transaction_url";
 	public static final String EXTRA_ANIMATION_EXIT = "com.omnom.android.extra.animation";
 	public static final String EXTRA_TRANSLATION_TOP = "com.omnom.android.extra.translation.top";
+	public static final String EXTRA_RESTAURANT_MENU = "com.omnom.android.restaurant.menu";
+	public static final String EXTRA_MENU_ITEM = "com.omnom.android.restaurant.menu.item";
+	public static final String EXTRA_RESTAURANT_MENU_CATEGORY = "com.omnom.android.restaurant.menu.category";
+	public static final String EXTRA_POSITION = "com.omnom.android.position";
+	public static final String EXTRA_PIVOT_Y = "com.omnom.android.position.y";
 
 	public static final String EXTRA_CHARACTERISTIC_UUID = "ble.characteristic.uuid";
 	public static final String EXTRA_CHARACTERISTIC_VALUE = "ble.characteristic.value";
@@ -58,4 +64,7 @@ public interface Extras extends Preferences {
 
 	public static final int REQUEST_CODE_CHANGE_TABLE = 2000;
 	public static final int RESULT_CODE_TABLE_CHANGED = 2001;
+	public static final int REQUEST_CODE_MENU_ITEM = 5001;
+	public static final int REQUEST_CODE_MENU_SUBCATEGORY = 5002;
+	public static final int REQUEST_CODE_WISH_LIST = 5002;
 }

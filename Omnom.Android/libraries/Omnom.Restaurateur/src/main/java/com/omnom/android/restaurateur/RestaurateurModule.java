@@ -1,7 +1,6 @@
 package com.omnom.android.restaurateur;
 
 import android.content.Context;
-import android.os.Build;
 import android.text.TextUtils;
 
 import com.omnom.android.protocol.BaseRequestInterceptor;
@@ -22,12 +21,6 @@ import dagger.Provides;
 public class RestaurateurModule {
 
 	public static final String PLATFORM_ANDROID = "Android";
-
-	private static final String sManufacturer = Build.MANUFACTURER;
-
-	private static final String sModel = Build.MODEL;
-
-	private static final String sApiLevel = String.valueOf(Build.VERSION.SDK_INT);
 
 	private AuthTokenProvider tokenProvider;
 

@@ -1,8 +1,23 @@
 <resources>
+    <color name="panel_background_grey_light">#f6f6f6</color>
+
     <color name="loader_hint_text_color">#99ffffff</color>
     <color name="loader_bg">#CE1200</color>
     <color name="loader_bg_transparent">#CE1200</color>
     <color name="error_red">#D0021B</color>
     <color name="error_bg_white_transparent">#aaffffff</color>
     <color name="transparent">#00000000</color>
+    <color name="divider_light">#77aaaaaa</color>
+
+    <color name="lighter_grey">#ddd</color>
+    <color name="darker_grey">#aaa</color>
+
+    <color name="menu_item_details">#ffafafaf</color>
+    <color name="menu_item_details_transparent">#59afafaf</color>
+
+    <color name="menu_item_buy_border">#77aaaaaa</color>
+    <color name="menu_item_buy_border_transparent">#33aaaaaa</color>
+
+    <color name="menu_blue">#ff157efb</color>
+    <color name="menu_blue_transparent">#59157efb</color>
 </resources>

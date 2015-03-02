@@ -24,12 +24,15 @@ public class BaseRequestInterceptor implements RequestInterceptor {
 
 	private final int mAppVersionCode;
 
+	private final String mInstallId;
+
 	private Context mContext;
 
 	public BaseRequestInterceptor(Context context) {
 		mContext = context;
 		mAppVersion = AndroidUtils.getAppVersion(mContext);
 		mAppVersionCode = AndroidUtils.getAppVersionCode(mContext);
+		mInstallId = AndroidUtils.getInstallId(mContext);
 	}
 
 	@Override
@@ -37,9 +40,13 @@ public class BaseRequestInterceptor implements RequestInterceptor {
 		request.addHeader(Protocol.HEADER_X_CURRENT_APP_VERSION, mAppVersion);
 		request.addHeader(Protocol.HEADER_X_CURRENT_APP_BUILD, String.valueOf(mAppVersionCode));
 
+		request.addHeader(Protocol.HEADER_X_MOBILE_DEVICE_ID, mInstallId);
+
 		request.addHeader(Protocol.HEADER_X_MOBILE_VENDOR, sManufacturer);
 		request.addHeader(Protocol.HEADER_X_MOBILE_MODEL, sModel);
 		request.addHeader(Protocol.HEADER_X_MOBILE_OS_VERSION, sApiLevel);
 		request.addHeader(Protocol.HEADER_X_MOBILE_PLATFORM, PLATFORM_ANDROID);
+
+		request.addHeader(Protocol.HEADER_X_MOBILE_CONFIGURATION, Protocol.MOBILE_CONFIGURATION_PRODUCTION);
 	}
 }

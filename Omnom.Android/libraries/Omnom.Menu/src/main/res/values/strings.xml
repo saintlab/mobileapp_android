@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dish_nutritional_title_100">На 100гр.</string>
+    <string name="dish_nutritional_title_portion">На процию</string>
+
+    <string name="dish_nutritional_calories">%1$s ккал</string>
+    <string name="dish_nutritional_protein">Белки %1$s</string>
+    <string name="dish_nutritional_fat">Жиры %1$s</string>
+    <string name="dish_nutritional_carbohydrates">Углеводы %1$s</string>
+
+    <string name="dish_details_volume">%1$s мл.</string>
+    <string name="dish_details_weight">%1$s гр.</string>
+
+    <string name="dish_details_persons_count">Порция на %1$s</string>
+    <string name="dish_details_persons_count_large">Порция на %1$s персон</string>
+    <string name="dish_details_cooking_time">Время приготовления %1$s минут</string>
+    <string name="wish_items_price_detailed">%1$s x %2$s</string>
+
+    <string name="persons_one">одного</string>
+    <string name="persons_two">двоих</string>
+    <string name="persons_three">троих</string>
+    <string name="persons_four">четверых</string>
+</resources>

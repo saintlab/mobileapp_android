@@ -3,15 +3,19 @@ package com.omnom.android.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
@@ -29,6 +33,13 @@ import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.fragment.NoOrdersFragment;
+import com.omnom.android.fragment.menu.OrderUpdateEvent;
+import com.omnom.android.menu.api.observable.MenuObservableApi;
+import com.omnom.android.menu.model.Item;
+import com.omnom.android.menu.model.Menu;
+import com.omnom.android.menu.model.MenuResponse;
+import com.omnom.android.menu.model.UserOrder;
+import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.mixpanel.model.AppLaunchMixpanelEvent;
@@ -62,10 +73,15 @@ import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
+import com.omnom.android.view.PanelSlideListenerAdapter;
+import com.omnom.android.view.PanelSlideListenerSimple;
+import com.omnom.android.view.SubcategoriesView;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,8 +97,10 @@ import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.observables.AndroidObservable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 import static butterknife.ButterKnife.findById;
 import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM;
@@ -91,7 +109,8 @@ import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM_ANDROID;
 /**
  * Created by Ch3D on 08.10.2014.
  */
-public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
+public abstract class ValidateActivity extends BaseOmnomFragmentActivity
+		implements FragmentManager.OnBackStackChangedListener, SubcategoriesView.OnCollapsedTouchListener {
 
 	public static final int REQUEST_CODE_ORDERS = 100;
 
@@ -101,15 +120,20 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	public static final int TYPE_DEFAULT = -1;
 
 	public static final String ACTION_LAUNCH_QR = "com.omnom.android.action.launch_qr";
+
 	public static final String ACTION_LAUNCH_HASHCODE = "com.omnom.android.action.launch_hashcode";
+
 	public static final String QR_URL_PATH_PREFIX = "/qr/";
+
 	public static final String SCHEME_OMNOM = "omnom";
+
 	public static final String QUERY_PARAMETER_HASH = "hash";
 
-	private static final String TAG = ValidateActivity.class.getSimpleName();
-
 	public static final int BACKGROUND_PREVIEW_WIDTH = 50;
+
 	public static final int BACKGROUND_PREVIEW_BLUR_RADIUS = 5;
+
+	private static final String TAG = ValidateActivity.class.getSimpleName();
 
 	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
 		@Override
@@ -189,14 +213,15 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		final Class validateActivityBleClass = AndroidUtils.isLollipop() ? ValidateActivityBle21.class : ValidateActivityBle.class;
 		final boolean isBleReadyDevice = hasBle & AndroidUtils.isJellyBeanMR2();
 
-		final Intent intent = new Intent(context, isBleReadyDevice && data == null ? validateActivityBleClass : ValidateActivityCamera.class);
+		final Intent intent = new Intent(context,
+		                                 isBleReadyDevice && data == null ? validateActivityBleClass : ValidateActivityCamera.class);
 
 		intent.putExtra(EXTRA_LOADER_ANIMATION, animationType);
 		intent.putExtra(EXTRA_DEMO_MODE, isDemo);
 		intent.putExtra(EXTRA_CONFIRM_TYPE, userEnterType);
-		if (data != null) {
+		if(data != null) {
 			intent.setData(data);
-			if (data.toString().contains(QR_URL_PATH_PREFIX)) {
+			if(data.toString().contains(QR_URL_PATH_PREFIX)) {
 				intent.setAction(ACTION_LAUNCH_QR);
 			} else {
 				intent.setAction(ACTION_LAUNCH_HASHCODE);
@@ -213,7 +238,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		return intent;
 	}
 
-
 	protected final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -228,6 +252,47 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}
 	};
 
+	final Target backgroundTarget = new Target() {
+		@Override
+		public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
+			final BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
+			AnimationUtils.animateDrawable(findViewById(R.id.root), findViewById(R.id.background),
+			                               drawable,
+			                               getResources().getInteger(R.integer.default_animation_duration_long));
+		}
+
+		@Override
+		public void onBitmapFailed(Drawable errorDrawable) {
+		}
+
+		@Override
+		public void onPrepareLoad(Drawable placeHolderDrawable) {
+		}
+	};
+
+	final Target previewTarget = new Target() {
+		@Override
+		public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
+			final Bitmap blurredBitmap = BitmapUtils.blur(bitmap, BACKGROUND_PREVIEW_BLUR_RADIUS);
+			final BitmapDrawable drawable = new BitmapDrawable(getResources(), blurredBitmap);
+			AnimationUtils.animateDrawable(getWindow().getDecorView(), findViewById(R.id.root),
+			                               drawable,
+			                               getResources().getInteger(R.integer.default_animation_duration_quick));
+			OmnomApplication.getPicasso(ValidateActivity.this)
+			                .load(RestaurantHelper.getBackground(currentRestaurant,
+			                                                     getResources().getDisplayMetrics().widthPixels))
+			                .into(backgroundTarget);
+		}
+
+		@Override
+		public void onBitmapFailed(Drawable errorDrawable) {
+		}
+
+		@Override
+		public void onPrepareLoad(Drawable placeHolderDrawable) {
+		}
+	};
+
 	@InjectView(R.id.loader)
 	protected LoaderView loader;
 
@@ -239,6 +304,15 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	@InjectView(R.id.btn_bottom)
 	protected View btnErrorRepeat;
+
+	@InjectView(R.id.sliding_layout)
+	protected SlidingUpPanelLayout slidingPanel;
+
+	@InjectView(R.id.menu_gradient)
+	protected View menuGradientPanel;
+
+	@InjectView(R.id.menu_subcategories)
+	protected SubcategoriesView menuCategories;
 
 	@InjectView(R.id.txt_bottom)
 	protected TextView txtErrorRepeat;
@@ -279,6 +353,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Inject
 	protected AuthService authenticator;
 
+	@Inject
+	protected MenuObservableApi menuApi;
+
 	protected OmnomErrorHelper mErrorHelper;
 
 	protected boolean mFirstRun = true;
@@ -295,14 +372,19 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBackgroundFunction;
 
+	@Nullable
+	protected Menu mMenu;
+
+	protected Uri mData;
+
+	Restaurant currentRestaurant;
+
 	/**
 	 * ConfirmPhoneActivity.TYPE_LOGIN or ConfirmPhoneActivity.TYPE_REGISTER
 	 */
 	private int mType;
 
 	private boolean mIsApplicationLaunch;
-
-	protected Uri mData;
 
 	private int mAnimationType;
 
@@ -322,13 +404,22 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	private ConfigurationService configurationService;
 
+	private UserOrder mOrder;
+
+	private View.OnClickListener loadConfigsErrorListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			loadConfigs();
+		}
+	};
+
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mData = getIntent().getData();
 		configurationService =
 				new ConfigurationService(this, authenticator, api, mAcquiring,
-										 OmnomApplication.get(getActivity()).getAuthToken());
+				                         OmnomApplication.get(getActivity()).getAuthToken());
 	}
 
 	@Override
@@ -347,7 +438,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	}
 
 	private void startValidation() {
-		if (!mSkipViewRendering) {
+		if(!mSkipViewRendering) {
 			postDelayed(getResources().getInteger(R.integer.default_animation_duration_quick), new Runnable() {
 				@Override
 				public void run() {
@@ -360,8 +451,46 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (mPaymentListener != null && mTable != null) {
+		updateWishUi();
+		if(mPaymentListener != null && mTable != null) {
 			mPaymentListener.initTableSocket(mTable);
+		}
+	}
+
+	protected void updateOrderData(final OrderUpdateEvent event) {
+		if(mOrder == null) {
+			return;
+		}
+		final Item item = event.getItem();
+		mOrder.itemsTable().put(item.id(), UserOrderData.create(event.getCount(), item));
+		menuCategories.refresh(event);
+		updateWishUi();
+	}
+
+	private void updateWishUi() {
+		final Button btnOrder = (Button) findViewById(R.id.btn_order);
+		if(mOrder == null || btnOrder == null) {
+			return;
+		}
+
+		final BigDecimal totalAmount = mOrder.getTotalPrice();
+		final boolean hasWishItems = mOrder != null && totalAmount.compareTo(BigDecimal.ZERO) > 0;
+
+		if(hasWishItems) {
+			ViewUtils.setVisible(btnOrder, true);
+			btnOrder.setText(totalAmount.toString() + getString(R.string.currency_suffix_ruble));
+			btnOrder.setTextColor(Color.WHITE);
+			btnOrder.setBackgroundResource(R.drawable.btn_rounded_blue);
+		} else {
+			ViewUtils.setVisible(btnOrder, false);
+			btnOrder.setTextColor(Color.GRAY);
+			btnOrder.setText(getString(R.string.your_order));
+			btnOrder.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
+		}
+
+		if(bottomView != null) {
+			View btnBill = findById(bottomView, R.id.btn_bill);
+			ViewUtils.setVisible(btnBill, !hasWishItems);
 		}
 	}
 
@@ -426,15 +555,67 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}
 	}
 
-	private View.OnClickListener loadConfigsErrorListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			loadConfigs();
+	@OnClick(R.id.btn_previous)
+	public void onPrevious(View v) {
+		if(slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+			collapseSlidingPanel();
+		} else {
+			RestaurantsListActivity.startLeft(ValidateActivity.this);
 		}
-	};
+	}
+
+	public void collapseSlidingPanel() {slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);}
+
+	@Override
+	public void onBackPressed() {
+		if(getSupportFragmentManager().getBackStackEntryCount() == 0
+				&& slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+			collapseSlidingPanel();
+		} else {
+			super.onBackPressed();
+		}
+	}
 
 	@Override
 	public void initUi() {
+		getSupportFragmentManager().addOnBackStackChangedListener(this);
+
+		mOrder = insureOrder();
+		slidingPanel.setPanelSlideListener(menuCategories);
+
+		menuCategories.setOnCollapsedTouchListener(this);
+
+		final PanelSlideListenerAdapter listener = new PanelSlideListenerAdapter();
+		listener.addListener(new PanelSlideListenerSimple() {
+			@Override
+			public void onPanelSlide(final View panel, final float slideOffset) {
+				final float loaderFactor = 1.0f - slideOffset;
+
+				if(loaderFactor < 0.85f) {
+					AnimationUtils.animateAlpha3(imgProfile, false);
+					AnimationUtils.animateAlpha3(imgPrevious, false);
+					loader.hideLogo();
+				} else {
+					AnimationUtils.animateAlpha3(imgProfile, true);
+					AnimationUtils.animateAlpha3(imgPrevious, true);
+					loader.showLogo();
+				}
+				loader.scaleDown((int) (loader.getLoaderSizeDefault() * loaderFactor), 0, null);
+			}
+
+			@Override
+			public void onPanelCollapsed(final View panel) {
+				setSlidingTouchEnabled(true);
+			}
+
+			@Override
+			public void onPanelExpanded(final View panel) {
+				setSlidingTouchEnabled(false);
+			}
+		});
+		listener.addListener(menuCategories);
+		slidingPanel.setPanelSlideListener(listener);
+
 		loader.setLogo(R.drawable.ic_fork_n_knife);
 		loader.setColor(getResources().getColor(R.color.loader_bg));
 		mPaymentListener = new PaymentEventListener(this);
@@ -445,13 +626,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 		bgTransitionDrawable.setCrossFadeEnabled(true);
 		AndroidUtils.setBackground(contentView, bgTransitionDrawable);
-
-		imgPrevious.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				RestaurantsListActivity.startLeft(ValidateActivity.this);
-			}
-		});
 
 		btnDemo.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -484,7 +658,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			}
 		};
 
-		if (mSkipViewRendering) {
+		if(mSkipViewRendering) {
 			mFirstRun = false;
 			decode(true);
 		}
@@ -537,20 +711,20 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	private void updateConfiguration(final Config config) {
 		OmnomApplication.get(getActivity()).cacheConfig(config);
-		if (mAcquiring instanceof AcquiringMailRu) {
+		if(mAcquiring instanceof AcquiringMailRu) {
 			((AcquiringMailRu) mAcquiring).changeEndpoint(config.getAcquiringData().getBaseUrl());
 		}
 		getMixPanelHelper().addApi(OMNOM,
-								   MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
+		                           MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
 		getMixPanelHelper().addApi(OMNOM_ANDROID,
-								   MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));
+		                           MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));
 	}
 
 	private void correctMixpanelTime(final UserResponse userResponse) {
 		final MixPanelHelper mixPanelHelper = getMixPanelHelper();
-		if (mixPanelHelper != null) {
+		if(mixPanelHelper != null) {
 			final Long timeDiff = TimeUnit.SECONDS.toMillis(userResponse.getServerTime()) -
-								  userResponse.getResponseTime();
+					userResponse.getResponseTime();
 			mixPanelHelper.setTimeDiff(timeDiff);
 		}
 	}
@@ -559,6 +733,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	 * @return <code>true</code> if app was launched by an extrenal qr/link
 	 */
 	protected boolean isExternalLaunch() {return mData != null;}
+
+	protected final UserOrder insureOrder() {
+		if(mOrder == null) {
+			mOrder = UserOrder.create();
+		}
+		return mOrder;
+	}
 
 	protected void validate() {
 		if(mFirstRun || mRestaurant == null) {
@@ -569,7 +750,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			loader.scaleDown(null, new Runnable() {
 				@Override
 				public void run() {
-					if (mIsApplicationLaunch) {
+					if(mIsApplicationLaunch) {
 						loadConfigs();
 					} else {
 						decode(true);
@@ -586,12 +767,45 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	protected abstract void decode(boolean startProgressAnimation);
 
 	public void onBill(final View v) {
+		final int fragmentsCount = getSupportFragmentManager().getBackStackEntryCount();
+		final int startDelay = getResources().getInteger(R.integer.default_animation_duration_quick);
+		final int stepDelay = getResources().getInteger(R.integer.default_menu_to_bill_step_duration);
+		final int animationSteps = 2;
+
+		Observable.timer(startDelay, stepDelay, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+		          .take(fragmentsCount + animationSteps)
+		          .subscribe(new Action1<Long>() {
+			          @Override
+			          public void call(final Long aLong) {
+				          if(aLong < fragmentsCount) {
+					          getSupportFragmentManager().popBackStack();
+				          } else {
+					          if(aLong == fragmentsCount) {
+						          onBillStep1(v);
+					          }
+					          if(aLong == fragmentsCount + 1) {
+						          onBillStep2(v);
+					          }
+				          }
+			          }
+		          });
+	}
+
+	private void onBillStep1(final View v) {
+		if(slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+			collapseSlidingPanel();
+		}
+	}
+
+	private void onBillStep2(final View v) {
 		v.setEnabled(false);
 		hideProfile();
 		ViewUtils.setVisible(imgPrevious, false);
 		ViewUtils.setVisible(getPanelBottom(), false);
+		AnimationUtils.animateAlpha(slidingPanel, false);
+		AnimationUtils.animateAlpha(menuGradientPanel, false);
 		ViewUtils.setVisible(txtLeave, false);
-		loader.setLogo(R.drawable.ic_bill_white_normal);
+		loader.animateLogo(R.drawable.ic_bill_white_normal);
 		loader.startProgressAnimation(10000, new Runnable() {
 			@Override
 			public void run() {
@@ -602,7 +816,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		                    .subscribe(new Action1<Boolean>() {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
-				                    if (hasNoErrors) {
+				                    if(hasNoErrors) {
 					                    clearErrors(false);
 					                    loadOrders(v);
 				                    } else {
@@ -675,7 +889,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 				                                       mErrorHelper.showUnknownError(new View.OnClickListener() {
 					                                       @Override
 					                                       public void onClick(View v) {
-														        onErrorClose();
+						                                       onErrorClose();
 					                                       }
 				                                       });
 			                                       }
@@ -686,13 +900,15 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		clearErrors(true);
 		ViewUtils.setVisible(txtErrorAdditional, false);
 		loader.animateLogoFast(RestaurantHelper.getLogo(mRestaurant),
-				R.drawable.ic_bill_white_normal);
+		                       R.drawable.ic_bill_white_normal);
 		loader.showProgress(false);
 		configureScreen(mRestaurant);
 		updateLightProfile(!mIsDemo);
 		ViewUtils.setVisible(imgPrevious, !mIsDemo);
 		ViewUtils.setVisible(txtLeave, mIsDemo);
 		ViewUtils.setVisible(getPanelBottom(), true);
+		AnimationUtils.animateAlpha(menuGradientPanel, true);
+		AnimationUtils.animateAlpha(slidingPanel, true);
 	}
 
 	private void showNoOrdersInfo() {
@@ -768,6 +984,22 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == REQUEST_CODE_WISH_LIST) {
+			if(data != null) {
+				final UserOrder resultOrder = data.getParcelableExtra(EXTRA_ORDER);
+				mOrder = resultOrder;
+				updateWishUi();
+			}
+			if(resultCode == WishActivity.RESULT_CLEARED) {
+				mOrder.itemsTable().clear();
+			}
+			if((resultCode & WishActivity.RESULT_CLEARED) == WishActivity.RESULT_CLEARED) {
+				mOrder.itemsTable().clear();
+			}
+			if((resultCode & WishActivity.RESULT_BILL) == WishActivity.RESULT_BILL) {
+				onBill(findViewById(R.id.btn_bill));
+			}
+		}
 		if(requestCode == REQUEST_CODE_CHANGE_TABLE && resultCode == RESULT_CODE_TABLE_CHANGED) {
 			finish();
 		}
@@ -783,6 +1015,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 							@Override
 							public void run() {
 								ViewUtils.setVisible(getPanelBottom(), true);
+								AnimationUtils.animateAlpha(menuGradientPanel, true);
+								AnimationUtils.animateAlpha(slidingPanel, true);
 								updateLightProfile(!mIsDemo);
 								ViewUtils.setVisible(imgPrevious, !mIsDemo);
 								ViewUtils.setVisible(txtLeave, mIsDemo);
@@ -797,7 +1031,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	}
 
 	@OnClick(R.id.img_profile)
-	protected void onProfile(View v) {
+	public void onProfile(View v) {
 		final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
 		final String tableId = mTable != null ? mTable.getId() : null;
 		UserProfileActivity.startSliding(this, tableNumber, tableId);
@@ -834,6 +1068,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 				ViewUtils.setVisible(imgPrevious, !mIsDemo);
 				ViewUtils.setVisible(txtLeave, mIsDemo);
 				ViewUtils.setVisible(getPanelBottom(), true);
+				AnimationUtils.animateAlpha(menuGradientPanel, true);
+				AnimationUtils.animateAlpha(slidingPanel, true);
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
 				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
 				if(forwardToBill) {
@@ -848,53 +1084,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		});
 	}
 
-	final Target backgroundTarget = new Target() {
-		@Override
-		public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
-			final BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
-			AnimationUtils.animateDrawable(findViewById(R.id.root), findViewById(R.id.background),
-										   drawable,
-										   getResources().getInteger(R.integer.default_animation_duration_long));
-		}
-
-		@Override
-		public void onBitmapFailed(Drawable errorDrawable) {
-		}
-
-		@Override
-		public void onPrepareLoad(Drawable placeHolderDrawable) {
-		}
-	};
-
-	Restaurant currentRestaurant;
-	final Target previewTarget = new Target() {
-		@Override
-		public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
-			final Bitmap blurredBitmap = BitmapUtils.blur(bitmap, BACKGROUND_PREVIEW_BLUR_RADIUS);
-			final BitmapDrawable drawable = new BitmapDrawable(getResources(), blurredBitmap);
-			AnimationUtils.animateDrawable(getWindow().getDecorView(), findViewById(R.id.root),
-										   drawable,
-										   getResources().getInteger(R.integer.default_animation_duration_quick));
-			OmnomApplication.getPicasso(ValidateActivity.this)
-					.load(RestaurantHelper.getBackground(currentRestaurant,
-														 getResources().getDisplayMetrics().widthPixels))
-					.into(backgroundTarget);
-		}
-
-		@Override
-		public void onBitmapFailed(Drawable errorDrawable) {
-		}
-
-		@Override
-		public void onPrepareLoad(Drawable placeHolderDrawable) {
-		}
-	};
-
 	private void animateRestaurantBackground(final Restaurant restaurant) {
 		currentRestaurant = restaurant;
 		OmnomApplication.getPicasso(this)
-				.load(RestaurantHelper.getBackground(restaurant, BACKGROUND_PREVIEW_WIDTH))
-				.into(previewTarget);
+		                .load(RestaurantHelper.getBackground(restaurant, BACKGROUND_PREVIEW_WIDTH))
+		                .into(previewTarget);
 	}
 
 	private void animateRestaurantLogo(final Restaurant restaurant) {
@@ -943,6 +1137,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		if(bottomView == null) {
 			stubBottomMenu.setLayoutResource(waiterEnabled ? R.layout.layout_bill_waiter : R.layout.layout_bill);
 			bottomView = stubBottomMenu.inflate();
+			AndroidUtils.applyFont(this, (ViewGroup) bottomView, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
 		}
 
 		if(waiterEnabled) {
@@ -963,8 +1158,21 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			}
 		});
 
+		final View btnOrder = findById(bottomView, R.id.btn_order);
+		btnOrder.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				onOrder();
+			}
+		});
+
 		ViewUtils.setVisible(btnDownPromo, promoEnabled);
 		// getPanelBottom().setTranslationY(100);
+		updateWishUi();
+	}
+
+	private void onOrder() {
+		WishActivity.start(this, mRestaurant, mMenu, insureOrder(), REQUEST_CODE_WISH_LIST);
 	}
 
 	public View getPanelBottom() {
@@ -974,16 +1182,33 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 	protected boolean validateDemo() {
 		if(mIsDemo) {
 			if(mRestaurant == null || mTable == null) {
-				loader.startProgressAnimation(10000, new Runnable() {
+				loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration));
+				api.getDemoTable().mergeMap(
+						new Func1<List<DemoTableData>, Observable<MenuResponse>>() {
+							@Override
+							public Observable<MenuResponse> call(final List<DemoTableData> demoTableResponse) {
+								if(demoTableResponse.size() > 0) {
+									final DemoTableData demoTableData = demoTableResponse.get(0);
+									if(demoTableData != null && demoTableData.getRestaurant() != null) {
+										return menuApi.getMenu(demoTableData.getRestaurant().id());
+									}
+								}
+								return Observable.from(new MenuResponse());
+							}
+						}, new Func2<List<DemoTableData>, MenuResponse, Pair<List<DemoTableData>, MenuResponse>>() {
+							@Override
+							public Pair<List<DemoTableData>, MenuResponse> call(final List<DemoTableData> restaurant,
+							                                                    final MenuResponse menu) {
+								mMenu = menu.getMenu();
+								return Pair.create(restaurant, menu);
+							}
+						}).subscribe(new Action1<Pair<List<DemoTableData>, MenuResponse>>() {
 					@Override
-					public void run() {
-					}
-				});
-				api.getDemoTable().subscribe(new Action1<List<DemoTableData>>() {
-					@Override
-					public void call(final List<DemoTableData> response) {
-						final DemoTableData data = response.get(0);
+					public void call(final Pair<List<DemoTableData>, MenuResponse> listMenuResponsePair) {
+						final List<DemoTableData> demoTableResponse = listMenuResponsePair.first;
+						final DemoTableData data = demoTableResponse.get(0);
 						onDataLoaded(data.getRestaurant(), data.getTable());
+						bindMenuData();
 					}
 				}, onError);
 				mFirstRun = false;
@@ -1015,7 +1240,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		}
 	}
 
-	protected void handleHashRestaurants(final String requestId, final Restaurant restaurant) {
+	protected void handleHashRestaurants(final String requestId, final Restaurant restaurant, final Menu menu) {
 
 	}
 
@@ -1061,7 +1286,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 					loader.showProgress(false, true, new Runnable() {
 						@Override
 						public void run() {
-							ValidateActivityShortcut.start(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
+							ValidateActivityShortcut.start(ValidateActivity.this, R.anim.fake_fade_in_instant,
+							                               R.anim.fake_fade_out_instant,
 							                               EXTRA_LOADER_ANIMATION_FIXED);
 							finish();
 						}
@@ -1083,8 +1309,60 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			@Override
 			public void run() {
 				ValidateActivity.start(ValidateActivity.this, R.anim.fade_in_long, R.anim.fade_out_long, EXTRA_LOADER_ANIMATION_FIXED,
-						ConfirmPhoneActivity.TYPE_DEFAULT);
+				                       ConfirmPhoneActivity.TYPE_DEFAULT);
 			}
 		});
+	}
+
+	public UserOrder getUserOrder() {
+		return insureOrder();
+	}
+
+	@Override
+	public void onBackStackChanged() {
+		if(getSupportFragmentManager() != null && getSupportFragmentManager().getBackStackEntryCount() == 0) {
+			ViewUtils.setVisible(imgPrevious, true);
+		} else {
+			ViewUtils.setVisible(imgPrevious, false);
+		}
+	}
+
+	protected Observable<Pair<RestaurantResponse, MenuResponse>> concatMenuObservable(final Observable<RestaurantResponse>
+			                                                                                  restaurantObservable) {
+		return restaurantObservable.mergeMap(
+				new Func1<RestaurantResponse, Observable<MenuResponse>>() {
+					@Override
+					public Observable<MenuResponse> call(final RestaurantResponse restaurantResponse) {
+						if(restaurantResponse.hasOnlyRestaurant()) {
+							final Restaurant restaurant = restaurantResponse.getRestaurants().get(0);
+							return menuApi.getMenu(restaurant.id());
+						}
+						return Observable.from(new MenuResponse());
+					}
+				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
+					@Override
+					public Pair<RestaurantResponse, MenuResponse> call(final RestaurantResponse restaurant, final MenuResponse menu) {
+						mMenu = menu.getMenu();
+						return Pair.create(restaurant, menu);
+					}
+				});
+	}
+
+	protected void bindMenuData() {
+		slidingPanel.setTouchEnabled(mMenu != null && !mMenu.isEmpty());
+		if(mMenu != null) {
+			menuCategories.bind(mMenu, mOrder);
+		}
+	}
+
+	private int getMenuTranslationDefault() {return getResources().getDisplayMetrics().heightPixels - ViewUtils.dipToPixels(this, 304);}
+
+	private void setSlidingTouchEnabled(final boolean enabled) {
+		slidingPanel.setTouchEnabled(enabled);
+	}
+
+	@Override
+	public void onCollapsedSubcategoriesTouch() {
+		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 	}
 }

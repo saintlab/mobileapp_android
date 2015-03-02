@@ -15,6 +15,7 @@ import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
+import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
@@ -95,5 +96,7 @@ public interface RestaurateurObservableApi {
 	public Observable<Restaurant> link(long orderId, double amount, double tip);
 
 	public Observable<Config> getConfig();
+
+	public Observable wishes(String restaurantId, WishRequest request);
 
 }

@@ -26,6 +26,7 @@ import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.restaurateur.retrofit.RestaurateurRxSupport;
@@ -192,6 +193,11 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	@Override
 	public Observable<Config> getConfig() {
 		return mDataService.getConfig().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable wishes(final String restaurantId, final WishRequest request) {
+		return mDataService.wishes(restaurantId, request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

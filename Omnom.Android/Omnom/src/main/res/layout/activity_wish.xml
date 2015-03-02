@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    tools:context="com.omnom.android.activity.WishActivity">
+
+    <FrameLayout
+        android:id="@+id/panel_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:background="@color/menu_blue">
+
+        <TextView
+            android:id="@+id/txt_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingLeft="@dimen/header_view_horizontal_margin"
+            android:paddingRight="@dimen/header_view_horizontal_margin"
+            android:textColor="@drawable/text_color_selector_white"
+            android:text="@string/close"
+            android:textAppearance="?android:textAppearanceLarge" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginRight="@dimen/header_view_horizontal_margin"
+            android:layout_gravity="center_vertical|right"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/panel_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+
+        <include layout="@layout/delimiter_vertical" />
+
+        <include layout="@layout/layout_bill" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@android:id/list"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:animateLayoutChanges="true"
+        android:listSelector="@color/transparent"
+        android:layout_below="@+id/panel_top"
+        android:layout_above="@+id/panel_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"/>
+
+</RelativeLayout>

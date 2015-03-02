@@ -88,7 +88,9 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 					final String status = args[1].toString();
 					if(status.contains(HandshakeSocketEvent.HANDSHAKE_SUCCESS)) {
 						post(new HandshakeSocketEvent(true));
-						mSocket.emit(SocketEvent.EVENT_JOIN, getRoomId());
+						if(mSocket != null) {
+							mSocket.emit(SocketEvent.EVENT_JOIN, getRoomId());
+						}
 					} else if(status.contains(HandshakeSocketEvent.HANDSHAKE_ERROR)) {
 						post(new HandshakeSocketEvent(false));
 					}

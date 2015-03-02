@@ -6,21 +6,21 @@ import com.crashlytics.android.Crashlytics;
 import com.omnom.android.auth.AuthModule;
 import com.omnom.android.restaurateur.RestaurateurModule;
 import com.omnom.android.restaurateur.model.UserProfile;
-import com.saintlab.android.linker.modules.AndroidModule;
-import com.saintlab.android.linker.modules.ApplicationModule;
-import com.saintlab.android.linker.modules.BeaconModule;
-import com.saintlab.android.linker.preferences.PreferenceHelper;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.preferences.PreferenceProvider;
+import com.saintlab.android.linker.modules.AndroidModule;
+import com.saintlab.android.linker.modules.ApplicationModule;
+import com.saintlab.android.linker.modules.BeaconModule;
+import com.saintlab.android.linker.preferences.PreferenceHelper;
 
-import io.fabric.sdk.android.Fabric;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import dagger.ObjectGraph;
+import io.fabric.sdk.android.Fabric;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
@@ -44,7 +44,8 @@ public class LinkerApplication extends BaseOmnomApplication implements AuthToken
 
 	protected List<Object> getModules() {
 		return Arrays.asList(/*new StubDataProviderModule(),*/new RestaurateurModule(this, R.string.config_data_endpoint), new AndroidModule(this),
-		                     new ApplicationModule(), new BeaconModule(this), new AuthModule(this, R.string.config_auth_endpoint));
+		                     new ApplicationModule(), new BeaconModule(this),
+		                     new AuthModule(this, R.string.config_auth_endpoint));
 	}
 
 	@Override
