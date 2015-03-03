@@ -115,6 +115,14 @@ public class RestaurantHelper {
 		return hasSettings(restaurant) && restaurant.settings().hasMenu();
 	}
 
+	public static boolean isBar(final Restaurant restaurant) {
+		return true;
+	}
+
+	public static String getBarUri(final Restaurant restaurant) {
+		return "http://www.android.com/";
+	}
+
 	public static boolean isPromoEnabled(final Restaurant restaurant) {
 		return hasSettings(restaurant) && restaurant.settings().hasPromo();
 	}

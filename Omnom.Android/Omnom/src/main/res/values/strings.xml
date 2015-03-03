@@ -38,6 +38,7 @@
     <string name="title_activity_validate">ValidateActivity</string>
     <string name="waiter">Официант</string>
     <string name="bill">Счёт</string>
+    <string name="ready_orders">Готовые заказы</string>
     <string name="title_activity_orders">OrdersActivity</string>
     <string name="title_activity_add_card">AddCardActivity</string>
     <string name="order_overall">Итого: %1$s</string>

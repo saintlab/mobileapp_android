@@ -77,6 +77,19 @@
             android:clickable="true"
             android:src="@drawable/btn_previous_white" />
 
+        <TextView
+            android:id="@+id/txt_bar"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:paddingTop="16dp"
+            android:layout_margin="@dimen/activity_vertical_margin_xsmall"
+            android:layout_gravity="top|center_horizontal"
+            android:textColor="@android:color/white"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:visibility="gone"
+            android:text="Бар"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
         <ImageView
             android:id="@+id/img_profile"
             android:layout_margin="@dimen/activity_vertical_margin_xsmall"

@@ -244,10 +244,17 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	};
 
-	protected final View.OnClickListener mInternetErrorClickBillListener = new View.OnClickListener() {
+	protected final View.OnClickListener mOnBillClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			onBill(findViewById(R.id.btn_bill));
+		}
+	};
+
+	protected final View.OnClickListener mOnReadyOrdersClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			onReadyOrders(findViewById(R.id.btn_bill));
 		}
 	};
 
@@ -342,6 +349,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	@InjectView(R.id.txt_demo_leave)
 	protected TextView txtLeave;
+
+	@InjectView(R.id.txt_bar)
+	protected TextView txtBar;
 
 	@Inject
 	protected RestaurateurObservableApi api;
@@ -594,10 +604,12 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 				if(loaderFactor < 0.85f) {
 					AnimationUtils.animateAlpha3(imgProfile, false);
 					AnimationUtils.animateAlpha3(imgPrevious, false);
+					AnimationUtils.animateAlpha(txtBar, false);
 					loader.hideLogo();
 				} else {
 					AnimationUtils.animateAlpha3(imgProfile, true);
 					AnimationUtils.animateAlpha3(imgPrevious, true);
+					AnimationUtils.animateAlpha(txtBar, true);
 					loader.showLogo();
 				}
 				loader.scaleDown((int) (loader.getLoaderSizeDefault() * loaderFactor), 0, null);
@@ -812,7 +824,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			}
 		});
 		ValidationObservable.validateSmart(this, mIsDemo)
-		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, mInternetErrorClickBillListener)).isEmpty()
+		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, getOnBillClickListener())).isEmpty()
 		                    .subscribe(new Action1<Boolean>() {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
@@ -829,7 +841,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			                    @Override
 			                    public void call(final Throwable throwable) {
 				                    startErrorTransition();
-				                    mErrorHelper.showInternetError(mInternetErrorClickBillListener);
+				                    mErrorHelper.showInternetError(getOnBillClickListener());
 				                    v.setEnabled(true);
 			                    }
 		                    });
@@ -1133,9 +1145,15 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		final boolean promoEnabled = false; //RestaurantHelper.isPromoEnabled(restaurant);
 		// FIXME: uncomment the code below when waiter call is implemented
 		final boolean waiterEnabled = false; //RestaurantHelper.isWaiterEnabled(restaurant);
+		final boolean isBar = RestaurantHelper.isBar(restaurant);
 
 		if(bottomView == null) {
-			stubBottomMenu.setLayoutResource(waiterEnabled ? R.layout.layout_bill_waiter : R.layout.layout_bill);
+			ViewUtils.setVisible(findById(this, R.id.txt_bar), isBar);
+			if(isBar) {
+				stubBottomMenu.setLayoutResource(R.layout.layout_bar);
+			} else {
+				stubBottomMenu.setLayoutResource(waiterEnabled ? R.layout.layout_bill_waiter : R.layout.layout_bill);
+			}
 			bottomView = stubBottomMenu.inflate();
 			AndroidUtils.applyFont(this, (ViewGroup) bottomView, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
 		}
@@ -1151,12 +1169,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 
 		final View btnBill = findById(bottomView, R.id.btn_bill);
-		btnBill.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				onBill(v);
-			}
-		});
+		btnBill.setOnClickListener(getOnBillClickListener());
 
 		final View btnOrder = findById(bottomView, R.id.btn_order);
 		btnOrder.setOnClickListener(new View.OnClickListener() {
@@ -1169,6 +1182,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		ViewUtils.setVisible(btnDownPromo, promoEnabled);
 		// getPanelBottom().setTranslationY(100);
 		updateWishUi();
+	}
+
+	private void onReadyOrders(final View v) {
+		WebActivity.start(this, RestaurantHelper.getBarUri(mRestaurant));
 	}
 
 	private void onOrder() {
@@ -1364,5 +1381,12 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	@Override
 	public void onCollapsedSubcategoriesTouch() {
 		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+	}
+
+	public View.OnClickListener getOnBillClickListener() {
+		if(RestaurantHelper.isBar(mRestaurant)) {
+			return mOnReadyOrdersClickListener;
+		}
+		return mOnBillClickListener;
 	}
 }
