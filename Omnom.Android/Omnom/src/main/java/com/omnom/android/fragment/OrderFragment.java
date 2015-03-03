@@ -46,6 +46,7 @@ import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.listener.DecimalKeyListener;
+import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.BillViewMixpanelEvent;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
@@ -54,6 +55,7 @@ import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.utils.AmountHelper;
@@ -199,6 +201,18 @@ public class OrderFragment extends Fragment {
 			tableId = order.getTableId();
 			restaurantName = order.getRestaurantId();
 			orderId = order.getId();
+			mTipsWay = tipsWay.ordinal();
+			mSplitWay = splitWay.ordinal();
+		}
+
+		public PaymentDetails(Restaurant restaurant, UserOrder order, double amount, int tip, TipsWay tipsWay, int tipValue,
+		                      SplitWay splitWay) {
+			mAmount = amount;
+			mTip = tip;
+			mTipValue = tipValue;
+			tableId = StringUtils.EMPTY_STRING;
+			restaurantName = restaurant.id();
+			orderId = StringUtils.EMPTY_STRING;
 			mTipsWay = tipsWay.ordinal();
 			mSplitWay = splitWay.ordinal();
 		}

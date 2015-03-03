@@ -36,6 +36,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_CARD_DATA = "com.omnom.android.card.data";
 	public static final String EXTRA_TYPE = "com.omnom.android.type";
 	public static final String EXTRA_ORDER = "com.omnom.android.order";
+	public static final String EXTRA_USER_ORDER = "com.omnom.android.wish.order";
 	public static final String EXTRA_ORDER_DATA = "com.omnom.android.order.data";
 	public static final String EXTRA_PAYMENT_DETAILS = "com.omnom.android.payment.details";
 	public static final String EXTRA_PAYMENT_EVENT = "com.omnom.android.payment.event";

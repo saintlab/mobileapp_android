@@ -11,6 +11,7 @@ import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationA
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.WishListAdapter;
+import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.Item;
@@ -18,6 +19,8 @@ import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
+import com.omnom.android.mixpanel.model.SplitWay;
+import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.restaurant.ModifierRequestItem;
@@ -259,22 +262,30 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	}
 
 	private void doWish() {
-		AnimationUtils.animateAlpha(mProgressBar, true);
-		api.wishes(mRestaurant.id(), createWishRequest(mRestaurant, mOrder)).subscribe(new Action1() {
-			@Override
-			public void call(final Object o) {
-				ViewUtils.setVisible(mProgressBar, false);
-				WishSentActivity.start(WishActivity.this, REQUEST_CODE_WISH_LIST);
-				doClear();
-				showToast(getActivity(), getString(R.string.your_wish_processed));
-			}
-		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			@Override
-			protected void onError(final Throwable throwable) {
-				ViewUtils.setVisible(mProgressBar, false);
-				Log.e(TAG, "restaurateur.wishes", throwable);
-			}
-		});
+		if(RestaurantHelper.isBar(mRestaurant)) {
+			final OrderFragment.PaymentDetails paymentDetails = new OrderFragment.PaymentDetails(mRestaurant, mOrder,
+			                                                                                     mOrder.getTotalPrice().doubleValue(), 0,
+			                                                                                     TipsWay.DEFAULT, 0,
+			                                                                                     SplitWay.WASNT_USED);
+			CardsActivity.start(this, mOrder, paymentDetails, RestaurantHelper.getBackgroundColor(mRestaurant), REQUEST_CODE_WISH_LIST);
+		} else {
+			AnimationUtils.animateAlpha(mProgressBar, true);
+			api.wishes(mRestaurant.id(), createWishRequest(mRestaurant, mOrder)).subscribe(new Action1() {
+				@Override
+				public void call(final Object o) {
+					ViewUtils.setVisible(mProgressBar, false);
+					WishSentActivity.start(WishActivity.this, REQUEST_CODE_WISH_LIST);
+					doClear();
+					showToast(getActivity(), getString(R.string.your_wish_processed));
+				}
+			}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+				@Override
+				protected void onError(final Throwable throwable) {
+					ViewUtils.setVisible(mProgressBar, false);
+					Log.e(TAG, "restaurateur.wishes", throwable);
+				}
+			});
+		}
 	}
 
 	private void doClear() {
