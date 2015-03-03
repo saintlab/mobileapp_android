@@ -144,28 +144,28 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 				continue;
 			}
 			if(data.getChildren() != null && data.getChildren().size() > 0) {
-				if(data.getLevel() == level/* && firstItem.getRoot() == data.getRoot()*/) {
+				if(data.getLevel() >= level) {
 					collapseGroup(i);
 				}
 			}
 		}
 
-		for(int i = 0; i < mData.size(); i++) {
-			final Data data = mData.get(i);
-			if(data.getChildren() != null && data.getChildren().size() > 0) {
-				if(firstItem != data.getRoot() || data == firstItem) {
-					continue;
-				}
-				if(data.getLevel() > level) {
-					level = data.getLevel();
-					if(data.isGroup()) {
-						expandGroup(i);
-					}
-				} else {
-					collapseGroup(i);
-				}
-			}
-		}
+		//for(int i = 0; i < mData.size(); i++) {
+		//	final Data data = mData.get(i);
+		//	if(data.getChildren() != null && data.getChildren().size() > 0) {
+		//		if(firstItem != data.getRoot() || data == firstItem) {
+		//			continue;
+		//		}
+		//		if(data.getLevel() > level) {
+		//			level = data.getLevel();
+		//			//if(data.isGroup()) {
+		//			//	expandGroup(i);
+		//			//}
+		//		} else {
+		//			collapseGroup(i);
+		//		}
+		//	}
+		//}
 	}
 
 	public void collapseExpandedGroup(int position) {

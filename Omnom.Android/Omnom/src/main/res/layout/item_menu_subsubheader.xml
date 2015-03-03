@@ -9,4 +9,5 @@
     android:ellipsize="end"
     android:textAppearance="?android:textAppearanceLarge"
     android:textColor="@android:color/white"
+    android:background="#aaffffff"
     omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />

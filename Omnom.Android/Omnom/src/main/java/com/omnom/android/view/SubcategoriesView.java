@@ -138,12 +138,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		});
 		mListView.setAdapter(mMenuAdapter);
 		mMenuAdapter.addAll(menuData.getData());
-
 		mMenuAdapter.collapseAll();
-
 		mPanelBottom.setBackgroundColor(Color.TRANSPARENT);
-		mMenuAdapter.setTextColor(Color.WHITE);
-		mMenuAdapter.setCategoriesBackground(Color.TRANSPARENT);
 
 		mListView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
 			public Point mPoint = new Point();
@@ -201,11 +197,11 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	@Override
 	@DebugLog
 	public void onPanelSlide(final View panel, final float slideOffset) {
-		mMenuAdapter.setTextColor((int) mBackgroundEvaluator.evaluate(slideOffset, Color.WHITE, Color.BLACK));
-		mMenuAdapter.setCategoriesBackground((int) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT,
-		                                                                         getResources().getColor(
-				                                                                         R.color.panel_background_grey_light)));
-		mPanelBottom.setBackgroundColor((Integer) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT, Color.WHITE));
+		//mMenuAdapter.setTextColor((int) mBackgroundEvaluator.evaluate(slideOffset, Color.WHITE, Color.BLACK));
+		//mMenuAdapter.setCategoriesBackground((int) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT,
+		//                                                                         getResources().getColor(
+		//		                                                                         R.color.panel_background_grey_light)));
+		//mPanelBottom.setBackgroundColor((Integer) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT, Color.WHITE));
 	}
 
 	@Override
