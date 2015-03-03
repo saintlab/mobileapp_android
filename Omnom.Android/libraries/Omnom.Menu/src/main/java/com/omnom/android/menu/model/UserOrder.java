@@ -67,4 +67,11 @@ public abstract class UserOrder implements Parcelable {
 		}
 		itemsTable().put(item.id(), UserOrderData.create(count, item));
 	}
+
+	public void updateData(final UserOrder resultOrder) {
+		itemsTable().clear();
+		for(UserOrderData orderData : resultOrder.getSelectedItems()) {
+			addItem(orderData.item(), orderData.amount());
+		}
+	}
 }

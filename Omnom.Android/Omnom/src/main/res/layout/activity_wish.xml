@@ -44,11 +44,8 @@
         <include layout="@layout/layout_bill" />
     </LinearLayout>
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@android:id/list"
-        android:divider="@null"
-        android:dividerHeight="0dp"
-        android:animateLayoutChanges="true"
         android:listSelector="@color/transparent"
         android:layout_below="@+id/panel_top"
         android:layout_above="@+id/panel_bottom"

@@ -999,7 +999,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		if(requestCode == REQUEST_CODE_WISH_LIST) {
 			if(data != null) {
 				final UserOrder resultOrder = data.getParcelableExtra(EXTRA_ORDER);
-				mOrder = resultOrder;
+				mOrder.updateData(resultOrder);
 				updateWishUi();
 			}
 			if(resultCode == WishActivity.RESULT_CLEARED) {

@@ -1,17 +1,16 @@
 package com.omnom.android.activity;
 
 import android.content.Intent;
-import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
-import com.omnom.android.adapter.WishListAdapter;
 import com.omnom.android.fragment.OrderFragment;
+import com.omnom.android.adapter.WishAdapter;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.Item;
@@ -92,7 +91,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	}
 
 	@InjectView(android.R.id.list)
-	protected ListView mList;
+	protected RecyclerView mList;
 
 	@InjectView(R.id.progress)
 	protected ProgressBar mProgressBar;
@@ -105,7 +104,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	private UserOrder mOrder;
 
-	private WishListAdapter mAdapter;
+	private WishAdapter mAdapter;
 
 	private boolean mClear = false;
 
@@ -115,11 +114,11 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	private Menu mMenu;
 
-	private SwingBottomInAnimationAdapter swAdapter;
-
 	private boolean mOrderChanged = false;
 
 	private Restaurant mRestaurant;
+
+	private LinearLayoutManager mLayoutManager;
 
 	@OnClick(R.id.txt_close)
 	public void onClose() {
@@ -135,7 +134,8 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	@Override
 	public void finish() {
-		setResult(mClear ? RESULT_CLEARED : RESULT_OK, getResultData());
+		final boolean cleared = mClear || mOrder.getSelectedItems().size() == 0;
+		setResult(cleared ? RESULT_CLEARED : RESULT_OK, getResultData());
 		super.finish();
 		overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 	}
@@ -162,10 +162,11 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	public void initUi() {
 		ViewUtils.setVisible(mPanelBottom, !RestaurantHelper.isBar(mRestaurant));
 		ViewUtils.setVisible(mProgressBar, false);
-		mAdapter = new WishListAdapter(this, mOrder, Collections.EMPTY_LIST, this);
-		swAdapter = new SwingBottomInAnimationAdapter(mAdapter);
-		swAdapter.setAbsListView(mList);
-		mList.setAdapter(swAdapter);
+		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, this);
+		mLayoutManager = new LinearLayoutManager(this);
+		mList.setHasFixedSize(true);
+		mList.setLayoutManager(mLayoutManager);
+		mList.setAdapter(mAdapter);
 		refresh();
 	}
 
@@ -175,13 +176,10 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 			@Override
 			public void call(final Collection<OrderItem> response) {
 				mList.setAdapter(null);
-				final WishListAdapter adapter = new WishListAdapter(WishActivity.this, mOrder, response,
-				                                                    WishActivity.this);
-				SwingBottomInAnimationAdapter animationAdapter = new SwingBottomInAnimationAdapter(adapter);
-				animationAdapter.setAbsListView(mList);
-				mList.setAdapter(animationAdapter);
+				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response,
+				                                            WishActivity.this);
+				mList.setAdapter(adapter);
 				mAdapter = adapter;
-				swAdapter = animationAdapter;
 				ViewUtils.setVisible(mProgressBar, false);
 			}
 		}, new Action1<Throwable>() {
@@ -249,8 +247,12 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		mOrderChanged = true;
 		final Item item = event.getItem();
 		mOrder.addItem(item, event.getCount());
-		mAdapter.notifyDataSetChanged();
-		swAdapter.notifyDataSetChanged();
+		if(event.getCount() > 0) {
+			mAdapter.clearCache();
+			mAdapter.notifyDataSetChanged();
+		} else {
+			mAdapter.removeItem(item);
+		}
 	}
 
 	@Override
@@ -290,29 +292,9 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	private void doClear() {
 		mClear = true;
-		mOrder.itemsTable().clear();
-
-		final int childCount = mList.getChildCount();
-		for(int i = 0; i < childCount - 1; i++) {
-			final View childAt = mList.getChildAt(i);
-			if(childAt != null) {
-				childAt.animate().alpha(0).start();
-				AnimationUtils.scaleHeight(childAt, 0, new Runnable() {
-					@Override
-					public void run() {
-						final Object tag = childAt.getTag(R.id.item);
-						mAdapter.remove(tag);
-						mAdapter.notifyDataSetChanged();
-						childAt.animate().alpha(1).setDuration(0).start();
-						if(ViewCompat.hasTransientState(childAt)) {
-							ViewCompat.setHasTransientState(childAt, false);
-						}
-					}
-				}, getResources().getInteger(R.integer.default_animation_duration_short));
-				if(!ViewCompat.hasTransientState(childAt)) {
-					ViewCompat.setHasTransientState(childAt, true);
-				}
-			}
+		for(UserOrderData orderData : mOrder.getSelectedItems()) {
+			mAdapter.remove(orderData);
 		}
+		mOrder.itemsTable().clear();
 	}
 }
