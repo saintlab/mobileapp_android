@@ -140,6 +140,7 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/image_button_size"
             android:layout_marginTop="@dimen/activity_vertical_margin_xsmall"
+            android:padding="@dimen/activity_vertical_margin_small"
             android:layout_gravity="top|center_horizontal"
             android:gravity="center"
             android:drawableLeft="@drawable/ic_table"

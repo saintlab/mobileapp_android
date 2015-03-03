@@ -1,5 +1,6 @@
 package com.omnom.android.activity;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -720,30 +721,12 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 		if (mTable != null) {
 			txtTable.setText(String.valueOf(mTable.getInternalId()));
 			if (visible && !ViewUtils.isVisible(txtTable)) {
+				ViewUtils.setVisible(imgProfile, true);
 				if (txtTable.getTranslationX() == 0) {
 					ViewUtils.setVisible(imgProfile, true);
-				}
-				ViewTreeObserver viewTreeObserver = imgProfile.getViewTreeObserver();
-				if (viewTreeObserver.isAlive()) {
-					viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-						@Override
-						public void onGlobalLayout() {
-							AndroidUtils.removeOnGlobalLayoutListener(imgProfile, this);
-							final int animationDuration = getResources().getInteger(R.integer.default_animation_duration_long);
-							AnimationUtils.animateAlpha(txtTable, true, new Runnable() {
-								@Override
-								public void run() {
-									final int translation = (imgProfile.getLeft() - txtTable.getLeft()) -
-															(txtTable.getWidth() - imgProfile.getWidth());
-									txtTable.animate()
-											.translationX(translation)
-											.setDuration(animationDuration)
-											.start();
-									AnimationUtils.animateAlpha2(imgProfile, false, null, animationDuration);
-								}
-							}, animationDuration);
-						}
-					});
+					animateTable();
+				} else {
+					ViewUtils.setVisible(txtTable, false);
 				}
 			} else {
 				ViewUtils.setVisible(txtTable, visible);
@@ -752,6 +735,58 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 			ViewUtils.setVisible(txtTable, false);
 			imgProfile.setImageResource(backgroundResource);
 			ViewUtils.setVisible(imgProfile, visible);
+		}
+	}
+
+	protected void animateTable() {
+		ViewTreeObserver viewTreeObserver = imgProfile.getViewTreeObserver();
+		if (viewTreeObserver.isAlive()) {
+			viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+				@Override
+				public void onGlobalLayout() {
+					AndroidUtils.removeOnGlobalLayoutListener(imgProfile, this);
+					final int animationDuration = getResources().getInteger(R.integer.default_animation_duration_long);
+					AnimationUtils.animateAlpha(txtTable, true, new Runnable() {
+						@Override
+						public void run() {
+							final int translation = (imgProfile.getLeft() - txtTable.getLeft()) -
+									(txtTable.getWidth() - imgProfile.getWidth());
+							AnimationUtils.animateAlpha2(imgProfile, false, null, animationDuration);
+							txtTable.animate()
+									.translationX(translation)
+									.setDuration(animationDuration)
+									.setListener(new Animator.AnimatorListener() {
+										@Override
+										public void onAnimationStart(Animator animation) {
+
+										}
+
+										@Override
+										public void onAnimationEnd(Animator animation) {
+											postDelayed(animationDuration, new Runnable() {
+												@Override
+												public void run() {
+													AnimationUtils.animateAlpha2(imgProfile, true, null, animationDuration);
+													AnimationUtils.animateAlpha2(txtTable, false, null, animationDuration);
+												}
+											});
+										}
+
+										@Override
+										public void onAnimationCancel(Animator animation) {
+
+										}
+
+										@Override
+										public void onAnimationRepeat(Animator animation) {
+
+										}
+									})
+									.start();
+						}
+					}, animationDuration);
+				}
+			});
 		}
 	}
 
