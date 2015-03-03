@@ -1,5 +1,6 @@
 package com.omnom.android.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.webkit.WebView;
@@ -19,9 +20,13 @@ public class WebActivity extends BaseOmnomActivity {
 	public static final String SCHEME_PREFIX_HTTP = "http://";
 
 	public static void start(OmnomActivity context, final String url) {
-		final Intent intent = new Intent(context.getActivity(), WebActivity.class);
+		context.start(createIntent(context.getActivity(), url), R.anim.slide_in_up, R.anim.nothing, false);
+	}
+
+	public static Intent createIntent(Context context, final String url) {
+		final Intent intent = new Intent(context, WebActivity.class);
 		intent.putExtra(EXTRA_URI, url);
-		context.start(intent, R.anim.slide_in_up, R.anim.nothing, false);
+		return intent;
 	}
 
 	@InjectView(R.id.web_view)
