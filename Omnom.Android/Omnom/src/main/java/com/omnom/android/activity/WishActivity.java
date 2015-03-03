@@ -94,6 +94,9 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	@InjectView(R.id.progress)
 	protected ProgressBar mProgressBar;
 
+	@InjectView(R.id.panel_bottom)
+	protected View mPanelBottom;
+
 	@Inject
 	protected RestaurateurObservableApi api;
 
@@ -154,6 +157,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	@Override
 	public void initUi() {
+		ViewUtils.setVisible(mPanelBottom, !RestaurantHelper.isBar(mRestaurant));
 		ViewUtils.setVisible(mProgressBar, false);
 		mAdapter = new WishListAdapter(this, mOrder, Collections.EMPTY_LIST, this);
 		swAdapter = new SwingBottomInAnimationAdapter(mAdapter);
