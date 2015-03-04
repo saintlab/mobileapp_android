@@ -42,6 +42,7 @@ import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.mixpanel.model.AppLaunchMixpanelEvent;
+import com.omnom.android.notifier.api.observable.NotifierObservableApi;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.protocol.Protocol;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
@@ -354,6 +355,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	@Inject
 	protected MenuObservableApi menuApi;
+
+	@Inject
+	protected NotifierObservableApi notifierApi;
 
 	protected OmnomErrorHelper mErrorHelper;
 
@@ -1056,6 +1060,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		mPaymentListener.initTableSocket(mTable);
 
 		onNewGuest(mTable);
+
 		animateRestaurantLogo(restaurant);
 		animateRestaurantBackground(restaurant);
 
@@ -1103,8 +1108,16 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	private void onNewGuest(TableDataResponse table) {
-		api.newGuest(table.getRestaurantId(), table.getId())
-		   .subscribe(OmnomObservable.emptyOnNext(), OmnomObservable.loggerOnError(TAG));
+		api.newGuest(table.getRestaurantId(), table.getId()).subscribe(OmnomObservable.emptyOnNext(),
+		                                                               OmnomObservable.loggerOnError(TAG));
+
+		notifierApi.tableIn(table.getRestaurantId(), table.getId()).subscribe(new Action1() {
+			                                                                      @Override
+			                                                                      public void call(final Object o) {
+
+			                                                                      }
+		                                                                      },
+		                                                                      OmnomObservable.loggerOnError(TAG));
 	}
 
 	/**

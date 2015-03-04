@@ -18,10 +18,10 @@ public interface NotifierDataService {
 	public Observable<Object> register(@Body RegisterRequest request);
 
 	@GET("/restaurants/{restaurant_id}/tables/{table_id}/in")
-	public Observable tableIn(@Path(Protocol.FIELD_RESTAURANT_ID) String restId, @Path(Protocol.FIELD_TABLE_ID) String tableId);
+	public Observable<Object> tableIn(@Path(Protocol.FIELD_RESTAURANT_ID) String restId, @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@GET("/restaurants/{restaurant_id}/tables/{table_id}/out")
-	public Observable tableOut(@Path(Protocol.FIELD_RESTAURANT_ID) String restId, @Path(Protocol.FIELD_TABLE_ID) String tableId);
+	public Observable<Object> tableOut(@Path(Protocol.FIELD_RESTAURANT_ID) String restId, @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@POST("/notifier/unregister")
 	public Observable<Object> unregister();

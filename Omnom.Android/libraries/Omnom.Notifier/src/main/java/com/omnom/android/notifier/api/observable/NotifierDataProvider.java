@@ -1,11 +1,14 @@
 package com.omnom.android.notifier.api.observable;
 
+import android.text.TextUtils;
+
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.omnom.android.notifier.api.NotifierDataService;
 import com.omnom.android.notifier.model.RegisterRequest;
 import com.omnom.android.utils.generation.AutoParcelAdapterFactory;
+import com.omnom.android.utils.utils.StringUtils;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
@@ -36,30 +39,44 @@ public class NotifierDataProvider implements NotifierObservableApi {
 
 	private NotifierDataService mDataService;
 
+	private String mRestId = StringUtils.EMPTY_STRING;
+
+	private String mTableId = StringUtils.EMPTY_STRING;
+
 	public NotifierDataProvider(final NotifierDataService dataService) {
 		mDataService = dataService;
 	}
 
 	@Override
-	public Observable register(final String pushtoken) {
+	public Observable<Object> register(final String pushtoken) {
 		return mDataService.register(new RegisterRequest(pushtoken)).subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable tableIn(final String restId, final String tableId) {
-		return mDataService.tableIn(restId, tableId).subscribeOn(
-				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<Object> tableIn(final String restId, final String tableId) {
+		mRestId = restId;
+		mTableId = tableId;
+		return mDataService.tableIn(restId, tableId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable tableOut(final String restId, final String tableId) {
+	public Observable<Object> tableOut(final String restId, final String tableId) {
 		return mDataService.tableOut(restId, tableId).subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable unregister() {
+	public Observable<Object> tableOut() {
+		if(!TextUtils.isEmpty(mRestId) && !TextUtils.isEmpty(mTableId)) {
+			return mDataService.tableOut(mRestId, mTableId).subscribeOn(
+					Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		}
+		return Observable.from(new Object());
+	}
+
+	@Override
+	public Observable<Object> unregister() {
 		return mDataService.unregister().subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
