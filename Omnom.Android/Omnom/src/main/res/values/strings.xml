@@ -129,6 +129,9 @@
     <string name="facebook_url_fb">fb://profile/1548920272002383</string>
     <string name="facebook_url_http">https://www.facebook.com/omnom.menu/</string>
 
+    <string name="out_of_sale_title">Нет в продаже</string>
+    <string name="out_of_sale_message">В&#160;вашем заказе есть блюда, которые больше не&#160;продают:\n%1$s.\n\nУбрать из&#160;заказа и&#160;продолжить?</string>
+
     <string name="no_order_info">
         Omnom показывает все&#160;заказы, добавленные к&#160;вашему столу.
         На&#160;столе&#160;№%1$s открытых заказов сейчас нет.\n\nВозможно, официант ещё&#160;не&#160;успел его внести.
