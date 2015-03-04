@@ -847,6 +847,7 @@ public class OrderFragment extends Fragment {
 	private void reportFixedTips(final TipData tips, final PaymentDetails paymentDetails) {
 		final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(getActivity());
 		mixPanelHelper.track(MixPanelHelper.Project.ALL, "WRONG_TIPS_VALUE_FIXED", new Object[]{tips, paymentDetails});
+		mixPanelHelper.flush();
 	}
 
 	private void initList() {
