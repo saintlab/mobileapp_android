@@ -118,6 +118,10 @@ public class OrderFragment extends Fragment {
 
 		public static int TYPE_NULL = -1;
 
+		public static TipData fix(final TipData tips) {
+			return new TipData(BigDecimal.ZERO, 0, tips.getType());
+		}
+
 		private final BigDecimal mAmount;
 
 		private final int mValue;
@@ -131,21 +135,25 @@ public class OrderFragment extends Fragment {
 		}
 
 		public BigDecimal getAmount() {
-			if(mAmount.compareTo(BigDecimal.ZERO) < 0) {
-				return BigDecimal.ZERO;
-			}
 			return mAmount;
 		}
 
 		public int getValue() {
-			if(mValue < 0) {
-				return 0;
-			}
 			return mValue;
 		}
 
 		public int getType() {
 			return mType;
+		}
+
+		public boolean validate() {
+			if(mAmount.compareTo(BigDecimal.ZERO) < 0) {
+				return false;
+			}
+			if(mValue < 0) {
+				return false;
+			}
+			return true;
 		}
 	}
 
@@ -808,14 +816,37 @@ public class OrderFragment extends Fragment {
 
 	private void showCardsActivity() {
 		final BigDecimal amount = getEnteredAmount();
-		final TipData tips = getSelectedTips(amount);
+		TipData tips = getSelectedTips(amount);
+		final boolean validate = tips.validate();
+		if(!validate) {
+			reportWrongTips(tips, amount);
+			tips = TipData.fix(tips);
+		}
 		final BigDecimal amountTips = tips.getAmount();
 		final BigDecimal amountToPay = amount.add(amountTips);
 		final PaymentDetails paymentDetails = new PaymentDetails(amountToPay.doubleValue(), amountTips.intValue() * 100,
 		                                                         mOrder, mTipsWay, tips.getValue(),
 		                                                         mSplitWay);
+		if(!validate) {
+			reportFixedTips(tips, paymentDetails);
+		}
 		final OrdersActivity activity = (OrdersActivity) getActivity();
 		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
+	}
+
+	private void reportWrongTips(final TipData tips, final BigDecimal amount) {
+		final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(getActivity());
+		final BigDecimal amountTips = tips.getAmount();
+		final BigDecimal amountToPay = amount.add(amountTips);
+		final PaymentDetails paymentDetails = new PaymentDetails(amountToPay.doubleValue(), amountTips.intValue() * 100,
+		                                                         mOrder, mTipsWay, tips.getValue(),
+		                                                         mSplitWay);
+		mixPanelHelper.track(MixPanelHelper.Project.ALL, "WRONG_TIPS_VALUE", new Object[]{tips, paymentDetails});
+	}
+
+	private void reportFixedTips(final TipData tips, final PaymentDetails paymentDetails) {
+		final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(getActivity());
+		mixPanelHelper.track(MixPanelHelper.Project.ALL, "WRONG_TIPS_VALUE_FIXED", new Object[]{tips, paymentDetails});
 	}
 
 	private void initList() {
