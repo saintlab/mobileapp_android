@@ -57,6 +57,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 			super(v);
 			ButterKnife.inject(this, v);
 			sTitleViews.add(txtTitle);
+			// setIsRecyclable(false);
 		}
 	}
 
@@ -197,6 +198,12 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		mItemClickListener = itemClickListener;
 		mApplyClickListener = applyClickListener;
 		mInflater = LayoutInflater.from(mContext);
+	}
+
+	@Override
+	public long getItemId(final int position) {
+		final Data itemAt = getItemAt(position);
+		return itemAt.hashCode();
 	}
 
 	@Override

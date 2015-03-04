@@ -2,8 +2,10 @@ package com.omnom.android.view;
 
 import android.animation.ArgbEvaluator;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -150,6 +152,32 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		final FlipInTopXAnimator animator = new FlipInTopXAnimator();
 		animator.setAddDuration(500);
 		animator.setRemoveDuration(500);
+		mListView.addItemDecoration(new RecyclerView.ItemDecoration() {
+			@Override
+			public void onDraw(final Canvas c, final RecyclerView parent, final RecyclerView.State state) {
+				super.onDraw(c, parent, state);
+				drawHeaders(c, parent, state);
+			}
+
+			@Override
+			public void onDrawOver(final Canvas c, final RecyclerView parent, final RecyclerView.State state) {
+				super.onDrawOver(c, parent, state);
+				drawHeaders(c, parent, state);
+			}
+
+			@Override
+			public void getItemOffsets(final Rect outRect, final View view, final RecyclerView parent, final RecyclerView.State state) {
+				//RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
+				//RecyclerView.ViewHolder holder = parent.getChildViewHolder(view);
+				//final boolean isHeader = holder instanceof MenuAdapter.CategoryViewHolder;
+				//if(!isHeader) {
+				//	outRect.set(0, 0, 0, 0);
+				//} else {
+				//	//TODO: Handle layout direction
+				//	outRect.set(0, 96, 0, 0);
+				//}
+			}
+		});
 		mListView.setItemAnimator(animator);
 
 		mMenuAdapter.addAll(menuData.getData());
@@ -185,6 +213,60 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 				// Do nothing
 			}
 		});
+	}
+
+	private float getHeaderY(View item, RecyclerView.LayoutManager lm) {
+		return lm.getDecoratedTop(item) < 0 ? 0 : lm.getDecoratedTop(item);
+	}
+
+	private void drawHeaders(final Canvas c, final RecyclerView parent, final RecyclerView.State state) {
+		final View childAt = parent.getChildAt(0);
+		final RecyclerView.LayoutManager lm = parent.getLayoutManager();
+		final int decoratedTop = lm.getDecoratedTop(childAt);
+		System.err.println(">>>> decoratedTop = " + decoratedTop);
+
+		//final int childCount = parent.getChildCount();
+		//final RecyclerView.LayoutManager lm = parent.getLayoutManager();
+		//Float lastY = null;
+		//for(int i = childCount - 1; i >= 0; i--) {
+		//	View child = parent.getChildAt(i);
+		//	RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
+		//	RecyclerView.ViewHolder holder = parent.getChildViewHolder(child);
+		//	final boolean isHeader = holder instanceof MenuAdapter.CategoryViewHolder;
+		//	if(!lp.isItemRemoved() && !lp.isViewInvalid()) {
+		//		float translationY = ViewCompat.getTranslationY(child);
+		//		if(i == 0 || isHeader) {
+		//			View header = getHeaderViewByItem(holder);
+		//			final TextView viewById = (TextView) findViewById(R.id.txt_title);
+		//			System.err.println(">>>> header = " + viewById.getText());
+		//			if(!viewById.getText().equals("AndTest")) {
+		//				return;
+		//			}
+		//			if(header != null && header.getVisibility() == View.VISIBLE) {
+		//				int headerHeight = 96;
+		//				float y = getHeaderY(header, lm) + translationY;
+		//				if(lastY != null && lastY < y + headerHeight) {
+		//					y = lastY - headerHeight;
+		//				}
+		//				c.save();
+		//				System.err.println("y = " + y);
+		//				c.translate(0, y);
+		//				header.draw(c);
+		//				c.restore();
+		//				lastY = y;
+		//			}
+		//		}
+		//	}
+		//}
+	}
+
+	private View getHeaderViewByItem(final RecyclerView.ViewHolder holder) {
+		final MultiLevelRecyclerAdapter.Data item = mMenuAdapter.getItemAt(holder.getPosition());
+		if(item instanceof CategoryData) {
+			return holder.itemView;
+		}
+		final int itemPosition = mMenuAdapter.getItemPosition(item.getParent());
+		return mListView.getChildAt(itemPosition);
 	}
 
 	public void showAddFragment(final Item item, int pos) {

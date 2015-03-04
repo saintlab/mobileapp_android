@@ -100,4 +100,5 @@ public class ItemData implements Data {
 	public int getType() {
 		return mType;
 	}
+
 }
