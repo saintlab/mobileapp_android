@@ -131,10 +131,16 @@ public class OrderFragment extends Fragment {
 		}
 
 		public BigDecimal getAmount() {
+			if(mAmount.compareTo(BigDecimal.ZERO) < 0) {
+				return BigDecimal.ZERO;
+			}
 			return mAmount;
 		}
 
 		public int getValue() {
+			if(mValue < 0) {
+				return 0;
+			}
 			return mValue;
 		}
 
@@ -494,7 +500,7 @@ public class OrderFragment extends Fragment {
 	public void onStart() {
 		super.onStart();
 		updateDecimalSeparator();
-		if (tipsButtons != null) {
+		if(tipsButtons != null) {
 			final BigDecimal amount = getEnteredAmount();
 			updatePaymentTipsAmount(amount, tipsButtons);
 		}
@@ -503,7 +509,7 @@ public class OrderFragment extends Fragment {
 	private void updateDecimalSeparator() {
 		numberFormat = NumberFormat.getNumberInstance();
 		decimalSeparator = ((DecimalFormat) numberFormat).getDecimalFormatSymbols().getDecimalSeparator();
-		if (editAmount != null) {
+		if(editAmount != null) {
 			editAmount.updateSeparator();
 		}
 	}
@@ -1061,7 +1067,7 @@ public class OrderFragment extends Fragment {
 		initFooter(true);
 		if(resetAmount) {
 			editAmount.setText(StringUtils.formatCurrency(String.valueOf(decimalSeparator),
-														  AmountHelper.format(mOrder.getAmountToPay())));
+			                                              AmountHelper.format(mOrder.getAmountToPay())));
 			updatePaymentTipsAmount(getEnteredAmount());
 		}
 	}
@@ -1195,7 +1201,7 @@ public class OrderFragment extends Fragment {
 		}
 		try {
 			return new BigDecimal(numberFormat.parse(filtered).doubleValue());
-		} catch (ParseException e) {
+		} catch(ParseException e) {
 			return BigDecimal.ZERO;
 		}
 	}
@@ -1249,7 +1255,7 @@ public class OrderFragment extends Fragment {
 
 	private TipData getSelectedTips(final BigDecimal amount, final CompoundButton selectedTipsButton) {
 		if(selectedTipsButton == null) {
-			return new TipData(BigDecimal.ZERO, TipData.TYPE_NULL, TipData.TYPE_NULL);
+			return new TipData(BigDecimal.ZERO, 0, TipData.TYPE_NULL);
 		}
 		if(OrderHelper.isPercentTips(mOrder, amount) || selectedTipsButton.getId() == otherTips.getId()) {
 			final int percent = (Integer) selectedTipsButton.getTag();
@@ -1284,7 +1290,7 @@ public class OrderFragment extends Fragment {
 			}
 			otherTips.setEnabled(true);
 			if(radioGroup.getCheckedRadioButtonId() == -1) {
-				final CompoundButton btn = findById(getActivity(), mCheckedId);
+				final CompoundButton btn = findById(mFragmentView, mCheckedId);
 				if(btn != null) {
 					btn.setChecked(true);
 					updateTipsButtonState(btn);
@@ -1377,5 +1383,4 @@ public class OrderFragment extends Fragment {
 	private void amountModified(final boolean isModified) {
 		isAmountModified = isModified;
 	}
-
 }
