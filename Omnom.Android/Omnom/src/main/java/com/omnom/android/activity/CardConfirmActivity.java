@@ -507,6 +507,9 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	private void showPayOnceFragment() {
 		mEditAmount.getEditText().setEnabled(false);
+		if (payOnceFragment == null) {
+			payOnceFragment = PayOnceFragment.newInstance(mAmount, mType);
+		}
 		getSupportFragmentManager().beginTransaction()
 		                           .addToBackStack(null)
 		                           .setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
