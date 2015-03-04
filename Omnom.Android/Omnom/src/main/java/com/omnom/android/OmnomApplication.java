@@ -162,9 +162,6 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 			@Override
 			public void onActivityDestroyed(Activity activity) {
 				activityStack.pop();
-				if(!hasActivities()) {
-					notifierApi.tableOut().subscribe(OmnomObservable.emptyOnNext(), OmnomObservable.loggerOnError(TAG));
-				}
 			}
 		});
 	}
