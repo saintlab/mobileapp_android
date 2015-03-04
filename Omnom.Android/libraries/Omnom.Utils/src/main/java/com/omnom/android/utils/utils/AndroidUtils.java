@@ -265,6 +265,21 @@ public class AndroidUtils {
 		return alertDialog;
 	}
 
+	public static AlertDialog showDialog(Context context, int titleResId, String msg,
+	                                     int okResId, DialogInterface.OnClickListener okListener,
+	                                     int cancelResId, DialogInterface.OnClickListener cancelListener) {
+		final AlertDialog alertDialog = new AlertDialog.Builder(context)
+				.setTitle(titleResId)
+				.setMessage(msg)
+				.setPositiveButton(okResId, okListener)
+				.setNegativeButton(cancelResId, cancelListener)
+				.create();
+		alertDialog.setCancelable(false);
+		alertDialog.setCanceledOnTouchOutside(false);
+		alertDialog.show();
+		return alertDialog;
+	}
+
 	public static String getAppVersion(Context context) {
 		try {
 			return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
