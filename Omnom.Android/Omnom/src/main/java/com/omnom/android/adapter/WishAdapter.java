@@ -17,6 +17,7 @@ import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.utils.AmountHelper;
+import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,8 +58,8 @@ public class WishAdapter extends RecyclerView.Adapter {
 		@InjectView(R.id.txt_info)
 		protected TextView txtInfo;
 
-		@InjectView(R.id.txt_price)
-		protected TextView txtPrice;
+		@InjectView(R.id.btn_apply)
+		protected Button btnApply;
 
 		public ItemViewHolder(final View convertView) {
 			super(convertView);
@@ -152,8 +153,14 @@ public class WishAdapter extends RecyclerView.Adapter {
 				break;
 
 			case VIEW_TYPE_WISH_ITEM:
+				v = mInflater.inflate(R.layout.item_wish, parent, false);
+				viewHolder = new ItemViewHolder(v);
+				break;
 			case VIEW_TYPE_TABLE_ITEM:
 				v = mInflater.inflate(R.layout.item_wish, parent, false);
+				final Button btnApply = (Button) v.findViewById(R.id.btn_apply);
+				btnApply.setBackgroundResource(R.drawable.btn_wish_on_table);
+				btnApply.setText(StringUtils.EMPTY_STRING);
 				viewHolder = new ItemViewHolder(v);
 				break;
 
@@ -179,9 +186,9 @@ public class WishAdapter extends RecyclerView.Adapter {
 				ivh.txtTitle.setText(data.item().name());
 
 				final String price = AmountHelper.format(data.item().price()) + mContext.getString(R.string.currency_suffix_ruble);
-				ivh.txtPrice.setText(mContext.getString(R.string.wish_items_price_detailed, data.amount(), price));
-				ivh.txtPrice.setTag(data);
-				ivh.txtPrice.setOnClickListener(mClickListener);
+				ivh.btnApply.setText(mContext.getString(R.string.wish_items_price_detailed, data.amount(), price));
+				ivh.btnApply.setTag(data);
+				ivh.btnApply.setOnClickListener(mClickListener);
 				MenuHelper.bindDetails(mContext, data.item().details(), ivh.txtInfo, false);
 				break;
 
@@ -190,11 +197,8 @@ public class WishAdapter extends RecyclerView.Adapter {
 				final OrderItem orderItem = (OrderItem) getItemAt(position);
 				tivh.txtTitle.setText(orderItem.getTitle());
 
-				final String itemPrice = AmountHelper.format(orderItem.getPricePerItem()) + mContext.getString(
-						R.string.currency_suffix_ruble);
-				tivh.txtPrice.setText(itemPrice);
-				tivh.txtPrice.setTag(orderItem);
-				tivh.txtPrice.setOnClickListener(mClickListener);
+				tivh.btnApply.setTag(orderItem);
+				tivh.btnApply.setOnClickListener(mClickListener);
 				MenuHelper.bindDetails(mContext, null, tivh.txtInfo, false);
 				break;
 

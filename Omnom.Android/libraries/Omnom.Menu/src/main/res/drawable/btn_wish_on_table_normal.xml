@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/bg_rounded_bordered_grey_normal" />
+    <item>
+        <bitmap
+            android:src="@drawable/ic_in_wish_list_position_blue"
+            android:gravity="center" />
+    </item>
+</layer-list>
+

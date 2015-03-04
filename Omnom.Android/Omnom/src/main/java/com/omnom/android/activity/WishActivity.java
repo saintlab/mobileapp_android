@@ -236,7 +236,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 				refresh();
 				break;
 
-			case R.id.txt_price:
+			case R.id.btn_apply:
 				MenuItemAddFragment.show(getSupportFragmentManager(),
 				                         R.id.fragment_container,
 				                         mMenu.modifiers(),
