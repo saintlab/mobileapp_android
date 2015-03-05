@@ -962,9 +962,12 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity {
 
 	private void animateRestaurantBackground(final Restaurant restaurant) {
 		currentRestaurant = restaurant;
-		OmnomApplication.getPicasso(this)
-				.load(RestaurantHelper.getBackground(restaurant, BACKGROUND_PREVIEW_WIDTH))
-				.into(previewTarget);
+		final String bgImgUrl = RestaurantHelper.getBackground(restaurant, BACKGROUND_PREVIEW_WIDTH);
+		if(!TextUtils.isEmpty(bgImgUrl)) {
+			OmnomApplication.getPicasso(this)
+					.load(bgImgUrl)
+					.into(previewTarget);
+		}
 	}
 
 	private void animateRestaurantLogo(final Restaurant restaurant) {
