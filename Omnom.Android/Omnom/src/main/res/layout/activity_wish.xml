@@ -67,7 +67,7 @@
                 android:ellipsize="end"
                 android:text="@string/ready_orders_list"
                 android:textColor="@drawable/text_color_selector"
-                android:textAppearance="?android:textAppearanceMedium" />
+                android:textAppearance="?android:textAppearanceLarge" />
         </LinearLayout>
 
     </LinearLayout>
