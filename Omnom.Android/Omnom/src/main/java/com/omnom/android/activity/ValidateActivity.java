@@ -253,10 +253,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	};
 
-	protected final View.OnClickListener mOnReadyOrdersClickListener = new View.OnClickListener() {
+	protected final View.OnClickListener mOnOrderClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			onReadyOrders(findViewById(R.id.btn_bill));
+			onOrder();
 		}
 	};
 
@@ -837,7 +837,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			}
 		});
 		ValidationObservable.validateSmart(this, mIsDemo)
-		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, getOnBillClickListener())).isEmpty()
+		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, getBillClickListener())).isEmpty()
 		                    .subscribe(new Action1<Boolean>() {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
@@ -854,7 +854,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			                    @Override
 			                    public void call(final Throwable throwable) {
 				                    startErrorTransition();
-				                    mErrorHelper.showInternetError(getOnBillClickListener());
+				                    mErrorHelper.showInternetError(getBillClickListener());
 				                    v.setEnabled(true);
 			                    }
 		                    });
@@ -1115,8 +1115,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		final String bgImgUrl = RestaurantHelper.getBackground(restaurant, BACKGROUND_PREVIEW_WIDTH);
 		if(!TextUtils.isEmpty(bgImgUrl)) {
 			OmnomApplication.getPicasso(this)
-					.load(bgImgUrl)
-					.into(previewTarget);
+			                .load(bgImgUrl)
+			                .into(previewTarget);
 		}
 	}
 
@@ -1184,8 +1184,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 
 		if(waiterEnabled) {
-			final View btnWaiter = findById(bottomView, R.id.btn_waiter);
-			btnWaiter.setOnClickListener(new View.OnClickListener() {
+			findById(bottomView, R.id.btn_waiter).setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(final View v) {
 					onWaiter(v);
@@ -1193,24 +1192,12 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			});
 		}
 
-		final View btnBill = findById(bottomView, R.id.btn_bill);
-		btnBill.setOnClickListener(getOnBillClickListener());
-
-		final View btnOrder = findById(bottomView, R.id.btn_order);
-		btnOrder.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				onOrder();
-			}
-		});
+		findById(bottomView, R.id.btn_bill).setOnClickListener(getBillClickListener());
+		findById(bottomView, R.id.btn_order).setOnClickListener(mOnOrderClickListener);
 
 		ViewUtils.setVisible(btnDownPromo, promoEnabled);
 		// getPanelBottom().setTranslationY(100);
 		updateWishUi();
-	}
-
-	private void onReadyOrders(final View v) {
-		WebActivity.start(this, RestaurantHelper.getBarUri(mRestaurant));
 	}
 
 	private void onOrder() {
@@ -1397,8 +1384,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	}
 
-	private int getMenuTranslationDefault() {return getResources().getDisplayMetrics().heightPixels - ViewUtils.dipToPixels(this, 304);}
-
 	private void setSlidingTouchEnabled(final boolean enabled) {
 		slidingPanel.setTouchEnabled(enabled);
 	}
@@ -1408,9 +1393,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 	}
 
-	public View.OnClickListener getOnBillClickListener() {
+	public View.OnClickListener getBillClickListener() {
 		if(RestaurantHelper.isBar(mRestaurant)) {
-			return mOnReadyOrdersClickListener;
+			return mOnOrderClickListener;
 		}
 		return mOnBillClickListener;
 	}

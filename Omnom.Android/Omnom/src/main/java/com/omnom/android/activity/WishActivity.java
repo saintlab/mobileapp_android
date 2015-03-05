@@ -49,7 +49,6 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
-import retrofit.http.HEAD;
 import rx.functions.Action1;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
@@ -73,25 +72,25 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	}
 
 	private static void showOutOfSaleDialog(final Context context, final Collection<String> items) {
-		if (items == null || items.isEmpty()) {
+		if(items == null || items.isEmpty()) {
 			return;
 		}
 		final String itemsStr = StringUtils.concat(",\n", items);
 		final String message = context.getResources().getString(R.string.out_of_sale_message, itemsStr);
 		final AlertDialog dialog = AndroidUtils.showDialog(context,
-				R.string.out_of_sale_title, message, R.string.ok,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Toast.makeText(context, "ok", Toast.LENGTH_SHORT).show();
-					}
-				}, R.string.cancel,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
+		                                                   R.string.out_of_sale_title, message, R.string.ok,
+		                                                   new DialogInterface.OnClickListener() {
+			                                                   @Override
+			                                                   public void onClick(DialogInterface dialog, int which) {
+				                                                   Toast.makeText(context, "ok", Toast.LENGTH_SHORT).show();
+			                                                   }
+		                                                   }, R.string.cancel,
+		                                                   new DialogInterface.OnClickListener() {
+			                                                   @Override
+			                                                   public void onClick(DialogInterface dialog, int which) {
+				                                                   dialog.dismiss();
+			                                                   }
+		                                                   });
 		TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
 		messageView.setGravity(Gravity.CENTER);
 	}
@@ -132,6 +131,9 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
 
+	@InjectView(R.id.panel_bottom_bar)
+	protected View mPanelBottomBar;
+
 	@Inject
 	protected RestaurateurObservableApi api;
 
@@ -156,6 +158,11 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	@OnClick(R.id.txt_close)
 	public void onClose() {
 		finish();
+	}
+
+	@OnClick(R.id.panel_bottom_bar)
+	public void onReadyOrders() {
+		WebActivity.start(this, RestaurantHelper.getBarUri(mRestaurant));
 	}
 
 	@OnClick(R.id.btn_bill)
@@ -193,7 +200,9 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	@Override
 	public void initUi() {
-		ViewUtils.setVisible(mPanelBottom, !RestaurantHelper.isBar(mRestaurant));
+		final boolean isBar = RestaurantHelper.isBar(mRestaurant);
+		ViewUtils.setVisible(mPanelBottom, !isBar);
+		ViewUtils.setVisible(mPanelBottomBar, isBar);
 		ViewUtils.setVisible(mProgressBar, false);
 		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, this);
 		mLayoutManager = new LinearLayoutManager(this);
