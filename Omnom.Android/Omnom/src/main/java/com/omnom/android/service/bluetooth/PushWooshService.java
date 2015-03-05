@@ -11,8 +11,10 @@ import android.util.Log;
 
 import com.arellomobile.android.push.DeviceRegistrar;
 import com.arellomobile.android.push.PushGCMIntentService;
-import com.google.gson.Gson;
+import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.activity.EnteringActivity;
+import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.utils.utils.StringUtils;
 
 import org.json.JSONException;
@@ -23,15 +25,15 @@ import org.json.JSONObject;
  */
 public class PushWooshService extends PushGCMIntentService {
 
+	public static final String ARG_ANDROID_PAYLOAD = "aps";
+
+	public static final String ARG_HASH = "hash";
+
+	public static final String ARG_ALERT = "alert";
+
+	public static final String EVENT_PUSH_RECEIVED = "PUSH_RECEIVED";
+
 	private static final String TAG = PushWooshService.class.getSimpleName();
-
-	private Gson mGson;
-
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		mGson = new Gson();
-	}
 
 	@Override
 	protected void onRegistered(final Context context, final String registrationId) {
@@ -52,31 +54,62 @@ public class PushWooshService extends PushGCMIntentService {
 	}
 
 	private void showNotification(final Context context, final Intent intent) {
-		String title = StringUtils.EMPTY_STRING;
+
+		String title = getString(R.string.app_name);
+		String info = getString(R.string.notification_tap_to_open_omnom);
+
 		try {
-			final JSONObject json = new JSONObject(intent.getStringExtra("aps"));
-			title = json.optString("alert", "Приятного аппетита!");
+			final JSONObject json = new JSONObject(intent.getStringExtra(ARG_ANDROID_PAYLOAD));
+			title = json.optString(ARG_ALERT);
+			final String[] split = title.split(StringUtils.NEXT_STRING);
+			if(split.length > 0) {
+				title = split[0];
+			}
+			if(split.length > 1) {
+				info = split[1];
+			}
 		} catch(JSONException e) {
-			e.printStackTrace();
+			Log.e(TAG, "showNotification", e);
 		}
-		final String hash = intent.getStringExtra("hash");
-		final String type = intent.getStringExtra("type");
+
+		reportPushReceived(context, intent);
+
+		final String hash = intent.getStringExtra(ARG_HASH);
 
 		NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		final Intent hashIntent = new Intent(Intent.ACTION_VIEW);
-		hashIntent.addCategory(Intent.CATEGORY_DEFAULT);
-		hashIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+
+		final Intent hashIntent = new Intent(Intent.ACTION_MAIN);
+		hashIntent.setClass(context, EnteringActivity.class);
+		hashIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		hashIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		hashIntent.setData(Uri.parse(hash));
 
 		final Notification notification = builder.setAutoCancel(true)
 		                                         .setContentTitle(title)
+		                                         .setContentText(info)
 		                                         .setSmallIcon(R.drawable.ic_app)
 		                                         .setDefaults(Notification.DEFAULT_ALL)
 		                                         .setTicker(title)
 		                                         .setContentIntent(PendingIntent.getActivity(context, 0, hashIntent, 0))
+		                                         .setStyle(new NotificationCompat.BigTextStyle().bigText(info))
 		                                         .build();
 		nm.notify(0, notification);
+	}
+
+	private void reportPushReceived(final Context context, final Intent intent) {
+		if(intent != null) {
+			OmnomApplication.getMixPanelHelper(context).track(MixPanelHelper.Project.OMNOM_ANDROID,
+			                                                  EVENT_PUSH_RECEIVED,
+			                                                  new Object[]{
+					                                                  intent.getStringExtra(ARG_ANDROID_PAYLOAD),
+					                                                  intent.getStringExtra(ARG_HASH)
+			                                                  });
+		} else {
+			OmnomApplication.getMixPanelHelper(context).track(MixPanelHelper.Project.OMNOM_ANDROID,
+			                                                  EVENT_PUSH_RECEIVED,
+			                                                  "Intent is empty");
+		}
 	}
 
 	@Override

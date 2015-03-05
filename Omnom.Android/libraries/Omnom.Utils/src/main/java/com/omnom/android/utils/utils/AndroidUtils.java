@@ -57,6 +57,12 @@ import static butterknife.ButterKnife.findById;
  */
 public class AndroidUtils {
 
+	public interface KeyboardVisibilityListener {
+		public void onVisibilityChanged(boolean isVisible);
+	}
+
+	public static final int MAX_ANIMATION_INCEREMENT = 20;
+
 	public static void clickify(TextView view, final String clickableText,
 	                            final ClickSpan.OnClickListener listener) {
 
@@ -66,8 +72,9 @@ public class AndroidUtils {
 
 		int start = string.indexOf(clickableText);
 		int end = start + clickableText.length();
-		if(start == -1)
+		if(start == -1) {
 			return;
+		}
 
 		if(text instanceof Spannable) {
 			((Spannable) text).setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -84,7 +91,7 @@ public class AndroidUtils {
 		view.setHighlightColor(view.getResources().getColor(android.R.color.transparent));
 	}
 
-	public static void sendFeedbackEmail(final Context context,@StringRes int resId) {
+	public static void sendFeedbackEmail(final Context context, @StringRes int resId) {
 		Intent intent = new Intent(Intent.ACTION_SENDTO);
 		String email = "team@omnom.menu";
 		intent.setData(Uri.parse("mailto:" + email));
@@ -92,12 +99,6 @@ public class AndroidUtils {
 		intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_subject_feedback));
 		context.startActivity(Intent.createChooser(intent, context.getString(resId)));
 	}
-
-	public interface KeyboardVisibilityListener {
-		public void onVisibilityChanged(boolean isVisible);
-	}
-
-	public static final int MAX_ANIMATION_INCEREMENT = 20;
 
 	public static void showKeyboard(EditText view) {
 		view.requestFocus();
@@ -144,7 +145,7 @@ public class AndroidUtils {
 	public static int getNavigationBarHeight(final Context context) {
 		Resources resources = context.getResources();
 		int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
-		if (resourceId > 0) {
+		if(resourceId > 0) {
 			return resources.getDimensionPixelSize(resourceId);
 		}
 		return 0;
@@ -256,9 +257,9 @@ public class AndroidUtils {
 	public static AlertDialog showDialog(Context context, int msg, int okResId,
 	                                     DialogInterface.OnClickListener okListener) {
 		final AlertDialog alertDialog = new AlertDialog.Builder(context)
-															.setMessage(context.getString(msg))
-															.setPositiveButton(okResId, okListener)
-															.create();
+				.setMessage(context.getString(msg))
+				.setPositiveButton(okResId, okListener)
+				.create();
 		alertDialog.setCancelable(false);
 		alertDialog.setCanceledOnTouchOutside(false);
 		alertDialog.show();
@@ -432,16 +433,16 @@ public class AndroidUtils {
 	}
 
 	@SuppressWarnings("deprecation")
-    public static void removeOnGlobalLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener listener){
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
-        } else {
-            v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
-        }
-    }
+	public static void removeOnGlobalLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener listener) {
+		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+			v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+		} else {
+			v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+		}
+	}
 
 	@SuppressWarnings("deprecation")
-	public static void setBackground(View v, Drawable drawable){
+	public static void setBackground(View v, Drawable drawable) {
 		if(Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
 			v.setBackgroundDrawable(drawable);
 		} else {
