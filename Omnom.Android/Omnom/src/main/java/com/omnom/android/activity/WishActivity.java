@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.WishAdapter;
+import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.Item;
@@ -23,6 +24,8 @@ import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
+import com.omnom.android.mixpanel.model.SplitWay;
+import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
@@ -44,8 +47,10 @@ import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -322,24 +327,52 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 			   @Override
 			   public Observable<BillResponse> call(final WishResponse wishResponse) {
 				   if(!wishResponse.hasErrors()) {
-					   if(wishResponse.getItems().size() > 0) {
-						   // TODO: show out of sale dialog in accordance with server response
-						   // showOutOfSaleDialog(this, Arrays.asList("Пиво Guinness", "Пиво Bud"));
+					   if(wishResponse.getItems() != null && wishResponse.getItems().size() > 0) {
+						   showOutOfSaleDialog(getActivity(), getStoppedItems(wishResponse.getItems()));
 						   return Observable.empty();
 					   } else {
 						   return api.bill(BillRequest.create(AmountHelper.format(mOrder.getTotalPrice()), mTable.getRestaurantId(),
 						                                      mTable.getId(), wishResponse.getRestaurateurOrderId()));
 					   }
 				   } else {
+					   showWishError(wishResponse);
 					   return Observable.empty();
 				   }
 			   }
 		   }).subscribe(new Action1<BillResponse>() {
 			@Override
 			public void call(final BillResponse billResponse) {
-				// show cards and pay
+				final OrderFragment.PaymentDetails paymentDetails = new OrderFragment.PaymentDetails(billResponse,
+				                                                                                     mOrder.getTotalPrice().doubleValue(),
+				                                                                                     0,
+				                                                                                     TipsWay.DEFAULT, 0,
+				                                                                                     SplitWay.WASNT_USED);
+				CardsActivity.start(WishActivity.this,
+				                    mOrder,
+				                    paymentDetails,
+				                    RestaurantHelper.getBackgroundColor(mRestaurant),
+				                    REQUEST_CODE_WISH_LIST);
 			}
 		}, OmnomObservable.loggerOnError(TAG));
+	}
+
+	private void showWishError(final WishResponse wishResponse) {
+		if(wishResponse.getErrors() != null) {
+			showToast(this, wishResponse.getErrors().getMessage());
+		} else {
+			showToast(this, wishResponse.getError());
+		}
+	}
+
+	private Collection<String> getStoppedItems(final List<String> items) {
+		final ArrayList<String> result = new ArrayList<String>();
+		for(final String id : items) {
+			final Item item = mMenu.findItem(id);
+			if(item != null) {
+				result.add(item.name());
+			}
+		}
+		return result;
 	}
 
 	private void doWishDefault() {

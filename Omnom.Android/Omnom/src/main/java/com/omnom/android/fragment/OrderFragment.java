@@ -46,16 +46,15 @@ import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.listener.DecimalKeyListener;
-import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.BillViewMixpanelEvent;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
 import com.omnom.android.mixpanel.model.SplitWay;
 import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
+import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
-import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.utils.AmountHelper;
@@ -205,14 +204,13 @@ public class OrderFragment extends Fragment {
 			mSplitWay = splitWay.ordinal();
 		}
 
-		public PaymentDetails(Restaurant restaurant, UserOrder order, double amount, int tip, TipsWay tipsWay, int tipValue,
-		                      SplitWay splitWay) {
+		public PaymentDetails(BillResponse bill, double amount, int tip, TipsWay tipsWay, int tipValue, SplitWay splitWay) {
 			mAmount = amount;
 			mTip = tip;
 			mTipValue = tipValue;
-			tableId = StringUtils.EMPTY_STRING;
-			restaurantName = restaurant.id();
-			orderId = StringUtils.EMPTY_STRING;
+			tableId = bill.getTableId();
+			restaurantName = bill.getRestaurantId();
+			orderId = bill.getRestaurateurOrderId();
 			mTipsWay = tipsWay.ordinal();
 			mSplitWay = splitWay.ordinal();
 		}
@@ -508,7 +506,7 @@ public class OrderFragment extends Fragment {
 	public void onStart() {
 		super.onStart();
 		updateDecimalSeparator();
-		if (tipsButtons != null) {
+		if(tipsButtons != null) {
 			final BigDecimal amount = getEnteredAmount();
 			updatePaymentTipsAmount(amount, tipsButtons);
 		}
@@ -517,7 +515,7 @@ public class OrderFragment extends Fragment {
 	private void updateDecimalSeparator() {
 		numberFormat = NumberFormat.getNumberInstance();
 		decimalSeparator = ((DecimalFormat) numberFormat).getDecimalFormatSymbols().getDecimalSeparator();
-		if (editAmount != null) {
+		if(editAmount != null) {
 			editAmount.updateSeparator();
 		}
 	}
@@ -1075,7 +1073,7 @@ public class OrderFragment extends Fragment {
 		initFooter(true);
 		if(resetAmount) {
 			editAmount.setText(StringUtils.formatCurrency(String.valueOf(decimalSeparator),
-														  AmountHelper.format(mOrder.getAmountToPay())));
+			                                              AmountHelper.format(mOrder.getAmountToPay())));
 			updatePaymentTipsAmount(getEnteredAmount());
 		}
 	}
@@ -1209,7 +1207,7 @@ public class OrderFragment extends Fragment {
 		}
 		try {
 			return new BigDecimal(numberFormat.parse(filtered).doubleValue());
-		} catch (ParseException e) {
+		} catch(ParseException e) {
 			return BigDecimal.ZERO;
 		}
 	}
