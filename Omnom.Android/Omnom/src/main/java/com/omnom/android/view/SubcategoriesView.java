@@ -149,6 +149,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		mListView.setAdapter(mMenuAdapter);
 		final FlipInTopXDelayedAnimator animator = new FlipInTopXDelayedAnimator(300, 50);
 		mListView.setItemAnimator(animator);
+		mListView.setOverScrollMode(OVER_SCROLL_NEVER);
 
 		mMenuAdapter.addAll(menuData.getData());
 		mMenuAdapter.collapseAll();
