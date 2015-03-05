@@ -42,8 +42,10 @@ import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.mixpanel.model.AppLaunchMixpanelEvent;
+import com.omnom.android.notifier.api.observable.NotifierObservableApi;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.protocol.Protocol;
+import com.omnom.android.push.PushNotificationManager;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
@@ -364,6 +366,12 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	@Inject
 	protected MenuObservableApi menuApi;
+
+	@Inject
+	protected PushNotificationManager mPushManager;
+
+	@Inject
+	protected NotifierObservableApi notifierApi;
 
 	protected OmnomErrorHelper mErrorHelper;
 
@@ -694,6 +702,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 				                                     correctMixpanelTime(userResponse);
 				                                     reportMixPanel(userResponse);
 				                                     OmnomApplication.get(getActivity()).cacheUserProfile(new UserProfile(userResponse));
+
 				                                     updateConfiguration(configurationResponse.getConfig());
 				                                     getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 				                                                               new AppLaunchMixpanelEvent(userResponse.getUser()));
@@ -722,6 +731,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	private void updateConfiguration(final Config config) {
+		mPushManager.register();
 		OmnomApplication.get(getActivity()).cacheConfig(config);
 		if(mAcquiring instanceof AcquiringMailRu) {
 			((AcquiringMailRu) mAcquiring).changeEndpoint(config.getAcquiringData().getBaseUrl());
@@ -1068,6 +1078,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		mPaymentListener.initTableSocket(mTable);
 
 		onNewGuest(mTable);
+
 		animateRestaurantLogo(restaurant);
 		animateRestaurantBackground(restaurant);
 
@@ -1118,8 +1129,16 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	private void onNewGuest(TableDataResponse table) {
-		api.newGuest(table.getRestaurantId(), table.getId())
-		   .subscribe(OmnomObservable.emptyOnNext(), OmnomObservable.loggerOnError(TAG));
+		api.newGuest(table.getRestaurantId(), table.getId()).subscribe(OmnomObservable.emptyOnNext(),
+		                                                               OmnomObservable.loggerOnError(TAG));
+
+		notifierApi.tableIn(table.getRestaurantId(), table.getId()).subscribe(new Action1() {
+			                                                                      @Override
+			                                                                      public void call(final Object o) {
+
+			                                                                      }
+		                                                                      },
+		                                                                      OmnomObservable.loggerOnError(TAG));
 	}
 
 	/**

@@ -117,6 +117,7 @@ dependencies {
     compile 'uk.co.chrisjenx:calligraphy:1.2.0'
     compile 'com.nhaarman.listviewanimations:lib-core:3.1.0@aar'
     compile 'com.nineoldandroids:library:2.4.0'
+    compile 'jp.wasabeef:recyclerview-animators:1.1.0@aar'
 
     compile 'com.mixpanel.android:mixpanel-android:4.4.1@aar'
     compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
@@ -133,6 +134,7 @@ dependencies {
     compile project(':libraries:SlidingUpPanel:library')
     compile project(':libraries:Io.Socket.Client')
     compile project(':libraries:Io.Engine.Client')
+
     androidTestCompile('com.jakewharton.espresso:espresso:1.1-r3') {
         exclude group: 'com.squareup.dagger'
     }

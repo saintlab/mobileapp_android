@@ -16,6 +16,7 @@ import android.widget.ImageView;
 
 import com.omnom.android.R;
 import com.omnom.android.adapter.MenuCategoryItemsAdapter;
+import com.omnom.android.adapter.MultiLevelRecyclerAdapter;
 import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
@@ -207,7 +208,10 @@ public class MenuSubcategoryFragment extends BaseFragment {
 			public void onClick(final View v) {
 				final int childPosition = mListView.getChildPosition(v);
 				final Data category = mMenuAdapter.getItemAt(childPosition);
-				mMenuAdapter.toggleGroup(childPosition);
+				mMenuAdapter.toggleGroup(childPosition, new MultiLevelRecyclerAdapter.DataFilter() {
+					@Override
+					public boolean filter(final Data data) { return false; }
+				});
 
 				final int newPos = mMenuAdapter.getItemPosition(category);
 				mLayoutManager.scrollToPositionWithOffset(newPos, 0);

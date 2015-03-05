@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,6 +25,10 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		void remove(Data item);
 
 		int getLevel();
+	}
+
+	public interface DataFilter {
+		public boolean filter(Data data);
 	}
 
 	private boolean mNotifyOnChange;
@@ -52,6 +57,36 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 			mData.addAll(position, data);
 			if(mNotifyOnChange) {
 				notifyItemRangeInserted(position, data.size());
+			}
+		}
+	}
+
+	private void addAll(final int position, final List<? extends Data> data, final DataFilter filter) {
+		if(data != null && data.size() > 0) {
+			List<? extends Data> skipChildren = Collections.EMPTY_LIST;
+			int index = 0;
+			for(int i = 0; i < data.size(); i++) {
+				final Data item = data.get(i);
+				final List<? extends Data> children = item.getChildren();
+				if(children != null && children.size() > 0) {
+					skipChildren = children;
+					item.setIsGroup(true);
+					mGroups.put(item, children);
+					if(filter.filter(item)) {
+						mData.add(position + index, item);
+						index++;
+					}
+				} else {
+					if(!skipChildren.contains(item)) {
+						mData.add(position + index, item);
+						index++;
+					}
+				}
+			}
+
+			// mData.addAll(position, data);
+			if(mNotifyOnChange) {
+				notifyItemRangeInserted(position, index);
 			}
 		}
 	}
@@ -120,6 +155,33 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		return mData.size();
 	}
 
+	public void expandGroup(int position, final DataFilter filter) {
+		if(position < 0) {
+			return;
+		}
+		Data firstItem = getItemAt(position);
+
+		if(!firstItem.isGroup()) {
+			return;
+		}
+
+		List<? extends Data> group = mGroups.remove(firstItem);
+
+		firstItem.setIsGroup(false);
+
+		notifyItemChanged(position);
+		addAll(position + 1, group, filter);
+
+		for(int i = 0; i < mData.size(); i++) {
+			final Data data = mData.get(i);
+			if(firstItem.getParent() == data.getParent() && firstItem != data) {
+				if(data.getLevel() == firstItem.getLevel() && data.getChildren() != null && data.getChildren().size() > 0) {
+					collapseExpandedGroup(i);
+				}
+			}
+		}
+	}
+
 	public void expandGroup(int position) {
 		if(position < 0) {
 			return;
@@ -136,36 +198,6 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 
 		notifyItemChanged(position);
 		addAll(position + 1, group);
-
-		int level = firstItem.getLevel();
-		for(int i = 0; i < mData.size(); i++) {
-			final Data data = mData.get(i);
-			if(data == firstItem) {
-				continue;
-			}
-			if(data.getChildren() != null && data.getChildren().size() > 0) {
-				if(data.getLevel() == level/* && firstItem.getRoot() == data.getRoot()*/) {
-					collapseGroup(i);
-				}
-			}
-		}
-
-		for(int i = 0; i < mData.size(); i++) {
-			final Data data = mData.get(i);
-			if(data.getChildren() != null && data.getChildren().size() > 0) {
-				if(firstItem != data.getRoot() || data == firstItem) {
-					continue;
-				}
-				if(data.getLevel() > level) {
-					level = data.getLevel();
-					if(data.isGroup()) {
-						expandGroup(i);
-					}
-				} else {
-					collapseGroup(i);
-				}
-			}
-		}
 	}
 
 	public void collapseExpandedGroup(int position) {
@@ -221,9 +253,9 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		notifyItemRangeRemoved(position + 1, groupSize);
 	}
 
-	public void toggleGroup(int position) {
+	public void toggleGroup(int position, final DataFilter filter) {
 		if(getItemAt(position).isGroup()) {
-			expandGroup(position);
+			expandGroup(position, filter);
 		} else {
 			collapseGroup(position);
 		}

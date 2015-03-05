@@ -110,7 +110,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 					findTable(mData.getLastPathSegment());
 				}
 			} else if(ACTION_LAUNCH_QR.equals(getIntent().getAction())) {
-				findTable(mData.getLastPathSegment());
+				findTable(mData.toString());
 			}
 			return;
 		}

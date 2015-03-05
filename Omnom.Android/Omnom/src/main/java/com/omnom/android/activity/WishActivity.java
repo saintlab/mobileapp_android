@@ -1,16 +1,22 @@
 package com.omnom.android.activity;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
-import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.adapter.WishAdapter;
+import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.Item;
@@ -30,7 +36,9 @@ import com.omnom.android.restaurateur.model.restaurant.WishRequestItem;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
 
@@ -41,6 +49,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import retrofit.http.HEAD;
 import rx.functions.Action1;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
@@ -61,6 +70,30 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		intent.putExtra(EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(EXTRA_RESTAURANT_MENU, menu);
 		activity.startForResult(intent, R.anim.slide_in_up, R.anim.nothing, code);
+	}
+
+	private static void showOutOfSaleDialog(final Context context, final Collection<String> items) {
+		if (items == null || items.isEmpty()) {
+			return;
+		}
+		final String itemsStr = StringUtils.concat(",\n", items);
+		final String message = context.getResources().getString(R.string.out_of_sale_message, itemsStr);
+		final AlertDialog dialog = AndroidUtils.showDialog(context,
+				R.string.out_of_sale_title, message, R.string.ok,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Toast.makeText(context, "ok", Toast.LENGTH_SHORT).show();
+					}
+				}, R.string.cancel,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+		TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
+		messageView.setGravity(Gravity.CENTER);
 	}
 
 	private static WishRequest createWishRequest(Restaurant restaurant, UserOrder order) {
@@ -211,7 +244,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 				refresh();
 				break;
 
-			case R.id.txt_price:
+			case R.id.btn_apply:
 				MenuItemAddFragment.show(getSupportFragmentManager(),
 				                         R.id.fragment_container,
 				                         mMenu.modifiers(),
@@ -271,6 +304,8 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 			                                                                                     SplitWay.WASNT_USED);
 			CardsActivity.start(this, mOrder, paymentDetails, RestaurantHelper.getBackgroundColor(mRestaurant), REQUEST_CODE_WISH_LIST);
 		} else {
+			// TODO: show out of sale dialog in accordance with server response
+			// showOutOfSaleDialog(this, Arrays.asList("Пиво Guinness", "Пиво Bud"));
 			AnimationUtils.animateAlpha(mProgressBar, true);
 			api.wishes(mRestaurant.id(), createWishRequest(mRestaurant, mOrder)).subscribe(new Action1() {
 				@Override

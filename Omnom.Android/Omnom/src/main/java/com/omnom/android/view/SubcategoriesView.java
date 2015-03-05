@@ -19,6 +19,7 @@ import com.omnom.android.activity.ValidateActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.MenuCategoryItemsAdapter;
 import com.omnom.android.adapter.MultiLevelRecyclerAdapter;
+import com.omnom.android.fragment.menu.CategoryData;
 import com.omnom.android.fragment.menu.ItemData;
 import com.omnom.android.fragment.menu.MenuAdapter;
 import com.omnom.android.fragment.menu.MenuData;
@@ -37,6 +38,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import hugo.weaving.DebugLog;
+import jp.wasabeef.recyclerview.animators.FlipInTopXAnimator;
 
 /**
  * Created by Ch3D on 26.02.2015.
@@ -115,8 +117,16 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			public void onClick(final View v) {
 				final int childPosition = mListView.getChildPosition(v);
 				final MultiLevelRecyclerAdapter.Data category = mMenuAdapter.getItemAt(childPosition);
-				mMenuAdapter.toggleGroup(childPosition);
-
+				mMenuAdapter.toggleGroup(childPosition, new MultiLevelRecyclerAdapter.DataFilter() {
+					@Override
+					public boolean filter(final MultiLevelRecyclerAdapter.Data data) {
+						if(category instanceof CategoryData) {
+							CategoryData cd = (CategoryData) category;
+							return data.getLevel() == cd.getLevel() + 1;
+						}
+						return false;
+					}
+				});
 				final int newPos = mMenuAdapter.getItemPosition(category);
 				mLayoutManager.scrollToPositionWithOffset(newPos, 0);
 				mMenuAdapter.notifyItemChanged(newPos);
@@ -137,13 +147,14 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			}
 		});
 		mListView.setAdapter(mMenuAdapter);
+		final FlipInTopXAnimator animator = new FlipInTopXAnimator();
+		animator.setAddDuration(500);
+		animator.setRemoveDuration(500);
+		mListView.setItemAnimator(animator);
+
 		mMenuAdapter.addAll(menuData.getData());
-
 		mMenuAdapter.collapseAll();
-
 		mPanelBottom.setBackgroundColor(Color.TRANSPARENT);
-		mMenuAdapter.setTextColor(Color.WHITE);
-		mMenuAdapter.setCategoriesBackground(Color.TRANSPARENT);
 
 		mListView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
 			public Point mPoint = new Point();
@@ -201,11 +212,11 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	@Override
 	@DebugLog
 	public void onPanelSlide(final View panel, final float slideOffset) {
-		mMenuAdapter.setTextColor((int) mBackgroundEvaluator.evaluate(slideOffset, Color.WHITE, Color.BLACK));
-		mMenuAdapter.setCategoriesBackground((int) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT,
-		                                                                         getResources().getColor(
-				                                                                         R.color.panel_background_grey_light)));
-		mPanelBottom.setBackgroundColor((Integer) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT, Color.WHITE));
+		//mMenuAdapter.setTextColor((int) mBackgroundEvaluator.evaluate(slideOffset, Color.WHITE, Color.BLACK));
+		//mMenuAdapter.setCategoriesBackground((int) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT,
+		//                                                                         getResources().getColor(
+		//		                                                                         R.color.panel_background_grey_light)));
+		//mPanelBottom.setBackgroundColor((Integer) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT, Color.WHITE));
 	}
 
 	@Override
