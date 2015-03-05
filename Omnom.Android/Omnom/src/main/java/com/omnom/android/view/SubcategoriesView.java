@@ -38,7 +38,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import hugo.weaving.DebugLog;
-import jp.wasabeef.recyclerview.animators.FlipInTopXAnimator;
+import jp.wasabeef.recyclerview.animators.FlipInTopXDelayedAnimator;
 
 /**
  * Created by Ch3D on 26.02.2015.
@@ -147,10 +147,9 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			}
 		});
 		mListView.setAdapter(mMenuAdapter);
-		final FlipInTopXAnimator animator = new FlipInTopXAnimator();
-		animator.setAddDuration(500);
-		animator.setRemoveDuration(500);
+		final FlipInTopXDelayedAnimator animator = new FlipInTopXDelayedAnimator(300, 50);
 		mListView.setItemAnimator(animator);
+		mListView.setOverScrollMode(OVER_SCROLL_NEVER);
 
 		mMenuAdapter.addAll(menuData.getData());
 		mMenuAdapter.collapseAll();
