@@ -121,10 +121,15 @@ public class RestaurantHelper {
 	}
 
 	public static boolean isBar(final Restaurant restaurant) {
-		return true;
+		if(restaurant == null) {
+			return false;
+		}
+		return restaurant.isBar();
 	}
 
 	public static String getBarUri(final Restaurant restaurant) {
+		// FIXME:
+		// TODO: return real URI when backend will provide it
 		return "http://www.android.com/";
 	}
 
