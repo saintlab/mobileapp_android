@@ -55,12 +55,17 @@ public class RestaurantHelper {
 	}
 
 	public static int getBackgroundColor(Restaurant restaurant) {
-		final String decorationBg = restaurant.decoration().getBackgroundColor();
-		if(!decorationBg.startsWith(COLOR_PREFIX)) {
-			return Color.parseColor(COLOR_PREFIX + decorationBg);
-		} else {
-			return Color.parseColor(decorationBg);
+		final Decoration decoration = restaurant.decoration();
+		if (decoration != null) {
+			final String decorationBg = decoration.getBackgroundColor();
+			if (!decorationBg.startsWith(COLOR_PREFIX)) {
+				return Color.parseColor(COLOR_PREFIX + decorationBg);
+			} else {
+				return Color.parseColor(decorationBg);
+			}
 		}
+
+		return Color.BLACK;
 	}
 
 	public static int getBackgroundColor(String decorationBg) {
