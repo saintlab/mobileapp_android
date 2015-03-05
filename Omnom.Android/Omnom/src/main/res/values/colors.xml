@@ -40,6 +40,10 @@
 
     <color name="balk_notification_background">#02c164</color>
 
+    <color name="order_accepted_color">#00881E</color>
+
+    <color name="order_details">#515753</color>
+
     <color name="delimiter_color">#33aaaaaa</color>
 
     <color name="secure_payment_color">#33000000</color>

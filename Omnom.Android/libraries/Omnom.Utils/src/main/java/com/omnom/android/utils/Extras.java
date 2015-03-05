@@ -29,6 +29,8 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_REQUEST_ID = "com.omnom.android.request_id";
 	public static final String EXTRA_MARGIN = "com.omnom.android.page.margin";
 	public static final String EXTRA_ACCENT_COLOR = "com.omnom.android.order.color.accent";
+	public static final String EXTRA_ORDER_NUMBER = "com.omnom.android.order.color.order_number";
+	public static final String EXTRA_PIN_CODE = "com.omnom.android.order.color.pin_code";
 	public static final String EXTRA_ORDER_AMOUNT = "com.omnom.android.order.amount";
 	public static final String EXTRA_ORDER_TIPS = "com.omnom.android.order.tips";
 	public static final String EXTRA_SCAN_USED = "com.omnom.android.order.scan_used";
