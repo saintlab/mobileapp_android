@@ -572,7 +572,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	}
 
-	public void collapseSlidingPanel() {slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);}
+	public void collapseSlidingPanel() {
+		menuCategories.collapse();
+		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+	}
 
 	@Override
 	public void onBackPressed() {

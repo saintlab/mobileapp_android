@@ -285,4 +285,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			mMenuAdapter.notifyDataSetChanged();
 		}
 	}
+
+	public void collapse() {
+		mMenuAdapter.collapseAll();
+	}
 }
