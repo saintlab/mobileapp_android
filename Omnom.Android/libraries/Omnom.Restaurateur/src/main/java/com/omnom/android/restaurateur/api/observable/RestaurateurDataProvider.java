@@ -28,9 +28,9 @@ import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
-import com.omnom.android.restaurateur.model.table.TableItemsResponse;
 import com.omnom.android.restaurateur.retrofit.RestaurateurRxSupport;
 import com.omnom.android.restaurateur.serializer.MailRuSerializer;
 import com.omnom.android.restaurateur.serializer.OrdersResponseSerializer;
@@ -205,8 +205,13 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	}
 
 	@Override
-	public Observable wishes(final String restaurantId, final WishRequest request) {
-		return mDataService.wishes(restaurantId, request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable wishes(final String restId, final WishRequest request) {
+		return mDataService.wishes(restId, request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<WishResponse> createWish(final WishRequest request) {
+		return mDataService.bill(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
