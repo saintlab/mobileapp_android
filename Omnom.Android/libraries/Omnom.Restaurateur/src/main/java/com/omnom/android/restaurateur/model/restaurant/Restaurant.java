@@ -57,4 +57,7 @@ public abstract class Restaurant implements Parcelable {
 
 	@Nullable
 	public abstract List<Order> orders();
+
+	@Nullable
+	public abstract String entranceMode();
 }
