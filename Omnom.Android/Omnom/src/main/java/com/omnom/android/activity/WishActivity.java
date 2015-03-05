@@ -24,15 +24,19 @@ import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
+import com.omnom.android.restaurateur.model.bill.BillRequest;
+import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.restaurant.ModifierRequestItem;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
-import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishRequestItem;
+import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
+import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -46,7 +50,9 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
@@ -69,36 +75,33 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	}
 
 	private static void showOutOfSaleDialog(final Context context, final Collection<String> items) {
-		if (items == null || items.isEmpty()) {
+		if(items == null || items.isEmpty()) {
 			return;
 		}
 		final String itemsStr = StringUtils.concat(",\n", items);
 		final String message = context.getResources().getString(R.string.out_of_sale_message, itemsStr);
 		final AlertDialog dialog = AndroidUtils.showDialog(context,
-				R.string.out_of_sale_title, message, R.string.ok,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Toast.makeText(context, "ok", Toast.LENGTH_SHORT).show();
-					}
-				}, R.string.cancel,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
+		                                                   R.string.out_of_sale_title, message, R.string.ok,
+		                                                   new DialogInterface.OnClickListener() {
+			                                                   @Override
+			                                                   public void onClick(DialogInterface dialog, int which) {
+				                                                   Toast.makeText(context, "ok", Toast.LENGTH_SHORT).show();
+			                                                   }
+		                                                   }, R.string.cancel,
+		                                                   new DialogInterface.OnClickListener() {
+			                                                   @Override
+			                                                   public void onClick(DialogInterface dialog, int which) {
+				                                                   dialog.dismiss();
+			                                                   }
+		                                                   });
 		TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
 		messageView.setGravity(Gravity.CENTER);
 	}
 
-	private static WishRequest createWishRequest(Restaurant restaurant, UserOrder order) {
-		final WishRequest wishRequest = new WishRequest();
-		wishRequest.setInternalTableId(RestaurantHelper.getTable(restaurant).getInternalId());
-
+	private static WishRequest createWishRequest(TableDataResponse table, UserOrder order) {
+		final WishRequest wishRequest = WishRequest.create(table);
 		for(final UserOrderData data : order.getSelectedItems()) {
-			final WishRequestItem item = createWishRequestItem(data);
-			wishRequest.addItem(item);
+			wishRequest.addItem(createWishRequestItem(data));
 		}
 		return wishRequest;
 	}
@@ -288,11 +291,37 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		}
 	}
 
-	private void doWish() {
+	private void doWishBar() {
 		AnimationUtils.animateAlpha(mProgressBar, true);
-		// TODO: show out of sale dialog in accordance with server response
-		// showOutOfSaleDialog(this, Arrays.asList("Пиво Guinness", "Пиво Bud"));
-		api.wishes(mRestaurant.id(), createWishRequest(mRestaurant, mOrder)).subscribe(new Action1() {
+		final WishRequest wishRequest = createWishRequest(mTable, mOrder);
+		api.createWish(wishRequest)
+		   .flatMap(new Func1<WishResponse, Observable<BillResponse>>() {
+			   @Override
+			   public Observable<BillResponse> call(final WishResponse wishResponse) {
+				   if(!wishResponse.hasErrors()) {
+					   if(wishResponse.getItems().size() > 0) {
+						   // TODO: show out of sale dialog in accordance with server response
+						   // showOutOfSaleDialog(this, Arrays.asList("Пиво Guinness", "Пиво Bud"));
+						   return Observable.empty();
+					   } else {
+						   return api.bill(BillRequest.create(AmountHelper.format(mOrder.getTotalPrice()), mTable.getRestaurantId(),
+						                                      mTable.getId(), wishResponse.getRestaurateurOrderId()));
+					   }
+				   } else {
+					   return Observable.empty();
+				   }
+			   }
+		   }).subscribe(new Action1<BillResponse>() {
+			@Override
+			public void call(final BillResponse billResponse) {
+				// show cards and pay
+			}
+		}, OmnomObservable.loggerOnError(TAG));
+	}
+
+	private void doWish() {
+		final WishRequest wishRequest = createWishRequest(mTable, mOrder);
+		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1() {
 			@Override
 			public void call(final Object o) {
 				ViewUtils.setVisible(mProgressBar, false);

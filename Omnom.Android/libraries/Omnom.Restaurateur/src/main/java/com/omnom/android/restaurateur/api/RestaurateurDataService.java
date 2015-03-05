@@ -24,6 +24,7 @@ import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.RestaurantTablesResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
@@ -87,7 +88,7 @@ public interface RestaurateurDataService {
 
 	@GET("/restaurants/{restaurant_id}/tables/{table_id}/items")
 	Observable<Collection<OrderItem>> getItems(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
-	                                     @Path(Protocol.FIELD_TABLE_ID) String tableId);
+	                                           @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
 	@POST("/restaurants/{restaurant_id}/tables/{table_id}/new/guest")
 	Observable<ResponseBase> newGuest(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
@@ -98,6 +99,9 @@ public interface RestaurateurDataService {
 
 	@POST("/bill")
 	Observable<BillResponse> bill(@Body BillRequest request);
+
+	@POST("/wish")
+	Observable<WishResponse> createWish(@Body WishRequest request);
 
 	@GET("/link/{orderId}/{amount}/{tip}")
 	Observable<Restaurant> link(@Path(Protocol.FIELD_ORDER_ID) long orderId,
@@ -133,6 +137,7 @@ public interface RestaurateurDataService {
 	@POST("/restaurants/{id}/wishes")
 	Observable<Restaurant> wishes(@Path(Protocol.FIELD_ID) String restaurantId,
 	                              @Body WishRequest request);
+
 
 	@PUT("/restaurants/{id}")
 	Observable<Restaurant> setRssiThreshold(@Path(Protocol.FIELD_ID) String restaurantId,
