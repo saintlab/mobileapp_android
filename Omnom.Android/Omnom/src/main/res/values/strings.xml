@@ -83,8 +83,16 @@
     <string name="err_no_internet">Нет доступа в интернет</string>
     <string name="repeat">Повторить</string>
     <string name="payment_success">Платёж принят</string>
+    <string name="order_accepted">Заказ принят</string>
+    <string name="order_number">Номер заказа</string>
+    <string name="pin_code">Пин-код</string>
+    <string name="we_will_invite_you">
+        Мы пригласим ваc, когда&#160;заказ будет&#160;готов.\nТакже, проверить готов&#160;ли&#160;ваш&#160;заказ\nможно&#160;здесь.
+    </string>
+    <string name="we_will_invite_you_mark">здесь</string>
     <string name="sms_sent_to_waiter">Официант получил sms с&#160;суммой чаевых.</string>
-    <string name="bill_sent_by_email">Счёт отправлен на&#160;почту</string>
+    <string name="bill_sent_by_email">Счёт отправлен на&#160;почту.</string>
+    <string name="cheque_sent_by_email">Чек об оплате отправлен на&#160;почту.</string>
     <string name="title_activity_thanks">ThanksActivity</string>
     <string name="bill_split_amount_">= %1$s&#160;</string>
     <string name="bill_number_">Счёт %1$s</string>

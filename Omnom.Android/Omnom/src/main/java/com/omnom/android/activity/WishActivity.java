@@ -320,6 +320,8 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 				@Override
 				public void call(final Object o) {
 					ViewUtils.setVisible(mProgressBar, false);
+					// TODO: launch order accepted activity in case of bar
+					// OrderAcceptedActivity.start(WishActivity.this, 1018, 9001, REQUEST_CODE_WISH_LIST, Color.BLACK);
 					WishSentActivity.start(WishActivity.this, REQUEST_CODE_WISH_LIST);
 					doClear();
 					showToast(getActivity(), getString(R.string.your_wish_processed));
