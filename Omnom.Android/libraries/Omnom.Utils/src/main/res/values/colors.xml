@@ -7,7 +7,7 @@
     <color name="error_red">#D0021B</color>
     <color name="error_bg_white_transparent">#aaffffff</color>
     <color name="transparent">#00000000</color>
-    <color name="divider_light">#77aaaaaa</color>
+    <color name="divider_light">#59aaaaaa</color>
 
     <color name="lighter_grey">#ddd</color>
     <color name="darker_grey">#aaa</color>

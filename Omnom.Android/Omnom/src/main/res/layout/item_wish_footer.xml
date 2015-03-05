@@ -23,7 +23,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:textColor="@drawable/text_color_selector_grey"
-            android:textAppearance="?android:textAppearance"
+            android:textAppearance="?android:textAppearanceMedium"
             android:background="@drawable/btn_rounded_bordered_grey"
             android:text="@string/wish_clear"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
@@ -45,7 +45,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:textColor="@android:color/white"
-            android:textAppearance="?android:textAppearance"
+            android:textAppearance="?android:textAppearanceMedium"
             android:background="@drawable/btn_rounded_blue"
             android:text="@string/wish_order"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />

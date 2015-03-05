@@ -18,6 +18,7 @@ import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,6 +61,9 @@ public class WishAdapter extends RecyclerView.Adapter {
 
 		@InjectView(R.id.btn_apply)
 		protected Button btnApply;
+
+		@InjectView(R.id.divider)
+		protected View viewDivider;
 
 		public ItemViewHolder(final View convertView) {
 			super(convertView);
@@ -190,6 +194,7 @@ public class WishAdapter extends RecyclerView.Adapter {
 				ivh.btnApply.setTag(data);
 				ivh.btnApply.setOnClickListener(mClickListener);
 				MenuHelper.bindDetails(mContext, data.item().details(), ivh.txtInfo, false);
+				ViewUtils.setVisible(ivh.viewDivider, getItemViewType(position + 1) != VIEW_TYPE_WISH_FOOTER);
 				break;
 
 			case VIEW_TYPE_TABLE_ITEM:
