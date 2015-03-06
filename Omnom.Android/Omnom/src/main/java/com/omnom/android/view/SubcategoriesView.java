@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -15,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.ValidateActivity;
@@ -75,6 +77,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	private boolean mTouchEnabled = false;
 
 	private OnCollapsedTouchListener mCollapsedTouchListener;
+
+	private RecyclerView.ViewHolder mFakeHeader;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public SubcategoriesView(Context context) {
@@ -156,7 +160,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			@Override
 			public void onDraw(final Canvas c, final RecyclerView parent, final RecyclerView.State state) {
 				super.onDraw(c, parent, state);
-				drawHeaders(c, parent, state);
+				// drawHeaders(c, parent, state);
 			}
 
 			@Override
@@ -220,44 +224,71 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	}
 
 	private void drawHeaders(final Canvas c, final RecyclerView parent, final RecyclerView.State state) {
-		final View childAt = parent.getChildAt(0);
 		final RecyclerView.LayoutManager lm = parent.getLayoutManager();
-		final int decoratedTop = lm.getDecoratedTop(childAt);
-		System.err.println(">>>> decoratedTop = " + decoratedTop);
 
-		//final int childCount = parent.getChildCount();
-		//final RecyclerView.LayoutManager lm = parent.getLayoutManager();
-		//Float lastY = null;
-		//for(int i = childCount - 1; i >= 0; i--) {
-		//	View child = parent.getChildAt(i);
-		//	RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
-		//	RecyclerView.ViewHolder holder = parent.getChildViewHolder(child);
-		//	final boolean isHeader = holder instanceof MenuAdapter.CategoryViewHolder;
-		//	if(!lp.isItemRemoved() && !lp.isViewInvalid()) {
-		//		float translationY = ViewCompat.getTranslationY(child);
-		//		if(i == 0 || isHeader) {
-		//			View header = getHeaderViewByItem(holder);
-		//			final TextView viewById = (TextView) findViewById(R.id.txt_title);
-		//			System.err.println(">>>> header = " + viewById.getText());
-		//			if(!viewById.getText().equals("AndTest")) {
-		//				return;
-		//			}
-		//			if(header != null && header.getVisibility() == View.VISIBLE) {
-		//				int headerHeight = 96;
-		//				float y = getHeaderY(header, lm) + translationY;
-		//				if(lastY != null && lastY < y + headerHeight) {
-		//					y = lastY - headerHeight;
-		//				}
-		//				c.save();
-		//				System.err.println("y = " + y);
-		//				c.translate(0, y);
-		//				header.draw(c);
-		//				c.restore();
-		//				lastY = y;
-		//			}
-		//		}
-		//	}
-		//}
+		View child = parent.getChildAt(0);
+		RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
+		final View nextChild = parent.getChildAt(1);
+		RecyclerView.ViewHolder childViewHolder = parent.getChildViewHolder(child);
+		RecyclerView.ViewHolder nextChildViewHolder = parent.getChildViewHolder(nextChild);
+		final boolean nextIsHeader = nextChildViewHolder instanceof MenuAdapter.CategoryViewHolder;
+
+		final int decoratedTop = lm.getDecoratedTop(child);
+		final int decoratedBottom = lm.getDecoratedBottom(child);
+		final int decoratedHeight = lm.getDecoratedMeasuredHeight(child);
+		System.err.println(">>>> decoratedTop = " + decoratedTop);
+		System.err.println(">>>> decoratedBottom = " + decoratedBottom);
+		System.err.println(">>>> decoratedHeight = " + decoratedHeight);
+
+		int dy = 0;
+		if(decoratedBottom < 120 && nextIsHeader) {
+			dy = 120 - decoratedBottom;
+		}
+		System.err.println(">>>> dy = " + dy);
+
+		if(!(childViewHolder instanceof MenuAdapter.CategoryViewHolder)) {
+			if(mFakeHeader == null) {
+				mFakeHeader = mMenuAdapter.createViewHolder(mListView, MenuAdapter.VIEW_TYPE_SUBCATEGORY);
+				mFakeHeader.itemView.setBackgroundColor(Color.GREEN);
+				((TextView) mFakeHeader.itemView.findViewById(R.id.txt_title)).setText("HEADER");
+				layoutHeader(mFakeHeader.itemView);
+			}
+			drawHeader(c, lm, dy, ViewCompat.getTranslationY(child), mFakeHeader.itemView);
+			return;
+		}
+		final boolean isHeader = childViewHolder instanceof MenuAdapter.CategoryViewHolder;
+		if(!lp.isItemRemoved() && !lp.isViewInvalid()) {
+			float translationY = ViewCompat.getTranslationY(child);
+			if(isHeader) {
+				View header = getHeaderViewByItem(childViewHolder);
+				mFakeHeader = childViewHolder;
+				// mFakeHeader.setIsRecyclable(false);
+				header.setBackgroundColor(Color.argb(77, 255, 0, 0));
+				drawHeader(c, lm, dy, translationY, header);
+			}
+		}
+	}
+
+	private void drawHeader(final Canvas c, final RecyclerView.LayoutManager lm, int dy, final float translationY,
+	                        final View header) {
+		final TextView viewById = (TextView) header.findViewById(R.id.txt_title);
+		System.err.println(">>>> header = " + viewById.getText());
+		if(header != null && header.getVisibility() == View.VISIBLE) {
+			float y = getHeaderY(header, lm) + translationY;
+			c.save();
+			System.err.println("y = " + y);
+			c.translate(0, y - dy);
+			header.draw(c);
+			viewById.draw(c);
+			c.restore();
+		}
+	}
+
+	private void layoutHeader(View header) {
+		int widthSpec = View.MeasureSpec.makeMeasureSpec(mListView.getWidth(), View.MeasureSpec.EXACTLY);
+		int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		header.measure(widthSpec, heightSpec);
+		header.layout(0, 0, header.getMeasuredWidth(), header.getMeasuredHeight());
 	}
 
 	private View getHeaderViewByItem(final RecyclerView.ViewHolder holder) {
