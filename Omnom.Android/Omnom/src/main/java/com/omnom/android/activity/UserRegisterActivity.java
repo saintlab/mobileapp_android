@@ -1,18 +1,19 @@
 package com.omnom.android.activity;
 
 import android.app.DatePickerDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.text.Html;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
@@ -151,8 +152,19 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 			}
 		});
 
-		textAgreement.setMovementMethod(LinkMovementMethod.getInstance());
-		textAgreement.setText(Html.fromHtml(getResources().getString(R.string.register_agreement)));
+		AndroidUtils.clickify(textAgreement, getString(R.string.register_agreement_mark), new ClickSpan.OnClickListener() {
+			@Override
+			public void onClick() {
+				final Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setData(Uri.parse(getString(R.string.register_agreement_url)));
+				try {
+					startActivity(i);
+				} catch (ActivityNotFoundException e) {
+					Toast.makeText(getActivity(), getString(R.string.register_agreement_fail), Toast.LENGTH_LONG).show();
+				}
+			}
+		});
+
 	}
 
 	private void showDatePickerDialog() {

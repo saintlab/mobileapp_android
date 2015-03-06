@@ -89,7 +89,9 @@
                 android:paddingBottom="@dimen/activity_vertical_margin"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:textColor="@color/profile_hint"
-                android:textAppearance="?android:textAppearance"/>
+                android:textAppearance="?android:textAppearance"
+                android:text="@string/register_agreement"
+                />
 
         </LinearLayout>
     </ScrollView>
