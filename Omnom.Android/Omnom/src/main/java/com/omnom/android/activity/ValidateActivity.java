@@ -63,6 +63,7 @@ import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
+import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -1287,6 +1288,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	protected void handleRestaurant(final String method, final String requestId, final Restaurant restaurant) {
+		if(!restaurant.available()) {
+			mErrorHelper.showError(LoaderError.RESTAURANT_UNAVAILABLE, mInternetErrorClickListener);
+			return;
+		}
+
 		// User in already in a restaurant there is no need to send them notification
 		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(getActivity()).getPreferences();
 		preferences.saveNotificationDetails(this, restaurant.id());

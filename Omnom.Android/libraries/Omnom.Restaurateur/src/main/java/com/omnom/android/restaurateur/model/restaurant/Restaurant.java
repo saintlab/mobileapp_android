@@ -60,4 +60,7 @@ public abstract class Restaurant implements Parcelable {
 
 	@Nullable
 	public abstract String entranceMode();
+
+	@Nullable
+	public abstract boolean available();
 }
