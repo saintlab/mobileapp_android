@@ -1,5 +1,6 @@
 package com.omnom.android.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -286,7 +287,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(requestCode == REQUEST_CODE_WISH_LIST && resultCode == RESULT_OK) {
+		if(requestCode == REQUEST_CODE_WISH_LIST && resultCode == Activity.RESULT_OK) {
 			finish();
 		}
 	}
