@@ -9,9 +9,12 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.MenuCategoryItemsAdapter;
 import com.omnom.android.fragment.base.BaseFragment;
@@ -36,6 +39,8 @@ import butterknife.OnClick;
  */
 public class MenuItemDetailsFragment extends BaseFragment implements View.OnClickListener {
 
+	public static final String TAG = MenuItemDetailsFragment.class.getSimpleName();
+
 	private static final ViewFilter sViewFilter = new ViewFilter() {
 		@Override
 		public boolean filter(final View v) {
@@ -43,24 +48,27 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		}
 	};
 
-	public static Fragment newInstance(Menu menu, final UserOrder order, final Item item) {
+	public static Fragment newInstance(Menu menu, final UserOrder order, final Item item, final int translationY, final int top) {
 		final MenuItemDetailsFragment fragment = new MenuItemDetailsFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(Extras.EXTRA_ORDER, order);
+		args.putInt(Extras.EXTRA_TRANSLATION_TOP, translationY);
+		args.putInt(Extras.EXTRA_POSITION, top);
 		args.putParcelable(Extras.EXTRA_MENU_ITEM, item);
 		args.putParcelable(Extras.EXTRA_RESTAURANT_MENU, menu);
 		fragment.setArguments(args);
 		return fragment;
 	}
 
-	public static void show(final FragmentManager manager, Menu menu, final UserOrder order, final Item item) {
+	public static void show(final FragmentManager manager, Menu menu, final UserOrder order, final Item item, final int translationY,
+	                        final int top) {
 		manager.beginTransaction()
 		       .addToBackStack(null)
-		       .setCustomAnimations(R.anim.slide_in_right,
-		                            R.anim.slide_out_right,
-		                            R.anim.slide_in_right,
-		                            R.anim.slide_out_right)
-		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item))
+		       .setCustomAnimations(R.anim.fade_in,
+		                            R.anim.fade_out_medium,
+		                            R.anim.fade_in,
+		                            R.anim.fade_out_medium)
+		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item, translationY, top), MenuItemDetailsFragment.TAG)
 		       .commit();
 	}
 
@@ -119,6 +127,9 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	@InjectView(R.id.txt_info_energy)
 	protected TextView mTxtEnergy;
 
+	@InjectView(R.id.scroll)
+	protected ScrollView mScroll;
+
 	@InjectView(R.id.panel_bottom)
 	protected LinearLayout mPanelRecommendations;
 
@@ -130,9 +141,88 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	private Menu mMenu;
 
+	private View mView;
+
+	private int mImgHeight;
+
+	private int mTranslationTop;
+
+	private TextView energy;
+
+	private TextView additional;
+
+	private TextView info;
+
+	private TextView title;
+
+	private View rl;
+
+	private ImageView logo;
+
+	private ImageView iv;
+
+	private int mDuration;
+
+	private int mPaddingTop;
+
+	private int mApplyTop;
+
+	private boolean mAnimate = true;
+
 	@OnClick(R.id.btn_close)
 	public void onClose() {
-		getFragmentManager().popBackStack();
+		if(mScroll.getScrollY() != 0) {
+			mScroll.smoothScrollTo(0, 0);
+			mView.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					animateClose();
+				}
+			}, mDuration);
+		} else {
+			animateClose();
+		}
+	}
+
+	private void animateClose() {
+		final int imgSize = getResources().getDimensionPixelSize(R.dimen.menu_dish_image_height);
+
+		final View btnApply = mView.findViewById(R.id.btn_apply);
+		final int top = btnApply.getTop();
+
+		final boolean noPhoto = TextUtils.isEmpty(mItem.photo());
+
+		if(mApplyTop != 0 && noPhoto) {
+			btnApply.animate().translationY(mApplyTop + (title.getTop() - top)).setDuration(mDuration).start();
+		}
+
+		if(mTranslationTop > 0) {
+			mView.findViewById(R.id.root).animate().translationY(mTranslationTop).setDuration(mDuration).start();
+		}
+
+		if(!noPhoto) {
+			ViewUtils.setVisible(info, false);
+			ViewUtils.setVisible(additional, false);
+			ViewUtils.setVisible(energy, false);
+
+			AnimationUtils.scaleHeight(logo, imgSize, mDuration);
+			rl.animate().translationY(mPaddingTop).setDuration(mDuration).start();
+			title.animate().translationY(-imgSize).setDuration(mDuration).start();
+		} else {
+			ViewUtils.setVisible2(info, false);
+			ViewUtils.setVisible2(additional, false);
+			ViewUtils.setVisible2(energy, false);
+		}
+
+		title.setSingleLine(true);
+		title.setMaxLines(1);
+
+		iv.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				getFragmentManager().popBackStack();
+			}
+		}, mDuration);
 	}
 
 	@Override
@@ -142,15 +232,28 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			mOrder = getArguments().getParcelable(Extras.EXTRA_ORDER);
 			mItem = getArguments().getParcelable(Extras.EXTRA_MENU_ITEM);
 			mMenu = getArguments().getParcelable(Extras.EXTRA_RESTAURANT_MENU);
+			mTranslationTop = getArguments().getInt(Extras.EXTRA_TRANSLATION_TOP, 0);
+			mApplyTop = getArguments().getInt(Extras.EXTRA_POSITION, 0);
 		}
 		if(mOrder == null) {
 			mOrder = UserOrder.create();
 		}
+		mDuration = getResources().getInteger(R.integer.default_animation_duration_short);
+		mPaddingTop = getResources().getDimensionPixelSize(R.dimen.view_size_default);
 		return getActivity().getLayoutInflater().inflate(R.layout.fragment_menu_item_details, null);
 	}
 
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
+		mView = view;
+		iv = (ImageView) mView.findViewById(R.id.img_icon);
+		logo = (ImageView) mView.findViewById(R.id.img_logo);
+		rl = mView.findViewById(R.id.panel_container);
+		title = (TextView) mView.findViewById(R.id.txt_title);
+		info = (TextView) mView.findViewById(R.id.txt_info);
+		additional = (TextView) mView.findViewById(R.id.txt_info_additional);
+		energy = (TextView) mView.findViewById(R.id.txt_info_energy);
+
 		final View viewRoot = view.findViewById(R.id.root);
 		ButterKnife.inject(this, view);
 		holder = new MenuCategoryItemsAdapter.ViewHolder(viewRoot, this, null);
@@ -162,6 +265,53 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		mTxtAdditional.setText(description);
 
 		MenuHelper.bindNutritionalValue(view.getContext(), mItem.details(), mTxtEnergy);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		if(mAnimate) {
+			if(mTranslationTop > 0) {
+				mView.findViewById(R.id.root).animate().translationY(mTranslationTop).setDuration(0).start();
+			}
+
+			ViewUtils.setVisible(info, false);
+			ViewUtils.setVisible(additional, false);
+			ViewUtils.setVisible(energy, false);
+
+			final boolean emptyPhoto = TextUtils.isEmpty(mItem.photo());
+			if(emptyPhoto) {
+				ViewUtils.setVisible(rl, false);
+			} else {
+				rl.animate().translationY(mPaddingTop).setDuration(0).start();
+				title.animate().translationY(-getResources().getDimensionPixelSize(R.dimen.menu_dish_image_height)).setDuration(0).start();
+			}
+			OmnomApplication.getPicasso(getActivity()).load(mItem.photo()).into(logo);
+			iv.post(new Runnable() {
+				@Override
+				public void run() {
+					mImgHeight = iv.getHeight();
+					ViewUtils.setVisible(iv, false);
+				}
+			});
+			iv.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					mView.findViewById(R.id.root).animate().translationY(0).setDuration(mDuration).start();
+					rl.animate().translationY(0).setDuration(mDuration).start();
+					title.animate().translationY(0).setDuration(mDuration).start();
+
+					title.setSingleLine(false);
+					title.setMaxLines(2);
+
+					AnimationUtils.scaleHeight(logo, mImgHeight, mDuration);
+					AnimationUtils.animateAlpha(info, info.getText().length() > 0);
+					AnimationUtils.animateAlpha(additional, additional.getText().length() > 0);
+					AnimationUtils.animateAlpha(energy, energy.getText().length() > 0);
+				}
+			}, emptyPhoto ? 0 : getResources().getInteger(R.integer.default_animation_duration_quick));
+			mAnimate = false;
+		}
 	}
 
 	private void refresh() {

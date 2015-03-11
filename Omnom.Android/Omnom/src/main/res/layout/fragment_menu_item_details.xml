@@ -1,10 +1,12 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:omnom="http://schemas.android.com/apk/res-auto"
-    android:background="@android:color/white"
+    android:id="@+id/root_frame"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
     <ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -13,27 +15,45 @@
             android:id="@+id/root"
             android:clickable="true"
             android:orientation="vertical"
-            android:paddingTop="48dp"
             android:layout_width="match_parent"
+            android:paddingTop="@dimen/menu_margin_top"
             android:layout_height="match_parent"
-            android:gravity="top|center_horizontal">
+            android:gravity="top|center_horizontal"
+            android:baselineAligned="false">
 
+            <RelativeLayout
+                android:id="@+id/panel_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/img_icon"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/menu_dish_image_height"
-                android:scaleType="centerInside" />
+                <ImageView
+                    android:id="@+id/img_icon"
+                    android:layout_alignParentTop="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitStart" />
+
+                <ImageView
+                    android:id="@+id/img_logo"
+                    android:layout_alignParentTop="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/menu_dish_image_height"
+                    android:scaleType="centerCrop" />
+
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/txt_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:layout_gravity="center_horizontal"
-                android:singleLine="false"
-                android:maxLines="2"
+                android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+                android:paddingRight="@dimen/activity_horizontal_margin_medium"
+                android:gravity="center"
+                android:singleLine="true"
                 android:ellipsize="end"
-                android:paddingBottom="8dp"
                 omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
                 android:textColor="@android:color/black"
                 android:textAppearance="?android:textAppearanceLarge" />
@@ -107,7 +127,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="@dimen/menu_margin_top"
         android:background="@color/white_transparent">
 
         <ImageView
@@ -115,7 +135,7 @@
             android:scaleType="centerInside"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_gravity="top|center_horizontal"
+            android:layout_gravity="center"
             android:src="@drawable/ic_cross_black" />
 
     </FrameLayout>

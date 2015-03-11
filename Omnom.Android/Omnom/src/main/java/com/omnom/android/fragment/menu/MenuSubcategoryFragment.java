@@ -252,7 +252,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 		}
 		if(!(item instanceof MenuCategoryItemsAdapter.HeaderItem) &&
 				!(item instanceof MenuCategoryItemsAdapter.SubHeaderItem)) {
-			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item);
+			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, 0, 0);
 		}
 	}
 

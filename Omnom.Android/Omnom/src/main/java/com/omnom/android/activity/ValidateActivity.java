@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,6 +34,7 @@ import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.fragment.NoOrdersFragment;
+import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.api.observable.MenuObservableApi;
 import com.omnom.android.menu.model.Item;
@@ -584,7 +586,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 				&& slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
 			collapseSlidingPanel();
 		} else {
-			super.onBackPressed();
+			final Fragment itemDetailsFragment = getSupportFragmentManager().findFragmentByTag(MenuItemDetailsFragment.TAG);
+			if(itemDetailsFragment != null) {
+				MenuItemDetailsFragment midf = (MenuItemDetailsFragment) itemDetailsFragment;
+				midf.onClose();
+			} else {
+				super.onBackPressed();
+			}
 		}
 	}
 
