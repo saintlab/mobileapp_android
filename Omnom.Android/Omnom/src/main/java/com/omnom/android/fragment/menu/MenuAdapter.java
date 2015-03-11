@@ -1,6 +1,7 @@
 package com.omnom.android.fragment.menu;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -48,10 +49,10 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 	private static final ArrayList<TextView> sTitleViews = new ArrayList<TextView>();
 
-	public class CategoryViewHolder extends RecyclerView.ViewHolder {
+	public static class CategoryViewHolder extends RecyclerView.ViewHolder {
 
 		@InjectView(R.id.txt_title)
-		protected TextView txtTitle;
+		public TextView txtTitle;
 
 		public CategoryViewHolder(final View v) {
 			super(v);
@@ -280,8 +281,23 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 				CategoryData category = (CategoryData) getItemAt(position);
 				cvh.txtTitle.setText(category.getName());
 				cvh.itemView.setTag("header");
+				cvh.itemView.setBackgroundColor(getCategoryColor(viewType));
 				break;
 		}
+	}
+
+	private int getCategoryColor(final int viewType) {
+		switch(viewType) {
+			case VIEW_TYPE_CATEGORY:
+				return Color.TRANSPARENT;
+
+			case VIEW_TYPE_SUBCATEGORY:
+				return Color.parseColor("#59ffffff");
+
+			case VIEW_TYPE_SUBSUBCATEGORY:
+				return Color.parseColor("#aaffffff");
+		}
+		return Color.TRANSPARENT;
 	}
 
 	@Override
@@ -313,5 +329,11 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 		}
 		throw new RuntimeException("wrong item type");
+	}
+
+	public boolean isHeader(final RecyclerView.ViewHolder header) {
+		return header.getItemViewType() == VIEW_TYPE_CATEGORY
+				|| header.getItemViewType() == VIEW_TYPE_SUBCATEGORY
+				|| header.getItemViewType() == VIEW_TYPE_SUBSUBCATEGORY;
 	}
 }

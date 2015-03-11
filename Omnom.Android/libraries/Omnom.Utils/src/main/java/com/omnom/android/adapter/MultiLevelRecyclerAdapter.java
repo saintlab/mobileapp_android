@@ -302,4 +302,15 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 	public int getItemPosition(final Data category) {
 		return mData.indexOf(category);
 	}
+
+	public boolean hasExpandedGroups() {
+		for(int i = 0; i < mData.size(); i++) {
+			final Data firstItem = getItemAt(i);
+			if(firstItem.getChildren() == null || firstItem.getChildren().isEmpty() || firstItem.isGroup()) {
+				continue;
+			}
+			return true;
+		}
+		return false;
+	}
 }
