@@ -54,6 +54,7 @@ import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.utils.AmountHelper;
@@ -81,7 +82,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.Optional;
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 import static butterknife.ButterKnife.findById;
 
@@ -494,7 +494,7 @@ public class OrderFragment extends Fragment {
 	public void onStart() {
 		super.onStart();
 		updateDecimalSeparator();
-		if (tipsButtons != null) {
+		if(tipsButtons != null) {
 			final BigDecimal amount = getEnteredAmount();
 			updatePaymentTipsAmount(amount, tipsButtons);
 		}
@@ -503,7 +503,7 @@ public class OrderFragment extends Fragment {
 	private void updateDecimalSeparator() {
 		numberFormat = NumberFormat.getNumberInstance();
 		decimalSeparator = ((DecimalFormat) numberFormat).getDecimalFormatSymbols().getDecimalSeparator();
-		if (editAmount != null) {
+		if(editAmount != null) {
 			editAmount.updateSeparator();
 		}
 	}
@@ -654,7 +654,7 @@ public class OrderFragment extends Fragment {
 			stubPaymentOptions.setLayoutResource(R.layout.view_order_payment_options);
 
 			ViewGroup inflate = (ViewGroup) stubPaymentOptions.inflate();
-			AndroidUtils.applyFont(getActivity(), inflate, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+			AndroidUtils.applyFont(getActivity(), inflate, OmnomFont.LSF_LE_REGULAR);
 
 			editAmount = (AmountEditText) inflate.findViewById(R.id.edit_payment_amount);
 			txtCustomTips = (TextView) inflate.findViewById(R.id.txt_custom_tips);
@@ -788,7 +788,7 @@ public class OrderFragment extends Fragment {
 		}
 
 		pickerTips.setDividerDrawable(new ColorDrawable(mAccentColor));
-		CalligraphyUtils.applyFontToTextView(getActivity(), txtTitle, "fonts/Futura-OSF-Omnom-Medium.otf");
+		AndroidUtils.applyFont(getActivity(), txtTitle, OmnomFont.OSF_MEDIUM);
 		txtTitle.setText(billText);
 
 		initPicker();
@@ -1061,7 +1061,7 @@ public class OrderFragment extends Fragment {
 		initFooter(true);
 		if(resetAmount) {
 			editAmount.setText(StringUtils.formatCurrency(String.valueOf(decimalSeparator),
-														  AmountHelper.format(mOrder.getAmountToPay())));
+			                                              AmountHelper.format(mOrder.getAmountToPay())));
 			updatePaymentTipsAmount(getEnteredAmount());
 		}
 	}
@@ -1195,7 +1195,7 @@ public class OrderFragment extends Fragment {
 		}
 		try {
 			return new BigDecimal(numberFormat.parse(filtered).doubleValue());
-		} catch (ParseException e) {
+		} catch(ParseException e) {
 			return BigDecimal.ZERO;
 		}
 	}

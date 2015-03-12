@@ -63,6 +63,7 @@ import com.omnom.android.service.configuration.ConfigurationResponse;
 import com.omnom.android.service.configuration.ConfigurationService;
 import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.ObservableUtils;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.loader.LoaderError;
@@ -1168,7 +1169,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		if(bottomView == null) {
 			stubBottomMenu.setLayoutResource(waiterEnabled ? R.layout.layout_bill_waiter : R.layout.layout_bill);
 			bottomView = stubBottomMenu.inflate();
-			AndroidUtils.applyFont(this, (ViewGroup) bottomView, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+			AndroidUtils.applyFont(this, (ViewGroup) bottomView, OmnomFont.LSF_LE_REGULAR);
 		}
 
 		if(waiterEnabled) {

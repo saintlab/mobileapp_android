@@ -31,6 +31,7 @@ import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -117,7 +118,7 @@ public class EditHashFragment extends Fragment {
 		OmnomApplication.get(getActivity()).inject(this);
 		final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_enter_hash, container, false);
 		ButterKnife.inject(this, view);
-		AndroidUtils.applyFont(getActivity(), view, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+		AndroidUtils.applyFont(getActivity(), view, OmnomFont.LSF_LE_REGULAR);
 		initPreloadBackgroundFunction();
 		initEditHash();
 		return view;

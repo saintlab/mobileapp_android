@@ -10,13 +10,13 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.ValidateActivity;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 /**
  * Created by Ch3D on 06.01.2015.
@@ -77,6 +77,6 @@ public class NoOrdersFragment extends Fragment {
 				}
 			}
 		});
-		CalligraphyUtils.applyFontToTextView(getActivity(), txtInfo, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+		AndroidUtils.applyFont(getActivity(), txtInfo, OmnomFont.LSF_LE_REGULAR);
 	}
 }

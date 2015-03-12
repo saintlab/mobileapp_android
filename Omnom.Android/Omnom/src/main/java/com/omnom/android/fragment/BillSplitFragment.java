@@ -27,7 +27,9 @@ import com.omnom.android.adapter.BillSplitPagerAdapter;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.view.HeaderView;
 import com.squareup.otto.Bus;
 
@@ -38,7 +40,6 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 /**
  * Created by Ch3D on 11.11.2014.
@@ -130,20 +131,18 @@ public class BillSplitFragment extends Fragment {
 		             .translationY(0)
 		             .start();
 
-		CalligraphyUtils.applyFontToTextView(getActivity(), mBtnCommit, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+		AndroidUtils.applyFont(getActivity(), mBtnCommit, OmnomFont.LSF_LE_REGULAR);
 
-		final String fontPath = "fonts/Futura-OSF-Omnom-Regular.otf";
-		final float fontSize = getResources().getDimension(R.dimen.font_normal);
 		Class pagerTabStrip = PagerTabStrip.class;
 		resetPageTitleSpacing(pagerTabStrip);
 		mPagerTitle.setPadding((int) getResources().getDimension(R.dimen.bill_split_person_title_padding), 0,
-				               (int) getResources().getDimension(R.dimen.bill_split_person_title_padding), 0);
+		                       (int) getResources().getDimension(R.dimen.bill_split_person_title_padding), 0);
 		for(int i = 0; i < mPagerTitle.getChildCount(); ++i) {
 			View nextChild = mPagerTitle.getChildAt(i);
 			if(nextChild instanceof TextView) {
 				TextView textViewToConvert = (TextView) nextChild;
-				CalligraphyUtils.applyFontToTextView(getActivity(), textViewToConvert, fontPath);
-				textViewToConvert.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
+				AndroidUtils.applyFont(getActivity(), textViewToConvert, OmnomFont.OSF_REGULAR);
+				textViewToConvert.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.font_normal));
 			}
 		}
 
@@ -212,9 +211,9 @@ public class BillSplitFragment extends Fragment {
 			Field minTextSpacing = pagerTabStrip.getDeclaredField("mMinTextSpacing");
 			minTextSpacing.setAccessible(true);
 			minTextSpacing.set(mPagerTitle, 0);
-		} catch (NoSuchFieldException e) {
+		} catch(NoSuchFieldException e) {
 			Log.d(TAG, e.getMessage());
-		} catch (IllegalAccessException e) {
+		} catch(IllegalAccessException e) {
 			Log.d(TAG, e.getMessage());
 		}
 		mPagerTitle.setTextSpacing(0);
@@ -239,7 +238,7 @@ public class BillSplitFragment extends Fragment {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
 				FragmentManager fragmentManager = getFragmentManager();
-				if (fragmentManager != null) {
+				if(fragmentManager != null) {
 					fragmentManager.beginTransaction().remove(BillSplitFragment.this).commit();
 				}
 
