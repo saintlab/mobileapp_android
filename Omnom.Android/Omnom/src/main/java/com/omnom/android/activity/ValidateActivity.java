@@ -1,5 +1,7 @@
 package com.omnom.android.activity;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,6 +20,7 @@ import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -424,6 +427,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	};
 
+	private ValueAnimator mColorAnimator;
+
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -610,6 +615,26 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		listener.addListener(new PanelSlideListenerSimple() {
 			@Override
 			public void onPanelSlide(final View panel, final float slideOffset) {
+				if(slideOffset == 1) {
+					if(mColorAnimator == null) {
+						mColorAnimator = ValueAnimator.ofInt(Color.TRANSPARENT, getResources().getColor(R.color.transparent_black));
+						mColorAnimator.setDuration(350);
+						mColorAnimator.setEvaluator(new ArgbEvaluator());
+						mColorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+						mColorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+							@Override
+							public void onAnimationUpdate(ValueAnimator animation) {
+								slidingPanel.setBackgroundColor((Integer) animation.getAnimatedValue());
+							}
+						});
+					}
+					mColorAnimator.start();
+				} else if(slideOffset == 0) {
+					if(mColorAnimator != null) {
+						mColorAnimator.reverse();
+					}
+				}
+
 				final float loaderFactor = 1.0f - slideOffset;
 
 				if(loaderFactor < 0.85f) {

@@ -258,7 +258,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	@OnClick(R.id.btn_close_menu)
 	public void onClose() {
-		mMenuAdapter.collapseExpandedGroups();
+		// mMenuAdapter.collapseExpandedGroups();
 		getActivity().collapseSlidingPanel();
 		AnimationUtils.animateAlpha3(mImgClose, false);
 	}
@@ -311,6 +311,6 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	}
 
 	public void collapse() {
-		mMenuAdapter.collapseAll();
+		mMenuAdapter.collapseExpandedGroups();
 	}
 }
