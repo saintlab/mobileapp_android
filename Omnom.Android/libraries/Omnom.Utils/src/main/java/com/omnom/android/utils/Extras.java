@@ -41,12 +41,14 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_PAYMENT_EVENT = "com.omnom.android.payment.event";
 	public static final String EXTRA_TRANSACTION_URL = "com.omnom.android.payment.transaction_url";
 	public static final String EXTRA_ANIMATION_EXIT = "com.omnom.android.extra.animation";
-	public static final String EXTRA_TRANSLATION_TOP = "com.omnom.android.extra.translation.top";
 	public static final String EXTRA_RESTAURANT_MENU = "com.omnom.android.restaurant.menu";
 	public static final String EXTRA_MENU_ITEM = "com.omnom.android.restaurant.menu.item";
 	public static final String EXTRA_TABLE = "com.omnom.android.restaurant.table";
 	public static final String EXTRA_RESTAURANT_MENU_CATEGORY = "com.omnom.android.restaurant.menu.category";
 	public static final String EXTRA_POSITION = "com.omnom.android.position";
+	public static final String EXTRA_TRANSLATION_CONTENT = "com.omnom.android.extra.translation.content";
+	public static final String EXTRA_TRANSLATION_TOP = "com.omnom.android.extra.translation.top";
+	public static final String EXTRA_TRANSLATION_BUTTON = "com.omnom.android.extra.translation.btn";
 	public static final String EXTRA_PIVOT_Y = "com.omnom.android.position.y";
 
 	public static final String EXTRA_CHARACTERISTIC_UUID = "ble.characteristic.uuid";
