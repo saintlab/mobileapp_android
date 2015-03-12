@@ -257,10 +257,10 @@ public class AnimationUtils {
 	/**
 	 * Performs drawable transition using alpha.
 	 *
-	 * @param backView view from behind
+	 * @param backView  view from behind
 	 * @param frontView front view
-	 * @param drawable drawable to animate
-	 * @param duration animation duration
+	 * @param drawable  drawable to animate
+	 * @param duration  animation duration
 	 */
 	public static void animateDrawable(final View backView, final View frontView, final BitmapDrawable drawable, final int duration) {
 		drawable.setAlpha(0);
@@ -281,5 +281,4 @@ public class AnimationUtils {
 		});
 		va.start();
 	}
-
 }

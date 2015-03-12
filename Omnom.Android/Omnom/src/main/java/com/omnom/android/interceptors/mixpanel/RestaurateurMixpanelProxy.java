@@ -264,6 +264,28 @@ public class RestaurateurMixpanelProxy extends RestaurateurDataProvider {
 	}
 
 	@Override
+	public Observable<RestaurantsResponse> getRestaurantsAll(double latitude, double longitude) {
+		mMixHelper.track(OMNOM_ANDROID, "restarateur.getRestaurants ->", latitude + " " + longitude);
+		return super.getRestaurantsAll(latitude, longitude).doOnNext(new Action1<RestaurantsResponse>() {
+			@Override
+			public void call(RestaurantsResponse response) {
+				mMixHelper.track(OMNOM_ANDROID, "restarateur.getRestaurants <-", response);
+			}
+		});
+	}
+
+	@Override
+	public Observable<RestaurantsResponse> getRestaurantsAll() {
+		mMixHelper.track(OMNOM_ANDROID, "restarateur.getRestaurants ->", StringUtils.EMPTY_STRING);
+		return super.getRestaurantsAll().doOnNext(new Action1<RestaurantsResponse>() {
+			@Override
+			public void call(RestaurantsResponse response) {
+				mMixHelper.track(OMNOM_ANDROID, "restarateur.getRestaurants <-", response);
+			}
+		});
+	}
+
+	@Override
 	public Observable<RestaurantResponse> decode(final BeaconDecodeRequest request, final Func1<RestaurantResponse, RestaurantResponse>
 			funcMap) {
 		mMixHelper.track(OMNOM_ANDROID, "restarateur.decode ->", request);

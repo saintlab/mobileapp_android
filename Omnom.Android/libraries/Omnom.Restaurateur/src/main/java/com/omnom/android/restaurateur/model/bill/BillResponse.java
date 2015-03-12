@@ -12,6 +12,8 @@ public class BillResponse extends ResponseBase {
 
 	public static final String STATUS_PAID = "paid";
 
+	public static final String STATUS_RESTAURANT_NOT_AVAILABLE = "restaurant_not_available";
+
 	public static final String STATUS_ORDER_CLOSED = "order_closed";
 
 	@Expose

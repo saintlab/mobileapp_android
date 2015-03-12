@@ -25,8 +25,6 @@ public abstract class Restaurant implements Parcelable {
 
 	public static final String ENTRANCE_MODE_NONE = "none";
 
-	private boolean mBar;
-
 	@Nullable
 	public abstract String id();
 
@@ -77,4 +75,7 @@ public abstract class Restaurant implements Parcelable {
 		return true;
 		// return ENTRANCE_MODE_BAR.equals(entranceMode());
 	}
+
+	@Nullable
+	public abstract boolean available();
 }
