@@ -11,6 +11,6 @@ import rx.Observable;
  * Created by Ch3D on 26.01.2015.
  */
 public interface MenuDataService {
-	@GET("/menu/{id}")
-	public Observable<MenuResponse> getMenu(@Path(Protocol.FIELD_ID) String id);
+	@GET("/restaurants/{id}/menu")
+	Observable<MenuResponse> getMenu(@Path(Protocol.FIELD_ID) String id);
 }
