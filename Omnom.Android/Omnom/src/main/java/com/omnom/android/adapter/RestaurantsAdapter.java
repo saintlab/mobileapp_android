@@ -40,9 +40,6 @@ public class RestaurantsAdapter extends BaseAdapter {
 		@InjectView(R.id.cover)
 		public LoaderView cover;
 
-		@InjectView(R.id.panel_linear)
-		public View panelAddress;
-
 		@InjectView(R.id.txt_info)
 		public TextView txtInfo;
 
@@ -97,7 +94,7 @@ public class RestaurantsAdapter extends BaseAdapter {
 		}
 
 		public void alpha(final int alpha) {
-			panelAddress.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
+			txtInfo.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
 			txtSchedule.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
 			cover.animate().alpha(alpha).setDuration(ANIMATION_DURATION).start();
 		}
