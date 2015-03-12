@@ -58,6 +58,13 @@ public class RestaurantsAdapter extends BaseAdapter {
 		}
 
 		public void bindData(final Context context, final Restaurant item, int weekDay) {
+			if(item == null) {
+				cover.setLogo(R.drawable.transparent);
+				txtInfo.setText(StringUtils.EMPTY_STRING);
+				txtSchedule.setText(StringUtils.EMPTY_STRING);
+				return;
+			}
+
 			cover.setLogo(R.drawable.transparent);
 			final String logo = RestaurantHelper.getLogo(item);
 			cover.showProgress(false);
@@ -68,19 +75,25 @@ public class RestaurantsAdapter extends BaseAdapter {
 			if(!TextUtils.isEmpty(addressSmall)) {
 				ViewUtils.setVisible(txtInfo, true);
 				txtInfo.setText(addressSmall);
-				if (item.distance() != null) {
+				if(item.distance() != null) {
 					final String distance = StringUtils.formatDistance(item.distance());
 					final String addressWithDistance = addressSmall + " " + distance;
 					SpannableString s = SpannableString.valueOf(addressWithDistance);
 					s.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.info_hint)),
-							addressWithDistance.indexOf(distance), addressWithDistance.length(),
-							Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+					          addressWithDistance.indexOf(distance), addressWithDistance.length(),
+					          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 					txtInfo.setText(s);
 				}
 			} else {
 				ViewUtils.setVisible(txtInfo, false);
 			}
-			txtSchedule.setText(RestaurantHelper.getOpenedTime(context, item, weekDay));
+			final String openedTime = RestaurantHelper.getOpenedTime(context, item, weekDay);
+			if(TextUtils.isEmpty(openedTime)) {
+				ViewUtils.setVisible(txtSchedule, false);
+			} else {
+				ViewUtils.setVisible(txtSchedule, true);
+				txtSchedule.setText(openedTime);
+			}
 		}
 
 		public void alpha(final int alpha) {
@@ -106,8 +119,6 @@ public class RestaurantsAdapter extends BaseAdapter {
 
 	private int logoSizeSmall;
 
-	private int logoSizeLarge;
-
 	public RestaurantsAdapter(Context context, List<Restaurant> restaurants) {
 		mContext = context;
 		mRestaurants = restaurants;
@@ -115,7 +126,6 @@ public class RestaurantsAdapter extends BaseAdapter {
 		mWeekDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 		final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
 		logoSizeSmall = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_SMALL + 0.5);
-		logoSizeLarge = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_LARGE + 0.5);
 	}
 
 	@Override

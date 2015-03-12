@@ -74,6 +74,9 @@ public class RestaurantHelper {
 		if(dailySchedule.isClosed()) {
 			return context.getString(R.string.restaurant_closed);
 		}
+		if(TextUtils.isEmpty(dailySchedule.getCloseTime()) || TextUtils.isEmpty(dailySchedule.getOpenTime())) {
+			return StringUtils.EMPTY_STRING;
+		}
 		return context.getString(R.string.restaurant_schedule_from_till, dailySchedule.getOpenTime(), dailySchedule.getCloseTime());
 	}
 
