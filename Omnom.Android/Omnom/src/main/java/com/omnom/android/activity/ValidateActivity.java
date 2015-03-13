@@ -328,9 +328,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	@InjectView(R.id.btn_demo)
 	protected View btnDemo;
 
-	@InjectView(R.id.btn_down)
-	protected Button btnDownPromo;
-
 	@InjectView(R.id.stub_bottom_menu)
 	protected ViewStub stubBottomMenu;
 
@@ -1223,7 +1220,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			}
 		});
 
-		ViewUtils.setVisible(btnDownPromo, promoEnabled);
 		// getPanelBottom().setTranslationY(100);
 		updateWishUi();
 	}
@@ -1233,7 +1229,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	public View getPanelBottom() {
-		return findById(this, R.id.panel_bottom);
+		return findById(this, R.id.panel_validate_bottom);
 	}
 
 	protected boolean validateDemo() {
