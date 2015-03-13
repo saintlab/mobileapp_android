@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.EnteringActivity;
-import com.omnom.android.activity.ValidateActivity;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -28,7 +28,6 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import retrofit.http.HEAD;
 
 import static com.omnom.android.utils.Extras.EXTRA_LOADER_ANIMATION_SCALE_DOWN;
 

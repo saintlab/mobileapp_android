@@ -15,9 +15,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.ValidateActivity;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
-import com.omnom.android.adapter.MenuCategoryItemsAdapter;
+import com.omnom.android.adapter.MenuCategoryItems;
 import com.omnom.android.adapter.MultiLevelRecyclerAdapter;
 import com.omnom.android.fragment.menu.CategoryData;
 import com.omnom.android.fragment.menu.ItemData;
@@ -37,8 +37,9 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import hugo.weaving.DebugLog;
 import jp.wasabeef.recyclerview.animators.FlipInTopXDelayedAnimator;
+
+import static butterknife.ButterKnife.findById;
 
 /**
  * Created by Ch3D on 26.02.2015.
@@ -46,7 +47,7 @@ import jp.wasabeef.recyclerview.animators.FlipInTopXDelayedAnimator;
 public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelLayout.PanelSlideListener {
 
 	public interface OnCollapsedTouchListener {
-		public void onCollapsedSubcategoriesTouch();
+		void onCollapsedSubcategoriesTouch();
 	}
 
 	private class MenuDataFilter implements MultiLevelRecyclerAdapter.DataFilter {
@@ -205,12 +206,14 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					showDetails(itemData.getItem(), v.getTop(),
-					            v.findViewById(R.id.btn_apply).getTop() - v.findViewById(R.id.txt_title).getTop());
+					final int btnTranslation = findById(v, R.id.btn_apply).getTop() - findById(v, R.id.txt_title).getTop();
+					final int contentTranslation = v.getTop();
+					showDetails(itemData.getItem(), contentTranslation, btnTranslation);
 				}
 			}, getResources().getInteger(R.integer.default_animation_duration_short));
 		} else {
-			showDetails(itemData.getItem(), 0, v.findViewById(R.id.btn_apply).getTop() - v.findViewById(R.id.txt_title).getTop());
+			final int btnTranslation = findById(v, R.id.btn_apply).getTop() - findById(v, R.id.txt_title).getTop();
+			showDetails(itemData.getItem(), 0, btnTranslation);
 		}
 	}
 
@@ -226,24 +229,18 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		return activity.getSupportFragmentManager();
 	}
 
-	private void showDetails(final Item item, final int translationY, final int top) {
+	private void showDetails(final Item item, final int contentTranslation, final int btnTranslation) {
 		if(item == null) {
 			return;
 		}
-		if(!(item instanceof MenuCategoryItemsAdapter.HeaderItem) &&
-				!(item instanceof MenuCategoryItemsAdapter.SubHeaderItem)) {
-			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, translationY, top);
+		if(!(item instanceof MenuCategoryItems.HeaderItem) &&
+				!(item instanceof MenuCategoryItems.SubHeaderItem)) {
+			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, contentTranslation, btnTranslation);
 		}
 	}
 
 	@Override
-	@DebugLog
 	public void onPanelSlide(final View panel, final float slideOffset) {
-		//mMenuAdapter.setTextColor((int) mBackgroundEvaluator.evaluate(slideOffset, Color.WHITE, Color.BLACK));
-		//mMenuAdapter.setCategoriesBackground((int) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT,
-		//                                                                         getResources().getColor(
-		//		                                                                         R.color.panel_background_grey_light)));
-		//mPanelBottom.setBackgroundColor((Integer) mBackgroundEvaluator.evaluate(slideOffset, Color.TRANSPARENT, Color.WHITE));
 	}
 
 	@Override
@@ -261,7 +258,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	@OnClick(R.id.btn_close_menu)
 	public void onClose() {
-		mMenuAdapter.collapseExpandedGroups();
+		// mMenuAdapter.collapseExpandedGroups();
 		getActivity().collapseSlidingPanel();
 		AnimationUtils.animateAlpha3(mImgClose, false);
 	}
@@ -314,6 +311,6 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	}
 
 	public void collapse() {
-		mMenuAdapter.collapseAll();
+		mMenuAdapter.collapseExpandedGroups();
 	}
 }

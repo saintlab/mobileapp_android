@@ -302,4 +302,5 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 	public int getItemPosition(final Data category) {
 		return mData.indexOf(category);
 	}
+
 }

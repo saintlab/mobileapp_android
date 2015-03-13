@@ -14,12 +14,13 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.CardConfirmActivity;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.utils.AmountHelper;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 /**
  * Created by mvpotter on 12/3/2014.
@@ -62,7 +63,7 @@ public class PayOnceFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (getArguments() != null) {
+		if(getArguments() != null) {
 			mAmount = getArguments().getDouble(ARG_AMOUNT);
 			mType = getArguments().getInt(ARG_TYPE);
 		}
@@ -73,7 +74,7 @@ public class PayOnceFragment extends Fragment {
 		super.onAttach(activity);
 		addOnPayListener(activity);
 		addFragmentVisibilityListener(activity);
-		if (mVisibilityListener != null) {
+		if(mVisibilityListener != null) {
 			mVisibilityListener.onVisibilityChanged(true);
 		}
 	}
@@ -81,7 +82,7 @@ public class PayOnceFragment extends Fragment {
 	@Override
 	public void onDetach() {
 		super.onDetach();
-		if (mVisibilityListener != null) {
+		if(mVisibilityListener != null) {
 			mVisibilityListener.onVisibilityChanged(false);
 		}
 	}
@@ -89,7 +90,7 @@ public class PayOnceFragment extends Fragment {
 	private void addOnPayListener(Activity activity) {
 		try {
 			mPayListener = (OnPayListener) activity;
-		} catch (ClassCastException e) {
+		} catch(ClassCastException e) {
 			throw new ClassCastException(activity.toString() + " must implement OnPayListener");
 		}
 	}
@@ -97,7 +98,7 @@ public class PayOnceFragment extends Fragment {
 	private void addFragmentVisibilityListener(Activity activity) {
 		try {
 			mVisibilityListener = (VisibilityListener) activity;
-		} catch (ClassCastException e) {
+		} catch(ClassCastException e) {
 			throw new ClassCastException(activity.toString() + " must implement VisibilityListener");
 		}
 	}
@@ -118,13 +119,12 @@ public class PayOnceFragment extends Fragment {
 				getActivity().onBackPressed();
 			}
 		});
-		if (mAmount > 0) {
-			CalligraphyUtils.applyFontToTextView(getActivity(), btnPay, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
-			final String osfFontPath = "fonts/Futura-OSF-Omnom-Regular.otf";
-			CalligraphyUtils.applyFontToTextView(getActivity(), txtSmsNotificationsOff, osfFontPath);
-			CalligraphyUtils.applyFontToTextView(getActivity(), txtPayOnce, osfFontPath);
+		if(mAmount > 0) {
+			AndroidUtils.applyFont(getActivity(), btnPay, OmnomFont.LSF_LE_REGULAR);
+			AndroidUtils.applyFont(getActivity(), txtSmsNotificationsOff, OmnomFont.OSF_REGULAR);
+			AndroidUtils.applyFont(getActivity(), txtPayOnce, OmnomFont.OSF_REGULAR);
 			final String text = AmountHelper.format(mAmount) + getActivity().getString(R.string.currency_suffix_ruble);
-			if (mType == CardConfirmActivity.TYPE_BIND_CONFIRM) {
+			if(mType == CardConfirmActivity.TYPE_BIND_CONFIRM) {
 				btnPay.setText(getString(R.string.pay_amount, text));
 			} else {
 				btnPay.setText(getString(R.string.enter_card_data));
@@ -132,7 +132,7 @@ public class PayOnceFragment extends Fragment {
 			btnPay.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					if (mPayListener != null) {
+					if(mPayListener != null) {
 						// remove visibility listener to keep keyboard hidden on frame close
 						mVisibilityListener = null;
 						mPayListener.pay();

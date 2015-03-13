@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.adapter.MenuCategoryItemsAdapter;
+import com.omnom.android.adapter.MenuCategoryItems;
 import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
@@ -48,12 +48,13 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		}
 	};
 
-	public static Fragment newInstance(Menu menu, final UserOrder order, final Item item, final int translationY, final int top) {
+	public static Fragment newInstance(Menu menu, final UserOrder order, final Item item, final int translationContent,
+	                                   final int translationButton) {
 		final MenuItemDetailsFragment fragment = new MenuItemDetailsFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(Extras.EXTRA_ORDER, order);
-		args.putInt(Extras.EXTRA_TRANSLATION_TOP, translationY);
-		args.putInt(Extras.EXTRA_POSITION, top);
+		args.putInt(Extras.EXTRA_TRANSLATION_CONTENT, translationContent);
+		args.putInt(Extras.EXTRA_TRANSLATION_BUTTON, translationButton);
 		args.putParcelable(Extras.EXTRA_MENU_ITEM, item);
 		args.putParcelable(Extras.EXTRA_RESTAURANT_MENU, menu);
 		fragment.setArguments(args);
@@ -86,7 +87,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 				final View itemView = inflater.inflate(R.layout.item_menu_dish, null, false);
 				itemView.setOnClickListener(itemClickListener);
 
-				MenuCategoryItemsAdapter.ViewHolder holder = new MenuCategoryItemsAdapter.ViewHolder(itemView);
+				MenuCategoryItems.ViewHolder holder = new MenuCategoryItems.ViewHolder(itemView);
 				holder.updateState(order, recommendedItem);
 				holder.bind(recommendedItem, order, menu, -1, false, false);
 				holder.showDivider(index != recommendations.size());
@@ -135,7 +136,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	protected UserOrder mOrder;
 
-	private MenuCategoryItemsAdapter.ViewHolder holder;
+	private MenuCategoryItems.ViewHolder holder;
 
 	private Item mItem;
 
@@ -232,8 +233,8 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			mOrder = getArguments().getParcelable(Extras.EXTRA_ORDER);
 			mItem = getArguments().getParcelable(Extras.EXTRA_MENU_ITEM);
 			mMenu = getArguments().getParcelable(Extras.EXTRA_RESTAURANT_MENU);
-			mTranslationTop = getArguments().getInt(Extras.EXTRA_TRANSLATION_TOP, 0);
-			mApplyTop = getArguments().getInt(Extras.EXTRA_POSITION, 0);
+			mTranslationTop = getArguments().getInt(Extras.EXTRA_TRANSLATION_CONTENT, 0);
+			mApplyTop = getArguments().getInt(Extras.EXTRA_TRANSLATION_BUTTON, 0);
 		}
 		if(mOrder == null) {
 			mOrder = UserOrder.create();
@@ -256,7 +257,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 		final View viewRoot = view.findViewById(R.id.root);
 		ButterKnife.inject(this, view);
-		holder = new MenuCategoryItemsAdapter.ViewHolder(viewRoot, this, null);
+		holder = new MenuCategoryItems.ViewHolder(viewRoot, this, null);
 		holder.showDivider(false);
 		refresh();
 

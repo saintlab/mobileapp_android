@@ -1,9 +1,8 @@
-package com.omnom.android.activity;
+package com.omnom.android.activity.validate;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -16,28 +15,32 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewStub;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.AcquiringMailRu;
+import com.omnom.android.activity.ConfirmPhoneActivity;
+import com.omnom.android.activity.EnteringActivity;
+import com.omnom.android.activity.OmnomBaseErrorHandler;
+import com.omnom.android.activity.OrdersActivity;
+import com.omnom.android.activity.RestaurantActivity;
+import com.omnom.android.activity.RestaurantsListActivity;
+import com.omnom.android.activity.UserProfileActivity;
+import com.omnom.android.activity.ValidateActivityBle;
+import com.omnom.android.activity.ValidateActivityBle21;
+import com.omnom.android.activity.ValidateActivityCamera;
+import com.omnom.android.activity.ValidateActivityShortcut;
+import com.omnom.android.activity.WishActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
-import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.api.observable.MenuObservableApi;
-import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.menu.model.UserOrder;
@@ -66,7 +69,6 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.loader.LoaderError;
-import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
@@ -74,18 +76,11 @@ import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.BitmapUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
-import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.StringUtils;
-import com.omnom.android.utils.utils.ViewUtils;
-import com.omnom.android.view.PanelSlideListenerAdapter;
-import com.omnom.android.view.PanelSlideListenerSimple;
-import com.omnom.android.view.SubcategoriesView;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,9 +88,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.InjectViews;
 import butterknife.OnClick;
 import retrofit.RetrofitError;
 import rx.Observable;
@@ -106,7 +98,6 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 
-import static butterknife.ButterKnife.findById;
 import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM;
 import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM_ANDROID;
 
@@ -114,7 +105,7 @@ import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM_ANDROID;
  * Created by Ch3D on 08.10.2014.
  */
 public abstract class ValidateActivity extends BaseOmnomFragmentActivity
-		implements FragmentManager.OnBackStackChangedListener, SubcategoriesView.OnCollapsedTouchListener {
+		implements FragmentManager.OnBackStackChangedListener {
 
 	public static final int REQUEST_CODE_ORDERS = 100;
 
@@ -139,11 +130,18 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	private static final String TAG = ValidateActivity.class.getSimpleName();
 
+	protected final View.OnClickListener mInternetErrorClickBillListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			onBill(findViewById(R.id.btn_bill));
+		}
+	};
+
 	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
 		@Override
 		protected void onThrowable(Throwable throwable) {
 			Log.e(TAG, "onError", throwable);
-			loader.stopProgressAnimation(true);
+			mViewHelper.loader.stopProgressAnimation(true);
 			if(throwable instanceof RetrofitError) {
 				final RetrofitError cause = (RetrofitError) throwable;
 				if(cause.getResponse() != null) {
@@ -160,7 +158,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 				return;
 			}
 
-			mErrorHelper.showBackendError(new View.OnClickListener() {
+			getErrorHelper().showBackendError(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					clearErrors(true);
@@ -169,6 +167,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			});
 		}
 	};
+
+	protected OmnomErrorHelper getErrorHelper() {return mViewHelper.getErrorHelper();}
 
 	public static void startDemo(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
 		start(context, enterAnim, exitAnim, animationType, true, -1);
@@ -304,60 +304,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	};
 
-	@InjectView(R.id.loader)
-	protected LoaderView loader;
-
-	@InjectView(R.id.txt_error)
-	protected TextView txtError;
-
-	@InjectView(R.id.txt_error_additional)
-	protected TextView txtErrorAdditional;
-
-	@InjectView(R.id.btn_bottom)
-	protected View btnErrorRepeat;
-
-	@InjectView(R.id.sliding_layout)
-	protected SlidingUpPanelLayout slidingPanel;
-
-	@InjectView(R.id.menu_gradient)
-	protected View menuGradientPanel;
-
-	@InjectView(R.id.menu_subcategories)
-	protected SubcategoriesView menuCategories;
-
-	@InjectView(R.id.txt_bottom)
-	protected TextView txtErrorRepeat;
-
-	@InjectView(R.id.btn_demo)
-	protected View btnDemo;
-
-	@InjectView(R.id.btn_down)
-	protected Button btnDownPromo;
-
-	@InjectView(R.id.stub_bottom_menu)
-	protected ViewStub stubBottomMenu;
-
-	@InjectView(R.id.root)
-	protected View rootView;
-
-	@InjectView(R.id.content)
-	protected View contentView;
-
-	@InjectViews({R.id.txt_error, R.id.panel_errors})
-	protected List<View> errorViews;
-
-	@InjectView(R.id.img_profile)
-	protected ImageView imgProfile;
-
-	@InjectView(R.id.btn_previous)
-	protected ImageView imgPrevious;
-
-	@InjectView(R.id.txt_demo_leave)
-	protected TextView txtLeave;
-
-	@InjectView(R.id.txt_bar)
-	protected TextView txtBar;
-
 	@Inject
 	protected RestaurateurObservableApi api;
 
@@ -375,8 +321,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	@Inject
 	protected NotifierObservableApi notifierApi;
-
-	protected OmnomErrorHelper mErrorHelper;
 
 	protected boolean mFirstRun = true;
 
@@ -416,15 +360,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	private Subscription mDataSubscription;
 
-	private View bottomView;
-
 	private com.omnom.android.utils.drawable.TransitionDrawable bgTransitionDrawable;
 
 	private PaymentEventListener mPaymentListener;
 
 	private ConfigurationService configurationService;
-
-	private UserOrder mOrder;
 
 	private View.OnClickListener loadConfigsErrorListener = new View.OnClickListener() {
 		@Override
@@ -433,10 +373,15 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	};
 
+	protected ValidateOrderHelper mOrderHelper;
+
+	protected ValidateViewHelper mViewHelper;
+
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mData = getIntent().getData();
+		mViewHelper = new ValidateViewHelper(this);
 		configurationService =
 				new ConfigurationService(this, authenticator, api, mAcquiring,
 				                         OmnomApplication.get(getActivity()).getAuthToken());
@@ -471,47 +416,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		updateWishUi();
-		menuCategories.onResume();
+		mOrderHelper.updateWishUi();
+		mViewHelper.onResume();
+
 		if(mPaymentListener != null && mTable != null) {
 			mPaymentListener.initTableSocket(mTable);
-		}
-	}
-
-	protected void updateOrderData(final OrderUpdateEvent event) {
-		if(mOrder == null) {
-			return;
-		}
-		final Item item = event.getItem();
-		mOrder.addItem(item, event.getCount());
-		menuCategories.refresh(event);
-		updateWishUi();
-	}
-
-	private void updateWishUi() {
-		final Button btnOrder = (Button) findViewById(R.id.btn_order);
-		if(mOrder == null || btnOrder == null) {
-			return;
-		}
-
-		final BigDecimal totalAmount = mOrder.getTotalPrice();
-		final boolean hasWishItems = mOrder != null && totalAmount.compareTo(BigDecimal.ZERO) > 0;
-
-		if(hasWishItems) {
-			ViewUtils.setVisible(btnOrder, true);
-			btnOrder.setText(totalAmount.toString() + getString(R.string.currency_suffix_ruble));
-			btnOrder.setTextColor(Color.WHITE);
-			btnOrder.setBackgroundResource(R.drawable.btn_rounded_blue);
-		} else {
-			ViewUtils.setVisible(btnOrder, false);
-			btnOrder.setTextColor(Color.GRAY);
-			btnOrder.setText(getString(R.string.your_order));
-			btnOrder.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
-		}
-
-		if(bottomView != null) {
-			View btnBill = findById(bottomView, R.id.btn_bill);
-			ViewUtils.setVisible(btnBill, !hasWishItems);
 		}
 	}
 
@@ -520,7 +429,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		super.onPause();
 		mPaymentListener.onPause();
 		if(mRestaurant == null) {
-			loader.animateLogoFast(R.drawable.ic_fork_n_knife);
+			mViewHelper.onPause();
 		}
 	}
 
@@ -530,16 +439,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	public void clearErrors(boolean animateLogo) {
-		hideProfile();
-		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-		ViewUtils.setVisible(txtErrorAdditional, false);
-		if(animateLogo) {
-			if(mRestaurant == null) {
-				loader.animateLogo(R.drawable.ic_fork_n_knife);
-			} else {
-				loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
-			}
-		}
+		mViewHelper.hideProfile();
+		mViewHelper.clearErrors(mRestaurant, animateLogo);
 		if(bgTransitionDrawable.isTransitioned()) {
 			bgTransitionDrawable.reverseTransition();
 		}
@@ -548,7 +449,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		loader.onDestroy();
+		mOrderHelper = null;
+		mViewHelper.onDestroy();
+		mViewHelper = null;
 		OmnomObservable.unsubscribe(mOrdersSubscription);
 		OmnomObservable.unsubscribe(mWaiterCallSubscribtion);
 		OmnomObservable.unsubscribe(mDataSubscription);
@@ -562,15 +465,15 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			switch(mAnimationType) {
 				case EXTRA_LOADER_ANIMATION_SCALE_DOWN:
 				case EXTRA_LOADER_ANIMATION_FIXED:
-					loader.scaleDown();
+					mViewHelper.scaleDown();
 					break;
 
 				case EXTRA_LOADER_ANIMATION_SCALE_UP:
-					loader.setSize(0, 0);
+					mViewHelper.setSize(0, 0);
 					break;
 
 				default:
-					loader.setSize(0, 0);
+					mViewHelper.setSize(0, 0);
 					break;
 			}
 		}
@@ -578,24 +481,12 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	@OnClick(R.id.btn_previous)
 	public void onPrevious(View v) {
-		if(slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-			collapseSlidingPanel();
-		} else {
-			RestaurantsListActivity.startLeft(ValidateActivity.this);
-		}
-	}
-
-	public void collapseSlidingPanel() {
-		menuCategories.collapse();
-		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+		mViewHelper.onPrevious();
 	}
 
 	@Override
 	public void onBackPressed() {
-		if(getSupportFragmentManager().getBackStackEntryCount() == 0
-				&& slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-			collapseSlidingPanel();
-		} else {
+		if(!mViewHelper.onBackPressed()) {
 			final Fragment itemDetailsFragment = getSupportFragmentManager().findFragmentByTag(MenuItemDetailsFragment.TAG);
 			if(itemDetailsFragment != null) {
 				MenuItemDetailsFragment midf = (MenuItemDetailsFragment) itemDetailsFragment;
@@ -610,46 +501,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	public void initUi() {
 		getSupportFragmentManager().addOnBackStackChangedListener(this);
 
-		mOrder = insureOrder();
-		slidingPanel.setPanelSlideListener(menuCategories);
+		mViewHelper.init();
+		mOrderHelper = new ValidateOrderHelper(this, mViewHelper);
 
-		menuCategories.setOnCollapsedTouchListener(this);
-
-		final PanelSlideListenerAdapter listener = new PanelSlideListenerAdapter();
-		listener.addListener(new PanelSlideListenerSimple() {
-			@Override
-			public void onPanelSlide(final View panel, final float slideOffset) {
-				final float loaderFactor = 1.0f - slideOffset;
-
-				if(loaderFactor < 0.85f) {
-					AnimationUtils.animateAlpha3(imgProfile, false);
-					AnimationUtils.animateAlpha3(imgPrevious, false);
-					AnimationUtils.animateAlpha(txtBar, false);
-					loader.hideLogo();
-				} else {
-					AnimationUtils.animateAlpha3(imgProfile, true);
-					AnimationUtils.animateAlpha3(imgPrevious, true);
-					AnimationUtils.animateAlpha(txtBar, true);
-					loader.showLogo();
-				}
-				loader.scaleDown((int) (loader.getLoaderSizeDefault() * loaderFactor), 0, null);
-			}
-
-			@Override
-			public void onPanelCollapsed(final View panel) {
-				setSlidingTouchEnabled(true);
-			}
-
-			@Override
-			public void onPanelExpanded(final View panel) {
-				setSlidingTouchEnabled(false);
-			}
-		});
-		listener.addListener(menuCategories);
-		slidingPanel.setPanelSlideListener(listener);
-
-		loader.setLogo(R.drawable.ic_fork_n_knife);
-		loader.setColor(getResources().getColor(R.color.loader_bg));
 		mPaymentListener = new PaymentEventListener(this);
 		bgTransitionDrawable = new com.omnom.android.utils.drawable.TransitionDrawable(
 				getResources().getInteger(R.integer.default_animation_duration_short),
@@ -657,17 +511,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 						new ColorDrawable(getResources().getColor(R.color.error_bg_white_transparent))});
 
 		bgTransitionDrawable.setCrossFadeEnabled(true);
-		AndroidUtils.setBackground(contentView, bgTransitionDrawable);
-
-		btnDemo.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				mErrorHelper.hideError();
-				ValidateActivity.startDemo(ValidateActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
-				                           EXTRA_LOADER_ANIMATION_SCALE_DOWN);
-			}
-		});
-		mErrorHelper = new OmnomErrorHelper(loader, txtError, btnErrorRepeat, txtErrorRepeat, btnDemo, errorViews);
+		mViewHelper.setBackground(bgTransitionDrawable);
 
 		mPreloadBackgroundFunction = new Func1<RestaurantResponse, RestaurantResponse>() {
 			@Override
@@ -700,11 +544,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		clearErrors(true);
 		final int locationUpdateTimeout = ConfigurationService.LOCATION_UPDATE_TIMEOUT;
 		final int validateDuration = getResources().getInteger(R.integer.omnom_validate_duration);
-		loader.startProgressAnimation(locationUpdateTimeout + validateDuration, new Runnable() {
-			@Override
-			public void run() {
-			}
-		});
+		mViewHelper.startProgressAnimation(locationUpdateTimeout + validateDuration);
+
 		mDataSubscription = AndroidObservable.bindActivity(this, configurationService.getConfigurationObservable())
 		                                     .subscribe(new Action1<ConfigurationResponse>() {
 			                                     @Override
@@ -719,13 +560,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 				                                     getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 				                                                               new AppLaunchMixpanelEvent(userResponse.getUser()));
 				                                     if(!BluetoothUtils.hasBleSupport(activity) && !isExternalLaunch()) {
-					                                     loader.stopProgressAnimation();
-					                                     loader.updateProgressMax(new Runnable() {
-						                                     @Override
-						                                     public void run() {
-							                                     RestaurantsListActivity.start(activity, true);
-						                                     }
-					                                     });
+					                                     mViewHelper.showRestaurants();
 				                                     } else {
 					                                     decode(false);
 				                                     }
@@ -734,9 +569,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			                                     @Override
 			                                     public void call(Throwable throwable) {
 				                                     if(throwable.getCause() instanceof UnknownHostException) {
-					                                     mErrorHelper.showInternetError(loadConfigsErrorListener);
+					                                     getErrorHelper().showInternetError(loadConfigsErrorListener);
 				                                     } else {
-					                                     mErrorHelper.showUnknownError(loadConfigsErrorListener);
+					                                     getErrorHelper().showUnknownError(loadConfigsErrorListener);
 				                                     }
 			                                     }
 		                                     });
@@ -768,20 +603,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	 */
 	protected boolean isExternalLaunch() {return mData != null;}
 
-	protected final UserOrder insureOrder() {
-		if(mOrder == null) {
-			mOrder = UserOrder.create();
-		}
-		return mOrder;
-	}
-
 	protected void validate() {
 		if(mFirstRun || mRestaurant == null) {
-			ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-			hideProfile();
-			loader.animateLogoFast(R.drawable.ic_fork_n_knife);
-			loader.showProgress(false);
-			loader.scaleDown(null, new Runnable() {
+			mViewHelper.hideProfile();
+			mViewHelper.validate(new Runnable() {
 				@Override
 				public void run() {
 					if(mIsApplicationLaunch) {
@@ -815,7 +640,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 					          getSupportFragmentManager().popBackStack();
 				          } else {
 					          if(aLong == fragmentsCount) {
-						          onBillStep1(v);
+						          mViewHelper.onBillStep1(v);
 					          }
 					          if(aLong == fragmentsCount + 1) {
 						          onBillStep2(v);
@@ -825,28 +650,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		          });
 	}
 
-	private void onBillStep1(final View v) {
-		if(slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-			collapseSlidingPanel();
-		}
-	}
-
 	private void onBillStep2(final View v) {
 		v.setEnabled(false);
-		hideProfile();
-		ViewUtils.setVisible(imgPrevious, false);
-		ViewUtils.setVisible(getPanelBottom(), false);
-		AnimationUtils.animateAlpha(slidingPanel, false);
-		AnimationUtils.animateAlpha(menuGradientPanel, false);
-		ViewUtils.setVisible(txtLeave, false);
-		loader.animateLogo(R.drawable.ic_bill_white_normal);
-		loader.startProgressAnimation(10000, new Runnable() {
-			@Override
-			public void run() {
-			}
-		});
+		mViewHelper.beforeShowOrders();
 		ValidationObservable.validateSmart(this, mIsDemo)
-		                    .map(OmnomObservable.getValidationFunc(this, mErrorHelper, getBillClickListener())).isEmpty()
+		                    .map(OmnomObservable.getValidationFunc(this, getErrorHelper(), mInternetErrorClickBillListener)).isEmpty()
 		                    .subscribe(new Action1<Boolean>() {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
@@ -855,7 +663,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 					                    loadOrders(v);
 				                    } else {
 					                    startErrorTransition();
-					                    getPanelBottom().animate().translationY(200).start();
+					                    mViewHelper.translatePanelBottom(200);
 					                    v.setEnabled(true);
 				                    }
 			                    }
@@ -863,7 +671,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			                    @Override
 			                    public void call(final Throwable throwable) {
 				                    startErrorTransition();
-				                    mErrorHelper.showInternetError(getBillClickListener());
+				                    getErrorHelper().showInternetError(mInternetErrorClickBillListener);
 				                    v.setEnabled(true);
 			                    }
 		                    });
@@ -874,13 +682,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	private void loadOrders(final View v) {
-		getPanelBottom().animate().translationY(0).start();
+		mViewHelper.translatePanelBottom(0);
 		mOrdersSubscription = AndroidObservable.bindActivity(getActivity(), api.getOrders(mTable.getRestaurantId(), mTable.getId()))
 		                                       .subscribe(new Action1<OrdersResponse>() {
 			                                       @Override
 			                                       public void call(final OrdersResponse ordersResponse) {
-				                                       loader.stopProgressAnimation();
-				                                       loader.updateProgressMax(new Runnable() {
+				                                       mViewHelper.stopProgressAnimation();
+				                                       mViewHelper.updateProgressMax(new Runnable() {
 					                                       @Override
 					                                       public void run() {
 						                                       v.setEnabled(true);
@@ -888,29 +696,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 							                                       showOrders(ordersResponse.getOrders(), ordersResponse.getRequestId());
 						                                       } else {
 							                                       startErrorTransition();
-							                                       txtErrorAdditional.setText(getString(
-									                                       R.string.there_are_no_orders_additional,
-									                                       String.valueOf(mTable.getInternalId())));
-							                                       AndroidUtils.clickify(txtErrorAdditional,
-							                                                             getString(
-									                                                             R.string
-											                                                             .there_are_no_orders_additional_mark),
-							                                                             new ClickSpan
-									                                                             .OnClickListener() {
-								                                                             @Override
-								                                                             public void onClick() {
-									                                                             showNoOrdersInfo();
-								                                                             }
-							                                                             });
-							                                       ViewUtils.setVisible(txtErrorAdditional, true);
-							                                       final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
-							                                       mErrorHelper.showNoOrders(new View.OnClickListener() {
-								                                       @Override
-								                                       public void onClick(View v) {
-									                                       onErrorClose();
-								                                       }
-							                                       }, tableNumber);
-							                                       txtError.setText(StringUtils.EMPTY_STRING);
+							                                       mViewHelper.onOrderError(mRestaurant, mTable, mIsDemo);
 						                                       }
 					                                       }
 				                                       });
@@ -920,75 +706,25 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			                                       public void onError(Throwable throwable) {
 				                                       v.setEnabled(true);
 				                                       startErrorTransition();
-				                                       mErrorHelper.showUnknownError(new View.OnClickListener() {
+				                                       getErrorHelper().showUnknownError(new View.OnClickListener() {
 					                                       @Override
 					                                       public void onClick(View v) {
-						                                       onErrorClose();
+						                                       mViewHelper.onErrorClose(mRestaurant, mIsDemo);
 					                                       }
 				                                       });
 			                                       }
 		                                       });
 	}
 
-	private void onErrorClose() {
-		clearErrors(true);
-		ViewUtils.setVisible(txtErrorAdditional, false);
-		loader.animateLogoFast(RestaurantHelper.getLogo(mRestaurant),
-		                       R.drawable.ic_bill_white_normal);
-		loader.showProgress(false);
-		configureScreen(mRestaurant);
-		updateLightProfile(!mIsDemo);
-		ViewUtils.setVisible(imgPrevious, !mIsDemo);
-		ViewUtils.setVisible(txtLeave, mIsDemo);
-		ViewUtils.setVisible(getPanelBottom(), true);
-		AnimationUtils.animateAlpha(menuGradientPanel, true);
-		AnimationUtils.animateAlpha(slidingPanel, true);
-	}
-
-	private void showNoOrdersInfo() {
-		getSupportFragmentManager().beginTransaction()
-		                           .addToBackStack(null)
-		                           .setCustomAnimations(R.anim.slide_in_up,
-		                                                R.anim.slide_out_down,
-		                                                R.anim.slide_in_up,
-		                                                R.anim.slide_out_down)
-		                           .replace(R.id.fragment_container,
-		                                    NoOrdersFragment.newInstance
-				                                    (mTable.getInternalId()))
-		                           .commit();
-	}
-
-	protected void updateLightProfile(final boolean visible) {
-		updateProfile(R.drawable.ic_profile_white, visible);
-	}
-
-	protected void updateDarkProfile(final boolean visible) {
-		updateProfile(R.drawable.ic_profile, visible);
-	}
-
-	private void updateProfile(final int backgroundResource, final boolean visible) {
-		imgProfile.setImageResource(backgroundResource);
-		ViewUtils.setVisible(imgProfile, visible);
-	}
-
-	protected void hideProfile() {
-		ViewUtils.setVisible(imgProfile, false);
-	}
-
-	private void showOrders(final List<Order> orders, final String requestId) {
-		loader.hideLogo(new Runnable() {
+	protected void showOrders(final List<Order> orders, final String requestId) {
+		mViewHelper.showOrders(new Runnable() {
 			@Override
 			public void run() {
-				loader.scaleUp(getResources().getInteger(R.integer.default_animation_duration_medium), new Runnable() {
-					@Override
-					public void run() {
-						OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
-						                     mRestaurant.decoration().getBackgroundColor(), REQUEST_CODE_ORDERS, mIsDemo);
-						if(orders.size() == 1) {
-							overridePendingTransition(R.anim.slide_in_down_short, R.anim.nothing);
-						}
-					}
-				});
+				OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
+				                     mRestaurant.decoration().getBackgroundColor(), REQUEST_CODE_ORDERS, mIsDemo);
+				if(orders.size() == 1) {
+					overridePendingTransition(R.anim.slide_in_down_short, R.anim.nothing);
+				}
 			}
 		});
 	}
@@ -1021,14 +757,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		if(requestCode == REQUEST_CODE_WISH_LIST) {
 			if(data != null) {
 				final UserOrder resultOrder = data.getParcelableExtra(EXTRA_ORDER);
-				mOrder.updateData(resultOrder);
-				updateWishUi();
+				mOrderHelper.updateData(resultOrder);
 			}
 			if(resultCode == WishActivity.RESULT_CLEARED) {
-				mOrder.itemsTable().clear();
+				mOrderHelper.clearOrder();
 			}
 			if((resultCode & WishActivity.RESULT_CLEARED) == WishActivity.RESULT_CLEARED) {
-				mOrder.itemsTable().clear();
+				mOrderHelper.clearOrder();
 			}
 			if((resultCode & WishActivity.RESULT_BILL) == WishActivity.RESULT_BILL) {
 				onBill(findViewById(R.id.btn_bill));
@@ -1042,24 +777,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 				// The following delay is required due to different behavior on different devices.
 				// Some of them wait for activity transition animation to finish and then invoke onActivityResult,
 				// others perform them in parallel.
-				loader.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						loader.scaleDown(null, new Runnable() {
-							@Override
-							public void run() {
-								ViewUtils.setVisible(getPanelBottom(), true);
-								AnimationUtils.animateAlpha(menuGradientPanel, true);
-								AnimationUtils.animateAlpha(slidingPanel, true);
-								updateLightProfile(!mIsDemo);
-								ViewUtils.setVisible(imgPrevious, !mIsDemo);
-								ViewUtils.setVisible(txtLeave, mIsDemo);
-								loader.animateLogo(RestaurantHelper.getLogo(mRestaurant), R.drawable.ic_fork_n_knife);
-								loader.showLogo();
-							}
-						});
-					}
-				}, getResources().getInteger(R.integer.default_animation_duration_short));
+				postDelayed(getResources().getInteger(R.integer.default_animation_duration_short),
+				            new Runnable() {
+					            @Override
+					            public void run() {
+						            mViewHelper.onReturnToValidation(mRestaurant, mIsDemo);
+					            }
+				            });
 			}
 		}
 	}
@@ -1086,37 +810,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 		mRestaurant = restaurant;
 		mTable = table;
-
 		mPaymentListener.initTableSocket(mTable);
-
 		onNewGuest(mTable);
-
-		animateRestaurantLogo(restaurant);
 		animateRestaurantBackground(restaurant);
-
-		loader.stopProgressAnimation();
-		loader.updateProgressMax(new Runnable() {
-			@Override
-			public void run() {
-				configureScreen(mRestaurant);
-				updateLightProfile(!mIsDemo);
-				ViewUtils.setVisible(imgPrevious, !mIsDemo);
-				ViewUtils.setVisible(txtLeave, mIsDemo);
-				ViewUtils.setVisible(getPanelBottom(), true);
-				AnimationUtils.animateAlpha(menuGradientPanel, true);
-				AnimationUtils.animateAlpha(slidingPanel, true);
-				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
-				                .setDuration(getResources().getInteger(R.integer.default_animation_duration_short)).start();
-				if(forwardToBill) {
-					postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
-						@Override
-						public void run() {
-							showOrders(restaurant.orders(), requestId);
-						}
-					});
-				}
-			}
-		});
+		mViewHelper.onDataLoaded(restaurant, table, forwardToBill, mIsDemo, requestId);
 	}
 
 	private void animateRestaurantBackground(final Restaurant restaurant) {
@@ -1129,27 +826,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	}
 
-	private void animateRestaurantLogo(final Restaurant restaurant) {
-		loader.post(new Runnable() {
-			@Override
-			public void run() {
-				loader.animateLogo(RestaurantHelper.getLogo(restaurant), R.drawable.ic_fork_n_knife,
-				                   getResources().getInteger(R.integer.default_animation_duration_short));
-			}
-		});
-		loader.animateColor(RestaurantHelper.getBackgroundColor(restaurant));
-	}
-
 	private void onNewGuest(TableDataResponse table) {
 		api.newGuest(table.getRestaurantId(), table.getId()).subscribe(OmnomObservable.emptyOnNext(),
 		                                                               OmnomObservable.loggerOnError(TAG));
 
-		notifierApi.tableIn(table.getRestaurantId(), table.getId()).subscribe(new Action1() {
-			                                                                      @Override
-			                                                                      public void call(final Object o) {
-
-			                                                                      }
-		                                                                      },
+		notifierApi.tableIn(table.getRestaurantId(), table.getId()).subscribe(OmnomObservable.emptyOnNext(),
 		                                                                      OmnomObservable.loggerOnError(TAG));
 	}
 
@@ -1174,53 +855,27 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	}
 
-	private void configureScreen(final Restaurant restaurant) {
+	void configureScreen(final Restaurant restaurant) {
 		// FIXME: uncomment the code below when promo is implemented
 		final boolean promoEnabled = false; //RestaurantHelper.isPromoEnabled(restaurant);
 		// FIXME: uncomment the code below when waiter call is implemented
 		final boolean waiterEnabled = false; //RestaurantHelper.isWaiterEnabled(restaurant);
 		final boolean isBar = RestaurantHelper.isBar(restaurant);
 
-		if(bottomView == null) {
-			ViewUtils.setVisible(findById(this, R.id.txt_bar), isBar);
-			if(isBar) {
-				stubBottomMenu.setLayoutResource(R.layout.layout_bar);
-			} else {
-				stubBottomMenu.setLayoutResource(waiterEnabled ? R.layout.layout_bill_waiter : R.layout.layout_bill);
-			}
-			bottomView = stubBottomMenu.inflate();
-			AndroidUtils.applyFont(this, (ViewGroup) bottomView, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
-		}
+		mViewHelper.configureScreen(waiterEnabled);
 
-		if(waiterEnabled) {
-			findById(bottomView, R.id.btn_waiter).setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(final View v) {
-					onWaiter(v);
-				}
-			});
-		}
-
-		findById(bottomView, R.id.btn_bill).setOnClickListener(getBillClickListener());
-		findById(bottomView, R.id.btn_order).setOnClickListener(mOnOrderClickListener);
-
-		ViewUtils.setVisible(btnDownPromo, promoEnabled);
 		// getPanelBottom().setTranslationY(100);
-		updateWishUi();
+		mOrderHelper.updateWishUi();
 	}
 
-	private void onOrder() {
-		WishActivity.start(this, mRestaurant, mTable, mMenu, insureOrder(), REQUEST_CODE_WISH_LIST);
-	}
-
-	public View getPanelBottom() {
-		return findById(this, R.id.panel_bottom);
+	protected void onOrder() {
+		WishActivity.start(this, mRestaurant, mTable, mMenu, mOrderHelper.insureOrder(), REQUEST_CODE_WISH_LIST);
 	}
 
 	protected boolean validateDemo() {
 		if(mIsDemo) {
 			if(mRestaurant == null || mTable == null) {
-				loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration));
+				mViewHelper.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration));
 				api.getDemoTable().mergeMap(
 						new Func1<List<DemoTableData>, Observable<MenuResponse>>() {
 							@Override
@@ -1279,12 +934,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	protected void handleHashRestaurants(final String requestId, final Restaurant restaurant, final Menu menu) {
-
+		// TODO:
 	}
 
 	protected void handleRestaurants(final String requestId, final List<Restaurant> restaurants) {
-		loader.stopProgressAnimation();
-		loader.updateProgressMax(new Runnable() {
+		mViewHelper.handleRestaurants(new Runnable() {
 			@Override
 			public void run() {
 				RestaurantsListActivity.start(ValidateActivity.this, restaurants);
@@ -1293,8 +947,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	protected void handleEmptyResponse(final String requestId) {
-		loader.stopProgressAnimation();
-		loader.updateProgressMax(new Runnable() {
+		mViewHelper.handleRestaurants(new Runnable() {
 			@Override
 			public void run() {
 				RestaurantsListActivity.start(ValidateActivity.this, true);
@@ -1304,7 +957,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	protected void handleRestaurant(final String method, final String requestId, final Restaurant restaurant) {
 		if(!restaurant.available()) {
-			mErrorHelper.showError(LoaderError.RESTAURANT_UNAVAILABLE, mInternetErrorClickListener);
+			getErrorHelper().showError(LoaderError.RESTAURANT_UNAVAILABLE, mInternetErrorClickListener);
 			return;
 		}
 
@@ -1313,8 +966,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		preferences.saveNotificationDetails(this, restaurant.id());
 		final TableDataResponse table = RestaurantHelper.getTable(restaurant);
 		if(table != null) {
-			loader.stopProgressAnimation();
-			loader.updateProgressMax(new Runnable() {
+			mViewHelper.handleRestaurants(new Runnable() {
 				@Override
 				public void run() {
 					reportMixPanel(requestId, method, table);
@@ -1322,11 +974,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 				}
 			});
 		} else {
-			loader.stopProgressAnimation();
-			loader.updateProgressMax(new Runnable() {
+			mViewHelper.handleRestaurants(new Runnable() {
 				@Override
 				public void run() {
-					loader.showProgress(false, true, new Runnable() {
+					mViewHelper.showProgress(false, true, new Runnable() {
 						@Override
 						public void run() {
 							ValidateActivityShortcut.start(ValidateActivity.this, R.anim.fake_fade_in_instant,
@@ -1336,7 +987,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 						}
 					});
 				}
-			}, false);
+			});
 		}
 	}
 
@@ -1344,10 +995,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	public void changeTable() {
 		clearErrors(true);
-		AnimationUtils.animateAlpha(imgPrevious, false);
-		bottomView.animate().translationY(bottomView.getHeight());
-		loader.animateLogoFast(R.drawable.ic_fork_n_knife);
-		AnimationUtils.animateAlpha(imgProfile, false);
+		mViewHelper.onChangeTable();
 		postDelayed(850, new Runnable() {
 			@Override
 			public void run() {
@@ -1357,17 +1005,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		});
 	}
 
-	public UserOrder getUserOrder() {
-		return insureOrder();
-	}
-
 	@Override
 	public void onBackStackChanged() {
-		if(getSupportFragmentManager() != null && getSupportFragmentManager().getBackStackEntryCount() == 0) {
-			ViewUtils.setVisible(imgPrevious, true);
-		} else {
-			ViewUtils.setVisible(imgPrevious, false);
-		}
+		mViewHelper.showBack(getSupportFragmentManager() != null && getSupportFragmentManager().getBackStackEntryCount() == 0);
 	}
 
 	protected Observable<Pair<RestaurantResponse, MenuResponse>> concatMenuObservable(final Observable<RestaurantResponse>
@@ -1392,25 +1032,18 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	protected void bindMenuData() {
-		slidingPanel.setTouchEnabled(mMenu != null && !mMenu.isEmpty());
-		if(mMenu != null) {
-			menuCategories.bind(mMenu, mOrder);
-		}
+		mViewHelper.bindMenuData(mMenu, mOrderHelper);
 	}
 
-	private void setSlidingTouchEnabled(final boolean enabled) {
-		slidingPanel.setTouchEnabled(enabled);
+	protected void updateOrderData(final OrderUpdateEvent event) {
+		mOrderHelper.updateOrderData(event);
 	}
 
-	@Override
-	public void onCollapsedSubcategoriesTouch() {
-		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+	public View getBottomView() {
+		return mViewHelper.bottomView;
 	}
 
-	public View.OnClickListener getBillClickListener() {
-		if(RestaurantHelper.isBar(mRestaurant)) {
-			return mOnOrderClickListener;
-		}
-		return mOnBillClickListener;
+	public void collapseSlidingPanel() {
+		mViewHelper.collapseSlidingPanel();
 	}
 }

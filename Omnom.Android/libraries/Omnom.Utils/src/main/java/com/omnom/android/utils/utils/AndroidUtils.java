@@ -42,6 +42,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.R;
 import com.omnom.android.utils.view.ErrorEdit;
 
@@ -386,16 +387,20 @@ public class AndroidUtils {
 		return false;
 	}
 
-	public static void applyFont(final Context context, final ViewGroup view, final String fontPath) {
+	public static void applyFont(final Context context, final ViewGroup view, final OmnomFont font) {
 		for(int i = 0; i < view.getChildCount(); i++) {
 			final View childAt = view.getChildAt(i);
 			if(childAt instanceof ViewGroup) {
-				applyFont(context, (ViewGroup) childAt, fontPath);
+				applyFont(context, (ViewGroup) childAt, font);
 			}
 			if(childAt instanceof TextView) {
-				CalligraphyUtils.applyFontToTextView(context, (TextView) childAt, fontPath);
+				CalligraphyUtils.applyFontToTextView(context, (TextView) childAt, font.getPath());
 			}
 		}
+	}
+
+	public static void applyFont(final Context context, final TextView view, final OmnomFont font) {
+		CalligraphyUtils.applyFontToTextView(context, view, font.getPath());
 	}
 
 	public static void openDialer(final Context context, final String phone) {
