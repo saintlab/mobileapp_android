@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.ValidateActivity;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ClickSpan;

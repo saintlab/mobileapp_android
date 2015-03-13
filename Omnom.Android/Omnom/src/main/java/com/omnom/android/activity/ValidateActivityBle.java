@@ -8,6 +8,7 @@ import android.util.Pair;
 import android.view.View;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.mixpanel.MixPanelHelper;
@@ -120,17 +121,13 @@ public class ValidateActivityBle extends ValidateActivity {
 
 	@Override
 	protected void decode(final boolean startProgressAnimation) {
-		if (startProgressAnimation) {
+		if(startProgressAnimation) {
 			clearErrors(true);
-			loader.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration), new Runnable() {
-				@Override
-				public void run() {
-				}
-			});
+			mViewHelper.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration));
 		}
 		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
 		                                                                                 .map(OmnomObservable.getValidationFunc(this,
-		                                                                                                                        mErrorHelper,
+		                                                                                                                        getErrorHelper(),
 		                                                                                                                        mInternetErrorClickListener))
 		                                                                                 .isEmpty())
 		                                         .subscribe(new Action1<Boolean>() {
@@ -150,7 +147,7 @@ public class ValidateActivityBle extends ValidateActivity {
 			                                         @Override
 			                                         public void call(Throwable throwable) {
 				                                         startErrorTransition();
-				                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
+				                                         getErrorHelper().showInternetError(mInternetErrorClickListener);
 			                                         }
 		                                         });
 	}
@@ -173,7 +170,7 @@ public class ValidateActivityBle extends ValidateActivity {
 						                                           RestaurantResponse response = pair.first;
 						                                           if(response.hasErrors()) {
 							                                           startErrorTransition();
-							                                           mErrorHelper.showErrorDemo(
+							                                           getErrorHelper().showErrorDemo(
 									                                           LoaderError.BACKEND_ERROR,
 									                                           mInternetErrorClickListener);
 						                                           } else {
@@ -186,12 +183,12 @@ public class ValidateActivityBle extends ValidateActivity {
 					                                           protected void onError(final Throwable throwable) {
 						                                           if(throwable instanceof RetrofitError) {
 							                                           startErrorTransition();
-							                                           mErrorHelper.showErrorDemo(
+							                                           getErrorHelper().showErrorDemo(
 									                                           LoaderError.BACKEND_ERROR,
 									                                           mInternetErrorClickListener);
 						                                           } else {
 							                                           startErrorTransition();
-							                                           mErrorHelper.showErrorDemo(
+							                                           getErrorHelper().showErrorDemo(
 									                                           LoaderError.NO_CONNECTION_TRY,
 									                                           mInternetErrorClickListener);
 						                                           }
@@ -230,7 +227,7 @@ public class ValidateActivityBle extends ValidateActivity {
 			}, getResources().getInteger(R.integer.ble_scan_duration));
 			mBluetoothAdapter.startLeScan(mLeScanCallback);
 		} else {
-			if (BluetoothUtils.isAdapterStateOn(mBluetoothAdapter)) {
+			if(BluetoothUtils.isAdapterStateOn(mBluetoothAdapter)) {
 				mBluetoothAdapter.stopLeScan(mLeScanCallback);
 			}
 			if(endCallback != null) {

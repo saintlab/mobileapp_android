@@ -17,6 +17,7 @@ import android.view.View;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.activity.helper.ApplicationLaunchListener;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.fragment.EnteringFragment;
 import com.omnom.android.fragment.SplashFragment;
 import com.omnom.android.service.bluetooth.BackgroundBleService;

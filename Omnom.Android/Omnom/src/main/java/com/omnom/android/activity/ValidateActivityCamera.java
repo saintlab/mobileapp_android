@@ -10,6 +10,7 @@ import android.view.View;
 import com.google.zxing.client.android.CaptureActivity;
 import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
@@ -172,11 +173,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_SCAN_QR) {
 			if(resultCode == RESULT_OK) {
-				loader.startProgressAnimation(10000, new Runnable() {
-					@Override
-					public void run() {
-					}
-				});
+				mViewHelper.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration));
 				mQrData = data.getExtras().getString(CaptureActivity.EXTRA_SCANNED_URI);
 				findTable(mQrData);
 			} else if(resultCode == OmnomQRCaptureActivity.RESULT_RESTAURANT_FOUND) {
@@ -195,7 +192,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
 		                                                                                 .map(OmnomObservable.getValidationFunc(this,
-		                                                                                                                        mErrorHelper,
+		                                                                                                                        getErrorHelper(),
 		                                                                                                                        mInternetErrorClickListener))
 		                                                                                 .isEmpty())
 		                                         .subscribe(new Action1<Boolean>() {
@@ -216,7 +213,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 			                                         @Override
 			                                         public void call(Throwable throwable) {
 				                                         startErrorTransition();
-				                                         mErrorHelper.showInternetError(mInternetErrorClickListener);
+				                                         getErrorHelper().showInternetError(mInternetErrorClickListener);
 			                                         }
 		                                         });
 
@@ -253,7 +250,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 						}
 						bindMenuData();
 						if(!TextUtils.isEmpty(decodeResponse.getError())) {
-							mErrorHelper.showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
+							getErrorHelper().showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
 						} else {
 							if(isExternalLaunch()) {
 								handleExternalLaunchResult(decodeResponse);

@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.ValidateActivity;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.MenuCategoryItems;
 import com.omnom.android.adapter.MultiLevelRecyclerAdapter;
