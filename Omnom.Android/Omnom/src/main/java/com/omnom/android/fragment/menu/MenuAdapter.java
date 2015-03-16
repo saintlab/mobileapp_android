@@ -25,6 +25,7 @@ import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -47,8 +48,6 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 	public static final int VIEW_TYPE_SUBSUBCATEGORY = 5;
 
-	private static final ArrayList<TextView> sTitleViews = new ArrayList<TextView>();
-
 	public static class CategoryViewHolder extends RecyclerView.ViewHolder {
 
 		@InjectView(R.id.txt_title)
@@ -61,6 +60,8 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 			// setIsRecyclable(false);
 		}
 	}
+
+	private static final ArrayList<TextView> sTitleViews = new ArrayList<TextView>();
 
 	public class ItemViewHolder extends RecyclerView.ViewHolder {
 
@@ -176,6 +177,26 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		}
 	}
 
+	public static int getCategoryColor(final int viewType) {
+		switch(viewType) {
+			case VIEW_TYPE_CATEGORY:
+				return Color.TRANSPARENT;
+
+			case VIEW_TYPE_SUBCATEGORY:
+				return Color.parseColor("#59ffffff");
+
+			case VIEW_TYPE_SUBSUBCATEGORY:
+				return Color.parseColor("#aaffffff");
+		}
+		throw new IllegalArgumentException("wrong viewType = " + viewType);
+	}
+
+	public static boolean isHeader(final RecyclerView.ViewHolder header) {
+		return header.getItemViewType() == VIEW_TYPE_CATEGORY
+				|| header.getItemViewType() == VIEW_TYPE_SUBCATEGORY
+				|| header.getItemViewType() == VIEW_TYPE_SUBSUBCATEGORY;
+	}
+
 	private final LayoutInflater mInflater;
 
 	private final Menu mMenu;
@@ -188,13 +209,17 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 	private Context mContext;
 
+	private HashMap<Data, RecyclerView.ViewHolder> mHeaderStore;
+
 	private View.OnClickListener mListener;
 
-	public MenuAdapter(Context context, Menu menu, UserOrder userOrder, View.OnClickListener listener,
+	public MenuAdapter(Context context, Menu menu, UserOrder userOrder, final HashMap<Data, RecyclerView.ViewHolder> headerStore,
+	                   View.OnClickListener listener,
 	                   View.OnClickListener itemClickListener, View.OnClickListener applyClickListener) {
 		mContext = context;
 		mMenu = menu;
 		mUserOrder = userOrder;
+		mHeaderStore = headerStore;
 		mListener = listener;
 		mItemClickListener = itemClickListener;
 		mApplyClickListener = applyClickListener;
@@ -280,24 +305,11 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 				CategoryViewHolder cvh = (CategoryViewHolder) viewHolder;
 				CategoryData category = (CategoryData) getItemAt(position);
 				cvh.txtTitle.setText(category.getName());
-				cvh.itemView.setTag("header");
+				cvh.itemView.setTag(R.id.level, category.getLevel());
 				cvh.itemView.setBackgroundColor(getCategoryColor(viewType));
+				mHeaderStore.put(category, cvh);
 				break;
 		}
-	}
-
-	private int getCategoryColor(final int viewType) {
-		switch(viewType) {
-			case VIEW_TYPE_CATEGORY:
-				return Color.TRANSPARENT;
-
-			case VIEW_TYPE_SUBCATEGORY:
-				return Color.parseColor("#59ffffff");
-
-			case VIEW_TYPE_SUBSUBCATEGORY:
-				return Color.parseColor("#aaffffff");
-		}
-		return Color.TRANSPARENT;
 	}
 
 	@Override
@@ -329,11 +341,5 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 		}
 		throw new RuntimeException("wrong item type");
-	}
-
-	public boolean isHeader(final RecyclerView.ViewHolder header) {
-		return header.getItemViewType() == VIEW_TYPE_CATEGORY
-				|| header.getItemViewType() == VIEW_TYPE_SUBCATEGORY
-				|| header.getItemViewType() == VIEW_TYPE_SUBSUBCATEGORY;
 	}
 }

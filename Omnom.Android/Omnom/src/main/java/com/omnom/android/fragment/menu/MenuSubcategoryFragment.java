@@ -218,7 +218,7 @@ public class MenuSubcategoryFragment extends BaseFragment {
 				mMenuAdapter.notifyItemChanged(newPos);
 			}
 		};
-		mMenuAdapter = new MenuAdapter(getActivity(), mMenu, mOrder, mGroupClickListener, new View.OnClickListener() {
+		mMenuAdapter = new MenuAdapter(getActivity(), mMenu, mOrder, null, mGroupClickListener, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				int position = mListView.getChildPosition(v);

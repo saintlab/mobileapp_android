@@ -1,5 +1,6 @@
 package com.omnom.android.view;
 
+import android.animation.ArgbEvaluator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -33,15 +34,19 @@ import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import jp.wasabeef.recyclerview.animators.FlipInTopXAnimator;
+
+import static butterknife.ButterKnife.findById;
 
 /**
  * Created by Ch3D on 26.02.2015.
@@ -52,7 +57,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		void onCollapsedSubcategoriesTouch();
 	}
 
-	private static final boolean DEBUG_HEADERS = true;
+	private static final boolean DEBUG_HEADERS = false;
 
 	private class SingleTapDetector extends GestureDetector.SimpleOnGestureListener {
 
@@ -61,7 +66,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 		@Override
 		public boolean onSingleTapUp(MotionEvent e) {
-			if(e.getY() >= 96) {
+			if(e.getY() >= getResources().getDimensionPixelSize(R.dimen.view_size_default)) {
 				return false;
 			}
 			final View firstChild = mListView.getChildAt(0);
@@ -71,14 +76,19 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 				final MultiLevelRecyclerAdapter.Data parent = item.getParent();
 				final int headerPosition = mMenuAdapter.getItemPosition(parent);
 				mMenuAdapter.collapseExpandedGroup(headerPosition);
+
+				final View child = mListView.getChildAt(headerPosition);
+				if(child != null) {
+					restoreHeaderView(mListView.getChildViewHolder(child));
+				}
+				if(!mMenuAdapter.hasExpandedGroups()) {
+					ViewUtils.setVisible(mFakeStickyHeader, false);
+				}
 				return true;
 			}
 			return false;
 		}
 	}
-
-	private HashMap<MultiLevelRecyclerAdapter.Data, RecyclerView.ViewHolder> headerStore =
-			new HashMap<MultiLevelRecyclerAdapter.Data, RecyclerView.ViewHolder>();
 
 	@InjectView(R.id.content_recyclerview)
 	protected RecyclerView mListView;
@@ -88,6 +98,12 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
+
+	@InjectView(R.id.view_subheader)
+	protected View mFakeStickyHeader;
+
+	private HashMap<MultiLevelRecyclerAdapter.Data, RecyclerView.ViewHolder> headerStore =
+			new HashMap<MultiLevelRecyclerAdapter.Data, RecyclerView.ViewHolder>();
 
 	private UserOrder mOrder;
 
@@ -106,6 +122,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	private int mLastBottom = Integer.MAX_VALUE;
 
 	private GestureDetector gd;
+
+	private ArgbEvaluator mEvaluator;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public SubcategoriesView(Context context) {
@@ -133,11 +151,72 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		LayoutInflater.from(getContext()).inflate(R.layout.fragment_menu_subcategory, this);
 		ButterKnife.inject(this);
 
+		ViewUtils.setVisible(mFakeStickyHeader, false);
+
+		mEvaluator = new ArgbEvaluator();
+
+		mListView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrollStateChanged(final RecyclerView recyclerView, final int newState) {
+				super.onScrollStateChanged(recyclerView, newState);
+			}
+
+			@Override
+			public void onScrolled(final RecyclerView recyclerView, final int dx, final int dy) {
+				for(Map.Entry<MultiLevelRecyclerAdapter.Data, RecyclerView.ViewHolder> entry : headerStore.entrySet()) {
+					applyHeaderStyle(entry.getValue());
+				}
+			}
+		});
+
 		gd = new GestureDetector(getActivity(), new SingleTapDetector());
 
 		mListView.setHasFixedSize(true);
 		mLayoutManager = new LinearLayoutManager(getContext());
 		mListView.setLayoutManager(mLayoutManager);
+	}
+
+	private void animateHeaderStyle(final RecyclerView.ViewHolder holder) {
+		if(MenuAdapter.isHeader(holder)) {
+			final View view = holder.itemView;
+			final TextView title = findById(view, R.id.txt_title);
+			AnimationUtils.animateTextColor(title, Color.BLACK, 350);
+			AnimationUtils.animateBackground(view,
+			                                 MenuAdapter.getCategoryColor(holder.getItemViewType()),
+			                                 getResources().getColor(R.color.lighter_grey),
+			                                 350);
+		}
+	}
+
+	private void applyHeaderStyle(final RecyclerView.ViewHolder holder) {
+		if(!MenuAdapter.isHeader(holder)) {
+			return;
+		}
+
+		final View view = holder.itemView;
+		final int decoratedTop = mLayoutManager.getDecoratedTop(view);
+		final int position = holder.getPosition();
+		final int height = getResources().getDimensionPixelSize(R.dimen.view_size_default);
+		if(decoratedTop <= height && position >= 0) {
+			final CategoryData data = (CategoryData) mMenuAdapter.getItemAt(position);
+			if(!data.isGroup()) {
+				final TextView txtTitle = (TextView) view.findViewById(R.id.txt_title);
+				if(decoratedTop > 0) {
+					final float fraction = (float) decoratedTop / (float) height;
+					final Integer bgColor = (Integer) mEvaluator
+							.evaluate(fraction,
+							          getResources().getColor(R.color.lighter_grey),
+							          MenuAdapter.getCategoryColor(holder.getItemViewType()));
+					final Integer textColor = (Integer) mEvaluator.evaluate(fraction, Color.BLACK, Color.WHITE);
+					txtTitle.setTextColor(textColor);
+					view.setBackgroundColor(bgColor);
+				} else {
+					drawSelectedBackground(view);
+				}
+			}
+		} else {
+			restoreHeaderView(holder);
+		}
 	}
 
 	public void bind(Menu menu, UserOrder order) {
@@ -150,6 +229,11 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			public void onClick(final View v) {
 				final int childPosition = mListView.getChildPosition(v);
 				final MultiLevelRecyclerAdapter.Data category = mMenuAdapter.getItemAt(childPosition);
+				final boolean isGroup = category.isGroup();
+				if(!isGroup) {
+					final RecyclerView.ViewHolder holder = mListView.getChildViewHolder(v);
+					restoreHeaderView(holder);
+				}
 				mMenuAdapter.toggleGroup(childPosition, new MultiLevelRecyclerAdapter.DataFilter() {
 					@Override
 					public boolean filter(final MultiLevelRecyclerAdapter.Data data) {
@@ -163,9 +247,20 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 				final int newPos = mMenuAdapter.getItemPosition(category);
 				mLayoutManager.scrollToPositionWithOffset(newPos, 0);
 				mMenuAdapter.notifyItemChanged(newPos);
+				postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						if(isGroup && mLayoutManager.getDecoratedTop(v) == 0) {
+							animateHeaderStyle(mListView.getChildViewHolder(v));
+						}
+					}
+				}, 600);
+				if(!mMenuAdapter.hasExpandedGroups()) {
+					ViewUtils.setVisible(mFakeStickyHeader, false);
+				}
 			}
 		};
-		mMenuAdapter = new MenuAdapter(getContext(), mMenu, mOrder, mGroupClickListener, new View.OnClickListener() {
+		mMenuAdapter = new MenuAdapter(getContext(), mMenu, mOrder, headerStore, mGroupClickListener, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				int position = mListView.getChildPosition(v);
@@ -187,7 +282,9 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			@Override
 			public void onDrawOver(final Canvas c, final RecyclerView parent, final RecyclerView.State state) {
 				super.onDrawOver(c, parent, state);
-				drawHeaders(c, parent, state);
+				if(mMenuAdapter.hasExpandedGroups()) {
+					drawHeaders(c, parent, state);
+				}
 			}
 
 			@Override
@@ -233,8 +330,17 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		});
 	}
 
+	private void restoreHeaderView(final RecyclerView.ViewHolder holder) {
+		if(MenuAdapter.isHeader(holder)) {
+			final View v = holder.itemView;
+			v.setBackgroundColor(MenuAdapter.getCategoryColor(holder.getItemViewType()));
+			((TextView) v.findViewById(R.id.txt_title)).setTextColor(Color.WHITE);
+		}
+	}
+
 	private int getHeaderY(View item, RecyclerView.LayoutManager lm) {
-		return lm.getDecoratedTop(item) < 0 ? 0 : lm.getDecoratedTop(item);
+		// return lm.getDecoratedTop(item) < 0 ? 0 : lm.getDecoratedTop(item);
+		return 0;
 	}
 
 	private void drawHeaders(final Canvas c, final RecyclerView parent, final RecyclerView.State state) {
@@ -268,19 +374,28 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 				mFakeHeader = header;
 				mMenuAdapter.notifyDataSetChanged();
 			}
-			if(mMenuAdapter.hasExpandedGroups()) {
-				mFakeHeader.itemView.setBackgroundColor(Color.GRAY);
-			}
 			RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) header.itemView.getLayoutParams();
-			if(!lp.isItemRemoved() && !lp.isViewInvalid()) {
-				header.itemView.setBackgroundColor(Color.GRAY);
-				drawHeader(c, lm, getHeaderY(mFakeHeader.itemView, lm) - getDy(nextIsHeader, decoratedBottom), header.itemView);
+			if(lp != null && !lp.isItemRemoved() && !lp.isViewInvalid()) {
+				final int dy = getHeaderY(mFakeHeader.itemView, lm) - getDy(nextIsHeader, decoratedBottom);
+				drawHeader(c, lm, dy, header.itemView);
+				mFakeStickyHeader.setTranslationY(dy);
+				final MultiLevelRecyclerAdapter.Data item = mMenuAdapter.getItemAt(childViewHolder.getPosition());
+				if(item.getParent() instanceof CategoryData) {
+					final CategoryData cat = (CategoryData) item.getParent();
+					ViewUtils.setVisible(mFakeStickyHeader, true);
+					drawSelectedBackground(mFakeStickyHeader);
+					((TextView) mFakeStickyHeader.findViewById(R.id.txt_title)).setText(cat.getName());
+				} else {
+					AnimationUtils.animateAlpha(mFakeStickyHeader, false);
+				}
 			}
 		} else {
+			ViewUtils.setVisible(mFakeStickyHeader, false);
 			RecyclerView.ViewHolder header = getHeaderViewByItem(childViewHolder);
 			mFakeHeader = childViewHolder;
-			if(mMenuAdapter.hasExpandedGroups()) {
-				header.itemView.setBackgroundColor(Color.GRAY);
+			final MultiLevelRecyclerAdapter.Data itemAt = mMenuAdapter.getItemAt(header.getPosition());
+			if(!itemAt.isGroup()) {
+				// drawSelectedBackground(header.itemView);
 			}
 			RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) header.itemView.getLayoutParams();
 			if(!lp.isItemRemoved() && !lp.isViewInvalid()) {
@@ -289,10 +404,25 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		}
 	}
 
+	private void drawSelectedBackground(final View view) {
+		final Object tagLevel = view.getTag(R.id.level);
+		if(tagLevel != null) {
+			final Integer lvl = (Integer) tagLevel;
+			// if(lvl > 0)
+			{
+				if(mMenuAdapter.hasExpandedGroups()) {
+					((TextView) view.findViewById(R.id.txt_title)).setTextColor(Color.BLACK);
+					view.setBackgroundColor(getResources().getColor(R.color.lighter_grey));
+				}
+			}
+		}
+	}
+
 	private int getDy(final boolean nextIsHeader, final int decoratedBottom) {
 		int dy = 0;
-		if(decoratedBottom < 96 && nextIsHeader) {
-			dy = 96 - decoratedBottom;
+		final int height = getResources().getDimensionPixelSize(R.dimen.view_size_default);
+		if(decoratedBottom < height && nextIsHeader) {
+			dy = height - decoratedBottom;
 		}
 		return dy;
 	}
