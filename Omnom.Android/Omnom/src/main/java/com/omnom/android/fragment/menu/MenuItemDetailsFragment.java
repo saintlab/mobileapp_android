@@ -41,6 +41,8 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	public static final String TAG = MenuItemDetailsFragment.class.getSimpleName();
 
+    private static final String ARG_POSITION = "position";
+
 	private static final ViewFilter sViewFilter = new ViewFilter() {
 		@Override
 		public boolean filter(final View v) {
@@ -48,11 +50,12 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		}
 	};
 
-	public static Fragment newInstance(Menu menu, final UserOrder order, final Item item, final int translationContent,
-	                                   final int translationButton) {
+	public static Fragment newInstance(Menu menu, final UserOrder order, final Item item, final int position,
+                                       final int translationContent, final int translationButton) {
 		final MenuItemDetailsFragment fragment = new MenuItemDetailsFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(Extras.EXTRA_ORDER, order);
+		args.putInt(ARG_POSITION, position);
 		args.putInt(Extras.EXTRA_TRANSLATION_CONTENT, translationContent);
 		args.putInt(Extras.EXTRA_TRANSLATION_BUTTON, translationButton);
 		args.putParcelable(Extras.EXTRA_MENU_ITEM, item);
@@ -61,7 +64,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		return fragment;
 	}
 
-	public static void show(final FragmentManager manager, Menu menu, final UserOrder order, final Item item, final int translationY,
+	public static void show(final FragmentManager manager, Menu menu, final UserOrder order, final Item item, final int position, final int translationY,
 	                        final int top) {
 		manager.beginTransaction()
 		       .addToBackStack(null)
@@ -69,7 +72,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		                            R.anim.fade_out_medium,
 		                            R.anim.fade_in,
 		                            R.anim.fade_out_medium)
-		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item, translationY, top), MenuItemDetailsFragment.TAG)
+		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item, position, translationY, top), MenuItemDetailsFragment.TAG)
 		       .commit();
 	}
 
@@ -137,6 +140,8 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	protected UserOrder mOrder;
 
 	private MenuCategoryItems.ViewHolder holder;
+
+    private int mPosition;
 
 	private Item mItem;
 
@@ -231,6 +236,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	                         @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState) {
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(Extras.EXTRA_ORDER);
+			mPosition = getArguments().getInt(ARG_POSITION);
 			mItem = getArguments().getParcelable(Extras.EXTRA_MENU_ITEM);
 			mMenu = getArguments().getParcelable(Extras.EXTRA_RESTAURANT_MENU);
 			mTranslationTop = getArguments().getInt(Extras.EXTRA_TRANSLATION_CONTENT, 0);
@@ -330,7 +336,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	@OnClick(R.id.btn_apply)
 	public void onApply() {
-		MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, mItem, -1);
+		MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, mItem, mPosition);
 	}
 
 	@Override
@@ -338,7 +344,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		if(v.getId() == R.id.btn_apply) {
 			final Item item = (Item) v.getTag(R.id.item);
 			if(item != null) {
-				MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, item, -1);
+				MenuItemAddFragment.show(getFragmentManager(), mMenu.modifiers(), mOrder, item, mPosition);
 			}
 		}
 	}
