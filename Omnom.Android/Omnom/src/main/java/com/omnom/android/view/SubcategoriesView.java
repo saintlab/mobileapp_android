@@ -50,6 +50,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		void onCollapsedSubcategoriesTouch();
 	}
 
+	;
+
 	private class MenuDataFilter implements MultiLevelRecyclerAdapter.DataFilter {
 
 		private MultiLevelRecyclerAdapter.Data mData;
@@ -96,6 +98,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	private OnCollapsedTouchListener mCollapsedTouchListener;
 
+	private MenuSmoothScroller mSmoothScroller;
+
 	@SuppressWarnings("UnusedDeclaration")
 	public SubcategoriesView(Context context) {
 		super(context);
@@ -126,6 +130,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 		mListView.setHasFixedSize(true);
 		mLayoutManager = new LinearLayoutManager(getContext());
+		mSmoothScroller = new MenuSmoothScroller(getContext(), mLayoutManager, MenuSmoothScroller.MODE_DEFAULT);
 		mListView.setLayoutManager(mLayoutManager);
 	}
 
@@ -202,10 +207,12 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	}
 
 	private void showDetails(final View v) {
-		final ItemData itemData = (ItemData) mMenuAdapter.getItemAt(mListView.getChildPosition(v));
+		final int childPosition = mListView.getChildPosition(v);
+		final ItemData itemData = (ItemData) mMenuAdapter.getItemAt(childPosition);
 		final int top = v.getTop();
 		if(top != 0) {
-			mListView.smoothScrollBy(0, top);
+			mSmoothScroller.setTargetPosition(childPosition);
+			mLayoutManager.startSmoothScroll(mSmoothScroller);
 			postDelayed(new Runnable() {
 				@Override
 				public void run() {
