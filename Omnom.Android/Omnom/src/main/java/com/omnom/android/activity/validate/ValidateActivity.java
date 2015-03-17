@@ -77,7 +77,7 @@ import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.BitmapUtils;
 import com.omnom.android.utils.utils.BluetoothUtils;
 import com.omnom.android.utils.utils.StringUtils;
-import com.omnom.android.view.SubcategoriesView;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -1028,5 +1028,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	public void collapseSlidingPanel() {
 		mViewHelper.collapseSlidingPanel();
+	}
+
+	public SlidingUpPanelLayout.PanelState getSlidingPanelState() {
+		return mViewHelper.getSlidingPanelState();
+	}
+
+	public void expandSlidingPanel() {
+		mViewHelper.expandSlidingPanel();
 	}
 }

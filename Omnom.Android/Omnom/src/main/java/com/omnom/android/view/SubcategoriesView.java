@@ -15,8 +15,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.adapter.MenuCategoryItems;
 import com.omnom.android.adapter.MultiLevelRecyclerAdapter;
 import com.omnom.android.fragment.menu.CategoryData;
@@ -73,6 +73,9 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	@InjectView(R.id.btn_close_menu)
 	protected ImageView mImgClose;
+
+	@InjectView(R.id.menu_header)
+	protected View mMenuHeader;
 
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
@@ -254,6 +257,15 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		mTouchEnabled = true;
 		AnimationUtils.animateAlpha3(mImgClose, true);
 
+	}
+
+	@OnClick(R.id.menu_header)
+	public void onMenuHeader() {
+		if(SlidingUpPanelLayout.PanelState.EXPANDED == getActivity().getSlidingPanelState()) {
+			onClose();
+		} else {
+			getActivity().expandSlidingPanel();
+		}
 	}
 
 	@OnClick(R.id.btn_close_menu)

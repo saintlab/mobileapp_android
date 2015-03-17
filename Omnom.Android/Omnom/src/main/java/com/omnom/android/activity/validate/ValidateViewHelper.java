@@ -95,6 +95,8 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	@InjectView(R.id.txt_demo_leave)
 	protected TextView txtLeave;
 
+	protected View bottomView;
+
 	private ValueAnimator mColorAnimator;
 
 	private OmnomErrorHelper mErrorHelper;
@@ -147,6 +149,10 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	public void collapseSlidingPanel() {
 		menuCategories.collapse();
 		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+	}
+
+	public void expandSlidingPanel() {
+		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 	}
 
 	public boolean onBackPressed() {
@@ -294,8 +300,6 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		loader.animateLogo(R.drawable.ic_bill_white_normal);
 		loader.startProgressAnimation(10000, null);
 	}
-
-	protected View bottomView;
 
 	public void configureScreen(boolean waiterEnabled) {
 		if(bottomView == null) {
@@ -486,5 +490,9 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	public OmnomErrorHelper getErrorHelper() {
 		return mErrorHelper;
+	}
+
+	public SlidingUpPanelLayout.PanelState getSlidingPanelState() {
+		return slidingPanel.getPanelState();
 	}
 }
