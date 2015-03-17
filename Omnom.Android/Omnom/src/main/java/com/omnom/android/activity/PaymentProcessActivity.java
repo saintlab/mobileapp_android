@@ -41,6 +41,7 @@ import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.socket.listener.SilentPaymentEventListener;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
+import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -82,6 +83,15 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
 		activity.startActivityForResult(intent, code);
 	}
+
+	final View.OnClickListener mFinishClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			setResult(RESULT_CANCELED);
+			finish();
+			overridePendingTransition(R.anim.nothing, R.anim.fade_out);
+		}
+	};
 
 	@Inject
 	protected RestaurateurObservableApi api;
@@ -232,11 +242,14 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					} else if(response.getErrors() != null) {
 						Log.w(TAG, response.getErrors().toString());
 					}
-					if(BillResponse.STATUS_PAID.equals(status) || BillResponse.STATUS_ORDER_CLOSED.equals(status)) {
+					if(BillResponse.STATUS_RESTAURANT_NOT_AVAILABLE.equals(status)) {
+						mErrorHelper.showError(LoaderError.RESTAURANT_UNAVAILABLE, mFinishClickListener);
+					} else if(BillResponse.STATUS_PAID.equals(status) || BillResponse.STATUS_ORDER_CLOSED.equals(status)) {
 						onOrderClosed();
 					} else {
 						onUnknownError();
 					}
+
 				}
 			}
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
@@ -326,7 +339,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	private void onSimilarPayment(final AcquiringResponseError error) {
 		reportMixPanelFail(error);
 		loader.showProgress(false);
-		mErrorHelper.showSimilarPaymentDeclined(finishOnClick());
+		mErrorHelper.showSimilarPaymentDeclined(mFinishClickListener);
 	}
 
 	private void checkResult(final AcquiringResponse response) {
@@ -374,15 +387,15 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	private void onPayError(final AcquiringResponseError error) {
 		reportMixPanelFail(error);
 		loader.showProgress(false);
-		mErrorHelper.showPaymentDeclined(finishOnClick());
+		mErrorHelper.showPaymentDeclined(mFinishClickListener);
 	}
 
 	private void onUnknownError() {
-		mErrorHelper.showUnknownError(finishOnClick());
+		mErrorHelper.showUnknownError(mFinishClickListener);
 	}
 
 	private void onOrderClosed() {
-		mErrorHelper.showOrderClosed(finishOnClick());
+		mErrorHelper.showOrderClosed(mFinishClickListener);
 	}
 
 	private void reportMixPanelSuccess() {
@@ -400,17 +413,6 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 			                          new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
 			                                                   mCardInfo, error));
 		}
-	}
-
-	private View.OnClickListener finishOnClick() {
-		return new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				setResult(RESULT_CANCELED);
-				finish();
-				overridePendingTransition(R.anim.nothing, R.anim.fade_out);
-			}
-		};
 	}
 
 	private Acquiring getAcquiring() {

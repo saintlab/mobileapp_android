@@ -17,6 +17,7 @@ import android.view.View;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.activity.helper.ApplicationLaunchListener;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.fragment.EnteringFragment;
 import com.omnom.android.fragment.SplashFragment;
 import com.omnom.android.service.bluetooth.BackgroundBleService;
@@ -95,7 +96,8 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 
-		if(Intent.ACTION_VIEW.equals(action)) {
+		// check ACTION_MAIN and intent.data to in case if app was launched from push notification
+		if(Intent.ACTION_VIEW.equals(action) || (Intent.ACTION_MAIN.equals(action) && intent.getData() != null)) {
 			mData = intent.getData();
 			boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
 			if(mData != null && hasToken) {

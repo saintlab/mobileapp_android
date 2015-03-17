@@ -17,6 +17,7 @@ import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
@@ -38,6 +39,10 @@ public interface RestaurateurObservableApi {
 	public Observable<RestaurantsResponse> getRestaurants();
 
 	public Observable<RestaurantsResponse> getRestaurants(double latitude, double longitude);
+
+	public Observable<RestaurantsResponse> getRestaurantsAll();
+
+	public Observable<RestaurantsResponse> getRestaurantsAll(double latitude, double longitude);
 
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
 
@@ -101,6 +106,8 @@ public interface RestaurateurObservableApi {
 
 	public Observable<Config> getConfig();
 
-	public Observable wishes(String restaurantId, WishRequest request);
+	public Observable wishes(String restId, WishRequest request);
+
+	public Observable<WishResponse> createWish(WishRequest request);
 
 }

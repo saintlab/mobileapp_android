@@ -8,6 +8,7 @@ import com.google.gson.annotations.Expose;
 public class OmnomErrors {
 	@Expose
 	private String authentication;
+
 	@Expose
 	private String common;
 

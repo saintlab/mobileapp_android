@@ -3,6 +3,7 @@
 
     <string name="hint_table_number">Номер стола</string>
     <string name="error_you_have_no_internet_connection">У вас нет доступа к интернету</string>
+    <string name="restaurant_unavailable">Заведение не на связи. Пожалуйста попробуйте позже</string>
     <string name="error_bluetooth_disabled">Чтобы пользоваться Омном, необходимо включить Bluetooth.</string>
     <string name="error_location_disabled">Чтобы пользоваться Омном,\nнеобходимо разрешить\nиспользование службы\nгеопозиции.</string>
     <string name="turn_on_bluetooth">Включить Bluetooth</string>

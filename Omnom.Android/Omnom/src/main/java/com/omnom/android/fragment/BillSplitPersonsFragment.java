@@ -12,7 +12,9 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.utils.AmountHelper;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.view.NumberPicker;
 
@@ -21,7 +23,6 @@ import java.math.RoundingMode;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 /**
  * Created by Ch3D on 11.11.2014.
@@ -64,7 +65,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
-		CalligraphyUtils.applyFontToTextView(getActivity(), mTxtQuestion, "fonts/Futura-OSF-Omnom-Regular.otf");
+		AndroidUtils.applyFont(getActivity(), mTxtQuestion, OmnomFont.OSF_REGULAR);
 		mPicker.setMinValue(1);
 		mPicker.setMaxValue(40);
 		mPicker.setOnValueChangedListener(this);
@@ -96,7 +97,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 	private BigDecimal getAmount() {
 		final int value = mPicker.getValue();
 		double amountToPay = mOrder.getAmountToPay();
-		if (value > 1) {
+		if(value > 1) {
 			amountToPay = mOrder.getTotalAmount();
 		}
 		final double v = amountToPay / value;

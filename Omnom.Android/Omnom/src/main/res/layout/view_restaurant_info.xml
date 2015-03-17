@@ -4,23 +4,16 @@
     xmlns:omnom="http://schemas.android.com/apk/res-auto"
     tools:showIn="@layout/item_restaurant">
 
-    <LinearLayout
-        android:id="@+id/panel_linear"
+    <TextView
+        android:id="@+id/txt_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/txt_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textAppearance="?android:textAppearanceLarge"
-            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
-
-    </LinearLayout>
+        android:paddingLeft="@dimen/activity_horizontal_margin_large"
+        android:paddingRight="@dimen/activity_horizontal_margin_large"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:textAppearance="?android:textAppearanceLarge"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
     <TextView
         android:id="@+id/txt_schedule"

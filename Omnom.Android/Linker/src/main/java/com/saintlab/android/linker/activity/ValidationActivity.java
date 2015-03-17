@@ -356,7 +356,7 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private Observable<RestaurantsResponse> getRestaurantsObservable() {
-		return api.getRestaurants();
+		return api.getRestaurantsAll();
 	}
 
 	private void onRestaurantsLoaded(RestaurantsResponse result) {

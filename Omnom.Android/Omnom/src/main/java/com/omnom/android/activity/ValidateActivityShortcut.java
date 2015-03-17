@@ -76,7 +76,7 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 
 	private void onWrongQr(final String requestId) {
 		startErrorTransition();
-		mErrorHelper.showWrongQrError(requestId, new View.OnClickListener() {
+		getErrorHelper().showWrongQrError(requestId, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				decode(true);

@@ -25,6 +25,7 @@ import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.StringUtils;
 import com.squareup.picasso.LruCache;
@@ -115,7 +116,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		super.onCreate();
 		// FIXME: possible migration to bugsense
 		// Fabric.with(this, new Crashlytics());
-		CalligraphyConfig.initDefault("fonts/Futura-OSF-Omnom-Regular.otf", R.attr.fontPath);
+		CalligraphyConfig.initDefault(OmnomFont.OSF_REGULAR.getPath(), R.attr.fontPath);
 		mixPanelHelper = new MixPanelHelper();
 
 		objectGraph = ObjectGraph.create(getModules().toArray());

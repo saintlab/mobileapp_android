@@ -6,21 +6,18 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/activity_vertical_margin_small"
     android:baselineAligned="false"
     android:gravity="center">
 
     <TextView
         android:id="@+id/txt_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:paddingLeft="@dimen/activity_horizontal_margin_medium"
         android:paddingRight="@dimen/activity_horizontal_margin_medium"
-        android:singleLine="false"
-        android:maxLines="2"
+        android:singleLine="true"
         android:gravity="center"
         android:ellipsize="end"
-        android:paddingBottom="8dp"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
         android:textAppearance="?android:textAppearanceLarge" />
 
@@ -75,15 +72,10 @@
 
     <Button
         android:id="@+id/btn_apply"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
         android:layout_marginTop="@dimen/activity_vertical_margin_small"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
         android:textColor="@drawable/text_color_selector_menu_blue"
-        android:textAppearance="?android:textAppearance"
-        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+        style="@style/MenuButton.White" />
 
     <View
         android:id="@+id/delimiter"

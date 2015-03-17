@@ -19,9 +19,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.ValidateActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
-import com.omnom.android.adapter.MenuCategoryItemsAdapter;
+import com.omnom.android.activity.validate.ValidateActivity;
+import com.omnom.android.adapter.MenuCategoryItems;
 import com.omnom.android.adapter.MultiLevelRecyclerAdapter;
 import com.omnom.android.fragment.menu.CategoryData;
 import com.omnom.android.fragment.menu.ItemData;
@@ -44,7 +44,7 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import jp.wasabeef.recyclerview.animators.FlipInTopXAnimator;
+import jp.wasabeef.recyclerview.animators.FlipInTopXDelayedAnimator;
 
 import static butterknife.ButterKnife.findById;
 
@@ -90,11 +90,32 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		}
 	}
 
+	private class MenuDataFilter implements MultiLevelRecyclerAdapter.DataFilter {
+
+		private MultiLevelRecyclerAdapter.Data mData;
+
+		private MenuDataFilter(MultiLevelRecyclerAdapter.Data data) {
+			mData = data;
+		}
+
+		@Override
+		public boolean filter(final MultiLevelRecyclerAdapter.Data data) {
+			if(mData instanceof CategoryData) {
+				CategoryData cd = (CategoryData) mData;
+				return data.getLevel() == cd.getLevel() + 1;
+			}
+			return false;
+		}
+	}
+
 	@InjectView(R.id.content_recyclerview)
 	protected RecyclerView mListView;
 
 	@InjectView(R.id.btn_close_menu)
 	protected ImageView mImgClose;
+
+	@InjectView(R.id.menu_header)
+	protected View mMenuHeader;
 
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
@@ -227,45 +248,13 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		OnClickListener mGroupClickListener = new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				final int childPosition = mListView.getChildPosition(v);
-				final MultiLevelRecyclerAdapter.Data category = mMenuAdapter.getItemAt(childPosition);
-				final boolean isGroup = category.isGroup();
-				if(!isGroup) {
-					final RecyclerView.ViewHolder holder = mListView.getChildViewHolder(v);
-					restoreHeaderView(holder);
-				}
-				mMenuAdapter.toggleGroup(childPosition, new MultiLevelRecyclerAdapter.DataFilter() {
-					@Override
-					public boolean filter(final MultiLevelRecyclerAdapter.Data data) {
-						if(category instanceof CategoryData) {
-							CategoryData cd = (CategoryData) category;
-							return data.getLevel() == cd.getLevel() + 1;
-						}
-						return false;
-					}
-				});
-				final int newPos = mMenuAdapter.getItemPosition(category);
-				mLayoutManager.scrollToPositionWithOffset(newPos, 0);
-				mMenuAdapter.notifyItemChanged(newPos);
-				postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						if(isGroup && mLayoutManager.getDecoratedTop(v) == 0) {
-							animateHeaderStyle(mListView.getChildViewHolder(v));
-						}
-					}
-				}, 600);
-				if(!mMenuAdapter.hasExpandedGroups()) {
-					ViewUtils.setVisible(mFakeStickyHeader, false);
-				}
+				onGroupClick(v);
 			}
 		};
 		mMenuAdapter = new MenuAdapter(getContext(), mMenu, mOrder, headerStore, mGroupClickListener, new View.OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				int position = mListView.getChildPosition(v);
-				final ItemData itemData = (ItemData) mMenuAdapter.getItemAt(position);
-				showDetails(itemData.getItem());
+				showDetails(v);
 			}
 		}, new View.OnClickListener() {
 			@Override
@@ -275,9 +264,6 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			}
 		});
 		mListView.setAdapter(mMenuAdapter);
-		final FlipInTopXAnimator animator = new FlipInTopXAnimator();
-		animator.setAddDuration(500);
-		animator.setRemoveDuration(500);
 		mListView.addItemDecoration(new RecyclerView.ItemDecoration() {
 			@Override
 			public void onDrawOver(final Canvas c, final RecyclerView parent, final RecyclerView.State state) {
@@ -291,7 +277,9 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			public void getItemOffsets(final Rect outRect, final View view, final RecyclerView parent, final RecyclerView.State state) {
 			}
 		});
+		final FlipInTopXDelayedAnimator animator = new FlipInTopXDelayedAnimator(300, 50);
 		mListView.setItemAnimator(animator);
+		mListView.setOverScrollMode(OVER_SCROLL_NEVER);
 
 		mMenuAdapter.addAll(menuData.getData());
 		mMenuAdapter.collapseAll();
@@ -473,6 +461,67 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		return result;
 	}
 
+	private void onGroupClick(final View v) {
+
+					final int childPosition = mListView.getChildPosition(v);
+					final MultiLevelRecyclerAdapter.Data category = mMenuAdapter.getItemAt(childPosition);
+					final boolean isGroup = category.isGroup();
+					if(!isGroup) {
+						final RecyclerView.ViewHolder holder = mListView.getChildViewHolder(v);
+						restoreHeaderView(holder);
+					}
+					mMenuAdapter.toggleGroup(childPosition, new MultiLevelRecyclerAdapter.DataFilter() {
+						@Override
+						public boolean filter(final MultiLevelRecyclerAdapter.Data data) {
+							if(category instanceof CategoryData) {
+								CategoryData cd = (CategoryData) category;
+								return data.getLevel() == cd.getLevel() + 1;
+							}
+							return false;
+						}
+					});
+					final int newPos = mMenuAdapter.getItemPosition(category);
+					mLayoutManager.scrollToPositionWithOffset(newPos, 0);
+					mMenuAdapter.notifyItemChanged(newPos);
+					postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							if(isGroup && mLayoutManager.getDecoratedTop(v) == 0) {
+								animateHeaderStyle(mListView.getChildViewHolder(v));
+							}
+						}
+					}, 600);
+					if(!mMenuAdapter.hasExpandedGroups()) {
+						ViewUtils.setVisible(mFakeStickyHeader, false);
+					}
+
+		//			final int childPosition = mListView.getChildPosition(v);
+		//final MultiLevelRecyclerAdapter.Data data = mMenuAdapter.getItemAt(childPosition);
+		//mMenuAdapter.toggleGroup(childPosition, new MenuDataFilter(data));
+		//final int newPos = mMenuAdapter.getItemPosition(data);
+		//mLayoutManager.scrollToPositionWithOffset(newPos, 0);
+		//mMenuAdapter.notifyItemChanged(newPos);
+	}
+
+	private void showDetails(final View v) {
+		final ItemData itemData = (ItemData) mMenuAdapter.getItemAt(mListView.getChildPosition(v));
+		final int top = v.getTop();
+		if(top != 0) {
+			mListView.smoothScrollBy(0, top);
+			postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					final int btnTranslation = findById(v, R.id.btn_apply).getTop() - findById(v, R.id.txt_title).getTop();
+					final int contentTranslation = v.getTop();
+					showDetails(itemData.getItem(), contentTranslation, btnTranslation);
+				}
+			}, getResources().getInteger(R.integer.default_animation_duration_short));
+		} else {
+			final int btnTranslation = findById(v, R.id.btn_apply).getTop() - findById(v, R.id.txt_title).getTop();
+			showDetails(itemData.getItem(), 0, btnTranslation);
+		}
+	}
+
 	public void showAddFragment(final Item item, int pos) {
 		if(item == null) {
 			return;
@@ -485,13 +534,13 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		return activity.getSupportFragmentManager();
 	}
 
-	private void showDetails(final Item item) {
+	private void showDetails(final Item item, final int contentTranslation, final int btnTranslation) {
 		if(item == null) {
 			return;
 		}
-		if(!(item instanceof MenuCategoryItemsAdapter.HeaderItem) &&
-				!(item instanceof MenuCategoryItemsAdapter.SubHeaderItem)) {
-			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item);
+		if(!(item instanceof MenuCategoryItems.HeaderItem) &&
+				!(item instanceof MenuCategoryItems.SubHeaderItem)) {
+			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, contentTranslation, btnTranslation);
 		}
 	}
 
@@ -512,9 +561,18 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	}
 
+	@OnClick(R.id.menu_header)
+	public void onMenuHeader() {
+		if(SlidingUpPanelLayout.PanelState.EXPANDED == getActivity().getSlidingPanelState()) {
+			onClose();
+		} else {
+			getActivity().expandSlidingPanel();
+		}
+	}
+
 	@OnClick(R.id.btn_close_menu)
 	public void onClose() {
-		mMenuAdapter.collapseExpandedGroups();
+		// mMenuAdapter.collapseExpandedGroups();
 		getActivity().collapseSlidingPanel();
 		AnimationUtils.animateAlpha3(mImgClose, false);
 	}
@@ -564,5 +622,9 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		if(mMenuAdapter != null) {
 			mMenuAdapter.notifyDataSetChanged();
 		}
+	}
+
+	public void collapse() {
+		mMenuAdapter.collapseExpandedGroups();
 	}
 }

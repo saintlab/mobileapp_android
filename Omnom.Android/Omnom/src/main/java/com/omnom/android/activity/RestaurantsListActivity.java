@@ -17,6 +17,7 @@ import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationA
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -166,9 +167,9 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	private void refresh() {
 		Observable<RestaurantsResponse> restaurantsObservable;
 		if (getLocation() != null) {
-			restaurantsObservable = api.getRestaurants(getLocation().getLatitude(), getLocation().getLongitude());
+			restaurantsObservable = api.getRestaurantsAll(getLocation().getLatitude(), getLocation().getLongitude());
 		} else {
-			restaurantsObservable = api.getRestaurants();
+			restaurantsObservable = api.getRestaurantsAll();
 		}
 		restaurantsObservable.subscribe(new Action1<RestaurantsResponse>() {
 			@Override
