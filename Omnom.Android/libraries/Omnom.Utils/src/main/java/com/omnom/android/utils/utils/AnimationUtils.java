@@ -2,6 +2,7 @@ package com.omnom.android.utils.utils;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
@@ -10,6 +11,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.widget.TextView;
 
 import com.omnom.android.utils.R;
 
@@ -44,6 +46,72 @@ public class AnimationUtils {
 				isCallbackLaunched = true;
 			}
 		}
+	}
+
+	public static void animateBackground(final View view, final int startColor, final int endColor, final long duration) {
+		final Object tag = view.getTag(R.id.animating);
+		if(tag != null) {
+			final Boolean isAnimating = (Boolean) tag;
+			if(isAnimating) {
+				return;
+			}
+		}
+
+		view.setTag(R.id.animating, true);
+		final ValueAnimator colorAnimator = ValueAnimator.ofInt(startColor, endColor);
+		colorAnimator.setDuration(duration);
+		colorAnimator.setEvaluator(new ArgbEvaluator());
+		colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation) {
+				view.setBackgroundColor((Integer) animation.getAnimatedValue());
+			}
+		});
+		colorAnimator.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(final Animator animation) {
+				view.setTag(R.id.animating, false);
+			}
+		});
+		colorAnimator.start();
+	}
+
+	public static void animateTextColor(final TextView view, final int startColor, final int endColor, final long duration) {
+		final Object tag = view.getTag(R.id.animating);
+		if(tag != null) {
+			final Boolean isAnimating = (Boolean) tag;
+			if(isAnimating) {
+				return;
+			}
+		}
+
+		view.setTag(R.id.animating, true);
+		view.post(new Runnable() {
+			@Override
+			public void run() {
+				final ValueAnimator colorAnimator = ValueAnimator.ofInt(startColor, endColor);
+				colorAnimator.setDuration(duration);
+				colorAnimator.setEvaluator(new ArgbEvaluator());
+				colorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+				colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+					@Override
+					public void onAnimationUpdate(ValueAnimator animation) {
+						view.setTextColor((Integer) animation.getAnimatedValue());
+					}
+				});
+				colorAnimator.addListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationEnd(final Animator animation) {
+						view.setTag(R.id.animating, false);
+					}
+				});
+				colorAnimator.start();
+			}
+		});
+	}
+
+	public static void animateTextColor(final TextView view, final int endColor, final long duration) {
+		animateTextColor(view, view.getCurrentTextColor(), endColor, duration);
 	}
 
 	public static void animateAlpha(final View view, final boolean visible) {
