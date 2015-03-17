@@ -210,20 +210,24 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		final int childPosition = mListView.getChildPosition(v);
 		final ItemData itemData = (ItemData) mMenuAdapter.getItemAt(childPosition);
 		final int top = v.getTop();
+
+		final View btnApply = findById(v, R.id.btn_apply);
+		final int position = (Integer) btnApply.getTag(R.id.position);
+
 		if(top != 0) {
 			mSmoothScroller.setTargetPosition(childPosition);
 			mLayoutManager.startSmoothScroll(mSmoothScroller);
 			postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					final int btnTranslation = findById(v, R.id.btn_apply).getTop() - findById(v, R.id.txt_title).getTop();
+					final int btnTranslation = btnApply.getTop() - findById(v, R.id.txt_title).getTop();
 					final int contentTranslation = v.getTop();
-					showDetails(itemData.getItem(), contentTranslation, btnTranslation);
+					showDetails(itemData.getItem(), position, contentTranslation, btnTranslation);
 				}
 			}, getResources().getInteger(R.integer.default_animation_duration_short));
 		} else {
-			final int btnTranslation = findById(v, R.id.btn_apply).getTop() - findById(v, R.id.txt_title).getTop();
-			showDetails(itemData.getItem(), 0, btnTranslation);
+			final int btnTranslation = btnApply.getTop() - findById(v, R.id.txt_title).getTop();
+			showDetails(itemData.getItem(), position, 0, btnTranslation);
 		}
 	}
 
@@ -239,13 +243,13 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		return activity.getSupportFragmentManager();
 	}
 
-	private void showDetails(final Item item, final int contentTranslation, final int btnTranslation) {
+	private void showDetails(final Item item, final int position, final int contentTranslation, final int btnTranslation) {
 		if(item == null) {
 			return;
 		}
 		if(!(item instanceof MenuCategoryItems.HeaderItem) &&
 				!(item instanceof MenuCategoryItems.SubHeaderItem)) {
-			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, contentTranslation, btnTranslation);
+			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position, contentTranslation, btnTranslation);
 		}
 	}
 
@@ -295,6 +299,9 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	}
 
 	public void refresh(final OrderUpdateEvent event) {
+		if(event == null || event.getItem() == null) {
+			return;
+		}
 		final Item item = event.getItem();
 		mOrder.addItem(item, event.getCount());
 		mMenuAdapter.notifyItemChanged(event.getPosition());
