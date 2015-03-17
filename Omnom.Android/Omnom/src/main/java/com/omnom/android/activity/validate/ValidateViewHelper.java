@@ -29,7 +29,7 @@ import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.PanelSlideListenerAdapter;
 import com.omnom.android.view.PanelSlideListenerSimple;
-import com.omnom.android.view.SubcategoriesView;
+import com.omnom.android.view.subcategories.SubcategoriesView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.List;
