@@ -4,6 +4,7 @@ import android.animation.ArgbEvaluator;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -177,6 +178,7 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 				final MultiLevelRecyclerAdapter.Data item = mMenuAdapter.getItemAt(childViewHolder.getPosition());
 				if(item.getParent() instanceof CategoryData) {
 					final CategoryData cat = (CategoryData) item.getParent();
+					System.err.println(">>>> mFakeStickyHeader visible true");
 					ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, true);
 					drawSelectedBackground(mSubcategoriesView.mFakeStickyHeader);
 					((TextView) mSubcategoriesView.mFakeStickyHeader.findViewById(R.id.txt_title)).setText(cat.getName());
@@ -190,7 +192,8 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 			mFakeHeader = childViewHolder;
 			RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) header.itemView.getLayoutParams();
 			if(!lp.isItemRemoved() && !lp.isViewInvalid()) {
-				drawHeader(c, lm, -getDy(nextIsHeader, decoratedBottom), header.itemView);
+				drawHeader(c, lm, (int) ViewCompat.getTranslationY(header.itemView) - getDy(nextIsHeader, decoratedBottom),
+				           header.itemView);
 			}
 		}
 	}
