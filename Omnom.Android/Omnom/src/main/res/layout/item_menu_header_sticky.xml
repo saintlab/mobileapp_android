@@ -2,8 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/view_subheader"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/view_size_default"
-    android:background="@color/lighter_grey">
+    android:layout_height="@dimen/view_size_default">
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:omnom="http://schemas.android.com/apk/res-auto"

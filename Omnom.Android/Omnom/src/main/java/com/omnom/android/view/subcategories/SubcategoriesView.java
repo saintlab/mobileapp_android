@@ -139,6 +139,12 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		mLayoutManager = new LinearLayoutManager(getContext());
 		mSmoothScroller = new MenuSmoothScroller(getContext(), mLayoutManager, MenuSmoothScroller.MODE_DEFAULT);
 		mListView.setLayoutManager(mLayoutManager);
+		mListView.setRecyclerListener(new RecyclerView.RecyclerListener() {
+			@Override
+			public void onViewRecycled(final RecyclerView.ViewHolder holder) {
+				mHeaderItemDecorator.restoreHeaderView(holder);
+			}
+		});
 		mListView.setOnScrollListener(mOnScrollListener);
 		mListView.setHasFixedSize(true);
 	}

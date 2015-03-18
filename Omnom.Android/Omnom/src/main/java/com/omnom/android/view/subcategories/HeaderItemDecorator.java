@@ -178,7 +178,6 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 				final MultiLevelRecyclerAdapter.Data item = mMenuAdapter.getItemAt(childViewHolder.getPosition());
 				if(item.getParent() instanceof CategoryData) {
 					final CategoryData cat = (CategoryData) item.getParent();
-					System.err.println(">>>> mFakeStickyHeader visible true");
 					ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, true);
 					drawSelectedBackground(mSubcategoriesView.mFakeStickyHeader);
 					((TextView) mSubcategoriesView.mFakeStickyHeader.findViewById(R.id.txt_title)).setText(cat.getName());
@@ -190,6 +189,10 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 			ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, false);
 			RecyclerView.ViewHolder header = getHeaderViewByItem(childViewHolder);
 			mFakeHeader = childViewHolder;
+			final MultiLevelRecyclerAdapter.Data itemAt = mMenuAdapter.getItemAt(header.getPosition());
+			if(itemAt.isGroup()) {
+				return;
+			}
 			RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) header.itemView.getLayoutParams();
 			if(!lp.isItemRemoved() && !lp.isViewInvalid()) {
 				drawHeader(c, lm, (int) ViewCompat.getTranslationY(header.itemView) - getDy(nextIsHeader, decoratedBottom),
