@@ -134,7 +134,7 @@ public class WishAdapter extends RecyclerView.Adapter {
 		throw new RuntimeException("wrong item type");
 	}
 
-	private Object getItemAt(final int position) {
+	public Object getItemAt(final int position) {
 		final int wishSize = getSelectedItems().size();
 		if(position < wishSize) {
 			return getSelectedItems().get(position);

@@ -46,6 +46,7 @@ import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.HeaderView;
 
@@ -273,30 +274,12 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	private void askForRemoval(final Card card) {
 		final String title = getString(R.string.card_removal_confirmation, card.getMaskedPan(), card.getAssociation());
-		final AlertDialog alertDialog = AndroidUtils.showDialog(this, title,
-		                                                        R.string.delete, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, final int which) {
-						removeCard(card);
-					}
-				}, R.string.cancel, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, final int which) {
-						dialog.dismiss();
-					}
-				});
-		alertDialog.setCanceledOnTouchOutside(true);
-		final float btnTextSize = getResources().getDimension(R.dimen.font_normal);
-		final Button btn1 = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-		btn1.setTextSize(TypedValue.COMPLEX_UNIT_PX, btnTextSize);
-		final Button btn2 = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
-		btn2.setTextSize(TypedValue.COMPLEX_UNIT_PX, btnTextSize);
-		TextView messageView = (TextView) alertDialog.findViewById(android.R.id.message);
-		messageView.setGravity(Gravity.CENTER);
-		Button removeCardButton = (Button) alertDialog.findViewById(android.R.id.button1);
-		removeCardButton.setTextColor(getResources().getColor(android.R.color.holo_red_light));
-		Button cancelButton = (Button) alertDialog.findViewById(android.R.id.button2);
-		cancelButton.setTextColor(getResources().getColor(R.color.cancel_button));
+		DialogUtils.showDeleteDialog(this, title, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                removeCard(card);
+            }
+        });
 	}
 
 	private void removeCard(final Card card) {
