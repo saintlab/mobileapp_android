@@ -60,6 +60,7 @@ import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.OmnomListView;
@@ -542,7 +543,7 @@ public class OrderFragment extends Fragment {
 	public void onOrderUpdate(final Order order) {
 		if(order != null && order.getId().equals(mOrder.getId())) {
 			if(!isDownscaled()) {
-				AndroidUtils.showDialog(getActivity(), R.string.order_updated, R.string.update,
+				DialogUtils.showDialog(getActivity(), R.string.order_updated, R.string.update,
 				                        new DialogInterface.OnClickListener() {
 					                        @Override
 					                        public void onClick(final DialogInterface dialog,
@@ -671,19 +672,19 @@ public class OrderFragment extends Fragment {
 				@Override
 				public void onClick(final View v) {
 					if(amountIsTooHigh()) {
-						final AlertDialog alertDialog = AndroidUtils.showDialog(getActivity(), R.string.amount_is_too_high, R.string.pay,
-						                                                        new DialogInterface.OnClickListener() {
-							                                                        @Override
-							                                                        public void onClick(final DialogInterface dialog,
-							                                                                            final int which) {
-								                                                        showCardsActivity();
-							                                                        }
-						                                                        }, R.string.refuse, new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(final DialogInterface dialog, final int which) {
-										dialog.dismiss();
-									}
-								});
+						final AlertDialog alertDialog = DialogUtils.showDialog(getActivity(), R.string.amount_is_too_high, R.string.pay,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(final DialogInterface dialog,
+                                                        final int which) {
+                                        showCardsActivity();
+                                    }
+                                }, R.string.refuse, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(final DialogInterface dialog, final int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
 						alertDialog.setCanceledOnTouchOutside(true);
 						final float btnTextSize = getResources().getDimension(R.dimen.font_normal);
 						final Button btn1 = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);

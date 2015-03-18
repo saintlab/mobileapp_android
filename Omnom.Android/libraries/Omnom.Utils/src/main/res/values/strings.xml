@@ -14,6 +14,7 @@
     <string name="repeat">Повторить</string>
     <string name="cancel">Отменить</string>
     <string name="error_ok">Ок</string>
+    <string name="delete">Удалить</string>
     <string name="restaurant_closed">Ресторан не&#160;работает</string>
     <string name="restaurant_schedule_from_till">с %1$s до %2$s</string>
     <string name="there_are_no_orders_on_this_table">На&#160;данном столе нет заказов</string>

@@ -39,6 +39,7 @@ import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.saintlab.android.linker.BuildConfig;
@@ -575,7 +576,7 @@ public class BindActivity extends BaseActivity {
 
 	private void onErrorQrCheck(final int number) {
 		mLoader.stopProgressAnimation(true);
-		AndroidUtils.showDialog(getActivity(), getString(R.string.qr_already_bound, number), R.string.proceed,
+        DialogUtils.showDialog(getActivity(), getString(R.string.qr_already_bound, number), R.string.proceed,
 		                        new DialogInterface.OnClickListener() {
 			                        @Override
 			                        public void onClick(DialogInterface dialog, int which) {
@@ -600,18 +601,18 @@ public class BindActivity extends BaseActivity {
 
 	private void onErrorBeaconCheck(final int number) {
 		mLoader.stopProgressAnimation(true);
-		AndroidUtils.showDialog(getActivity(), getString(R.string.beacon_already_bound, number), R.string.proceed,
-		                        new DialogInterface.OnClickListener() {
-			                        @Override
-			                        public void onClick(DialogInterface dialog, int which) {
-				                        scanQrCode();
-			                        }
-		                        }, R.string.cancel, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						resetActivityState();
-					}
-				});
+        DialogUtils.showDialog(getActivity(), getString(R.string.beacon_already_bound, number), R.string.proceed,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        scanQrCode();
+                    }
+                }, R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        resetActivityState();
+                    }
+                });
 	}
 
 	@Override

@@ -20,4 +20,7 @@
 
     <color name="menu_blue">#ff157efb</color>
     <color name="menu_blue_transparent">#59157efb</color>
+
+    <color name="cancel_button">#555</color>
+
 </resources>
