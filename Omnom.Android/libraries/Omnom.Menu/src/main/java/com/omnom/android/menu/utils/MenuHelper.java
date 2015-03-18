@@ -85,7 +85,7 @@ public class MenuHelper {
 			if(details.volume() > 0) {
 				sb.append(context.getString(R.string.dish_details_volume, details.volume()));
 			} else if(details.weight() > 0) {
-				sb.append(context.getString(R.string.dish_details_weight, details.weight()));
+				sb.append(context.getString(R.string.dish_details_weight, (int) details.weight()));
 			}
 			if(large) {
 				final int persons = details.persons();
