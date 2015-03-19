@@ -134,7 +134,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 				ViewUtils.setVisible(viewDelimiter, false);
 			}
 
-			txtTitle.setText(item.name());
+			MenuHelper.bindTitle(txtTitle, item);
 			btnApply.setTag(item);
 			btnApply.setTag(R.id.position, position);
 			btnApply.setOnClickListener(mApplyClickListener);
@@ -293,7 +293,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 				final Item item = itemData.getItem();
 				ivh.updateState(mUserOrder, item);
 				ivh.bind(item, mUserOrder, mMenu, position, false);
-				ivh.txtTitle.setText(itemData.getName());
+
 				if(viewType == VIEW_TYPE_ITEM && item.hasRecommendations() && ivh.isRecommendationsVisible()) {
 					ViewUtils.setVisible(ivh.viewDelimiter, false);
 				}

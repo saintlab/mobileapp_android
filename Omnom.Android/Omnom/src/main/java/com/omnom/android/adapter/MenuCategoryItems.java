@@ -107,7 +107,7 @@ public class MenuCategoryItems {
 
 			bindDetails(item, detailed);
 			bindImage(item);
-			txtTitle.setText(item.name());
+			MenuHelper.bindTitle(txtTitle, item);
 			btnApply.setTag(item);
 
 			final boolean hasRecommendations = item.hasRecommendations();
