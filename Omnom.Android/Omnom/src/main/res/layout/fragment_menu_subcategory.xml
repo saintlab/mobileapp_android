@@ -36,6 +36,17 @@
             android:visibility="gone"
             android:src="@drawable/ic_cross_white" />
 
+        <ImageView
+            android:id="@+id/btn_search_menu"
+            android:duplicateParentState="false"
+            android:scaleType="centerInside"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:visibility="gone"
+            android:src="@drawable/ic_search_white" />
+
     </RelativeLayout>
 
     <FrameLayout
