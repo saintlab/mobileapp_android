@@ -158,7 +158,12 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	public boolean onBackPressed() {
 		if(mActivity.getSupportFragmentManager().getBackStackEntryCount() == 0
 				&& slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-			collapseSlidingPanel();
+			if(menuCategories.hasExpandedGroups()) {
+				menuCategories.restoreHeadersStyle();
+				menuCategories.collapse();
+			} else {
+				collapseSlidingPanel();
+			}
 			return true;
 		}
 		return false;

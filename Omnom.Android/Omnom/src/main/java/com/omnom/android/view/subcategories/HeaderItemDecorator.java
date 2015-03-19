@@ -17,6 +17,7 @@ import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static butterknife.ButterKnife.findById;
 
@@ -232,5 +233,11 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 
 	public RecyclerView.ViewHolder getFakeHeader() {
 		return mFakeHeader;
+	}
+
+	public void restoreHeadersStyle() {
+		for(Map.Entry<MultiLevelRecyclerAdapter.Data, RecyclerView.ViewHolder> entry : mHeaderStore.entrySet()) {
+			restoreHeaderView(entry.getValue());
+		}
 	}
 }
