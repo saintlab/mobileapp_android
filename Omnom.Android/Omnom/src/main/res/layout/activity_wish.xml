@@ -44,7 +44,7 @@
         <include layout="@layout/layout_bill" />
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
+    <com.omnom.android.utils.view.OmnomRecyclerView
         android:id="@android:id/list"
         android:listSelector="@color/transparent"
         android:layout_below="@+id/panel_top"
