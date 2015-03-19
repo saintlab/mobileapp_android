@@ -332,7 +332,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	@OnClick(R.id.btn_close_menu)
 	public void onClose() {
 		mHeaderItemDecorator.restoreHeadersStyle();
-		// mMenuAdapter.collapseExpandedGroups();
+		ViewUtils.setVisible(mFakeStickyHeader, false);
 		getActivity().collapseSlidingPanel();
 		AnimationUtils.animateAlpha3(mImgClose, false);
 	}
@@ -400,6 +400,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	}
 
 	public void restoreHeadersStyle() {
+		ViewUtils.setVisible(mFakeStickyHeader, false);
 		mHeaderItemDecorator.restoreHeadersStyle();
 	}
 }
