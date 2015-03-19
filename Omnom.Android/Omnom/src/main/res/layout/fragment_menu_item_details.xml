@@ -45,18 +45,8 @@
 
             <TextView
                 android:id="@+id/txt_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:layout_gravity="center_horizontal"
-                android:paddingLeft="@dimen/activity_horizontal_margin_medium"
-                android:paddingRight="@dimen/activity_horizontal_margin_medium"
-                android:gravity="center"
-                android:singleLine="true"
-                android:ellipsize="end"
                 omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-                android:textColor="@android:color/black"
-                android:textAppearance="?android:textAppearanceLarge" />
+                style="@style/TextView.MenuItem.Title" />
 
             <TextView
                 android:id="@+id/txt_info"

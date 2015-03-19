@@ -78,8 +78,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	@InjectView(R.id.btn_close_menu)
 	protected ImageView mImgClose;
 
-    @InjectView(R.id.btn_search_menu)
-    protected ImageView mImgSearch;
+	@InjectView(R.id.btn_search_menu)
+	protected ImageView mImgSearch;
 
 	@InjectView(R.id.menu_header)
 	protected View mMenuHeader;
@@ -275,12 +275,12 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 				public void run() {
 					final int btnTranslation = btnApply.getTop() - findById(v, R.id.txt_title).getTop();
 					final int contentTranslation = v.getTop();
-					showDetails(itemData.getItem(), position, contentTranslation, btnTranslation);
+					showDetails(itemData.getItem(), position, findById(v, R.id.txt_title).getHeight(), contentTranslation, btnTranslation);
 				}
 			}, getResources().getInteger(R.integer.default_animation_duration_short));
 		} else {
 			final int btnTranslation = btnApply.getTop() - findById(v, R.id.txt_title).getTop();
-			showDetails(itemData.getItem(), position, 0, btnTranslation);
+			showDetails(itemData.getItem(), position, findById(v, R.id.txt_title).getHeight(), 0, btnTranslation);
 		}
 	}
 
@@ -296,26 +296,30 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		return activity.getSupportFragmentManager();
 	}
 
-	public void showDetails(final Item item, final int position, final int contentTranslation, final int btnTranslation) {
+	public void showDetails(final Item item, final int position, final int titleSize, final int contentTranslation,
+	                        final int btnTranslation) {
 		if(item == null) {
 			return;
 		}
 		if(!(item instanceof MenuCategoryItems.HeaderItem) &&
 				!(item instanceof MenuCategoryItems.SubHeaderItem)) {
-			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position, contentTranslation, btnTranslation);
+			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position,
+			                             titleSize,
+			                             contentTranslation,
+			                             btnTranslation);
 		}
 	}
 
-    public void showDetails(final Item item) {
-        if(item == null) {
-            return;
-        }
-        if(!(item instanceof MenuCategoryItems.HeaderItem) &&
-                !(item instanceof MenuCategoryItems.SubHeaderItem)) {
-            final int position = mMenuAdapter.getItemPosition(item);
-            MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position, 0, 0);
-        }
-    }
+	public void showDetails(final Item item) {
+		if(item == null) {
+			return;
+		}
+		if(!(item instanceof MenuCategoryItems.HeaderItem) &&
+				!(item instanceof MenuCategoryItems.SubHeaderItem)) {
+			final int position = mMenuAdapter.getItemPosition(item);
+			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position);
+		}
+	}
 
 	@Override
 	public void onPanelSlide(final View panel, final float slideOffset) {
@@ -354,10 +358,10 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		AnimationUtils.animateAlpha3(mImgSearch, false);
 	}
 
-    @OnClick(R.id.btn_search_menu)
-    public void onSearch() {
-        getActivity().showSearchFragment();
-    }
+	@OnClick(R.id.btn_search_menu)
+	public void onSearch() {
+		getActivity().showSearchFragment();
+	}
 
 	private ValidateActivity getActivity() {return ((ValidateActivity) getContext());}
 
