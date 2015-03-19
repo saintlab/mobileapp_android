@@ -153,4 +153,5 @@
     <string name="your_wish_processed">Ваш заказ отправлен!</string>
     <string name="title_activity_wish_sent">WishSentActivity</string>
     <string name="notification_tap_to_open_omnom">Когда потребуется, ваш счёт можно увидеть и оплатить в Omnom</string>
+    <string name="menu_search_undefined">Увы, но такого блюда\nнет в нашем меню</string>
 </resources>

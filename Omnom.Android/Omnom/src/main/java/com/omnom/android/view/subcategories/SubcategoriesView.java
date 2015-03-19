@@ -78,6 +78,9 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	@InjectView(R.id.btn_close_menu)
 	protected ImageView mImgClose;
 
+    @InjectView(R.id.btn_search_menu)
+    protected ImageView mImgSearch;
+
 	@InjectView(R.id.menu_header)
 	protected View mMenuHeader;
 
@@ -293,7 +296,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		return activity.getSupportFragmentManager();
 	}
 
-	private void showDetails(final Item item, final int position, final int contentTranslation, final int btnTranslation) {
+	public void showDetails(final Item item, final int position, final int contentTranslation, final int btnTranslation) {
 		if(item == null) {
 			return;
 		}
@@ -303,6 +306,17 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		}
 	}
 
+    public void showDetails(final Item item) {
+        if(item == null) {
+            return;
+        }
+        if(!(item instanceof MenuCategoryItems.HeaderItem) &&
+                !(item instanceof MenuCategoryItems.SubHeaderItem)) {
+            final int position = mMenuAdapter.getItemPosition(item);
+            MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position, 0, 0);
+        }
+    }
+
 	@Override
 	public void onPanelSlide(final View panel, final float slideOffset) {
 	}
@@ -311,12 +325,14 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	public void onPanelCollapsed(final View panel) {
 		mTouchEnabled = false;
 		AnimationUtils.animateAlpha3(mImgClose, false);
+		AnimationUtils.animateAlpha3(mImgSearch, false);
 	}
 
 	@Override
 	public void onPanelExpanded(final View panel) {
 		mTouchEnabled = true;
 		AnimationUtils.animateAlpha3(mImgClose, true);
+		AnimationUtils.animateAlpha3(mImgSearch, true);
 
 	}
 
@@ -334,7 +350,13 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		// mMenuAdapter.collapseExpandedGroups();
 		getActivity().collapseSlidingPanel();
 		AnimationUtils.animateAlpha3(mImgClose, false);
+		AnimationUtils.animateAlpha3(mImgSearch, false);
 	}
+
+    @OnClick(R.id.btn_search_menu)
+    public void onSearch() {
+        getActivity().showSearchFragment();
+    }
 
 	private ValidateActivity getActivity() {return ((ValidateActivity) getContext());}
 

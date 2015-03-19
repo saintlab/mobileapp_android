@@ -38,9 +38,11 @@ import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.fragment.SearchFragment;
 import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.api.observable.MenuObservableApi;
+import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.menu.model.UserOrder;
@@ -84,7 +86,12 @@ import com.squareup.picasso.Target;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -106,7 +113,7 @@ import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM_ANDROID;
  * Created by Ch3D on 08.10.2014.
  */
 public abstract class ValidateActivity extends BaseOmnomFragmentActivity
-		implements FragmentManager.OnBackStackChangedListener {
+		implements FragmentManager.OnBackStackChangedListener, SearchFragment.ItemClickListener<Item>, SearchFragment.FragmentCloseListener {
 
 	public static final int REQUEST_CODE_ORDERS = 100;
 
@@ -1037,4 +1044,33 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	public void expandSlidingPanel() {
 		mViewHelper.expandSlidingPanel();
 	}
+
+    public void showSearchFragment() {
+        if (mMenu == null || mMenu.items() == null || mMenu.items().items() == null) {
+            return;
+        }
+        Map<String, Item> itemsByName = new LinkedHashMap<String, Item>();
+        List<Item> items = new LinkedList<Item>(mMenu.items().items().values());
+        Collections.sort(items, new Comparator<Item>() {
+            @Override
+            public int compare(Item lhs, Item rhs) {
+                return lhs.name().compareTo(rhs.name());
+            }
+        });
+        for (Item item: items) {
+            itemsByName.put(item.name(), item);
+        }
+        mViewHelper.showSearchFragment(itemsByName);
+    }
+
+    @Override
+    public void onFragmentClose() {
+        mViewHelper.onSearchFragmentClose();
+    }
+
+    @Override
+    public void onItemClick(final Item item) {
+        mViewHelper.showMenuItemDetails(item);
+    }
+
 }

@@ -342,4 +342,14 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		}
 		throw new RuntimeException("wrong item type");
 	}
+
+    public int getItemPosition(final Item item) {
+        for (int i = 0; i < getItemCount(); i++) {
+            final Data data = getItemAt(i);
+            if (data instanceof ItemData && ((ItemData) data).getItem().id().equals(item.id())) {
+                return i;
+            }
+        }
+        return 0;
+    }
 }
