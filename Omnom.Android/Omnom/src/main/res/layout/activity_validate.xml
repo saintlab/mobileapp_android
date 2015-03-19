@@ -46,7 +46,7 @@
             android:gravity="bottom"
             sothree:umanoFadeColor="@color/transparent"
             android:visibility="gone"
-            sothree:umanoPanelHeight="256dp"
+            sothree:umanoPanelHeight="@dimen/menu_sliding_panel_height"
             sothree:umanoShadowHeight="0dp">
 
             <View

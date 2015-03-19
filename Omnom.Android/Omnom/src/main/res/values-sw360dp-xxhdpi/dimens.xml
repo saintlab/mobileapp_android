@@ -41,4 +41,6 @@
     <dimen name="pay_once_fragment_height_large">300dp</dimen>
     <dimen name="pay_once_fragment_height_small">200dp</dimen>
 
+    <dimen name="menu_sliding_panel_height">256dp</dimen>
+
 </resources>

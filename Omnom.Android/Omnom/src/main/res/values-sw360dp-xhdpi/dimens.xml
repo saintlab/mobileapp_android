@@ -43,4 +43,6 @@
     <dimen name="not_scanning_padding">16dp</dimen>
 
     <dimen name="pay_once_font_size">16sp</dimen>
+
+    <dimen name="menu_sliding_panel_height">256dp</dimen>
 </resources>
