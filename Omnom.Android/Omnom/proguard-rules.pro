@@ -200,3 +200,5 @@
 
 #mixpanel
 -dontwarn com.mixpanel.**
+
+-keep class com.omnom.android.view.support.** { *; }

@@ -12,6 +12,7 @@
         android:layout_height="@dimen/menu_margin_top">
 
         <TextView
+            android:id="@+id/menu_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -35,6 +36,17 @@
             android:visibility="gone"
             android:src="@drawable/ic_cross_white" />
 
+        <ImageView
+            android:id="@+id/btn_search_menu"
+            android:duplicateParentState="false"
+            android:scaleType="centerInside"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:visibility="gone"
+            android:src="@drawable/ic_search_white" />
+
     </RelativeLayout>
 
     <FrameLayout
@@ -45,11 +57,13 @@
         android:background="@android:color/white"
         android:layout_below="@+id/panel_top">
 
-        <android.support.v7.widget.RecyclerView
+        <com.omnom.android.utils.view.OmnomRecyclerView
             android:id="@+id/content_recyclerview"
             android:scrollbars="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
+        <include layout="@layout/item_menu_header_sticky" />
 
     </FrameLayout>
 

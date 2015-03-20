@@ -3,4 +3,5 @@
     <item type="id" name="group" />
     <item type="id" name="item" />
     <item type="id" name="position" />
+    <item type="id" name="level" />
 </resources>

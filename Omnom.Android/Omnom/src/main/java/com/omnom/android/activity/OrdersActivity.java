@@ -27,6 +27,7 @@ import com.omnom.android.socket.listener.OrderUpdateEventListener;
 import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.OrdersViewPager;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
@@ -137,14 +138,14 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 		// Return from current bill view if it is opened
 		if (currentFragment != null && order.getId().equals(currentFragment.getOrderId()) &&
 				!currentFragment.isDownscaled()) {
-			AndroidUtils.showDialog(getActivity(), R.string.order_closed, R.string.exit,
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(final DialogInterface dialog,
-						                    final int which) {
-							closeOrder(order);
-						}
-					});
+			DialogUtils.showDialog(getActivity(), R.string.order_closed, R.string.exit,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog,
+                                            final int which) {
+                            closeOrder(order);
+                        }
+                    });
 		} else {
 			closeOrder(order);
 		}

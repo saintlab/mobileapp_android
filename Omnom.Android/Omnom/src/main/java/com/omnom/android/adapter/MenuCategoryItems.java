@@ -107,7 +107,7 @@ public class MenuCategoryItems {
 
 			bindDetails(item, detailed);
 			bindImage(item);
-			txtTitle.setText(item.name());
+			MenuHelper.bindTitle(txtTitle, item);
 			btnApply.setTag(item);
 
 			final boolean hasRecommendations = item.hasRecommendations();
@@ -142,6 +142,7 @@ public class MenuCategoryItems {
 			final boolean hasRecommendations = item.hasRecommendations();
 
 			final boolean recommendationsAdded = hasRecommendations &&
+					panelRecommendations != null &&
 					panelRecommendations.getChildCount() == item.recommendations().size() + 2;
 
 			final boolean skipRecommendations = !showRecommendations || !hasRecommendations;

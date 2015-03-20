@@ -9,4 +9,6 @@
     <dimen name="card_frame_height">165dp</dimen>
     <dimen name="order_payment_tips_title_margin">-24dp</dimen>
     <dimen name="not_scanning_padding">8dp</dimen>
+
+    <dimen name="menu_sliding_panel_height">216dp</dimen>
 </resources>

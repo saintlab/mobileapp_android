@@ -1,7 +1,11 @@
 package com.omnom.android.menu.utils;
 
 import android.content.Context;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.TextAppearanceSpan;
 import android.util.SparseIntArray;
 import android.widget.TextView;
 
@@ -78,19 +82,47 @@ public class MenuHelper {
 		}
 	}
 
+	public static void bindTitle(TextView txtTitle, Item item) {
+		if(txtTitle == null || item == null) {
+			return;
+		}
+
+		txtTitle.setText(item.name());
+		if(item.details() != null) {
+			if(item.details().volume() > 0) {
+				final String volume = txtTitle.getContext().getString(R.string.dish_details_volume, item.details().volume());
+				appendVolumeInfo(txtTitle, volume);
+			} else if(item.details().weight() > 0) {
+				final String weight = txtTitle.getContext().getString(R.string.dish_details_weight, (int) item.details().weight());
+				appendVolumeInfo(txtTitle, weight);
+			}
+		}
+	}
+
+	private static void appendVolumeInfo(final TextView txtTitle, final String text) {
+		final Context context = txtTitle.getContext();
+		txtTitle.append(StringUtils.WHITESPACE + text);
+		final SpannableString spannableString = new SpannableString(txtTitle.getText());
+		final TextAppearanceSpan textAppearanceSpan = new TextAppearanceSpan(context, android.R.style.TextAppearance_Small);
+
+		final int length = spannableString.length();
+		final int textLength = text.length();
+
+		spannableString.setSpan(textAppearanceSpan, length - textLength, length, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+
+		ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(context.getResources().getColor(R.color.menu_item_details));
+		spannableString.setSpan(foregroundColorSpan, length - textLength, length, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+
+		txtTitle.setText(spannableString, TextView.BufferType.SPANNABLE);
+	}
+
 	public static void bindDetails(final Context context, Details details, TextView txtDetails, boolean large) {
 		final boolean hasDetails = details != null;
 		StringBuilder sb = new StringBuilder();
 		if(hasDetails) {
-			if(details.volume() > 0) {
-				sb.append(context.getString(R.string.dish_details_volume, details.volume()));
-			} else if(details.weight() > 0) {
-				sb.append(context.getString(R.string.dish_details_weight, details.weight()));
-			}
 			if(large) {
 				final int persons = details.persons();
 				if(persons > 0) {
-					sb.append("\n");
 					if(persons > 4) {
 						sb.append(context.getString(R.string.dish_details_persons_count_large, persons));
 					} else {

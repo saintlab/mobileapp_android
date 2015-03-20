@@ -1,6 +1,7 @@
 package com.omnom.android.fragment.menu;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -24,6 +25,7 @@ import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -46,19 +48,20 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 	public static final int VIEW_TYPE_SUBSUBCATEGORY = 5;
 
-	private static final ArrayList<TextView> sTitleViews = new ArrayList<TextView>();
-
-	public class CategoryViewHolder extends RecyclerView.ViewHolder {
+	public static class CategoryViewHolder extends RecyclerView.ViewHolder {
 
 		@InjectView(R.id.txt_title)
-		protected TextView txtTitle;
+		public TextView txtTitle;
 
 		public CategoryViewHolder(final View v) {
 			super(v);
 			ButterKnife.inject(this, v);
 			sTitleViews.add(txtTitle);
+			// setIsRecyclable(false);
 		}
 	}
+
+	private static final ArrayList<TextView> sTitleViews = new ArrayList<TextView>();
 
 	public class ItemViewHolder extends RecyclerView.ViewHolder {
 
@@ -131,7 +134,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 				ViewUtils.setVisible(viewDelimiter, false);
 			}
 
-			txtTitle.setText(item.name());
+			MenuHelper.bindTitle(txtTitle, item);
 			btnApply.setTag(item);
 			btnApply.setTag(R.id.position, position);
 			btnApply.setOnClickListener(mApplyClickListener);
@@ -174,6 +177,26 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		}
 	}
 
+	public static int getCategoryColor(final int viewType) {
+		switch(viewType) {
+			case VIEW_TYPE_CATEGORY:
+				return Color.TRANSPARENT;
+
+			case VIEW_TYPE_SUBCATEGORY:
+				return Color.parseColor("#59ffffff");
+
+			case VIEW_TYPE_SUBSUBCATEGORY:
+				return Color.parseColor("#aaffffff");
+		}
+		throw new IllegalArgumentException("wrong viewType = " + viewType);
+	}
+
+	public static boolean isHeader(final RecyclerView.ViewHolder header) {
+		return header.getItemViewType() == VIEW_TYPE_CATEGORY
+				|| header.getItemViewType() == VIEW_TYPE_SUBCATEGORY
+				|| header.getItemViewType() == VIEW_TYPE_SUBSUBCATEGORY;
+	}
+
 	private final LayoutInflater mInflater;
 
 	private final Menu mMenu;
@@ -186,17 +209,27 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 	private Context mContext;
 
+	private HashMap<Data, RecyclerView.ViewHolder> mHeaderStore;
+
 	private View.OnClickListener mListener;
 
-	public MenuAdapter(Context context, Menu menu, UserOrder userOrder, View.OnClickListener listener,
+	public MenuAdapter(Context context, Menu menu, UserOrder userOrder, final HashMap<Data, RecyclerView.ViewHolder> headerStore,
+	                   View.OnClickListener listener,
 	                   View.OnClickListener itemClickListener, View.OnClickListener applyClickListener) {
 		mContext = context;
 		mMenu = menu;
 		mUserOrder = userOrder;
+		mHeaderStore = headerStore;
 		mListener = listener;
 		mItemClickListener = itemClickListener;
 		mApplyClickListener = applyClickListener;
 		mInflater = LayoutInflater.from(mContext);
+	}
+
+	@Override
+	public long getItemId(final int position) {
+		final Data itemAt = getItemAt(position);
+		return itemAt.hashCode();
 	}
 
 	@Override
@@ -260,7 +293,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 				final Item item = itemData.getItem();
 				ivh.updateState(mUserOrder, item);
 				ivh.bind(item, mUserOrder, mMenu, position, false);
-				ivh.txtTitle.setText(itemData.getName());
+
 				if(viewType == VIEW_TYPE_ITEM && item.hasRecommendations() && ivh.isRecommendationsVisible()) {
 					ViewUtils.setVisible(ivh.viewDelimiter, false);
 				}
@@ -272,7 +305,9 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 				CategoryViewHolder cvh = (CategoryViewHolder) viewHolder;
 				CategoryData category = (CategoryData) getItemAt(position);
 				cvh.txtTitle.setText(category.getName());
-				cvh.itemView.setTag("header");
+				cvh.itemView.setTag(R.id.level, category.getLevel());
+				cvh.itemView.setBackgroundColor(getCategoryColor(viewType));
+				mHeaderStore.put(category, cvh);
 				break;
 		}
 	}
@@ -307,4 +342,14 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		}
 		throw new RuntimeException("wrong item type");
 	}
+
+    public int getItemPosition(final Item item) {
+        for (int i = 0; i < getItemCount(); i++) {
+            final Data data = getItemAt(i);
+            if (data instanceof ItemData && ((ItemData) data).getItem().id().equals(item.id())) {
+                return i;
+            }
+        }
+        return 0;
+    }
 }

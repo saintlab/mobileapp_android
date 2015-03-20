@@ -5,4 +5,6 @@
     <dimen name="order_items_list_height_collapsed">140dp</dimen>
     <dimen name="card_frame_width">280dp</dimen>
     <dimen name="card_frame_height">165dp</dimen>
+
+    <dimen name="menu_sliding_panel_height">216dp</dimen>
 </resources>

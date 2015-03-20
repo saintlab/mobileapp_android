@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/standard_padding"
+    android:paddingRight="@dimen/standard_padding"
+    android:background="@android:color/white"
+    >
+
+    <EditText android:id="@+id/edit_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/standard_padding"
+        android:paddingBottom="@dimen/standard_padding"
+        android:hint="Название блюда..."
+        android:background="@android:color/white"
+        android:drawableLeft="@drawable/ic_search_black"
+        android:drawablePadding="@dimen/drawable_padding_default"/>
+
+    <ImageView
+        android:id="@+id/btn_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/edit_search"
+        android:layout_alignBottom="@+id/edit_search"
+        android:paddingTop="@dimen/standard_padding"
+        android:paddingBottom="@dimen/standard_padding"
+        android:src="@drawable/ic_cross_black"
+        android:contentDescription="@null" />
+
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_search"
+        android:headerDividersEnabled="true"
+        android:footerDividersEnabled="true"/>
+
+    <TextView
+        android:id="@+id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/menu_search_undefined"
+        android:textColor="@color/qr_hint_color"
+        android:textSize="@dimen/font_medium"
+        android:visibility="gone"
+        />
+
+</RelativeLayout>

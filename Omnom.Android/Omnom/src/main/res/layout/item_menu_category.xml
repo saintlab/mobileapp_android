@@ -5,5 +5,6 @@
     android:layout_height="@dimen/menu_category_height"
     android:gravity="center"
     android:textColor="@drawable/text_color_selector_white"
+    android:text="HEADER"
     android:textSize="@dimen/font_larger"
     android:textAppearance="?android:textAppearanceLarge" />

@@ -105,7 +105,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 		if(isExternalLaunch()) {
 			if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction())) {
-				if(mData.getScheme().equals(SCHEME_OMNOM)) {
+				if(SCHEME_OMNOM.equals(mData.getScheme())) {
 					findTable(mData.getQueryParameter(QUERY_PARAMETER_HASH));
 				} else {
 					findTable(mData.getLastPathSegment());

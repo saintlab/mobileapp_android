@@ -36,8 +36,6 @@
     <color name="tip_active">#ffffff</color>
     <color name="tip_default">#b7ffffff</color>
 
-    <color name="cancel_button">#555</color>
-
     <color name="balk_notification_background">#02c164</color>
 
     <color name="order_accepted_color">#00881E</color>

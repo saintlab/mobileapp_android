@@ -115,7 +115,6 @@
     <string name="card_removal_confirmation">Карта %1$s %2$s</string>
     <string name="unable_to_remove_card_number_try_againt_later">Не&#160;удается удалить карту: %1$s\nПожалуйста, попробуйте позже</string>
     <string name="unable_to_remove_card">Не&#160;удается удалить карту</string>
-    <string name="delete">Удалить</string>
     <string name="how_many_guests_will_pay">На&#160;скольких гостей делить?</string>
     <string name="welcome_to_">Добро пожаловать в&#160;%1$s</string>
     <string name="balk_notification_user_paid_">%1$s: оплачено по&#160;счету %2$s </string>
@@ -164,4 +163,5 @@
     <string name="title_activity_wish_sent">WishSentActivity</string>
     <string name="notification_tap_to_open_omnom">Когда потребуется, ваш счёт можно увидеть и оплатить в Omnom</string>
     <string name="ready_orders_list">Табло готовых заказов</string>
+    <string name="menu_search_undefined">Увы, но такого блюда\nнет в нашем меню</string>
 </resources>

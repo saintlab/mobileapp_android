@@ -30,4 +30,6 @@
 
     <dimen name="picker_drawable_height">32dp</dimen>
     <dimen name="order_payment_tips_radio_padding_bottom">0dp</dimen>
+
+    <dimen name="menu_sliding_panel_height">216dp</dimen>
 </resources>

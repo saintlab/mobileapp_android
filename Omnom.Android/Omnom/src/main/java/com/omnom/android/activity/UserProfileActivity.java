@@ -31,6 +31,7 @@ import com.omnom.android.utils.drawable.RoundedDrawable;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -244,18 +245,18 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.btn_bottom)
 	public void onLogout() {
-		final AlertDialog alertDialog = AndroidUtils.showDialog(this, R.string.are_you_to_quit,
-		                                                        R.string.quit, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, final int which) {
-						quit();
-					}
-				}, R.string.cancel, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, final int which) {
-						dialog.dismiss();
-					}
-				});
+		final AlertDialog alertDialog = DialogUtils.showDialog(this, R.string.are_you_to_quit,
+                R.string.quit, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int which) {
+                        quit();
+                    }
+                }, R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int which) {
+                        dialog.dismiss();
+                    }
+                });
 		alertDialog.setCanceledOnTouchOutside(true);
 		final float btnTextSize = getResources().getDimension(R.dimen.font_normal);
 		final Button btn1 = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);

@@ -86,7 +86,7 @@ public class ItemData implements Data {
 
 	@Override
 	public int getLevel() {
-		return 0;
+		return Integer.MAX_VALUE;
 	}
 
 	public String getName() {
@@ -100,4 +100,5 @@ public class ItemData implements Data {
 	public int getType() {
 		return mType;
 	}
+
 }
