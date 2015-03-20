@@ -70,7 +70,6 @@ import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
-import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
@@ -864,13 +863,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	void configureScreen(final Restaurant restaurant) {
-		// FIXME: uncomment the code below when promo is implemented
-		final boolean promoEnabled = false; //RestaurantHelper.isPromoEnabled(restaurant);
-		// FIXME: uncomment the code below when waiter call is implemented
-		final boolean waiterEnabled = false; //RestaurantHelper.isWaiterEnabled(restaurant);
-		final boolean isBar = RestaurantHelper.isBar(restaurant);
-
-		mViewHelper.configureScreen(waiterEnabled);
+		mViewHelper.configureScreen(restaurant);
 
 		// getPanelBottom().setTranslationY(100);
 		mOrderHelper.updateWishUi();
@@ -964,10 +957,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	protected void handleRestaurant(final String method, final String requestId, final Restaurant restaurant) {
-		if(!restaurant.available()) {
-			getErrorHelper().showError(LoaderError.RESTAURANT_UNAVAILABLE, mInternetErrorClickListener);
-			return;
-		}
+		// TODO: Uncomment
+		//if(!restaurant.available()) {
+		//	getErrorHelper().showError(LoaderError.RESTAURANT_UNAVAILABLE, mInternetErrorClickListener);
+		//	return;
+		//}
 
 		// User in already in a restaurant there is no need to send them notification
 		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(getActivity()).getPreferences();

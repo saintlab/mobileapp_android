@@ -3,7 +3,6 @@ package com.omnom.android.activity.validate;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.graphics.Color;
-import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -17,7 +16,6 @@ import com.omnom.android.activity.RestaurantsListActivity;
 import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.fragment.SearchFragment;
 import com.omnom.android.menu.model.Item;
-import com.omnom.android.fragment.SearchFragment;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.mixpanel.OmnomErrorHelper;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -50,7 +48,7 @@ import static butterknife.ButterKnife.findById;
  */
 public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchListener {
 
-    private static final String TAG_SEARCH_FRAGMENT = "search_fragment";
+	private static final String TAG_SEARCH_FRAGMENT = "search_fragment";
 
 	private final ValidateActivity mActivity;
 
@@ -65,6 +63,9 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	@InjectView(R.id.btn_bottom)
 	protected View btnErrorRepeat;
+
+	@InjectView(R.id.txt_bar)
+	protected TextView txtBar;
 
 	@InjectView(R.id.sliding_layout)
 	protected SlidingUpPanelLayout slidingPanel;
@@ -131,6 +132,13 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 				loader.animateLogo(RestaurantHelper.getLogo(restaurant), R.drawable.ic_fork_n_knife);
 			}
 		}
+	}
+
+	public View.OnClickListener getBillClickListener() {
+		if(RestaurantHelper.isBar(mActivity.mRestaurant)) {
+			return mActivity.mOnOrderClickListener;
+		}
+		return mActivity.mOnBillClickListener;
 	}
 
 	public void onDestroy() {
@@ -210,10 +218,12 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 				if(loaderFactor < 0.85f) {
 					AnimationUtils.animateAlpha3(imgProfile, false);
 					AnimationUtils.animateAlpha3(imgPrevious, false);
+					AnimationUtils.animateAlpha3(txtBar, false);
 					loader.hideLogo();
 				} else {
 					AnimationUtils.animateAlpha3(imgProfile, true);
 					AnimationUtils.animateAlpha3(imgPrevious, true);
+					AnimationUtils.animateAlpha3(txtBar, true);
 					loader.showLogo();
 				}
 				loader.scaleDown((int) (loader.getLoaderSizeDefault() * loaderFactor), 0, null);
@@ -236,13 +246,13 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		loader.setColor(mActivity.getResources().getColor(R.color.loader_bg));
 
 		btnDemo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                mErrorHelper.hideError();
-                ValidateActivity.startDemo(mActivity, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
-                        ValidateActivity.EXTRA_LOADER_ANIMATION_SCALE_DOWN);
-            }
-        });
+			@Override
+			public void onClick(final View v) {
+				mErrorHelper.hideError();
+				ValidateActivity.startDemo(mActivity, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant,
+				                           ValidateActivity.EXTRA_LOADER_ANIMATION_SCALE_DOWN);
+			}
+		});
 	}
 
 	private void setSlidingTouchEnabled(final boolean enabled) {
@@ -265,11 +275,11 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	public void showRestaurants() {
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
-            @Override
-            public void run() {
-                RestaurantsListActivity.start(mActivity, true);
-            }
-        });
+			@Override
+			public void run() {
+				RestaurantsListActivity.start(mActivity, true);
+			}
+		});
 	}
 
 	public void validate(final Runnable runnable) {
@@ -313,9 +323,22 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		loader.startProgressAnimation(10000, null);
 	}
 
-	public void configureScreen(boolean waiterEnabled) {
+	public void configureScreen(Restaurant restaurant) {
+		// FIXME: uncomment the code below when promo is implemented
+		final boolean promoEnabled = false; //RestaurantHelper.isPromoEnabled(restaurant);
+		// FIXME: uncomment the code below when waiter call is implemented
+		final boolean waiterEnabled = false; //RestaurantHelper.isWaiterEnabled(restaurant);
+		final boolean isBar = RestaurantHelper.isBar(restaurant);
+
 		if(bottomView == null) {
-			stubBottomMenu.setLayoutResource(waiterEnabled ? R.layout.layout_bill_waiter : R.layout.layout_bill);
+			ViewUtils.setVisible(findById(mActivity, R.id.txt_bar), isBar);
+			if(isBar) {
+				stubBottomMenu.setLayoutResource(R.layout.layout_bar);
+
+			} else {
+				stubBottomMenu.setLayoutResource(waiterEnabled ? R.layout.layout_bill_waiter : R.layout.layout_bill);
+
+			}
 			bottomView = stubBottomMenu.inflate();
 			AndroidUtils.applyFont(mActivity, (ViewGroup) bottomView, OmnomFont.LSF_LE_REGULAR);
 		}
@@ -330,21 +353,8 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 			});
 		}
 
-		final View btnBill = findById(bottomView, R.id.btn_bill);
-		btnBill.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				mActivity.onBill(v);
-			}
-		});
-
-		final View btnOrder = findById(bottomView, R.id.btn_order);
-		btnOrder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                mActivity.onOrder();
-            }
-        });
+		findById(bottomView, R.id.btn_bill).setOnClickListener(getBillClickListener());
+		findById(bottomView, R.id.btn_order).setOnClickListener(mActivity.mOnOrderClickListener);
 	}
 
 	public void translatePanelBottom(final int value) {
@@ -411,27 +421,27 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	public void showOrders(final Runnable callback) {
 		loader.hideLogo(new Runnable() {
-            @Override
-            public void run() {
-                scaleUp(mActivity.getResources().getInteger(R.integer.default_animation_duration_medium), callback);
-            }
-        });
+			@Override
+			public void run() {
+				scaleUp(mActivity.getResources().getInteger(R.integer.default_animation_duration_medium), callback);
+			}
+		});
 	}
 
 	public void onReturnToValidation(final Restaurant restaurant, final boolean isDemo) {
 		loader.scaleDown(null, new Runnable() {
-            @Override
-            public void run() {
-                ViewUtils.setVisible(getPanelBottom(), true);
-                AnimationUtils.animateAlpha(menuGradientPanel, true);
-                AnimationUtils.animateAlpha(slidingPanel, true);
-                updateLightProfile(!isDemo);
-                ViewUtils.setVisible(imgPrevious, !isDemo);
-                ViewUtils.setVisible(txtLeave, isDemo);
-                loader.animateLogo(RestaurantHelper.getLogo(restaurant), R.drawable.ic_fork_n_knife);
-                loader.showLogo();
-            }
-        });
+			@Override
+			public void run() {
+				ViewUtils.setVisible(getPanelBottom(), true);
+				AnimationUtils.animateAlpha(menuGradientPanel, true);
+				AnimationUtils.animateAlpha(slidingPanel, true);
+				updateLightProfile(!isDemo);
+				ViewUtils.setVisible(imgPrevious, !isDemo);
+				ViewUtils.setVisible(txtLeave, isDemo);
+				loader.animateLogo(RestaurantHelper.getLogo(restaurant), R.drawable.ic_fork_n_knife);
+				loader.showLogo();
+			}
+		});
 	}
 
 	public void onDataLoaded(final Restaurant restaurant, final TableDataResponse table, final boolean forwardToBill, final boolean
@@ -439,37 +449,37 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		animateRestaurantLogo(restaurant);
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
-            @Override
-            public void run() {
-                mActivity.configureScreen(restaurant);
-                updateLightProfile(!mIsDemo);
-                ViewUtils.setVisible(imgPrevious, !mIsDemo);
-                ViewUtils.setVisible(txtLeave, mIsDemo);
-                ViewUtils.setVisible(getPanelBottom(), true);
-                AnimationUtils.animateAlpha(menuGradientPanel, true);
-                AnimationUtils.animateAlpha(slidingPanel, true);
-                getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
-                        .setDuration(mActivity.getResources().getInteger(R.integer.default_animation_duration_short)).start();
-                if (forwardToBill) {
-                    loader.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mActivity.showOrders(restaurant.orders(), requestId);
-                        }
-                    }, mActivity.getResources().getInteger(R.integer.default_animation_duration_short));
-                }
-            }
-        });
+			@Override
+			public void run() {
+				mActivity.configureScreen(restaurant);
+				updateLightProfile(!mIsDemo);
+				ViewUtils.setVisible(imgPrevious, !mIsDemo);
+				ViewUtils.setVisible(txtLeave, mIsDemo);
+				ViewUtils.setVisible(getPanelBottom(), true);
+				AnimationUtils.animateAlpha(menuGradientPanel, true);
+				AnimationUtils.animateAlpha(slidingPanel, true);
+				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
+				                .setDuration(mActivity.getResources().getInteger(R.integer.default_animation_duration_short)).start();
+				if(forwardToBill) {
+					loader.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							mActivity.showOrders(restaurant.orders(), requestId);
+						}
+					}, mActivity.getResources().getInteger(R.integer.default_animation_duration_short));
+				}
+			}
+		});
 	}
 
 	public void animateRestaurantLogo(final Restaurant restaurant) {
 		loader.post(new Runnable() {
-            @Override
-            public void run() {
-                loader.animateLogo(RestaurantHelper.getLogo(restaurant), R.drawable.ic_fork_n_knife,
-                        mActivity.getResources().getInteger(R.integer.default_animation_duration_short));
-            }
-        });
+			@Override
+			public void run() {
+				loader.animateLogo(RestaurantHelper.getLogo(restaurant), R.drawable.ic_fork_n_knife,
+				                   mActivity.getResources().getInteger(R.integer.default_animation_duration_short));
+			}
+		});
 		loader.animateColor(RestaurantHelper.getBackgroundColor(restaurant));
 	}
 
@@ -508,23 +518,23 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		return slidingPanel.getPanelState();
 	}
 
-    public void showSearchFragment(Map<String, Item> itemsByName) {
-        ViewUtils.setVisible(bottomView, false);
-        mActivity.getSupportFragmentManager().beginTransaction()
-                .addToBackStack(null)
-                .setCustomAnimations(R.anim.slide_in_up,
-                        R.anim.slide_out_down,
-                        R.anim.slide_in_up,
-                        R.anim.slide_out_down)
-                .replace(R.id.fragment_container, SearchFragment.newInstance(itemsByName), TAG_SEARCH_FRAGMENT)
-                .commit();
-    }
+	public void showSearchFragment(Map<String, Item> itemsByName) {
+		ViewUtils.setVisible(bottomView, false);
+		mActivity.getSupportFragmentManager().beginTransaction()
+		         .addToBackStack(null)
+		         .setCustomAnimations(R.anim.slide_in_up,
+		                              R.anim.slide_out_down,
+		                              R.anim.slide_in_up,
+		                              R.anim.slide_out_down)
+		         .replace(R.id.fragment_container, SearchFragment.newInstance(itemsByName), TAG_SEARCH_FRAGMENT)
+		         .commit();
+	}
 
-    public void onSearchFragmentClose() {
-        ViewUtils.setVisible(bottomView, true);
-    }
+	public void onSearchFragmentClose() {
+		ViewUtils.setVisible(bottomView, true);
+	}
 
-    public void showMenuItemDetails(final Item item) {
-        menuCategories.showDetails(item);
-    }
+	public void showMenuItemDetails(final Item item) {
+		menuCategories.showDetails(item);
+	}
 }
