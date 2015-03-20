@@ -1,85 +1,36 @@
 package com.omnom.android.restaurateur.model.restaurant;
 
-import com.google.gson.annotations.Expose;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
+
+import com.omnom.android.utils.generation.AutoGson;
+
+import auto.parcel.AutoParcel;
 
 /**
  * Created by Ch3D on 20.03.2015.
  */
-public class WishResponseItem {
-	@Expose
-	private Integer quantity;
+@AutoParcel
+@AutoGson
+public abstract class WishResponseItem implements Parcelable {
+	@Nullable
+	public abstract int quantity();
 
-	@Expose
-	private Integer priceTotal;
+	@Nullable
+	public abstract int priceTotal();
 
-	@Expose
-	private Integer pricePerItem;
+	@Nullable
+	public abstract int pricePerItem();
 
-	@Expose
-	private String internalId;
+	@Nullable
+	public abstract String internalId();
 
-	@Expose
-	private String title;
+	@Nullable
+	public abstract String title();
 
-	@Expose
-	private Boolean isModifier;
+	@Nullable
+	public abstract Boolean isModifier();
 
-	@Expose
-	private String id;
-
-	public Integer getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(final Integer quantity) {
-		this.quantity = quantity;
-	}
-
-	public Integer getPriceTotal() {
-		return priceTotal;
-	}
-
-	public void setPriceTotal(final Integer priceTotal) {
-		this.priceTotal = priceTotal;
-	}
-
-	public Integer getPricePerItem() {
-		return pricePerItem;
-	}
-
-	public void setPricePerItem(final Integer pricePerItem) {
-		this.pricePerItem = pricePerItem;
-	}
-
-	public String getInternalId() {
-		return internalId;
-	}
-
-	public void setInternalId(final String internalId) {
-		this.internalId = internalId;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(final String title) {
-		this.title = title;
-	}
-
-	public Boolean getIsModifier() {
-		return isModifier;
-	}
-
-	public void setIsModifier(final Boolean isModifier) {
-		this.isModifier = isModifier;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(final String id) {
-		this.id = id;
-	}
+	@Nullable
+	public abstract String id();
 }

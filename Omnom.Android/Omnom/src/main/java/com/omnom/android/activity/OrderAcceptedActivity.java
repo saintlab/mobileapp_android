@@ -16,7 +16,7 @@ import butterknife.InjectView;
 
 public class OrderAcceptedActivity extends BaseOmnomActivity {
 
-	public static void start(Activity activity, int orderNumber, int pinCode,
+	public static void start(Activity activity, String orderNumber, String pinCode,
 	                         int requestCode, final int accentColor) {
 		final Intent intent = new Intent(activity, OrderAcceptedActivity.class);
 		intent.putExtra(EXTRA_ORDER_NUMBER, orderNumber);
@@ -37,9 +37,9 @@ public class OrderAcceptedActivity extends BaseOmnomActivity {
 	@InjectView(R.id.txt_check_order)
 	protected TextView txtCheckOrder;
 
-	private int mOrderNumber;
+	private String mOrderNumber;
 
-	private int mPinCode;
+	private String mPinCode;
 
 	private int mAccentColor;
 
@@ -50,8 +50,8 @@ public class OrderAcceptedActivity extends BaseOmnomActivity {
 
 	@Override
 	protected void handleIntent(final Intent intent) {
-		mOrderNumber = intent.getIntExtra(EXTRA_ORDER_NUMBER, 0);
-		mPinCode = intent.getIntExtra(EXTRA_PIN_CODE, 0);
+		mOrderNumber = intent.getStringExtra(EXTRA_ORDER_NUMBER);
+		mPinCode = intent.getStringExtra(EXTRA_PIN_CODE);
 		mAccentColor = intent.getIntExtra(EXTRA_ACCENT_COLOR, 0);
 	}
 
@@ -68,12 +68,12 @@ public class OrderAcceptedActivity extends BaseOmnomActivity {
 		txtOrderNumber.setText(String.valueOf(mOrderNumber));
 		txtPinCode.setText(String.valueOf(mPinCode));
 		AndroidUtils.clickify(txtCheckOrder, getString(R.string.we_will_invite_you_mark),
-							  new ClickSpan.OnClickListener() {
-								  @Override
-								  public void onClick() {
-									  Toast.makeText(getActivity(), "Hey!", Toast.LENGTH_SHORT).show();
-								  }
-							  });
+		                      new ClickSpan.OnClickListener() {
+			                      @Override
+			                      public void onClick() {
+				                      Toast.makeText(getActivity(), "Hey!", Toast.LENGTH_SHORT).show();
+			                      }
+		                      });
 	}
 
 	@Override

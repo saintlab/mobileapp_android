@@ -52,7 +52,6 @@ import com.omnom.android.mixpanel.model.MixpanelEvent;
 import com.omnom.android.mixpanel.model.SplitWay;
 import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
-import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.OmnomFont;
@@ -205,13 +204,10 @@ public class OrderFragment extends Fragment {
 			mSplitWay = splitWay.ordinal();
 		}
 
-		public PaymentDetails(BillResponse bill, double amount, int tip, TipsWay tipsWay, int tipValue, SplitWay splitWay) {
+		public PaymentDetails(double amount, int tip, TipsWay tipsWay, int tipValue, SplitWay splitWay) {
 			mAmount = amount;
 			mTip = tip;
 			mTipValue = tipValue;
-			tableId = bill.getTableId();
-			restaurantName = bill.getRestaurantId();
-			orderId = bill.getRestaurateurOrderId();
 			mTipsWay = tipsWay.ordinal();
 			mSplitWay = splitWay.ordinal();
 		}

@@ -38,6 +38,7 @@ import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.socket.listener.SilentPaymentEventListener;
 import com.omnom.android.utils.Extras;
@@ -80,19 +81,22 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
 		intent.putExtra(Extras.EXTRA_ORDER, order);
+		intent.putExtra(Extras.EXTRA_PAYMENT_TYPE, MailRuExtra.PAYMENT_TYPE_ORDER);
 		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
 		activity.startActivityForResult(intent, code);
 	}
 
 	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
-	                         final UserOrder order, CardInfo cardInfo, final boolean isDemo,
+	                         final UserOrder order, CardInfo cardInfo, WishResponse wishResponse, final boolean isDemo,
 	                         final int accentColor) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
 		intent.putExtra(Extras.EXTRA_USER_ORDER, order);
+		intent.putExtra(Extras.EXTRA_PAYMENT_TYPE, MailRuExtra.PAYMENT_TYPE_WISH);
 		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
+		intent.putExtra(Extras.EXTRA_WISH_RESPONSE, wishResponse);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
 		activity.startActivityForResult(intent, code);
 	}
@@ -170,6 +174,10 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	@Nullable
 	private UserOrder mUserOrder;
+
+	private String mType;
+
+	private WishResponse mWishResponse;
 
 	@Override
 	public void initUi() {
@@ -284,9 +292,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		if(mOrder != null) {
 			return BillRequest.create(amount, mOrder);
 		}
-		return null;
-		// TODO:
-		// return BillRequest.create(amount, mUserOrder);
+		return BillRequest.createForWish(mWishResponse.restaurantId(), mWishResponse.id());
 	}
 
 	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final int tip) {
@@ -306,7 +312,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 			return;
 		}
 
-		final ExtraData extra = MailRuExtra.create(tip, mailRestaurantId);
+		final ExtraData extra = MailRuExtra.create(tip, mailRestaurantId, mType);
 		mBillData = billData;
 		mBillId = billData.getId();
 		final OrderInfo order = OrderInfoMailRu.create(amount, String.valueOf(billData.getId()), "message");
@@ -405,7 +411,11 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 				if(mIsDemo) {
 					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mDetails.getAmount(), mDetails.getTip());
 				} else {
-					ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
+					if(mWishResponse != null) {
+						OrderAcceptedActivity.start(getActivity(), "#orderNumber", mWishResponse.code(), REQUEST_THANKS, mAccentColor);
+					} else {
+						ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
+					}
 				}
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 			}
@@ -466,6 +476,11 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
 		mDetails = intent.getParcelableExtra(EXTRA_PAYMENT_DETAILS);
 		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
+		mWishResponse = intent.getParcelableExtra(Extras.EXTRA_WISH_RESPONSE);
+		mType = intent.getStringExtra(Extras.EXTRA_PAYMENT_TYPE);
+		if(TextUtils.isEmpty(mType)) {
+			mType = MailRuExtra.PAYMENT_TYPE_ORDER;
+		}
 		mUserOrder = intent.getParcelableExtra(Extras.EXTRA_USER_ORDER);
 		mCardInfo = intent.getParcelableExtra(Extras.EXTRA_CARD_DATA);
 		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);

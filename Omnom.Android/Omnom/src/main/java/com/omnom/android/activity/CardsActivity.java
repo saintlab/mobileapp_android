@@ -3,7 +3,6 @@ package com.omnom.android.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,14 +12,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.omnom.android.OmnomApplication;
@@ -41,6 +37,7 @@ import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
@@ -130,11 +127,14 @@ public class CardsActivity extends BaseOmnomActivity {
 		}
 	}
 
-	public static void start(final WishActivity activity, final UserOrder order, final OrderFragment.PaymentDetails paymentDetails,
+	public static void start(final WishActivity activity, final UserOrder order, WishResponse wishResponse,
+	                         final OrderFragment.PaymentDetails
+			                         paymentDetails,
 	                         final int accentColor, final int code) {
 		final Intent intent = new Intent(activity, CardsActivity.class);
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, paymentDetails);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
+		intent.putExtra(Extras.EXTRA_WISH_RESPONSE, wishResponse);
 		intent.putExtra(Extras.EXTRA_USER_ORDER, order);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, false);
 		startActivity(activity, intent, code);
@@ -186,6 +186,8 @@ public class CardsActivity extends BaseOmnomActivity {
 	@Nullable
 	private UserOrder mUserOrder;
 
+	private WishResponse mWishResponse;
+
 	@Override
 	public void finish() {
 		super.finish();
@@ -211,6 +213,7 @@ public class CardsActivity extends BaseOmnomActivity {
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
 		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
 		mUserOrder = intent.getParcelableExtra(Extras.EXTRA_USER_ORDER);
+		mWishResponse = intent.getParcelableExtra(Extras.EXTRA_WISH_RESPONSE);
 		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);
 		mTableId = intent.getStringExtra(Extras.EXTRA_TABLE_ID);
 	}
@@ -292,11 +295,11 @@ public class CardsActivity extends BaseOmnomActivity {
 	private void askForRemoval(final Card card) {
 		final String title = getString(R.string.card_removal_confirmation, card.getMaskedPan(), card.getAssociation());
 		DialogUtils.showDeleteDialog(this, title, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                removeCard(card);
-            }
-        });
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				removeCard(card);
+			}
+		});
 	}
 
 	private void removeCard(final Card card) {
@@ -505,7 +508,8 @@ public class CardsActivity extends BaseOmnomActivity {
 			if(mOrder != null) {
 				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mOrder, cardInfo, mIsDemo, mAccentColor);
 			} else {
-				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mUserOrder, cardInfo, mIsDemo, mAccentColor);
+				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mUserOrder, cardInfo, mWishResponse, mIsDemo,
+				                             mAccentColor);
 			}
 		}
 	}

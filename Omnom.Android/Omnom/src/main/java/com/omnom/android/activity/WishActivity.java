@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.WishAdapter;
-import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.Item;
@@ -28,8 +27,6 @@ import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.mixpanel.model.SplitWay;
 import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
-import com.omnom.android.restaurateur.model.bill.BillRequest;
-import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.restaurant.ModifierRequestItem;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -41,7 +38,6 @@ import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.observable.OmnomObservable;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -58,21 +54,21 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
-import retrofit.http.HEAD;
-import rx.Observable;
 import rx.functions.Action1;
-import rx.functions.Func1;
 
+import static com.omnom.android.fragment.OrderFragment.PaymentDetails;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 public class WishActivity extends BaseOmnomFragmentActivity implements View.OnClickListener,
                                                                        ItemClickSupport.OnItemLongClickListener {
 
-	public static int RESULT_CLEARED = 1;
+	public static final int RESULT_CLEARED = 1;
 
-	public static int RESULT_BILL = 2;
+	public static final int RESULT_BILL = 2;
 
-	public static int RESULT_OK = 4;
+	public static final int RESULT_ORDER_DONE = 3;
+
+	public static final int RESULT_OK = 4;
 
 	public static void start(OmnomActivity activity, Restaurant restaurant, TableDataResponse table, Menu menu, UserOrder order,
 	                         int code) {
@@ -286,24 +282,24 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		}
 	}
 
-    @Override
-    public boolean onItemLongClick(final RecyclerView parent, final View view, final int position, final long id) {
-        final int itemType = mAdapter.getItemViewType(position);
-        if (itemType == WishAdapter.VIEW_TYPE_WISH_ITEM) {
-            final UserOrderData order = (UserOrderData) mAdapter.getItemAt(position);
-            if (order != null && order.item() != null) {
-                final String title = order.item().name();
-                DialogUtils.showDeleteDialog(this, title, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        onOrderUpdate(new OrderUpdateEvent(order.item(), 0, position));
-                    }
-                });
-                return true;
-            }
-        }
-        return false;
-    }
+	@Override
+	public boolean onItemLongClick(final RecyclerView parent, final View view, final int position, final long id) {
+		final int itemType = mAdapter.getItemViewType(position);
+		if(itemType == WishAdapter.VIEW_TYPE_WISH_ITEM) {
+			final UserOrderData order = (UserOrderData) mAdapter.getItemAt(position);
+			if(order != null && order.item() != null) {
+				final String title = order.item().name();
+				DialogUtils.showDeleteDialog(this, title, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						onOrderUpdate(new OrderUpdateEvent(order.item(), 0, position));
+					}
+				});
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private Item getItem(final View v) {
 		final Object orderData = v.getTag();
@@ -344,54 +340,64 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_WISH_LIST && resultCode == Activity.RESULT_OK) {
-			finish();
+			setResult(RESULT_ORDER_DONE);
+			super.finish();
 		}
 	}
 
 	private void doWishBar() {
 		AnimationUtils.animateAlpha(mProgressBar, true);
 		final WishRequest wishRequest = createWishRequest(mOrder);
-		api.wishes(mRestaurant.id(), wishRequest)
-		   .flatMap(new Func1<WishResponse, Observable<BillResponse>>() {
-			   @Override
-			   public Observable<BillResponse> call(final WishResponse wishResponse) {
-				   if(!wishResponse.hasErrors()) {
-					   // TODO:
-					   //if(wishResponse.getItems() != null && wishResponse.getItems().size() > 0) {
-					   //   showOutOfSaleDialog(getActivity(), getStoppedItems(wishResponse.getItems()));
-					   //   return Observable.empty();
-					   //} else {
-					   return api.bill(BillRequest.createForWish(mTable.getRestaurantId(), wishResponse.getId()));
-					   //}
-				   } else {
-					   showWishError(wishResponse);
-					   return Observable.empty();
-				   }
-			   }
-		   }).subscribe(new Action1<BillResponse>() {
+
+		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1<WishResponse>() {
 			@Override
-			public void call(final BillResponse billResponse) {
-				final OrderFragment.PaymentDetails paymentDetails = new OrderFragment.PaymentDetails(billResponse,
-				                                                                                     mOrder.getTotalPrice().doubleValue(),
-				                                                                                     0,
-				                                                                                     TipsWay.DEFAULT, 0,
-				                                                                                     SplitWay.WASNT_USED);
+			public void call(final WishResponse wishResponse) {
+				final PaymentDetails paymentDetails = new PaymentDetails(2.0,
+				                                                         //mOrder.getTotalPrice().doubleValue(),
+				                                                         0,
+				                                                         TipsWay.DEFAULT, 0,
+				                                                         SplitWay.WASNT_USED);
 				CardsActivity.start(WishActivity.this,
 				                    mOrder,
+				                    wishResponse,
 				                    paymentDetails,
 				                    RestaurantHelper.getBackgroundColor(mRestaurant),
 				                    REQUEST_CODE_WISH_LIST);
 			}
 		}, OmnomObservable.loggerOnError(TAG));
+
+		//api.wishes(mRestaurant.id(), wishRequest)
+		//   .flatMap(new Func1<WishResponse, Observable<BillResponse>>() {
+		//	   @Override
+		//	   public Observable<BillResponse> call(final WishResponse wishResponse) {
+		//		   if(!wishResponse.hasErrors()) {
+		//			   // TODO:
+		//			   //if(wishResponse.getItems() != null && wishResponse.getItems().size() > 0) {
+		//			   //   showOutOfSaleDialog(getActivity(), getStoppedItems(wishResponse.getItems()));
+		//			   //   return Observable.empty();
+		//			   //} else {
+		//			   return api.bill(BillRequest.createForWish(mTable.getRestaurantId(), wishResponse.getId()));
+		//			   //}
+		//		   } else {
+		//			   showWishError(wishResponse);
+		//			   return Observable.empty();
+		//		   }
+		//	   }
+		//   }).subscribe(new Action1<BillResponse>() {
+		//	@Override
+		//	public void call(final BillResponse billResponse) {
+		//
+		//	}
+		//}, OmnomObservable.loggerOnError(TAG));
 	}
 
-	private void showWishError(final WishResponse wishResponse) {
-		if(wishResponse.getErrors() != null) {
-			showToast(this, wishResponse.getErrors().getMessage());
-		} else {
-			showToast(this, wishResponse.getError());
-		}
-	}
+	//private void showWishError(final WishResponse wishResponse) {
+	//	if(wishResponse.getErrors() != null) {
+	//		showToast(this, wishResponse.getErrors().getMessage());
+	//	} else {
+	//		showToast(this, wishResponse.getError());
+	//	}
+	//}
 
 	private Collection<String> getStoppedItems(final List<String> items) {
 		final ArrayList<String> result = new ArrayList<String>();
