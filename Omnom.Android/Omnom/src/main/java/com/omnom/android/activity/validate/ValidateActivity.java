@@ -766,6 +766,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 				final UserOrder resultOrder = data.getParcelableExtra(EXTRA_ORDER);
 				mOrderHelper.updateData(resultOrder);
 			}
+			if(resultCode == WishActivity.RESULT_ORDER_DONE) {
+				mOrderHelper.clearOrder();
+				collapseSlidingPanel();
+			}
 			if(resultCode == WishActivity.RESULT_CLEARED) {
 				mOrderHelper.clearOrder();
 			}

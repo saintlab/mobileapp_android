@@ -66,9 +66,9 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	public static final int RESULT_BILL = 2;
 
-	public static final int RESULT_ORDER_DONE = 3;
-
 	public static final int RESULT_OK = 4;
+
+	public static final int RESULT_ORDER_DONE = 8;
 
 	public static void start(OmnomActivity activity, Restaurant restaurant, TableDataResponse table, Menu menu, UserOrder order,
 	                         int code) {
