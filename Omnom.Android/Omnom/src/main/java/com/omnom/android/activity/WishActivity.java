@@ -30,6 +30,7 @@ import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.restaurant.ModifierRequestItem;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishRequestItem;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
@@ -37,7 +38,6 @@ import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.observable.OmnomObservable;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -45,8 +45,10 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.support.ItemClickSupport;
 import com.squareup.otto.Subscribe;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -84,25 +86,25 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		final String itemsStr = StringUtils.concat(",\n", items);
 		final String message = context.getResources().getString(R.string.out_of_sale_message, itemsStr);
 		final AlertDialog dialog = DialogUtils.showDialog(context,
-                R.string.out_of_sale_title, message, R.string.ok,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(context, "ok", Toast.LENGTH_SHORT).show();
-                    }
-                }, R.string.cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+		                                                  R.string.out_of_sale_title, message, R.string.ok,
+		                                                  new DialogInterface.OnClickListener() {
+			                                                  @Override
+			                                                  public void onClick(DialogInterface dialog, int which) {
+				                                                  Toast.makeText(context, "ok", Toast.LENGTH_SHORT).show();
+			                                                  }
+		                                                  }, R.string.cancel,
+		                                                  new DialogInterface.OnClickListener() {
+			                                                  @Override
+			                                                  public void onClick(DialogInterface dialog, int which) {
+				                                                  dialog.dismiss();
+			                                                  }
+		                                                  });
 		TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
 		messageView.setGravity(Gravity.CENTER);
 	}
 
-	private static WishRequest createWishRequest(TableDataResponse table, UserOrder order) {
-		final WishRequest wishRequest = WishRequest.create(table);
+	private static WishRequest createWishRequest(UserOrder order) {
+		final WishRequest wishRequest = new WishRequest();
 		for(final UserOrderData data : order.getSelectedItems()) {
 			wishRequest.addItem(createWishRequestItem(data));
 		}
@@ -204,24 +206,24 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	private void refresh() {
 		ViewUtils.setVisible(mProgressBar, true);
 		api.getItems(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<Collection<OrderItem>>() {
-            @Override
-            public void call(final Collection<OrderItem> response) {
-                mList.setAdapter(null);
-                final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response,
-                        WishActivity.this);
-                mList.setAdapter(adapter);
-                ItemClickSupport itemClickSupport = ItemClickSupport.addTo(mList);
-                itemClickSupport.setOnItemLongClickListener(WishActivity.this);
-                mAdapter = adapter;
-                ViewUtils.setVisible(mProgressBar, false);
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(final Throwable throwable) {
-                Log.e(TAG, "Unable to get items on table", throwable);
-                ViewUtils.setVisible(mProgressBar, false);
-            }
-        });
+			@Override
+			public void call(final Collection<OrderItem> response) {
+				mList.setAdapter(null);
+				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response,
+				                                            WishActivity.this);
+				mList.setAdapter(adapter);
+				ItemClickSupport itemClickSupport = ItemClickSupport.addTo(mList);
+				itemClickSupport.setOnItemLongClickListener(WishActivity.this);
+				mAdapter = adapter;
+				ViewUtils.setVisible(mProgressBar, false);
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(final Throwable throwable) {
+				Log.e(TAG, "Unable to get items on table", throwable);
+				ViewUtils.setVisible(mProgressBar, false);
+			}
+		});
 	}
 
 	@Override
@@ -254,24 +256,32 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		}
 	}
 
-    @Override
-    public boolean onItemLongClick(final RecyclerView parent, final View view, final int position, final long id) {
-        final int itemType = mAdapter.getItemViewType(position);
-        if (itemType == WishAdapter.VIEW_TYPE_WISH_ITEM) {
-            final UserOrderData order = (UserOrderData) mAdapter.getItemAt(position);
-            if (order != null && order.item() != null) {
-                final String title = order.item().name();
-                DialogUtils.showDeleteDialog(this, title, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        onOrderUpdate(new OrderUpdateEvent(order.item(), 0, position));
-                    }
-                });
-                return true;
-            }
-        }
-        return false;
-    }
+	private void doWish() {
+		if(RestaurantHelper.isBar(mRestaurant)) {
+			doWishBar();
+		} else {
+			doWishDefault();
+		}
+	}
+
+	@Override
+	public boolean onItemLongClick(final RecyclerView parent, final View view, final int position, final long id) {
+		final int itemType = mAdapter.getItemViewType(position);
+		if(itemType == WishAdapter.VIEW_TYPE_WISH_ITEM) {
+			final UserOrderData order = (UserOrderData) mAdapter.getItemAt(position);
+			if(order != null && order.item() != null) {
+				final String title = order.item().name();
+				DialogUtils.showDeleteDialog(this, title, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						onOrderUpdate(new OrderUpdateEvent(order.item(), 0, position));
+					}
+				});
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private Item getItem(final View v) {
 		final Object orderData = v.getTag();
@@ -317,20 +327,19 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	private void doWishBar() {
 		AnimationUtils.animateAlpha(mProgressBar, true);
-		final WishRequest wishRequest = createWishRequest(mTable, mOrder);
-		api.createWish(wishRequest)
+		final WishRequest wishRequest = createWishRequest(mOrder);
+		api.wishes(mRestaurant.id(), wishRequest)
 		   .flatMap(new Func1<WishResponse, Observable<BillResponse>>() {
 			   @Override
 			   public Observable<BillResponse> call(final WishResponse wishResponse) {
 				   if(!wishResponse.hasErrors()) {
-					   if(wishResponse.getItems().size() > 0) {
-						   // TODO: show out of sale dialog in accordance with server response
-						   // showOutOfSaleDialog(this, Arrays.asList("Пиво Guinness", "Пиво Bud"));
-						   return Observable.empty();
-					   } else {
-						   return api.bill(BillRequest.create(AmountHelper.format(mOrder.getTotalPrice()), mTable.getRestaurantId(),
-						                                      mTable.getId(), wishResponse.getRestaurateurOrderId()));
-					   }
+					   // TODO:
+					   //if(wishResponse.getItems() != null && wishResponse.getItems().size() > 0) {
+					   //   showOutOfSaleDialog(getActivity(), getStoppedItems(wishResponse.getItems()));
+					   //   return Observable.empty();
+					   //} else {
+					   return api.bill(BillRequest.createForWish(mTable.getRestaurantId(), wishResponse.getId()));
+					   //}
 				   } else {
 					   return Observable.empty();
 				   }
@@ -343,8 +352,27 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		}, OmnomObservable.loggerOnError(TAG));
 	}
 
-	private void doWish() {
-		final WishRequest wishRequest = createWishRequest(mTable, mOrder);
+	private void showWishError(final WishResponse wishResponse) {
+		if(wishResponse.getErrors() != null) {
+			showToast(this, wishResponse.getErrors().getCommon());
+		} else {
+			showToast(this, wishResponse.getError());
+		}
+	}
+
+	private Collection<String> getStoppedItems(final List<String> items) {
+		final ArrayList<String> result = new ArrayList<String>();
+		for(final String id : items) {
+			final Item item = mMenu.findItem(id);
+			if(item != null) {
+				result.add(item.name());
+			}
+		}
+		return result;
+	}
+
+	private void doWishDefault() {
+		final WishRequest wishRequest = createWishRequest(mOrder);
 		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1() {
 			@Override
 			public void call(final Object o) {

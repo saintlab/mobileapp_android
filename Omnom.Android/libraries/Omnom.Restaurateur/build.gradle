@@ -35,4 +35,5 @@ dependencies {
     compile project(':libraries:Omnom.Utils')
     compile project(':libraries:Omnom.Auth')
     compile project(':libraries:Omnom.Altbeacon')
+    compile project(':libraries:Omnom.Menu')
 }

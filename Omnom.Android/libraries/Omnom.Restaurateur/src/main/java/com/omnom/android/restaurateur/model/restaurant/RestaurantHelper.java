@@ -164,4 +164,8 @@ public class RestaurantHelper {
 
 		return table;
 	}
+
+	public static boolean isBar(final Restaurant restaurant) {
+		return false;
+	}
 }

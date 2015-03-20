@@ -17,20 +17,42 @@ public class BillRequest {
 		return billRequest;
 	}
 
+	public static BillRequest createForWish(String restaurantId, String wishId) {
+		final BillRequest billRequest = new BillRequest();
+		billRequest.restaurantId = restaurantId;
+		billRequest.wishId = wishId;
+		return billRequest;
+	}
+
 	public static BillRequest create(double amount, Order order) {
 		return create(Double.toString(amount), order.getRestaurantId(), order.getTableId(), order.getId());
 	}
 
 	@Expose
 	private String description;
+
+	@Expose
+	private String wishId;
+
 	@Expose
 	private String amount;
+
 	@Expose
 	private String restaurantId;
+
 	@Expose
 	private String tableId;
+
 	@Expose
 	private String restaurateurOrderId;
+
+	public String getWishId() {
+		return wishId;
+	}
+
+	public void setWishId(final String wishId) {
+		this.wishId = wishId;
+	}
 
 	public String getDescription() {
 		return description;
