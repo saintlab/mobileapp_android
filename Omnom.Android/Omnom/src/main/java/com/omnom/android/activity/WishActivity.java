@@ -208,14 +208,11 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		api.getItems(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<Collection<OrderItem>>() {
 			@Override
 			public void call(final Collection<OrderItem> response) {
-				mList.setAdapter(null);
-				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response,
-				                                            WishActivity.this);
-				mList.setAdapter(adapter);
-				ItemClickSupport itemClickSupport = ItemClickSupport.addTo(mList);
-				itemClickSupport.setOnItemLongClickListener(WishActivity.this);
+				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, WishActivity.this);
 				mAdapter = adapter;
+				mList.swapAdapter(mAdapter, true);
 				ViewUtils.setVisible(mProgressBar, false);
+				fakeScroll();
 			}
 		}, new Action1<Throwable>() {
 			@Override
@@ -224,6 +221,12 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 				ViewUtils.setVisible(mProgressBar, false);
 			}
 		});
+	}
+
+	private void fakeScroll() {
+		// workaround for https://github.com/saintlab/mobileapp_android/issues/393
+		// problem appears on cheap devices like huawei, zte and so on
+		mList.smoothScrollBy(1, 0);
 	}
 
 	@Override
@@ -315,6 +318,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		} else {
 			mAdapter.removeItem(item);
 		}
+		fakeScroll();
 	}
 
 	@Override
@@ -396,6 +400,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 			mAdapter.remove(orderData);
 		}
 		mOrder.itemsTable().clear();
+		fakeScroll();
 	}
 
 }
