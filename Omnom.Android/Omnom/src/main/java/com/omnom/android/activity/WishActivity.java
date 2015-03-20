@@ -58,6 +58,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import retrofit.http.HEAD;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -90,25 +91,25 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		final String itemsStr = StringUtils.concat(",\n", items);
 		final String message = context.getResources().getString(R.string.out_of_sale_message, itemsStr);
 		final AlertDialog dialog = DialogUtils.showDialog(context,
-                R.string.out_of_sale_title, message, R.string.ok,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(context, "ok", Toast.LENGTH_SHORT).show();
-                    }
-                }, R.string.cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+		                                                  R.string.out_of_sale_title, message, R.string.ok,
+		                                                  new DialogInterface.OnClickListener() {
+			                                                  @Override
+			                                                  public void onClick(DialogInterface dialog, int which) {
+				                                                  Toast.makeText(context, "ok", Toast.LENGTH_SHORT).show();
+			                                                  }
+		                                                  }, R.string.cancel,
+		                                                  new DialogInterface.OnClickListener() {
+			                                                  @Override
+			                                                  public void onClick(DialogInterface dialog, int which) {
+				                                                  dialog.dismiss();
+			                                                  }
+		                                                  });
 		TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
 		messageView.setGravity(Gravity.CENTER);
 	}
 
-	private static WishRequest createWishRequest(TableDataResponse table, UserOrder order) {
-		final WishRequest wishRequest = WishRequest.create(table);
+	private static WishRequest createWishRequest(UserOrder order) {
+		final WishRequest wishRequest = new WishRequest();
 		for(final UserOrderData data : order.getSelectedItems()) {
 			wishRequest.addItem(createWishRequestItem(data));
 		}
@@ -224,24 +225,27 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	private void refresh() {
 		ViewUtils.setVisible(mProgressBar, true);
 		api.getItems(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<Collection<OrderItem>>() {
-            @Override
-            public void call(final Collection<OrderItem> response) {
-                mList.setAdapter(null);
-                final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response,
-                        WishActivity.this);
-                mList.setAdapter(adapter);
-                ItemClickSupport itemClickSupport = ItemClickSupport.addTo(mList);
-                itemClickSupport.setOnItemLongClickListener(WishActivity.this);
-                mAdapter = adapter;
-                ViewUtils.setVisible(mProgressBar, false);
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(final Throwable throwable) {
-                Log.e(TAG, "Unable to get items on table", throwable);
-                ViewUtils.setVisible(mProgressBar, false);
-            }
-        });
+			@Override
+			public void call(final Collection<OrderItem> response) {
+				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, WishActivity.this);
+				mAdapter = adapter;
+				mList.swapAdapter(mAdapter, true);
+				ViewUtils.setVisible(mProgressBar, false);
+				fakeScroll();
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(final Throwable throwable) {
+				Log.e(TAG, "Unable to get items on table", throwable);
+				ViewUtils.setVisible(mProgressBar, false);
+			}
+		});
+	}
+
+	private void fakeScroll() {
+		// workaround for https://github.com/saintlab/mobileapp_android/issues/393
+		// problem appears on cheap devices like huawei, zte and so on
+		mList.smoothScrollBy(1, 0);
 	}
 
 	@Override
@@ -333,6 +337,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		} else {
 			mAdapter.removeItem(item);
 		}
+		fakeScroll();
 	}
 
 	@Override
@@ -345,19 +350,19 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	private void doWishBar() {
 		AnimationUtils.animateAlpha(mProgressBar, true);
-		final WishRequest wishRequest = createWishRequest(mTable, mOrder);
-		api.createWish(wishRequest)
+		final WishRequest wishRequest = createWishRequest(mOrder);
+		api.wishes(mRestaurant.id(), wishRequest)
 		   .flatMap(new Func1<WishResponse, Observable<BillResponse>>() {
 			   @Override
 			   public Observable<BillResponse> call(final WishResponse wishResponse) {
 				   if(!wishResponse.hasErrors()) {
-					   if(wishResponse.getItems() != null && wishResponse.getItems().size() > 0) {
-						   showOutOfSaleDialog(getActivity(), getStoppedItems(wishResponse.getItems()));
-						   return Observable.empty();
-					   } else {
-						   return api.bill(BillRequest.create(AmountHelper.format(mOrder.getTotalPrice()), mTable.getRestaurantId(),
-						                                      mTable.getId(), wishResponse.getRestaurateurOrderId()));
-					   }
+					   // TODO:
+					   //if(wishResponse.getItems() != null && wishResponse.getItems().size() > 0) {
+					   //   showOutOfSaleDialog(getActivity(), getStoppedItems(wishResponse.getItems()));
+					   //   return Observable.empty();
+					   //} else {
+					   return api.bill(BillRequest.createForWish(mTable.getRestaurantId(), wishResponse.getId()));
+					   //}
 				   } else {
 					   showWishError(wishResponse);
 					   return Observable.empty();
@@ -400,7 +405,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	}
 
 	private void doWishDefault() {
-		final WishRequest wishRequest = createWishRequest(mTable, mOrder);
+		final WishRequest wishRequest = createWishRequest(mOrder);
 		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1() {
 			@Override
 			public void call(final Object o) {
@@ -424,6 +429,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 			mAdapter.remove(orderData);
 		}
 		mOrder.itemsTable().clear();
+		fakeScroll();
 	}
 
 }

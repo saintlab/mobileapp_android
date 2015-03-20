@@ -81,7 +81,7 @@ public interface RestaurateurDataService {
 
 	@GET("/restaurants/all")
 	Observable<RestaurantsResponse> getRestaurantsAll(@Query(Protocol.FIELD_LATITUDE) double latitude,
-	                                               @Query(Protocol.FIELD_LONGITUDE) double longitude);
+	                                                  @Query(Protocol.FIELD_LONGITUDE) double longitude);
 
 	@GET("/restaurants/{id}")
 	Observable<Restaurant> getRestaurant(@Path(Protocol.FIELD_ID) String restaurantId);
@@ -106,9 +106,6 @@ public interface RestaurateurDataService {
 
 	@POST("/bill")
 	Observable<BillResponse> bill(@Body BillRequest request);
-
-	@POST("/wish")
-	Observable<WishResponse> createWish(@Body WishRequest request);
 
 	@GET("/link/{orderId}/{amount}/{tip}")
 	Observable<Restaurant> link(@Path(Protocol.FIELD_ORDER_ID) long orderId,
@@ -142,9 +139,8 @@ public interface RestaurateurDataService {
 	Observable<List<DemoTableData>> getDemoTable();
 
 	@POST("/restaurants/{id}/wishes")
-	Observable<Restaurant> wishes(@Path(Protocol.FIELD_ID) String restaurantId,
-	                              @Body WishRequest request);
-
+	Observable<WishResponse> wishes(@Path(Protocol.FIELD_ID) String restaurantId,
+	                                @Body WishRequest request);
 
 	@PUT("/restaurants/{id}")
 	Observable<Restaurant> setRssiThreshold(@Path(Protocol.FIELD_ID) String restaurantId,

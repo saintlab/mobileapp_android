@@ -205,13 +205,8 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	}
 
 	@Override
-	public Observable wishes(final String restId, final WishRequest request) {
+	public Observable<WishResponse> wishes(final String restId, final WishRequest request) {
 		return mDataService.wishes(restId, request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-	}
-
-	@Override
-	public Observable<WishResponse> createWish(final WishRequest request) {
-		return mDataService.createWish(request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

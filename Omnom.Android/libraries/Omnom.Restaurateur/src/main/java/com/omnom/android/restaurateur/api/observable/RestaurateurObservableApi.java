@@ -106,8 +106,5 @@ public interface RestaurateurObservableApi {
 
 	public Observable<Config> getConfig();
 
-	public Observable wishes(String restId, WishRequest request);
-
-	public Observable<WishResponse> createWish(WishRequest request);
-
+	public Observable<WishResponse> wishes(String restId, WishRequest request);
 }

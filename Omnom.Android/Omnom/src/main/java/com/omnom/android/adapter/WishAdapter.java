@@ -26,6 +26,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.Optional;
 
 /**
  * Created by Ch3D on 03.03.2015.
@@ -62,6 +63,7 @@ public class WishAdapter extends RecyclerView.Adapter {
 		@InjectView(R.id.btn_apply)
 		protected Button btnApply;
 
+		@Optional
 		@InjectView(R.id.divider)
 		protected View viewDivider;
 
