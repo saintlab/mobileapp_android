@@ -44,6 +44,8 @@ import rx.functions.Action1;
  */
 public class UserRegisterActivity extends BaseOmnomActivity {
 
+	public static final int START_YEAR = 1900;
+
 	public static final int YEAR_OFFSET = 30;
 
 	public static final String DELIMITER_DATE_UI = "/";
@@ -156,6 +158,9 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 			}
 		}, gc.get(Calendar.YEAR), gc.get(Calendar.MONTH), gc.get(Calendar.DAY_OF_MONTH));
+        Calendar minPickerDate = Calendar.getInstance();
+        minPickerDate.set(Calendar.YEAR, START_YEAR);
+        dialog.getDatePicker().setMinDate(minPickerDate.getTimeInMillis());
 		dialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
