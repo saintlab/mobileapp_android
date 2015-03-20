@@ -78,4 +78,7 @@ public abstract class Restaurant implements Parcelable {
 
 	@Nullable
 	public abstract boolean available();
+
+	@Nullable
+	public abstract String ordersPaidUrl();
 }

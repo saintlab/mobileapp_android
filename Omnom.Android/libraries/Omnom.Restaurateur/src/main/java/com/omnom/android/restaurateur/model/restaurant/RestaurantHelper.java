@@ -124,9 +124,10 @@ public class RestaurantHelper {
 	}
 
 	public static String getBarUri(final Restaurant restaurant) {
-		// FIXME:
-		// TODO: return real URI when backend will provide it
-		return "http://www.android.com/";
+		if(restaurant == null) {
+			return StringUtils.EMPTY_STRING;
+		}
+		return restaurant.ordersPaidUrl();
 	}
 
 	public static boolean isPromoEnabled(final Restaurant restaurant) {
