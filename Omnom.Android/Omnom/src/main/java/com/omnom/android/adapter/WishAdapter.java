@@ -62,13 +62,10 @@ public class WishAdapter extends RecyclerView.Adapter {
 		@InjectView(R.id.btn_apply)
 		protected Button btnApply;
 
-<<<<<<< Updated upstream
-=======
 		@Optional
 		@InjectView(R.id.divider)
 		protected View viewDivider;
 
->>>>>>> Stashed changes
 		public ItemViewHolder(final View convertView) {
 			super(convertView);
 			ButterKnife.inject(this, convertView);
