@@ -1,6 +1,5 @@
 package com.omnom.android.view.subcategories;
 
-import android.animation.ArgbEvaluator;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -36,7 +35,7 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 
 	private final int mAnimationDurationDefault;
 
-	private final ArgbEvaluator mEvaluator;
+	private final OmnomArgbEvaluator mEvaluator;
 
 	private SubcategoriesView mSubcategoriesView;
 
@@ -59,7 +58,7 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 		mHeaderStore = headerStore;
 		mBgColorSelected = subcategoriesView.getResources().getColor(R.color.lighter_grey);
 		mAnimationDurationDefault = subcategoriesView.getResources().getInteger(R.integer.default_animation_duration_short);
-		mEvaluator = new ArgbEvaluator();
+		mEvaluator = OmnomArgbEvaluator.getInstance();
 	}
 
 	@Override
