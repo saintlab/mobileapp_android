@@ -29,6 +29,7 @@ import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.UserOrder;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.MenuSmoothScroller;
@@ -111,6 +112,10 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	private HeaderItemDecorator mHeaderItemDecorator;
 
+	private FlipInTopXDelayedAnimator mItemAnimator;
+
+	private boolean mItemAnimationsSupported;
+
 	@SuppressWarnings("UnusedDeclaration")
 	public SubcategoriesView(Context context) {
 		super(context);
@@ -136,6 +141,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	private void init() {
 		LayoutInflater.from(getContext()).inflate(R.layout.fragment_menu_subcategory, this);
 		ButterKnife.inject(this);
+
+		mItemAnimationsSupported = AndroidUtils.isRecyclerItemAnimationSupported();
 
 		ViewUtils.setVisible(mFakeStickyHeader, false);
 
@@ -179,8 +186,11 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 		mListView.setAdapter(mMenuAdapter);
 		mHeaderItemDecorator = new HeaderItemDecorator(this, mListView, mMenuAdapter, headerStore);
+		mItemAnimator = new FlipInTopXDelayedAnimator(DURATION_ITEM_FLIP, DURATION_ITEM_FLIP_STEP);
 		mListView.addItemDecoration(mHeaderItemDecorator);
-		mListView.setItemAnimator(new FlipInTopXDelayedAnimator(DURATION_ITEM_FLIP, DURATION_ITEM_FLIP_STEP));
+		if(mItemAnimationsSupported) {
+			mListView.setItemAnimator(mItemAnimator);
+		}
 		mListView.setOverScrollMode(OVER_SCROLL_NEVER);
 
 		mMenuAdapter.addAll(menuData.getData());
@@ -246,16 +256,27 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		final int newPos = mMenuAdapter.getItemPosition(category);
 		mLayoutManager.scrollToPositionWithOffset(newPos, 0);
 		mMenuAdapter.notifyItemChanged(newPos);
+		animateHeader(v, isGroup);
+		if(!mMenuAdapter.hasExpandedGroups()) {
+			ViewUtils.setVisible(mFakeStickyHeader, false);
+		}
+	}
+
+	private void animateHeader(final View v, final boolean isGroup) {
+		final int delay = getResources().getInteger(mItemAnimationsSupported ?
+				                                            R.integer.default_animation_duration_medium :
+				                                            R.integer.default_animation_duration_quick);
 		postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if(isGroup && mLayoutManager.getDecoratedTop(v) == 0) {
-					mHeaderItemDecorator.animateHeaderStyle(mListView.getChildViewHolder(v));
-				}
+				animateHeaderStyle(v, isGroup);
 			}
-		}, getResources().getInteger(R.integer.default_animation_duration_medium));
-		if(!mMenuAdapter.hasExpandedGroups()) {
-			ViewUtils.setVisible(mFakeStickyHeader, false);
+		}, delay);
+	}
+
+	private void animateHeaderStyle(final View v, final boolean isGroup) {
+		if(isGroup && mLayoutManager.getDecoratedTop(v) == 0) {
+			mHeaderItemDecorator.animateHeaderStyle(mListView.getChildViewHolder(v));
 		}
 	}
 

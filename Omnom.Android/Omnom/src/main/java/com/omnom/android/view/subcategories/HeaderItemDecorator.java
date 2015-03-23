@@ -149,6 +149,10 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 		final View child = parent.getChildAt(0);
 		final View nextChild = parent.getChildAt(1);
 
+		if(child == null || nextChild == null) {
+			return;
+		}
+
 		RecyclerView.ViewHolder childViewHolder = parent.getChildViewHolder(child);
 		RecyclerView.ViewHolder nextChildViewHolder = parent.getChildViewHolder(nextChild);
 		final boolean nextIsHeader = nextChildViewHolder instanceof MenuAdapter.CategoryViewHolder;

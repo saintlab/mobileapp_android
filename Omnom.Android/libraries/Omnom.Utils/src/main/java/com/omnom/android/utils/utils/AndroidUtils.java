@@ -1,9 +1,7 @@
 package com.omnom.android.utils.utils;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -416,4 +414,7 @@ public class AndroidUtils {
 		return context.getResources().getConfiguration().locale;
 	}
 
+	public static boolean isRecyclerItemAnimationSupported() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+	}
 }
