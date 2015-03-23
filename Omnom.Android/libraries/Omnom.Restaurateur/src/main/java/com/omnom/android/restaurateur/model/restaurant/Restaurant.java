@@ -70,10 +70,7 @@ public abstract class Restaurant implements Parcelable {
 	public abstract String entranceMode();
 
 	public boolean isBar() {
-		// FIXME:
-		// TODO: always true for DEBUG purpose
-		return true;
-		// return ENTRANCE_MODE_BAR.equals(entranceMode());
+		return ENTRANCE_MODE_BAR.equals(entranceMode());
 	}
 
 	@Nullable
