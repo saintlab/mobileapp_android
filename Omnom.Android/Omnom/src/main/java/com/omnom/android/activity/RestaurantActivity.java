@@ -218,9 +218,9 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		}
 		final Settings settings = mRestaurant.settings();
 		if (settings != null) {
-			txtBar.setEnabled(settings.hasBar());
-			txtLunch.setEnabled(settings.hasLunch());
-			txtTakeaway.setEnabled(settings.hasTakeaway());
+			ViewUtils.setVisible(txtBar, settings.hasBar());
+			ViewUtils.setVisible(txtLunch, settings.hasLunch());
+			ViewUtils.setVisible(txtTakeaway, settings.hasTakeaway());
 		}
 		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 		logoSizeSmall = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_SMALL + 0.5);

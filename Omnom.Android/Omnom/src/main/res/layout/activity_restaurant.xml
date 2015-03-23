@@ -66,8 +66,7 @@
             android:id="@+id/txt_bar"
             android:text="@string/to_bar"
             android:drawablePadding="@dimen/drawable_padding_default"
-            android:drawableTop="@drawable/ic_reserve_table"
-            android:enabled="false"
+            android:drawableTop="@drawable/ic_bar"
             style="@style/TextView.Restaurant.Landing" />
 
         <TextView
@@ -88,7 +87,7 @@
             android:id="@+id/txt_takeaway"
             android:text="@string/takeaway_order"
             android:drawablePadding="@dimen/drawable_padding_default"
-            android:drawableTop="@drawable/ic_im_inside"
+            android:drawableTop="@drawable/ic_takeaway"
             style="@style/TextView.Restaurant.Landing" />
 
     </LinearLayout>
