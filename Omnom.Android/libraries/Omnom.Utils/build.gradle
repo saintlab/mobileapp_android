@@ -25,8 +25,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // auto-parcel
-    compile 'com.github.frankiesardo:auto-parcel:+'
-    apt 'com.github.frankiesardo:auto-parcel-processor:+'
+    compile 'com.github.frankiesardo:auto-parcel:0.3'
+    apt 'com.github.frankiesardo:auto-parcel-processor:0.3'
 
     compile 'com.google.code.gson:gson:2.2.4'
 
