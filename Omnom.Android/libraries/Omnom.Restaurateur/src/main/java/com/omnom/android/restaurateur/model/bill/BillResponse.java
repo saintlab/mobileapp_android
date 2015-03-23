@@ -52,6 +52,28 @@ public class BillResponse extends ResponseBase {
 	@Expose
 	private double tipCommission;
 
+	@Expose
+	private String wishId;
+
+	@Expose
+	private String hash;
+
+	public String getWishId() {
+		return wishId;
+	}
+
+	public void setWishId(final String wishId) {
+		this.wishId = wishId;
+	}
+
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(final String hash) {
+		this.hash = hash;
+	}
+
 	public String getRestaurantId() {
 		return restaurantId;
 	}

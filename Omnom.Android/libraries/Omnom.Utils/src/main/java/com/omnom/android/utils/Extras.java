@@ -29,15 +29,20 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_REQUEST_ID = "com.omnom.android.request_id";
 	public static final String EXTRA_MARGIN = "com.omnom.android.page.margin";
 	public static final String EXTRA_ACCENT_COLOR = "com.omnom.android.order.color.accent";
+	public static final String EXTRA_ORDER_NUMBER = "com.omnom.android.order.color.order_number";
+	public static final String EXTRA_PIN_CODE = "com.omnom.android.order.color.pin_code";
 	public static final String EXTRA_ORDER_AMOUNT = "com.omnom.android.order.amount";
 	public static final String EXTRA_ORDER_TIPS = "com.omnom.android.order.tips";
 	public static final String EXTRA_SCAN_USED = "com.omnom.android.order.scan_used";
 	public static final String EXTRA_CONFIRM_TYPE = "com.omnom.android.user.phone.confirm_type";
 	public static final String EXTRA_CARD_DATA = "com.omnom.android.card.data";
+	public static final String EXTRA_WISH_RESPONSE = "com.omnom.android.wish.response";
 	public static final String EXTRA_TYPE = "com.omnom.android.type";
 	public static final String EXTRA_ORDER = "com.omnom.android.order";
+	public static final String EXTRA_USER_ORDER = "com.omnom.android.wish.order";
 	public static final String EXTRA_ORDER_DATA = "com.omnom.android.order.data";
 	public static final String EXTRA_PAYMENT_DETAILS = "com.omnom.android.payment.details";
+	public static final String EXTRA_PAYMENT_TYPE = "com.omnom.android.payment.type";
 	public static final String EXTRA_PAYMENT_EVENT = "com.omnom.android.payment.event";
 	public static final String EXTRA_TRANSACTION_URL = "com.omnom.android.payment.transaction_url";
 	public static final String EXTRA_ANIMATION_EXIT = "com.omnom.android.extra.animation";
@@ -51,6 +56,8 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_TRANSLATION_BUTTON = "com.omnom.android.extra.translation.btn";
 	public static final String EXTRA_TITLE_SIZE = "com.omnom.android.extra.title.height";
 	public static final String EXTRA_PIVOT_Y = "com.omnom.android.position.y";
+
+	public static final String EXTRA_URI = "com.omnom.android.uri";
 
 	public static final String EXTRA_CHARACTERISTIC_UUID = "ble.characteristic.uuid";
 	public static final String EXTRA_CHARACTERISTIC_VALUE = "ble.characteristic.value";

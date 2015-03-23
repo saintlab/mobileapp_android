@@ -204,6 +204,14 @@ public class OrderFragment extends Fragment {
 			mSplitWay = splitWay.ordinal();
 		}
 
+		public PaymentDetails(double amount, int tip, TipsWay tipsWay, int tipValue, SplitWay splitWay) {
+			mAmount = amount;
+			mTip = tip;
+			mTipValue = tipValue;
+			mTipsWay = tipsWay.ordinal();
+			mSplitWay = splitWay.ordinal();
+		}
+
 		@Override
 		public String toString() {
 			return "PaymentDetails{" +

@@ -116,6 +116,20 @@ public class RestaurantHelper {
 		return hasSettings(restaurant) && restaurant.settings().hasMenu();
 	}
 
+	public static boolean isBar(final Restaurant restaurant) {
+		if(restaurant == null) {
+			return false;
+		}
+		return restaurant.isBar();
+	}
+
+	public static String getBarUri(final Restaurant restaurant) {
+		if(restaurant == null) {
+			return StringUtils.EMPTY_STRING;
+		}
+		return restaurant.ordersPaidUrl();
+	}
+
 	public static boolean isPromoEnabled(final Restaurant restaurant) {
 		return hasSettings(restaurant) && restaurant.settings().hasPromo();
 	}
@@ -163,9 +177,5 @@ public class RestaurantHelper {
 		}
 
 		return table;
-	}
-
-	public static boolean isBar(final Restaurant restaurant) {
-		return false;
 	}
 }

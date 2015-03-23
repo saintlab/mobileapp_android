@@ -33,22 +33,50 @@
     </FrameLayout>
 
     <LinearLayout
-        android:id="@+id/panel_bottom"
+        android:id="@+id/panel_linear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_alignParentBottom="true">
 
-        <include layout="@layout/delimiter_vertical" />
+        <LinearLayout
+            android:id="@+id/panel_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        <include layout="@layout/layout_bill" />
+            <include layout="@layout/delimiter_vertical" />
+
+            <include layout="@layout/layout_bill" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/panel_bottom_bar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/view_size_default"
+            android:orientation="vertical"
+            android:clickable="true">
+
+            <include layout="@layout/delimiter_vertical" />
+
+            <TextView
+                android:duplicateParentState="true"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:text="@string/ready_orders_list"
+                android:textColor="@drawable/text_color_selector"
+                android:textAppearance="?android:textAppearanceLarge" />
+        </LinearLayout>
+
     </LinearLayout>
 
     <com.omnom.android.utils.view.OmnomRecyclerView
         android:id="@android:id/list"
         android:listSelector="@color/transparent"
         android:layout_below="@+id/panel_top"
-        android:layout_above="@+id/panel_bottom"
+        android:layout_above="@+id/panel_linear"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -56,6 +84,6 @@
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom" />
 
 </RelativeLayout>

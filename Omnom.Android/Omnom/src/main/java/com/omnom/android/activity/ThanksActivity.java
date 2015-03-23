@@ -35,6 +35,7 @@ public class ThanksActivity extends BaseOmnomActivity {
 
 	private int mAccentColor;
 
+	@Nullable
 	private Order mOrder;
 
 	@Nullable
@@ -95,6 +96,8 @@ public class ThanksActivity extends BaseOmnomActivity {
 				}
 			});
 		}
-		mPaymentListener.initTableSocket(mOrder.getTableId());
+		if(mOrder != null) {
+			mPaymentListener.initTableSocket(mOrder.getTableId());
+		}
 	}
 }
