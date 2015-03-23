@@ -559,11 +559,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			                                     public void call(ConfigurationResponse configurationResponse) {
 				                                     final ValidateActivity activity = ValidateActivity.this;
 				                                     final UserResponse userResponse = configurationResponse.getUserResponse();
+				                                     updateConfiguration(configurationResponse.getConfig());
 				                                     correctMixpanelTime(userResponse);
 				                                     reportMixPanel(userResponse);
 				                                     OmnomApplication.get(getActivity()).cacheUserProfile(new UserProfile(userResponse));
 
-				                                     updateConfiguration(configurationResponse.getConfig());
 				                                     getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 				                                                               new AppLaunchMixpanelEvent(userResponse.getUser()));
 				                                     if(!BluetoothUtils.hasBleSupport(activity) && !isExternalLaunch()) {

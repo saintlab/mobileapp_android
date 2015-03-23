@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by mvpotter on 12/30/2014.
@@ -24,21 +23,34 @@ public class Settings implements Parcelable {
 	};
 
 	@Expose
-	@SerializedName("has_waiter_call")
 	private boolean hasWaiterCall;
 
 	@Expose
-	@SerializedName("has_promo")
 	private boolean hasPromo;
 
 	@Expose
-	@SerializedName("has_menu")
 	private boolean hasMenu;
+
+	@Expose
+	private boolean hasTableOrder;
+
+	@Expose
+	private boolean hasBar;
+
+	@Expose
+	private boolean hasLunch;
+
+	@Expose
+	private boolean hasTakeaway;
 
 	public Settings(Parcel parcel) {
 		hasWaiterCall = toBoolean(parcel.readByte());
 		hasPromo = toBoolean(parcel.readByte());
 		hasMenu = toBoolean(parcel.readByte());
+		hasTableOrder = toBoolean(parcel.readByte());
+		hasBar = toBoolean(parcel.readByte());
+		hasLunch = toBoolean(parcel.readByte());
+		hasTakeaway = toBoolean(parcel.readByte());
 	}
 
 	public boolean hasWaiterCall() {
@@ -53,6 +65,22 @@ public class Settings implements Parcelable {
 		return hasMenu;
 	}
 
+	public boolean hasBar() {
+		return hasBar;
+	}
+
+	public boolean hasLunch() {
+		return hasLunch;
+	}
+
+	public boolean hasTakeaway() {
+		return hasTakeaway;
+	}
+
+	public boolean hasTableOrder() {
+		return hasTableOrder;
+	}
+
 	@Override
 	public int describeContents() {
 		return 0;
@@ -63,6 +91,10 @@ public class Settings implements Parcelable {
 		dest.writeByte(toByte(hasWaiterCall));
 		dest.writeByte(toByte(hasPromo));
 		dest.writeByte(toByte(hasMenu));
+		dest.writeByte(toByte(hasTableOrder));
+		dest.writeByte(toByte(hasBar));
+		dest.writeByte(toByte(hasLunch));
+		dest.writeByte(toByte(hasTakeaway));
 	}
 
 	private byte toByte(final boolean value) {

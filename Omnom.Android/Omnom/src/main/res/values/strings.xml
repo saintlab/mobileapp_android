@@ -120,9 +120,11 @@
     <string name="balk_notification_user_paid_">%1$s: оплачено по&#160;счету %2$s </string>
     <string name="title_activity_restaurants_list">RestaurantsListActivity</string>
     <string name="title_activity_restaurant">RestaurantActivity</string>
-    <string name="reserve_table">Бронировать\nстолик</string>
-    <string name="im_inside_restaurant">Я внутри</string>
-    <string name="make_an_order">Сделать\nзаказ</string>
+    <string name="to_bar">В бар</string>
+    <string name="im_inside_restaurant">За стол</string>
+    <string name="takeaway_order">Заказ на&#160;вынос</string>
+    <string name="lunch">Заказ обеда в&#160;офис</string>
+    <string name="orders_are_accepted_only_from_to">Мы принимаем заказы только\nс&#160;%1$s до&#160;%2$s</string>
     <string name="write_to_us">Напишите нам</string>
     <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
     <string name="navigate_qr_code">Наведите камеру\nна&#160;QR-код Omnom.\nЧто это такое?</string>

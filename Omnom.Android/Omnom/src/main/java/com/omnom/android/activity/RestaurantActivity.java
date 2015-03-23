@@ -1,23 +1,31 @@
 package com.omnom.android.activity;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.restaurant.Settings;
+import com.omnom.android.restaurateur.model.restaurant.schedule.DailySchedule;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.Calendar;
@@ -76,6 +84,15 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	@InjectView(R.id.main_content)
 	protected View viewMain;
 
+	@InjectView(R.id.txt_bar)
+	protected View txtBar;
+
+	@InjectView(R.id.txt_takeaway)
+	protected View txtTakeaway;
+
+	@InjectView(R.id.txt_lunch)
+	protected View txtLunch;
+
 	private Restaurant mRestaurant;
 
 	private boolean mFinishing = false;
@@ -86,8 +103,8 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	private int logoSizeLarge;
 
-	@OnClick(R.id.txt_reserve)
-	protected void doReserve() {
+	@OnClick(R.id.txt_bar)
+	protected void goToBar() {
 		if(!mFinishing) {
 			// TODO: Implement
 		}
@@ -100,17 +117,28 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		}
 	}
 
+	@OnClick(R.id.txt_lunch)
+	protected void doOrderLunch() {
+		if(!mFinishing) {
+			if (validateOrderTime()) {
+				// TODO: implement
+			}
+		}
+	}
+
+	@OnClick(R.id.txt_takeaway)
+	protected void doTakeAway() {
+		if(!mFinishing) {
+			if (validateOrderTime()) {
+				// TODO: implement
+			}
+		}
+	}
+
 	@OnClick(R.id.btn_call)
 	protected void doCall() {
 		if(!mFinishing) {
 			AndroidUtils.openDialer(this, mRestaurant.phone());
-		}
-	}
-
-	@OnClick(R.id.txt_order)
-	protected void doMakeOrder() {
-		if(!mFinishing) {
-			// TODO: Implement
 		}
 	}
 
@@ -188,6 +216,12 @@ public class RestaurantActivity extends BaseOmnomActivity {
 			finish();
 			return;
 		}
+		final Settings settings = mRestaurant.settings();
+		if (settings != null) {
+			txtBar.setEnabled(settings.hasBar());
+			txtLunch.setEnabled(settings.hasLunch());
+			txtTakeaway.setEnabled(settings.hasTakeaway());
+		}
 		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 		logoSizeSmall = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_SMALL + 0.5);
 		logoSizeLarge = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_LARGE + 0.5);
@@ -211,4 +245,27 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	public int getLayoutResource() {
 		return R.layout.activity_restaurant;
 	}
+
+	private boolean validateOrderTime() {
+		final int weekDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+		final DailySchedule dailySchedule = RestaurantHelper.getOrderSchedule(mRestaurant, weekDay);
+		if (dailySchedule.isClosed()) {
+			showScheduleDialog(dailySchedule.getOpenTime(), dailySchedule.getCloseTime());
+		}
+		return !dailySchedule.isClosed();
+	}
+
+	private void showScheduleDialog(final String from, final String to) {
+		final String message = getString(R.string.orders_are_accepted_only_from_to, from, to);
+		final AlertDialog dialog = DialogUtils.showDialog(this, message, R.string.ok,
+							   new DialogInterface.OnClickListener() {
+								   @Override
+								   public void onClick(DialogInterface dialog, int which) {
+									   dialog.dismiss();
+								   }
+							   });
+		TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
+		messageView.setGravity(Gravity.CENTER);
+	}
+
 }

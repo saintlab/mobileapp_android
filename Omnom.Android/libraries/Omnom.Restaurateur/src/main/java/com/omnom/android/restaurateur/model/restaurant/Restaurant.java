@@ -58,6 +58,9 @@ public abstract class Restaurant implements Parcelable {
 	public abstract Schedules schedules();
 
 	@Nullable
+	public abstract Schedules orderSchedules();
+
+	@Nullable
 	public abstract String phone();
 
 	@Nullable

@@ -87,7 +87,14 @@ public class RestaurantHelper {
 	 * @see java.util.Calendar#SUNDAY
 	 */
 	public static DailySchedule getDailySchedule(Restaurant restaurant, int weekDay) {
-		final Schedules schedules = restaurant.schedules();
+		return getDailySchedule(restaurant.schedules(), weekDay);
+	}
+
+	public static DailySchedule getOrderSchedule(Restaurant restaurant, int weekDay) {
+		return getDailySchedule(restaurant.orderSchedules(), weekDay);
+	}
+
+	private static DailySchedule getDailySchedule(final Schedules schedules, int weekDay) {
 		if(schedules == null) {
 			return DailySchedule.NULL;
 		}
