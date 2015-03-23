@@ -93,9 +93,8 @@ public interface RestaurateurDataService {
 	Observable<OrdersResponse> getOrders(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
 	                                     @Path(Protocol.FIELD_TABLE_ID) String tableId);
 
-	@GET("/restaurants/{restaurant_id}/tables/{table_id}/items")
-	Observable<Collection<OrderItem>> getItems(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
-	                                           @Path(Protocol.FIELD_TABLE_ID) String tableId);
+	@GET("/restaurants/{restaurant_id}/wishes/items")
+	Observable<Collection<OrderItem>> getWishItems(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId);
 
 	@POST("/restaurants/{restaurant_id}/tables/{table_id}/new/guest")
 	Observable<ResponseBase> newGuest(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,

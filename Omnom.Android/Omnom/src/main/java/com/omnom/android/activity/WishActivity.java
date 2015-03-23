@@ -220,7 +220,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	private void refresh() {
 		ViewUtils.setVisible(mProgressBar, true);
-		api.getItems(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<Collection<OrderItem>>() {
+		api.getItems(mTable.getRestaurantId()).subscribe(new Action1<Collection<OrderItem>>() {
 			@Override
 			public void call(final Collection<OrderItem> response) {
 				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, WishActivity.this);
@@ -372,8 +372,8 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		//	   public Observable<BillResponse> call(final WishResponse wishResponse) {
 		//		   if(!wishResponse.hasErrors()) {
 		//			   // TODO:
-		//			   //if(wishResponse.getItems() != null && wishResponse.getItems().size() > 0) {
-		//			   //   showOutOfSaleDialog(getActivity(), getStoppedItems(wishResponse.getItems()));
+		//			   //if(wishResponse.getWishItems() != null && wishResponse.getWishItems().size() > 0) {
+		//			   //   showOutOfSaleDialog(getActivity(), getStoppedItems(wishResponse.getWishItems()));
 		//			   //   return Observable.empty();
 		//			   //} else {
 		//			   return api.bill(BillRequest.createForWish(mTable.getRestaurantId(), wishResponse.getId()));

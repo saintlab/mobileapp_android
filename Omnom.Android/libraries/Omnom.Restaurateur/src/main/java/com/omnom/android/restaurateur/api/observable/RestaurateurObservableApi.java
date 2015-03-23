@@ -96,7 +96,7 @@ public interface RestaurateurObservableApi {
 
 	public Observable<OrdersResponse> getOrders(String restaurantId, String tableId);
 
-	public Observable<Collection<OrderItem>> getItems(String restaurantId, String tableId);
+	public Observable<Collection<OrderItem>> getWishItems(String restaurantId);
 
 	public Observable<ResponseBase> newGuest(String restaurantId, String tableId);
 
