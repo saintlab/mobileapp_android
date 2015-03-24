@@ -125,6 +125,8 @@
     <string name="takeaway_order">Заказ на&#160;вынос</string>
     <string name="lunch">Заказ обеда в&#160;офис</string>
     <string name="orders_are_accepted_only_from_to">Мы принимаем заказы только\nс&#160;%1$s до&#160;%2$s</string>
+    <string name="order_will_be_waiting_for_you">Заказ будет ждать вас\n сегодня %1$s\nпо&#160;адресу\n%2$s</string>
+    <string name="order_will_be_delivered">Заказ будет доставлен по&#160;адресу\n%1$s\n&#160;%2$s %3$s %4$s\nориентировочно в&#160;%5$s</string>
     <string name="write_to_us">Напишите нам</string>
     <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
     <string name="navigate_qr_code">Наведите камеру\nна&#160;QR-код Omnom.\nЧто это такое?</string>

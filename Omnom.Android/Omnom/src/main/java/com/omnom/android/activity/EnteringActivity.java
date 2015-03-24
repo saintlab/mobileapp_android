@@ -118,16 +118,16 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 			enteringFragment = EnteringFragment.newInstance();
 			if(skipSplash) {
 				getSupportFragmentManager().beginTransaction()
-				                           .replace(R.id.fragment_container, enteringFragment)
-				                           .commit();
+						.replace(R.id.fragment_container, enteringFragment)
+						.commit();
 				showPanelBottom(false);
 			} else {
 				// During initial setup, plug in the details fragment.
 				mIsApplicationLaunch = intent.getBooleanExtra(EXTRA_APPLICATION_LAUNCH, true);
 				splashFragment = SplashFragment.newInstance(mIsApplicationLaunch);
 				getSupportFragmentManager().beginTransaction()
-				                           .replace(R.id.fragment_container, splashFragment)
-				                           .commit();
+						.replace(R.id.fragment_container, splashFragment)
+						.commit();
 			}
 		}
 	}

@@ -257,7 +257,19 @@
             android:theme="@style/Theme.Wood.Red"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".activity.OrderAcceptedActivity"
+            android:name=".activity.order.BarOrderAcceptedActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood.Red"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activity.order.LunchOrderAcceptedActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood.Red"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activity.order.TakeawayOrderAcceptedActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood.Red"

@@ -11,7 +11,8 @@ import com.omnom.android.activity.ConfirmPhoneActivity;
 import com.omnom.android.activity.EnteringActivity;
 import com.omnom.android.activity.LoginActivity;
 import com.omnom.android.activity.OmnomQRCaptureActivity;
-import com.omnom.android.activity.OrderAcceptedActivity;
+import com.omnom.android.activity.order.BarOrderAcceptedActivity;
+import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.activity.PaymentProcessActivity;
 import com.omnom.android.activity.RestaurantActivity;
@@ -27,6 +28,8 @@ import com.omnom.android.activity.ValidateActivityShortcut;
 import com.omnom.android.activity.WebActivity;
 import com.omnom.android.activity.WishActivity;
 import com.omnom.android.activity.WishSentActivity;
+import com.omnom.android.activity.order.LunchOrderAcceptedActivity;
+import com.omnom.android.activity.order.TakeawayOrderAcceptedActivity;
 import com.omnom.android.fragment.BillItemsFragment;
 import com.omnom.android.fragment.BillSplitFragment;
 import com.omnom.android.fragment.BillSplitPersonsFragment;
@@ -53,8 +56,10 @@ import dagger.Module;
 		ValidateActivityBle.class, ValidateActivityCamera.class,
 		ValidateActivityShortcut.class, ValidateActivityBle.class, ValidateActivityBle21.class, OrdersActivity.class, CardsActivity.class,
 		UserProfileActivity.class,
-		CardAddActivity.class,
-		CardConfirmActivity.class, OrderAcceptedActivity.class, ThanksActivity.class, ThanksDemoActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
+		CardAddActivity.class, CardConfirmActivity.class,
+		BaseOrderAcceptedActivity.class, BarOrderAcceptedActivity.class,
+		LunchOrderAcceptedActivity.class, TakeawayOrderAcceptedActivity.class,
+		ThanksActivity.class, ThanksDemoActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
 		PaymentProcessActivity.class, RestaurantsListActivity.class, RestaurantActivity.class, WishActivity.class, WishSentActivity.class,
 		WebActivity.class,
 		/* services */

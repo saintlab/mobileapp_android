@@ -62,6 +62,8 @@ public class AndroidUtils {
 
 	public static final int MAX_ANIMATION_INCEREMENT = 20;
 
+	public static final Locale russianLocale = new Locale("ru", "RU");
+
 	public static void clickify(TextView view, final String clickableText,
 	                            final ClickSpan.OnClickListener listener) {
 

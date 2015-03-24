@@ -28,6 +28,7 @@ import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.mixpanel.MixPanelHelper;
@@ -412,7 +413,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mDetails.getAmount(), mDetails.getTip());
 				} else {
 					if(mWishResponse != null) {
-						OrderAcceptedActivity.start(getActivity(), "#orderNumber", mWishResponse.code(), REQUEST_THANKS, mAccentColor);
+						BaseOrderAcceptedActivity.startBar(getActivity(), "#orderNumber", mWishResponse.code(), REQUEST_THANKS, mAccentColor);
 					} else {
 						ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
 					}
