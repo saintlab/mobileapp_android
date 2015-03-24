@@ -220,7 +220,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	private void refresh() {
 		ViewUtils.setVisible(mProgressBar, true);
-		api.getItems(mTable.getRestaurantId()).subscribe(new Action1<Collection<OrderItem>>() {
+		api.getWishItems(mTable.getRestaurantId()).subscribe(new Action1<Collection<OrderItem>>() {
 			@Override
 			public void call(final Collection<OrderItem> response) {
 				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, WishActivity.this);
