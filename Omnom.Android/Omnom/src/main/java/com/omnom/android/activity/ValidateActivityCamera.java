@@ -126,7 +126,8 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 		if(BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
 			// findTable("http://www.riston.ru/wishes"); // mehico
-			findTable("http://m.2gis.ru/os/"); // mehico
+			// findTable("http://m.2gis.ru/os/"); // mehico
+			findTable("qr-code-for-0-lunch2gis"); // mehico
 			// findTable("http://omnom.menu/qr/00e7232a4d9d2533e7fa503620c4431b"); // shashlikoff
 			return;
 		}

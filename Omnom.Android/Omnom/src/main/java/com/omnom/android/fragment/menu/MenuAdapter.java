@@ -155,7 +155,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		}
 
 		private void bindDescription(final Item item) {
-			if(panelDescription != null) {
+			if(panelDescription != null && item != null) {
 				ViewUtils.setVisible(panelDescription, item.hasDescription());
 				txtDescription.setText(item.description() + "..");
 			}
@@ -221,10 +221,10 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 	private View.OnClickListener mListener;
 
-	public MenuAdapter(Context context, Menu menu, UserOrder userOrder, final HashMap<Data,
-			RecyclerView.ViewHolder> headerStore,
+	public MenuAdapter(Context context, Menu menu, UserOrder userOrder, final HashMap<Data, RecyclerView.ViewHolder> headerStore,
 	                   View.OnClickListener listener,
-	                   View.OnClickListener itemClickListener, View.OnClickListener applyClickListener) {
+	                   View.OnClickListener itemClickListener,
+	                   View.OnClickListener applyClickListener) {
 		mContext = context;
 		mMenu = menu;
 		mUserOrder = userOrder;

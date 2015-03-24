@@ -24,14 +24,6 @@
             android:layout_gravity="bottom"
             android:background="@drawable/bg_menu_gradient" />
 
-        <com.omnom.android.view.subcategories.SubcategoriesView
-            android:id="@+id/view_subcategories"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="48dp"
-            android:layout_gravity="bottom"
-            android:visibility="gone" />
-
         <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
             android:id="@+id/sliding_layout"
             android:layout_width="match_parent"
@@ -52,9 +44,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="48dp"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:clickable="true"
                 android:layout_gravity="bottom" />
 
         </com.sothree.slidinguppanel.SlidingUpPanelLayout>

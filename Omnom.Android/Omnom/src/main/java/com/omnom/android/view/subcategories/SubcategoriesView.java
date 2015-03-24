@@ -2,7 +2,6 @@ package com.omnom.android.view.subcategories;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -60,6 +59,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	public static final int DURATION_ITEM_FLIP_STEP = 50;
 
+	public final int THRESHOLD = ViewUtils.dipToPixels(getContext(), 4);
+
 	private final RecyclerView.OnScrollListener mOnScrollListener = new RecyclerView.OnScrollListener() {
 		@Override
 		public void onScrollStateChanged(final RecyclerView recyclerView, final int newState) {
@@ -105,17 +106,17 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	private boolean mTouchEnabled = false;
 
-	private OnCollapsedTouchListener mCollapsedTouchListener;
-
 	private MenuSmoothScroller mSmoothScroller;
-
-	private GestureDetector mGestureDetector;
 
 	private HeaderItemDecorator mHeaderItemDecorator;
 
 	private FlipInTopXDelayedAnimator mItemAnimator;
 
 	private boolean mItemAnimationsSupported;
+
+	private ItemTouchListenerBase mItemTouchListener;
+
+	private OnCollapsedTouchListener mCollapsedTouchListener;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public SubcategoriesView(Context context) {
@@ -168,7 +169,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		OnClickListener mGroupClickListener = new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				onGroupClick(v);
+				onGroupClick(v, false);
 			}
 		};
 		mMenuAdapter = new MenuAdapter(getContext(), mMenu, mOrder, headerStore, mGroupClickListener, new OnClickListener() {
@@ -184,7 +185,6 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			}
 		});
 		mMenuAdapter.setHasStableIds(true);
-		mGestureDetector = new GestureDetector(getActivity(), new SingleTapDetector(this, mListView, mMenuAdapter));
 
 		mListView.setAdapter(mMenuAdapter);
 		mHeaderItemDecorator = new HeaderItemDecorator(this, mListView, mMenuAdapter, headerStore);
@@ -199,47 +199,20 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		mMenuAdapter.addAll(menuData.getData());
 		mMenuAdapter.collapseAll();
 		mPanelBottom.setBackgroundColor(Color.TRANSPARENT);
-
-		mListView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-			public Point mPoint = new Point();
-
-			@Override
-			public boolean onInterceptTouchEvent(final RecyclerView rv, final MotionEvent e) {
-				if(!mTouchEnabled) {
-					switch(e.getAction()) {
-						case MotionEvent.ACTION_DOWN:
-							mPoint.set((int) e.getX(), (int) e.getY());
-							break;
-
-						case MotionEvent.ACTION_UP:
-							if(mPoint.equals(new Point((int) e.getX(), (int) e.getY()))) {
-								if(mCollapsedTouchListener != null) {
-									mCollapsedTouchListener.onCollapsedSubcategoriesTouch(e);
-									final View childViewUnder = mListView.findChildViewUnder(e.getX(), e.getY());
-									onGroupClick(childViewUnder);
-								}
-							}
-							mPoint.set(-1, -1);
-							break;
-					}
-				} else {
-					return mGestureDetector.onTouchEvent(e);
-				}
-				return !mTouchEnabled;
-			}
-
-			@Override
-			public void onTouchEvent(final RecyclerView rv, final MotionEvent e) {
-				// Do nothing
-			}
-		});
+		final GestureDetector gestureDetector = new GestureDetector(getActivity(), new SingleTapDetector(this, mListView, mMenuAdapter));
+		mItemTouchListener = ItemTouchListenerFactory.create(this, gestureDetector, mCollapsedTouchListener);
+		mListView.addOnItemTouchListener(mItemTouchListener);
 	}
 
 	protected void restoreHeaderView(final RecyclerView.ViewHolder holder) {
 		mHeaderItemDecorator.restoreHeaderView(holder);
 	}
 
-	private void onGroupClick(final View v) {
+	protected final void onGroupClick(final View v, boolean force) {
+		if(!mTouchEnabled && !force) {
+			return;
+		}
+
 		final int childPosition = mListView.getChildPosition(v);
 		final MultiLevelRecyclerAdapter.Data category = mMenuAdapter.getItemAt(childPosition);
 		final boolean isGroup = category.isGroup();
@@ -336,6 +309,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	@Override
 	public void onPanelCollapsed(final View panel) {
 		mTouchEnabled = false;
+		mItemTouchListener.setTouchEnabled(mTouchEnabled);
 		AnimationUtils.animateAlpha3(mImgClose, false);
 		AnimationUtils.animateAlpha3(mImgSearch, false);
 	}
@@ -343,6 +317,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	@Override
 	public void onPanelExpanded(final View panel) {
 		mTouchEnabled = true;
+		mItemTouchListener.setTouchEnabled(mTouchEnabled);
 		AnimationUtils.animateAlpha3(mImgClose, true);
 		AnimationUtils.animateAlpha3(mImgSearch, true);
 

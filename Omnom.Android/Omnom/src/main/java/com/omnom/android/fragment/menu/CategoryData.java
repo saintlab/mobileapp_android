@@ -29,7 +29,7 @@ public class CategoryData implements Data {
 
 	private ArrayList<Data> mChildren;
 
-	private boolean mIsGroup;
+	private boolean mIsGroup = true;
 
 	public CategoryData(Data parent, Menu menu, UserOrder order, Category category, int level) {
 		mParent = parent;
