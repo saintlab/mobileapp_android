@@ -3,6 +3,7 @@ package com.omnom.android.view.subcategories;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -18,8 +19,6 @@ import com.omnom.android.utils.utils.ViewUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import static butterknife.ButterKnife.findById;
-
 /**
  * Created by Ch3D on 17.03.2015.
  */
@@ -32,10 +31,6 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 	public static final int TEXT_COLOR_DEFAULT = Color.WHITE;
 
 	private final int mBgColorSelected;
-
-	private final int mAnimationDurationDefault;
-
-	private final OmnomArgbEvaluator mEvaluator;
 
 	private SubcategoriesView mSubcategoriesView;
 
@@ -57,8 +52,6 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 		mMenuAdapter = menuAdapter;
 		mHeaderStore = headerStore;
 		mBgColorSelected = subcategoriesView.getResources().getColor(R.color.lighter_grey);
-		mAnimationDurationDefault = subcategoriesView.getResources().getInteger(R.integer.default_animation_duration_short);
-		mEvaluator = OmnomArgbEvaluator.getInstance();
 	}
 
 	@Override
@@ -73,27 +66,39 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 		return MenuAdapter.getCategoryColor(holder.getItemViewType());
 	}
 
-	protected void restoreHeaderView(final RecyclerView.ViewHolder holder) {
-		if(MenuAdapter.isHeader(holder)) {
-			final View v = holder.itemView;
-			v.setBackgroundColor(getCategoryBgColor(holder));
-			((TextView) v.findViewById(R.id.txt_title)).setTextColor(TEXT_COLOR_DEFAULT);
+	public final void restoreHeaderView(final RecyclerView.ViewHolder holder) {
+		restoreHeaderView(holder, mMenuAdapter.getItemAt(holder.getPosition()));
+	}
+
+	public final void restoreHeaderView(final RecyclerView.ViewHolder holder, MultiLevelRecyclerAdapter.Data item) {
+		if(holder.getPosition() < 0 || !MenuAdapter.isHeader(holder)) {
+			return;
+		}
+
+		if(item instanceof CategoryData) {
+			final CategoryData category = (CategoryData) item;
+			if(!category.isGroup() && category.getChildren() != null && category.getChildren().size() > 0) {
+				drawSelectedBackground(holder.itemView);
+			} else {
+				final View v = holder.itemView;
+				restoreView(holder, v);
+			}
 		}
 	}
 
-	void drawSelectedBackground(final View view) {
+	private void restoreView(final RecyclerView.ViewHolder holder, final View v) {
+		v.setBackgroundColor(getCategoryBgColor(holder));
+		((TextView) v.findViewById(R.id.txt_title)).setTextColor(TEXT_COLOR_DEFAULT);
+	}
+
+	public final void drawSelectedBackground(final View view) {
 		if(mMenuAdapter.hasExpandedGroups()) {
-			((TextView) view.findViewById(R.id.txt_title)).setTextColor(TEXT_COLOR_SELECTED);
+			final TextView viewById = (TextView) view.findViewById(R.id.txt_title);
+			if(viewById.getText().equals("Основное")) {
+				System.err.println(">>>");
+			}
+			viewById.setTextColor(TEXT_COLOR_SELECTED);
 			view.setBackgroundColor(mBgColorSelected);
-		}
-	}
-
-	void animateHeaderStyle(final RecyclerView.ViewHolder holder) {
-		if(MenuAdapter.isHeader(holder)) {
-			AnimationUtils.animateTextColor((TextView) findById(holder.itemView, R.id.txt_title),
-			                                TEXT_COLOR_SELECTED,
-			                                mAnimationDurationDefault);
-			AnimationUtils.animateBackground(holder.itemView, getCategoryBgColor(holder), mBgColorSelected, mAnimationDurationDefault);
 		}
 	}
 
@@ -103,23 +108,15 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 		}
 
 		final View view = holder.itemView;
-		final int decoratedTop = mRecycleView.getLayoutManager().getDecoratedTop(view);
 		final int position = holder.getPosition();
-		final int headerHeight = mSubcategoriesView.getResources().getDimensionPixelSize(R.dimen.view_size_default);
-		if(decoratedTop <= headerHeight && position >= 0) {
-			final CategoryData data = (CategoryData) mMenuAdapter.getItemAt(position);
-			if(!data.isGroup()) {
-				if(decoratedTop > 0) {
-					final TextView txtTitle = (TextView) view.findViewById(R.id.txt_title);
-					final float fraction = (float) decoratedTop / (float) headerHeight;
-					final Integer bgColor = (Integer) mEvaluator.evaluate(fraction, mBgColorSelected, getCategoryBgColor(holder));
-					final Integer textColor = (Integer) mEvaluator.evaluate(fraction, TEXT_COLOR_SELECTED, TEXT_COLOR_DEFAULT);
-					txtTitle.setTextColor(textColor);
-					view.setBackgroundColor(bgColor);
-				} else {
-					drawSelectedBackground(view);
-				}
-			}
+		if(position < 0) {
+			restoreView(holder, holder.itemView);
+			return;
+		}
+
+		final MultiLevelRecyclerAdapter.Data data = mMenuAdapter.getItemAt(position);
+		if(data != null && !data.isGroup()) {
+			drawSelectedBackground(view);
 		} else {
 			restoreHeaderView(holder);
 		}
@@ -134,7 +131,7 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 		return dy;
 	}
 
-	private void drawHeader(final Canvas c, final RecyclerView.LayoutManager lm, int dy, final View header) {
+	private void drawHeader(final Canvas c, int dy, final View header) {
 		if(header != null && header.getVisibility() == View.VISIBLE) {
 			c.save();
 			c.translate(0, dy);
@@ -167,19 +164,24 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 
 		if(!isHeader) {
 			RecyclerView.ViewHolder header = getHeaderViewByItem(childViewHolder);
-			if(!mMenuAdapter.isHeader(header)) {
+			if(header == null || !MenuAdapter.isHeader(header)) {
 				return;
 			}
-			if(mFakeHeader == null || (mFakeHeader != null && header != mFakeHeader)) {
+			if(mFakeHeader == null || header != mFakeHeader) {
 				mFakeHeader = header;
 				mMenuAdapter.notifyDataSetChanged();
 			}
 			RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) header.itemView.getLayoutParams();
 			if(lp != null && !lp.isItemRemoved() && !lp.isViewInvalid()) {
 				final int dy = getDy(nextIsHeader, decoratedBottom);
-				drawHeader(c, lm, -dy, header.itemView);
+				drawHeader(c, -dy, header.itemView);
 				mSubcategoriesView.mFakeStickyHeader.setTranslationY(-dy);
 				final MultiLevelRecyclerAdapter.Data item = mMenuAdapter.getItemAt(childViewHolder.getPosition());
+				if(item == null) {
+					// skip
+					return;
+				}
+
 				if(item.getParent() instanceof CategoryData) {
 					final CategoryData cat = (CategoryData) item.getParent();
 					ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, true);
@@ -192,25 +194,33 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 		} else {
 			ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, false);
 			RecyclerView.ViewHolder header = getHeaderViewByItem(childViewHolder);
+			if(header == null) {
+				return;
+			}
 			mFakeHeader = childViewHolder;
-			final MultiLevelRecyclerAdapter.Data itemAt = mMenuAdapter.getItemAt(header.getPosition());
-			if(itemAt.isGroup()) {
+			final MultiLevelRecyclerAdapter.Data item = mMenuAdapter.getItemAt(header.getPosition());
+			if(item == null || item.isGroup()) {
 				return;
 			}
 			RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) header.itemView.getLayoutParams();
 			if(!lp.isItemRemoved() && !lp.isViewInvalid()) {
-				drawHeader(c, lm, (int) ViewCompat.getTranslationY(header.itemView) - getDy(nextIsHeader, decoratedBottom),
+				drawHeader(c, (int) ViewCompat.getTranslationY(header.itemView) - getDy(nextIsHeader, decoratedBottom),
 				           header.itemView);
 			}
 		}
 	}
 
+	@Nullable
 	private RecyclerView.ViewHolder getHeaderViewByItem(final RecyclerView.ViewHolder holder) {
 		final MultiLevelRecyclerAdapter.Data item = mMenuAdapter.getItemAt(holder.getPosition());
 		if(item instanceof CategoryData) {
 			mHeaderStore.put(item, holder);
 			return holder;
 		}
+		if(item == null) {
+			return null;
+		}
+
 		final MultiLevelRecyclerAdapter.Data parent = item.getParent();
 		RecyclerView.ViewHolder result = mHeaderStore.get(parent);
 		if(result == null) {
@@ -240,7 +250,7 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 
 	public void restoreHeadersStyle() {
 		for(Map.Entry<MultiLevelRecyclerAdapter.Data, RecyclerView.ViewHolder> entry : mHeaderStore.entrySet()) {
-			restoreHeaderView(entry.getValue());
+			restoreHeaderView(entry.getValue(), entry.getKey());
 		}
 	}
 }

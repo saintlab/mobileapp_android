@@ -1,5 +1,6 @@
 package com.omnom.android.adapter;
 
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -146,7 +147,11 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		return removed;
 	}
 
+	@Nullable
 	public Data getItemAt(int position) {
+		if(position < 0 || mData.size() - 1 < position) {
+			return null;
+		}
 		return mData.get(position);
 	}
 
@@ -161,7 +166,7 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		}
 		Data firstItem = getItemAt(position);
 
-		if(!firstItem.isGroup()) {
+		if(firstItem == null || !firstItem.isGroup()) {
 			return;
 		}
 
@@ -188,7 +193,7 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		}
 		Data firstItem = getItemAt(position);
 
-		if(!firstItem.isGroup()) {
+		if(firstItem == null || !firstItem.isGroup()) {
 			return;
 		}
 
@@ -206,7 +211,7 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		}
 		Data firstItem = getItemAt(position);
 
-		if(firstItem.getChildren() == null || firstItem.getChildren().isEmpty() || firstItem.isGroup()) {
+		if(firstItem == null || firstItem.getChildren() == null || firstItem.getChildren().isEmpty() || firstItem.isGroup()) {
 			return;
 		}
 		collapseGroup(position);
@@ -218,7 +223,7 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 		}
 		Data firstItem = getItemAt(position);
 
-		if(firstItem.getChildren() == null || firstItem.getChildren().isEmpty()) {
+		if(firstItem == null || firstItem.getChildren() == null || firstItem.getChildren().isEmpty()) {
 			return;
 		}
 
@@ -254,7 +259,11 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 	}
 
 	public void toggleGroup(int position, final DataFilter filter) {
-		if(getItemAt(position).isGroup()) {
+		final Data item = getItemAt(position);
+		if(item == null) {
+			return;
+		}
+		if(item.isGroup()) {
 			expandGroup(position, filter);
 		} else {
 			collapseGroup(position);
@@ -305,8 +314,8 @@ public abstract class MultiLevelRecyclerAdapter extends RecyclerView.Adapter {
 
 	public boolean hasExpandedGroups() {
 		for(int i = 0; i < mData.size(); i++) {
-			final Data firstItem = getItemAt(i);
-			if(firstItem.getChildren() == null || firstItem.getChildren().isEmpty() || firstItem.isGroup()) {
+			final Data item = getItemAt(i);
+			if(item == null || item.getChildren() == null || item.getChildren().isEmpty() || item.isGroup()) {
 				continue;
 			}
 			return true;

@@ -53,7 +53,7 @@ import static butterknife.ButterKnife.findById;
 public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelLayout.PanelSlideListener {
 
 	public interface OnCollapsedTouchListener {
-		void onCollapsedSubcategoriesTouch();
+		void onCollapsedSubcategoriesTouch(final MotionEvent e);
 	}
 
 	public static final int DURATION_ITEM_FLIP = 300;
@@ -188,6 +188,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 		mListView.setAdapter(mMenuAdapter);
 		mHeaderItemDecorator = new HeaderItemDecorator(this, mListView, mMenuAdapter, headerStore);
+		mMenuAdapter.setDecorator(mHeaderItemDecorator);
 		mItemAnimator = new FlipInTopXDelayedAnimator(DURATION_ITEM_FLIP, DURATION_ITEM_FLIP_STEP);
 		mListView.addItemDecoration(mHeaderItemDecorator);
 		if(mItemAnimationsSupported) {
@@ -213,7 +214,9 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 						case MotionEvent.ACTION_UP:
 							if(mPoint.equals(new Point((int) e.getX(), (int) e.getY()))) {
 								if(mCollapsedTouchListener != null) {
-									mCollapsedTouchListener.onCollapsedSubcategoriesTouch();
+									mCollapsedTouchListener.onCollapsedSubcategoriesTouch(e);
+									final View childViewUnder = mListView.findChildViewUnder(e.getX(), e.getY());
+									onGroupClick(childViewUnder);
 								}
 							}
 							mPoint.set(-1, -1);
@@ -258,28 +261,10 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		final int newPos = mMenuAdapter.getItemPosition(category);
 		mLayoutManager.scrollToPositionWithOffset(newPos, 0);
 		mMenuAdapter.notifyItemChanged(newPos);
-		animateHeader(v, isGroup);
 		if(!mMenuAdapter.hasExpandedGroups()) {
 			ViewUtils.setVisible(mFakeStickyHeader, false);
 		}
-	}
-
-	private void animateHeader(final View v, final boolean isGroup) {
-		final int delay = getResources().getInteger(mItemAnimationsSupported ?
-				                                            R.integer.default_animation_duration_medium :
-				                                            R.integer.default_animation_duration_quick);
-		postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				animateHeaderStyle(v, isGroup);
-			}
-		}, delay);
-	}
-
-	private void animateHeaderStyle(final View v, final boolean isGroup) {
-		if(isGroup && mLayoutManager.getDecoratedTop(v) == 0) {
-			mHeaderItemDecorator.animateHeaderStyle(mListView.getChildViewHolder(v));
-		}
+		restoreHeadersStyle();
 	}
 
 	private void showDetails(final View v) {

@@ -3,6 +3,7 @@ package com.omnom.android.activity.validate;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.graphics.Color;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -260,7 +261,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	}
 
 	@Override
-	public void onCollapsedSubcategoriesTouch() {
+	public void onCollapsedSubcategoriesTouch(final MotionEvent e) {
 		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 	}
 
