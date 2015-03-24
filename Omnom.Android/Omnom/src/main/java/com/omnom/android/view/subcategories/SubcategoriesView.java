@@ -32,6 +32,7 @@ import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
+import com.omnom.android.utils.view.OmnomRecyclerView;
 import com.omnom.android.view.MenuSmoothScroller;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -74,7 +75,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	};
 
 	@InjectView(R.id.content_recyclerview)
-	protected RecyclerView mListView;
+	protected OmnomRecyclerView mListView;
 
 	@InjectView(R.id.btn_close_menu)
 	protected ImageView mImgClose;
@@ -182,6 +183,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 				showAddFragment((Item) v.getTag(), position);
 			}
 		});
+		mMenuAdapter.setHasStableIds(true);
 		mGestureDetector = new GestureDetector(getActivity(), new SingleTapDetector(this, mListView, mMenuAdapter));
 
 		mListView.setAdapter(mMenuAdapter);
