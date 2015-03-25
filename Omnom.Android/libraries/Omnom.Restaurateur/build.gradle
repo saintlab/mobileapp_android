@@ -29,8 +29,8 @@ dependencies {
     apt 'com.squareup.dagger:dagger-compiler:1.2.2'
 
     // auto-parcel
-    compile 'com.github.frankiesardo:auto-parcel:+'
-    apt 'com.github.frankiesardo:auto-parcel-processor:+'
+    compile 'com.github.frankiesardo:auto-parcel:0.2'
+    apt 'com.github.frankiesardo:auto-parcel-processor:0.2'
 
     compile project(':libraries:Omnom.Utils')
     compile project(':libraries:Omnom.Auth')

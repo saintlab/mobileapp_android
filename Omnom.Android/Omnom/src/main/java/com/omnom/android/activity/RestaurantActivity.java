@@ -112,6 +112,11 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 
 	@OnClick(R.id.txt_im_inside)
 	protected void doImInside() {
+		// TODO:
+		//if(BuildConfig.DEBUG) {
+		//	DinnerDetailsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mRestaurant);
+		//	return;
+		//}
 		if(!mFinishing) {
 			ValidateActivityShortcut.start(this);
 		}
@@ -120,7 +125,7 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.txt_lunch)
 	protected void doOrderLunch() {
 		if(!mFinishing) {
-			if (validateOrderTime()) {
+			if(validateOrderTime()) {
 				// TODO: implement
 			}
 		}
@@ -129,7 +134,7 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.txt_takeaway)
 	protected void doTakeAway() {
 		if(!mFinishing) {
-			if (validateOrderTime()) {
+			if(validateOrderTime()) {
 				// TODO: implement
 			}
 		}
@@ -181,8 +186,8 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 
 		final View panelBottom = findViewById(R.id.panel_bottom);
 		final int paddingDiff = (int) (getResources().getDimension(R.dimen.image_button_size) +
-									   getResources().getDimension(R.dimen.activity_vertical_margin) * 2 -
-									   getResources().getDimension(R.dimen.activity_vertical_margin_large) + 0.5);
+				getResources().getDimension(R.dimen.activity_vertical_margin) * 2 -
+				getResources().getDimension(R.dimen.activity_vertical_margin_large) + 0.5);
 		final int topBarHeight = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);
 		final int translationY = topBarHeight - mTopTranslation - paddingDiff;
 
@@ -217,7 +222,7 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 			return;
 		}
 		final Settings settings = mRestaurant.settings();
-		if (settings != null) {
+		if(settings != null) {
 			ViewUtils.setVisible(txtBar, settings.hasBar());
 			ViewUtils.setVisible(txtLunch, settings.hasLunch());
 			ViewUtils.setVisible(txtTakeaway, settings.hasTakeaway());
@@ -249,7 +254,7 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	private boolean validateOrderTime() {
 		final int weekDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 		final DailySchedule dailySchedule = RestaurantHelper.getOrderSchedule(mRestaurant, weekDay);
-		if (dailySchedule.isClosed()) {
+		if(dailySchedule.isClosed()) {
 			showScheduleDialog(dailySchedule.getOpenTime(), dailySchedule.getCloseTime());
 		}
 		return !dailySchedule.isClosed();
@@ -258,12 +263,12 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	private void showScheduleDialog(final String from, final String to) {
 		final String message = getString(R.string.orders_are_accepted_only_from_to, from, to);
 		final AlertDialog dialog = DialogUtils.showDialog(this, message, R.string.ok,
-							   new DialogInterface.OnClickListener() {
-								   @Override
-								   public void onClick(DialogInterface dialog, int which) {
-									   dialog.dismiss();
-								   }
-							   });
+		                                                  new DialogInterface.OnClickListener() {
+			                                                  @Override
+			                                                  public void onClick(DialogInterface dialog, int which) {
+				                                                  dialog.dismiss();
+			                                                  }
+		                                                  });
 		TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
 		messageView.setGravity(Gravity.CENTER);
 	}

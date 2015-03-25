@@ -419,4 +419,8 @@ public class AndroidUtils {
 	public static boolean isRecyclerItemAnimationSupported() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
 	}
+
+	public static int getScreenHeightPixels(final Context context) {
+		return context.getResources().getDisplayMetrics().heightPixels;
+	}
 }
