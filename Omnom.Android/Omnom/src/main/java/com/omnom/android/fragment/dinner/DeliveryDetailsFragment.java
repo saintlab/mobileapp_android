@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.holder.DeliveryEntranceData;
+import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.utils.OmnomFont;
@@ -72,6 +74,8 @@ public class DeliveryDetailsFragment extends BaseFragment {
 
 	private boolean mFirstStart = true;
 
+	private DeliveryEntranceData entranceData;
+
 	public DeliveryDetailsFragment() {
 		// Required empty public constructor
 	}
@@ -122,6 +126,8 @@ public class DeliveryDetailsFragment extends BaseFragment {
 	@Override
 	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		final Date now = new Date();
+		entranceData = DeliveryEntranceData.create(now, StringUtils.EMPTY_STRING, now);
 		onDeliveryDate(DateUtils.parseDate(getMockDateData().get(0)));
 		onDeliveryAddress(getMockAddressData().get(0));
 	}
@@ -144,7 +150,8 @@ public class DeliveryDetailsFragment extends BaseFragment {
 	@OnClick(R.id.btn_ok)
 	public void onOk() {
 		if(validate()) {
-			// TODO:
+			// TODO: launch validate activity and pass entrance data as intent (Extras.EXTRA_ENTRANCE_DATA)
+			BaseOrderAcceptedActivity.start(getActivity(), entranceData, 0, 0);
 		}
 	}
 
@@ -158,7 +165,7 @@ public class DeliveryDetailsFragment extends BaseFragment {
 			txtDate.setError(true, getResources().getString(R.string.select_date));
 			hasErrors |= true;
 		}
-		return hasErrors;
+		return !hasErrors;
 	}
 
 	@Subscribe
@@ -169,12 +176,15 @@ public class DeliveryDetailsFragment extends BaseFragment {
 		} else {
 			txtDate.setText(getResources().getString(R.string.order_date, DateUtils.getDayOfWeek(date), DateUtils.getDayAndMonth(date)));
 		}
+		entranceData = DeliveryEntranceData.create(entranceData.orderTime(), entranceData.deliveryAddress(), date);
 	}
 
 	@Subscribe
 	public void onDeliveryAddress(DeliveryAddressData addressData) {
 		txtDate.setError(false);
+		final String deliveryAddress = addressData.name() + StringUtils.WHITESPACE + addressData.address();
 		txtAddress.setText(addressData.name() + StringUtils.WHITESPACE + addressData.address());
+		entranceData = DeliveryEntranceData.create(entranceData.orderTime(), deliveryAddress, entranceData.deliveryTime());
 	}
 
 	private ArrayList<String> getMockDateData() {

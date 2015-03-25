@@ -41,6 +41,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
+import com.omnom.android.activity.holder.TableEntranceData;
 import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
@@ -818,7 +819,8 @@ public class OrderFragment extends Fragment {
 		                                                         mOrder, mTipsWay, tips.getValue(),
 		                                                         mSplitWay);
 		final OrdersActivity activity = (OrdersActivity) getActivity();
-		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
+		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, TableEntranceData.create(),
+							OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
 	}
 
 	private void initList() {
@@ -948,7 +950,7 @@ public class OrderFragment extends Fragment {
 					@Override
 					public void onVisibilityChanged(boolean isVisible) {
 						editMode(isVisible);
-						if(mCurrentKeyboardVisility != isVisible) {
+						if (mCurrentKeyboardVisility != isVisible) {
 							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA2, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
 
@@ -962,13 +964,13 @@ public class OrderFragment extends Fragment {
 							mCurrentKeyboardVisility = isVisible;
 							editAmount.setCursorVisible(isVisible);
 
-							if(isVisible) {
+							if (isVisible) {
 								mMode = MODE_AMOUNT;
 								mLastAmount = getEnteredAmount();
 								txtPaymentTitle.setText(R.string.i_m_going_to_pay);
 								editAmount.setSelection(editAmount.getText().length() - getCurrencySuffix().length());
 							} else {
-								if(!mApply) {
+								if (!mApply) {
 									editAmount.setText(AmountHelper.format(mLastAmount) + getCurrencySuffix());
 								} else {
 									editAmount.setText(AmountHelper.format(getEnteredAmount()) + getCurrencySuffix());

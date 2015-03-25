@@ -6,6 +6,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.holder.BarEntranceData;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -29,15 +30,12 @@ public class BarOrderAcceptedActivity extends BaseOrderAcceptedActivity {
 	@InjectView(R.id.txt_check_order)
 	protected TextView txtCheckOrder;
 
-	private String mOrderNumber;
-
-	private String mPinCode;
-
 	@Override
 	protected void handleIntent(final Intent intent) {
 		super.handleIntent(intent);
-		mOrderNumber = intent.getStringExtra(EXTRA_ORDER_NUMBER);
-		mPinCode = intent.getStringExtra(EXTRA_PIN_CODE);
+		if (!(entranceData instanceof BarEntranceData)) {
+			throw new IllegalArgumentException("Bar entrance data is expected");
+		}
 	}
 
 	@Override
@@ -45,8 +43,9 @@ public class BarOrderAcceptedActivity extends BaseOrderAcceptedActivity {
 		super.initUi();
 		ViewUtils.setVisible(orderNumberContainer, true);
 		ViewUtils.setVisible(pinCodeContainer, true);
-		txtOrderNumber.setText(String.valueOf(mOrderNumber));
-		txtPinCode.setText(String.valueOf(mPinCode));
+		final BarEntranceData barEntranceData = (BarEntranceData) entranceData;
+		txtOrderNumber.setText(String.valueOf(barEntranceData.orderNumber()));
+		txtPinCode.setText(String.valueOf(barEntranceData.pinCode()));
 		AndroidUtils.clickify(txtCheckOrder, getString(R.string.we_will_invite_you_mark),
 		                      new ClickSpan.OnClickListener() {
 			                      @Override

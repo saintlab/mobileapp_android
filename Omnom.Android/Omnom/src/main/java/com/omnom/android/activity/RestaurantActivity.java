@@ -17,7 +17,11 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.holder.BarEntranceData;
+import com.omnom.android.activity.holder.TakeawayEntranceData;
+import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
+import com.omnom.android.fragment.dinner.DeliveryDetailsFragment;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.restaurant.Settings;
@@ -29,6 +33,7 @@ import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -106,17 +111,13 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.txt_bar)
 	protected void goToBar() {
 		if(!mFinishing) {
-			// TODO: Implement
+			// TODO: create BarEntranceData and pass to ValidateActivity intent  (Extras.EXTRA_ENTRANCE_DATA)
+			BaseOrderAcceptedActivity.start(getActivity(), BarEntranceData.create("#orderNumber", "#pinCode"), 0, 0);
 		}
 	}
 
 	@OnClick(R.id.txt_im_inside)
 	protected void doImInside() {
-		// TODO:
-		//if(BuildConfig.DEBUG) {
-		//	DinnerDetailsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mRestaurant);
-		//	return;
-		//}
 		if(!mFinishing) {
 			ValidateActivityShortcut.start(this);
 		}
@@ -125,8 +126,8 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.txt_lunch)
 	protected void doOrderLunch() {
 		if(!mFinishing) {
-			if(validateOrderTime()) {
-				// TODO: implement
+			if (validateOrderTime()) {
+				DeliveryDetailsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mRestaurant);
 			}
 		}
 	}
@@ -134,8 +135,12 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.txt_takeaway)
 	protected void doTakeAway() {
 		if(!mFinishing) {
-			if(validateOrderTime()) {
-				// TODO: implement
+			if (validateOrderTime()) {
+				// TODO: create TakeawayEntranceData and pass to ValidateActivity intent (Extras.EXTRA_ENTRANCE_DATA)
+				final Date orderDate = new Date();
+				final String takeawayAfter = "через 1.5 часа";
+				final String takeawayAddress = "Коптюга 13";
+				BaseOrderAcceptedActivity.start(getActivity(), TakeawayEntranceData.create(orderDate, takeawayAddress, takeawayAfter), 0, 0);
 			}
 		}
 	}
@@ -186,8 +191,8 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 
 		final View panelBottom = findViewById(R.id.panel_bottom);
 		final int paddingDiff = (int) (getResources().getDimension(R.dimen.image_button_size) +
-				getResources().getDimension(R.dimen.activity_vertical_margin) * 2 -
-				getResources().getDimension(R.dimen.activity_vertical_margin_large) + 0.5);
+									   getResources().getDimension(R.dimen.activity_vertical_margin) * 2 -
+									   getResources().getDimension(R.dimen.activity_vertical_margin_large) + 0.5);
 		final int topBarHeight = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);
 		final int translationY = topBarHeight - mTopTranslation - paddingDiff;
 

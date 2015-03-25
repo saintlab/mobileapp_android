@@ -26,7 +26,8 @@ import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
-import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.holder.EntranceData;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.menu.model.UserOrder;
@@ -66,7 +67,7 @@ import rx.functions.Func1;
 
 import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM;
 
-public class CardsActivity extends BaseOmnomActivity {
+public class CardsActivity extends BaseOmnomModeSupportActivity {
 
 	public static final int RESULT_PAY = 10;
 
@@ -100,12 +101,13 @@ public class CardsActivity extends BaseOmnomActivity {
 	}
 
 	public static void start(final Activity activity, final Order order, final OrderFragment.PaymentDetails details,
-	                         final int accentColor, final int code, boolean isDemo) {
+	                         final int accentColor, EntranceData entranceData, final int code, boolean isDemo) {
 		final Intent intent = new Intent(activity, CardsActivity.class);
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
 		intent.putExtra(Extras.EXTRA_ORDER, order);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
+		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, entranceData);
 		startActivity(activity, intent, code);
 	}
 
@@ -127,7 +129,8 @@ public class CardsActivity extends BaseOmnomActivity {
 		}
 	}
 
-	public static void start(final WishActivity activity, final UserOrder order, WishResponse wishResponse,
+	public static void start(final WishActivity activity, final UserOrder order,
+	                         WishResponse wishResponse, EntranceData entranceData,
 	                         final OrderFragment.PaymentDetails
 			                         paymentDetails,
 	                         final int accentColor, final int code) {
@@ -137,6 +140,7 @@ public class CardsActivity extends BaseOmnomActivity {
 		intent.putExtra(Extras.EXTRA_WISH_RESPONSE, wishResponse);
 		intent.putExtra(Extras.EXTRA_USER_ORDER, order);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, false);
+		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, entranceData);
 		startActivity(activity, intent, code);
 	}
 
@@ -209,6 +213,7 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	@Override
 	protected void handleIntent(final Intent intent) {
+		super.handleIntent(intent);
 		mDetails = intent.getParcelableExtra(Extras.EXTRA_PAYMENT_DETAILS);
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
 		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
@@ -533,7 +538,8 @@ public class CardsActivity extends BaseOmnomActivity {
 			}
 		} else if(resultCode == RESULT_ENTER_CARD_AND_PAY) {
 			CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : 0,
-			                      CardAddActivity.TYPE_ENTER_AND_PAY, REQUEST_CODE_CARD_ADD);
+			                      CardAddActivity.TYPE_ENTER_AND_PAY, entranceData,
+								  REQUEST_CODE_CARD_ADD);
 		}
 	}
 
@@ -553,7 +559,7 @@ public class CardsActivity extends BaseOmnomActivity {
 			type = CardAddActivity.TYPE_BIND_OR_PAY;
 		}
 		CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : 0,
-		                      type, REQUEST_CODE_CARD_ADD);
+		                      type, entranceData, REQUEST_CODE_CARD_ADD);
 	}
 
 	@Override
