@@ -33,7 +33,7 @@ import java.util.Calendar;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class RestaurantActivity extends BaseOmnomActivity {
+public class RestaurantActivity extends BaseOmnomFragmentActivity {
 
 	public static void start(BaseOmnomActivity activity, Restaurant restaurant, final int topTranslation) {
 		start(activity, restaurant, false, topTranslation);
