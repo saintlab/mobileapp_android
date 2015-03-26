@@ -114,7 +114,7 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	protected void doImInside() {
 		// TODO:
 		//if(BuildConfig.DEBUG) {
-		//	DinnerDetailsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mRestaurant);
+		//	DeliveryDetailsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mRestaurant);
 		//	return;
 		//}
 		if(!mFinishing) {

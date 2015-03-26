@@ -54,6 +54,23 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private static final int SLIDE_UP = 1;
 
+	private class RestaurantsComparator implements Comparator<Restaurant> {
+
+		@Override
+		public int compare(Restaurant lhs, Restaurant rhs) {
+			if(lhs.distance() == null && rhs.distance() == null) {
+				return 0;
+			} else if(lhs.distance() == null) {
+				return -1;
+			} else if(rhs.distance() == null) {
+				return 1;
+			}
+
+			return (int) (lhs.distance() - rhs.distance()) * 10;
+		}
+
+	}
+
 	public static void start(BaseOmnomActivity activity) {
 		start(activity, false);
 	}
@@ -166,7 +183,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private void refresh() {
 		Observable<RestaurantsResponse> restaurantsObservable;
-		if (getLocation() != null) {
+		if(getLocation() != null) {
 			restaurantsObservable = api.getRestaurantsAll(getLocation().getLatitude(), getLocation().getLongitude());
 		} else {
 			restaurantsObservable = api.getRestaurantsAll();
@@ -196,7 +213,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		footer.findViewById(R.id.txt_info).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AndroidUtils.sendFeedbackEmail(getActivity(), R.string.email_subject_feedback);
+				AndroidUtils.sendFeedbackEmail(getActivity(), R.string.email_subject_feedback, R.string.email_subject_feedback);
 			}
 		});
 		list.addFooterView(footer);
@@ -215,8 +232,8 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 			return;
 		}
 		final int paddingDiff = (int) (getResources().getDimension(R.dimen.image_button_size) +
-								       getResources().getDimension(R.dimen.activity_vertical_margin) * 2 -
-								       getResources().getDimension(R.dimen.activity_vertical_margin_large) + 0.5);
+				getResources().getDimension(R.dimen.activity_vertical_margin) * 2 -
+				getResources().getDimension(R.dimen.activity_vertical_margin_large) + 0.5);
 		final int height = panelTop.getHeight();
 
 		mItemClicked = true;
@@ -243,7 +260,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		final int listTranslation;
 		final int topTranslation;
 		final int duration = getResources().getInteger(R.integer.default_animation_duration_short);
-		if (isLast) {
+		if(isLast) {
 			footer.animate().alpha(0).setDuration(duration).start();
 			topTranslation = -view.getTop();
 			listTranslation = -height;
@@ -253,11 +270,11 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		}
 		panelTop.animate().translationYBy(-height).setDuration(duration).start();
 		refreshView.animate()
-				.translationYBy(listTranslation + topTranslation + paddingDiff)
-				.setDuration(duration)
-				.start();
+		           .translationYBy(listTranslation + topTranslation + paddingDiff)
+		           .setDuration(duration)
+		           .start();
 		panelDemo.animate().alpha(0).setDuration(duration).start();
-		if (selectedCover != null) {
+		if(selectedCover != null) {
 			AnimationUtils.scale(selectedCover, logoSizeLarge, duration);
 			selectedCover.scaleUp(duration, logoSizeLarge, true, new Runnable() {
 				@Override
@@ -291,15 +308,15 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		list.setScrollEnabled(true);
 		refreshView.setEnabled(true);
 		panelTop.setTranslationY(0);
-		if (footer != null && footer.getAlpha() < 1) {
+		if(footer != null && footer.getAlpha() < 1) {
 			footer.animate().alpha(1).start();
 		}
 		refreshView.setTranslationY(0);
-		if (mAdapter != null) {
+		if(mAdapter != null) {
 			mAdapter.setSelected(-1);
 		}
 		panelDemo.animate().alpha(1).start();
-		if (selectedCover != null) {
+		if(selectedCover != null) {
 			LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) selectedCover.getLayoutParams();
 			layoutParams.width = logoSizeSmall;
 			layoutParams.height = logoSizeSmall;
@@ -321,23 +338,6 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_restaurants_list;
-	}
-
-	private class RestaurantsComparator implements Comparator<Restaurant> {
-
-		@Override
-		public int compare(Restaurant lhs, Restaurant rhs) {
-			if (lhs.distance() == null && rhs.distance() == null) {
-				return 0;
-			} else if (lhs.distance() == null) {
-				return -1;
-			} else if (rhs.distance() == null) {
-				return 1;
-			}
-
-			return (int) (lhs.distance() - rhs.distance()) * 10;
-		}
-
 	}
 
 }

@@ -55,7 +55,8 @@ public class DeliveryOptionsFragment extends BaseFragment {
 		               .commit();
 	}
 
-	public static void showAddress(final FragmentManager fragmentManager, final @IdRes int containerId, ArrayList<DeliveryAddressData> data) {
+	public static void showAddress(final FragmentManager fragmentManager, final @IdRes
+	int containerId, ArrayList<DeliveryAddressData> data) {
 		int titleId = R.string.where;
 		int infoId = R.string.choose_delivery_locations;
 		fragmentManager.beginTransaction()
@@ -68,7 +69,8 @@ public class DeliveryOptionsFragment extends BaseFragment {
 		               .commit();
 	}
 
-	public static DeliveryOptionsFragment newInstanceDate(int type, @StringRes int titleId, @StringRes int infoId, ArrayList<String> data) {
+	public static DeliveryOptionsFragment newInstanceDate(int type, @StringRes int titleId, @StringRes int infoId,
+	                                                      ArrayList<String> data) {
 		DeliveryOptionsFragment fragment = new DeliveryOptionsFragment();
 		Bundle args = new Bundle();
 		args.putInt(ARG_TITLE, titleId);
@@ -80,7 +82,7 @@ public class DeliveryOptionsFragment extends BaseFragment {
 	}
 
 	public static DeliveryOptionsFragment newInstanceAddress(int type, @StringRes int titleId, @StringRes int infoId,
-	                                                       ArrayList<DeliveryAddressData> data) {
+	                                                         ArrayList<DeliveryAddressData> data) {
 		DeliveryOptionsFragment fragment = new DeliveryOptionsFragment();
 		Bundle args = new Bundle();
 		args.putInt(ARG_TITLE, titleId);
@@ -185,7 +187,7 @@ public class DeliveryOptionsFragment extends BaseFragment {
 		});
 
 		if(mType == TYPE_ADDRESS) {
-			mAdapter = new DeliveryAddressAdapter(getActivity(), mAddressData);
+			mAdapter = DeliveryAddressAdapter.create(getActivity(), mAddressData);
 		}
 		if(mType == TYPE_DATE) {
 			mAdapter = new DeliveryDateAdapter(getActivity(), mDataDate);
