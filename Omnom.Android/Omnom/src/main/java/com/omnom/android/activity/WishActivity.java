@@ -16,8 +16,9 @@ import android.widget.Toast;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
-import com.omnom.android.activity.holder.EntranceData;
 import com.omnom.android.activity.holder.DeliveryEntranceData;
+import com.omnom.android.activity.holder.EntranceData;
+import com.omnom.android.activity.holder.TakeawayEntranceData;
 import com.omnom.android.adapter.WishAdapter;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
@@ -135,6 +136,12 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		return item;
 	}
 
+	private static WishRequest createWishRequest(final UserOrder order, final int time) {
+		final WishRequest wishRequest = createWishRequest(order);
+		wishRequest.setTime(time);
+		return wishRequest;
+	}
+
 	@InjectView(android.R.id.list)
 	protected RecyclerView mList;
 
@@ -217,7 +224,9 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		ViewUtils.setVisible(mPanelBottom, !isBar);
 		ViewUtils.setVisible(mPanelBottomBar, isBar);
 		ViewUtils.setVisible(mProgressBar, false);
-		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, DeliveryEntranceData.create(new Date(), "Октябрьская", new Date()), this);
+		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, DeliveryEntranceData.create(new Date(), "Октябрьская",
+		                                                                                             new Date()),
+		                           this);
 		mLayoutManager = new LinearLayoutManager(this);
 		mList.setHasFixedSize(true);
 		mList.setLayoutManager(mLayoutManager);
@@ -230,7 +239,10 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		api.getItems(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<Collection<OrderItem>>() {
 			@Override
 			public void call(final Collection<OrderItem> response) {
-				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, DeliveryEntranceData.create(new Date(), "Октябрьская", new Date()), WishActivity.this);
+				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, DeliveryEntranceData.create(new Date(),
+				                                                                                                             "Октябрьская",
+				                                                                                                             new Date()),
+				                                            WishActivity.this);
 				mAdapter = adapter;
 				mList.swapAdapter(mAdapter, true);
 				ViewUtils.setVisible(mProgressBar, false);
@@ -284,7 +296,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	private void doWish() {
 		if(RestaurantHelper.isBar(mRestaurant)) {
 			doWishBar();
-		} else if(RestaurantHelper.isTakeAway(mRestaurant)) {
+		} else if(entranceData instanceof TakeawayEntranceData) {
 			doAskAboutTime();
 		} else {
 			doWishDefault();
@@ -295,8 +307,27 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		TakeawayTimeFragment.show(getSupportFragmentManager(), R.id.fragment_container);
 	}
 
+	@Subscribe
 	public void onTakeawayTimePicked(TakeawayTimePickedEvent event) {
-		// TODO: Proceed -> move to cards
+		AnimationUtils.animateAlpha(mProgressBar, true);
+		final WishRequest wishRequest = createWishRequest(mOrder, event.getTimeValue());
+		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1<WishResponse>() {
+			@Override
+			public void call(final WishResponse wishResponse) {
+				final PaymentDetails paymentDetails = new PaymentDetails(2.0,
+				                                                         //mOrder.getTotalPrice().doubleValue(),
+				                                                         0,
+				                                                         TipsWay.DEFAULT, 0,
+				                                                         SplitWay.WASNT_USED);
+				CardsActivity.start(WishActivity.this,
+				                    mOrder,
+				                    wishResponse,
+				                    entranceData,
+				                    paymentDetails,
+				                    RestaurantHelper.getBackgroundColor(mRestaurant),
+				                    REQUEST_CODE_WISH_LIST);
+			}
+		}, OmnomObservable.loggerOnError(TAG));
 	}
 
 	@Override
@@ -377,7 +408,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 				CardsActivity.start(WishActivity.this,
 				                    mOrder,
 				                    wishResponse,
-									entranceData,
+				                    entranceData,
 				                    paymentDetails,
 				                    RestaurantHelper.getBackgroundColor(mRestaurant),
 				                    REQUEST_CODE_WISH_LIST);
