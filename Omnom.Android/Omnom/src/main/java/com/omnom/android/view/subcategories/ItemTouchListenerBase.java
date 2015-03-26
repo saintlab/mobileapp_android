@@ -37,7 +37,6 @@ public abstract class ItemTouchListenerBase implements RecyclerView.OnItemTouchL
 	}
 
 	protected void onActionUp(final MotionEvent e) {
-		//if(mPoint.equals(new Point((int) e.getX(), (int) e.getY()))) {
 		if(mRect.contains((int) e.getX(), (int) e.getY())) {
 			final View childViewUnder = mView.mListView.findChildViewUnder(e.getX(), e.getY());
 			mView.onGroupClick(childViewUnder, true);
@@ -45,14 +44,14 @@ public abstract class ItemTouchListenerBase implements RecyclerView.OnItemTouchL
 				mCollapsedTouchListener.onCollapsedSubcategoriesTouch(e);
 			}
 		}
-		// mPoint.set(-1, -1);
 		mRect.set(-1, -1, -1, -1);
 	}
 
 	protected void onActionDown(final MotionEvent e) {
-		// mPoint.set((int) e.getX(), (int) e.getY());
 		final View childViewUnder = mView.mListView.findChildViewUnder(e.getX(), e.getY());
-		mRect = new Rect(childViewUnder.getLeft(), childViewUnder.getTop(), childViewUnder.getRight(), childViewUnder.getBottom());
+		if(childViewUnder != null) {
+			mRect = new Rect(childViewUnder.getLeft(), childViewUnder.getTop(), childViewUnder.getRight(), childViewUnder.getBottom());
+		}
 	}
 
 	protected boolean onGestureHandle(final MotionEvent e) {
