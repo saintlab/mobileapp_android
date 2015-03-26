@@ -37,8 +37,8 @@ import com.omnom.android.fragment.EditHashFragment;
 import com.omnom.android.fragment.EnteringFragment;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.fragment.SplashFragment;
-import com.omnom.android.fragment.dinner.DinnerDetailsFragment;
-import com.omnom.android.fragment.dinner.DinnerOptionsFragment;
+import com.omnom.android.fragment.dinner.DeliveryDetailsFragment;
+import com.omnom.android.fragment.dinner.DeliveryOptionsFragment;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.push.PushNotificationsManagerImpl;
@@ -69,7 +69,7 @@ import dagger.Module;
 		/* fragments */
 		SplashFragment.class, EnteringFragment.class, OrderFragment.class, BillSplitFragment.class, BillItemsFragment.class,
 		BillSplitPersonsFragment.class, EditHashFragment.class, OrderFragment.class, MenuItemAddFragment.class,
-		DinnerDetailsFragment.class, MenuItemDetailsFragment.class, BillSplitFragment.class, BillItemsFragment.class,
-		BillSplitPersonsFragment.class, DinnerOptionsFragment.class},
+		DeliveryDetailsFragment.class, MenuItemDetailsFragment.class, BillSplitFragment.class, BillItemsFragment.class,
+		BillSplitPersonsFragment.class, DeliveryOptionsFragment.class},
         complete = false)
 public class OmnomApplicationModule {}

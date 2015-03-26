@@ -27,7 +27,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class DinnerOptionsFragment extends BaseFragment {
+public class DeliveryOptionsFragment extends BaseFragment {
 	public static final int TYPE_ADDRESS = 0;
 
 	public static final int TYPE_DATE = 1;
@@ -51,11 +51,11 @@ public class DinnerOptionsFragment extends BaseFragment {
 		                                    R.anim.slide_out_down,
 		                                    R.anim.fade_in,
 		                                    R.anim.slide_out_down)
-		               .add(containerId, DinnerOptionsFragment.newInstanceDate(TYPE_DATE, titleId, infoId, data))
+		               .add(containerId, DeliveryOptionsFragment.newInstanceDate(TYPE_DATE, titleId, infoId, data))
 		               .commit();
 	}
 
-	public static void showAddress(final FragmentManager fragmentManager, final @IdRes int containerId, ArrayList<AddressData> data) {
+	public static void showAddress(final FragmentManager fragmentManager, final @IdRes int containerId, ArrayList<DeliveryAddressData> data) {
 		int titleId = R.string.where;
 		int infoId = R.string.choose_delivery_locations;
 		fragmentManager.beginTransaction()
@@ -64,12 +64,12 @@ public class DinnerOptionsFragment extends BaseFragment {
 		                                    R.anim.slide_out_down,
 		                                    R.anim.fade_in,
 		                                    R.anim.slide_out_down)
-		               .add(containerId, DinnerOptionsFragment.newInstanceAddress(TYPE_ADDRESS, titleId, infoId, data))
+		               .add(containerId, DeliveryOptionsFragment.newInstanceAddress(TYPE_ADDRESS, titleId, infoId, data))
 		               .commit();
 	}
 
-	public static DinnerOptionsFragment newInstanceDate(int type, @StringRes int titleId, @StringRes int infoId, ArrayList<String> data) {
-		DinnerOptionsFragment fragment = new DinnerOptionsFragment();
+	public static DeliveryOptionsFragment newInstanceDate(int type, @StringRes int titleId, @StringRes int infoId, ArrayList<String> data) {
+		DeliveryOptionsFragment fragment = new DeliveryOptionsFragment();
 		Bundle args = new Bundle();
 		args.putInt(ARG_TITLE, titleId);
 		args.putInt(ARG_INFO, infoId);
@@ -79,9 +79,9 @@ public class DinnerOptionsFragment extends BaseFragment {
 		return fragment;
 	}
 
-	public static DinnerOptionsFragment newInstanceAddress(int type, @StringRes int titleId, @StringRes int infoId,
-	                                                       ArrayList<AddressData> data) {
-		DinnerOptionsFragment fragment = new DinnerOptionsFragment();
+	public static DeliveryOptionsFragment newInstanceAddress(int type, @StringRes int titleId, @StringRes int infoId,
+	                                                       ArrayList<DeliveryAddressData> data) {
+		DeliveryOptionsFragment fragment = new DeliveryOptionsFragment();
 		Bundle args = new Bundle();
 		args.putInt(ARG_TITLE, titleId);
 		args.putInt(ARG_INFO, infoId);
@@ -107,7 +107,7 @@ public class DinnerOptionsFragment extends BaseFragment {
 
 	private int mInfoId;
 
-	private DinnerDataAdapterBase mAdapter;
+	private DeliveryDataAdapterBase mAdapter;
 
 	private boolean mFirstStart = true;
 
@@ -115,9 +115,9 @@ public class DinnerOptionsFragment extends BaseFragment {
 
 	private ArrayList<String> mDataDate;
 
-	private ArrayList<AddressData> mAddressData;
+	private ArrayList<DeliveryAddressData> mAddressData;
 
-	public DinnerOptionsFragment() {
+	public DeliveryOptionsFragment() {
 		// Required empty public constructor
 	}
 
@@ -125,7 +125,7 @@ public class DinnerOptionsFragment extends BaseFragment {
 	public void onBack() {
 		switch(mType) {
 			case TYPE_ADDRESS:
-				final AddressData addressData = (AddressData) mAdapter.getSelectedItem();
+				final DeliveryAddressData addressData = (DeliveryAddressData) mAdapter.getSelectedItem();
 				if(addressData != null) {
 					mBus.post(addressData);
 				}
@@ -156,7 +156,7 @@ public class DinnerOptionsFragment extends BaseFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		final View view = inflater.inflate(R.layout.fragment_dinner_options, container, false);
+		final View view = inflater.inflate(R.layout.fragment_delivery_options, container, false);
 		ButterKnife.inject(this, view);
 		AndroidUtils.applyFont(view.getContext(), (ViewGroup) view, OmnomFont.LSF_LE_REGULAR);
 		AndroidUtils.applyFont(view.getContext(), mTxtTitle, OmnomFont.OSF_MEDIUM);
@@ -185,10 +185,10 @@ public class DinnerOptionsFragment extends BaseFragment {
 		});
 
 		if(mType == TYPE_ADDRESS) {
-			mAdapter = new DinnerAddressAdapter(getActivity(), mAddressData);
+			mAdapter = new DeliveryAddressAdapter(getActivity(), mAddressData);
 		}
 		if(mType == TYPE_DATE) {
-			mAdapter = new DinnerDateAdapter(getActivity(), mDataDate);
+			mAdapter = new DeliveryDateAdapter(getActivity(), mDataDate);
 		}
 
 		mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

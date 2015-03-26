@@ -23,7 +23,7 @@ import static com.omnom.android.utils.utils.DateUtils.parseDate;
 /**
  * Created by Ch3D on 25.03.2015.
  */
-public class DinnerDateAdapter extends DinnerDataAdapterBase<String, DinnerDateAdapter.ItemViewHolder> {
+public class DeliveryDateAdapter extends DeliveryDataAdapterBase<String, DeliveryDateAdapter.ItemViewHolder> {
 
 	public static class ItemViewHolder extends RecyclerView.ViewHolder {
 
@@ -39,17 +39,17 @@ public class DinnerDateAdapter extends DinnerDataAdapterBase<String, DinnerDateA
 		}
 	}
 
-	public DinnerDateAdapter(final Context context, ArrayList<String> data) {
+	public DeliveryDateAdapter(final Context context, ArrayList<String> data) {
 		super(context, data);
 	}
 
 	@Override
-	public DinnerDateAdapter.ItemViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
-		return new DinnerDateAdapter.ItemViewHolder(mInflater.inflate(R.layout.item_dinner_date, parent, false));
+	public DeliveryDateAdapter.ItemViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
+		return new DeliveryDateAdapter.ItemViewHolder(mInflater.inflate(R.layout.item_dinner_date, parent, false));
 	}
 
 	@Override
-	public void onBindViewHolder(final DinnerDateAdapter.ItemViewHolder holder, final int position) {
+	public void onBindViewHolder(final DeliveryDateAdapter.ItemViewHolder holder, final int position) {
 		final String item = getItem(position);
 		final Date date = parseDate(DATE_FORMAT_DDMMYYYY, item);
 

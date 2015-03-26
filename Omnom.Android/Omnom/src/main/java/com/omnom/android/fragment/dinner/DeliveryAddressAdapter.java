@@ -17,7 +17,7 @@ import butterknife.InjectView;
 /**
  * Created by Ch3D on 25.03.2015.
  */
-public class DinnerAddressAdapter extends DinnerDataAdapterBase<AddressData, DinnerAddressAdapter.ItemViewHolder> {
+public class DeliveryAddressAdapter extends DeliveryDataAdapterBase<DeliveryAddressData, DeliveryAddressAdapter.ItemViewHolder> {
 
 	public static class ItemViewHolder extends RecyclerView.ViewHolder {
 
@@ -36,18 +36,18 @@ public class DinnerAddressAdapter extends DinnerDataAdapterBase<AddressData, Din
 		}
 	}
 
-	public DinnerAddressAdapter(final Context context, final ArrayList<AddressData> data) {
+	public DeliveryAddressAdapter(final Context context, final ArrayList<DeliveryAddressData> data) {
 		super(context, data);
 	}
 
 	@Override
 	public ItemViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
-		return new DinnerAddressAdapter.ItemViewHolder(mInflater.inflate(R.layout.item_dinner_address, parent, false));
+		return new DeliveryAddressAdapter.ItemViewHolder(mInflater.inflate(R.layout.item_dinner_address, parent, false));
 	}
 
 	@Override
 	public void onBindViewHolder(final ItemViewHolder holder, final int position) {
-		final AddressData item = getItem(position);
+		final DeliveryAddressData item = getItem(position);
 		holder.mTxtTitle.setText(item.name());
 		holder.mTxtInfo.setText(item.address());
 		ViewUtils.setVisible2(holder.mCheckedIndicator, isItemChecked(position));

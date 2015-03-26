@@ -11,7 +11,7 @@ import java.util.ArrayList;
 /**
  * Created by Ch3D on 25.03.2015.
  */
-public abstract class DinnerDataAdapterBase<K, V extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<V> {
+public abstract class DeliveryDataAdapterBase<K, V extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<V> {
 	protected final Context mContext;
 
 	protected final ArrayList<K> mData;
@@ -20,7 +20,7 @@ public abstract class DinnerDataAdapterBase<K, V extends RecyclerView.ViewHolder
 
 	protected SparseBooleanArrayParcelable mCheckStates = new SparseBooleanArrayParcelable();
 
-	public DinnerDataAdapterBase(final Context context, ArrayList<K> data) {
+	public DeliveryDataAdapterBase(final Context context, ArrayList<K> data) {
 		mContext = context;
 		mData = data;
 		mInflater = LayoutInflater.from(mContext);

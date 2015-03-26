@@ -11,10 +11,10 @@ import auto.parcel.AutoParcel;
  */
 @AutoParcel
 @AutoGson
-public abstract class AddressData implements Parcelable {
+public abstract class DeliveryAddressData implements Parcelable {
 
-	public static AddressData create(final String name, final String address) {
-		return new AutoParcel_AddressData(name, address);
+	public static DeliveryAddressData create(final String name, final String address) {
+		return new AutoParcel_DeliveryAddressData(name, address);
 	}
 
 	public abstract String name();

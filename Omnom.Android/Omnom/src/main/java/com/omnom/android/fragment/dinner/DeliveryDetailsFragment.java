@@ -29,12 +29,12 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class DinnerDetailsFragment extends BaseFragment {
+public class DeliveryDetailsFragment extends BaseFragment {
 
 	private static final String ARG_RESTAURANT = "param1";
 
-	public static DinnerDetailsFragment newInstance(Restaurant restaurant) {
-		final DinnerDetailsFragment fragment = new DinnerDetailsFragment();
+	public static DeliveryDetailsFragment newInstance(Restaurant restaurant) {
+		final DeliveryDetailsFragment fragment = new DeliveryDetailsFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(ARG_RESTAURANT, restaurant);
 		fragment.setArguments(args);
@@ -48,7 +48,7 @@ public class DinnerDetailsFragment extends BaseFragment {
 		                                    R.anim.nothing_long,
 		                                    R.anim.fade_in,
 		                                    R.anim.nothing_long)
-		               .add(containerId, DinnerDetailsFragment.newInstance(restaurant))
+		               .add(containerId, DeliveryDetailsFragment.newInstance(restaurant))
 		               .commit();
 	}
 
@@ -72,7 +72,7 @@ public class DinnerDetailsFragment extends BaseFragment {
 
 	private boolean mFirstStart = true;
 
-	public DinnerDetailsFragment() {
+	public DeliveryDetailsFragment() {
 		// Required empty public constructor
 	}
 
@@ -87,7 +87,7 @@ public class DinnerDetailsFragment extends BaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
-		final View view = inflater.inflate(R.layout.fragment_dinner_details, container, false);
+		final View view = inflater.inflate(R.layout.fragment_delivery_details, container, false);
 		ButterKnife.inject(this, view);
 		AndroidUtils.applyFont(view.getContext(), (ViewGroup) view, OmnomFont.LSF_LE_REGULAR);
 		contentView.setTranslationY(AndroidUtils.getScreenHeightPixels(getActivity()));
@@ -128,12 +128,12 @@ public class DinnerDetailsFragment extends BaseFragment {
 
 	@OnClick(R.id.txt_date)
 	public void onDate() {
-		DinnerOptionsFragment.showDate(getFragmentManager(), R.id.fragment_container, getMockDateData());
+		DeliveryOptionsFragment.showDate(getFragmentManager(), R.id.fragment_container, getMockDateData());
 	}
 
 	@OnClick(R.id.txt_address)
 	public void onAddress() {
-		DinnerOptionsFragment.showAddress(getFragmentManager(), R.id.fragment_container, getMockAddressData());
+		DeliveryOptionsFragment.showAddress(getFragmentManager(), R.id.fragment_container, getMockAddressData());
 	}
 
 	@OnClick(R.id.btn_close)
@@ -172,7 +172,7 @@ public class DinnerDetailsFragment extends BaseFragment {
 	}
 
 	@Subscribe
-	public void onDeliveryAddress(AddressData addressData) {
+	public void onDeliveryAddress(DeliveryAddressData addressData) {
 		txtDate.setError(false);
 		txtAddress.setText(addressData.name() + StringUtils.WHITESPACE + addressData.address());
 	}
@@ -189,10 +189,10 @@ public class DinnerDetailsFragment extends BaseFragment {
 		return data;
 	}
 
-	private ArrayList<AddressData> getMockAddressData() {
-		final ArrayList<AddressData> data = new ArrayList<AddressData>();
-		data.add(AddressData.create("Банк Интеза", "Жопа жопенная, 2"));
-		data.add(AddressData.create("Банк Рога Илоны", "Жопа жопенная, ff"));
+	private ArrayList<DeliveryAddressData> getMockAddressData() {
+		final ArrayList<DeliveryAddressData> data = new ArrayList<DeliveryAddressData>();
+		data.add(DeliveryAddressData.create("Банк Интеза", "Жопа жопенная, 2"));
+		data.add(DeliveryAddressData.create("Банк Рога Илоны", "Жопа жопенная, ff"));
 		return data;
 	}
 
