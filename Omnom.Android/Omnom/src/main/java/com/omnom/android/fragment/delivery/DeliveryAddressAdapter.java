@@ -1,4 +1,4 @@
-package com.omnom.android.fragment.dinner;
+package com.omnom.android.fragment.delivery;
 
 import android.content.Context;
 import android.os.Parcel;

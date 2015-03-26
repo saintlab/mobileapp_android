@@ -1,4 +1,4 @@
-package com.omnom.android.fragment.dinner;
+package com.omnom.android.fragment.delivery;
 
 import android.os.Bundle;
 import android.support.annotation.IdRes;

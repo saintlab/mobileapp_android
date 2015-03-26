@@ -17,6 +17,8 @@ import auto.parcel.AutoParcel;
 @AutoParcel
 @AutoGson
 public abstract class Restaurant implements Parcelable {
+	public static final String ENTRANCE_MODE_TAKEAWAY = "takeaway";
+
 	public static final String ENTRANCE_MODE_BAR = "bar";
 
 	public static final String ENTRANCE_MODE_LUNCH = "lunch";
@@ -74,6 +76,10 @@ public abstract class Restaurant implements Parcelable {
 
 	public boolean isBar() {
 		return ENTRANCE_MODE_BAR.equals(entranceMode());
+	}
+
+	public boolean isTakeAway() {
+		return ENTRANCE_MODE_TAKEAWAY.equals(entranceMode());
 	}
 
 	@Nullable

@@ -130,6 +130,13 @@ public class RestaurantHelper {
 		return restaurant.isBar();
 	}
 
+	public static boolean isTakeAway(final Restaurant restaurant) {
+		if(restaurant == null) {
+			return false;
+		}
+		return restaurant.isTakeAway();
+	}
+
 	public static String getBarUri(final Restaurant restaurant) {
 		if(restaurant == null) {
 			return StringUtils.EMPTY_STRING;

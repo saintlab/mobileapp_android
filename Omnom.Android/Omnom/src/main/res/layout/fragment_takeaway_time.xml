@@ -13,8 +13,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:paddingTop="@dimen/activity_horizontal_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
         android:background="@android:color/white"
         android:clickable="true"
         android:orientation="vertical">
@@ -27,28 +25,17 @@
             android:id="@+id/txt_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/order_lunch_in_the_office"
+            android:text="@string/when_will_you_come"
             android:gravity="center"
             android:textColor="@android:color/black"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <com.omnom.android.utils.view.ErrorEditText
-            android:id="@+id/txt_date"
-            android:editable="false"
-            android:focusableInTouchMode="false"
-            android:focusable="false"
-            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-            style="@style/TextView.Dinner.OrderData" />
-
-        <com.omnom.android.utils.view.ErrorEditText
-            android:id="@+id/txt_address"
-            android:editable="false"
-            android:focusableInTouchMode="false"
-            android:focusable="false"
-            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            style="@style/TextView.Dinner.OrderData" />
+        <com.omnom.android.utils.view.NumberPicker
+            android:id="@+id/picker"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/takeaway_picker_height"
+            style="@style/NPWidget.Holo.Light.NumberPicker.Grey" />
 
         <Button
             android:id="@+id/btn_ok"

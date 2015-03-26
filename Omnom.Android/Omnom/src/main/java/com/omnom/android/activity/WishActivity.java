@@ -19,6 +19,8 @@ import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.WishAdapter;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
+import com.omnom.android.fragment.takeaway.TakeawayTimeFragment;
+import com.omnom.android.fragment.takeaway.TakeawayTimePickedEvent;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.Modifier;
@@ -277,9 +279,19 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	private void doWish() {
 		if(RestaurantHelper.isBar(mRestaurant)) {
 			doWishBar();
+		} else if(RestaurantHelper.isTakeAway(mRestaurant)) {
+			doAskAboutTime();
 		} else {
 			doWishDefault();
 		}
+	}
+
+	private void doAskAboutTime() {
+		TakeawayTimeFragment.show(getSupportFragmentManager(), R.id.fragment_container);
+	}
+
+	public void onTakeawayTimePicked(TakeawayTimePickedEvent event) {
+		// TODO: Proceed -> move to cards
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package com.omnom.android.fragment.dinner;
+package com.omnom.android.fragment.delivery;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

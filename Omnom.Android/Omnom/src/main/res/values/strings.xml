@@ -180,4 +180,5 @@
     <string name="select_date">Выберите дату</string>
     <string name="tomorrow">завтра</string>
     <string name="Tomorrow">Завтра</string>
+    <string name="when_will_you_come">Когда вас ждать?</string>
 </resources>
