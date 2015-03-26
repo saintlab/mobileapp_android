@@ -33,7 +33,7 @@ import com.omnom.android.activity.ValidateActivityBle21;
 import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.activity.ValidateActivityShortcut;
 import com.omnom.android.activity.WishActivity;
-import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
@@ -111,7 +111,7 @@ import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM_ANDROID;
 /**
  * Created by Ch3D on 08.10.2014.
  */
-public abstract class ValidateActivity extends BaseOmnomFragmentActivity
+public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		implements FragmentManager.OnBackStackChangedListener, SearchFragment.ItemClickListener<Item>, SearchFragment.FragmentCloseListener {
 
 	public static final int REQUEST_CODE_ORDERS = 100;
@@ -396,6 +396,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	protected void handleIntent(Intent intent) {
+		super.handleIntent(intent);
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 		mIsDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
 		mSkipViewRendering = intent.getBooleanExtra(EXTRA_SKIP_VIEW_RENDERING, false);
@@ -591,7 +592,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			((AcquiringMailRu) mAcquiring).changeEndpoint(config.getAcquiringData().getBaseUrl());
 		}
 		getMixPanelHelper().addApi(OMNOM,
-		                           MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
+				MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
 		getMixPanelHelper().addApi(OMNOM_ANDROID,
 		                           MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));
 	}
@@ -665,7 +666,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		                    .subscribe(new Action1<Boolean>() {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
-				                    if(hasNoErrors) {
+				                    if (hasNoErrors) {
 					                    clearErrors(false);
 					                    loadOrders(v);
 				                    } else {
@@ -874,7 +875,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	protected void onOrder() {
-		WishActivity.start(this, mRestaurant, mTable, mMenu, mOrderHelper.insureOrder(), REQUEST_CODE_WISH_LIST);
+		WishActivity.start(this, mRestaurant, mTable, mMenu, mOrderHelper.insureOrder(), entranceData, REQUEST_CODE_WISH_LIST);
 	}
 
 	protected boolean validateDemo() {

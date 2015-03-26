@@ -170,6 +170,7 @@
     <string name="ready_orders_list">Табло готовых заказов</string>
     <string name="menu_search_undefined">Увы, но такого блюда\nнет в нашем меню</string>
     <string name="order_lunch_in_the_office">Заказ обеда в офис</string>
+    <string name="wish_lunch_order_info">Доставка на&#160;%1$s по&#160;адресу:\n%2$s</string>
     <string name="when">Когда</string>
     <string name="where">Куда</string>
     <string name="choose_when_you_want_to_pick_your_order">Выберите, когда надо доставить обед:</string>

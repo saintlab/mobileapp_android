@@ -5,46 +5,43 @@ import android.content.Intent;
 import android.view.View;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.holder.BarEntranceData;
+import com.omnom.android.activity.holder.EntranceData;
+import com.omnom.android.activity.holder.DeliveryEntranceData;
+import com.omnom.android.activity.holder.TakeawayEntranceData;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.view.HeaderView;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import butterknife.InjectView;
 
-public abstract class BaseOrderAcceptedActivity extends BaseOmnomActivity {
+public abstract class BaseOrderAcceptedActivity extends BaseOmnomModeSupportActivity {
 
 	protected final SimpleDateFormat ORDER_TIME_FORMAT = new SimpleDateFormat("dd MMMM в HH:mm", AndroidUtils.russianLocale);
 
-	public static void startBar(Activity activity, String orderNumber, String pinCode,
-	                            int requestCode, final int accentColor) {
-		final Intent intent = new Intent(activity, BarOrderAcceptedActivity.class);
-		intent.putExtra(EXTRA_ORDER_NUMBER, orderNumber);
-		intent.putExtra(EXTRA_PIN_CODE, pinCode);
+	public static void start(Activity activity, EntranceData entranceData, int requestCode,
+	                         final int accentColor) {
+		final Intent intent = new Intent(activity, getOrderAcceptedActivity(entranceData));
+		intent.putExtra(EXTRA_ENTRANCE_DATA, entranceData);
 		intent.putExtra(EXTRA_ACCENT_COLOR, accentColor);
 		activity.startActivityForResult(intent, requestCode);
 	}
 
-	public static void startLunch(Activity activity, Date orderTime, String deliveryAddress,
-	                              Date deliveryTime, int requestCode, final int accentColor) {
-		final Intent intent = new Intent(activity, LunchOrderAcceptedActivity.class);
-		intent.putExtra(EXTRA_ORDER_TIME, orderTime.getTime());
-		intent.putExtra(EXTRA_DELIVERY_ADDRESS, deliveryAddress);
-		intent.putExtra(EXTRA_DELIVERY_TIME, deliveryTime.getTime());
-		intent.putExtra(EXTRA_ACCENT_COLOR, accentColor);
-		activity.startActivityForResult(intent, requestCode);
-	}
-
-	public static void startTakeaway(Activity activity, Date orderTime, String takeawayAddress,
-	                                 String takeawayAfter, int requestCode, final int accentColor) {
-		final Intent intent = new Intent(activity, TakeawayOrderAcceptedActivity.class);
-		intent.putExtra(EXTRA_ORDER_TIME, orderTime.getTime());
-		intent.putExtra(EXTRA_TAKEAWAY_ADDRESS, takeawayAddress);
-		intent.putExtra(EXTRA_TAKEAWAY_AFTER, takeawayAfter);
-		intent.putExtra(EXTRA_ACCENT_COLOR, accentColor);
-		activity.startActivityForResult(intent, requestCode);
+	private static Class getOrderAcceptedActivity(final EntranceData entranceData) {
+		if (entranceData == null) {
+			throw new IllegalArgumentException("entranceData should not be null");
+		}
+		if (entranceData instanceof BarEntranceData) {
+			return BarOrderAcceptedActivity.class;
+		} else if (entranceData instanceof DeliveryEntranceData) {
+			return LunchOrderAcceptedActivity.class;
+		} else if (entranceData instanceof TakeawayEntranceData) {
+			return TakeawayOrderAcceptedActivity.class;
+		} else {
+			throw new IllegalArgumentException("Unknown entrance data type");
+		}
 	}
 
 	@InjectView(R.id.panel_top)
@@ -59,6 +56,7 @@ public abstract class BaseOrderAcceptedActivity extends BaseOmnomActivity {
 
 	@Override
 	protected void handleIntent(final Intent intent) {
+		super.handleIntent(intent);
 		mAccentColor = intent.getIntExtra(EXTRA_ACCENT_COLOR, 0);
 	}
 

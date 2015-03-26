@@ -35,8 +35,9 @@ import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
-import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.holder.EntranceData;
 import com.omnom.android.fragment.PayOnceFragment;
 import com.omnom.android.listener.DecimalKeyListener;
 import com.omnom.android.mixpanel.model.acquiring.CardAddedMixpanelEvent;
@@ -69,7 +70,7 @@ import rx.functions.Action1;
 import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
-public class CardConfirmActivity extends BaseOmnomFragmentActivity
+public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 		implements PayOnceFragment.OnPayListener,
 		           PayOnceFragment.VisibilityListener {
 
@@ -79,13 +80,14 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	public static final int TYPE_CONFIRM = 1;
 
 	@SuppressLint("NewApi")
-	public static void startAddConfirm(BaseOmnomActivity activity, final CardInfo card, int code,
-	                                   double amount, boolean scanUsed) {
+	public static void startAddConfirm(BaseOmnomFragmentActivity activity, final CardInfo card, int code,
+	                                   double amount, boolean scanUsed, EntranceData entranceData) {
 		final Intent intent = new Intent(activity, CardConfirmActivity.class);
 		intent.putExtra(EXTRA_CARD_DATA, card);
 		intent.putExtra(EXTRA_TYPE, TYPE_BIND_CONFIRM);
 		intent.putExtra(EXTRA_ORDER_AMOUNT, amount);
 		intent.putExtra(EXTRA_SCAN_USED, scanUsed);
+		intent.putExtra(EXTRA_ENTRANCE_DATA, entranceData);
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
 			                                                    R.anim.slide_in_right,
@@ -97,7 +99,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 	}
 
 	@SuppressLint("NewApi")
-	public static void startConfirm(BaseOmnomActivity activity, final CardInfo card, int code,
+	public static void startConfirm(BaseOmnomFragmentActivity activity, final CardInfo card, int code,
 	                                double amount) {
 		final Intent intent = new Intent(activity, CardConfirmActivity.class);
 		intent.putExtra(EXTRA_CARD_DATA, card);
@@ -181,6 +183,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	protected void handleIntent(final Intent intent) {
+		super.handleIntent(intent);
 		mCard = intent.getParcelableExtra(EXTRA_CARD_DATA);
 		mType = intent.getIntExtra(EXTRA_TYPE, TYPE_BIND_CONFIRM);
 		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);

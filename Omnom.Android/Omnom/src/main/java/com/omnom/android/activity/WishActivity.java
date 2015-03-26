@@ -15,7 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.holder.EntranceData;
+import com.omnom.android.activity.holder.DeliveryEntranceData;
 import com.omnom.android.adapter.WishAdapter;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
@@ -50,6 +52,7 @@ import com.squareup.otto.Subscribe;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -61,8 +64,8 @@ import rx.functions.Action1;
 import static com.omnom.android.fragment.OrderFragment.PaymentDetails;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
-public class WishActivity extends BaseOmnomFragmentActivity implements View.OnClickListener,
-                                                                       ItemClickSupport.OnItemLongClickListener {
+public class WishActivity extends BaseOmnomModeSupportActivity implements View.OnClickListener,
+                                                                          ItemClickSupport.OnItemLongClickListener {
 
 	public static final int RESULT_CLEARED = 1;
 
@@ -72,13 +75,15 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	public static final int RESULT_ORDER_DONE = 8;
 
-	public static void start(OmnomActivity activity, Restaurant restaurant, TableDataResponse table, Menu menu, UserOrder order,
+	public static void start(OmnomActivity activity, Restaurant restaurant, TableDataResponse table,
+	                         Menu menu, UserOrder order, EntranceData entranceData,
 	                         int code) {
 		final Intent intent = new Intent(activity.getActivity(), WishActivity.class);
 		intent.putExtra(EXTRA_ORDER, order);
 		intent.putExtra(EXTRA_TABLE, table);
 		intent.putExtra(EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(EXTRA_RESTAURANT_MENU, menu);
+		intent.putExtra(EXTRA_ENTRANCE_DATA, entranceData);
 		activity.startForResult(intent, R.anim.slide_in_up, R.anim.nothing, code);
 	}
 
@@ -212,7 +217,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		ViewUtils.setVisible(mPanelBottom, !isBar);
 		ViewUtils.setVisible(mPanelBottomBar, isBar);
 		ViewUtils.setVisible(mProgressBar, false);
-		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, this);
+		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, DeliveryEntranceData.create(new Date(), "Октябрьская", new Date()), this);
 		mLayoutManager = new LinearLayoutManager(this);
 		mList.setHasFixedSize(true);
 		mList.setLayoutManager(mLayoutManager);
@@ -225,7 +230,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		api.getItems(mTable.getRestaurantId(), mTable.getId()).subscribe(new Action1<Collection<OrderItem>>() {
 			@Override
 			public void call(final Collection<OrderItem> response) {
-				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, WishActivity.this);
+				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, DeliveryEntranceData.create(new Date(), "Октябрьская", new Date()), WishActivity.this);
 				mAdapter = adapter;
 				mList.swapAdapter(mAdapter, true);
 				ViewUtils.setVisible(mProgressBar, false);
@@ -372,6 +377,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 				CardsActivity.start(WishActivity.this,
 				                    mOrder,
 				                    wishResponse,
+									entranceData,
 				                    paymentDetails,
 				                    RestaurantHelper.getBackgroundColor(mRestaurant),
 				                    REQUEST_CODE_WISH_LIST);
