@@ -56,8 +56,8 @@ public class DinnerOptionsFragment extends BaseFragment {
 	}
 
 	public static void showAddress(final FragmentManager fragmentManager, final @IdRes int containerId, ArrayList<AddressData> data) {
-		int titleId = R.string.when;
-		int infoId = R.string.choose_when_you_want_to_pick_your_order;
+		int titleId = R.string.where;
+		int infoId = R.string.choose_delivery_locations;
 		fragmentManager.beginTransaction()
 		               .addToBackStack(null)
 		               .setCustomAnimations(R.anim.fade_in,
