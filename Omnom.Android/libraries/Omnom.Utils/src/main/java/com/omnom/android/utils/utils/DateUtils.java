@@ -1,6 +1,7 @@
 package com.omnom.android.utils.utils;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -12,6 +13,10 @@ import java.util.Date;
  * Created by mvpotter on 2/7/2015.
  */
 public final class DateUtils {
+
+	public static final String DATE_PATTERN_DDMMYYYY = "dd/MM/yyyy";
+
+	public static final SimpleDateFormat DATE_FORMAT_DDMMYYYY = new SimpleDateFormat(DATE_PATTERN_DDMMYYYY);
 
 	private static final String TAG = DateUtils.class.getSimpleName();
 
@@ -33,16 +38,9 @@ public final class DateUtils {
 	}
 
 	public static String getWeekday(final Context context, final Date date) {
-		return android.text.format.DateUtils.formatDateTime(context, date.getTime(), android.text.format.DateUtils.FORMAT_SHOW_WEEKDAY
-				| android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE);
-	}
-
-	public static CharSequence getRelativeTimeSpan(long time, long now) {
-		return android.text.format.DateUtils.getRelativeTimeSpanString(time, now, 0L, android.text.format.DateUtils.FORMAT_ABBREV_ALL);
-	}
-
-	public static CharSequence getTomorrowRelativeTimeSpan() {
-		return getRelativeTimeSpan(getTomorrow().getTimeInMillis(), Calendar.getInstance().getTimeInMillis());
+		return android.text.format.DateUtils.formatDateTime(context, date.getTime(),
+		                                                    android.text.format.DateUtils.FORMAT_SHOW_WEEKDAY |
+				                                                    android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE);
 	}
 
 	public static String getOnDayPreposition(final Date date) {
@@ -69,6 +67,17 @@ public final class DateUtils {
 		return dayName;
 	}
 
+	public static String getDayAndMonth(final Date date) {
+		final Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		final int dayNumber = calendar.get(Calendar.DAY_OF_MONTH);
+		final String monthName = calendar.getDisplayName(Calendar.MONTH,
+		                                                 Calendar.LONG,
+		                                                 AndroidUtils.russianLocale);
+		return dayNumber + StringUtils.WHITESPACE + monthName;
+	}
+
+	@Nullable
 	public static Date parseDate(SimpleDateFormat dateFormat, String s) {
 		try {
 			return dateFormat.parse(s);
@@ -76,6 +85,10 @@ public final class DateUtils {
 			Log.e(TAG, "Unable to parse date = " + s, e);
 		}
 		return null;
+	}
+
+	public static Date parseDate(String s) {
+		return parseDate(DATE_FORMAT_DDMMYYYY, s);
 	}
 
 	private DateUtils() {

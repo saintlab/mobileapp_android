@@ -33,15 +33,19 @@
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <TextView
+        <com.omnom.android.utils.view.ErrorEditText
             android:id="@+id/txt_date"
-            android:text="на завтра, ХХ марта"
+            android:editable="false"
+            android:focusableInTouchMode="false"
+            android:focusable="false"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             style="@style/TextView.Dinner.OrderData" />
 
-        <TextView
+        <com.omnom.android.utils.view.ErrorEditText
             android:id="@+id/txt_address"
-            android:text="Банк Интеза, Октябрьская 49"
+            android:editable="false"
+            android:focusableInTouchMode="false"
+            android:focusable="false"
             omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
             android:textAppearance="?android:attr/textAppearanceLarge"
             style="@style/TextView.Dinner.OrderData" />

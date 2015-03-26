@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.DateUtils;
 import com.omnom.android.utils.utils.StringUtils;
+import com.omnom.android.utils.view.ErrorEditText;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -54,10 +56,10 @@ public class DinnerDetailsFragment extends BaseFragment {
 	protected TextView txtInfo;
 
 	@InjectView(R.id.txt_address)
-	protected TextView txtAddress;
+	protected ErrorEditText txtAddress;
 
 	@InjectView(R.id.txt_date)
-	protected TextView txtDate;
+	protected ErrorEditText txtDate;
 
 	@InjectView(R.id.root)
 	protected View rootView;
@@ -117,6 +119,13 @@ public class DinnerDetailsFragment extends BaseFragment {
 		}).start();
 	}
 
+	@Override
+	public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		onDeliveryDate(DateUtils.parseDate(getMockDateData().get(0)));
+		onDeliveryAddress(getMockAddressData().get(0));
+	}
+
 	@OnClick(R.id.txt_date)
 	public void onDate() {
 		DinnerOptionsFragment.showDate(getFragmentManager(), R.id.fragment_container, getMockDateData());
@@ -134,25 +143,37 @@ public class DinnerDetailsFragment extends BaseFragment {
 
 	@OnClick(R.id.btn_ok)
 	public void onOk() {
-		// TODO:
+		if(validate()) {
+			// TODO:
+		}
+	}
+
+	private boolean validate() {
+		boolean hasErrors = false;
+		if(TextUtils.isEmpty(txtAddress.getText())) {
+			txtAddress.setError(true, getResources().getString(R.string.select_address));
+			hasErrors |= true;
+		}
+		if(TextUtils.isEmpty(txtDate.getText())) {
+			txtDate.setError(true, getResources().getString(R.string.select_date));
+			hasErrors |= true;
+		}
+		return hasErrors;
 	}
 
 	@Subscribe
-	public void onDinnerDate(Date date) {
-		// день-месяц -> dd MMM
-		final String dateString = android.text.format.DateUtils.formatDateTime(getActivity(), date.getTime(),
-		                                                                       android.text.format.DateUtils.FORMAT_SHOW_DATE
-				                                                                       | android.text.format.DateUtils.FORMAT_NO_YEAR);
+	public void onDeliveryDate(Date date) {
+		txtDate.setError(false);
 		if(DateUtils.isTomorrow(date)) {
-			txtDate.setText(getResources().getString(R.string.order_date,
-			                                         DateUtils.getTomorrowRelativeTimeSpan(), dateString));
+			txtDate.setText(getResources().getString(R.string.order_date, getString(R.string.tomorrow), DateUtils.getDayAndMonth(date)));
 		} else {
-			txtDate.setText(getResources().getString(R.string.order_date, DateUtils.getWeekday(getActivity(), date), dateString));
+			txtDate.setText(getResources().getString(R.string.order_date, DateUtils.getDayOfWeek(date), DateUtils.getDayAndMonth(date)));
 		}
 	}
 
 	@Subscribe
-	public void onDinnerDate(AddressData addressData) {
+	public void onDeliveryAddress(AddressData addressData) {
+		txtDate.setError(false);
 		txtAddress.setText(addressData.name() + StringUtils.WHITESPACE + addressData.address());
 	}
 

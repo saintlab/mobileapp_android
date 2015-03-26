@@ -175,4 +175,8 @@
     <string name="choose_delivery_locations">Выберите офис, куда доставить обед:</string>
     <string name="order_pick_date_related">%1$s (%2$s)</string>
     <string name="order_date">на %1$s, %2$s</string>
+    <string name="select_address">Выберите адрес</string>
+    <string name="select_date">Выберите дату</string>
+    <string name="tomorrow">завтра</string>
+    <string name="Tomorrow">Завтра</string>
 </resources>

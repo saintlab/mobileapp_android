@@ -2,7 +2,6 @@ package com.omnom.android.fragment.dinner;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -10,15 +9,14 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.utils.utils.ViewUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-import static com.omnom.android.utils.utils.DateUtils.getTomorrowRelativeTimeSpan;
-import static com.omnom.android.utils.utils.DateUtils.getWeekday;
+import static com.omnom.android.utils.utils.DateUtils.DATE_FORMAT_DDMMYYYY;
+import static com.omnom.android.utils.utils.DateUtils.getDayOfWeek;
 import static com.omnom.android.utils.utils.DateUtils.isTomorrow;
 import static com.omnom.android.utils.utils.DateUtils.parseDate;
 
@@ -26,10 +24,6 @@ import static com.omnom.android.utils.utils.DateUtils.parseDate;
  * Created by Ch3D on 25.03.2015.
  */
 public class DinnerDateAdapter extends DinnerDataAdapterBase<String, DinnerDateAdapter.ItemViewHolder> {
-
-	public static final String DATE_PATTERN = "dd/MM/yyyy";
-
-	public static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
 
 	public static class ItemViewHolder extends RecyclerView.ViewHolder {
 
@@ -57,23 +51,24 @@ public class DinnerDateAdapter extends DinnerDataAdapterBase<String, DinnerDateA
 	@Override
 	public void onBindViewHolder(final DinnerDateAdapter.ItemViewHolder holder, final int position) {
 		final String item = getItem(position);
-		final Date date = parseDate(dateFormat, item);
+		final Date date = parseDate(DATE_FORMAT_DDMMYYYY, item);
 
 		if(date == null) {
 			holder.mTxtTitle.setText(item);
 			return;
 		}
 
+		String dayOfWeek = getDayOfWeek(date);
+		final String firstLetter = new String(dayOfWeek.substring(0, 1));
+		final String firstLetterUpper = firstLetter.toUpperCase();
+		dayOfWeek = dayOfWeek.replace(firstLetter, firstLetterUpper);
+
 		if(isTomorrow(date)) {
-			holder.mTxtTitle.setText(mContext.getResources().getString(R.string.order_pick_date_related,
-			                                                           getTomorrowRelativeTimeSpan(),
-			                                                           getWeekday(mContext, date)));
+			holder.mTxtTitle.setText(mContext.getString(R.string.order_pick_date_related,
+			                                            mContext.getString(R.string.Tomorrow),
+			                                            dayOfWeek));
 		} else {
-			holder.mTxtTitle.setText(DateUtils.formatDateTime(mContext,
-			                                                  date.getTime(),
-			                                                  DateUtils.FORMAT_SHOW_WEEKDAY |
-					                                                  DateUtils.FORMAT_SHOW_DATE |
-					                                                  DateUtils.FORMAT_NO_YEAR));
+			holder.mTxtTitle.setText(dayOfWeek);
 		}
 
 		ViewUtils.setVisible2(holder.mCheckedIndicator, isItemChecked(position));

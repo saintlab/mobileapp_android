@@ -126,13 +126,15 @@ public class DinnerOptionsFragment extends BaseFragment {
 		switch(mType) {
 			case TYPE_ADDRESS:
 				final AddressData addressData = (AddressData) mAdapter.getSelectedItem();
-				mBus.post(addressData);
+				if(addressData != null) {
+					mBus.post(addressData);
+				}
 				break;
 
 			case TYPE_DATE:
 				final String selectedItem = (String) mAdapter.getSelectedItem();
 				if(!TextUtils.isEmpty(selectedItem)) {
-					final Date date = DateUtils.parseDate(DinnerDateAdapter.dateFormat, selectedItem);
+					final Date date = DateUtils.parseDate(DateUtils.DATE_FORMAT_DDMMYYYY, selectedItem);
 					mBus.post(date);
 				}
 				break;
