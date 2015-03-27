@@ -72,7 +72,7 @@ public class NotifierDataProvider implements NotifierObservableApi {
 			return mDataService.tableOut(mRestId, mTableId).subscribeOn(
 					Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 		}
-		return Observable.from(new Object());
+		return Observable.from(new Object[]{});
 	}
 
 	@Override

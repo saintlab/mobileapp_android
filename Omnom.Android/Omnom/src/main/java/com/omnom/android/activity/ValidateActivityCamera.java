@@ -37,7 +37,7 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 public class ValidateActivityCamera extends ValidateActivity {
@@ -191,32 +191,32 @@ public class ValidateActivityCamera extends ValidateActivity {
 	private void findTable(final String tableData) {
 		final TableDataResponse[] table = new TableDataResponse[1];
 
-		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
-		                                                                                 .map(OmnomObservable.getValidationFunc(this,
-		                                                                                                                        getErrorHelper(),
-		                                                                                                                        mInternetErrorClickListener))
-		                                                                                 .isEmpty())
-		                                         .subscribe(new Action1<Boolean>() {
-			                                         @Override
-			                                         public void call(Boolean hasNoErrors) {
-				                                         if(hasNoErrors) {
-					                                         loadTable(tableData);
-				                                         } else {
-					                                         reportMixPanel(null, OnTableMixpanelEvent.METHOD_QR, table[0]);
-					                                         startErrorTransition();
-					                                         final View viewById = findViewById(R.id.panel_bottom);
-					                                         if(viewById != null) {
-						                                         viewById.animate().translationY(200).start();
-					                                         }
-				                                         }
-			                                         }
-		                                         }, new Action1<Throwable>() {
-			                                         @Override
-			                                         public void call(Throwable throwable) {
-				                                         startErrorTransition();
-				                                         getErrorHelper().showInternetError(mInternetErrorClickListener);
-			                                         }
-		                                         });
+		mValidateSubscribtion = AppObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
+		                                                                             .map(OmnomObservable.getValidationFunc(this,
+		                                                                                                                    getErrorHelper(),
+		                                                                                                                    mInternetErrorClickListener))
+		                                                                             .isEmpty())
+		                                     .subscribe(new Action1<Boolean>() {
+			                                     @Override
+			                                     public void call(Boolean hasNoErrors) {
+				                                     if(hasNoErrors) {
+					                                     loadTable(tableData);
+				                                     } else {
+					                                     reportMixPanel(null, OnTableMixpanelEvent.METHOD_QR, table[0]);
+					                                     startErrorTransition();
+					                                     final View viewById = findViewById(R.id.panel_bottom);
+					                                     if(viewById != null) {
+						                                     viewById.animate().translationY(200).start();
+					                                     }
+				                                     }
+			                                     }
+		                                     }, new Action1<Throwable>() {
+			                                     @Override
+			                                     public void call(Throwable throwable) {
+				                                     startErrorTransition();
+				                                     getErrorHelper().showInternetError(mInternetErrorClickListener);
+			                                     }
+		                                     });
 
 	}
 
@@ -238,7 +238,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 			restaurantObservable = api.decode(new QrDecodeRequest(data), mPreloadBackgroundFunction);
 		}
 
-		mCheckQrSubscribtion = AndroidObservable
+		mCheckQrSubscribtion = AppObservable
 				.bindActivity(this, concatMenuObservable(restaurantObservable))
 				.subscribe(new Action1<Pair<RestaurantResponse, MenuResponse>>() {
 					@Override

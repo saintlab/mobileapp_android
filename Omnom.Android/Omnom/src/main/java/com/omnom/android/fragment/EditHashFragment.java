@@ -46,7 +46,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -232,7 +232,7 @@ public class EditHashFragment extends Fragment {
 	private void loadTable(final String hash) {
 
 		final Observable<RestaurantResponse> responseObservable = api.decode(new HashDecodeRequest(hash), mPreloadBackgroundFunction);
-		final Observable<Pair<RestaurantResponse, MenuResponse>> restMenuObservable = responseObservable.mergeMap(
+		final Observable<Pair<RestaurantResponse, MenuResponse>> restMenuObservable = responseObservable.flatMap(
 				new Func1<RestaurantResponse, Observable<MenuResponse>>() {
 					@Override
 					public Observable<MenuResponse> call(final RestaurantResponse restaurantResponse) {
@@ -240,7 +240,7 @@ public class EditHashFragment extends Fragment {
 							final Restaurant restaurant = restaurantResponse.getRestaurants().get(0);
 							return menuApi.getMenu(restaurant.id());
 						}
-						return Observable.from(new MenuResponse());
+						return Observable.just(new MenuResponse());
 					}
 				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
 					@Override
@@ -250,7 +250,7 @@ public class EditHashFragment extends Fragment {
 					}
 				});
 
-		mCheckQrSubscription = AndroidObservable.bindActivity(getActivity(), restMenuObservable).subscribe(
+		mCheckQrSubscription = AppObservable.bindActivity(getActivity(), restMenuObservable).subscribe(
 				new Action1<Pair<RestaurantResponse, MenuResponse>>() {
 					@Override
 					public void call(final Pair<RestaurantResponse, MenuResponse> response) {

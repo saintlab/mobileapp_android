@@ -58,7 +58,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 /**
@@ -256,7 +256,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		final Activity activity = getActivity();
 
 		final BillRequest request = createBillRequest(amount);
-		mBillSubscription = AndroidObservable.bindActivity(activity, api.bill(request)).subscribe(new Action1<BillResponse>() {
+		mBillSubscription = AppObservable.bindActivity(activity, api.bill(request)).subscribe(new Action1<BillResponse>() {
 			@Override
 			public void call(final BillResponse response) {
 				final String status = response.getStatus();
@@ -345,7 +345,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 			mPayChecker.onPrePayment(mDetails);
 		}
 
-		mPaySubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().pay(acquiringData, paymentInfo))
+		mPaySubscription = AppObservable.bindActivity(getActivity(), getAcquiring().pay(acquiringData, paymentInfo))
 		                                    .subscribe(new Action1<AcquiringResponse>() {
 			                                    @Override
 			                                    public void call(final AcquiringResponse response) {
@@ -377,7 +377,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	}
 
 	private void checkResult(final AcquiringResponse response) {
-		mCheckSubscription = AndroidObservable.bindActivity(getActivity(), getAcquiring().checkResult(response))
+		mCheckSubscription = AppObservable.bindActivity(getActivity(), getAcquiring().checkResult(response))
 		                                      .subscribe(new Action1<AcquiringPollingResponse>() {
 			                                      @Override
 			                                      public void call(final AcquiringPollingResponse response) {

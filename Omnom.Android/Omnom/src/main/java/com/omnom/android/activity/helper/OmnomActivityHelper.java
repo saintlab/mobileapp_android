@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 /**
@@ -67,7 +67,7 @@ public class OmnomActivityHelper implements ActivityHelper, LocationListener {
 		if(app.getUserProfile() == null) {
 			final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(mActivity);
 			final String token = app.getAuthToken();
-			mUserSubscription = AndroidObservable.bindActivity(mActivity, mAuthenticator.getUser(token)).subscribe(
+			mUserSubscription = AppObservable.bindActivity(mActivity, mAuthenticator.getUser(token)).subscribe(
 					new Action1<UserResponse>() {
 						@Override
 						public void call(UserResponse userResponse) {
@@ -130,7 +130,7 @@ public class OmnomActivityHelper implements ActivityHelper, LocationListener {
 		final OmnomApplication app = OmnomApplication.get(mActivity);
 		final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(mActivity);
 		final String token = app.getAuthToken();
-		mUserSubscription = AndroidObservable.bindActivity(mActivity, mAuthenticator.getUser(token)).subscribe(new Action1<UserResponse>
+		mUserSubscription = AppObservable.bindActivity(mActivity, mAuthenticator.getUser(token)).subscribe(new Action1<UserResponse>
 				() {
 			@Override
 			public void call(UserResponse userResponse) {
@@ -166,7 +166,7 @@ public class OmnomActivityHelper implements ActivityHelper, LocationListener {
 					getLocation().getLongitude(),
 					getLocation().getLatitude(),
 					token);
-			mLocationSubscription = AndroidObservable.bindActivity(mActivity, locationObservable).subscribe(
+			mLocationSubscription = AppObservable.bindActivity(mActivity, locationObservable).subscribe(
 					new Action1<AuthResponse>() {
 						@Override
 						public void call(AuthResponse authResponse) {

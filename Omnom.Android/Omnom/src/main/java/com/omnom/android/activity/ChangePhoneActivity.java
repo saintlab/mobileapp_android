@@ -21,7 +21,7 @@ import com.omnom.android.view.HeaderView;
 
 import butterknife.InjectView;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 public class ChangePhoneActivity extends BaseOmnomActivity {
@@ -112,7 +112,7 @@ public class ChangePhoneActivity extends BaseOmnomActivity {
 		}
 		busy(true);
 		topPanel.showProgress(true);
-		mProceedSubscription = AndroidObservable.bindActivity(this, authenticator.changePhone(editPhone.getText()))
+		mProceedSubscription = AppObservable.bindActivity(this, authenticator.changePhone(editPhone.getText()))
 		                                        .subscribe(new Action1<AuthResponse>() {
 			                                        @Override
 			                                        public void call(AuthResponse authResponse) {

@@ -36,7 +36,7 @@ import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 public class ValidateActivityBle extends ValidateActivity {
@@ -125,31 +125,31 @@ public class ValidateActivityBle extends ValidateActivity {
 			clearErrors(true);
 			mViewHelper.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration));
 		}
-		mValidateSubscribtion = AndroidObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
-		                                                                                 .map(OmnomObservable.getValidationFunc(this,
-		                                                                                                                        getErrorHelper(),
-		                                                                                                                        mInternetErrorClickListener))
-		                                                                                 .isEmpty())
-		                                         .subscribe(new Action1<Boolean>() {
-			                                         @Override
-			                                         public void call(Boolean hasNoErrors) {
-				                                         if(hasNoErrors) {
-					                                         readBeacons();
-				                                         } else {
-					                                         startErrorTransition();
-					                                         final View viewById = findViewById(R.id.panel_bottom);
-					                                         if(viewById != null) {
-						                                         viewById.animate().translationY(200).start();
-					                                         }
-				                                         }
-			                                         }
-		                                         }, new Action1<Throwable>() {
-			                                         @Override
-			                                         public void call(Throwable throwable) {
-				                                         startErrorTransition();
-				                                         getErrorHelper().showInternetError(mInternetErrorClickListener);
-			                                         }
-		                                         });
+		mValidateSubscribtion = AppObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
+		                                                                             .map(OmnomObservable.getValidationFunc(this,
+		                                                                                                                    getErrorHelper(),
+		                                                                                                                    mInternetErrorClickListener))
+		                                                                             .isEmpty())
+		                                     .subscribe(new Action1<Boolean>() {
+			                                     @Override
+			                                     public void call(Boolean hasNoErrors) {
+				                                     if(hasNoErrors) {
+					                                     readBeacons();
+				                                     } else {
+					                                     startErrorTransition();
+					                                     final View viewById = findViewById(R.id.panel_bottom);
+					                                     if(viewById != null) {
+						                                     viewById.animate().translationY(200).start();
+					                                     }
+				                                     }
+			                                     }
+		                                     }, new Action1<Throwable>() {
+			                                     @Override
+			                                     public void call(Throwable throwable) {
+				                                     startErrorTransition();
+				                                     getErrorHelper().showInternetError(mInternetErrorClickListener);
+			                                     }
+		                                     });
 	}
 
 	private void readBeacons() {
@@ -162,38 +162,38 @@ public class ValidateActivityBle extends ValidateActivity {
 						                                                                   Collections.unmodifiableList(mBeacons)),
 				                                                                   mPreloadBackgroundFunction);
 
-				mFindBeaconSubscription = AndroidObservable.bindActivity(ValidateActivityBle.this, concatMenuObservable(decodeObservable))
-				                                           .subscribe(new Action1<Pair<RestaurantResponse, MenuResponse>>() {
-					                                           @Override
-					                                           public void call(final Pair<RestaurantResponse, MenuResponse> pair) {
-						                                           bindMenuData();
-						                                           RestaurantResponse response = pair.first;
-						                                           if(response.hasErrors()) {
-							                                           startErrorTransition();
-							                                           getErrorHelper().showErrorDemo(
-									                                           LoaderError.BACKEND_ERROR,
-									                                           mInternetErrorClickListener);
-						                                           } else {
-							                                           handleDecodeResponse(OnTableMixpanelEvent.METHOD_BLUETOOTH,
-							                                                                response);
-						                                           }
-					                                           }
-				                                           }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-					                                           @Override
-					                                           protected void onError(final Throwable throwable) {
-						                                           if(throwable instanceof RetrofitError) {
-							                                           startErrorTransition();
-							                                           getErrorHelper().showErrorDemo(
-									                                           LoaderError.BACKEND_ERROR,
-									                                           mInternetErrorClickListener);
-						                                           } else {
-							                                           startErrorTransition();
-							                                           getErrorHelper().showErrorDemo(
-									                                           LoaderError.NO_CONNECTION_TRY,
-									                                           mInternetErrorClickListener);
-						                                           }
-					                                           }
-				                                           });
+				mFindBeaconSubscription = AppObservable.bindActivity(ValidateActivityBle.this, concatMenuObservable(decodeObservable))
+				                                       .subscribe(new Action1<Pair<RestaurantResponse, MenuResponse>>() {
+					                                       @Override
+					                                       public void call(final Pair<RestaurantResponse, MenuResponse> pair) {
+						                                       bindMenuData();
+						                                       RestaurantResponse response = pair.first;
+						                                       if(response.hasErrors()) {
+							                                       startErrorTransition();
+							                                       getErrorHelper().showErrorDemo(
+									                                       LoaderError.BACKEND_ERROR,
+									                                       mInternetErrorClickListener);
+						                                       } else {
+							                                       handleDecodeResponse(OnTableMixpanelEvent.METHOD_BLUETOOTH,
+							                                                            response);
+						                                       }
+					                                       }
+				                                       }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					                                       @Override
+					                                       protected void onError(final Throwable throwable) {
+						                                       if(throwable instanceof RetrofitError) {
+							                                       startErrorTransition();
+							                                       getErrorHelper().showErrorDemo(
+									                                       LoaderError.BACKEND_ERROR,
+									                                       mInternetErrorClickListener);
+						                                       } else {
+							                                       startErrorTransition();
+							                                       getErrorHelper().showErrorDemo(
+									                                       LoaderError.NO_CONNECTION_TRY,
+									                                       mInternetErrorClickListener);
+						                                       }
+					                                       }
+				                                       });
 			}
 		};
 		if(AndroidUtils.isJellyBeanMR2()) {

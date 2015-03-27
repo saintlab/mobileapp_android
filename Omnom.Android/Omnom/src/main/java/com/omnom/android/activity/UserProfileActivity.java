@@ -41,7 +41,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -148,7 +148,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 				forwardToIntro();
 				return;
 			}
-			profileSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(
+			profileSubscription = AppObservable.bindActivity(this, authenticator.getUser(token)).subscribe(
 					new Action1<UserResponse>() {
 						@Override
 						public void call(UserResponse response) {
@@ -267,13 +267,13 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	private void quit() {
 		final String token = getPreferences().getAuthToken(this);
-		final Observable logoutObservable = notifierApi.unregister().mergeMap(new Func1<Object, Observable<AuthResponse>>() {
+		final Observable logoutObservable = notifierApi.unregister().flatMap(new Func1<Object, Observable<AuthResponse>>() {
 			@Override
 			public Observable<AuthResponse> call(final Object o) {
 				return authenticator.logout(token);
 			}
 		});
-		logoutSubscription = AndroidObservable.bindActivity(this, logoutObservable).subscribe(
+		logoutSubscription = AppObservable.bindActivity(this, logoutObservable).subscribe(
 				new Action1<AuthResponse>() {
 					@Override
 					public void call(AuthResponse authResponseBase) {

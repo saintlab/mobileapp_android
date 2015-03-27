@@ -60,7 +60,7 @@ import butterknife.OnClick;
 import butterknife.Optional;
 import rx.Observable;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -312,7 +312,7 @@ public class CardsActivity extends BaseOmnomActivity {
 				.mixpanelPan(card.getMaskedPanMixpanel())
 				.cvv(cvv)
 				.build();
-		mDeleteCardSubscription = AndroidObservable.bindActivity(this, mAcquiring.deleteCard(acquiringData, userData, cardInfo))
+		mDeleteCardSubscription = AppObservable.bindActivity(this, mAcquiring.deleteCard(acquiringData, userData, cardInfo))
 		                                           .flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
 				                                           Observable<CardDeleteResponse>>() {
 			                                           @Override
@@ -407,7 +407,7 @@ public class CardsActivity extends BaseOmnomActivity {
 			mPanelTop.showButtonRight(true);
 		} else {
 			mList.setAdapter(null);
-			mCardsSubscription = AndroidObservable.bindActivity(this, api.getCards().delaySubscription(1000, TimeUnit.MILLISECONDS))
+			mCardsSubscription = AppObservable.bindActivity(this, api.getCards().delaySubscription(1000, TimeUnit.MILLISECONDS))
 			                                      .subscribe(
 					                                      new Action1<CardsResponse>() {
 						                                      @Override

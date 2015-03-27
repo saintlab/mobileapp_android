@@ -36,7 +36,7 @@ import java.util.GregorianCalendar;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 /**
@@ -220,7 +220,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 				.create(AndroidUtils.getInstallId(this), editName.getText(), StringUtils.EMPTY_STRING, editEmail.getText(),
 				        editPhone.getText(), editBirth.getText().toString().replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
 		mRegisterSubscription =
-				AndroidObservable.bindActivity(this, authenticator.register(request)).subscribe(new Action1<AuthRegisterResponse>() {
+				AppObservable.bindActivity(this, authenticator.register(request)).subscribe(new Action1<AuthRegisterResponse>() {
 					@Override
 					public void call(final AuthRegisterResponse authRegisterResponse) {
 						if (!authRegisterResponse.hasError()) {

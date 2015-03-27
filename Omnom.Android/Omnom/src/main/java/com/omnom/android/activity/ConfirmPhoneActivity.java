@@ -26,7 +26,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 public class ConfirmPhoneActivity extends BaseOmnomActivity {
@@ -158,7 +158,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	private void doConfirm() {
 		btnRequestCode.setEnabled(false);
-		mConfirmSubscription = AndroidObservable.bindActivity(this, getAuthObservable()).subscribe(new Action1<AuthResponse>() {
+		mConfirmSubscription = AppObservable.bindActivity(this, getAuthObservable()).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(final AuthResponse authResponse) {
 				if(!authResponse.hasError()) {
@@ -244,7 +244,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	@OnClick(R.id.btn_request_code)
 	protected void onRequestCode() {
 		mRequestCodeSubscription =
-				AndroidObservable.bindActivity(this, getRequestCodeObservable()).subscribe(new Action1<AuthResponse>() {
+				AppObservable.bindActivity(this, getRequestCodeObservable()).subscribe(new Action1<AuthResponse>() {
 					@Override
 					public void call(AuthResponse authResponse) {
 						// handle result if necessary
