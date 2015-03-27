@@ -26,7 +26,6 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.Optional;
 
 /**
  * Created by Ch3D on 03.03.2015.
@@ -42,8 +41,13 @@ public class WishAdapter extends RecyclerView.Adapter {
 	public static final int VIEW_TYPE_TABLE_HEADER = 3;
 
 	static class FooterViewHolder extends RecyclerView.ViewHolder {
+
+		@InjectView(R.id.txt_amount)
+		protected TextView txtAmount;
+
 		public FooterViewHolder(final View itemView) {
 			super(itemView);
+			ButterKnife.inject(this, itemView);
 		}
 	}
 
@@ -63,7 +67,6 @@ public class WishAdapter extends RecyclerView.Adapter {
 		@InjectView(R.id.btn_apply)
 		protected Button btnApply;
 
-		@Optional
 		@InjectView(R.id.divider)
 		protected View viewDivider;
 
@@ -212,9 +215,15 @@ public class WishAdapter extends RecyclerView.Adapter {
 			case VIEW_TYPE_WISH_FOOTER:
 				final Button btnClear = (Button) holder.itemView.findViewById(R.id.btn_clear);
 				final Button btnSend = (Button) holder.itemView.findViewById(R.id.btn_send);
+				final TextView txtAmount = (TextView) holder.itemView.findViewById(R.id.txt_amount);
+				final View panelAmount = holder.itemView.findViewById(R.id.panel_top);
+
 				btnClear.setOnClickListener(mClickListener);
 				btnSend.setOnClickListener(mClickListener);
+				txtAmount.setText(AmountHelper.format(mOrder.getTotalPrice()) + mContext.getString(R.string.currency_suffix_ruble));
+
 				final boolean enabled = getSelectedItems().size() > 1;
+				ViewUtils.setVisible(panelAmount, enabled);
 				btnClear.setEnabled(enabled);
 				btnSend.setEnabled(enabled);
 				break;
@@ -244,6 +253,19 @@ public class WishAdapter extends RecyclerView.Adapter {
 		}
 		if(selectedItems.size() == 1) {
 			notifyItemChanged(0);
+		} else {
+			// update total amount
+			final int itemCount = getItemCount();
+			for(int i = 0; i < itemCount; i++) {
+				if(getItemViewType(i) == VIEW_TYPE_WISH_FOOTER) {
+					if(i > 0) {
+						// update pre-footer item to hide delimiter
+						notifyItemChanged(i - 1);
+					}
+					notifyItemChanged(i);
+					break;
+				}
+			}
 		}
 	}
 

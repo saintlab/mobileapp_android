@@ -39,5 +39,6 @@
     <dimen name="pay_once_fragment_height_small">150dp</dimen>
 
     <dimen name="image_button_size">48dp</dimen>
+    <dimen name="wish_button_size">40dp</dimen>
 
 </resources>

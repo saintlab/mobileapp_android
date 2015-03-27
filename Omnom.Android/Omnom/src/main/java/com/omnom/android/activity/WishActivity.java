@@ -215,6 +215,8 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		mList.setHasFixedSize(true);
 		mList.setLayoutManager(mLayoutManager);
 		mList.setAdapter(mAdapter);
+		ItemClickSupport itemClickSupport = ItemClickSupport.addTo(mList);
+		itemClickSupport.setOnItemLongClickListener(this);
 		refresh();
 	}
 

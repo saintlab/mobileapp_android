@@ -1,47 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:omnom="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/activity_vertical_margin">
+    android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btn_apply"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:gravity="center"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        style="@style/MenuButton.White" />
-
-    <TextView
-        android:id="@+id/txt_title"
-        android:layout_width="wrap_content"
+    <RelativeLayout xmlns:omnom="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/root"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/btn_apply"
-        android:singleLine="false"
-        android:maxLines="2"
-        android:ellipsize="end"
-        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-        android:text="TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE "
-        android:textAppearance="?android:textAppearanceLarge" />
+        android:padding="@dimen/activity_vertical_margin">
 
-    <TextView
-        android:id="@+id/txt_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/txt_title"
-        android:layout_below="@+id/txt_title"
-        android:layout_toLeftOf="@+id/btn_apply"
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:textColor="@color/menu_item_details"
-        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
-        android:text="INFO"
-        android:textAppearance="?android:textAppearance" />
+        <Button
+            android:id="@+id/btn_apply"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/wish_button_size"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textColor="@drawable/text_color_selector_menu_blue"
+            android:textAppearance="?android:textAppearance"
+            android:background="@drawable/btn_rounded_bordered_grey"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
+        <TextView
+            android:id="@+id/txt_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/btn_apply"
+            android:singleLine="false"
+            android:maxLines="2"
+            android:ellipsize="end"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+            android:text="TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE "
+            android:textAppearance="?android:textAppearanceLarge" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/txt_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/txt_title"
+            android:layout_below="@+id/txt_title"
+            android:layout_toLeftOf="@+id/btn_apply"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textColor="@color/menu_item_details"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+            android:text="INFO"
+            android:textAppearance="?android:textAppearance" />
+
+    </RelativeLayout>
+
+    <include
+        android:id="@+id/divider"
+        layout="@layout/delimiter_vertical_light"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="@dimen/activity_vertical_margin"
+        android:layout_marginRight="@dimen/activity_vertical_margin" />
+
+</LinearLayout>
