@@ -164,6 +164,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	public void collapseSlidingPanel() {
 		menuCategories.collapse();
+		menuCategories.restoreHeadersStyle();
 		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 	}
 
