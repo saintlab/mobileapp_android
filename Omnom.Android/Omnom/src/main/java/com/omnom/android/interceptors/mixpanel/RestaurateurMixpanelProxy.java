@@ -19,9 +19,12 @@ import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
+import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
+import com.omnom.android.restaurateur.model.restaurant.WishRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.restaurateur.retrofit.RestaurateurRxSupport;
@@ -33,6 +36,7 @@ import com.omnom.android.utils.utils.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Collection;
 import java.util.List;
 
 import altbeacon.beacon.Beacon;
@@ -293,6 +297,39 @@ public class RestaurateurMixpanelProxy extends RestaurateurDataProvider {
 			@Override
 			public void call(RestaurantResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "restarateur.decode <-", response);
+			}
+		});
+	}
+
+	@Override
+	public Observable<Restaurant> getMenu(final String restaurantId) {
+		mMixHelper.track(OMNOM_ANDROID, "restarateur.getMenu ->", restaurantId);
+		return super.getMenu(restaurantId).doOnNext(new Action1<Restaurant>() {
+			@Override
+			public void call(final Restaurant restaurant) {
+				mMixHelper.track(OMNOM_ANDROID, "restarateur.getMenu <-", restaurant);
+			}
+		});
+	}
+
+	@Override
+	public Observable<Collection<OrderItem>> getRecommendations(final String restaurantId) {
+		mMixHelper.track(OMNOM_ANDROID, "restarateur.getRecommendations ->", restaurantId);
+		return super.getRecommendations(restaurantId).doOnNext(new Action1<Collection<OrderItem>>() {
+			@Override
+			public void call(final Collection<OrderItem> orderItems) {
+				mMixHelper.track(OMNOM_ANDROID, "restarateur.getRecommendations <-", orderItems);
+			}
+		});
+	}
+
+	@Override
+	public Observable<WishResponse> wishes(final String restId, final WishRequest request) {
+		mMixHelper.track(OMNOM_ANDROID, "restarateur.wishes ->", request);
+		return super.wishes(restId, request).doOnNext(new Action1<WishResponse>() {
+			@Override
+			public void call(WishResponse response) {
+				mMixHelper.track(OMNOM_ANDROID, "restarateur.wishes <-", response);
 			}
 		});
 	}
