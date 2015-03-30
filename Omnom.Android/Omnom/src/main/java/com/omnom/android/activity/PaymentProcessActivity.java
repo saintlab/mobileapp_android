@@ -38,6 +38,8 @@ import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.socket.listener.SilentPaymentEventListener;
@@ -76,9 +78,10 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final Order order, CardInfo cardInfo, final boolean isDemo,
-	                         final int accentColor) {
+	                         final Restaurant restaurant) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
-		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
+		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
+		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(restaurant));
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
 		intent.putExtra(Extras.EXTRA_ORDER, order);
 		intent.putExtra(Extras.EXTRA_PAYMENT_TYPE, MailRuExtra.PAYMENT_TYPE_ORDER);
@@ -89,9 +92,10 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final UserOrder order, CardInfo cardInfo, WishResponse wishResponse, final boolean isDemo,
-	                         final int accentColor) {
+	                         final Restaurant restaurant) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
-		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
+		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
+		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(restaurant));
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
 		intent.putExtra(Extras.EXTRA_USER_ORDER, order);
 		intent.putExtra(Extras.EXTRA_PAYMENT_TYPE, MailRuExtra.PAYMENT_TYPE_WISH);
@@ -178,6 +182,9 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	private String mType;
 
 	private WishResponse mWishResponse;
+
+	@Nullable
+	private Restaurant mRestaurant;
 
 	@Override
 	public void initUi() {
@@ -346,28 +353,28 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		}
 
 		mPaySubscription = AppObservable.bindActivity(getActivity(), getAcquiring().pay(acquiringData, paymentInfo))
-		                                    .subscribe(new Action1<AcquiringResponse>() {
-			                                    @Override
-			                                    public void call(final AcquiringResponse response) {
-				                                    if(response.getError() != null) {
-					                                    Log.w(TAG, response.getError().toString());
-					                                    onPayError(response.getError());
-				                                    } else {
-					                                    mTransactionUrl = response.getUrl();
-					                                    mDetails.setTransactionUrl(mTransactionUrl);
-					                                    if(mPayChecker != null) {
-						                                    mPayChecker.onPaymentRequested(mDetails);
-					                                    }
-					                                    checkResult(response);
-				                                    }
-			                                    }
-		                                    }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			                                    @Override
-			                                    public void onError(Throwable throwable) {
-				                                    Log.w(TAG, "pay", throwable);
-				                                    onUnknownError();
-			                                    }
-		                                    });
+		                                .subscribe(new Action1<AcquiringResponse>() {
+			                                @Override
+			                                public void call(final AcquiringResponse response) {
+				                                if(response.getError() != null) {
+					                                Log.w(TAG, response.getError().toString());
+					                                onPayError(response.getError());
+				                                } else {
+					                                mTransactionUrl = response.getUrl();
+					                                mDetails.setTransactionUrl(mTransactionUrl);
+					                                if(mPayChecker != null) {
+						                                mPayChecker.onPaymentRequested(mDetails);
+					                                }
+					                                checkResult(response);
+				                                }
+			                                }
+		                                }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			                                @Override
+			                                public void onError(Throwable throwable) {
+				                                Log.w(TAG, "pay", throwable);
+				                                onUnknownError();
+			                                }
+		                                });
 	}
 
 	private void onSimilarPayment(final AcquiringResponseError error) {
@@ -378,18 +385,18 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private void checkResult(final AcquiringResponse response) {
 		mCheckSubscription = AppObservable.bindActivity(getActivity(), getAcquiring().checkResult(response))
-		                                      .subscribe(new Action1<AcquiringPollingResponse>() {
-			                                      @Override
-			                                      public void call(final AcquiringPollingResponse response) {
-				                                      processResponse(response);
-			                                      }
-		                                      }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			                                      @Override
-			                                      public void onError(Throwable throwable) {
-				                                      Log.w(TAG, "checkResult", throwable);
-				                                      onUnknownError();
-			                                      }
-		                                      });
+		                                  .subscribe(new Action1<AcquiringPollingResponse>() {
+			                                  @Override
+			                                  public void call(final AcquiringPollingResponse response) {
+				                                  processResponse(response);
+			                                  }
+		                                  }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			                                  @Override
+			                                  public void onError(Throwable throwable) {
+				                                  Log.w(TAG, "checkResult", throwable);
+				                                  onUnknownError();
+			                                  }
+		                                  });
 	}
 
 	private void processResponse(AcquiringPollingResponse response) {
@@ -412,7 +419,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mDetails.getAmount(), mDetails.getTip());
 				} else {
 					if(mWishResponse != null) {
-						OrderAcceptedActivity.start(getActivity(), "#orderNumber", mWishResponse.code(), REQUEST_THANKS, mAccentColor);
+						OrderAcceptedActivity.start(getActivity(), mRestaurant, mWishResponse, REQUEST_THANKS, mAccentColor);
 					} else {
 						ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
 					}
@@ -473,6 +480,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	@Override
 	protected void handleIntent(Intent intent) {
+		mRestaurant = intent.getParcelableExtra(Extras.EXTRA_RESTAURANT);
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
 		mDetails = intent.getParcelableExtra(EXTRA_PAYMENT_DETAILS);
 		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);

@@ -2,12 +2,15 @@ package com.omnom.android.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.view.HeaderView;
@@ -16,11 +19,12 @@ import butterknife.InjectView;
 
 public class OrderAcceptedActivity extends BaseOmnomActivity {
 
-	public static void start(Activity activity, String orderNumber, String pinCode,
+	public static void start(Activity activity, final Restaurant restaurant, WishResponse wishResponse,
 	                         int requestCode, final int accentColor) {
 		final Intent intent = new Intent(activity, OrderAcceptedActivity.class);
-		intent.putExtra(EXTRA_ORDER_NUMBER, orderNumber);
-		intent.putExtra(EXTRA_PIN_CODE, pinCode);
+		intent.putExtra(EXTRA_RESTAURANT, restaurant);
+		intent.putExtra(EXTRA_ORDER_NUMBER, wishResponse.internalTableId());
+		intent.putExtra(EXTRA_PIN_CODE, wishResponse.code());
 		intent.putExtra(EXTRA_ACCENT_COLOR, accentColor);
 		activity.startActivityForResult(intent, requestCode);
 	}
@@ -43,6 +47,9 @@ public class OrderAcceptedActivity extends BaseOmnomActivity {
 
 	private int mAccentColor;
 
+	@Nullable
+	private Restaurant mRestaurant;
+
 	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_order_accepted;
@@ -50,6 +57,7 @@ public class OrderAcceptedActivity extends BaseOmnomActivity {
 
 	@Override
 	protected void handleIntent(final Intent intent) {
+		mRestaurant = intent.getParcelableExtra(EXTRA_RESTAURANT);
 		mOrderNumber = intent.getStringExtra(EXTRA_ORDER_NUMBER);
 		mPinCode = intent.getStringExtra(EXTRA_PIN_CODE);
 		mAccentColor = intent.getIntExtra(EXTRA_ACCENT_COLOR, 0);
@@ -71,7 +79,7 @@ public class OrderAcceptedActivity extends BaseOmnomActivity {
 		                      new ClickSpan.OnClickListener() {
 			                      @Override
 			                      public void onClick() {
-				                      Toast.makeText(getActivity(), "Hey!", Toast.LENGTH_SHORT).show();
+				                      WebActivity.start(OrderAcceptedActivity.this, RestaurantHelper.getBarUri(mRestaurant));
 			                      }
 		                      });
 	}

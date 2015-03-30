@@ -37,6 +37,7 @@ import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.Extras;
@@ -99,18 +100,20 @@ public class CardsActivity extends BaseOmnomActivity {
 		}
 	}
 
-	public static void start(final Activity activity, final Order order, final OrderFragment.PaymentDetails details,
+	public static void start(final Activity activity, Restaurant restaurant, final Order order, final OrderFragment.PaymentDetails details,
 	                         final int accentColor, final int code, boolean isDemo) {
 		final Intent intent = new Intent(activity, CardsActivity.class);
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
+		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
 		intent.putExtra(Extras.EXTRA_ORDER, order);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
 		startActivity(activity, intent, code);
 	}
 
-	public static void start(final Activity activity, final String tableId) {
+	public static void start(final Activity activity, Restaurant restaurant, final String tableId) {
 		final Intent intent = new Intent(activity, CardsActivity.class);
+		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(EXTRA_TABLE_ID, tableId);
 		startActivity(activity, intent, -1);
 	}
@@ -127,12 +130,13 @@ public class CardsActivity extends BaseOmnomActivity {
 		}
 	}
 
-	public static void start(final WishActivity activity, final UserOrder order, WishResponse wishResponse,
+	public static void start(final WishActivity activity, Restaurant restaurant, final UserOrder order, WishResponse wishResponse,
 	                         final OrderFragment.PaymentDetails
 			                         paymentDetails,
 	                         final int accentColor, final int code) {
 		final Intent intent = new Intent(activity, CardsActivity.class);
 		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, paymentDetails);
+		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, accentColor);
 		intent.putExtra(Extras.EXTRA_WISH_RESPONSE, wishResponse);
 		intent.putExtra(Extras.EXTRA_USER_ORDER, order);
@@ -188,6 +192,9 @@ public class CardsActivity extends BaseOmnomActivity {
 
 	private WishResponse mWishResponse;
 
+	@Nullable
+	private Restaurant mRestaurant;
+
 	@Override
 	public void finish() {
 		super.finish();
@@ -210,6 +217,7 @@ public class CardsActivity extends BaseOmnomActivity {
 	@Override
 	protected void handleIntent(final Intent intent) {
 		mDetails = intent.getParcelableExtra(Extras.EXTRA_PAYMENT_DETAILS);
+		mRestaurant = intent.getParcelableExtra(Extras.EXTRA_RESTAURANT);
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
 		mOrder = intent.getParcelableExtra(Extras.EXTRA_ORDER);
 		mUserOrder = intent.getParcelableExtra(Extras.EXTRA_USER_ORDER);
@@ -313,23 +321,23 @@ public class CardsActivity extends BaseOmnomActivity {
 				.cvv(cvv)
 				.build();
 		mDeleteCardSubscription = AppObservable.bindActivity(this, mAcquiring.deleteCard(acquiringData, userData, cardInfo))
-		                                           .flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
-				                                           Observable<CardDeleteResponse>>() {
-			                                           @Override
-			                                           public Observable<CardDeleteResponse> call(com.omnom.android.acquiring.mailru
-					                                                                                      .response.CardDeleteResponse
-					                                                                                      cardDeleteResponse) {
-				                                           if(cardDeleteResponse.isSuccess()) {
-					                                           reportMixPanelSuccess(cardInfo);
-					                                           return api.deleteCard(card.getId());
-				                                           } else {
-					                                           if(cardDeleteResponse.getError() != null) {
-						                                           reportMixPanelFail(cardInfo, cardDeleteResponse.getError());
-					                                           }
-					                                           throw new AcquiringResponseException(cardDeleteResponse.getError());
-				                                           }
-			                                           }
-		                                           }).subscribe(new Action1<CardDeleteResponse>() {
+		                                       .flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
+				                                       Observable<CardDeleteResponse>>() {
+			                                       @Override
+			                                       public Observable<CardDeleteResponse> call(com.omnom.android.acquiring.mailru
+					                                                                                  .response.CardDeleteResponse
+					                                                                                  cardDeleteResponse) {
+				                                       if(cardDeleteResponse.isSuccess()) {
+					                                       reportMixPanelSuccess(cardInfo);
+					                                       return api.deleteCard(card.getId());
+				                                       } else {
+					                                       if(cardDeleteResponse.getError() != null) {
+						                                       reportMixPanelFail(cardInfo, cardDeleteResponse.getError());
+					                                       }
+					                                       throw new AcquiringResponseException(cardDeleteResponse.getError());
+				                                       }
+			                                       }
+		                                       }).subscribe(new Action1<CardDeleteResponse>() {
 					@Override
 					public void call(CardDeleteResponse cardDeleteResponse) {
 						if(cardDeleteResponse.isSuccess()) {
@@ -408,27 +416,27 @@ public class CardsActivity extends BaseOmnomActivity {
 		} else {
 			mList.setAdapter(null);
 			mCardsSubscription = AppObservable.bindActivity(this, api.getCards().delaySubscription(1000, TimeUnit.MILLISECONDS))
-			                                      .subscribe(
-					                                      new Action1<CardsResponse>() {
-						                                      @Override
-						                                      public void call(final CardsResponse cards) {
-							                                      final List<Card> cardsList = cards.getCards();
-							                                      mList.setAdapter(new CardsAdapter(getActivity(), cardsList, false));
-							                                      boolean isSelected = selectCard((CardsAdapter) mList.getAdapter(),
-							                                                                      mPreferences.getCardId(getActivity()));
-							                                      if(mBtnPay != null) {
-								                                      mBtnPay.setEnabled(isSelected);
-							                                      }
-							                                      mPanelTop.showProgress(false);
-							                                      mPanelTop.showButtonRight(true);
-						                                      }
-					                                      }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-						                                      @Override
-						                                      public void onError(Throwable throwable) {
-							                                      mPanelTop.showProgress(false);
-							                                      mPanelTop.showButtonRight(true);
-						                                      }
-					                                      });
+			                                  .subscribe(
+					                                  new Action1<CardsResponse>() {
+						                                  @Override
+						                                  public void call(final CardsResponse cards) {
+							                                  final List<Card> cardsList = cards.getCards();
+							                                  mList.setAdapter(new CardsAdapter(getActivity(), cardsList, false));
+							                                  boolean isSelected = selectCard((CardsAdapter) mList.getAdapter(),
+							                                                                  mPreferences.getCardId(getActivity()));
+							                                  if(mBtnPay != null) {
+								                                  mBtnPay.setEnabled(isSelected);
+							                                  }
+							                                  mPanelTop.showProgress(false);
+							                                  mPanelTop.showButtonRight(true);
+						                                  }
+					                                  }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+						                                  @Override
+						                                  public void onError(Throwable throwable) {
+							                                  mPanelTop.showProgress(false);
+							                                  mPanelTop.showButtonRight(true);
+						                                  }
+					                                  });
 		}
 	}
 
@@ -506,10 +514,10 @@ public class CardsActivity extends BaseOmnomActivity {
 	private void pay(final CardInfo cardInfo) {
 		if(mDetails != null) {
 			if(mOrder != null) {
-				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mOrder, cardInfo, mIsDemo, mAccentColor);
+				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mOrder, cardInfo, mIsDemo, mRestaurant);
 			} else {
 				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mUserOrder, cardInfo, mWishResponse, mIsDemo,
-				                             mAccentColor);
+				                             mRestaurant);
 			}
 		}
 	}

@@ -15,6 +15,7 @@ import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.adapter.OrdersPagerAdaper;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
+import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.socket.event.OrderCloseSocketEvent;
 import com.omnom.android.socket.event.OrderCreateSocketEvent;
@@ -40,9 +41,9 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class OrdersActivity extends BaseOmnomFragmentActivity
-                            implements OrderCreateEventListener.OrderCreateListener,
-                                       OrderUpdateEventListener.OrderUpdateListener,
-									   OrderCloseEventListener.OrderCloseListener {
+		implements OrderCreateEventListener.OrderCreateListener,
+		           OrderUpdateEventListener.OrderUpdateListener,
+		           OrderCloseEventListener.OrderCloseListener {
 
 	public static final int REQUEST_CODE_CARDS = 100;
 
@@ -52,25 +53,26 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 
 	public static final String TAG_SWITCHER_DELIMITER = ":";
 
-	public static void start(BaseOmnomActivity activity, ArrayList<Order> orders, String requestId,
+	public static void start(BaseOmnomActivity activity, Restaurant restaurant, ArrayList<Order> orders, String requestId,
 	                         final String bgColor, int code, boolean isDemo) {
-		final Intent intent = getIntent(activity, orders, requestId, bgColor, isDemo);
+		final Intent intent = getIntent(activity, restaurant, orders, requestId, bgColor, isDemo);
 		activity.startActivityForResult(intent, code);
 	}
 
-	private static Intent getIntent(final Context context, final ArrayList<Order> orders, final String requestId,
+	private static Intent getIntent(final Context context, Restaurant restaurant, final ArrayList<Order> orders, final String requestId,
 	                                final String bgColor, final boolean isDemo) {
 		final Intent intent = new Intent(context, OrdersActivity.class);
 		intent.putParcelableArrayListExtra(OrdersActivity.EXTRA_ORDERS, orders);
+		intent.putExtra(OrdersActivity.EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(OrdersActivity.EXTRA_REQUEST_ID, requestId);
 		intent.putExtra(OrdersActivity.EXTRA_ACCENT_COLOR, bgColor);
 		intent.putExtra(OrdersActivity.EXTRA_DEMO_MODE, isDemo);
 		return intent;
 	}
 
-	public static void start(BaseOmnomFragmentActivity activity, ArrayList<Order> orders, String requestId,
+	public static void start(BaseOmnomFragmentActivity activity, Restaurant restaurant, ArrayList<Order> orders, String requestId,
 	                         final String bgColor, int code, boolean isDemo) {
-		final Intent intent = getIntent(activity, orders, requestId, bgColor, isDemo);
+		final Intent intent = getIntent(activity, restaurant, orders, requestId, bgColor, isDemo);
 		activity.startActivityForResult(intent, code);
 	}
 
@@ -103,85 +105,87 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 
 	private ListenersSet listenersSet;
 
+	private Restaurant mRestaurant;
+
 	@Subscribe
 	public void onPayment(final PaymentSocketEvent event) {
-	    updateOrder(event.getPaymentData().getOrder());
+		updateOrder(event.getPaymentData().getOrder());
 	}
 
-    @Override
-    public void onOrderCreateEvent(final OrderCreateSocketEvent event) {
-        if (orders != null) {
-	        orders.add(event.getOrder());
-	        getActivity().runOnUiThread(new Runnable() {
-		        @Override
-		        public void run() {
-			        mPagerAdapter.updateOrders(orders);
-			        mTextInfo.setText(getString(R.string.your_has_n_orders, mPagerAdapter.getCount()));
-			        final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
-			        if (currentFragment != null && !currentFragment.isDownscaled()) {
-				        showOther(mPager.getCurrentItem(), false);
-			        }
-		        }
-	        });
-        }
-    }
+	@Override
+	public void onOrderCreateEvent(final OrderCreateSocketEvent event) {
+		if(orders != null) {
+			orders.add(event.getOrder());
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					mPagerAdapter.updateOrders(orders);
+					mTextInfo.setText(getString(R.string.your_has_n_orders, mPagerAdapter.getCount()));
+					final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
+					if(currentFragment != null && !currentFragment.isDownscaled()) {
+						showOther(mPager.getCurrentItem(), false);
+					}
+				}
+			});
+		}
+	}
 
-    @Override
-    public void onOrderUpdateEvent(final OrderUpdateSocketEvent event) {
-        updateOrder(event.getOrder());
-    }
+	@Override
+	public void onOrderUpdateEvent(final OrderUpdateSocketEvent event) {
+		updateOrder(event.getOrder());
+	}
 
 	@Override
 	public void onOrderCloseEvent(final OrderCloseSocketEvent event) {
 		final Order order = event.getOrder();
 		final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
 		// Return from current bill view if it is opened
-		if (currentFragment != null && order.getId().equals(currentFragment.getOrderId()) &&
+		if(currentFragment != null && order.getId().equals(currentFragment.getOrderId()) &&
 				!currentFragment.isDownscaled()) {
 			DialogUtils.showDialog(getActivity(), R.string.order_closed, R.string.exit,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(final DialogInterface dialog,
-                                            final int which) {
-                            closeOrder(order);
-                        }
-                    });
+			                       new DialogInterface.OnClickListener() {
+				                       @Override
+				                       public void onClick(final DialogInterface dialog,
+				                                           final int which) {
+					                       closeOrder(order);
+				                       }
+			                       });
 		} else {
 			closeOrder(order);
 		}
 	}
 
-    private void updateOrder(final Order order) {
-        final int position = replaceOrder(orders, order);
-        if(order != null && position >= 0 && mPagerAdapter != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-	                mPagerAdapter.updateOrders(orders);
-                    final Fragment currentFragment = findFragmentByPosition(position);
-                    if(currentFragment != null) {
-                        ((OrderFragment) currentFragment).onOrderUpdate(order);
-                    }
-                }
-            });
-        }
-    }
+	private void updateOrder(final Order order) {
+		final int position = replaceOrder(orders, order);
+		if(order != null && position >= 0 && mPagerAdapter != null) {
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					mPagerAdapter.updateOrders(orders);
+					final Fragment currentFragment = findFragmentByPosition(position);
+					if(currentFragment != null) {
+						((OrderFragment) currentFragment).onOrderUpdate(order);
+					}
+				}
+			});
+		}
+	}
 
 	public void closeOrder(final Order order) {
-		if (orders != null) {
+		if(orders != null) {
 			final int removedItemIndex = orders.indexOf(order);
 			orders.remove(order);
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					if (orders.size() == 0) {
+					if(orders.size() == 0) {
 						close();
 						return;
 					}
 					final int currentItemIndex = mPager.getCurrentItem();
 					final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
 					// Return from current bill view if it is opened
-					if (currentFragment != null &&
+					if(currentFragment != null &&
 							order.getId().equals(currentFragment.getOrderId()) &&
 							!currentFragment.isDownscaled()) {
 						mPager.setEnabled(true);
@@ -215,10 +219,10 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void initUi() {
-        listenersSet = new ListenersSet(new PaymentEventListener(this),
-                       new OrderCreateEventListener(this, this),
-                       new OrderUpdateEventListener(this, this),
-		               new OrderCloseEventListener(this, this));
+		listenersSet = new ListenersSet(new PaymentEventListener(this),
+		                                new OrderCreateEventListener(this, this),
+		                                new OrderUpdateEventListener(this, this),
+		                                new OrderCloseEventListener(this, this));
 		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, requestId, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 4.5);
@@ -236,7 +240,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 		if(orders.size() > 0) {
 			final Order order = orders.get(0);
 			if(order != null) {
-                listenersSet.initTableSocket(order.getTableId());
+				listenersSet.initTableSocket(order.getTableId());
 			}
 		}
 	}
@@ -244,7 +248,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 	@Override
 	protected void onPause() {
 		super.onPause();
-        listenersSet.onPause();
+		listenersSet.onPause();
 	}
 
 	@Override
@@ -257,6 +261,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 	protected void handleIntent(Intent intent) {
 		orders = intent.getParcelableArrayListExtra(EXTRA_ORDERS);
 		requestId = intent.getStringExtra(EXTRA_REQUEST_ID);
+		mRestaurant = intent.getParcelableExtra(EXTRA_RESTAURANT);
 		final String colorStr = intent.getStringExtra(EXTRA_ACCENT_COLOR);
 		bgColor = RestaurantHelper.getBackgroundColor(colorStr);
 		mDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
@@ -380,4 +385,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 		return position;
 	}
 
+	public Restaurant getRestaurant() {
+		return mRestaurant;
+	}
 }

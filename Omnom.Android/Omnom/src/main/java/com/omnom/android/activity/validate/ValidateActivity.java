@@ -728,7 +728,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		mViewHelper.showOrders(new Runnable() {
 			@Override
 			public void run() {
-				OrdersActivity.start(ValidateActivity.this, new ArrayList<Order>(orders), requestId,
+				OrdersActivity.start(ValidateActivity.this, mRestaurant, new ArrayList<Order>(orders), requestId,
 				                     mRestaurant.decoration().getBackgroundColor(), REQUEST_CODE_ORDERS, mIsDemo);
 				if(orders.size() == 1) {
 					overridePendingTransition(R.anim.slide_in_down_short, R.anim.nothing);

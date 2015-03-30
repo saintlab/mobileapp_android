@@ -106,7 +106,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.btn_my_cards)
 	protected void onMyCards() {
-		CardsActivity.start(this, mTableId);
+		CardsActivity.start(this, null, mTableId);
 	}
 
 	@OnClick(R.id.btn_feedback)

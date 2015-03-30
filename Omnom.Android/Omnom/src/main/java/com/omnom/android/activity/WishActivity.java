@@ -354,12 +354,13 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1<WishResponse>() {
 			@Override
 			public void call(final WishResponse wishResponse) {
-				final PaymentDetails paymentDetails = new PaymentDetails(2.0,
-				                                                         //mOrder.getTotalPrice().doubleValue(),
+				final PaymentDetails paymentDetails = new PaymentDetails(mOrder.getTotalPrice().doubleValue(),
 				                                                         0,
-				                                                         TipsWay.DEFAULT, 0,
+				                                                         TipsWay.DEFAULT,
+				                                                         0,
 				                                                         SplitWay.WASNT_USED);
 				CardsActivity.start(WishActivity.this,
+				                    mRestaurant,
 				                    mOrder,
 				                    wishResponse,
 				                    paymentDetails,

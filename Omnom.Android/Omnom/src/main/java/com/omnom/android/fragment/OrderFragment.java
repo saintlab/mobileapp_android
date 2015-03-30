@@ -552,13 +552,13 @@ public class OrderFragment extends Fragment {
 		if(order != null && order.getId().equals(mOrder.getId())) {
 			if(!isDownscaled()) {
 				DialogUtils.showDialog(getActivity(), R.string.order_updated, R.string.update,
-				                        new DialogInterface.OnClickListener() {
-					                        @Override
-					                        public void onClick(final DialogInterface dialog,
-					                                            final int which) {
-						                        updateOrder(order);
-					                        }
-				                        });
+				                       new DialogInterface.OnClickListener() {
+					                       @Override
+					                       public void onClick(final DialogInterface dialog,
+					                                           final int which) {
+						                       updateOrder(order);
+					                       }
+				                       });
 			} else {
 				updateOrder(order);
 			}
@@ -681,18 +681,18 @@ public class OrderFragment extends Fragment {
 				public void onClick(final View v) {
 					if(amountIsTooHigh()) {
 						final AlertDialog alertDialog = DialogUtils.showDialog(getActivity(), R.string.amount_is_too_high, R.string.pay,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(final DialogInterface dialog,
-                                                        final int which) {
-                                        showCardsActivity();
-                                    }
-                                }, R.string.refuse, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(final DialogInterface dialog, final int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
+						                                                       new DialogInterface.OnClickListener() {
+							                                                       @Override
+							                                                       public void onClick(final DialogInterface dialog,
+							                                                                           final int which) {
+								                                                       showCardsActivity();
+							                                                       }
+						                                                       }, R.string.refuse, new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(final DialogInterface dialog, final int which) {
+										dialog.dismiss();
+									}
+								});
 						alertDialog.setCanceledOnTouchOutside(true);
 						final float btnTextSize = getResources().getDimension(R.dimen.font_normal);
 						final Button btn1 = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
@@ -818,7 +818,8 @@ public class OrderFragment extends Fragment {
 		                                                         mOrder, mTipsWay, tips.getValue(),
 		                                                         mSplitWay);
 		final OrdersActivity activity = (OrdersActivity) getActivity();
-		CardsActivity.start(getActivity(), mOrder, paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
+		CardsActivity.start(getActivity(), activity.getRestaurant(), mOrder, paymentDetails, mAccentColor,
+		                    OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
 	}
 
 	private void initList() {

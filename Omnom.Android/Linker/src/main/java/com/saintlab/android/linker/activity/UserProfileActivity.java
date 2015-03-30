@@ -40,7 +40,7 @@ import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.OnClick;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 import static butterknife.ButterKnife.findById;
@@ -113,7 +113,7 @@ public class UserProfileActivity extends BaseActivity {
 				LoginActivity.start(this);
 				return;
 			}
-			profileSubscription = AndroidObservable.bindActivity(this, authenticator.getUser(token)).subscribe(
+			profileSubscription = AppObservable.bindActivity(this, authenticator.getUser(token)).subscribe(
 					new Action1<UserResponse>() {
 						@Override
 						public void call(UserResponse response) {
@@ -250,7 +250,7 @@ public class UserProfileActivity extends BaseActivity {
 	@OnClick(R.id.btn_bottom)
 	public void onLogout() {
 		final String token = getPreferences().getAuthToken(this);
-		logoutSubscription = AndroidObservable.bindActivity(this, authenticator.logout(token)).subscribe(new Action1<AuthResponse>() {
+		logoutSubscription = AppObservable.bindActivity(this, authenticator.logout(token)).subscribe(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse authResponseBase) {
 				if(!authResponseBase.hasError()) {

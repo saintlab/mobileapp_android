@@ -73,7 +73,7 @@ import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -299,7 +299,7 @@ public class BindActivity extends BaseActivity {
 		}
 		AndroidUtils.hideKeyboard(findById(this, R.id.edit_table_number));
 		AnimationUtils.animateAlpha(mBtnBindTable, false);
-		mBuildBeaconsSubscribtion = AndroidObservable.bindActivity(this, api.buildBeacon(mRestaurant.id(), tableNumber,
+		mBuildBeaconsSubscribtion = AppObservable.bindActivity(this, api.buildBeacon(mRestaurant.id(), tableNumber,
 		                                                                                 mBeacon.getIdValue(0))).subscribe(
 				new RestaurateurObservable.AuthAwareOnNext<BeaconDataResponse>(getActivity()) {
 					@Override
@@ -334,7 +334,7 @@ public class BindActivity extends BaseActivity {
 		final Func1<ValidationObservable.Error, Boolean> validationFunc = OmnomObservable.getValidationFunc(this,
 		                                                                                                    mErrorHelper,
 		                                                                                                    mInternetErrorClickListener);
-		mErrValidationSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this)
+		mErrValidationSubscription = AppObservable.bindActivity(this, ValidationObservable.validate(this)
 		                                                                                      .map(validationFunc)
 		                                                                                      .isEmpty())
 		                                              .subscribe(new Action1<Boolean>() {
@@ -478,11 +478,11 @@ public class BindActivity extends BaseActivity {
 		clearErrors();
 		mApiBindComplete = false;
 		mLoader.startProgressAnimation(getResources().getInteger(R.integer.bind_validation_duration), null);
-		mErrBindSubscription = AndroidObservable.bindActivity(this, ValidationObservable.validate(this)
-		                                                                                .map(OmnomObservable.getValidationFunc(this,
-		                                                                                                                       mErrorHelper,
-		                                                                                                                       mInternetErrorClickListener))
-		                                                                                .isEmpty())
+		mErrBindSubscription = AppObservable.bindActivity(this, ValidationObservable.validate(this)
+		                                                                            .map(OmnomObservable.getValidationFunc(this,
+		                                                                                                                   mErrorHelper,
+		                                                                                                                   mInternetErrorClickListener))
+		                                                                            .isEmpty())
 		                                        .subscribe(new Action1<Boolean>() {
 			                                        @Override
 			                                        public void call(Boolean hasNoErrors) {
@@ -505,7 +505,7 @@ public class BindActivity extends BaseActivity {
 								                                                               mInternetErrorClickListener);
 							                                        } else if(size == 1) {
 								                                        mBeacon = nearBeacons.get(0);
-								                                        mFindBeaconSubscription = AndroidObservable.bindActivity(
+								                                        mFindBeaconSubscription = AppObservable.bindActivity(
 										                                        context,
 										                                        api.findBeacon(mBeacon).onErrorReturn(
 												                                        RestaurateurObservable
@@ -771,7 +771,7 @@ public class BindActivity extends BaseActivity {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						mApiBindingSubscription = AndroidObservable.bindActivity(getActivity(), api.bind(mRestaurant.id(),
+						mApiBindingSubscription = AppObservable.bindActivity(getActivity(), api.bind(mRestaurant.id(),
 						                                                                                 mLoader.getTableNumber(),
 						                                                                                 mQrData, mBeaconData, mBeacon))
 						                                           .subscribe(new Action1<ResponseBase>() {
