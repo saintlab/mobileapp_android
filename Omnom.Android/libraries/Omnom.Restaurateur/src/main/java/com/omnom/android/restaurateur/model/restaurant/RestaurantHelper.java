@@ -178,4 +178,20 @@ public class RestaurantHelper {
 
 		return table;
 	}
+
+	public static boolean hasBar(final Restaurant restaurant) {
+		return restaurant.settings() != null && restaurant.settings().hasBar();
+	}
+
+	public static boolean hasTableOrder(final Restaurant restaurant) {
+		return restaurant.settings() != null && restaurant.settings().hasTableOrder();
+	}
+
+	public static boolean hasPreOrder(final Restaurant restaurant) {
+		return restaurant.settings() != null && restaurant.settings().hasPreOrder();
+	}
+
+	public static boolean hasTakeaway(final Restaurant restaurant) {
+		return false;
+	}
 }

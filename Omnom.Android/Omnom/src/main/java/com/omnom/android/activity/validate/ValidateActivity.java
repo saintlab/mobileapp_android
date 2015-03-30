@@ -70,6 +70,7 @@ import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
+import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
@@ -203,10 +204,17 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		context.start(intent, enterAnim, exitAnim, !isDemo);
 	}
 
-	public static void start(final BaseFragmentActivity context, final int enterAnim,
+	public static void start(final OmnomActivity context, final int enterAnim,
 	                         final int exitAnim, final int animationType, final int userEnterType,
 	                         final Uri data, final boolean isApplicationLaunch) {
-		Intent intent = createIntent(context, animationType, false, userEnterType, data, isApplicationLaunch);
+		Intent intent = createIntent(context.getActivity(), animationType, false, userEnterType, data, isApplicationLaunch);
+		context.start(intent, enterAnim, exitAnim, true);
+	}
+
+	public static void start(final OmnomActivity context, final int enterAnim,
+	                         final int exitAnim, final int animationType, Restaurant restaurant) {
+		Intent intent = createIntent(context.getActivity(), animationType, false, ValidateActivity.TYPE_DEFAULT, null, false);
+		intent.putExtra(EXTRA_RESTAURANT, restaurant);
 		context.start(intent, enterAnim, exitAnim, true);
 	}
 
@@ -402,6 +410,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		mSkipViewRendering = intent.getBooleanExtra(EXTRA_SKIP_VIEW_RENDERING, false);
 		mType = intent.getIntExtra(EXTRA_CONFIRM_TYPE, TYPE_DEFAULT);
 		mIsApplicationLaunch = intent.getBooleanExtra(EXTRA_APPLICATION_LAUNCH, false);
+		mRestaurant = intent.getParcelableExtra(EXTRA_RESTAURANT);
 	}
 
 	@Override
@@ -412,6 +421,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	private void startValidation() {
 		if(!mSkipViewRendering) {
+			if(mRestaurant != null && mRestaurant.settings().hasBar()) {
+				handleBar(mRestaurant);
+				return;
+			}
+
 			postDelayed(getResources().getInteger(R.integer.default_animation_duration_quick), new Runnable() {
 				@Override
 				public void run() {
@@ -419,6 +433,23 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 				}
 			});
 		}
+	}
+
+	private void handleBar(final Restaurant restaurant) {
+		mViewHelper.updateLoader(mRestaurant);
+		mViewHelper.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration));
+
+		menuApi.getMenu(restaurant.id()).subscribe(new Action1<MenuResponse>() {
+			@Override
+			public void call(final MenuResponse menuResponse) {
+				mMenu = menuResponse.getMenu();
+				onDataLoaded(restaurant, TableDataResponse.NULL);
+				bindMenuData();
+				mSkipViewRendering = true;
+			}
+		}, onError);
+
+		mFirstRun = false;
 	}
 
 	@Override
