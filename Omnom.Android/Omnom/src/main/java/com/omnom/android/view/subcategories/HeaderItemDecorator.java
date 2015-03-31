@@ -94,9 +94,6 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 	public final void drawSelectedBackground(final View view) {
 		if(mMenuAdapter.hasExpandedGroups()) {
 			final TextView viewById = (TextView) view.findViewById(R.id.txt_title);
-			if(viewById.getText().equals("Основное")) {
-				System.err.println(">>>");
-			}
 			viewById.setTextColor(TEXT_COLOR_SELECTED);
 			view.setBackgroundColor(mBgColorSelected);
 		}

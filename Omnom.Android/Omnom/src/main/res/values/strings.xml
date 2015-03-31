@@ -121,8 +121,10 @@
     <string name="title_activity_restaurants_list">RestaurantsListActivity</string>
     <string name="title_activity_restaurant">RestaurantActivity</string>
     <string name="reserve_table">Бронировать\nстолик</string>
-    <string name="im_inside_restaurant">Я внутри</string>
-    <string name="make_an_order">Сделать\nзаказ</string>
+    <string name="to_the_bar">В бар</string>
+    <string name="im_inside_restaurant">За стол</string>
+    <string name="make_an_order">Сделать\nзаказ\nобеда\nв офис</string>
+    <string name="takeaway">Заказ\nна вынос</string>
     <string name="write_to_us">Напишите нам</string>
     <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
     <string name="navigate_qr_code">Наведите камеру\nна&#160;QR-код Omnom.\nЧто это такое?</string>

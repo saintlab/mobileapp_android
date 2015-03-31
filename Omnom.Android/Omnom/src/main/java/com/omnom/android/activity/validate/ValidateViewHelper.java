@@ -539,4 +539,9 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	public void showMenuItemDetails(final Item item) {
 		menuCategories.showDetails(item);
 	}
+
+	public void updateLoader(final Restaurant restaurant) {
+		loader.setBgColor(RestaurantHelper.getBackgroundColor(restaurant));
+		loader.animateLogoInstant(RestaurantHelper.getLogo(restaurant), R.drawable.ic_fork_n_knife);
+	}
 }

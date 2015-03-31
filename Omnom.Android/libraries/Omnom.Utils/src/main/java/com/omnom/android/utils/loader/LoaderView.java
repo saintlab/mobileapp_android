@@ -173,10 +173,14 @@ public class LoaderView extends FrameLayout {
 		});
 	}
 
+	public static int getLoaderSizeDefault(Context context) {
+		final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+		return (int) (displayMetrics.widthPixels * LOADER_WIDTH_SCALE + 0.5);
+	}
+
 	public int getLoaderSizeDefault() {
 		if(mDefaultLoaderSize == -1) {
-			final DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
-			mDefaultLoaderSize = (int) (displayMetrics.widthPixels * LOADER_WIDTH_SCALE + 0.5);
+			mDefaultLoaderSize = getLoaderSizeDefault(getContext());
 		}
 		return mDefaultLoaderSize;
 	}
@@ -193,6 +197,14 @@ public class LoaderView extends FrameLayout {
 
 	private int getDefaultBgColor() {
 		return getContext().getResources().getColor(R.color.loader_bg);
+	}
+
+	public void setBgColor(int color) {
+		if(AndroidUtils.isJellyBean()) {
+			setColor16(color);
+		} else {
+			setColor(color);
+		}
 	}
 
 	public void animateColor(int endColor) {
@@ -646,6 +658,10 @@ public class LoaderView extends FrameLayout {
 
 	public void animateLogoFast(final String logo, int placeholder) {
 		animateLogo(logo, placeholder, getResources().getInteger(R.integer.default_animation_duration_quick));
+	}
+
+	public void animateLogoInstant(final String logo, int placeholder) {
+		animateLogo(logo, placeholder, 0);
 	}
 
 	public void animateLogo(final String logo, int placeholder) {

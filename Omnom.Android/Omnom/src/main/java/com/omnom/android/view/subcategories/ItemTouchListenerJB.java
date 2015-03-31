@@ -22,7 +22,6 @@ public class ItemTouchListenerJB extends ItemTouchListenerBase {
 	@Override
 	@DebugLog
 	public boolean onInterceptTouchEvent(final RecyclerView rv, final MotionEvent e) {
-		System.err.println(">>>> action = " + e);
 		if(!mTouchEnabled) {
 			switch(e.getAction()) {
 				case MotionEvent.ACTION_DOWN:
