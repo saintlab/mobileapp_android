@@ -278,7 +278,6 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		System.err.println(">>> requestCode = " + requestCode + " resultCode = " + requestCode + " data = " + data);
 		if(requestCode == REQUEST_CODE_CHANGE_TABLE && resultCode == RESULT_CODE_TABLE_CHANGED) {
 			setResult(RESULT_CODE_TABLE_CHANGED);
 			RestaurantsListActivity.super.finish();
