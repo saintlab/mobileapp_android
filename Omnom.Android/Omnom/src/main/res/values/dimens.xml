@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <dimen name="order_items_list_height_collapsed">240dp</dimen>
     <dimen name="order_list_trasnlation_active">-240dp</dimen>
     <dimen name="order_payment_translation_y">0dp</dimen>

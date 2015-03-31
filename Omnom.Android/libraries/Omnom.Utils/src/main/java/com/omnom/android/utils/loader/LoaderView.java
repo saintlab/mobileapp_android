@@ -190,7 +190,7 @@ public class LoaderView extends FrameLayout {
 		TypedValue outValue = new TypedValue();
 		getResources().getValue(R.dimen.loader_progress_inner_radius, outValue, true);
 		float innerRadiusRatio = outValue.getFloat();
-		final int progressSize = (int) (loaderSize * innerRadiusRatio / 2 + 0.5);
+		final int progressSize = (int) (loaderSize * innerRadiusRatio / 2 + 0.5) + ViewUtils.dipToPixels(getContext(), 1.0f);
 		layoutParams.height = progressSize;
 		layoutParams.width = progressSize;
 	}
