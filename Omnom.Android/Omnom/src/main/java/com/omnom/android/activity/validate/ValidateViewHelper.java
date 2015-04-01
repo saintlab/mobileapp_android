@@ -461,8 +461,8 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 				AnimationUtils.animateAlpha(menuGradientPanel, true);
 				AnimationUtils.animateAlpha(slidingPanel, true);
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
-				                .setDuration(mActivity.getResources().getInteger(R.integer.default_animation_duration_short)).start();
-				if(forwardToBill) {
+						.setDuration(mActivity.getResources().getInteger(R.integer.default_animation_duration_short)).start();
+				if (forwardToBill) {
 					loader.postDelayed(new Runnable() {
 						@Override
 						public void run() {
@@ -543,5 +543,9 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	public void updateLoader(final Restaurant restaurant) {
 		loader.setBgColor(RestaurantHelper.getBackgroundColor(restaurant));
 		loader.animateLogoInstant(RestaurantHelper.getLogo(restaurant), R.drawable.ic_fork_n_knife);
+	}
+
+	public void resetMenuState() {
+		menuCategories.resetState();
 	}
 }

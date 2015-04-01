@@ -67,8 +67,7 @@
         android:id="@+id/btn_apply"
         android:layout_marginTop="@dimen/activity_vertical_margin_small"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:textColor="@drawable/text_color_selector_menu_blue"
-        style="@style/MenuButton.White" />
+        style="@style/MenuButton.Price" />
 
     <View
         android:id="@+id/delimiter"

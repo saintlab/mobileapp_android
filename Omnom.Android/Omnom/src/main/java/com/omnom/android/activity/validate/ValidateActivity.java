@@ -622,8 +622,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		if(mAcquiring instanceof AcquiringMailRu) {
 			((AcquiringMailRu) mAcquiring).changeEndpoint(config.getAcquiringData().getBaseUrl());
 		}
-		getMixPanelHelper().addApi(OMNOM,
-		                           MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
+		getMixPanelHelper().addApi(OMNOM, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
 		getMixPanelHelper().addApi(OMNOM_ANDROID,
 		                           MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));
 	}
@@ -697,7 +696,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		                    .subscribe(new Action1<Boolean>() {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
-				                    if(hasNoErrors) {
+				                    if (hasNoErrors) {
 					                    clearErrors(false);
 					                    loadOrders(v);
 				                    } else {
@@ -1044,7 +1043,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void onBackStackChanged() {
-		mViewHelper.showBack(getSupportFragmentManager() != null && getSupportFragmentManager().getBackStackEntryCount() == 0);
+		boolean noFragments = getSupportFragmentManager() != null && getSupportFragmentManager().getBackStackEntryCount() == 0;
+		mViewHelper.showBack(noFragments);
+		if(noFragments) {
+			mViewHelper.resetMenuState();
+		}
 	}
 
 	protected Observable<Pair<RestaurantResponse, MenuResponse>> concatMenuObservable(final Observable<RestaurantResponse>

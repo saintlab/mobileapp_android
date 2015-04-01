@@ -278,6 +278,11 @@
         <item name="android:background">@drawable/btn_rounded_bordered_grey</item>
     </style>
 
+    <style name="MenuButton.Price">
+        <item name="android:textColor">@drawable/text_color_selector_menu_price</item>
+        <item name="android:background">@drawable/btn_rounded_menu_price</item>
+    </style>
+
     <style name="MenuButton.Blue">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@drawable/btn_rounded_blue</item>

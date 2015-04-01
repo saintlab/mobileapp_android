@@ -53,6 +53,10 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 	private MenuSmoothScroller mSmoothScrollerTop;
 
+	public void resetState() {
+		mMenuAdapter.resetState();
+	}
+
 	public interface OnCollapsedTouchListener {
 		void onCollapsedSubcategoriesTouch(final MotionEvent e);
 	}
@@ -60,8 +64,6 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	public static final int DURATION_ITEM_FLIP = 300;
 
 	public static final int DURATION_ITEM_FLIP_STEP = 50;
-
-	public final int THRESHOLD = ViewUtils.dipToPixels(getContext(), 4);
 
 	private final RecyclerView.OnScrollListener mOnScrollListener = new RecyclerView.OnScrollListener() {
 		@Override
@@ -186,6 +188,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 				final int position = (Integer) v.getTag(R.id.position);
 				mSmoothScrollerTop.setTargetPosition(position);
 				mLayoutManager.startSmoothScroll(mSmoothScrollerTop);
+				mMenuAdapter.setSelected(position);
+				mMenuAdapter.notifyItemChanged(position);
 				showAddFragment((Item) v.getTag(), position);
 			}
 		});

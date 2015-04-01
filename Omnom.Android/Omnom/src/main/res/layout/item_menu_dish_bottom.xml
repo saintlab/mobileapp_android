@@ -68,7 +68,7 @@
         android:id="@+id/btn_apply"
         android:layout_marginTop="@dimen/activity_vertical_margin_small"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
-        style="@style/MenuButton.White"/>
+        style="@style/MenuButton.Price"/>
 
     <View
         android:layout_width="match_parent"
