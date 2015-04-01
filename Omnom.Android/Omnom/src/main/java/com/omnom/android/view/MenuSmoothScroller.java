@@ -7,6 +7,8 @@ import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.omnom.android.R;
+
 public class MenuSmoothScroller extends LinearSmoothScroller {
 
 	/**
@@ -36,11 +38,14 @@ public class MenuSmoothScroller extends LinearSmoothScroller {
 
 	@Override
 	public int calculateDyToMakeVisible(final View view, final int snapPreference) {
-		if(mMode == MODE_DEFAULT) {
+		if (mMode == MODE_DEFAULT) {
 			return super.calculateDyToMakeVisible(view, snapPreference);
-		} else {
-			final RecyclerView.LayoutManager layoutManager = getLayoutManager();
-			return !layoutManager.canScrollVertically() ? 0 : -view.getTop();
 		}
+		if (mMode == MODE_TOP) {
+			final RecyclerView.LayoutManager layoutManager = getLayoutManager();
+			return !layoutManager.canScrollVertically() ? 0 :
+					-view.getTop() + view.getResources().getDimensionPixelSize(R.dimen.view_size_default);
+		}
+		throw new IllegalArgumentException("Unable to scroll with mode = " + mMode);
 	}
 }
