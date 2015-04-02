@@ -304,7 +304,7 @@ public class MenuCategoryItems {
 
 		@Nullable
 		@Override
-		public long price() {
+		public double price() {
 			return 0;
 		}
 

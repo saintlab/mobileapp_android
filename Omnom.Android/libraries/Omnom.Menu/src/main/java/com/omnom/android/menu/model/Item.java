@@ -43,7 +43,7 @@ public abstract class Item implements Parcelable {
 	public abstract List<Modifier> modifiers();
 
 	@Nullable
-	public abstract long price();
+	public abstract double price();
 
 	@Nullable
 	public abstract Details details();

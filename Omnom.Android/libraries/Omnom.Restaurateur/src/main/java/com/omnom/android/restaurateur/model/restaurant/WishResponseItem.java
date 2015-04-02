@@ -17,10 +17,10 @@ public abstract class WishResponseItem implements Parcelable {
 	public abstract int quantity();
 
 	@Nullable
-	public abstract int priceTotal();
+	public abstract double priceTotal();
 
 	@Nullable
-	public abstract int pricePerItem();
+	public abstract double pricePerItem();
 
 	@Nullable
 	public abstract String internalId();

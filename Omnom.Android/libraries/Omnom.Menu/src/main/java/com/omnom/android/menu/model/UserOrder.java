@@ -54,7 +54,7 @@ public abstract class UserOrder implements Parcelable {
 		for(Map.Entry<String, UserOrderData> entry : entries) {
 			final UserOrderData value = entry.getValue();
 			if(value != null && value.item() != null) {
-				final long amount = value.item().price() * value.amount();
+				final double amount = value.item().price() * value.amount();
 				result = result.add(BigDecimal.valueOf(amount));
 			}
 		}
