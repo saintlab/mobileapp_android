@@ -3,6 +3,7 @@ package com.omnom.android.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.view.View;
 import android.webkit.WebView;
 
 import com.omnom.android.R;
@@ -44,6 +45,8 @@ public class WebActivity extends BaseOmnomActivity {
 		if(!mUriString.startsWith(SCHEME_PREFIX_HTTP)) {
 			mUriString = SCHEME_PREFIX_HTTP + mUriString;
 		}
+		mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.loadUrl(mUriString);
 	}
 
