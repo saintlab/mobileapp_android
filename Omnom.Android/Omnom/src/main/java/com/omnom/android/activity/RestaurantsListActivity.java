@@ -340,21 +340,4 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		return R.layout.activity_restaurants_list;
 	}
 
-	private class RestaurantsComparator implements Comparator<Restaurant> {
-
-		@Override
-		public int compare(Restaurant lhs, Restaurant rhs) {
-			if (lhs.distance() == null && rhs.distance() == null) {
-				return 0;
-			} else if (lhs.distance() == null) {
-				return -1;
-			} else if (rhs.distance() == null) {
-				return 1;
-			}
-
-			return (int) (lhs.distance() - rhs.distance()) * 10;
-		}
-
-	}
-
 }

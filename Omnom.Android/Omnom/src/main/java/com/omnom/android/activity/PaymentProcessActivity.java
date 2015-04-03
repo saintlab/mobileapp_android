@@ -425,23 +425,22 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 					if(mWishResponse != null) {
 						OrderAcceptedActivity.start(getActivity(), mRestaurant, mWishResponse, REQUEST_THANKS, mAccentColor);
 					} else {
-					if (entranceData instanceof TableEntranceData) {
-						ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
-					} else {
-						if (entranceData instanceof BarEntranceData) {
-							if (mWishResponse != null) {
-								final EntranceData barEntranceData =
-										BarEntranceData.create("#orderNumber", mWishResponse.code());
-								BaseOrderAcceptedActivity.start(getActivity(), barEntranceData,
-																REQUEST_THANKS, mAccentColor);
-							}
+						if(entranceData instanceof TableEntranceData) {
+							ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
 						} else {
-							// TODO: fill appropriate entrance data fields if necessary
-							BaseOrderAcceptedActivity.start(getActivity(), entranceData, REQUEST_THANKS, mAccentColor);
+							if(entranceData instanceof BarEntranceData) {
+								if(mWishResponse != null) {
+									final EntranceData barEntranceData = BarEntranceData.create("#orderNumber", mWishResponse.code());
+									BaseOrderAcceptedActivity.start(getActivity(), barEntranceData, REQUEST_THANKS, mAccentColor);
+								}
+							} else {
+								// TODO: fill appropriate entrance data fields if necessary
+								BaseOrderAcceptedActivity.start(getActivity(), entranceData, REQUEST_THANKS, mAccentColor);
+							}
 						}
 					}
+					overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 				}
-				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 			}
 		});
 	}

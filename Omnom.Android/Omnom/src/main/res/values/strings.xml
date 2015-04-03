@@ -122,7 +122,6 @@
     <string name="title_activity_restaurant">RestaurantActivity</string>
     <string name="reserve_table">Бронировать\nстолик</string>
     <string name="to_the_bar">В бар</string>
-    <string name="im_inside_restaurant">За стол</string>
     <string name="make_an_order">Сделать\nзаказ\nобеда\nв офис</string>
     <string name="takeaway">Заказ\nна вынос</string>
     <string name="to_bar">В бар</string>

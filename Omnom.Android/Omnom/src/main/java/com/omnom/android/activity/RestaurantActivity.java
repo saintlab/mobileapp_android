@@ -18,16 +18,13 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
-import com.omnom.android.activity.validate.ValidateActivity;
-import com.omnom.android.activity.holder.BarEntranceData;
 import com.omnom.android.activity.holder.TakeawayEntranceData;
 import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.fragment.delivery.DeliveryDetailsFragment;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
-import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
-import com.omnom.android.restaurateur.model.restaurant.Settings;
 import com.omnom.android.restaurateur.model.restaurant.schedule.DailySchedule;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -94,9 +91,6 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	@InjectView(R.id.txt_bar)
 	protected TextView txtBar;
 
-	@InjectView(R.id.txt_order)
-	protected TextView txtOrder;
-
 	@InjectView(R.id.txt_im_inside)
 	protected TextView txtImInside;
 
@@ -105,12 +99,6 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 
 	@InjectView(R.id.main_content)
 	protected View viewMain;
-
-	@InjectView(R.id.txt_bar)
-	protected View txtBar;
-
-	@InjectView(R.id.txt_takeaway)
-	protected View txtTakeaway;
 
 	@InjectView(R.id.txt_lunch)
 	protected View txtLunch;
@@ -270,19 +258,11 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 		}
 
 		
-		// TODO: cleanup screen configuration
 		ViewUtils.setVisible(txtBar, RestaurantHelper.hasBar(mRestaurant));
 		ViewUtils.setVisible(txtImInside, RestaurantHelper.hasTableOrder(mRestaurant));
-		ViewUtils.setVisible(txtOrder, RestaurantHelper.hasPreOrder(mRestaurant));
+		ViewUtils.setVisible(txtLunch, RestaurantHelper.hasPreOrder(mRestaurant));
 		ViewUtils.setVisible(txtTakeaway, RestaurantHelper.hasTakeaway(mRestaurant));
 
-		final Settings settings = mRestaurant.settings();
-		if(settings != null) {
-			ViewUtils.setVisible(txtBar, settings.hasBar());
-			ViewUtils.setVisible(txtLunch, settings.hasLunch());
-			ViewUtils.setVisible(txtTakeaway, settings.hasTakeaway());
-		}
-		
 		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 		logoSizeSmall = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_SMALL + 0.5);
 		logoSizeLarge = viewCover.getLoaderSizeDefault();

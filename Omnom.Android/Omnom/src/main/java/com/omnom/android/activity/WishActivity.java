@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
-import com.omnom.android.activity.holder.DeliveryEntranceData;
 import com.omnom.android.activity.holder.EntranceData;
 import com.omnom.android.activity.holder.TakeawayEntranceData;
 import com.omnom.android.adapter.WishAdapter;
@@ -53,7 +52,6 @@ import com.squareup.otto.Subscribe;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -224,9 +222,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		ViewUtils.setVisible(mPanelBottom, !isBar);
 		ViewUtils.setVisible(mPanelBottomBar, isBar);
 		ViewUtils.setVisible(mProgressBar, false);
-		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, DeliveryEntranceData.create(new Date(), "Октябрьская",
-		                                                                                             new Date()),
-		                           this);
+		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, entranceData, this);
 		mLayoutManager = new LinearLayoutManager(this);
 		mList.setHasFixedSize(true);
 		mList.setLayoutManager(mLayoutManager);
@@ -241,10 +237,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		api.getRecommendations(mTable.getRestaurantId()).subscribe(new Action1<Collection<OrderItem>>() {
 			@Override
 			public void call(final Collection<OrderItem> response) {
-				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, DeliveryEntranceData.create(new Date(),
-				                                                                                                             "Октябрьская",
-				                                                                                                             new Date()),
-				                                            WishActivity.this);
+				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, entranceData, WishActivity.this);
 				mAdapter = adapter;
 				mList.swapAdapter(mAdapter, true);
 				ViewUtils.setVisible(mProgressBar, false);
@@ -322,6 +315,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 				                                                         TipsWay.DEFAULT, 0,
 				                                                         SplitWay.WASNT_USED);
 				CardsActivity.start(WishActivity.this,
+				                    mRestaurant,
 				                    mOrder,
 				                    wishResponse,
 				                    entranceData,

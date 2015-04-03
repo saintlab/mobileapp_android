@@ -113,7 +113,8 @@ import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM_ANDROID;
  * Created by Ch3D on 08.10.2014.
  */
 public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
-		implements FragmentManager.OnBackStackChangedListener, SearchFragment.ItemClickListener<Item>, SearchFragment.FragmentCloseListener {
+		implements FragmentManager.OnBackStackChangedListener, SearchFragment.ItemClickListener<Item>, SearchFragment
+		.FragmentCloseListener {
 
 	public static final int REQUEST_CODE_ORDERS = 100;
 
@@ -137,13 +138,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	public static final int BACKGROUND_PREVIEW_BLUR_RADIUS = 5;
 
 	private static final String TAG = ValidateActivity.class.getSimpleName();
-
-	protected final View.OnClickListener mInternetErrorClickBillListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			onBill(findViewById(R.id.btn_bill));
-		}
-	};
 
 	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
 		@Override
@@ -362,10 +356,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	protected Menu mMenu;
 
 	protected Uri mData;
-
-	protected ValidateOrderHelper mOrderHelper;
-
-	protected ValidateViewHelper mViewHelper;
 
 	Restaurant currentRestaurant;
 
