@@ -353,8 +353,8 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 					                                             @Override
 					                                             public void call(CardRegisterPollingResponse response) {
 						                                             if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
-							                                             reportMixPanelSuccess(mCard);
 							                                             mCard.setCardId(response.getCardId());
+							                                             reportMixPanelSuccess(mCard);
 							                                             ViewUtils.setVisible(mTextInfo, true);
 							                                             mPanelTop.showProgress(false);
 							                                             mPanelTop.setButtonRightEnabled(true);
