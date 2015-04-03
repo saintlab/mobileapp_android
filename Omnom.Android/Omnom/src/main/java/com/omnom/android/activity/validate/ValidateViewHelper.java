@@ -168,6 +168,14 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 	}
 
+	public void collapseSlidingPanelInstant() {
+		menuCategories.collapseInstant();
+		slidingPanel.smoothSlideToInstant(0);
+		ViewUtils.setVisible(imgProfile, true);
+		ViewUtils.setVisible(imgPrevious, true);
+		loader.showLogo();
+	}
+
 	public void expandSlidingPanel() {
 		slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 	}
@@ -461,8 +469,8 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 				AnimationUtils.animateAlpha(menuGradientPanel, true);
 				AnimationUtils.animateAlpha(slidingPanel, true);
 				getPanelBottom().animate().translationY(0).setInterpolator(new DecelerateInterpolator())
-						.setDuration(mActivity.getResources().getInteger(R.integer.default_animation_duration_short)).start();
-				if (forwardToBill) {
+				                .setDuration(mActivity.getResources().getInteger(R.integer.default_animation_duration_short)).start();
+				if(forwardToBill) {
 					loader.postDelayed(new Runnable() {
 						@Override
 						public void run() {
@@ -548,4 +556,5 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	public void resetMenuState() {
 		menuCategories.resetState();
 	}
+
 }

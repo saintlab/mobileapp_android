@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="default_animation_duration_long">1000</integer>
+    <integer name="default_animation_duration_mid_long">850</integer>
     <integer name="default_animation_duration_medium">500</integer>
     <integer name="default_animation_duration_short">350</integer>
     <integer name="default_animation_duration_quick">150</integer>

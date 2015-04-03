@@ -696,7 +696,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		                    .subscribe(new Action1<Boolean>() {
 			                    @Override
 			                    public void call(final Boolean hasNoErrors) {
-				                    if (hasNoErrors) {
+				                    if(hasNoErrors) {
 					                    clearErrors(false);
 					                    loadOrders(v);
 				                    } else {
@@ -799,7 +799,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			}
 			if(resultCode == WishActivity.RESULT_ORDER_DONE) {
 				mOrderHelper.clearOrder();
-				collapseSlidingPanel();
+				collapseSlidingPanelInstant();
 			}
 			if(resultCode == WishActivity.RESULT_CLEARED) {
 				mOrderHelper.clearOrder();
@@ -1085,6 +1085,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	public void collapseSlidingPanel() {
 		mViewHelper.collapseSlidingPanel();
+	}
+
+	protected void collapseSlidingPanelInstant() {
+		bindMenuData();
+		mViewHelper.collapseSlidingPanelInstant();
 	}
 
 	public SlidingUpPanelLayout.PanelState getSlidingPanelState() {

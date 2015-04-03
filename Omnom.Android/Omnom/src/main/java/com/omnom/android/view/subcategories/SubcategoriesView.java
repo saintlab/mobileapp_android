@@ -418,4 +418,10 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		ViewUtils.setVisible(mFakeStickyHeader, false);
 		mHeaderItemDecorator.restoreHeadersStyle();
 	}
+
+	public void collapseInstant() {
+		restoreHeadersStyle();
+		ViewUtils.setVisible(mImgClose, false);
+		ViewUtils.setVisible(mImgSearch, false);
+	}
 }
