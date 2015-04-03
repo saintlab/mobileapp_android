@@ -34,15 +34,20 @@ public final class DialogUtils {
 
     public static AlertDialog showDialog(Context context, int msg, int okResId,
                                          DialogInterface.OnClickListener okListener) {
-        final AlertDialog alertDialog = new AlertDialog.Builder(context)
-                .setMessage(context.getString(msg))
-                .setPositiveButton(okResId, okListener)
-                .create();
-        alertDialog.setCancelable(false);
-        alertDialog.setCanceledOnTouchOutside(false);
-        alertDialog.show();
-        return alertDialog;
+	    return showDialog(context, context.getString(msg), okResId, okListener);
     }
+
+	public static AlertDialog showDialog(Context context, String msg, int okResId,
+	                                     DialogInterface.OnClickListener okListener) {
+		final AlertDialog alertDialog = new AlertDialog.Builder(context)
+				.setMessage(msg)
+				.setPositiveButton(okResId, okListener)
+				.create();
+		alertDialog.setCancelable(false);
+		alertDialog.setCanceledOnTouchOutside(false);
+		alertDialog.show();
+		return alertDialog;
+	}
 
     public static AlertDialog showDialog(Context context, int titleResId, String msg,
                                          int okResId, DialogInterface.OnClickListener okListener,

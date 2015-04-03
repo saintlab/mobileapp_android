@@ -27,7 +27,11 @@ import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
-import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.holder.BarEntranceData;
+import com.omnom.android.activity.holder.EntranceData;
+import com.omnom.android.activity.holder.TableEntranceData;
+import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.mixpanel.MixPanelHelper;
@@ -66,7 +70,7 @@ import rx.functions.Action1;
 /**
  * Created by mvpotter on 24/11/14.
  */
-public class PaymentProcessActivity extends BaseOmnomActivity implements SilentPaymentEventListener.PaymentListener {
+public class PaymentProcessActivity extends BaseOmnomModeSupportActivity implements SilentPaymentEventListener.PaymentListener {
 
 	public static final int SIMILAR_PAYMENTS_TIMEOUT = 60 * 1000;
 
@@ -421,7 +425,20 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 					if(mWishResponse != null) {
 						OrderAcceptedActivity.start(getActivity(), mRestaurant, mWishResponse, REQUEST_THANKS, mAccentColor);
 					} else {
+					if (entranceData instanceof TableEntranceData) {
 						ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
+					} else {
+						if (entranceData instanceof BarEntranceData) {
+							if (mWishResponse != null) {
+								final EntranceData barEntranceData =
+										BarEntranceData.create("#orderNumber", mWishResponse.code());
+								BaseOrderAcceptedActivity.start(getActivity(), barEntranceData,
+																REQUEST_THANKS, mAccentColor);
+							}
+						} else {
+							// TODO: fill appropriate entrance data fields if necessary
+							BaseOrderAcceptedActivity.start(getActivity(), entranceData, REQUEST_THANKS, mAccentColor);
+						}
 					}
 				}
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
@@ -480,6 +497,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	@Override
 	protected void handleIntent(Intent intent) {
+		super.handleIntent(intent);
 		mRestaurant = intent.getParcelableExtra(Extras.EXTRA_RESTAURANT);
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
 		mDetails = intent.getParcelableExtra(EXTRA_PAYMENT_DETAILS);

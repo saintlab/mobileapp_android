@@ -54,6 +54,23 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private static final int SLIDE_UP = 1;
 
+	private class RestaurantsComparator implements Comparator<Restaurant> {
+
+		@Override
+		public int compare(Restaurant lhs, Restaurant rhs) {
+			if(lhs.distance() == null && rhs.distance() == null) {
+				return 0;
+			} else if(lhs.distance() == null) {
+				return -1;
+			} else if(rhs.distance() == null) {
+				return 1;
+			}
+
+			return (int) (lhs.distance() - rhs.distance()) * 10;
+		}
+
+	}
+
 	public static void start(BaseOmnomActivity activity) {
 		start(activity, false);
 	}
@@ -196,7 +213,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		footer.findViewById(R.id.txt_info).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AndroidUtils.sendFeedbackEmail(getActivity(), R.string.email_subject_feedback);
+				AndroidUtils.sendFeedbackEmail(getActivity(), R.string.email_subject_feedback, R.string.email_subject_feedback);
 			}
 		});
 		list.addFooterView(footer);
@@ -327,11 +344,11 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 		@Override
 		public int compare(Restaurant lhs, Restaurant rhs) {
-			if(lhs.distance() == null && rhs.distance() == null) {
+			if (lhs.distance() == null && rhs.distance() == null) {
 				return 0;
-			} else if(lhs.distance() == null) {
+			} else if (lhs.distance() == null) {
 				return -1;
-			} else if(rhs.distance() == null) {
+			} else if (rhs.distance() == null) {
 				return 1;
 			}
 

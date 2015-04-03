@@ -16,7 +16,8 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.holder.EntranceData;
 import com.omnom.android.utils.CardDataTextWatcher;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
@@ -37,7 +38,7 @@ import butterknife.OnClick;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
 
-public class CardAddActivity extends BaseOmnomActivity implements TextListener {
+public class CardAddActivity extends BaseOmnomModeSupportActivity implements TextListener {
 
 	public static final int TYPE_BIND = 0;
 
@@ -74,10 +75,11 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 	}
 
 	@SuppressLint("NewApi")
-	public static void start(Activity activity, double amount, int type, int code) {
+	public static void start(Activity activity, double amount, int type, EntranceData entranceData, int code) {
 		final Intent intent = new Intent(activity, CardAddActivity.class);
 		intent.putExtra(EXTRA_ORDER_AMOUNT, amount);
 		intent.putExtra(EXTRA_TYPE, type);
+		intent.putExtra(EXTRA_ENTRANCE_DATA, entranceData);
 		if(AndroidUtils.isJellyBean()) {
 			Bundle extras = ActivityOptions.makeCustomAnimation(activity,
 			                                                    R.anim.slide_in_right,
@@ -298,7 +300,8 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 		if(!validate()) {
 			return;
 		}
-		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER, mAmount, mScanUsed);
+		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER,
+											mAmount, mScanUsed, entranceData);
 	}
 
 	private void doPay() {
@@ -374,6 +377,7 @@ public class CardAddActivity extends BaseOmnomActivity implements TextListener {
 
 	@Override
 	protected void handleIntent(Intent intent) {
+		super.handleIntent(intent);
 		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);
 		mType = intent.getIntExtra(EXTRA_TYPE, TYPE_BIND);
 	}

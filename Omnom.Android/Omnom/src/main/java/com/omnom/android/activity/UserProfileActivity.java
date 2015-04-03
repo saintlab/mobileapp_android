@@ -111,7 +111,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.btn_feedback)
 	protected void onFeedback() {
-		AndroidUtils.sendFeedbackEmail(this, R.string.send_feedback);
+		AndroidUtils.sendFeedbackEmail(this, R.string.send_feedback, com.omnom.android.utils.R.string.email_subject_feedback);
 	}
 
 	@OnClick(R.id.btn_facebook)
@@ -119,7 +119,7 @@ public class UserProfileActivity extends BaseOmnomActivity {
 		try {
 			Intent facebookIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.facebook_url_fb)));
 			startActivity(facebookIntent);
-		} catch (ActivityNotFoundException e) {
+		} catch(ActivityNotFoundException e) {
 			Intent facebookIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.facebook_url_http)));
 			startActivity(facebookIntent);
 		}
@@ -246,17 +246,17 @@ public class UserProfileActivity extends BaseOmnomActivity {
 	@OnClick(R.id.btn_bottom)
 	public void onLogout() {
 		final AlertDialog alertDialog = DialogUtils.showDialog(this, R.string.are_you_to_quit,
-                R.string.quit, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int which) {
-                        quit();
-                    }
-                }, R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int which) {
-                        dialog.dismiss();
-                    }
-                });
+		                                                       R.string.quit, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						quit();
+					}
+				}, R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						dialog.dismiss();
+					}
+				});
 		alertDialog.setCanceledOnTouchOutside(true);
 		final float btnTextSize = getResources().getDimension(R.dimen.font_normal);
 		final Button btn1 = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);

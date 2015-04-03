@@ -11,15 +11,19 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.activity.holder.EntranceData;
+import com.omnom.android.activity.holder.DeliveryEntranceData;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.utils.AmountHelper;
+import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,13 +36,17 @@ import butterknife.InjectView;
  */
 public class WishAdapter extends RecyclerView.Adapter {
 
+	public static final SimpleDateFormat LUNCH_DATE_FORMAT = new SimpleDateFormat("dd MMMM", AndroidUtils.russianLocale);
+
 	public static final int VIEW_TYPE_WISH_ITEM = 0;
 
 	public static final int VIEW_TYPE_WISH_FOOTER = 1;
 
-	public static final int VIEW_TYPE_TABLE_ITEM = 2;
+	public static final int VIEW_TYPE_WISH_FOOTER_LABEL = 2;
 
-	public static final int VIEW_TYPE_TABLE_HEADER = 3;
+	public static final int VIEW_TYPE_TABLE_ITEM = 3;
+
+	public static final int VIEW_TYPE_TABLE_HEADER = 4;
 
 	static class FooterViewHolder extends RecyclerView.ViewHolder {
 
@@ -74,6 +82,10 @@ public class WishAdapter extends RecyclerView.Adapter {
 			super(convertView);
 			ButterKnife.inject(this, convertView);
 		}
+	}
+
+	private class UserOrderDataFooterLabel extends UserOrderDataFooter {
+
 	}
 
 	private class UserOrderDataFooter extends UserOrderData {
@@ -115,12 +127,16 @@ public class WishAdapter extends RecyclerView.Adapter {
 
 	private ArrayList<OrderItem> mTableItems;
 
+	private EntranceData mEntranceData;
+
 	private List<UserOrderData> _lazy_selected_data;
 
-	public WishAdapter(Context context, UserOrder order, Collection<OrderItem> tableItems, View.OnClickListener clickListener) {
+	public WishAdapter(Context context, UserOrder order, Collection<OrderItem> tableItems,
+	                   EntranceData entranceData, View.OnClickListener clickListener) {
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
 		mOrder = order;
+		mEntranceData = entranceData;
 		mClickListener = clickListener;
 		mTableItems = new ArrayList<>(tableItems);
 		if(mTableItems.size() > 0) {
@@ -131,7 +147,9 @@ public class WishAdapter extends RecyclerView.Adapter {
 	@Override
 	public int getItemViewType(int position) {
 		final Object data = getItemAt(position);
-		if(data instanceof UserOrderDataFooter) {
+		if(data instanceof UserOrderDataFooterLabel) {
+			return VIEW_TYPE_WISH_FOOTER_LABEL;
+		} else if(data instanceof UserOrderDataFooter) {
 			return VIEW_TYPE_WISH_FOOTER;
 		} else if(data instanceof UserOrderData) {
 			return VIEW_TYPE_WISH_ITEM;
@@ -156,6 +174,11 @@ public class WishAdapter extends RecyclerView.Adapter {
 		View v;
 		RecyclerView.ViewHolder viewHolder = null;
 		switch(viewType) {
+			case VIEW_TYPE_WISH_FOOTER_LABEL:
+				v = mInflater.inflate(R.layout.item_wish_footer_label, parent, false);
+				viewHolder = new FooterViewHolder(v);
+				break;
+
 			case VIEW_TYPE_WISH_FOOTER:
 				v = mInflater.inflate(R.layout.item_wish_footer, parent, false);
 				viewHolder = new FooterViewHolder(v);
@@ -199,6 +222,7 @@ public class WishAdapter extends RecyclerView.Adapter {
 				ivh.btnApply.setTag(data);
 				ivh.btnApply.setOnClickListener(mClickListener);
 				MenuHelper.bindDetails(mContext, data.item().details(), ivh.txtInfo, false);
+				ViewUtils.setVisible(ivh.viewDivider, getItemViewType(position + 1) != VIEW_TYPE_WISH_FOOTER_LABEL);
 				ViewUtils.setVisible(ivh.viewDivider, getItemViewType(position + 1) != VIEW_TYPE_WISH_FOOTER);
 				break;
 
@@ -210,6 +234,14 @@ public class WishAdapter extends RecyclerView.Adapter {
 				tivh.btnApply.setTag(orderItem);
 				tivh.btnApply.setOnClickListener(mClickListener);
 				MenuHelper.bindDetails(mContext, null, tivh.txtInfo, false);
+				break;
+
+			case VIEW_TYPE_WISH_FOOTER_LABEL:
+				final TextView lunchOrderInfo = (TextView) holder.itemView.findViewById(R.id.lunch_order_info);
+				final DeliveryEntranceData entranceData = (DeliveryEntranceData) mEntranceData;
+				lunchOrderInfo.setText(mContext.getString(R.string.wish_lunch_order_info,
+									   LUNCH_DATE_FORMAT.format(entranceData.deliveryTime()),
+									   entranceData.deliveryAddress()));
 				break;
 
 			case VIEW_TYPE_WISH_FOOTER:
@@ -238,6 +270,9 @@ public class WishAdapter extends RecyclerView.Adapter {
 	private List<UserOrderData> getSelectedItems() {
 		if(_lazy_selected_data == null) {
 			final List<UserOrderData> selectedItems = mOrder.getSelectedItems();
+			if (mEntranceData instanceof DeliveryEntranceData) {
+				selectedItems.add(new UserOrderDataFooterLabel());
+			}
 			selectedItems.add(new UserOrderDataFooter());
 			_lazy_selected_data = selectedItems;
 		}

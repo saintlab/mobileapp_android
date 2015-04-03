@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/activity_horizontal_margin_xlarge"
+    android:paddingLeft="@dimen/activity_horizontal_margin_xlarge"
+    android:paddingRight="@dimen/activity_horizontal_margin_xlarge"
+    android:paddingBottom="@dimen/activity_horizontal_margin_medium">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:text="Не нашли свой офис?"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    <TextView
+        android:id="@+id/btn_send"
+        android:padding="8dp"
+        android:clickable="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textColor="@color/menu_blue"
+        android:text="Оставьте заявку"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:text="Если заведение готово доставлять к вам, то ваш офис через день появится в списке."
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+</LinearLayout>

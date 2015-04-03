@@ -41,6 +41,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
+import com.omnom.android.activity.holder.TableEntranceData;
 import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
@@ -818,7 +819,7 @@ public class OrderFragment extends Fragment {
 		                                                         mOrder, mTipsWay, tips.getValue(),
 		                                                         mSplitWay);
 		final OrdersActivity activity = (OrdersActivity) getActivity();
-		CardsActivity.start(getActivity(), activity.getRestaurant(), mOrder, paymentDetails, mAccentColor,
+		CardsActivity.start(getActivity(), activity.getRestaurant(), mOrder, paymentDetails, mAccentColor, TableEntranceData.create(),
 		                    OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
 	}
 

@@ -33,7 +33,7 @@ import com.omnom.android.activity.ValidateActivityBle21;
 import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.activity.ValidateActivityShortcut;
 import com.omnom.android.activity.WishActivity;
-import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
@@ -112,9 +112,8 @@ import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM_ANDROID;
 /**
  * Created by Ch3D on 08.10.2014.
  */
-public abstract class ValidateActivity extends BaseOmnomFragmentActivity
-		implements FragmentManager.OnBackStackChangedListener, SearchFragment.ItemClickListener<Item>,
-		           SearchFragment.FragmentCloseListener {
+public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
+		implements FragmentManager.OnBackStackChangedListener, SearchFragment.ItemClickListener<Item>, SearchFragment.FragmentCloseListener {
 
 	public static final int REQUEST_CODE_ORDERS = 100;
 
@@ -138,6 +137,13 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	public static final int BACKGROUND_PREVIEW_BLUR_RADIUS = 5;
 
 	private static final String TAG = ValidateActivity.class.getSimpleName();
+
+	protected final View.OnClickListener mInternetErrorClickBillListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			onBill(findViewById(R.id.btn_bill));
+		}
+	};
 
 	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
 		@Override
@@ -169,6 +175,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			});
 		}
 	};
+
+	protected OmnomErrorHelper getErrorHelper() {return mViewHelper.getErrorHelper();}
 
 	public static void startDemo(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
 		start(context, enterAnim, exitAnim, animationType, true, -1);
@@ -391,7 +399,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	};
 
-	protected OmnomErrorHelper getErrorHelper() {return mViewHelper.getErrorHelper();}
+	protected ValidateOrderHelper mOrderHelper;
+
+	protected ValidateViewHelper mViewHelper;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -405,6 +415,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	protected void handleIntent(Intent intent) {
+		super.handleIntent(intent);
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 		mIsDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
 		mSkipViewRendering = intent.getBooleanExtra(EXTRA_SKIP_VIEW_RENDERING, false);
@@ -591,11 +602,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			                                 public void call(ConfigurationResponse configurationResponse) {
 				                                 final ValidateActivity activity = ValidateActivity.this;
 				                                 final UserResponse userResponse = configurationResponse.getUserResponse();
+				                                 updateConfiguration(configurationResponse.getConfig());
 				                                 correctMixpanelTime(userResponse);
 				                                 reportMixPanel(userResponse);
 				                                 OmnomApplication.get(getActivity()).cacheUserProfile(new UserProfile(userResponse));
 
-				                                 updateConfiguration(configurationResponse.getConfig());
 				                                 getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 				                                                           new AppLaunchMixpanelEvent(userResponse.getUser()));
 				                                 if(!BluetoothUtils.hasBleSupport(activity) && !isExternalLaunch()) {
@@ -905,7 +916,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	protected void onOrder() {
-		WishActivity.start(this, mRestaurant, mTable, mMenu, mOrderHelper.insureOrder(), REQUEST_CODE_WISH_LIST);
+		WishActivity.start(this, mRestaurant, mTable, mMenu, mOrderHelper.insureOrder(), entranceData, REQUEST_CODE_WISH_LIST);
 	}
 
 	protected boolean validateDemo() {

@@ -62,6 +62,8 @@ public class AndroidUtils {
 
 	public static final int MAX_ANIMATION_INCEREMENT = 20;
 
+	public static final Locale russianLocale = new Locale("ru", "RU");
+
 	public static void clickify(TextView view, final String clickableText,
 	                            final ClickSpan.OnClickListener listener) {
 
@@ -90,12 +92,12 @@ public class AndroidUtils {
 		view.setHighlightColor(view.getResources().getColor(android.R.color.transparent));
 	}
 
-	public static void sendFeedbackEmail(final Context context, @StringRes int resId) {
+	public static void sendFeedbackEmail(final Context context, @StringRes int resId, @StringRes int subjectResId) {
 		Intent intent = new Intent(Intent.ACTION_SENDTO);
 		String email = "team@omnom.menu";
 		intent.setData(Uri.parse("mailto:" + email));
 		intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
-		intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_subject_feedback));
+		intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(subjectResId));
 		context.startActivity(Intent.createChooser(intent, context.getString(resId)));
 	}
 
@@ -416,5 +418,9 @@ public class AndroidUtils {
 
 	public static boolean isRecyclerItemAnimationSupported() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+	}
+
+	public static int getScreenHeightPixels(final Context context) {
+		return context.getResources().getDisplayMetrics().heightPixels;
 	}
 }

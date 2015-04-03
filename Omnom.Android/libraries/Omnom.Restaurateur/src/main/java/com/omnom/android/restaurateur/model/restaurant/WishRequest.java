@@ -13,6 +13,9 @@ public class WishRequest {
 	@Expose
 	private List<WishRequestItem> items;
 
+	@Expose
+	private int time;
+
 	public List<WishRequestItem> getItems() {
 		return items;
 	}
@@ -26,5 +29,13 @@ public class WishRequest {
 			items = new ArrayList<WishRequestItem>();
 		}
 		items.add(item);
+	}
+
+	public int getTime() {
+		return time;
+	}
+
+	public void setTime(final int time) {
+		this.time = time;
 	}
 }
