@@ -8,6 +8,7 @@ import com.omnom.android.R;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrder;
+import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import java.math.BigDecimal;
@@ -62,7 +63,7 @@ public class ValidateOrderHelper {
 
 		if(hasWishItems) {
 			ViewUtils.setVisible(btnOrder, true);
-			btnOrder.setText(totalAmount.toString() + mActivity.getString(R.string.currency_suffix_ruble));
+			btnOrder.setText(AmountHelper.format(totalAmount) + mActivity.getString(R.string.currency_suffix_ruble));
 			btnOrder.setTextColor(Color.WHITE);
 			btnOrder.setBackgroundResource(R.drawable.btn_rounded_blue);
 		} else {
