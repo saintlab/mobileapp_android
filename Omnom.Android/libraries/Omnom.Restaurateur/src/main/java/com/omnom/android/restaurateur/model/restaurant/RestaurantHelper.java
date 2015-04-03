@@ -78,6 +78,9 @@ public class RestaurantHelper {
 
 	public static String getOpenedTime(Context context, Restaurant restaurant, int weekDay) {
 		final DailySchedule dailySchedule = getDailySchedule(restaurant, weekDay);
+		if (dailySchedule == null) {
+			return StringUtils.EMPTY_STRING;
+		}
 		if(dailySchedule.isClosed()) {
 			return context.getString(R.string.restaurant_closed);
 		}
