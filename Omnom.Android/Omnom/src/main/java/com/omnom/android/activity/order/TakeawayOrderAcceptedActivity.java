@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.holder.TakeawayEntranceData;
+import com.omnom.android.entrance.TakeawayEntranceData;
 import com.omnom.android.utils.utils.ViewUtils;
 
 import butterknife.InjectView;
@@ -25,7 +25,7 @@ public class TakeawayOrderAcceptedActivity extends BaseOrderAcceptedActivity {
 	@Override
 	protected void handleIntent(final Intent intent) {
 		super.handleIntent(intent);
-		if (!(entranceData instanceof TakeawayEntranceData)) {
+		if (!(mEntranceData instanceof TakeawayEntranceData)) {
 			throw new IllegalArgumentException("Takeaway entrance data is expected");
 		}
 	}
@@ -34,7 +34,7 @@ public class TakeawayOrderAcceptedActivity extends BaseOrderAcceptedActivity {
 	public void initUi() {
 		super.initUi();
 		ViewUtils.setVisible(txtOrderTime, true);
-		final TakeawayEntranceData takeawayEntranceData = (TakeawayEntranceData) entranceData;
+		final TakeawayEntranceData takeawayEntranceData = (TakeawayEntranceData) mEntranceData;
 		txtOrderTime.setText(ORDER_TIME_FORMAT.format(takeawayEntranceData.orderTime()));
 		txtCheckOrder.setText(getString(R.string.order_will_be_waiting_for_you,
 										takeawayEntranceData.takeawayAfter(),

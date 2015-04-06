@@ -41,6 +41,7 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
+import hugo.weaving.DebugLog;
 
 import static butterknife.ButterKnife.findById;
 
@@ -513,6 +514,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		ViewUtils.setVisible(imgPrevious, visible);
 	}
 
+	@DebugLog
 	public void bindMenuData(final Menu menu, ValidateOrderHelper orderHelper) {
 		slidingPanel.setTouchEnabled(menu != null && !menu.isEmpty());
 		if(menu != null) {
@@ -557,4 +559,10 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		menuCategories.resetState();
 	}
 
+	@DebugLog
+	public void hideMenu() {
+		slidingPanel.setTouchEnabled(false);
+		ViewUtils.setVisible(slidingPanel, false);
+		ViewUtils.setVisible(menuCategories, false);
+	}
 }

@@ -27,8 +27,8 @@ import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
-import com.omnom.android.activity.holder.EntranceData;
 import com.omnom.android.adapter.CardsAdapter;
+import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.mixpanel.model.acquiring.CardDeletedMixpanelEvent;
@@ -517,10 +517,11 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	private void pay(final CardInfo cardInfo) {
 		if(mDetails != null) {
 			if(mOrder != null) {
-				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mOrder, cardInfo, mIsDemo, mRestaurant);
+				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mOrder, cardInfo, mIsDemo, mRestaurant,
+				                             mEntranceData);
 			} else {
 				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mUserOrder, cardInfo, mWishResponse, mIsDemo,
-				                             mRestaurant);
+				                             mRestaurant, mEntranceData);
 			}
 		}
 	}
@@ -533,7 +534,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 			if(requestCode == REQUEST_PAYMENT) {
 				setResult(RESULT_OK);
 				finish();
-				overridePendingTransition(R.anim.nothing, R.anim.slide_out_up);
+				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 			}
 		} else if(resultCode == RESULT_PAY && data != null) {
 			CardInfo cardInfo = data.getParcelableExtra(EXTRA_CARD_DATA);
@@ -544,8 +545,8 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 			}
 		} else if(resultCode == RESULT_ENTER_CARD_AND_PAY) {
 			CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : 0,
-			                      CardAddActivity.TYPE_ENTER_AND_PAY, entranceData,
-								  REQUEST_CODE_CARD_ADD);
+			                      CardAddActivity.TYPE_ENTER_AND_PAY, mEntranceData,
+			                      REQUEST_CODE_CARD_ADD);
 		}
 	}
 
@@ -565,7 +566,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 			type = CardAddActivity.TYPE_BIND_OR_PAY;
 		}
 		CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : 0,
-		                      type, entranceData, REQUEST_CODE_CARD_ADD);
+		                      type, mEntranceData, REQUEST_CODE_CARD_ADD);
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package com.omnom.android.activity.holder;
+package com.omnom.android.entrance;
 
 import android.os.Parcelable;
 

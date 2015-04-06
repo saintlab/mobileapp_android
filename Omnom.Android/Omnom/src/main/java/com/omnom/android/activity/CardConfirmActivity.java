@@ -37,7 +37,7 @@ import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
-import com.omnom.android.activity.holder.EntranceData;
+import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.fragment.PayOnceFragment;
 import com.omnom.android.listener.DecimalKeyListener;
 import com.omnom.android.mixpanel.model.acquiring.CardAddedMixpanelEvent;

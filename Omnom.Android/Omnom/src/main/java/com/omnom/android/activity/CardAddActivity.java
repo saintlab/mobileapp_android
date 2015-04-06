@@ -17,7 +17,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
-import com.omnom.android.activity.holder.EntranceData;
+import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.utils.CardDataTextWatcher;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
@@ -301,7 +301,7 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 			return;
 		}
 		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER,
-											mAmount, mScanUsed, entranceData);
+											mAmount, mScanUsed, mEntranceData);
 	}
 
 	private void doPay() {

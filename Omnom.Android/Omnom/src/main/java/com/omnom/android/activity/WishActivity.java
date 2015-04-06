@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -16,8 +17,8 @@ import android.widget.Toast;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
-import com.omnom.android.activity.holder.EntranceData;
-import com.omnom.android.activity.holder.TakeawayEntranceData;
+import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.entrance.TakeawayEntranceData;
 import com.omnom.android.adapter.WishAdapter;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
@@ -126,8 +127,8 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		final WishRequestItem item = new WishRequestItem(dish.id(), data.amount());
 		if(dish.modifiers() != null && dish.modifiers().size() > 0) {
 			for(Modifier modifier : dish.modifiers()) {
-				if(modifier != null) {
-					item.modifiers.add(new ModifierRequestItem(modifier.id()));
+				if(modifier != null && !TextUtils.isEmpty(modifier.id())) {
+					item.getModifiers().add(new ModifierRequestItem(modifier.id()));
 				}
 			}
 		}
@@ -222,7 +223,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		ViewUtils.setVisible(mPanelBottom, !isBar);
 		ViewUtils.setVisible(mPanelBottomBar, isBar);
 		ViewUtils.setVisible(mProgressBar, false);
-		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, entranceData, this);
+		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, mEntranceData, this);
 		mLayoutManager = new LinearLayoutManager(this);
 		mList.setHasFixedSize(true);
 		mList.setLayoutManager(mLayoutManager);
@@ -237,7 +238,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		api.getRecommendations(mTable.getRestaurantId()).subscribe(new Action1<Collection<OrderItem>>() {
 			@Override
 			public void call(final Collection<OrderItem> response) {
-				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, entranceData, WishActivity.this);
+				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, mEntranceData, WishActivity.this);
 				mAdapter = adapter;
 				mList.swapAdapter(mAdapter, true);
 				ViewUtils.setVisible(mProgressBar, false);
@@ -291,7 +292,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	private void doWish() {
 		if(RestaurantHelper.isBar(mRestaurant)) {
 			doWishBar();
-		} else if(entranceData instanceof TakeawayEntranceData) {
+		} else if(mEntranceData instanceof TakeawayEntranceData) {
 			doAskAboutTime();
 		} else {
 			doWishDefault();
@@ -318,7 +319,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 				                    mRestaurant,
 				                    mOrder,
 				                    wishResponse,
-				                    entranceData,
+				                    mEntranceData,
 				                    paymentDetails,
 				                    RestaurantHelper.getBackgroundColor(mRestaurant),
 				                    REQUEST_CODE_WISH_LIST);
@@ -405,7 +406,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 				                    mRestaurant,
 				                    mOrder,
 				                    wishResponse,
-				                    entranceData,
+				                    mEntranceData,
 				                    paymentDetails,
 				                    RestaurantHelper.getBackgroundColor(mRestaurant),
 				                    REQUEST_CODE_WISH_LIST);

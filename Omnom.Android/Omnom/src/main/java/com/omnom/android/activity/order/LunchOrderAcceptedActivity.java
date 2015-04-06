@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.holder.DeliveryEntranceData;
+import com.omnom.android.entrance.DeliveryEntranceData;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.DateUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -33,7 +33,7 @@ public class LunchOrderAcceptedActivity extends BaseOrderAcceptedActivity {
 	@Override
 	protected void handleIntent(final Intent intent) {
 		super.handleIntent(intent);
-		if (!(entranceData instanceof DeliveryEntranceData)) {
+		if (!(mEntranceData instanceof DeliveryEntranceData)) {
 			throw new IllegalArgumentException("Lunch entrance data is expected");
 		}
 	}
@@ -42,7 +42,7 @@ public class LunchOrderAcceptedActivity extends BaseOrderAcceptedActivity {
 	public void initUi() {
 		super.initUi();
 		ViewUtils.setVisible(txtOrderTime, true);
-		final DeliveryEntranceData deliveryEntranceData = (DeliveryEntranceData) entranceData;
+		final DeliveryEntranceData deliveryEntranceData = (DeliveryEntranceData) mEntranceData;
 		final Date deliveryTime = deliveryEntranceData.deliveryTime();
 		txtOrderTime.setText(ORDER_TIME_FORMAT.format(deliveryEntranceData.orderTime()));
 		txtCheckOrder.setText(getString(R.string.order_will_be_delivered,

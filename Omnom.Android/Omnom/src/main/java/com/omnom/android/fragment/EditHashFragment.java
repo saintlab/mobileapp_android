@@ -237,10 +237,9 @@ public class EditHashFragment extends Fragment {
 					@Override
 					public Observable<MenuResponse> call(final RestaurantResponse restaurantResponse) {
 						if(restaurantResponse.hasOnlyRestaurant()) {
-							final Restaurant restaurant = restaurantResponse.getRestaurants().get(0);
-							return menuApi.getMenu(restaurant.id());
+							return RestaurantHelper.getMenuObservable(menuApi, restaurantResponse.getRestaurants().get(0));
 						}
-						return Observable.just(new MenuResponse());
+						return Observable.just(MenuResponse.EMPTY);
 					}
 				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
 					@Override

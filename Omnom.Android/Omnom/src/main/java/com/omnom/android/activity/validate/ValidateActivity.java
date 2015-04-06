@@ -71,6 +71,7 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.activity.OmnomActivity;
+import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
@@ -444,6 +445,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 			@Override
 			public void call(final MenuResponse menuResponse) {
 				mMenu = menuResponse.getMenu();
+				mEntranceData = RestaurantHelper.getEntranceData(restaurant);
 				onDataLoaded(restaurant, TableDataResponse.NULL);
 				bindMenuData();
 				mSkipViewRendering = true;
@@ -853,6 +855,8 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 		mRestaurant = restaurant;
 		mTable = table;
+		mEntranceData = RestaurantHelper.getEntranceData(mRestaurant);
+
 		mPaymentListener.initTableSocket(mTable);
 		onNewGuest(mTable);
 		animateRestaurantBackground(restaurant);
@@ -906,7 +910,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	}
 
 	protected void onOrder() {
-		WishActivity.start(this, mRestaurant, mTable, mMenu, mOrderHelper.insureOrder(), entranceData, REQUEST_CODE_WISH_LIST);
+		WishActivity.start(this, mRestaurant, mTable, mMenu, mOrderHelper.insureOrder(), mEntranceData, REQUEST_CODE_WISH_LIST);
 	}
 
 	protected boolean validateDemo() {
@@ -992,11 +996,10 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	}
 
 	protected void handleRestaurant(final String method, final String requestId, final Restaurant restaurant) {
-		// TODO: Uncomment
-		//if(!restaurant.available()) {
-		//	getErrorHelper().showError(LoaderError.RESTAURANT_UNAVAILABLE, mInternetErrorClickListener);
-		//	return;
-		//}
+		if(!restaurant.available()) {
+			getErrorHelper().showError(LoaderError.RESTAURANT_UNAVAILABLE, mInternetErrorClickListener);
+			return;
+		}
 
 		// User in already in a restaurant there is no need to send them notification
 		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(getActivity()).getPreferences();
@@ -1058,10 +1061,9 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 					@Override
 					public Observable<MenuResponse> call(final RestaurantResponse restaurantResponse) {
 						if(restaurantResponse.hasOnlyRestaurant()) {
-							final Restaurant restaurant = restaurantResponse.getRestaurants().get(0);
-							return menuApi.getMenu(restaurant.id());
+							return RestaurantHelper.getMenuObservable(menuApi, restaurantResponse.getRestaurants().get(0));
 						}
-						return Observable.just(new MenuResponse());
+						return Observable.just(MenuResponse.EMPTY);
 					}
 				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
 					@Override
@@ -1073,7 +1075,11 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	}
 
 	protected void bindMenuData() {
-		mViewHelper.bindMenuData(mMenu, mOrderHelper);
+		if(RestaurantHelper.isMenuEnabled(mRestaurant)) {
+			mViewHelper.bindMenuData(mMenu, mOrderHelper);
+		} else {
+			mViewHelper.hideMenu();
+		}
 	}
 
 	protected void updateOrderData(final OrderUpdateEvent event) {

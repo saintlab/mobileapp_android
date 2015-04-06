@@ -41,7 +41,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
-import com.omnom.android.activity.holder.TableEntranceData;
+import com.omnom.android.entrance.TableEntranceData;
 import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;

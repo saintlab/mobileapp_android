@@ -18,10 +18,10 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
-import com.omnom.android.activity.holder.TakeawayEntranceData;
 import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
+import com.omnom.android.entrance.TakeawayEntranceData;
 import com.omnom.android.fragment.delivery.DeliveryDetailsFragment;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
@@ -151,7 +151,7 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.txt_lunch)
 	protected void doOrderLunch() {
 		if(!mFinishing) {
-			if (validateOrderTime()) {
+			if(validateOrderTime()) {
 				DeliveryDetailsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mRestaurant);
 			}
 		}
@@ -160,12 +160,15 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.txt_takeaway)
 	protected void doTakeAway() {
 		if(!mFinishing) {
-			if (validateOrderTime()) {
+			if(validateOrderTime()) {
 				// TODO: create TakeawayEntranceData and pass to ValidateActivity intent (Extras.EXTRA_ENTRANCE_DATA)
 				final Date orderDate = new Date();
 				final String takeawayAfter = "????? 1.5 ????";
 				final String takeawayAddress = "??????? 13";
-				BaseOrderAcceptedActivity.start(getActivity(), TakeawayEntranceData.create(orderDate, takeawayAddress, takeawayAfter), 0, 0);
+				BaseOrderAcceptedActivity.start(RestaurantActivity.this,
+				                                mRestaurant,
+				                                TakeawayEntranceData.create(orderDate, takeawayAddress, takeawayAfter),
+				                                0);
 			}
 		}
 	}
@@ -257,7 +260,6 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 			return;
 		}
 
-		
 		ViewUtils.setVisible(txtBar, RestaurantHelper.hasBar(mRestaurant));
 		ViewUtils.setVisible(txtImInside, RestaurantHelper.hasTableOrder(mRestaurant));
 		ViewUtils.setVisible(txtLunch, RestaurantHelper.hasPreOrder(mRestaurant));

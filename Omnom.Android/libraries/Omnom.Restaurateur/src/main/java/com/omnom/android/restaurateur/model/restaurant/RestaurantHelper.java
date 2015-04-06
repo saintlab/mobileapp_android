@@ -4,6 +4,12 @@ import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
 
+import com.omnom.android.entrance.BarEntranceData;
+import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.entrance.TableEntranceData;
+import com.omnom.android.entrance.TakeawayEntranceData;
+import com.omnom.android.menu.api.observable.MenuObservableApi;
+import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.restaurateur.R;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.schedule.DailySchedule;
@@ -12,6 +18,8 @@ import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import rx.Observable;
 
 /**
  * Created by Ch3D on 09.09.2014.
@@ -144,6 +152,13 @@ public class RestaurantHelper {
 		return restaurant.ordersPaidUrl();
 	}
 
+	public static Observable<MenuResponse> getMenuObservable(MenuObservableApi api, Restaurant restaurant) {
+		if(restaurant == null || !RestaurantHelper.isMenuEnabled(restaurant)) {
+			return Observable.just(MenuResponse.EMPTY);
+		}
+		return api.getMenu(restaurant.id());
+	}
+
 	public static boolean isPromoEnabled(final Restaurant restaurant) {
 		return hasSettings(restaurant) && restaurant.settings().hasPromo();
 	}
@@ -207,5 +222,15 @@ public class RestaurantHelper {
 
 	public static boolean hasTakeaway(final Restaurant restaurant) {
 		return false;
+	}
+
+	public static EntranceData getEntranceData(final Restaurant restaurant) {
+		if(isBar(restaurant)) {
+			return BarEntranceData.create();
+		}
+		if(isTakeAway(restaurant)) {
+			return TakeawayEntranceData.create();
+		}
+		return TableEntranceData.create();
 	}
 }

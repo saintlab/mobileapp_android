@@ -11,8 +11,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.holder.EntranceData;
-import com.omnom.android.activity.holder.DeliveryEntranceData;
+import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.entrance.DeliveryEntranceData;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;

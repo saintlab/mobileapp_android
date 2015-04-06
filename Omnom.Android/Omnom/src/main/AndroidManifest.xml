@@ -303,6 +303,7 @@
             android:name="com.crashlytics.ApiKey"
             android:value="80e157ab6e31985057b3080949fbc7c82e4501a4" />
 
+
         <activity
             android:name=".activity.WishActivity"
             android:label="@string/title_activity_wish"

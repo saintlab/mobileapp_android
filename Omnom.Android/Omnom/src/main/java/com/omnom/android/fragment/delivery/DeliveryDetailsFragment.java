@@ -13,11 +13,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.holder.DeliveryEntranceData;
 import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
+import com.omnom.android.entrance.DeliveryEntranceData;
 import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.utils.OmnomFont;
+import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.DateUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -151,7 +152,7 @@ public class DeliveryDetailsFragment extends BaseFragment {
 	public void onOk() {
 		if(validate()) {
 			// TODO: launch validate activity and pass entrance data as intent (Extras.EXTRA_ENTRANCE_DATA)
-			BaseOrderAcceptedActivity.start(getActivity(), entranceData, 0, 0);
+			BaseOrderAcceptedActivity.start((OmnomActivity) getActivity(), mRestaurant, entranceData, 0);
 		}
 	}
 

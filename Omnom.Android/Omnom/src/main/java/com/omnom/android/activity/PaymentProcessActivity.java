@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.omnom.android.BuildConfig;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.PaymentChecker;
 import com.omnom.android.R;
@@ -28,9 +29,9 @@ import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
-import com.omnom.android.activity.holder.BarEntranceData;
-import com.omnom.android.activity.holder.EntranceData;
-import com.omnom.android.activity.holder.TableEntranceData;
+import com.omnom.android.entrance.BarEntranceData;
+import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.entrance.TableEntranceData;
 import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.menu.model.UserOrder;
@@ -82,7 +83,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 
 	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final Order order, CardInfo cardInfo, final boolean isDemo,
-	                         final Restaurant restaurant) {
+	                         final Restaurant restaurant, EntranceData entranceData) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
 		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(restaurant));
@@ -91,12 +92,13 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 		intent.putExtra(Extras.EXTRA_PAYMENT_TYPE, MailRuExtra.PAYMENT_TYPE_ORDER);
 		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
+		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, entranceData);
 		activity.startActivityForResult(intent, code);
 	}
 
 	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final UserOrder order, CardInfo cardInfo, WishResponse wishResponse, final boolean isDemo,
-	                         final Restaurant restaurant) {
+	                         final Restaurant restaurant, EntranceData entranceData) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
 		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(restaurant));
@@ -106,6 +108,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
 		intent.putExtra(Extras.EXTRA_WISH_RESPONSE, wishResponse);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
+		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, entranceData);
 		activity.startActivityForResult(intent, code);
 	}
 
@@ -414,6 +417,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 
 	private void onPayOk(final AcquiringPollingResponse response) {
 		Log.d(TAG, "status = " + response.getStatus());
+
 		reportMixPanelSuccess();
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
@@ -422,21 +426,15 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 				if(mIsDemo) {
 					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mDetails.getAmount(), mDetails.getTip());
 				} else {
-					if(mWishResponse != null) {
-						OrderAcceptedActivity.start(getActivity(), mRestaurant, mWishResponse, REQUEST_THANKS, mAccentColor);
+					if(mEntranceData instanceof TableEntranceData) {
+						ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
 					} else {
-						if(entranceData instanceof TableEntranceData) {
-							ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
+						if(mEntranceData instanceof BarEntranceData) {
+							final EntranceData barEntranceData = BarEntranceData.create(mWishResponse);
+							BaseOrderAcceptedActivity.start(PaymentProcessActivity.this, mRestaurant, barEntranceData, REQUEST_THANKS);
 						} else {
-							if(entranceData instanceof BarEntranceData) {
-								if(mWishResponse != null) {
-									final EntranceData barEntranceData = BarEntranceData.create("#orderNumber", mWishResponse.code());
-									BaseOrderAcceptedActivity.start(getActivity(), barEntranceData, REQUEST_THANKS, mAccentColor);
-								}
-							} else {
-								// TODO: fill appropriate entrance data fields if necessary
-								BaseOrderAcceptedActivity.start(getActivity(), entranceData, REQUEST_THANKS, mAccentColor);
-							}
+							// TODO: fill appropriate entrance data fields if necessary
+							BaseOrderAcceptedActivity.start(PaymentProcessActivity.this, mRestaurant, mEntranceData, REQUEST_THANKS);
 						}
 					}
 					overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
@@ -460,7 +458,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	}
 
 	private void reportMixPanelSuccess() {
-		if(!mIsDemo) {
+		if(!mIsDemo && !BuildConfig.DEBUG) {
 			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 			                          new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
 			getMixPanelHelper().trackRevenue(MixPanelHelper.Project.OMNOM,
@@ -469,7 +467,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	}
 
 	private void reportMixPanelFail(final AcquiringResponseError error) {
-		if(!mIsDemo) {
+		if(!mIsDemo && !BuildConfig.DEBUG) {
 			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 			                          new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
 			                                                   mCardInfo, error));

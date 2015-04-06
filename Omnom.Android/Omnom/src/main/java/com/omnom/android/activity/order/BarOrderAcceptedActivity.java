@@ -3,10 +3,11 @@ package com.omnom.android.activity.order;
 import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.holder.BarEntranceData;
+import com.omnom.android.activity.WebActivity;
+import com.omnom.android.entrance.BarEntranceData;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -33,7 +34,7 @@ public class BarOrderAcceptedActivity extends BaseOrderAcceptedActivity {
 	@Override
 	protected void handleIntent(final Intent intent) {
 		super.handleIntent(intent);
-		if (!(entranceData instanceof BarEntranceData)) {
+		if(!(mEntranceData instanceof BarEntranceData)) {
 			throw new IllegalArgumentException("Bar entrance data is expected");
 		}
 	}
@@ -43,14 +44,14 @@ public class BarOrderAcceptedActivity extends BaseOrderAcceptedActivity {
 		super.initUi();
 		ViewUtils.setVisible(orderNumberContainer, true);
 		ViewUtils.setVisible(pinCodeContainer, true);
-		final BarEntranceData barEntranceData = (BarEntranceData) entranceData;
+		final BarEntranceData barEntranceData = (BarEntranceData) mEntranceData;
 		txtOrderNumber.setText(String.valueOf(barEntranceData.orderNumber()));
 		txtPinCode.setText(String.valueOf(barEntranceData.pinCode()));
 		AndroidUtils.clickify(txtCheckOrder, getString(R.string.we_will_invite_you_mark),
 		                      new ClickSpan.OnClickListener() {
 			                      @Override
 			                      public void onClick() {
-				                      Toast.makeText(getActivity(), "Hey!", Toast.LENGTH_SHORT).show();
+				                      WebActivity.start(BarOrderAcceptedActivity.this, RestaurantHelper.getBarUri(mRestaurant));
 			                      }
 		                      });
 	}

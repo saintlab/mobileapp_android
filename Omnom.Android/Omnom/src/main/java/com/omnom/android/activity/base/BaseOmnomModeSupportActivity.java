@@ -2,16 +2,16 @@ package com.omnom.android.activity.base;
 
 import android.content.Intent;
 
-import com.omnom.android.activity.holder.EntranceData;
+import com.omnom.android.entrance.EntranceData;
 
 public abstract class BaseOmnomModeSupportActivity extends BaseOmnomFragmentActivity {
 
-	protected EntranceData entranceData;
+	protected EntranceData mEntranceData;
 
 	@Override
 	protected void handleIntent(Intent intent) {
 		super.handleIntent(intent);
-		entranceData = intent.getParcelableExtra(EXTRA_ENTRANCE_DATA);
+		mEntranceData = intent.getParcelableExtra(EXTRA_ENTRANCE_DATA);
 	}
 
 }

@@ -9,6 +9,8 @@ import com.google.gson.annotations.Expose;
  */
 public class MenuResponse {
 
+	public static final MenuResponse EMPTY = new MenuResponse();
+
 	@Expose
 	private Menu menu;
 
