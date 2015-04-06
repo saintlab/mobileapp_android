@@ -4,22 +4,28 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
+import com.omnom.android.menu.MenuModule;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.modules.AcquiringModuleMailRuMixpanel;
 import com.omnom.android.modules.AndroidModule;
 import com.omnom.android.modules.AuthMixpanelModule;
 import com.omnom.android.modules.BeaconModule;
 import com.omnom.android.modules.OmnomApplicationModule;
+import com.omnom.android.modules.PushWooshNotificationsModule;
 import com.omnom.android.modules.RestaurateurMixpanelModule;
+import com.omnom.android.notifier.NotifierModule;
+import com.omnom.android.notifier.api.observable.NotifierObservableApi;
 import com.omnom.android.preferences.JsonPreferenceProvider;
 import com.omnom.android.preferences.PreferenceHelperAdapter;
+import com.omnom.android.push.PushNotificationManager;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.StringUtils;
 import com.squareup.picasso.LruCache;
@@ -30,14 +36,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
 import dagger.ObjectGraph;
-import io.fabric.sdk.android.Fabric;
+import rx.functions.Action1;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
  * Created by Ch3D on 24.09.2014.
  */
 public class OmnomApplication extends BaseOmnomApplication implements AuthTokenProvider {
+
+	private static final String TAG = OmnomApplication.class.getSimpleName();
 
 	public static OmnomApplication get(Context context) {
 		return (OmnomApplication) context.getApplicationContext();
@@ -52,6 +62,12 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	}
 
 	private final List<Object> injectList = new ArrayList<Object>();
+
+	@Inject
+	protected PushNotificationManager mPushManager;
+
+	@Inject
+	protected NotifierObservableApi notifierApi;
 
 	private ObjectGraph objectGraph;
 
@@ -74,7 +90,10 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		                     new OmnomApplicationModule(),
 		                     new BeaconModule(this),
 		                     new RestaurateurMixpanelModule(this, R.string.endpoint_restaurateur, mixPanelHelper),
+		                     new MenuModule(this, R.string.endpoint_menu),
 		                     new AcquiringModuleMailRuMixpanel(this, mixPanelHelper),
+		                     new PushWooshNotificationsModule(this),
+		                     new NotifierModule(this, R.string.endpoint_restaurateur),
 		                     new AuthMixpanelModule(this, R.string.endpoint_auth, mixPanelHelper));
 	}
 
@@ -95,14 +114,16 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Fabric.with(this, new Crashlytics());
-		CalligraphyConfig.initDefault("fonts/Futura-OSF-Omnom-Regular.otf", R.attr.fontPath);
+		// FIXME: possible migration to bugsense
+		// Fabric.with(this, new Crashlytics());
+		CalligraphyConfig.initDefault(OmnomFont.OSF_REGULAR.getPath(), R.attr.fontPath);
 		mixPanelHelper = new MixPanelHelper();
 
 		objectGraph = ObjectGraph.create(getModules().toArray());
 		for(final Object obj : injectList) {
 			objectGraph.inject(obj);
 		}
+
 		injectList.clear();
 		inject(this);
 		preferenceHelper = new PreferenceHelperAdapter();
@@ -159,6 +180,22 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	}
 
 	public void logout() {
+		notifierApi.unregister().subscribe(new Action1() {
+			@Override
+			public void call(final Object o) {
+				Log.d(TAG, "notifierApi.unregister : " + o);
+				clearUserData();
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(final Throwable throwable) {
+				Log.d(TAG, "notifierApi.unregister", throwable);
+				clearUserData();
+			}
+		});
+	}
+
+	public void clearUserData() {
 		preferenceHelper.setAuthToken(this, StringUtils.EMPTY_STRING);
 		cacheUserProfile(null);
 	}

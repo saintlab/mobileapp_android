@@ -40,6 +40,7 @@
     <string name="title_activity_validate">ValidateActivity</string>
     <string name="waiter">Официант</string>
     <string name="bill">Счёт</string>
+    <string name="ready_orders">Готовые заказы</string>
     <string name="title_activity_orders">OrdersActivity</string>
     <string name="title_activity_add_card">AddCardActivity</string>
     <string name="order_overall">Итого: %1$s</string>
@@ -86,8 +87,16 @@
     <string name="err_no_internet">Нет доступа в интернет</string>
     <string name="repeat">Повторить</string>
     <string name="payment_success">Платёж принят</string>
+    <string name="order_accepted">Заказ принят</string>
+    <string name="order_number">Номер заказа</string>
+    <string name="pin_code">Пин-код</string>
+    <string name="we_will_invite_you">
+        Мы пригласим ваc, когда&#160;заказ будет&#160;готов.\nТакже, проверить готов&#160;ли&#160;ваш&#160;заказ\nможно&#160;здесь.
+    </string>
+    <string name="we_will_invite_you_mark">здесь</string>
     <string name="sms_sent_to_waiter">Официант получил sms с&#160;суммой чаевых.</string>
-    <string name="bill_sent_by_email">Счёт отправлен на&#160;почту</string>
+    <string name="bill_sent_by_email">Счёт отправлен на&#160;почту.</string>
+    <string name="cheque_sent_by_email">Чек об оплате отправлен на&#160;почту.</string>
     <string name="title_activity_thanks">ThanksActivity</string>
     <string name="bill_split_amount_">= %1$s&#160;</string>
     <string name="bill_number_">Счёт %1$s</string>
@@ -110,15 +119,16 @@
     <string name="card_removal_confirmation">Карта %1$s %2$s</string>
     <string name="unable_to_remove_card_number_try_againt_later">Не&#160;удается удалить карту: %1$s\nПожалуйста, попробуйте позже</string>
     <string name="unable_to_remove_card">Не&#160;удается удалить карту</string>
-    <string name="delete">Удалить</string>
     <string name="how_many_guests_will_pay">На&#160;скольких гостей делить?</string>
     <string name="welcome_to_">Добро пожаловать в&#160;%1$s</string>
     <string name="balk_notification_user_paid_">%1$s: оплачено по&#160;счету %2$s </string>
     <string name="title_activity_restaurants_list">RestaurantsListActivity</string>
     <string name="title_activity_restaurant">RestaurantActivity</string>
     <string name="reserve_table">Бронировать\nстолик</string>
-    <string name="im_inside_restaurant">Я внутри</string>
-    <string name="make_an_order">Сделать\nзаказ</string>
+    <string name="to_the_bar">В бар</string>
+    <string name="im_inside_restaurant">За стол</string>
+    <string name="make_an_order">Сделать\nзаказ\nобеда\nв офис</string>
+    <string name="takeaway">Заказ\nна вынос</string>
     <string name="write_to_us">Напишите нам</string>
     <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
     <string name="navigate_qr_code">Наведите камеру\nна&#160;QR-код Omnom.\nЧто это такое?</string>
@@ -132,6 +142,9 @@
     <string name="send_feedback">Написать отзыв</string>
     <string name="facebook_url_fb">fb://page/1548920272002383</string>
     <string name="facebook_url_http">https://www.facebook.com/omnom.menu/</string>
+
+    <string name="out_of_sale_title">Нет в продаже</string>
+    <string name="out_of_sale_message">В&#160;вашем заказе есть блюда, которые больше не&#160;продают:\n%1$s.\n\nУбрать из&#160;заказа и&#160;продолжить?</string>
 
     <string name="no_order_info">
         Omnom показывает все&#160;заказы, добавленные к&#160;вашему столу.
@@ -157,10 +170,24 @@
     <string name="change_table_mark">свой&#160;стол</string>
 
     <string name="attempt_to_perform_similar_payment">Повторная попытка оплаты счета</string>
+<<<<<<< HEAD
     <string name="feedback">Обратная связь</string>
     <string name="support">Звонок в тех.поддержку</string>
     <string name="facebook_title">facebook/Omnom</string>
     <string name="about_title">О ПРОГРАММЕ</string>
     <string name="table">Столик</string>
     <string name="bound_cards">Мои привязанные карты</string>
+=======
+    <string name="your_order">Ваш заказ</string>
+    <string name="title_activity_wish">WishActivity</string>
+    <string name="wish_clear">Очистить</string>
+    <string name="wish_order">Заказать</string>
+    <string name="menu">Меню</string>
+    <string name="your_wish_processed">Ваш заказ отправлен!</string>
+    <string name="title_activity_wish_sent">WishSentActivity</string>
+    <string name="notification_tap_to_open_omnom">Когда потребуется, ваш счёт можно увидеть и оплатить в Omnom</string>
+    <string name="ready_orders_list">Табло готовых заказов</string>
+    <string name="menu_search_undefined">Увы, но такого блюда\nнет в нашем меню</string>
+    <string name="wish_footer_total">Итого:&#160;</string>
+>>>>>>> omnom/omnom_master_menu_merge
 </resources>

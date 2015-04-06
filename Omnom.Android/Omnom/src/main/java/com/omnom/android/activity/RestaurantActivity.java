@@ -2,6 +2,7 @@ package com.omnom.android.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -9,12 +10,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
+import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -25,6 +29,8 @@ import java.util.Calendar;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+
+import static butterknife.ButterKnife.findById;
 
 public class RestaurantActivity extends BaseOmnomActivity {
 
@@ -77,6 +83,18 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	@InjectView(R.id.scroll)
 	protected ScrollView scrollView;
 
+	@InjectView(R.id.txt_bar)
+	protected TextView txtBar;
+
+	@InjectView(R.id.txt_order)
+	protected TextView txtOrder;
+
+	@InjectView(R.id.txt_im_inside)
+	protected TextView txtImInside;
+
+	@InjectView(R.id.txt_takeaway)
+	protected TextView txtTakeaway;
+
 	@InjectView(R.id.main_content)
 	protected View viewMain;
 
@@ -90,10 +108,24 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	private int logoSizeLarge;
 
-	@OnClick(R.id.txt_reserve)
-	protected void doReserve() {
+	private boolean mEnterBar = false;
+
+	@OnClick(R.id.txt_bar)
+	protected void doBar() {
 		if(!mFinishing) {
-			// TODO: Implement
+			mEnterBar = true;
+			scrollView.smoothScrollTo(0, 0);
+			final int duration = getResources().getInteger(R.integer.default_animation_duration_short);
+			AnimationUtils.animateAlpha(findById(this, R.id.txt_info), false, duration);
+			AnimationUtils.animateAlpha(findById(this, R.id.txt_schedule), false, duration);
+			AnimationUtils.animateAlpha(btnCall, false, duration);
+			postDelayed(duration, new Runnable() {
+				@Override
+				public void run() {
+					ValidateActivity.start(RestaurantActivity.this, R.anim.fade_in, R.anim.fake_fade_out,
+					                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, mRestaurant);
+				}
+			});
 		}
 	}
 
@@ -149,6 +181,11 @@ public class RestaurantActivity extends BaseOmnomActivity {
 		}
 		mFinishing = true;
 
+		if(mEnterBar) {
+			ActivityCompat.finishAffinity(this);
+			return;
+		}
+
 		if(mRestaurantViewHolder == null) {
 			finishSimple();
 			return;
@@ -158,8 +195,8 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 		final View panelBottom = findViewById(R.id.panel_bottom);
 		final int paddingDiff = (int) (getResources().getDimension(R.dimen.image_button_size) +
-									   getResources().getDimension(R.dimen.activity_vertical_margin) * 2 -
-									   getResources().getDimension(R.dimen.activity_vertical_margin_large) + 0.5);
+				getResources().getDimension(R.dimen.activity_vertical_margin) * 2 -
+				getResources().getDimension(R.dimen.activity_vertical_margin_large) + 0.5);
 		final int topBarHeight = getResources().getDimensionPixelSize(R.dimen.restaurants_topbar_height);
 		final int translationY = topBarHeight - mTopTranslation - paddingDiff;
 
@@ -193,14 +230,22 @@ public class RestaurantActivity extends BaseOmnomActivity {
 			finish();
 			return;
 		}
+
+		ViewUtils.setVisible(txtBar, RestaurantHelper.hasBar(mRestaurant));
+		ViewUtils.setVisible(txtImInside, RestaurantHelper.hasTableOrder(mRestaurant));
+		ViewUtils.setVisible(txtOrder, RestaurantHelper.hasPreOrder(mRestaurant));
+		ViewUtils.setVisible(txtTakeaway, RestaurantHelper.hasTakeaway(mRestaurant));
+
 		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 		logoSizeSmall = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_SMALL + 0.5);
-		logoSizeLarge = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_LARGE + 0.5);
+		logoSizeLarge = viewCover.getLoaderSizeDefault();
 		viewCover.resetMargins();
+
 		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) viewCover.getLayoutParams();
 		layoutParams.width = logoSizeLarge;
 		layoutParams.height = logoSizeLarge;
-		viewCover.setSize(logoSizeLarge, logoSizeLarge);
+		viewCover.scaleDown();
+
 		final int weekDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 		mRestaurantViewHolder = new RestaurantsAdapter.RestaurantViewHolder(this);
 		mRestaurantViewHolder.bindData(this, mRestaurant, weekDay);

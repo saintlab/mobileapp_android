@@ -18,7 +18,7 @@ import android.widget.ImageView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.EnteringActivity;
-import com.omnom.android.activity.ValidateActivity;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AnimationBuilder;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -122,6 +122,10 @@ public class SplashFragment extends Fragment {
 			return;
 		}
 
+		if(getActivity() == null || getResources() == null) {
+			return;
+		}
+
 		final int durationShort = getResources().getInteger(R.integer.default_animation_duration_short);
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
 		final EnteringActivity activity = (EnteringActivity) getActivity();
@@ -134,10 +138,10 @@ public class SplashFragment extends Fragment {
 		activity.findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (isAdded() && !activity.isFinishing()) {
+				if(isAdded() && !activity.isFinishing()) {
 					ValidateActivity.start(activity, R.anim.fake_fade_in, R.anim.fake_fade_out_instant,
-										   EXTRA_LOADER_ANIMATION_SCALE_DOWN, activity.getType(), data,
-										   isApplicationLaunch());
+					                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, activity.getType(), data,
+					                       isApplicationLaunch());
 				}
 			}
 		}, animationDuration);

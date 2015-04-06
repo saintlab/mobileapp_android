@@ -2,6 +2,7 @@ package com.omnom.android.utils.utils;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,8 +12,12 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+<<<<<<< HEAD
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+=======
+import android.widget.TextView;
+>>>>>>> omnom/omnom_master_menu_merge
 
 import com.omnom.android.utils.R;
 
@@ -22,6 +27,98 @@ import hugo.weaving.DebugLog;
  * Created by Ch3D on 29.07.2014.
  */
 public class AnimationUtils {
+
+	/**
+	 * Restricts that on animation end callback is launched only once.
+	 */
+	private static class OmnomAnimatorListenerAdapter extends AnimatorListenerAdapter {
+
+		private final View view;
+
+		private final Runnable callback;
+
+		private boolean isCallbackLaunched;
+
+		public OmnomAnimatorListenerAdapter(final View view, final Runnable callback) {
+			this.view = view;
+			this.callback = callback;
+			isCallbackLaunched = false;
+		}
+
+		@Override
+		public void onAnimationEnd(Animator animation) {
+			if(callback != null && !isCallbackLaunched) {
+				view.post(callback);
+				isCallbackLaunched = true;
+			}
+		}
+	}
+
+	public static void animateBackground(final View view, final int startColor, final int endColor, final long duration) {
+		final Object tag = view.getTag(R.id.animating);
+		if(tag != null) {
+			final Boolean isAnimating = (Boolean) tag;
+			if(isAnimating) {
+				return;
+			}
+		}
+
+		view.setTag(R.id.animating, true);
+		final ValueAnimator colorAnimator = ValueAnimator.ofInt(startColor, endColor);
+		colorAnimator.setDuration(duration);
+		colorAnimator.setEvaluator(new ArgbEvaluator());
+		colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation) {
+				view.setBackgroundColor((Integer) animation.getAnimatedValue());
+			}
+		});
+		colorAnimator.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(final Animator animation) {
+				view.setTag(R.id.animating, false);
+			}
+		});
+		colorAnimator.start();
+	}
+
+	public static void animateTextColor(final TextView view, final int startColor, final int endColor, final long duration) {
+		final Object tag = view.getTag(R.id.animating);
+		if(tag != null) {
+			final Boolean isAnimating = (Boolean) tag;
+			if(isAnimating) {
+				return;
+			}
+		}
+
+		view.setTag(R.id.animating, true);
+		view.post(new Runnable() {
+			@Override
+			public void run() {
+				final ValueAnimator colorAnimator = ValueAnimator.ofInt(startColor, endColor);
+				colorAnimator.setDuration(duration);
+				colorAnimator.setEvaluator(new ArgbEvaluator());
+				colorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+				colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+					@Override
+					public void onAnimationUpdate(ValueAnimator animation) {
+						view.setTextColor((Integer) animation.getAnimatedValue());
+					}
+				});
+				colorAnimator.addListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationEnd(final Animator animation) {
+						view.setTag(R.id.animating, false);
+					}
+				});
+				colorAnimator.start();
+			}
+		});
+	}
+
+	public static void animateTextColor(final TextView view, final int endColor, final long duration) {
+		animateTextColor(view, view.getCurrentTextColor(), endColor, duration);
+	}
 
 	public static void animateAlpha(final View view, final boolean visible) {
 		animateAlpha(view, visible, view.getResources().getInteger(R.integer.default_animation_duration_short));
@@ -40,7 +137,7 @@ public class AnimationUtils {
 	}
 
 	public static void animateAlpha(final View view, final boolean visible, final Runnable callback, long duration) {
-		if (view == null) {
+		if(view == null) {
 			return;
 		}
 		final Boolean tag = (Boolean) view.getTag();
@@ -56,12 +153,12 @@ public class AnimationUtils {
 		view.setTag(visible);
 		view.animate().setDuration(duration).
 				setInterpolator(new AccelerateDecelerateInterpolator()).
-				setListener(new OmnomAnimatorListenerAdapter(view, callback)).
-				alpha(visible ? 1 : 0).start();
+				    setListener(new OmnomAnimatorListenerAdapter(view, callback)).
+				    alpha(visible ? 1 : 0).start();
 	}
 
 	public static void animateAlpha3(final View view, final boolean visible) {
-		if (view == null) {
+		if(view == null) {
 			return;
 		}
 		final Boolean tag = (Boolean) view.getTag();
@@ -69,7 +166,6 @@ public class AnimationUtils {
 			// skip
 			return;
 		}
-
 		view.setAlpha(visible ? 0 : 1);
 		if(visible) {
 			ViewUtils.setVisible(view, visible);
@@ -88,7 +184,7 @@ public class AnimationUtils {
 	}
 
 	public static void animateAlpha2(final View view, final boolean visible, final Runnable callback, long duration) {
-		if (view == null) {
+		if(view == null) {
 			return;
 		}
 		view.setAlpha(visible ? 0 : 1);
@@ -98,8 +194,8 @@ public class AnimationUtils {
 		view.setTag(visible);
 		view.animate().setDuration(duration).
 				setInterpolator(new AccelerateDecelerateInterpolator()).
-				setListener(new OmnomAnimatorListenerAdapter(view, callback)).
-				alpha(visible ? 1 : 0).start();
+				    setListener(new OmnomAnimatorListenerAdapter(view, callback)).
+				    alpha(visible ? 1 : 0).start();
 	}
 
 	public static void translateUp(final Context context, final Iterable<View> views, final int translation, final Runnable endCallback) {
@@ -223,46 +319,22 @@ public class AnimationUtils {
 		scaleWidth(view, size, duration, endCallback);
 	}
 
-    public static void animateBlinking(final View view) {
-        final Animation animation = new AlphaAnimation(1, 0);
-        animation.setDuration(view.getResources().getInteger(R.integer.default_animation_duration_long));
-        animation.setInterpolator(new LinearInterpolator());
-        animation.setRepeatCount(Animation.INFINITE);
-        animation.setRepeatMode(Animation.REVERSE);
-        view.startAnimation(animation);
-    }
-
-	/**
-	 * Restricts that on animation end callback is launched only once.
-	 */
-	private static class OmnomAnimatorListenerAdapter extends AnimatorListenerAdapter {
-
-		private final View view;
-		private final Runnable callback;
-		private boolean isCallbackLaunched;
-
-		public OmnomAnimatorListenerAdapter(final View view, final Runnable callback) {
-			this.view = view;
-			this.callback = callback;
-			isCallbackLaunched = false;
-		}
-
-		@Override
-		public void onAnimationEnd(Animator animation) {
-			if(callback != null && !isCallbackLaunched) {
-				view.post(callback);
-				isCallbackLaunched = true;
-			}
-		}
+	public static void animateBlinking(final View view) {
+		final Animation animation = new AlphaAnimation(1, 0);
+		animation.setDuration(view.getResources().getInteger(R.integer.default_animation_duration_long));
+		animation.setInterpolator(new LinearInterpolator());
+		animation.setRepeatCount(Animation.INFINITE);
+		animation.setRepeatMode(Animation.REVERSE);
+		view.startAnimation(animation);
 	}
 
 	/**
 	 * Performs drawable transition using alpha.
 	 *
-	 * @param backView view from behind
+	 * @param backView  view from behind
 	 * @param frontView front view
-	 * @param drawable drawable to animate
-	 * @param duration animation duration
+	 * @param drawable  drawable to animate
+	 * @param duration  animation duration
 	 */
 	public static void animateDrawable(final View backView, final View frontView, final BitmapDrawable drawable, final int duration) {
 		drawable.setAlpha(0);
@@ -283,6 +355,7 @@ public class AnimationUtils {
 		});
 		va.start();
 	}
+<<<<<<< HEAD
 
 	public static void smoothScrollToPositionFromTop(final AbsListView view, final int position, final int duration, final Runnable callback) {
 		View child = getChildAtPosition(view, position);
@@ -336,4 +409,6 @@ public class AnimationUtils {
 		}
 	}
 
+=======
+>>>>>>> omnom/omnom_master_menu_merge
 }

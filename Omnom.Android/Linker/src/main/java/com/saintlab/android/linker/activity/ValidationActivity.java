@@ -45,7 +45,7 @@ import butterknife.InjectViews;
 import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -221,7 +221,7 @@ public class ValidationActivity extends BaseActivity {
 				onAnimationEnd();
 			}
 		});
-		mErrValidationSubscription = AndroidObservable
+		mErrValidationSubscription = AppObservable
 				.bindActivity(this, ValidationObservable.validate(this)
 				                                        .map(OmnomObservable.getValidationFunc(
 						                                             this,
@@ -304,7 +304,7 @@ public class ValidationActivity extends BaseActivity {
 		final String token = getPreferences().getAuthToken(this);
 		onError.setDataHolder(UserDataHolder.create(mUsername, mPassword));
 		if(TextUtils.isEmpty(token)) {
-			mAuthDataSubscription = AndroidObservable
+			mAuthDataSubscription = AppObservable
 					.bindActivity(this, mAuthenticator.authenticate(mUsername, mPassword).flatMap(
 							new Func1<AuthResponse, Observable<RestaurantsResponse>>() {
 								@Override
@@ -334,7 +334,7 @@ public class ValidationActivity extends BaseActivity {
 						}
 					}, onError);
 		} else {
-			mRestaurantsSubscription = AndroidObservable.bindActivity(this, mAuthenticator.getUser(token))
+			mRestaurantsSubscription = AppObservable.bindActivity(this, mAuthenticator.getUser(token))
 			                                            .flatMap(new Func1<UserResponse, Observable<RestaurantsResponse>>() {
 				                                            @Override
 				                                            public Observable<RestaurantsResponse> call(UserResponse userProfile) {
@@ -356,7 +356,7 @@ public class ValidationActivity extends BaseActivity {
 	}
 
 	private Observable<RestaurantsResponse> getRestaurantsObservable() {
-		return api.getRestaurants();
+		return api.getRestaurantsAll();
 	}
 
 	private void onRestaurantsLoaded(RestaurantsResponse result) {

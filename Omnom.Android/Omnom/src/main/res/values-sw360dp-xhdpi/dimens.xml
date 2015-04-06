@@ -15,7 +15,6 @@
     <dimen name="loader_logo_size">220dp</dimen>
     <dimen name="restaurant_logo_size">72dp</dimen>
     <dimen name="loader_progress_thickness">12dp</dimen>
-    <item type="dimen" format="float" name="loader_progress_inner_radius">2.265</item>
 
     <dimen name="profile_avatar_size">132dp</dimen>
     <dimen name="card_area_margin_top">48dp</dimen>
@@ -43,4 +42,6 @@
     <dimen name="not_scanning_padding">16dp</dimen>
 
     <dimen name="pay_once_font_size">16sp</dimen>
+
+    <dimen name="menu_sliding_panel_height">256dp</dimen>
 </resources>

@@ -53,6 +53,9 @@ public class OrderItem implements Parcelable {
 		isModifier = parcel.readInt() == 1;
 	}
 
+	public OrderItem() {
+	}
+
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
 		parcel.writeString(guestId);

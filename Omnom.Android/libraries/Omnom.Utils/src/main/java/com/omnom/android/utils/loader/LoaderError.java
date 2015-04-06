@@ -14,6 +14,13 @@ public class LoaderError {
 			                R.string.try_once_again,
 			                R.drawable.ic_repeat_small);
 
+	public static final String EVENT_RESTAURANT_UNAVAILABLE = "restaurant_unavailable";
+
+	public static final LoaderError RESTAURANT_UNAVAILABLE =
+			new LoaderError(EVENT_RESTAURANT_UNAVAILABLE, R.drawable.ic_no_connection, R.string.restaurant_unavailable,
+			                R.string.try_once_again,
+			                R.drawable.ic_repeat_small);
+
 	public static final String EVENT_UNKNOWN_ERROR = "unknown_error";
 
 	public static final LoaderError UNKNOWN_ERROR =

@@ -1,6 +1,7 @@
 package com.omnom.android.restaurateur.model;
 
 import com.google.gson.annotations.Expose;
+import com.omnom.android.utils.utils.StringUtils;
 
 /**
  * Created by Ch3D on 01.10.2014.
@@ -8,6 +9,7 @@ import com.google.gson.annotations.Expose;
 public class OmnomErrors {
 	@Expose
 	private String authentication;
+
 	@Expose
 	private String common;
 
@@ -27,4 +29,7 @@ public class OmnomErrors {
 		this.common = common;
 	}
 
+	public String getMessage() {
+		return common + StringUtils.NON_BREAKING_WHITESPACE + authentication;
+	}
 }

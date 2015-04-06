@@ -1,0 +1,24 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/list_header">
+
+        <ImageView
+            android:id="@+id/btn_close"
+            android:src="@drawable/ic_cross_black"
+            android:layout_gravity="left"
+            style="@style/ImageView.Clickable.Cropped" />
+
+    </FrameLayout>
+
+    <WebView
+        android:id="@+id/web_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
+

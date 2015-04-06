@@ -10,8 +10,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.ValidateActivity;
+import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.utils.Extras;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ClickSpan;
@@ -19,7 +20,6 @@ import com.omnom.android.utils.utils.ClickSpan;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 /**
  * Created by Ch3D on 06.01.2015.
@@ -57,14 +57,14 @@ public class QrHintFragment extends Fragment {
 		AndroidUtils.clickify(txtInfo, getString(R.string.qr_hint_mark), new ClickSpan.OnClickListener() {
 			@Override
 			public void onClick() {
-                getActivity().getSupportFragmentManager().popBackStack();
-                ValidateActivity.startDemo((BaseFragmentActivity) getActivity(),
-                                           R.anim.fake_fade_in_instant,
-                                           R.anim.fake_fade_out_instant,
-                                           Extras.EXTRA_LOADER_ANIMATION_SCALE_DOWN);
+				getActivity().getSupportFragmentManager().popBackStack();
+				ValidateActivity.startDemo((BaseFragmentActivity) getActivity(),
+				                           R.anim.fake_fade_in_instant,
+				                           R.anim.fake_fade_out_instant,
+				                           Extras.EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 			}
 		});
-		CalligraphyUtils.applyFontToTextView(getActivity(), txtInfo, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+		AndroidUtils.applyFont(getActivity(), txtInfo, OmnomFont.LSF_LE_REGULAR);
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class QrHintFragment extends Fragment {
 	private void addOnFragmentCloseListener(Activity activity) {
 		try {
 			mFragmentCloseListener = (FragmentCloseListener) activity;
-		} catch (ClassCastException e) {
+		} catch(ClassCastException e) {
 			throw new ClassCastException(activity.toString() + " must implement FragmentCloseListener");
 		}
 	}

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="default_animation_duration_long">1000</integer>
+    <integer name="default_animation_duration_mid_long">850</integer>
     <integer name="default_animation_duration_medium">500</integer>
     <integer name="default_animation_duration_short">350</integer>
     <integer name="default_animation_duration_quick">150</integer>
+
+    <integer name="default_menu_to_bill_step_duration">800</integer>
 
     <integer name="not_scanning_animation_duration">250</integer>
 

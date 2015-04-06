@@ -13,12 +13,16 @@ import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
+import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
+import com.omnom.android.restaurateur.model.restaurant.WishRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
+import java.util.Collection;
 import java.util.List;
 
 import altbeacon.beacon.Beacon;
@@ -36,6 +40,10 @@ public interface RestaurateurObservableApi {
 	public Observable<RestaurantsResponse> getRestaurants();
 
 	public Observable<RestaurantsResponse> getRestaurants(double latitude, double longitude);
+
+	public Observable<RestaurantsResponse> getRestaurantsAll();
+
+	public Observable<RestaurantsResponse> getRestaurantsAll(double latitude, double longitude);
 
 	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
 
@@ -89,6 +97,8 @@ public interface RestaurateurObservableApi {
 
 	public Observable<OrdersResponse> getOrders(String restaurantId, String tableId);
 
+	public Observable<Collection<OrderItem>> getRecommendations(String restaurantId);
+
 	public Observable<ResponseBase> newGuest(String restaurantId, String tableId);
 
 	public Observable<BillResponse> bill(BillRequest request);
@@ -97,6 +107,10 @@ public interface RestaurateurObservableApi {
 
 	public Observable<Config> getConfig();
 
+<<<<<<< HEAD
 	public Observable<SupportInfoResponse> getSupportInfo();
 
+=======
+	public Observable<WishResponse> wishes(String restId, WishRequest request);
+>>>>>>> omnom/omnom_master_menu_merge
 }

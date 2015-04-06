@@ -1,5 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -24,15 +24,20 @@
                 android:id="@+id/btn_close"
                 android:src="@drawable/ic_cross_black"
                 android:layout_gravity="center_horizontal"
+<<<<<<< HEAD
                 android:padding="@dimen/activity_vertical_margin"
                 android:layout_margin="@dimen/activity_vertical_margin_small"
                 style="@style/ImageView.Clickable.Cropped"/>
+=======
+                android:layout_margin="@dimen/activity_vertical_margin"
+                style="@style/ImageView.Clickable.Cropped" />
+>>>>>>> omnom/omnom_master_menu_merge
 
             <com.omnom.android.utils.loader.LoaderView
                 android:id="@+id/cover"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/activity_vertical_margin" />
 
             <include layout="@layout/view_restaurant_info" />
 
@@ -66,11 +71,10 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/txt_reserve"
-            android:text="@string/reserve_table"
+            android:id="@+id/txt_bar"
+            android:text="@string/to_the_bar"
             android:drawablePadding="@dimen/drawable_padding_default"
-            android:drawableTop="@drawable/ic_reserve_table"
-            android:enabled="false"
+            android:drawableTop="@drawable/ic_bar"
             style="@style/TextView.Restaurant.Landing" />
 
         <com.omnom.android.view.stateful.StatefulTextView
@@ -85,7 +89,13 @@
             android:text="@string/make_an_order"
             android:drawablePadding="@dimen/drawable_padding_default"
             android:drawableTop="@drawable/ic_make_order"
-            android:enabled="false"
+            style="@style/TextView.Restaurant.Landing" />
+
+        <TextView
+            android:id="@+id/txt_takeaway"
+            android:text="@string/takeaway"
+            android:drawablePadding="@dimen/drawable_padding_default"
+            android:drawableTop="@drawable/ic_takeaway"
             style="@style/TextView.Restaurant.Landing" />
     </LinearLayout>
 

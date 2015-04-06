@@ -25,7 +25,11 @@ import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.UserProfileHelper;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
+<<<<<<< HEAD
 import com.omnom.android.fragment.ChangeTableFragment;
+=======
+import com.omnom.android.notifier.api.observable.NotifierObservableApi;
+>>>>>>> omnom/omnom_master_menu_merge
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.SupportInfoResponse;
 import com.omnom.android.restaurateur.model.UserProfile;
@@ -35,7 +39,11 @@ import com.omnom.android.utils.drawable.RoundedDrawable;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
+<<<<<<< HEAD
 import com.omnom.android.utils.utils.AnimationUtils;
+=======
+import com.omnom.android.utils.utils.DialogUtils;
+>>>>>>> omnom/omnom_master_menu_merge
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -45,11 +53,17 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
+<<<<<<< HEAD
 import rx.android.observables.AndroidObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
+=======
+import rx.android.app.AppObservable;
+import rx.functions.Action1;
+import rx.functions.Func1;
+>>>>>>> omnom/omnom_master_menu_merge
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
@@ -99,6 +113,9 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	@Inject
 	protected RestaurateurObservableApi api;
 
+	@Inject
+	protected NotifierObservableApi notifierApi;
+
 	private Subscription profileSubscription;
 
 	private Subscription logoutSubscription;
@@ -117,7 +134,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 	@OnClick(R.id.btn_my_cards)
 	protected void onMyCards() {
-		CardsActivity.start(this, mTableId);
+		CardsActivity.start(this, null, mTableId);
 	}
 
 	@OnClick(R.id.btn_support)
@@ -154,6 +171,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 			ViewUtils.setVisible(delimiterTableNumber, false);
 		}
 
+<<<<<<< HEAD
 		updateUserImage(StringUtils.EMPTY_STRING);
 		final String token = getPreferences().getAuthToken(this);
 		if(TextUtils.isEmpty(token)) {
@@ -169,6 +187,30 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 							((OmnomApplication) getApplication()).logout();
 							forwardToIntro();
 							return;
+=======
+		final UserProfile userProfile = OmnomApplication.get(getActivity()).getUserProfile();
+		if(userProfile != null && userProfile.getUser() != null) {
+			initUserData(userProfile.getUser(), userProfile.getImageUrl());
+		} else {
+			updateUserImage(StringUtils.EMPTY_STRING);
+			final String token = getPreferences().getAuthToken(this);
+			if(TextUtils.isEmpty(token)) {
+				forwardToIntro();
+				return;
+			}
+			profileSubscription = AppObservable.bindActivity(this, authenticator.getUser(token)).subscribe(
+					new Action1<UserResponse>() {
+						@Override
+						public void call(UserResponse response) {
+							if(response.hasError() && UserProfileHelper.hasAuthError(response)) {
+								((OmnomApplication) getApplication()).logout();
+								forwardToIntro();
+								return;
+							}
+							UserProfile profile = new UserProfile(response);
+							OmnomApplication.get(getActivity()).cacheUserProfile(profile);
+							initUserData(response.getUser(), profile.getImageUrl());
+>>>>>>> omnom/omnom_master_menu_merge
 						}
 						UserProfile profile = new UserProfile(userResponse);
 						OmnomApplication.get(getActivity()).cacheUserProfile(profile);
@@ -299,18 +341,18 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 	@OnClick(R.id.btn_bottom)
 	public void onLogout() {
-		final AlertDialog alertDialog = AndroidUtils.showDialog(this, R.string.are_you_to_quit,
-		                                                        R.string.quit, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, final int which) {
-						quit();
-					}
-				}, R.string.cancel, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, final int which) {
-						dialog.dismiss();
-					}
-				});
+		final AlertDialog alertDialog = DialogUtils.showDialog(this, R.string.are_you_to_quit,
+                R.string.quit, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int which) {
+                        quit();
+                    }
+                }, R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int which) {
+                        dialog.dismiss();
+                    }
+                });
 		alertDialog.setCanceledOnTouchOutside(true);
 		final float btnTextSize = getResources().getDimension(R.dimen.font_normal);
 		final Button btn1 = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
@@ -321,22 +363,30 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 	private void quit() {
 		final String token = getPreferences().getAuthToken(this);
-		logoutSubscription = AndroidObservable.bindActivity(this, authenticator.logout(token)).subscribe(new Action1<AuthResponse>() {
+		final Observable logoutObservable = notifierApi.unregister().flatMap(new Func1<Object, Observable<AuthResponse>>() {
 			@Override
-			public void call(AuthResponse authResponseBase) {
-				if(!authResponseBase.hasError()) {
-					((OmnomApplication) getApplication()).logout();
-					forwardToIntro();
-				} else {
-					showToast(getActivity(), R.string.error_unknown_server_error);
-				}
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				showToast(getActivity(), R.string.error_unknown_server_error);
+			public Observable<AuthResponse> call(final Object o) {
+				return authenticator.logout(token);
 			}
 		});
+		logoutSubscription = AppObservable.bindActivity(this, logoutObservable).subscribe(
+				new Action1<AuthResponse>() {
+					@Override
+					public void call(AuthResponse authResponseBase) {
+						if(!authResponseBase.hasError()) {
+							((OmnomApplication) getApplication()).clearUserData();
+							forwardToIntro();
+						} else {
+							showToast(getActivity(), R.string.error_unknown_server_error);
+						}
+					}
+				}, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						showToast(getActivity(), R.string.error_unknown_server_error);
+					}
+				});
+		// TODO: unregister from push notifier
 	}
 
 	@Override

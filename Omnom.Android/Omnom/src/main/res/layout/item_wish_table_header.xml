@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/activity_vertical_margin"
+    android:layout_marginRight="@dimen/activity_vertical_margin">
+
+    <RelativeLayout xmlns:omnom="http://schemas.android.com/apk/res-auto"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/activity_vertical_margin_medium"
+        android:baselineAligned="false">
+
+        <TextView
+            android:id="@+id/txt_title"
+            android:layout_alignParentLeft="true"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:textColor="@android:color/black"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:text="Ранее вы заказывали"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+        <ImageView
+            android:id="@+id/btn_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:paddingRight="20dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_refresh" />
+
+    </RelativeLayout>
+
+    <include
+        android:id="@+id/divider"
+        layout="@layout/delimiter_vertical_light"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+
+</FrameLayout>

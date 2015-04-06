@@ -39,10 +39,10 @@ public class RestaurantHelper {
 		if(address != null) {
 			final String floor = !TextUtils.isEmpty(address.getFloor())
 					? StringUtils.WHITESPACE + address.getFloor() + StringUtils.NON_BREAKING_WHITESPACE +
-					  context.getString(R.string.floor_suffix) : StringUtils.EMPTY_STRING;
+					context.getString(R.string.floor_suffix) : StringUtils.EMPTY_STRING;
 			return StringUtils.concat(context.getString(R.string.restaurant_address_delimiter),
 			                          address.getStreet() + StringUtils.WHITESPACE + address.getBuilding(),
-									  floor);
+			                          floor);
 		}
 		return StringUtils.EMPTY_STRING;
 	}
@@ -55,6 +55,7 @@ public class RestaurantHelper {
 	}
 
 	public static int getBackgroundColor(Restaurant restaurant) {
+<<<<<<< HEAD
 		final Decoration decoration = restaurant.decoration();
 		if (decoration != null) {
 			final String decorationBg = decoration.getBackgroundColor();
@@ -66,6 +67,12 @@ public class RestaurantHelper {
 		}
 
 		return Color.BLACK;
+=======
+		if(restaurant == null || restaurant.decoration() == null) {
+			return Color.BLACK;
+		}
+		return getBackgroundColor(restaurant.decoration().getBackgroundColor());
+>>>>>>> omnom/omnom_master_menu_merge
 	}
 
 	public static int getBackgroundColor(String decorationBg) {
@@ -83,6 +90,9 @@ public class RestaurantHelper {
 		}
 		if(dailySchedule.isClosed()) {
 			return context.getString(R.string.restaurant_closed);
+		}
+		if(TextUtils.isEmpty(dailySchedule.getCloseTime()) || TextUtils.isEmpty(dailySchedule.getOpenTime())) {
+			return StringUtils.EMPTY_STRING;
 		}
 		return context.getString(R.string.restaurant_schedule_from_till, dailySchedule.getOpenTime(), dailySchedule.getCloseTime());
 	}
@@ -123,6 +133,20 @@ public class RestaurantHelper {
 		return hasSettings(restaurant) && restaurant.settings().hasMenu();
 	}
 
+	public static boolean isBar(final Restaurant restaurant) {
+		if(restaurant == null) {
+			return false;
+		}
+		return restaurant.isBar();
+	}
+
+	public static String getBarUri(final Restaurant restaurant) {
+		if(restaurant == null) {
+			return StringUtils.EMPTY_STRING;
+		}
+		return restaurant.ordersPaidUrl();
+	}
+
 	public static boolean isPromoEnabled(final Restaurant restaurant) {
 		return hasSettings(restaurant) && restaurant.settings().hasPromo();
 	}
@@ -160,15 +184,31 @@ public class RestaurantHelper {
 
 	public static TableDataResponse getTable(final Restaurant restaurant) {
 		TableDataResponse table = null;
-		if (hasOnlyTable(restaurant)) {
+		if(hasOnlyTable(restaurant)) {
 			table = restaurant.tables().get(0);
-		} else if (!hasTables(restaurant) && hasOrders(restaurant)) {
+		} else if(!hasTables(restaurant) && hasOrders(restaurant)) {
 			final Order order = restaurant.orders().get(0);
 			// TODO: add internal table id if necessary
 			table = new TableDataResponse(order.getTableId(), 0,
-										  new ArrayList<String>(), restaurant.id());
+			                              new ArrayList<String>(), restaurant.id());
 		}
 
 		return table;
+	}
+
+	public static boolean hasBar(final Restaurant restaurant) {
+		return restaurant.settings() != null && restaurant.settings().hasBar();
+	}
+
+	public static boolean hasTableOrder(final Restaurant restaurant) {
+		return restaurant.settings() != null && restaurant.settings().hasTableOrder();
+	}
+
+	public static boolean hasPreOrder(final Restaurant restaurant) {
+		return restaurant.settings() != null && restaurant.settings().hasPreOrder();
+	}
+
+	public static boolean hasTakeaway(final Restaurant restaurant) {
+		return false;
 	}
 }

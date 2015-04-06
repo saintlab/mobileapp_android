@@ -10,6 +10,88 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <com.omnom.android.utils.loader.LoaderView
+            android:id="@+id/loader"
+            omnom:progress_color="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <View
+            android:id="@+id/menu_gradient"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="304dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bg_menu_gradient" />
+
+        <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/sliding_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            sothree:umanoFadeColor="@color/transparent"
+            android:visibility="gone"
+            sothree:umanoPanelHeight="@dimen/menu_sliding_panel_height"
+            sothree:umanoShadowHeight="0dp">
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false" />
+
+            <com.omnom.android.view.subcategories.SubcategoriesView
+                android:id="@+id/menu_subcategories"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="48dp"
+                android:layout_gravity="bottom" />
+
+        </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
+        <ImageView
+            android:id="@+id/btn_previous"
+            android:layout_width="40dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin_small"
+            android:layout_gravity="top|left"
+            android:scaleType="centerInside"
+            android:visibility="gone"
+            android:clickable="true"
+            android:src="@drawable/btn_previous_white" />
+
+        <TextView
+            android:id="@+id/txt_bar"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:paddingTop="16dp"
+            android:layout_margin="@dimen/activity_vertical_margin_xsmall"
+            android:layout_gravity="top|center_horizontal"
+            android:textColor="@android:color/white"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:visibility="gone"
+            android:text="Бар"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+        <ImageView
+            android:id="@+id/img_profile"
+            android:layout_margin="@dimen/activity_vertical_margin_xsmall"
+            android:layout_gravity="top|right"
+            android:src="@drawable/ic_profile_white"
+            android:visibility="gone"
+            style="@style/ImageView.Clickable.Cropped" />
+
+        <TextView
+            android:id="@+id/txt_demo_leave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:layout_margin="@dimen/activity_horizontal_margin_medium"
+            android:layout_gravity="top|left"
+            android:background="@drawable/bg_demo_leave"
+            android:text="Выйти из Демо"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:visibility="gone" />
+
         <LinearLayout
             android:id="@+id/content"
             android:layout_width="match_parent"
@@ -19,7 +101,7 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -38,7 +120,7 @@
                     android:textStyle="bold"
                     android:textIsSelectable="true"
                     android:textAppearance="?android:textAppearanceLarge"
-                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
                 <TextView
                     android:id="@+id/txt_error_additional"
@@ -54,7 +136,7 @@
                     android:visibility="gone"
                     android:textColorLink="@android:color/secondary_text_light"
                     android:textAppearance="?android:textAppearanceLarge"
-                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
                 <LinearLayout
                     android:id="@+id/panel_errors"
@@ -86,7 +168,7 @@
                             android:drawablePadding="@dimen/drawable_padding_default"
                             android:drawableLeft="@drawable/ic_repeat_small"
                             android:textColor="@color/text_color_black"
-                            android:textAppearance="?android:textAppearanceLarge"/>
+                            android:textAppearance="?android:textAppearanceLarge" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -104,31 +186,24 @@
                             android:drawablePadding="@dimen/drawable_padding_default"
                             android:gravity="center"
                             android:drawableLeft="@drawable/ic_demo"
-                            android:textAppearance="?android:textAppearanceLarge"/>
+                            android:textAppearance="?android:textAppearanceLarge" />
                     </LinearLayout>
 
                 </LinearLayout>
 
                 <ViewStub
                     android:id="@+id/stub_bottom_menu"
-                    android:inflatedId="@+id/panel_bottom"
+                    android:inflatedId="@+id/panel_validate_bottom"
                     android:layout_gravity="bottom"
                     android:layout_alignParentBottom="true"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-                <Button
-                    android:id="@+id/btn_down"
-                    android:layout_width="22dp"
-                    android:layout_height="13dp"
-                    android:layout_above="@+id/panel_bottom"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="@dimen/activity_vertical_margin_large"
-                    android:background="@drawable/ic_down_button_icon_white"
-                    android:visibility="gone"/>
+                    android:layout_height="wrap_content" />
+
             </RelativeLayout>
 
         </LinearLayout>
 
+<<<<<<< HEAD
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -190,11 +265,13 @@
             android:textAppearance="?android:textAppearanceMedium"
             android:visibility="gone"/>
 
+=======
+>>>>>>> omnom/omnom_master_menu_merge
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="bottom"/>
+            android:layout_gravity="bottom" />
 
     </FrameLayout>
 

@@ -13,16 +13,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AndroidUtils;
-
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 import static butterknife.ButterKnife.findById;
 
 public class EnteringPageFragment extends Fragment {
 	private static final String ARG_COLOR = "color";
+
 	private static final String ARG_ICON = "icon";
+
 	private static final String ARG_TEXT = "text";
 
 	public static EnteringPageFragment newInstance(int color, int resId, final int strId) {
@@ -36,7 +37,9 @@ public class EnteringPageFragment extends Fragment {
 	}
 
 	private int color;
+
 	private int icon;
+
 	private int strId;
 
 	public EnteringPageFragment() {
@@ -72,7 +75,7 @@ public class EnteringPageFragment extends Fragment {
 		drawable.mutate();
 		drawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
 		AndroidUtils.setBackground(findById(view, R.id.root), drawable);
-		CalligraphyUtils.applyFontToTextView(getActivity(), (TextView) findById(view, R.id.text), "fonts/Futura-OSF-Omnom-Regular.otf");
+		AndroidUtils.applyFont(getActivity(), (TextView) findById(view, R.id.text), OmnomFont.OSF_REGULAR);
 		drawable.invalidateSelf();
 		((ImageView) findById(view, R.id.img_icon)).setImageResource(icon);
 		((TextView) findById(view, R.id.text)).setText(strId);

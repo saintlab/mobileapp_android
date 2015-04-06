@@ -63,7 +63,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM;
@@ -343,9 +343,16 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		}
 		mPanelTop.showProgress(true);
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
+<<<<<<< HEAD
 		UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		mCardRegisterSubscription = AndroidObservable.bindActivity(this,
 		                                                           mAcquiring.registerCard(acquiringData, wicketUser, mCard)
+=======
+		com.omnom.android.auth.UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
+		final UserData user = UserData.create(String.valueOf(wicketUser.getId()), wicketUser.getPhone());
+		mCardRegisterSubscription = AppObservable.bindActivity(this,
+		                                                           mAcquiring.registerCard(acquiringData, user, mCard)
+>>>>>>> omnom/omnom_master_menu_merge
 		                                                                     .delaySubscription(1000, TimeUnit.MILLISECONDS)
 		                                                          )
 		                                             .subscribe(
@@ -428,7 +435,7 @@ public class CardConfirmActivity extends BaseOmnomFragmentActivity
 		busy(true);
 		mPanelTop.showProgress(true);
 		double amount = getConfirmAmount();
-		mCardVerifySubscribtion = AndroidObservable.bindActivity(this, mAcquiring.verifyCard(mAcquiringData, mUser, mCard, amount))
+		mCardVerifySubscribtion = AppObservable.bindActivity(this, mAcquiring.verifyCard(mAcquiringData, mUser, mCard, amount))
 		                                           .subscribe(new Action1<AcquiringResponse>() {
 			                                           @Override
 			                                           public void call(AcquiringResponse response) {

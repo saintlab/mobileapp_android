@@ -1,0 +1,7 @@
+[submodule "Omnom.Android/libraries/SlidingUpPanel"]
+        path = Omnom.Android/libraries/SlidingUpPanel
+        url = https://github.com/Ch3D/AndroidSlidingUpPanel
+
+[submodule "Omnom.Android/libraries/recyclerview-animators"]
+        path = Omnom.Android/libraries/recyclerview-animators
+        url = https://github.com/Ch3D/recyclerview-animators

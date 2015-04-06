@@ -7,10 +7,16 @@ public interface Protocol {
 	public static final String HEADER_X_CURRENT_APP_BUILD = "X-Current-App-Build";
 	public static final String HEADER_X_CURRENT_APP_VERSION = "X-Current-App-Version";
 
+	public static final String HEADER_X_MOBILE_DEVICE_ID = "X-Mobile-Device-Id";
 	public static final String HEADER_X_MOBILE_VENDOR = "X-Mobile-Vendor";
 	public static final String HEADER_X_MOBILE_MODEL = "X-Mobile-Model";
 	public static final String HEADER_X_MOBILE_OS_VERSION = "X-Mobile-Os-Version";
 	public static final String HEADER_X_MOBILE_PLATFORM = "X-Mobile-Platform";
+
+	public static final String HEADER_X_MOBILE_CONFIGURATION = "X-Mobile-Configuration";
+
+	public static final String MOBILE_CONFIGURATION_PRODUCTION = "appstore";
+	public static final String MOBILE_CONFIGURATION_DEBUG = "debug";
 
 	public static final String FIELD_ID = "id";
 	public static final String FIELD_LOGIN = "login";

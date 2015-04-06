@@ -3,12 +3,16 @@ package com.omnom.android.utils.utils;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.util.Collection;
+
 import hugo.weaving.DebugLog;
 
 /**
  * Created by Ch3D on 31.07.2014.
  */
 public class StringUtils {
+
+	public static final String NEXT_STRING = "\n";
 
 	private static final String TAG = StringUtils.class.getSimpleName();
 
@@ -20,7 +24,19 @@ public class StringUtils {
 
 	private static final int METERS_IN_KILOMETER = 1000;
 
+	public static String concat(String delimiter, Collection<String> data) {
+		if (data == null || data.isEmpty()) {
+			return StringUtils.EMPTY_STRING;
+		}
+		String[] dataArray = new String[data.size()];
+		dataArray = data.toArray(dataArray);
+		return concat(delimiter, dataArray);
+	}
+
 	public static String concat(String delimiter, String... data) {
+		if (data == null || data.length == 0) {
+			return StringUtils.EMPTY_STRING;
+		}
 		final StringBuilder sb = new StringBuilder();
 		for(final String item : data) {
 			if(!TextUtils.isEmpty(item)) {

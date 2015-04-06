@@ -29,7 +29,7 @@ import javax.inject.Inject;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 public class LoginActivity extends BaseOmnomActivity {
@@ -171,8 +171,8 @@ public class LoginActivity extends BaseOmnomActivity {
 		ViewUtils.setVisible(txtChangePhone, false);
 		ViewUtils.setVisible(txtInfo, false);
 		ViewUtils.setVisible(txtRegister, false);
-		mProceedSubscription = AndroidObservable.bindActivity(this, authenticator.authorizePhone(editPhone.getText(),
-		                                                                                         StringUtils.EMPTY_STRING))
+		mProceedSubscription = AppObservable.bindActivity(this, authenticator.authorizePhone(editPhone.getText(),
+		                                                                                     StringUtils.EMPTY_STRING))
 		                                        .subscribe(new Action1<AuthResponse>() {
 			                                        @Override
 			                                        public void call(AuthResponse authResponse) {

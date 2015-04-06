@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/view_size_default">
+
+    <TextView xmlns:omnom="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/txt_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:gravity="center"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textColor="@android:color/white"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+</FrameLayout>

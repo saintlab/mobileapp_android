@@ -27,42 +27,68 @@ public class Order implements Parcelable {
 			return new Order[size];
 		}
 	};
+
+	public static Order create() {
+		return new Order();
+	}
+
 	@Expose
 	private int guests;
+
 	@Expose
 	private String internalId;
+
 	@Expose
 	private String internalOpenTime;
+
 	@Expose
 	private String internalTableId;
+
 	@Expose
 	private String modifiedTime;
+
 	@Expose
 	private String openTime;
+
 	@Expose
 	private String restaurantId;
+
 	@Expose
 	private String revision;
+
 	@Expose
 	private String status;
+
 	@Expose
 	private String tableId;
+
 	@Expose
 	private String waiterId;
+
 	@Expose
 	private String waiterName;
+
 	@Expose
 	private List<OrderItem> items = new ArrayList<OrderItem>();
+
 	@Expose
 	private boolean isClosed;
+
 	@Expose
 	private String id;
+
 	@Expose
 	private OrderTips tips;
+
 	@Expose
 	private int paidAmount;
+
 	@Expose
 	private int paidTip;
+
+	private Order() {
+
+	}
 
 	public Order(final Parcel parcel) {
 		guests = parcel.readInt();
@@ -245,15 +271,24 @@ public class Order implements Parcelable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if(this == o) {
+			return true;
+		}
+		if(o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
 		Order order = (Order) o;
 
-		if (id != null ? !id.equals(order.id) : order.id != null) return false;
-		if (tableId != null ? !tableId.equals(order.tableId) : order.tableId != null) return false;
-		if (waiterId != null ? !waiterId.equals(order.waiterId) : order.waiterId != null)
+		if(id != null ? !id.equals(order.id) : order.id != null) {
 			return false;
+		}
+		if(tableId != null ? !tableId.equals(order.tableId) : order.tableId != null) {
+			return false;
+		}
+		if(waiterId != null ? !waiterId.equals(order.waiterId) : order.waiterId != null) {
+			return false;
+		}
 
 		return true;
 	}
@@ -293,7 +328,7 @@ public class Order implements Parcelable {
 	}
 
 	public double getAmountToPay() {
-		return Math.max(getTotalAmount() - getPaidAmount(), 0) ;
+		return Math.max(getTotalAmount() - getPaidAmount(), 0);
 	}
 
 	public double getPaidTip() {

@@ -22,11 +22,14 @@ import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
+import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.restaurateur.retrofit.RestaurateurRxSupport;
@@ -34,6 +37,7 @@ import com.omnom.android.restaurateur.serializer.MailRuSerializer;
 import com.omnom.android.restaurateur.serializer.OrdersResponseSerializer;
 import com.omnom.android.utils.generation.AutoParcelAdapterFactory;
 
+import java.util.Collection;
 import java.util.List;
 
 import altbeacon.beacon.Beacon;
@@ -173,6 +177,12 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	}
 
 	@Override
+	public Observable<Collection<OrderItem>> getRecommendations(final String restaurantId) {
+		return mDataService.getRecommendations(restaurantId).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
+
+	@Override
 	public Observable<ResponseBase> newGuest(String restaurantId, String tableId) {
 		return mDataService.newGuest(restaurantId, tableId).subscribeOn(Schedulers.io()).observeOn(
 				AndroidSchedulers.mainThread());
@@ -196,8 +206,13 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	}
 
 	@Override
+<<<<<<< HEAD
 	public Observable<SupportInfoResponse> getSupportInfo() {
 		return mDataService.getSupportInfo().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+=======
+	public Observable<WishResponse> wishes(final String restId, final WishRequest request) {
+		return mDataService.wishes(restId, request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+>>>>>>> omnom/omnom_master_menu_merge
 	}
 
 	@Override
@@ -219,6 +234,16 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	@Override
 	public Observable<RestaurantsResponse> getRestaurants(double latitude, double longitude) {
 		return mDataService.getRestaurants(latitude, longitude).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<RestaurantsResponse> getRestaurantsAll() {
+		return mDataService.getRestaurantsAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<RestaurantsResponse> getRestaurantsAll(double latitude, double longitude) {
+		return mDataService.getRestaurantsAll(latitude, longitude).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

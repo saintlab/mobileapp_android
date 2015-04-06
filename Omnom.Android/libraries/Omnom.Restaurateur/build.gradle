@@ -22,17 +22,18 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.netflix.rxjava:rxjava-core:0.19.6'
-    compile 'com.netflix.rxjava:rxjava-android:0.19.6'
-    compile 'com.squareup.dagger:dagger:1.2.2'
-    compile 'com.google.code.gson:gson:2.2.4'
-    apt 'com.squareup.dagger:dagger-compiler:1.2.2'
 
     // auto-parcel
+<<<<<<< HEAD
     compile 'com.github.frankiesardo:auto-parcel:0.2'
     apt 'com.github.frankiesardo:auto-parcel-processor:0.2'
+=======
+    compile 'com.github.frankiesardo:auto-parcel:' + auto_parcel_version
+    apt 'com.github.frankiesardo:auto-parcel-processor:' + auto_parcel_version
+>>>>>>> omnom/omnom_master_menu_merge
 
     compile project(':libraries:Omnom.Utils')
     compile project(':libraries:Omnom.Auth')
     compile project(':libraries:Omnom.Altbeacon')
+    compile project(':libraries:Omnom.Menu')
 }

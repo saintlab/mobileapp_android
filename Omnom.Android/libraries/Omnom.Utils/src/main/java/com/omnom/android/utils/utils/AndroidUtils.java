@@ -1,9 +1,7 @@
 package com.omnom.android.utils.utils;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -42,6 +40,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.R;
 import com.omnom.android.utils.view.ErrorEdit;
 
@@ -57,12 +56,22 @@ import static butterknife.ButterKnife.findById;
  */
 public class AndroidUtils {
 
+<<<<<<< HEAD
     public static void clickify(TextView view, final String clickableText,
                                 final ClickSpan.OnClickListener listener) {
         clickify(view, true, clickableText, listener);
     }
 
 	public static void clickify(TextView view, final boolean isUnderlined, final String clickableText,
+=======
+	public interface KeyboardVisibilityListener {
+		public void onVisibilityChanged(boolean isVisible);
+	}
+
+	public static final int MAX_ANIMATION_INCEREMENT = 20;
+
+	public static void clickify(TextView view, final String clickableText,
+>>>>>>> omnom/omnom_master_menu_merge
 	                            final ClickSpan.OnClickListener listener) {
 
 		CharSequence text = view.getText();
@@ -71,8 +80,9 @@ public class AndroidUtils {
 
 		int start = string.indexOf(clickableText);
 		int end = start + clickableText.length();
-		if(start == -1)
+		if(start == -1) {
 			return;
+		}
 
 		if(text instanceof Spannable) {
 			((Spannable) text).setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -89,7 +99,7 @@ public class AndroidUtils {
 		view.setHighlightColor(view.getResources().getColor(android.R.color.transparent));
 	}
 
-	public static void sendFeedbackEmail(final Context context,@StringRes int resId) {
+	public static void sendFeedbackEmail(final Context context, @StringRes int resId) {
 		Intent intent = new Intent(Intent.ACTION_SENDTO);
 		String email = "team@omnom.menu";
 		intent.setData(Uri.parse("mailto:" + email));
@@ -97,12 +107,6 @@ public class AndroidUtils {
 		intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_subject_feedback));
 		context.startActivity(Intent.createChooser(intent, context.getString(resId)));
 	}
-
-	public interface KeyboardVisibilityListener {
-		public void onVisibilityChanged(boolean isVisible);
-	}
-
-	public static final int MAX_ANIMATION_INCEREMENT = 20;
 
 	public static void showKeyboard(EditText view) {
 		view.requestFocus();
@@ -149,7 +153,7 @@ public class AndroidUtils {
 	public static int getNavigationBarHeight(final Context context) {
 		Resources resources = context.getResources();
 		int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
-		if (resourceId > 0) {
+		if(resourceId > 0) {
 			return resources.getDimensionPixelSize(resourceId);
 		}
 		return 0;
@@ -240,34 +244,6 @@ public class AndroidUtils {
 
 	public static void showToastLong(View view, int resId) {
 		showToastLong(view.getContext(), resId);
-	}
-
-	public static AlertDialog showDialog(Context context, int msg, int okResId, DialogInterface.OnClickListener okListener,
-	                                     int cancelResId, DialogInterface.OnClickListener cancelListener) {
-		return showDialog(context, context.getString(msg), okResId, okListener, cancelResId, cancelListener);
-	}
-
-	public static AlertDialog showDialog(Context context, String msg, int okResId, DialogInterface.OnClickListener okListener,
-	                                     int cancelResId, DialogInterface.OnClickListener cancelListener) {
-		final AlertDialog alertDialog = new AlertDialog.Builder(context).setMessage(msg).setPositiveButton(okResId,
-		                                                                                                   okListener)
-		                                                                .setNegativeButton(cancelResId, cancelListener).create();
-		alertDialog.setCancelable(false);
-		alertDialog.setCanceledOnTouchOutside(false);
-		alertDialog.show();
-		return alertDialog;
-	}
-
-	public static AlertDialog showDialog(Context context, int msg, int okResId,
-	                                     DialogInterface.OnClickListener okListener) {
-		final AlertDialog alertDialog = new AlertDialog.Builder(context)
-															.setMessage(context.getString(msg))
-															.setPositiveButton(okResId, okListener)
-															.create();
-		alertDialog.setCancelable(false);
-		alertDialog.setCanceledOnTouchOutside(false);
-		alertDialog.show();
-		return alertDialog;
 	}
 
 	public static String getAppVersion(Context context) {
@@ -375,16 +351,20 @@ public class AndroidUtils {
 		return false;
 	}
 
-	public static void applyFont(final Context context, final ViewGroup view, final String fontPath) {
+	public static void applyFont(final Context context, final ViewGroup view, final OmnomFont font) {
 		for(int i = 0; i < view.getChildCount(); i++) {
 			final View childAt = view.getChildAt(i);
 			if(childAt instanceof ViewGroup) {
-				applyFont(context, (ViewGroup) childAt, fontPath);
+				applyFont(context, (ViewGroup) childAt, font);
 			}
 			if(childAt instanceof TextView) {
-				CalligraphyUtils.applyFontToTextView(context, (TextView) childAt, fontPath);
+				CalligraphyUtils.applyFontToTextView(context, (TextView) childAt, font.getPath());
 			}
 		}
+	}
+
+	public static void applyFont(final Context context, final TextView view, final OmnomFont font) {
+		CalligraphyUtils.applyFontToTextView(context, view, font.getPath());
 	}
 
 	public static void openDialer(final Context context, final String phone) {
@@ -422,16 +402,16 @@ public class AndroidUtils {
 	}
 
 	@SuppressWarnings("deprecation")
-    public static void removeOnGlobalLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener listener){
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
-        } else {
-            v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
-        }
-    }
+	public static void removeOnGlobalLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener listener) {
+		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+			v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+		} else {
+			v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+		}
+	}
 
 	@SuppressWarnings("deprecation")
-	public static void setBackground(View v, Drawable drawable){
+	public static void setBackground(View v, Drawable drawable) {
 		if(Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
 			v.setBackgroundDrawable(drawable);
 		} else {
@@ -443,4 +423,7 @@ public class AndroidUtils {
 		return context.getResources().getConfiguration().locale;
 	}
 
+	public static boolean isRecyclerItemAnimationSupported() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+	}
 }

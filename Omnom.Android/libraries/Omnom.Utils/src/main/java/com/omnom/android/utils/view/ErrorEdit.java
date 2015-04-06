@@ -20,6 +20,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.R;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -28,7 +29,6 @@ import com.omnom.android.utils.utils.ViewUtils;
 import java.util.Arrays;
 
 import hugo.weaving.DebugLog;
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 /**
  * Created by Ch3D on 29.09.2014.
@@ -152,7 +152,7 @@ public class ErrorEdit extends LinearLayout {
 		editView.setHint(mHintText);
 		editView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
 		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams((int) mEditTextWidth,
-																			 FrameLayout.LayoutParams.WRAP_CONTENT);
+		                                                                     FrameLayout.LayoutParams.WRAP_CONTENT);
 		layoutParams.gravity = Gravity.CENTER;
 		editView.setLayoutParams(layoutParams);
 		if(mMaxLen > 0) {
@@ -210,15 +210,15 @@ public class ErrorEdit extends LinearLayout {
 	private void initFontType() {
 		switch(mFontType) {
 			case FONT_TYPE_REGULAR:
-				CalligraphyUtils.applyFontToTextView(getContext(), editView, "fonts/Futura-OSF-Omnom-Regular.otf");
+				AndroidUtils.applyFont(getContext(), editView, OmnomFont.OSF_REGULAR);
 				break;
 
 			case FONT_TYPE_MEDIUM:
-				CalligraphyUtils.applyFontToTextView(getContext(), editView, "fonts/Futura-OSF-Omnom-Medium.otf");
+				AndroidUtils.applyFont(getContext(), editView, OmnomFont.OSF_MEDIUM);
 				break;
 
 			case FONT_TYPE_REGULAR_LE:
-				CalligraphyUtils.applyFontToTextView(getContext(), editView, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+				AndroidUtils.applyFont(getContext(), editView, OmnomFont.LSF_LE_REGULAR);
 				break;
 		}
 	}

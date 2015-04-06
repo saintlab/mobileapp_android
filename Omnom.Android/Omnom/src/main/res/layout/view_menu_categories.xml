@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.omnom.android.utils.view.OmnomListView
+        android:id="@android:id/list"
+        android:clickable="false"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:listSelector="@color/transparent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</merge>

@@ -40,13 +40,15 @@ import javax.inject.Inject;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Subscription;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 /**
  * Created by Ch3D on 28.09.2014.
  */
 public class UserRegisterActivity extends BaseOmnomActivity {
+
+	public static final int START_YEAR = 1900;
 
 	public static final int YEAR_OFFSET = 30;
 
@@ -174,6 +176,9 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 			}
 		}, gc.get(Calendar.YEAR), gc.get(Calendar.MONTH), gc.get(Calendar.DAY_OF_MONTH));
+        Calendar minPickerDate = Calendar.getInstance();
+        minPickerDate.set(Calendar.YEAR, START_YEAR);
+        dialog.getDatePicker().setMinDate(minPickerDate.getTimeInMillis());
 		dialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -233,7 +238,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 				.create(AndroidUtils.getInstallId(this), editName.getText(), StringUtils.EMPTY_STRING, editEmail.getText(),
 				        editPhone.getText(), editBirth.getText().toString().replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
 		mRegisterSubscription =
-				AndroidObservable.bindActivity(this, authenticator.register(request)).subscribe(new Action1<AuthRegisterResponse>() {
+				AppObservable.bindActivity(this, authenticator.register(request)).subscribe(new Action1<AuthRegisterResponse>() {
 					@Override
 					public void call(final AuthRegisterResponse authRegisterResponse) {
 						if (!authRegisterResponse.hasError()) {

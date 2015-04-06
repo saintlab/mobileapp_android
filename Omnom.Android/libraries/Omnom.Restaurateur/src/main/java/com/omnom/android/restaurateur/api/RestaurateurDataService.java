@@ -18,15 +18,19 @@ import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
+import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishRequest;
+import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.RestaurantTablesResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
+import java.util.Collection;
 import java.util.List;
 
 import retrofit.http.Body;
@@ -69,9 +73,16 @@ public interface RestaurateurDataService {
 	@GET("/restaurants")
 	Observable<RestaurantsResponse> getRestaurants();
 
+	@GET("/restaurants/all")
+	Observable<RestaurantsResponse> getRestaurantsAll();
+
 	@GET("/restaurants")
 	Observable<RestaurantsResponse> getRestaurants(@Query(Protocol.FIELD_LATITUDE) double latitude,
 	                                               @Query(Protocol.FIELD_LONGITUDE) double longitude);
+
+	@GET("/restaurants/all")
+	Observable<RestaurantsResponse> getRestaurantsAll(@Query(Protocol.FIELD_LATITUDE) double latitude,
+	                                                  @Query(Protocol.FIELD_LONGITUDE) double longitude);
 
 	@GET("/restaurants/{id}")
 	Observable<Restaurant> getRestaurant(@Path(Protocol.FIELD_ID) String restaurantId);
@@ -82,6 +93,9 @@ public interface RestaurateurDataService {
 	@GET("/restaurants/{restaurant_id}/tables/{table_id}/orders")
 	Observable<OrdersResponse> getOrders(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
 	                                     @Path(Protocol.FIELD_TABLE_ID) String tableId);
+
+	@GET("/restaurants/{restaurant_id}/recommendations")
+	Observable<Collection<OrderItem>> getRecommendations(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId);
 
 	@POST("/restaurants/{restaurant_id}/tables/{table_id}/new/guest")
 	Observable<ResponseBase> newGuest(@Path(Protocol.FIELD_RESTAURANT_ID) String restaurantId,
@@ -123,6 +137,10 @@ public interface RestaurateurDataService {
 
 	@GET("/ibeacons/demo")
 	Observable<List<DemoTableData>> getDemoTable();
+
+	@POST("/restaurants/{id}/wishes")
+	Observable<WishResponse> wishes(@Path(Protocol.FIELD_ID) String restaurantId,
+	                                @Body WishRequest request);
 
 	@PUT("/restaurants/{id}")
 	Observable<Restaurant> setRssiThreshold(@Path(Protocol.FIELD_ID) String restaurantId,

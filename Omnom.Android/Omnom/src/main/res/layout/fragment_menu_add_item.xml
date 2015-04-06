@@ -1,0 +1,94 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:animateLayoutChanges="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#77000000"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin_small"
+        android:paddingTop="@dimen/activity_vertical_margin_small"
+        android:paddingBottom="@dimen/activity_horizontal_margin_medium"
+        android:orientation="vertical"
+        android:animateLayoutChanges="true"
+        android:gravity="center"
+        android:layout_gravity="bottom"
+        android:background="@android:color/white">
+
+        <ImageView
+            android:id="@+id/btn_close"
+            android:scaleType="centerInside"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top|center_horizontal"
+            android:src="@drawable/ic_cross_black" />
+
+        <RelativeLayout
+            android:layout_marginTop="@dimen/activity_vertical_margin_small"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/view_size_default">
+
+            <TextView
+                android:id="@+id/txt_count"
+                android:paddingLeft="@dimen/activity_horizontal_margin_large"
+                android:paddingRight="@dimen/activity_horizontal_margin_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="@android:color/black"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:text="0"
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+            <Button
+                android:id="@+id/btn_plus"
+                android:layout_width="@dimen/pay_button_height"
+                android:layout_height="@dimen/pay_button_height"
+                android:layout_toRightOf="@+id/txt_count"
+                android:layout_centerVertical="true"
+                android:background="@drawable/btn_increase"
+                android:textAppearance="?android:textAppearanceLarge" />
+
+            <Button
+                android:id="@+id/btn_minus"
+                android:layout_width="@dimen/pay_button_height"
+                android:layout_height="@dimen/pay_button_height"
+                android:layout_toLeftOf="@+id/txt_count"
+                android:layout_centerVertical="true"
+                android:background="@drawable/btn_decrease"
+                android:textAppearance="?android:textAppearanceLarge" />
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="@dimen/activity_horizontal_margin_medium"
+            android:background="@color/divider_light" />
+
+        <ExpandableListView
+            android:id="@android:id/list"
+            android:animateLayoutChanges="true"
+            android:groupIndicator="@null"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btn_apply"
+            android:layout_marginTop="@dimen/activity_vertical_margin_small"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_small"
+            android:paddingLeft="@dimen/activity_horizontal_margin_large"
+            android:paddingRight="@dimen/activity_horizontal_margin_large"
+            android:text="@string/button_ok"
+            style="@style/MenuButton.Blue" />
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -55,11 +55,13 @@ import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
+import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.OmnomListView;
@@ -82,7 +84,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
 import butterknife.Optional;
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 import static butterknife.ButterKnife.findById;
 
@@ -214,6 +215,14 @@ public class OrderFragment extends Fragment {
 			tableId = order.getTableId();
 			restaurantName = order.getRestaurantId();
 			orderId = order.getId();
+			mTipsWay = tipsWay.ordinal();
+			mSplitWay = splitWay.ordinal();
+		}
+
+		public PaymentDetails(double amount, int tip, TipsWay tipsWay, int tipValue, SplitWay splitWay) {
+			mAmount = amount;
+			mTip = tip;
+			mTipValue = tipValue;
 			mTipsWay = tipsWay.ordinal();
 			mSplitWay = splitWay.ordinal();
 		}
@@ -559,14 +568,14 @@ public class OrderFragment extends Fragment {
 	public void onOrderUpdate(final Order order) {
 		if(order != null && order.getId().equals(getOrder().getId())) {
 			if(!isDownscaled()) {
-				AndroidUtils.showDialog(getActivity(), R.string.order_updated, R.string.update,
-				                        new DialogInterface.OnClickListener() {
-					                        @Override
-					                        public void onClick(final DialogInterface dialog,
-					                                            final int which) {
-						                        updateOrder(order);
-					                        }
-				                        });
+				DialogUtils.showDialog(getActivity(), R.string.order_updated, R.string.update,
+				                       new DialogInterface.OnClickListener() {
+					                       @Override
+					                       public void onClick(final DialogInterface dialog,
+					                                           final int which) {
+						                       updateOrder(order);
+					                       }
+				                       });
 			} else {
 				updateOrder(order);
 			}
@@ -665,7 +674,7 @@ public class OrderFragment extends Fragment {
 			stubPaymentOptions.setLayoutResource(R.layout.view_order_payment_options);
 
 			ViewGroup inflate = (ViewGroup) stubPaymentOptions.inflate();
-			AndroidUtils.applyFont(getActivity(), inflate, "fonts/Futura-LSF-Omnom-LE-Regular.otf");
+			AndroidUtils.applyFont(getActivity(), inflate, OmnomFont.LSF_LE_REGULAR);
 
             mPanelPayment = inflate.findViewById(R.id.panel_linear);
 			editAmount = (AmountEditText) inflate.findViewById(R.id.edit_payment_amount);
@@ -683,14 +692,14 @@ public class OrderFragment extends Fragment {
 				@Override
 				public void onClick(final View v) {
 					if(amountIsTooHigh()) {
-						final AlertDialog alertDialog = AndroidUtils.showDialog(getActivity(), R.string.amount_is_too_high, R.string.pay,
-						                                                        new DialogInterface.OnClickListener() {
-							                                                        @Override
-							                                                        public void onClick(final DialogInterface dialog,
-							                                                                            final int which) {
-								                                                        showCardsActivity();
-							                                                        }
-						                                                        }, R.string.refuse, new DialogInterface.OnClickListener() {
+						final AlertDialog alertDialog = DialogUtils.showDialog(getActivity(), R.string.amount_is_too_high, R.string.pay,
+						                                                       new DialogInterface.OnClickListener() {
+							                                                       @Override
+							                                                       public void onClick(final DialogInterface dialog,
+							                                                                           final int which) {
+								                                                       showCardsActivity();
+							                                                       }
+						                                                       }, R.string.refuse, new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(final DialogInterface dialog, final int which) {
 										dialog.dismiss();
@@ -803,7 +812,7 @@ public class OrderFragment extends Fragment {
 		}
 
 		pickerTips.setDividerDrawable(new ColorDrawable(mAccentColor));
-		CalligraphyUtils.applyFontToTextView(getActivity(), txtTitle, "fonts/Futura-OSF-Omnom-Medium.otf");
+		AndroidUtils.applyFont(getActivity(), txtTitle, OmnomFont.OSF_MEDIUM);
 		txtTitle.setText(billText);
 
 		initPicker();
@@ -832,6 +841,7 @@ public class OrderFragment extends Fragment {
 			reportFixedTips(tips, paymentDetails);
 		}
 		final OrdersActivity activity = (OrdersActivity) getActivity();
+<<<<<<< HEAD
 		CardsActivity.start(getActivity(), getOrder(), paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
 	}
 
@@ -849,6 +859,10 @@ public class OrderFragment extends Fragment {
 		final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(getActivity());
 		mixPanelHelper.track(MixPanelHelper.Project.ALL, "WRONG_TIPS_VALUE_FIXED", new Object[]{tips, paymentDetails});
 		mixPanelHelper.flush();
+=======
+		CardsActivity.start(getActivity(), activity.getRestaurant(), mOrder, paymentDetails, mAccentColor,
+		                    OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
+>>>>>>> omnom/omnom_master_menu_merge
 	}
 
 	private void initList() {
@@ -1139,8 +1153,13 @@ public class OrderFragment extends Fragment {
 		mAdapter.notifyDataSetChanged();
 		initFooter(true);
 		if(resetAmount) {
+<<<<<<< HEAD
 			updateAmount(StringUtils.formatCurrency(String.valueOf(decimalSeparator),
 													AmountHelper.format(getOrder().getAmountToPay())));
+=======
+			editAmount.setText(StringUtils.formatCurrency(String.valueOf(decimalSeparator),
+			                                              AmountHelper.format(mOrder.getAmountToPay())));
+>>>>>>> omnom/omnom_master_menu_merge
 			updatePaymentTipsAmount(getEnteredAmount());
 		}
 	}
@@ -1276,7 +1295,7 @@ public class OrderFragment extends Fragment {
 		}
 		try {
 			return new BigDecimal(numberFormat.parse(filtered).doubleValue());
-		} catch (ParseException e) {
+		} catch(ParseException e) {
 			return BigDecimal.ZERO;
 		}
 	}
