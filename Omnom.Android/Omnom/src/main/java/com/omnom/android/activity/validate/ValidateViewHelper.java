@@ -102,6 +102,9 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	@InjectView(R.id.btn_previous)
 	protected ImageView imgPrevious;
 
+	@InjectView(R.id.txt_table)
+	protected TextView txtTable;
+
 	@InjectView(R.id.txt_demo_leave)
 	protected TextView txtLeave;
 
@@ -505,6 +508,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	public void onChangeTable() {
 		AnimationUtils.animateAlpha(imgPrevious, false);
+		AnimationUtils.animateAlpha(txtTable, false);
 		bottomView.animate().translationY(bottomView.getHeight());
 		loader.animateLogoFast(R.drawable.ic_fork_n_knife);
 		AnimationUtils.animateAlpha(imgProfile, false);
@@ -516,7 +520,10 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	@DebugLog
 	public void bindMenuData(final Menu menu, ValidateOrderHelper orderHelper) {
-		slidingPanel.setTouchEnabled(menu != null && !menu.isEmpty());
+		final boolean hasMenu = menu != null && !menu.isEmpty();
+		ViewUtils.setVisible(slidingPanel, hasMenu);
+		ViewUtils.setVisible(menuCategories, hasMenu);
+		slidingPanel.setTouchEnabled(hasMenu);
 		if(menu != null) {
 			menuCategories.bind(menu, orderHelper.insureOrder());
 		}

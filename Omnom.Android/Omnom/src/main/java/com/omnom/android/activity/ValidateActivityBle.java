@@ -166,7 +166,6 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                       .subscribe(new Action1<Pair<RestaurantResponse, MenuResponse>>() {
 					                                       @Override
 					                                       public void call(final Pair<RestaurantResponse, MenuResponse> pair) {
-						                                       bindMenuData();
 						                                       RestaurantResponse response = pair.first;
 						                                       if(response.hasErrors()) {
 							                                       startErrorTransition();

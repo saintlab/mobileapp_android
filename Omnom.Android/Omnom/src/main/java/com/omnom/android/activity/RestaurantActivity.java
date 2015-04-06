@@ -31,7 +31,6 @@ import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.ViewUtils;
-import com.omnom.android.view.stateful.StatefulTextView;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -82,9 +81,6 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 
 	@InjectView(R.id.btn_call)
 	protected Button btnCall;
-
-	@InjectView(R.id.txt_im_inside)
-	protected StatefulTextView txtImInside;
 
 	@InjectView(R.id.cover)
 	protected LoaderView viewCover;
@@ -148,7 +144,6 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 		//	return;
 		//}
 		if(!mFinishing) {
-			txtImInside.setKeepStatePressed(true);
 			ValidateActivityShortcut.start(this);
 		}
 	}
@@ -289,13 +284,6 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 		} else {
 			ViewUtils.setVisible(btnCall, false);
 		}
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-		txtImInside.setKeepStatePressed(false);
-		txtImInside.setPressed(false);
 	}
 
 	@Override

@@ -248,7 +248,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 							                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
 							                                             decodeResponse.getError()));
 						}
-						bindMenuData();
 						if(!TextUtils.isEmpty(decodeResponse.getError())) {
 							getErrorHelper().showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
 						} else {

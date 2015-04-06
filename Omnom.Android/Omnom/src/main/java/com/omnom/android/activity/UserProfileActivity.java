@@ -166,7 +166,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 			forwardToIntro();
 			return;
 		}
-		profileSubscription = AndroidObservable.bindActivity(this, getProfileObservable(token)).subscribe(
+		profileSubscription = AppObservable.bindActivity(this, getProfileObservable(token)).subscribe(
 				new Action1<Pair<UserResponse, SupportInfoResponse>>() {
 					@Override
 					public void call(Pair<UserResponse, SupportInfoResponse> response) {

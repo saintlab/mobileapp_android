@@ -63,35 +63,6 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 
 	private static final int SCAN_DELAY = 5000;
 
-	private class LaunchAnimationListener implements Animator.AnimatorListener {
-
-		private final View background;
-
-		public LaunchAnimationListener(final View background) {
-			this.background = background;
-		}
-
-		@Override
-		public void onAnimationStart(Animator animation) {
-
-		}
-
-		@Override
-		public void onAnimationEnd(Animator animation) {
-			ViewUtils.setVisible(background, false);
-		}
-
-		@Override
-		public void onAnimationCancel(Animator animation) {
-
-		}
-
-		@Override
-		public void onAnimationRepeat(Animator animation) {
-
-		}
-	}
-
 	public static void start(final BaseOmnomActivity activity, final int code) {
 		final Intent intent = getIntent(activity);
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -199,7 +170,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 						}
 					}
 				}));
-		
+
 	}
 
 
@@ -355,7 +326,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 		finish(requestId, restaurant, menu);
 	}
 
-	private void finish(final String requestId, final Restaurant restaurant) {
+	private void finish(final String requestId, final Restaurant restaurant, final Menu menu) {
 		Intent data = new Intent();
 		data.putExtra(EXTRA_REQUEST_ID, requestId);
 		data.putExtra(EXTRA_RESTAURANT, restaurant);
