@@ -4,6 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <FrameLayout
+        android:id="@+id/top_gradient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_main_sceen_gradient"
+        />
+
     <com.omnom.android.utils.view.MultiplyImageView
         android:id="@+id/img_multiply"
         android:layout_width="match_parent"

@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
-import com.omnom.android.adapter.OrdersPagerAdaper;
+import com.omnom.android.adapter.OrdersPagerAdapter;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -91,7 +91,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 	@InjectView(R.id.root)
 	protected View rootView;
 
-	private OrdersPagerAdaper mPagerAdapter;
+	private OrdersPagerAdapter mPagerAdapter;
 
 	private ArrayList<Order> orders = null;
 

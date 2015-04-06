@@ -1,0 +1,55 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/panel_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingBottom="@dimen/activity_horizontal_margin"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:orientation="vertical"
+        >
+
+        <ImageButton
+            android:id="@+id/btn_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:layout_gravity="center_horizontal"
+            android:background="@null"
+            android:src="@drawable/ic_cross_black"
+            android:clickable="true"
+            android:contentDescription="@null"
+            />
+
+        <TextView
+            android:id="@+id/txt_table_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/table_number"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"
+            android:textColor="@color/qr_hint_color"
+            android:textSize="@dimen/font_medium"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+            />
+
+        <TextView
+            android:id="@+id/txt_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/change_table"
+            android:textSize="@dimen/font_normal"
+            android:gravity="left"
+            android:textColor="@color/qr_hint_color"
+            omnom:fontPath="fonts/Futura-OSF-Omnom-Regular.otf"
+            />
+
+    </LinearLayout>
+
+</FrameLayout>

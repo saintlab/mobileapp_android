@@ -27,8 +27,7 @@ import butterknife.OnClick;
 public class QrHintFragment extends Fragment {
 
 	public static Fragment newInstance() {
-		final QrHintFragment fragment = new QrHintFragment();
-		return fragment;
+		return new QrHintFragment();
 	}
 
 	@InjectView(R.id.panel_bottom)

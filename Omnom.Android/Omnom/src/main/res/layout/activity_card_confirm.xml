@@ -61,7 +61,7 @@
 
 
     <FrameLayout
-        android:id="@+id/transparent_panel"
+        android:id="@+id/dark_transparent_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"

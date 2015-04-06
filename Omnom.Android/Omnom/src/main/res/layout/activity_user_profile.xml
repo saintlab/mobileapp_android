@@ -20,7 +20,8 @@
                 android:layout_marginTop="72dp"
                 android:layout_width="@dimen/profile_avatar_size"
                 android:layout_height="@dimen/profile_avatar_size"
-                android:src="@drawable/empty_avatar"/>
+                android:src="@drawable/empty_avatar"
+                android:contentDescription="@null"/>
 
             <TextView
                 android:id="@+id/txt_username"
@@ -44,7 +45,7 @@
 
             <Button
                 android:id="@+id/btn_my_cards"
-                android:text="Мои привязанные карты"
+                android:text="@string/bound_cards"
                 style="@style/Button.UserProfile.Data.Expandable"/>
 
             <include layout="@layout/delimiter_profile_vertical"/>
@@ -62,7 +63,7 @@
                 style="@style/Button.Selectable">
 
                 <TextView
-                    android:text="Столик"
+                    android:text="@string/table"
                     android:drawableRight="@null"
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -99,7 +100,7 @@
                 android:layout_height="?android:listPreferredItemHeight"
                 android:paddingLeft="@dimen/activity_horizontal_margin_medium"
                 android:paddingBottom="@dimen/activity_vertical_margin_small"
-                android:text="О ПРОГРАММЕ"
+                android:text="@string/about_title"
                 android:layout_gravity="left"
                 android:gravity="bottom"
                 android:textAppearance="?android:textAppearance"
@@ -109,7 +110,15 @@
 
             <Button
                 android:id="@+id/btn_feedback"
-                android:text="Обратная связь"
+                android:text="@string/feedback"
+                style="@style/Button.UserProfile.Data">
+            </Button>
+
+            <include layout="@layout/delimiter_profile_vertical"/>
+
+            <Button
+                android:id="@+id/btn_support"
+                android:text="@string/support"
                 style="@style/Button.UserProfile.Data">
             </Button>
 
@@ -119,7 +128,7 @@
                 android:id="@+id/btn_facebook"
                 android:gravity="center_vertical"
                 android:clickable="true"
-                android:text="facebook/Omnom"
+                android:text="@string/facebook_title"
                 android:textColor="@color/blue_bright"
                 android:drawableLeft="@drawable/ic_facebook"
                 android:drawablePadding="@dimen/drawable_padding_default"
@@ -164,5 +173,18 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/ic_cross_black"/>
+
+    <FrameLayout
+        android:id="@+id/dark_transparent_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="@color/black_overlay"/>
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
 
 </FrameLayout>

@@ -58,8 +58,9 @@ public class ErrorEditText extends EditText {
 		if(mDefaultDrawableId == 0) {
 			getContext().getTheme().resolveAttribute(android.R.attr.editTextStyle, typedValue, true);
 			int[] attribute = new int[]{android.R.attr.background};
-			TypedArray array = getContext().obtainStyledAttributes(typedValue.resourceId, attribute);
+			final TypedArray array = getContext().obtainStyledAttributes(typedValue.resourceId, attribute);
 			int resId = array.getResourceId(0, -1);
+			array.recycle();
 			mDefaultDrawableId = (resId == -1) ? R.drawable.edit_text : resId;
 		}
 		return mDefaultDrawableId;

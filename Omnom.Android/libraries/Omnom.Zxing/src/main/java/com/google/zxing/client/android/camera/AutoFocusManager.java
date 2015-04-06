@@ -77,7 +77,6 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
 	}
 
 	synchronized void start() {
-		stopped = false;
 		if (useAutoFocus) {
 			outstandingTask = null;
 			if (!focusing) {

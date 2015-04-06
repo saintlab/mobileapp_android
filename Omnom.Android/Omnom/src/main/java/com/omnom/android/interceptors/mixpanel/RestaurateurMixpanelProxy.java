@@ -9,6 +9,7 @@ import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.restaurateur.api.RestaurateurDataService;
 import com.omnom.android.restaurateur.api.observable.RestaurateurDataProvider;
 import com.omnom.android.restaurateur.model.ResponseBase;
+import com.omnom.android.restaurateur.model.SupportInfoResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
@@ -219,6 +220,17 @@ public class RestaurateurMixpanelProxy extends RestaurateurDataProvider {
 			@Override
 			public void call(Config response) {
 				mMixHelper.track(OMNOM_ANDROID, "restarateur.getConfig <-", response);
+			}
+		});
+	}
+
+	@Override
+	public Observable<SupportInfoResponse> getSupportInfo() {
+		mMixHelper.track(OMNOM_ANDROID, "restarateur.getSupportInfo ->", StringUtils.EMPTY_STRING);
+		return super.getSupportInfo().doOnNext(new Action1<SupportInfoResponse>() {
+			@Override
+			public void call(SupportInfoResponse response) {
+				mMixHelper.track(OMNOM_ANDROID, "restarateur.getSupportInfo <-", response);
 			}
 		});
 	}

@@ -1,6 +1,7 @@
 package com.omnom.android.restaurateur.api.observable;
 
 import com.omnom.android.restaurateur.model.ResponseBase;
+import com.omnom.android.restaurateur.model.SupportInfoResponse;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
 import com.omnom.android.restaurateur.model.beacon.BeaconDataResponse;
 import com.omnom.android.restaurateur.model.bill.BillRequest;
@@ -105,6 +106,8 @@ public interface RestaurateurObservableApi {
 	public Observable<Restaurant> link(long orderId, double amount, double tip);
 
 	public Observable<Config> getConfig();
+
+	public Observable<SupportInfoResponse> getSupportInfo();
 
 	public Observable<WishResponse> wishes(String restId, WishRequest request);
 }

@@ -28,7 +28,7 @@
 
     <item android:state_window_focused="false" android:state_enabled="true" android:drawable="@drawable/bg_rounded_bordered_black_normal" />
     <item android:state_enabled="true" android:state_focused="true" android:drawable="@drawable/bg_rounded_bordered_black_normal" />
-    <iten android:state_enabled="true" android:state_activated="true" android:drawable="@drawable/bg_rounded_bordered_black_normal" />
+    <item android:state_enabled="true" android:state_activated="true" android:drawable="@drawable/bg_rounded_bordered_black_normal" />
     <item android:state_enabled="true" android:drawable="@drawable/bg_rounded_bordered_black_normal" />
 
     <!-- disabled -->

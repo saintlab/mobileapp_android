@@ -13,8 +13,6 @@ public interface ActivityHelper {
 
 	void onStart();
 
-	void onApplicationLaunch();
-
 	void onResume();
 
 	void onPause();

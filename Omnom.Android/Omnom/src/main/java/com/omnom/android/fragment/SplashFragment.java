@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.omnom.android.OmnomApplication;
@@ -60,6 +61,9 @@ public class SplashFragment extends Fragment {
 	@InjectView(R.id.img_logo)
 	protected ImageView imgLogo;
 
+	@InjectView(R.id.top_gradient)
+	protected FrameLayout topGradient;
+
 	@InjectView(R.id.img_fork)
 	protected ImageView imgFork;
 
@@ -106,6 +110,7 @@ public class SplashFragment extends Fragment {
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		topGradient.setAlpha(0);
 		imgForkLarge.setScaleX(0.4258f);
 		imgForkLarge.setScaleY(0.4258f);
 
@@ -212,7 +217,9 @@ public class SplashFragment extends Fragment {
 		alphaAnimtorForkSmall.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
-				imgFork.setAlpha((Float) animation.getAnimatedValue());
+				float value = (Float) animation.getAnimatedValue();
+				imgFork.setAlpha(value);
+				topGradient.setAlpha(1 - value);
 			}
 		});
 

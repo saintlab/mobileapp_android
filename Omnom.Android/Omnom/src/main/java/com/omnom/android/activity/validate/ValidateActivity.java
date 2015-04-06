@@ -1,5 +1,6 @@
 package com.omnom.android.activity.validate;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -15,6 +16,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
+import android.view.ViewStub;
+import android.view.ViewTreeObserver;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.OmnomApplication;
@@ -833,7 +840,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}
 	}
 
-	@OnClick(R.id.img_profile)
+	@OnClick(R.id.img_profile, R.id.txt_table)
 	public void onProfile(View v) {
 		final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
 		final String tableId = mTable != null ? mTable.getId() : null;
@@ -1035,7 +1042,14 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	public void changeTable() {
 		clearErrors(true);
+		//TODO: new
 		mViewHelper.onChangeTable();
+		//TODO: old
+		AnimationUtils.animateAlpha(imgPrevious, false);
+		bottomView.animate().translationY(bottomView.getHeight());
+		loader.animateLogoFast(R.drawable.ic_fork_n_knife);
+		AnimationUtils.animateAlpha(imgProfile, false);
+		AnimationUtils.animateAlpha(txtTable, false);
 		postDelayed(850, new Runnable() {
 			@Override
 			public void run() {

@@ -24,10 +24,10 @@ import com.omnom.android.R;
 import com.omnom.android.acquiring.AcquiringResponseException;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.adapter.CardsAdapter;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.menu.model.UserOrder;
@@ -315,8 +315,8 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 
 	private void removeCard(final Card card) {
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
-		UserData userData = UserData.create(OmnomApplication.get(getActivity()).getUserProfile().getUser());
-		String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
+		final UserData userData = OmnomApplication.get(getActivity()).getUserProfile().getUser();
+		final String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
 		final CardInfo cardInfo = new CardInfo.Builder()
 				.cardId(card.getExternalCardId())
 				.pan(card.getMaskedPan())

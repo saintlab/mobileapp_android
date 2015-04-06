@@ -36,6 +36,7 @@ public class AcquiringMailRuMixpanel extends AcquiringProxyMailRu {
 			@Override
 			public void call(AcquiringResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "acquiring.mail.pay <-", response);
+				mMixHelper.flush();
 			}
 		});
 	}
@@ -47,6 +48,7 @@ public class AcquiringMailRuMixpanel extends AcquiringProxyMailRu {
 			@Override
 			public void call(RegisterCardResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "acquiring.mail.registerCard <-", response);
+				mMixHelper.flush();
 			}
 		});
 	}
@@ -58,6 +60,7 @@ public class AcquiringMailRuMixpanel extends AcquiringProxyMailRu {
 			@Override
 			public void call(AcquiringResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "acquiring.mail.verifyCard <-", response);
+				mMixHelper.flush();
 			}
 		});
 	}
@@ -69,6 +72,7 @@ public class AcquiringMailRuMixpanel extends AcquiringProxyMailRu {
 			@Override
 			public void call(CardDeleteResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "acquiring.mail.deleteCard <-", response);
+				mMixHelper.flush();
 			}
 		});
 	}
@@ -80,6 +84,7 @@ public class AcquiringMailRuMixpanel extends AcquiringProxyMailRu {
 			@Override
 			public void call(AcquiringTransactionResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "acquiring.mail.checkTransaction <-", response);
+				mMixHelper.flush();
 			}
 		});
 	}
@@ -91,6 +96,7 @@ public class AcquiringMailRuMixpanel extends AcquiringProxyMailRu {
 			@Override
 			public void call(AcquiringTransactionExtendedResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "acquiring.mail.checkTransactionExtended <-", response);
+				mMixHelper.flush();
 			}
 		});
 	}

@@ -1,22 +1,24 @@
 package com.omnom.android.activity;
 
 import android.app.DatePickerDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.text.Html;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthError;
+import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.utils.ObservableUtils;
@@ -32,6 +34,8 @@ import com.omnom.android.view.HeaderView;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -76,6 +80,9 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.panel_top)
 	protected HeaderView topPanel;
+
+	@Inject
+	protected AuthService authenticator;
 
 	private boolean mFirstStart = true;
 
@@ -147,8 +154,19 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 			}
 		});
 
-		textAgreement.setMovementMethod(LinkMovementMethod.getInstance());
-		textAgreement.setText(Html.fromHtml(getResources().getString(R.string.register_agreement)));
+		AndroidUtils.clickify(textAgreement, getString(R.string.register_agreement_mark), new ClickSpan.OnClickListener() {
+			@Override
+			public void onClick() {
+				final Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setData(Uri.parse(getString(R.string.register_agreement_url)));
+				try {
+					startActivity(i);
+				} catch (ActivityNotFoundException e) {
+					Toast.makeText(getActivity(), getString(R.string.register_agreement_fail), Toast.LENGTH_LONG).show();
+				}
+			}
+		});
+
 	}
 
 	private void showDatePickerDialog() {

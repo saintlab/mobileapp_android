@@ -24,7 +24,6 @@ import com.omnom.android.acquiring.demo.DemoAcquiring;
 import com.omnom.android.acquiring.mailru.OrderInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.MailRuExtra;
-import com.omnom.android.acquiring.mailru.model.UserData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
@@ -33,6 +32,8 @@ import com.omnom.android.entrance.BarEntranceData;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.entrance.TableEntranceData;
 import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
+import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.mixpanel.MixPanelHelper;
@@ -310,8 +311,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	}
 
 	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final int tip) {
-		final com.omnom.android.auth.UserData cachedUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		final UserData user = UserData.create(String.valueOf(cachedUser.getId()), cachedUser.getPhone());
+		final UserData user = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		pay(billData, card, acquiringData, user, amount, tip);
 	}
@@ -439,6 +439,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 					}
 					overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 				}
+				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 			}
 		});
 	}

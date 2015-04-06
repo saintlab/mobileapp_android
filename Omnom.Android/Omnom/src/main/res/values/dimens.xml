@@ -42,4 +42,11 @@
     <dimen name="wish_button_size">40dp</dimen>
     <dimen name="takeaway_picker_height">196dp</dimen>
 
+    <dimen name="btn_cancel_size">62dp</dimen>
+    <dimen name="btn_edit_size">52dp</dimen>
+    <dimen name="btn_apply_size">58dp</dimen>
+    <dimen name="btn_cancel_padding">20dp</dimen>
+    <dimen name="btn_edit_padding">12dp</dimen>
+    <dimen name="btn_apply_padding">12dp</dimen>
+
 </resources>
