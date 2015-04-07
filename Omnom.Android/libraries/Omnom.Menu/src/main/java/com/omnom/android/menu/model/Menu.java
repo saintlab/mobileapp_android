@@ -1,9 +1,10 @@
 package com.omnom.android.menu.model;
 
+import com.omnom.android.menu.utils.MenuHelper;
+import com.omnom.android.utils.generation.AutoGson;
+
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
-
-import com.omnom.android.utils.generation.AutoGson;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,42 +18,47 @@ import auto.parcel.AutoParcel;
 @AutoParcel
 @AutoGson
 public abstract class Menu implements Parcelable {
-	@Nullable
-	public abstract String restaurantId();
 
-	@Nullable
-	public abstract Items items();
+    @Nullable
+    public abstract String restaurantId();
 
-	@Nullable
-	public abstract Modifiers modifiers();
+    @Nullable
+    public abstract Items items();
 
-	@Nullable
-	public abstract List<Category> categories();
+    @Nullable
+    public abstract Modifiers modifiers();
 
-	public final List<Category> getFilledCategories() {
-		final List<Category> categories = categories();
-		if(categories == null) {
-			return Collections.EMPTY_LIST;
-		}
+    @Nullable
+    public abstract List<Category> categories();
 
-		final List<Category> result = new ArrayList<>(categories.size());
-		for(Category category : categories) {
-			if(category.hasChildsOrItems()) {
-				result.add(category);
-			}
-		}
-		return result;
-	}
+    public final List<Category> getFilledCategories() {
+        final List<Category> categories = categories();
+        if (categories == null) {
+            return Collections.EMPTY_LIST;
+        }
 
-	public boolean isEmpty() {
-		final List<Category> filledCategories = getFilledCategories();
-		return filledCategories == null || filledCategories.size() == 0;
-	}
+        final List<Category> result = new ArrayList<>(categories.size());
+        for (Category category : categories) {
+            if (category.hasChildsOrItems()) {
+                result.add(category);
+            }
+        }
+        return result;
+    }
 
-	public Item findItem(final String id) {
-		if(items() != null && items().items() != null) {
-			return items().items().get(id);
-		}
-		return null;
-	}
+    public boolean isEmpty() {
+        final List<Category> filledCategories = getFilledCategories();
+        return filledCategories == null || filledCategories.size() == 0;
+    }
+
+    public Item findItem(final String id) {
+        if (items() != null && items().items() != null) {
+            return items().items().get(id);
+        }
+        return null;
+    }
+
+    public boolean hasItem(String id) {
+        return MenuHelper.hasItem(this, id);
+    }
 }
