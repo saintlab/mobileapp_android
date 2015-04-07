@@ -32,6 +32,8 @@ public class PushWooshService extends PushGCMIntentService {
 
 	public static final String ARG_ALERT = "alert";
 
+	public static final String ARG_BODY = "body";
+
 	public static final String EVENT_PUSH_RECEIVED = "PUSH_RECEIVED";
 
 	private static final String TAG = PushWooshService.class.getSimpleName();
@@ -51,11 +53,49 @@ public class PushWooshService extends PushGCMIntentService {
 	@Override
 	protected void onMessage(final Context context, final Intent intent) {
 		Log.d(TAG, "onMessage : " + intent);
-		showWebNotification(context, intent);
+		if(Boolean.TRUE.toString().equals(intent.getStringExtra("show_table_orders"))) {
+			showNotification(context, intent);
+		} else {
+			showWishNotification(context, intent);
+		}
+	}
+
+	private void showWishNotification(final Context context, final Intent intent) {
+		String title = getString(R.string.app_name);
+		String info = getString(R.string.notification_tap_to_open_omnom);
+
+		try {
+			final JSONObject json = new JSONObject(intent.getStringExtra(ARG_ANDROID_PAYLOAD));
+			final JSONObject objAlert = json.getJSONObject(ARG_ALERT);
+			info = objAlert.optString(ARG_BODY, info);
+		} catch(JSONException e) {
+			Log.e(TAG, "showNotification", e);
+		}
+
+		reportPushReceived(context, intent);
+
+		NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+
+		final Intent notifIntent = new Intent(Intent.ACTION_MAIN);
+		notifIntent.setClass(context, EnteringActivity.class);
+		notifIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		notifIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+		final Notification notification = builder.setAutoCancel(true)
+		                                         .setContentTitle(title)
+		                                         .setContentText(info)
+		                                         .setSmallIcon(R.drawable.ic_app)
+		                                         .setDefaults(Notification.DEFAULT_ALL)
+		                                         .setTicker(title)
+		                                         .setContentIntent(PendingIntent.getActivity(context, 0, notifIntent, 0))
+		                                         .setStyle(new NotificationCompat.BigTextStyle().bigText(info))
+		                                         .build();
+
+		nm.notify(0, notification);
 	}
 
 	private void showNotification(final Context context, final Intent intent) {
-
 		String title = getString(R.string.app_name);
 		String info = getString(R.string.notification_tap_to_open_omnom);
 
