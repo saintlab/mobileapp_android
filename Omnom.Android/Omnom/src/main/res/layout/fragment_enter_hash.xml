@@ -14,11 +14,7 @@
 
     <ImageButton
         android:id="@+id/btn_close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_horizontal_margin"
-        android:background="@drawable/ic_cross_black"
-        android:contentDescription="@null"/>
+        style="@style/Button.Fragment.Bottom.Close" />
 
     <TextView
         android:id="@+id/txt_enter_hash"
@@ -29,7 +25,7 @@
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:text="@string/enter_hash"
         android:textAppearance="?android:textAppearanceMedium"
-        android:textColor="@color/qr_hint_color"/>
+        android:textColor="@color/qr_hint_color" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -52,7 +48,7 @@
                 android:lines="1"
                 android:text="http:/"
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="@color/enter_hash_color"/>
+                android:textColor="@color/enter_hash_color" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -62,7 +58,7 @@
                 android:lines="1"
                 android:text="/"
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="@color/enter_hash_color"/>
+                android:textColor="@color/enter_hash_color" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -72,7 +68,7 @@
                 android:lines="1"
                 android:text="omnom.menu"
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="@color/enter_hash_color"/>
+                android:textColor="@color/enter_hash_color" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -82,7 +78,7 @@
                 android:lines="1"
                 android:text="/"
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="@color/enter_hash_color"/>
+                android:textColor="@color/enter_hash_color" />
             <!-- end https://github.com/saintlab/mobileapp_android/issues/291 -->
 
             <EditText
@@ -97,7 +93,7 @@
                 android:minEms="2"
                 android:paddingRight="@dimen/activity_horizontal_margin_small"
                 android:singleLine="true"
-                android:textAppearance="?android:textAppearanceMedium"/>
+                android:textAppearance="?android:textAppearanceMedium" />
 
         </LinearLayout>
 
@@ -108,7 +104,7 @@
             android:layout_alignLeft="@+id/enter_hash"
             android:layout_alignRight="@+id/enter_hash"
             android:layout_below="@+id/enter_hash"
-            android:background="@drawable/hash_underline"/>
+            android:background="@drawable/hash_underline" />
 
         <ProgressBar
             android:id="@+id/progress_bar"
@@ -117,7 +113,7 @@
             android:layout_alignBottom="@+id/enter_hash"
             android:layout_alignTop="@+id/enter_hash"
             android:layout_toRightOf="@+id/enter_hash"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/img_success"
@@ -128,7 +124,7 @@
             android:layout_toRightOf="@+id/enter_hash"
             android:contentDescription="@null"
             android:src="@drawable/ic_action_accept"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </RelativeLayout>
 
