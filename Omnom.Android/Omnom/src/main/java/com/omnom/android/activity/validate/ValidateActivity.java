@@ -941,7 +941,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 						final List<DemoTableData> demoTableResponse = listMenuResponsePair.first;
 						final DemoTableData data = demoTableResponse.get(0);
 						onDataLoaded(data.getRestaurant(), data.getTable());
-						bindMenuData();
 					}
 				}, onError);
 				mFirstRun = false;
@@ -1075,12 +1074,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	}
 
 	protected void bindMenuData() {
-		if(mRestaurant == null) {
-			final IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Restaurant cannot be null");
-			illegalArgumentException.printStackTrace();
-			throw illegalArgumentException;
-		}
-
 		if(RestaurantHelper.isMenuEnabled(mRestaurant) && !mIsDemo) {
 			mViewHelper.bindMenuData(mMenu, mOrderHelper);
 		} else {
