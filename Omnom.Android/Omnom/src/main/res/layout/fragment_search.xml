@@ -3,20 +3,20 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/standard_padding"
-    android:paddingRight="@dimen/standard_padding"
-    android:background="@android:color/white"
-    >
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:background="@android:color/white">
 
-    <EditText android:id="@+id/edit_search"
+    <EditText
+        android:id="@+id/edit_search"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?android:listPreferredItemHeight"
         android:paddingTop="@dimen/standard_padding"
         android:paddingBottom="@dimen/standard_padding"
         android:hint="Название блюда..."
         android:background="@android:color/white"
         android:drawableLeft="@drawable/ic_search_black"
-        android:drawablePadding="@dimen/drawable_padding_default"/>
+        android:drawablePadding="@dimen/drawable_padding_default" />
 
     <ImageView
         android:id="@+id/btn_close"
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/edit_search"
         android:headerDividersEnabled="true"
-        android:footerDividersEnabled="true"/>
+        android:footerDividersEnabled="true" />
 
     <TextView
         android:id="@+id/empty"
@@ -48,7 +48,6 @@
         android:text="@string/menu_search_undefined"
         android:textColor="@color/qr_hint_color"
         android:textSize="@dimen/font_medium"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
 
 </RelativeLayout>
