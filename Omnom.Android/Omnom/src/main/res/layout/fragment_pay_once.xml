@@ -1,5 +1,4 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,13 +9,9 @@
 
     <ImageButton
         android:id="@+id/btn_close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_horizontal_margin"
-        android:background="@drawable/ic_cross_black"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"
-        android:contentDescription="@null"/>
+        style="@style/Button.Fragment.Bottom.Close" />
 
     <Button
         android:id="@+id/btn_pay"
@@ -30,7 +25,7 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:textAppearance="?android:textAppearanceMedium"
-        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -48,7 +43,7 @@
             android:text="@string/sms_notifications_off"
             android:textSize="@dimen/pay_once_font_size"
             android:gravity="center"
-            android:textColor="@color/profile_hint"/>
+            android:textColor="@color/profile_hint" />
 
         <TextView
             android:id="@+id/txt_pay_once"
@@ -58,7 +53,7 @@
             android:text="@string/pay_once"
             android:textSize="@dimen/pay_once_font_size"
             android:gravity="center"
-            android:textColor="@color/profile_hint"/>
+            android:textColor="@color/profile_hint" />
 
     </LinearLayout>
 

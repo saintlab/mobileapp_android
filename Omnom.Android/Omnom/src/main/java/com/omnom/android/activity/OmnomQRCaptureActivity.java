@@ -40,6 +40,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import retrofit.http.HEAD;
 import rx.Subscription;
 import rx.functions.Func1;
 
