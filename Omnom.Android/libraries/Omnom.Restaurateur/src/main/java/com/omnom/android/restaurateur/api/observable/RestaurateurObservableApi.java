@@ -107,10 +107,7 @@ public interface RestaurateurObservableApi {
 
 	public Observable<Config> getConfig();
 
-<<<<<<< HEAD
 	public Observable<SupportInfoResponse> getSupportInfo();
 
-=======
 	public Observable<WishResponse> wishes(String restId, WishRequest request);
->>>>>>> omnom/omnom_master_menu_merge
 }

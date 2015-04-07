@@ -126,12 +126,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 
 		if(BuildConfig.DEBUG && AndroidUtils.getDeviceId(this).equals(DEVICE_ID_GENYMOTION)) {
 			// findTable("http://www.riston.ru/wishes"); // mehico
-			// findTable("http://m.2gis.ru/os/"); // mehico
-<<<<<<< HEAD
-			findTable("http://b.snappr.net/kus4y"); // mehico
-=======
-			findTable("qr-code-for-0-lunch2gis"); // mehico
->>>>>>> omnom/omnom_master_menu_merge
+			findTable("http://m.2gis.ru/os/"); // mehico
 			// findTable("http://omnom.menu/qr/00e7232a4d9d2533e7fa503620c4431b"); // shashlikoff
 			return;
 		}
@@ -253,7 +248,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 							                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
 							                                             decodeResponse.getError()));
 						}
-						bindMenuData();
 						if(!TextUtils.isEmpty(decodeResponse.getError())) {
 							getErrorHelper().showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
 						} else {

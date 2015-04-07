@@ -47,14 +47,15 @@ import rx.functions.Func1;
  * Created by Ch3D on 14.11.2014.
  */
 public class OmnomQRCaptureActivity extends CaptureActivity
-									implements QrHintFragment.FragmentCloseListener,
-											   EditHashFragment.EnterHashPanelCloseListener,
-											   EditHashFragment.TableFoundListener,
-											   CameraManager.TorchListener {
+		implements QrHintFragment.FragmentCloseListener,
+		           EditHashFragment.EnterHashPanelCloseListener,
+		           EditHashFragment.TableFoundListener,
+		           CameraManager.TorchListener {
 
 	private static final String TAG = OmnomQRCaptureActivity.class.getSimpleName();
 
 	private static final String ENTER_HASH_PANEL = "enter_hash_panel";
+
 	private static final String QR_HINT = "qr_hint";
 
 	public static final int RESULT_RESTAURANT_FOUND = 2;
@@ -62,35 +63,6 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 	private static final int LAUNCH_DELAY = 2000;
 
 	private static final int SCAN_DELAY = 5000;
-
-	private class LaunchAnimationListener implements Animator.AnimatorListener {
-
-		private final View background;
-
-		public LaunchAnimationListener(final View background) {
-			this.background = background;
-		}
-
-		@Override
-		public void onAnimationStart(Animator animation) {
-
-		}
-
-		@Override
-		public void onAnimationEnd(Animator animation) {
-			ViewUtils.setVisible(background, false);
-		}
-
-		@Override
-		public void onAnimationCancel(Animator animation) {
-
-		}
-
-		@Override
-		public void onAnimationRepeat(Animator animation) {
-
-		}
-	}
 
 	public static void start(final BaseOmnomActivity activity, final int code) {
 		final Intent intent = getIntent(activity);
@@ -182,35 +154,31 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 		playLaunchAnimation();
 		final TextView txtHint = (TextView) findViewById(R.id.txt_hint);
 		AndroidUtils.clickify(txtHint, false, getString(R.string.navigate_qr_code_mark),
-				new ClickSpan.OnClickListener() {
-					@Override
-					public void onClick() {
-						showHint();
-					}
-				});
+		                      new ClickSpan.OnClickListener() {
+			                      @Override
+			                      public void onClick() {
+				                      showHint();
+			                      }
+		                      });
 
 		final View activityRootView = ((ViewGroup) getActivity().findViewById(android.R.id.content)).getChildAt(0);
 		activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(
 				AndroidUtils.createKeyboardListener(activityRootView, new AndroidUtils.KeyboardVisibilityListener() {
 					@Override
 					public void onVisibilityChanged(boolean isVisible) {
-						if (!isVisible) {
+						if(!isVisible) {
 							closeEnterHashPanel();
 						}
 					}
 				}));
-		
+
 	}
 
-<<<<<<< HEAD
-=======
-
->>>>>>> omnom/omnom_master_menu_merge
 	private void showEnterHashPanel() {
 		getSupportFragmentManager().beginTransaction()
-				.addToBackStack(null)
-				.replace(R.id.fragment_container, EditHashFragment.newInstance(), ENTER_HASH_PANEL)
-				.commit();
+		                           .addToBackStack(null)
+		                           .replace(R.id.fragment_container, EditHashFragment.newInstance(), ENTER_HASH_PANEL)
+		                           .commit();
 	}
 
 	private void closeEnterHashPanel() {
@@ -219,7 +187,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 			public void run() {
 				FragmentManager fragmentManager = getSupportFragmentManager();
 				Fragment fragment = fragmentManager.findFragmentByTag(ENTER_HASH_PANEL);
-				if (fragment != null) {
+				if(fragment != null) {
 					fragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss();
 					AndroidUtils.hideKeyboard(getActivity());
 					setNotScanningButtonVisible(true);
@@ -240,28 +208,16 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 				                  .setDuration(duration)
 				                  .start();
 				background.animate()
-<<<<<<< HEAD
-						.translationYBy(displayMetrics.heightPixels)
-						.setDuration(duration)
-						.start();
-=======
 				          .translationYBy(displayMetrics.heightPixels)
 				          .setDuration(duration)
-				          .setListener(new LaunchAnimationListener(background))
 				          .start();
->>>>>>> omnom/omnom_master_menu_merge
 
 				launchScanningDelayHandler();
 			}
 		});
 
-<<<<<<< HEAD
 		ViewTreeObserver viewTreeObserver = btnNotScanning.getViewTreeObserver();
-		if (viewTreeObserver.isAlive()) {
-=======
-		ViewTreeObserver viewTreeObserver = scanFrame.getViewTreeObserver();
 		if(viewTreeObserver.isAlive()) {
->>>>>>> omnom/omnom_master_menu_merge
 			viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 				@Override
 				public void onGlobalLayout() {
@@ -300,7 +256,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 
 	@OnClick(R.id.btn_flash_light)
 	protected void onBtnFlash() {
-		if (getTorchState()) {
+		if(getTorchState()) {
 			turnTheLightOff(true);
 		} else {
 			turnTheLightOn(true);
@@ -317,62 +273,25 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 
 	private void showHint() {
 		setNotScanningButtonVisible(false);
-        getSupportFragmentManager().beginTransaction()
-                .addToBackStack(null)
-                .setCustomAnimations(R.anim.slide_in_up,
-                        R.anim.slide_out_down,
-                        R.anim.slide_in_up,
-                        R.anim.slide_out_down)
-                .replace(R.id.fragment_container, QrHintFragment.newInstance(), QR_HINT)
-                .commit();
-    }
+		getSupportFragmentManager().beginTransaction()
+		                           .addToBackStack(null)
+		                           .setCustomAnimations(R.anim.slide_in_up,
+		                                                R.anim.slide_out_down,
+		                                                R.anim.slide_in_up,
+		                                                R.anim.slide_out_down)
+		                           .replace(R.id.fragment_container, QrHintFragment.newInstance(), QR_HINT)
+		                           .commit();
+	}
 
 	private void setNotScanningButtonVisible(final boolean isVisible) {
-<<<<<<< HEAD
-		if (isNotScanningButtonVisible() == isVisible) {
+		if(isNotScanningButtonVisible() == isVisible) {
 			return;
-		}
-		final int duration = getResources().getInteger(R.integer.not_scanning_animation_duration);
-		btnNotScanning.animate()
-				.translationYBy(btnNotScanning.getHeight() * (isVisible ? -1 : 1))
-				.setDuration(duration)
-				.start();
-=======
-		if(ViewUtils.isVisible(btnNotScanning) == isVisible) {
-			return;
-		}
-		if(isVisible) {
-			ViewUtils.setVisible(btnNotScanning, true);
 		}
 		final int duration = getResources().getInteger(R.integer.not_scanning_animation_duration);
 		btnNotScanning.animate()
 		              .translationYBy(btnNotScanning.getHeight() * (isVisible ? -1 : 1))
 		              .setDuration(duration)
-		              .setListener(new Animator.AnimatorListener() {
-			              @Override
-			              public void onAnimationStart(Animator animation) {
-
-			              }
-
-			              @Override
-			              public void onAnimationEnd(Animator animation) {
-				              if(!isVisible) {
-					              ViewUtils.setVisible(btnNotScanning, false);
-				              }
-			              }
-
-			              @Override
-			              public void onAnimationCancel(Animator animation) {
-
-			              }
-
-			              @Override
-			              public void onAnimationRepeat(Animator animation) {
-
-			              }
-		              })
 		              .start();
->>>>>>> omnom/omnom_master_menu_merge
 	}
 
 	private boolean isNotScanningButtonVisible() {
@@ -394,7 +313,7 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 	@Override
 	public void onTorchStateChange(boolean isTurnedOn) {
 		btnFlashLight.setImageResource(isTurnedOn ? R.drawable.ic_flashlight_off :
-									                R.drawable.ic_flashlight_on);
+				                               R.drawable.ic_flashlight_on);
 	}
 
 	@Override
@@ -403,19 +322,11 @@ public class OmnomQRCaptureActivity extends CaptureActivity
 	}
 
 	@Override
-<<<<<<< HEAD
-	public void onTableFound(String requestId, Restaurant restaurant) {
-		finish(requestId, restaurant);
-	}
-
-	private void finish(final String requestId, final Restaurant restaurant) {
-=======
 	public void onTableFound(String requestId, Restaurant restaurant, Menu menu) {
 		finish(requestId, restaurant, menu);
 	}
 
-	private void finish(final String requestId, final Restaurant restaurant, Menu menu) {
->>>>>>> omnom/omnom_master_menu_merge
+	private void finish(final String requestId, final Restaurant restaurant, final Menu menu) {
 		Intent data = new Intent();
 		data.putExtra(EXTRA_REQUEST_ID, requestId);
 		data.putExtra(EXTRA_RESTAURANT, restaurant);

@@ -219,19 +219,11 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void initUi() {
-<<<<<<< HEAD
         listenersSet = new ListenersSet(new PaymentEventListener(this),
                        new OrderCreateEventListener(this, this),
                        new OrderUpdateEventListener(this, this),
 		               new OrderCloseEventListener(this, this));
 		mPagerAdapter = new OrdersPagerAdapter(getSupportFragmentManager(), orders, requestId, bgColor);
-=======
-		listenersSet = new ListenersSet(new PaymentEventListener(this),
-		                                new OrderCreateEventListener(this, this),
-		                                new OrderUpdateEventListener(this, this),
-		                                new OrderCloseEventListener(this, this));
-		mPagerAdapter = new OrdersPagerAdaper(getSupportFragmentManager(), orders, requestId, bgColor);
->>>>>>> omnom/omnom_master_menu_merge
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 4.5);
 		mPager.setPageMargin(margin);

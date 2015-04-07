@@ -24,13 +24,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // auto-parcel
-<<<<<<< HEAD
-    compile 'com.github.frankiesardo:auto-parcel:0.2'
-    apt 'com.github.frankiesardo:auto-parcel-processor:0.2'
-=======
     compile 'com.github.frankiesardo:auto-parcel:' + auto_parcel_version
     apt 'com.github.frankiesardo:auto-parcel-processor:' + auto_parcel_version
->>>>>>> omnom/omnom_master_menu_merge
 
     compile project(':libraries:Omnom.Utils')
     compile project(':libraries:Omnom.Auth')

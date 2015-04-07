@@ -1,6 +1,7 @@
 package com.omnom.android.utils.view;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -11,16 +12,25 @@ import com.omnom.android.utils.R;
 public class ErrorEditText extends EditText {
 	private int mDefaultDrawableId = 0;
 
+	private ColorStateList mTextColors = null;
+
 	public ErrorEditText(Context context) {
 		super(context);
+		init();
 	}
 
 	public ErrorEditText(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		init();
 	}
 
 	public ErrorEditText(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		init();
+	}
+
+	private void init() {
+		mTextColors = getTextColors();
 	}
 
 	@Override
@@ -30,6 +40,17 @@ public class ErrorEditText extends EditText {
 
 	public void setError(boolean error) {
 		setBackgroundResource(error ? R.drawable.textfield_error_mtrl_alpha : getDefaultDrawable());
+		if(!error && mTextColors != null) {
+			setTextColor(mTextColors);
+		}
+	}
+
+	public void setError(boolean error, String errorText) {
+		if(error) {
+			setText(errorText);
+			setTextColor(getResources().getColor(R.color.error_red));
+		}
+		setError(error);
 	}
 
 	private int getDefaultDrawable() {

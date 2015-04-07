@@ -126,9 +126,15 @@
     <string name="title_activity_restaurant">RestaurantActivity</string>
     <string name="reserve_table">Бронировать\nстолик</string>
     <string name="to_the_bar">В бар</string>
-    <string name="im_inside_restaurant">За стол</string>
     <string name="make_an_order">Сделать\nзаказ\nобеда\nв офис</string>
     <string name="takeaway">Заказ\nна вынос</string>
+    <string name="to_bar">В бар</string>
+    <string name="im_inside_restaurant">За стол</string>
+    <string name="takeaway_order">Заказ на&#160;вынос</string>
+    <string name="lunch">Заказ обеда в&#160;офис</string>
+    <string name="orders_are_accepted_only_from_to">Мы принимаем заказы только\nс&#160;%1$s до&#160;%2$s</string>
+    <string name="order_will_be_waiting_for_you">Заказ будет ждать вас\n сегодня %1$s\nпо&#160;адресу\n%2$s</string>
+    <string name="order_will_be_delivered">Заказ будет доставлен по&#160;адресу\n%1$s\n&#160;%2$s %3$s %4$s\nориентировочно в&#160;%5$s</string>
     <string name="write_to_us">Напишите нам</string>
     <string name="didnt_find_restaurant">Не нашли любимое заведение?</string>
     <string name="navigate_qr_code">Наведите камеру\nна&#160;QR-код Omnom.\nЧто это такое?</string>
@@ -140,7 +146,7 @@
     <string name="enter_hash_url">http://omnom.menu/</string>
     <string name="omnom_works_here">Omnom работает здесь</string>
     <string name="send_feedback">Написать отзыв</string>
-    <string name="facebook_url_fb">fb://page/1548920272002383</string>
+    <string name="facebook_url_fb">fb://profile/1548920272002383</string>
     <string name="facebook_url_http">https://www.facebook.com/omnom.menu/</string>
 
     <string name="out_of_sale_title">Нет в продаже</string>
@@ -170,14 +176,12 @@
     <string name="change_table_mark">свой&#160;стол</string>
 
     <string name="attempt_to_perform_similar_payment">Повторная попытка оплаты счета</string>
-<<<<<<< HEAD
     <string name="feedback">Обратная связь</string>
     <string name="support">Звонок в тех.поддержку</string>
     <string name="facebook_title">facebook/Omnom</string>
     <string name="about_title">О ПРОГРАММЕ</string>
     <string name="table">Столик</string>
     <string name="bound_cards">Мои привязанные карты</string>
-=======
     <string name="your_order">Ваш заказ</string>
     <string name="title_activity_wish">WishActivity</string>
     <string name="wish_clear">Очистить</string>
@@ -189,5 +193,18 @@
     <string name="ready_orders_list">Табло готовых заказов</string>
     <string name="menu_search_undefined">Увы, но такого блюда\nнет в нашем меню</string>
     <string name="wish_footer_total">Итого:&#160;</string>
->>>>>>> omnom/omnom_master_menu_merge
+    <string name="order_lunch_in_the_office">Заказ обеда в офис</string>
+    <string name="wish_lunch_order_info">Доставка на&#160;%1$s по&#160;адресу:\n%2$s</string>
+    <string name="when">Когда</string>
+    <string name="where">Куда</string>
+    <string name="choose_when_you_want_to_pick_your_order">Выберите, когда надо доставить обед:</string>
+    <string name="choose_delivery_locations">Выберите офис, куда доставить обед:</string>
+    <string name="order_pick_date_related">%1$s (%2$s)</string>
+    <string name="order_date">на %1$s, %2$s</string>
+    <string name="select_address">Выберите адрес</string>
+    <string name="select_date">Выберите дату</string>
+    <string name="tomorrow">завтра</string>
+    <string name="Tomorrow">Завтра</string>
+    <string name="when_will_you_come">Когда вас ждать?</string>
+    <string name="subject_add_my_address">Добавьте мой адрес</string>
 </resources>

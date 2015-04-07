@@ -42,6 +42,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
+import com.omnom.android.entrance.TableEntranceData;
 import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
@@ -792,9 +793,6 @@ public class OrderFragment extends Fragment {
 				((OrdersActivity) getActivity()).close();
 			}
 		});
-		if(!mSingle) {
-			mHeader.setTitleBigDrawableRight(R.drawable.ic_modifier_group_dropdown);
-		}
 		ViewUtils.setVisible(mHeader, false);
 
 		if(mAnimate) {
@@ -841,8 +839,8 @@ public class OrderFragment extends Fragment {
 			reportFixedTips(tips, paymentDetails);
 		}
 		final OrdersActivity activity = (OrdersActivity) getActivity();
-<<<<<<< HEAD
-		CardsActivity.start(getActivity(), getOrder(), paymentDetails, mAccentColor, OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
+		CardsActivity.start(getActivity(), activity.getRestaurant(), mOrder, paymentDetails, mAccentColor, TableEntranceData.create(),
+		                    OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
 	}
 
 	private void reportWrongTips(final TipData tips, final BigDecimal amount) {
@@ -859,10 +857,6 @@ public class OrderFragment extends Fragment {
 		final MixPanelHelper mixPanelHelper = OmnomApplication.getMixPanelHelper(getActivity());
 		mixPanelHelper.track(MixPanelHelper.Project.ALL, "WRONG_TIPS_VALUE_FIXED", new Object[]{tips, paymentDetails});
 		mixPanelHelper.flush();
-=======
-		CardsActivity.start(getActivity(), activity.getRestaurant(), mOrder, paymentDetails, mAccentColor,
-		                    OrdersActivity.REQUEST_CODE_CARDS, activity.isDemo());
->>>>>>> omnom/omnom_master_menu_merge
 	}
 
 	private void initList() {
@@ -1153,13 +1147,8 @@ public class OrderFragment extends Fragment {
 		mAdapter.notifyDataSetChanged();
 		initFooter(true);
 		if(resetAmount) {
-<<<<<<< HEAD
 			updateAmount(StringUtils.formatCurrency(String.valueOf(decimalSeparator),
 													AmountHelper.format(getOrder().getAmountToPay())));
-=======
-			editAmount.setText(StringUtils.formatCurrency(String.valueOf(decimalSeparator),
-			                                              AmountHelper.format(mOrder.getAmountToPay())));
->>>>>>> omnom/omnom_master_menu_merge
 			updatePaymentTipsAmount(getEnteredAmount());
 		}
 	}

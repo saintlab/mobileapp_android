@@ -25,11 +25,8 @@ import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.UserProfileHelper;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
-<<<<<<< HEAD
 import com.omnom.android.fragment.ChangeTableFragment;
-=======
 import com.omnom.android.notifier.api.observable.NotifierObservableApi;
->>>>>>> omnom/omnom_master_menu_merge
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.SupportInfoResponse;
 import com.omnom.android.restaurateur.model.UserProfile;
@@ -39,11 +36,8 @@ import com.omnom.android.utils.drawable.RoundedDrawable;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
-<<<<<<< HEAD
-import com.omnom.android.utils.utils.AnimationUtils;
-=======
 import com.omnom.android.utils.utils.DialogUtils;
->>>>>>> omnom/omnom_master_menu_merge
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -53,17 +47,12 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
-<<<<<<< HEAD
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
-=======
-import rx.android.app.AppObservable;
-import rx.functions.Action1;
-import rx.functions.Func1;
->>>>>>> omnom/omnom_master_menu_merge
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
@@ -144,7 +133,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 	@OnClick(R.id.btn_feedback)
 	protected void onFeedback() {
-		AndroidUtils.sendFeedbackEmail(this, R.string.send_feedback);
+		AndroidUtils.sendFeedbackEmail(this, R.string.send_feedback, com.omnom.android.utils.R.string.email_subject_feedback);
 	}
 
 	@OnClick(R.id.btn_facebook)
@@ -152,7 +141,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 		try {
 			Intent facebookIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.facebook_url_fb)));
 			startActivity(facebookIntent);
-		} catch (ActivityNotFoundException e) {
+		} catch(ActivityNotFoundException e) {
 			Intent facebookIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.facebook_url_http)));
 			startActivity(facebookIntent);
 		}
@@ -171,14 +160,13 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 			ViewUtils.setVisible(delimiterTableNumber, false);
 		}
 
-<<<<<<< HEAD
 		updateUserImage(StringUtils.EMPTY_STRING);
 		final String token = getPreferences().getAuthToken(this);
 		if(TextUtils.isEmpty(token)) {
 			forwardToIntro();
 			return;
 		}
-		profileSubscription = AndroidObservable.bindActivity(this, getProfileObservable(token)).subscribe(
+		profileSubscription = AppObservable.bindActivity(this, getProfileObservable(token)).subscribe(
 				new Action1<Pair<UserResponse, SupportInfoResponse>>() {
 					@Override
 					public void call(Pair<UserResponse, SupportInfoResponse> response) {
@@ -187,37 +175,13 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 							((OmnomApplication) getApplication()).logout();
 							forwardToIntro();
 							return;
-=======
-		final UserProfile userProfile = OmnomApplication.get(getActivity()).getUserProfile();
-		if(userProfile != null && userProfile.getUser() != null) {
-			initUserData(userProfile.getUser(), userProfile.getImageUrl());
-		} else {
-			updateUserImage(StringUtils.EMPTY_STRING);
-			final String token = getPreferences().getAuthToken(this);
-			if(TextUtils.isEmpty(token)) {
-				forwardToIntro();
-				return;
-			}
-			profileSubscription = AppObservable.bindActivity(this, authenticator.getUser(token)).subscribe(
-					new Action1<UserResponse>() {
-						@Override
-						public void call(UserResponse response) {
-							if(response.hasError() && UserProfileHelper.hasAuthError(response)) {
-								((OmnomApplication) getApplication()).logout();
-								forwardToIntro();
-								return;
-							}
-							UserProfile profile = new UserProfile(response);
-							OmnomApplication.get(getActivity()).cacheUserProfile(profile);
-							initUserData(response.getUser(), profile.getImageUrl());
->>>>>>> omnom/omnom_master_menu_merge
 						}
 						UserProfile profile = new UserProfile(userResponse);
 						OmnomApplication.get(getActivity()).cacheUserProfile(profile);
 						initUserData(userResponse.getUser());
 
 						final SupportInfoResponse supportInfoResponse = response.second;
-						if (!supportInfoResponse.hasErrors()) {
+						if(!supportInfoResponse.hasErrors()) {
 							supportPhone = supportInfoResponse.getPhone();
 						}
 					}
@@ -342,17 +306,17 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.btn_bottom)
 	public void onLogout() {
 		final AlertDialog alertDialog = DialogUtils.showDialog(this, R.string.are_you_to_quit,
-                R.string.quit, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int which) {
-                        quit();
-                    }
-                }, R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int which) {
-                        dialog.dismiss();
-                    }
-                });
+		                                                       R.string.quit, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						quit();
+					}
+				}, R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						dialog.dismiss();
+					}
+				});
 		alertDialog.setCanceledOnTouchOutside(true);
 		final float btnTextSize = getResources().getDimension(R.dimen.font_normal);
 		final Button btn1 = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);

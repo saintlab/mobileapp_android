@@ -4,6 +4,12 @@ import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
 
+import com.omnom.android.entrance.BarEntranceData;
+import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.entrance.TableEntranceData;
+import com.omnom.android.entrance.TakeawayEntranceData;
+import com.omnom.android.menu.api.observable.MenuObservableApi;
+import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.restaurateur.R;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.schedule.DailySchedule;
@@ -12,6 +18,8 @@ import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import rx.Observable;
 
 /**
  * Created by Ch3D on 09.09.2014.
@@ -55,24 +63,10 @@ public class RestaurantHelper {
 	}
 
 	public static int getBackgroundColor(Restaurant restaurant) {
-<<<<<<< HEAD
-		final Decoration decoration = restaurant.decoration();
-		if (decoration != null) {
-			final String decorationBg = decoration.getBackgroundColor();
-			if (!decorationBg.startsWith(COLOR_PREFIX)) {
-				return Color.parseColor(COLOR_PREFIX + decorationBg);
-			} else {
-				return Color.parseColor(decorationBg);
-			}
-		}
-
-		return Color.BLACK;
-=======
 		if(restaurant == null || restaurant.decoration() == null) {
 			return Color.BLACK;
 		}
 		return getBackgroundColor(restaurant.decoration().getBackgroundColor());
->>>>>>> omnom/omnom_master_menu_merge
 	}
 
 	public static int getBackgroundColor(String decorationBg) {
@@ -85,9 +79,6 @@ public class RestaurantHelper {
 
 	public static String getOpenedTime(Context context, Restaurant restaurant, int weekDay) {
 		final DailySchedule dailySchedule = getDailySchedule(restaurant, weekDay);
-		if (dailySchedule == null) {
-			return StringUtils.EMPTY_STRING;
-		}
 		if(dailySchedule.isClosed()) {
 			return context.getString(R.string.restaurant_closed);
 		}
@@ -104,7 +95,14 @@ public class RestaurantHelper {
 	 * @see java.util.Calendar#SUNDAY
 	 */
 	public static DailySchedule getDailySchedule(Restaurant restaurant, int weekDay) {
-		final Schedules schedules = restaurant.schedules();
+		return getDailySchedule(restaurant.schedules(), weekDay);
+	}
+
+	public static DailySchedule getOrderSchedule(Restaurant restaurant, int weekDay) {
+		return getDailySchedule(restaurant.orderSchedules(), weekDay);
+	}
+
+	private static DailySchedule getDailySchedule(final Schedules schedules, int weekDay) {
 		if(schedules == null) {
 			return DailySchedule.NULL;
 		}
@@ -140,11 +138,25 @@ public class RestaurantHelper {
 		return restaurant.isBar();
 	}
 
+	public static boolean isTakeAway(final Restaurant restaurant) {
+		if(restaurant == null) {
+			return false;
+		}
+		return restaurant.isTakeAway();
+	}
+
 	public static String getBarUri(final Restaurant restaurant) {
 		if(restaurant == null) {
 			return StringUtils.EMPTY_STRING;
 		}
 		return restaurant.ordersPaidUrl();
+	}
+
+	public static Observable<MenuResponse> getMenuObservable(MenuObservableApi api, Restaurant restaurant) {
+		if(restaurant == null || !RestaurantHelper.isMenuEnabled(restaurant)) {
+			return Observable.just(MenuResponse.EMPTY);
+		}
+		return api.getMenu(restaurant.id());
 	}
 
 	public static boolean isPromoEnabled(final Restaurant restaurant) {
@@ -210,5 +222,15 @@ public class RestaurantHelper {
 
 	public static boolean hasTakeaway(final Restaurant restaurant) {
 		return false;
+	}
+
+	public static EntranceData getEntranceData(final Restaurant restaurant) {
+		if(isBar(restaurant)) {
+			return BarEntranceData.create();
+		}
+		if(isTakeAway(restaurant)) {
+			return TakeawayEntranceData.create();
+		}
+		return TableEntranceData.create();
 	}
 }

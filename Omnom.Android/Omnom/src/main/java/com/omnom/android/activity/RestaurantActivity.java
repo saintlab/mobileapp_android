@@ -1,11 +1,14 @@
 package com.omnom.android.activity;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -15,24 +18,29 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
+import com.omnom.android.entrance.TakeawayEntranceData;
+import com.omnom.android.fragment.delivery.DeliveryDetailsFragment;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.restaurant.schedule.DailySchedule;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.ViewUtils;
-import com.omnom.android.view.stateful.StatefulTextView;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
 
 import static butterknife.ButterKnife.findById;
 
-public class RestaurantActivity extends BaseOmnomActivity {
+public class RestaurantActivity extends BaseOmnomFragmentActivity {
 
 	public static void start(BaseOmnomActivity activity, Restaurant restaurant, final int topTranslation) {
 		start(activity, restaurant, false, topTranslation);
@@ -74,9 +82,6 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	@InjectView(R.id.btn_call)
 	protected Button btnCall;
 
-	@InjectView(R.id.txt_im_inside)
-	protected StatefulTextView txtImInside;
-
 	@InjectView(R.id.cover)
 	protected LoaderView viewCover;
 
@@ -86,9 +91,6 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	@InjectView(R.id.txt_bar)
 	protected TextView txtBar;
 
-	@InjectView(R.id.txt_order)
-	protected TextView txtOrder;
-
 	@InjectView(R.id.txt_im_inside)
 	protected TextView txtImInside;
 
@@ -97,6 +99,9 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@InjectView(R.id.main_content)
 	protected View viewMain;
+
+	@InjectView(R.id.txt_lunch)
+	protected View txtLunch;
 
 	private Restaurant mRestaurant;
 
@@ -112,6 +117,7 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.txt_bar)
 	protected void doBar() {
+		// TODO: BarEntranceData.create("#orderNumber", "#pinCode")
 		if(!mFinishing) {
 			mEnterBar = true;
 			scrollView.smoothScrollTo(0, 0);
@@ -131,9 +137,39 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.txt_im_inside)
 	protected void doImInside() {
+		// TODO:
+		//if(BuildConfig.DEBUG) {
+		//	// DeliveryDetailsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mRestaurant);
+		//	// TakeawayTimeFragment.show(getSupportFragmentManager(), R.id.fragment_container);
+		//	return;
+		//}
 		if(!mFinishing) {
-			txtImInside.setKeepStatePressed(true);
 			ValidateActivityShortcut.start(this);
+		}
+	}
+
+	@OnClick(R.id.txt_lunch)
+	protected void doOrderLunch() {
+		if(!mFinishing) {
+			if(validateOrderTime()) {
+				DeliveryDetailsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mRestaurant);
+			}
+		}
+	}
+
+	@OnClick(R.id.txt_takeaway)
+	protected void doTakeAway() {
+		if(!mFinishing) {
+			if(validateOrderTime()) {
+				// TODO: create TakeawayEntranceData and pass to ValidateActivity intent (Extras.EXTRA_ENTRANCE_DATA)
+				final Date orderDate = new Date();
+				final String takeawayAfter = "????? 1.5 ????";
+				final String takeawayAddress = "??????? 13";
+				BaseOrderAcceptedActivity.start(RestaurantActivity.this,
+				                                mRestaurant,
+				                                TakeawayEntranceData.create(orderDate, takeawayAddress, takeawayAfter),
+				                                0);
+			}
 		}
 	}
 
@@ -141,13 +177,6 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	protected void doCall() {
 		if(!mFinishing) {
 			AndroidUtils.openDialer(this, mRestaurant.phone());
-		}
-	}
-
-	@OnClick(R.id.txt_order)
-	protected void doMakeOrder() {
-		if(!mFinishing) {
-			// TODO: Implement
 		}
 	}
 
@@ -233,7 +262,7 @@ public class RestaurantActivity extends BaseOmnomActivity {
 
 		ViewUtils.setVisible(txtBar, RestaurantHelper.hasBar(mRestaurant));
 		ViewUtils.setVisible(txtImInside, RestaurantHelper.hasTableOrder(mRestaurant));
-		ViewUtils.setVisible(txtOrder, RestaurantHelper.hasPreOrder(mRestaurant));
+		ViewUtils.setVisible(txtLunch, RestaurantHelper.hasPreOrder(mRestaurant));
 		ViewUtils.setVisible(txtTakeaway, RestaurantHelper.hasTakeaway(mRestaurant));
 
 		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
@@ -258,14 +287,30 @@ public class RestaurantActivity extends BaseOmnomActivity {
 	}
 
 	@Override
-	protected void onStart() {
-		super.onStart();
-		txtImInside.setKeepStatePressed(false);
-		txtImInside.setPressed(false);
-	}
-
-	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_restaurant;
 	}
+
+	private boolean validateOrderTime() {
+		final int weekDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+		final DailySchedule dailySchedule = RestaurantHelper.getOrderSchedule(mRestaurant, weekDay);
+		if(dailySchedule.isClosed()) {
+			showScheduleDialog(dailySchedule.getOpenTime(), dailySchedule.getCloseTime());
+		}
+		return !dailySchedule.isClosed();
+	}
+
+	private void showScheduleDialog(final String from, final String to) {
+		final String message = getString(R.string.orders_are_accepted_only_from_to, from, to);
+		final AlertDialog dialog = DialogUtils.showDialog(this, message, R.string.ok,
+		                                                  new DialogInterface.OnClickListener() {
+			                                                  @Override
+			                                                  public void onClick(DialogInterface dialog, int which) {
+				                                                  dialog.dismiss();
+			                                                  }
+		                                                  });
+		TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
+		messageView.setGravity(Gravity.CENTER);
+	}
+
 }

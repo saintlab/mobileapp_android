@@ -2,6 +2,7 @@ package com.omnom.android.restaurateur.model.restaurant;
 
 import com.google.gson.annotations.Expose;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,20 +10,21 @@ import java.util.List;
  */
 public class WishRequestItem {
 	@Expose
-	public String id;
+	private String id;
 
 	@Expose
-	public int quantity;
+	private int quantity;
 
-	public List<ModifierRequestItem> modifiers;
+	private List<ModifierRequestItem> modifiers;
 
 	public WishRequestItem() {
-
+		modifiers = new ArrayList<ModifierRequestItem>();
 	}
 
 	public WishRequestItem(String id, int quantity) {
 		this.id = id;
 		this.quantity = quantity;
+		modifiers = new ArrayList<ModifierRequestItem>();
 	}
 
 	public List<ModifierRequestItem> getModifiers() {

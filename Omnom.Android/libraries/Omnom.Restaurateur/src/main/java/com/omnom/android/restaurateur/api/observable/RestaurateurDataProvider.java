@@ -206,13 +206,13 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	}
 
 	@Override
-<<<<<<< HEAD
 	public Observable<SupportInfoResponse> getSupportInfo() {
 		return mDataService.getSupportInfo().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-=======
+	}
+
+	@Override
 	public Observable<WishResponse> wishes(final String restId, final WishRequest request) {
 		return mDataService.wishes(restId, request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
->>>>>>> omnom/omnom_master_menu_merge
 	}
 
 	@Override

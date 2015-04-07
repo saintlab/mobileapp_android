@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.omnom.android.BuildConfig;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.PaymentChecker;
 import com.omnom.android.R;
@@ -26,6 +27,11 @@ import com.omnom.android.acquiring.mailru.model.MailRuExtra;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
+import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.entrance.BarEntranceData;
+import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.entrance.TableEntranceData;
+import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
@@ -66,7 +72,7 @@ import rx.functions.Action1;
 /**
  * Created by mvpotter on 24/11/14.
  */
-public class PaymentProcessActivity extends BaseOmnomActivity implements SilentPaymentEventListener.PaymentListener {
+public class PaymentProcessActivity extends BaseOmnomModeSupportActivity implements SilentPaymentEventListener.PaymentListener {
 
 	public static final int SIMILAR_PAYMENTS_TIMEOUT = 60 * 1000;
 
@@ -78,7 +84,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final Order order, CardInfo cardInfo, final boolean isDemo,
-	                         final Restaurant restaurant) {
+	                         final Restaurant restaurant, EntranceData entranceData) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
 		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(restaurant));
@@ -87,12 +93,13 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		intent.putExtra(Extras.EXTRA_PAYMENT_TYPE, MailRuExtra.PAYMENT_TYPE_ORDER);
 		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
+		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, entranceData);
 		activity.startActivityForResult(intent, code);
 	}
 
 	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
 	                         final UserOrder order, CardInfo cardInfo, WishResponse wishResponse, final boolean isDemo,
-	                         final Restaurant restaurant) {
+	                         final Restaurant restaurant, EntranceData entranceData) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
 		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(restaurant));
@@ -102,6 +109,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
 		intent.putExtra(Extras.EXTRA_WISH_RESPONSE, wishResponse);
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
+		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, entranceData);
 		activity.startActivityForResult(intent, code);
 	}
 
@@ -409,6 +417,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	private void onPayOk(final AcquiringPollingResponse response) {
 		Log.d(TAG, "status = " + response.getStatus());
+
 		reportMixPanelSuccess();
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
@@ -417,11 +426,18 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 				if(mIsDemo) {
 					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mDetails.getAmount(), mDetails.getTip());
 				} else {
-					if(mWishResponse != null) {
-						OrderAcceptedActivity.start(getActivity(), mRestaurant, mWishResponse, REQUEST_THANKS, mAccentColor);
-					} else {
+					if(mEntranceData instanceof TableEntranceData) {
 						ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
+					} else {
+						if(mEntranceData instanceof BarEntranceData) {
+							final EntranceData barEntranceData = BarEntranceData.create(mWishResponse);
+							BaseOrderAcceptedActivity.start(PaymentProcessActivity.this, mRestaurant, barEntranceData, REQUEST_THANKS);
+						} else {
+							// TODO: fill appropriate entrance data fields if necessary
+							BaseOrderAcceptedActivity.start(PaymentProcessActivity.this, mRestaurant, mEntranceData, REQUEST_THANKS);
+						}
 					}
+					overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 				}
 				overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 			}
@@ -443,7 +459,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	}
 
 	private void reportMixPanelSuccess() {
-		if(!mIsDemo) {
+		if(!mIsDemo && !BuildConfig.DEBUG) {
 			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 			                          new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
 			getMixPanelHelper().trackRevenue(MixPanelHelper.Project.OMNOM,
@@ -452,7 +468,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 	}
 
 	private void reportMixPanelFail(final AcquiringResponseError error) {
-		if(!mIsDemo) {
+		if(!mIsDemo && !BuildConfig.DEBUG) {
 			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 			                          new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
 			                                                   mCardInfo, error));
@@ -479,6 +495,7 @@ public class PaymentProcessActivity extends BaseOmnomActivity implements SilentP
 
 	@Override
 	protected void handleIntent(Intent intent) {
+		super.handleIntent(intent);
 		mRestaurant = intent.getParcelableExtra(Extras.EXTRA_RESTAURANT);
 		mAccentColor = intent.getIntExtra(Extras.EXTRA_ACCENT_COLOR, Color.WHITE);
 		mDetails = intent.getParcelableExtra(EXTRA_PAYMENT_DETAILS);

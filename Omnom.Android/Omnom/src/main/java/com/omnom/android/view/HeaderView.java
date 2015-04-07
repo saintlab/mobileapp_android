@@ -1,7 +1,6 @@
 package com.omnom.android.view;
 
 import android.content.Context;
-import android.support.annotation.DrawableRes;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,7 +80,7 @@ public class HeaderView extends RelativeLayout {
 		setClickable(true);
 
 		ViewTreeObserver viewTreeObserver = txtTitleBig.getViewTreeObserver();
-		if(viewTreeObserver.isAlive()) {
+		if (viewTreeObserver.isAlive()) {
 			viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 				@Override
 				public void onGlobalLayout() {
@@ -133,14 +132,9 @@ public class HeaderView extends RelativeLayout {
 		setButton(btnLeft, resId, listener);
 	}
 
-	public void setTitleBigDrawableRight(final @DrawableRes int resId) {
-		txtTitleBig.setCompoundDrawablePadding(getResources().getDimensionPixelOffset(R.dimen.drawable_padding_small));
-		txtTitleBig.setCompoundDrawablesWithIntrinsicBounds(0, 0, resId, 0);
-	}
-
 	private void updateTitleRules() {
 		LayoutParams layoutParams = (LayoutParams) txtTitleBig.getLayoutParams();
-		if(btnRight.getVisibility() == VISIBLE && ViewUtils.intersect(txtTitleBig, btnRight)) {
+		if (btnRight.getVisibility() == VISIBLE && ViewUtils.intersect(txtTitleBig, btnRight)) {
 			layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
 			layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
 			layoutParams.addRule(RelativeLayout.LEFT_OF, R.id.btn_right);

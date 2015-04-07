@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -15,10 +16,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.omnom.android.R;
-import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.entrance.TakeawayEntranceData;
 import com.omnom.android.adapter.WishAdapter;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
+import com.omnom.android.fragment.takeaway.TakeawayTimeFragment;
+import com.omnom.android.fragment.takeaway.TakeawayTimePickedEvent;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.Modifier;
@@ -59,8 +64,8 @@ import rx.functions.Action1;
 import static com.omnom.android.fragment.OrderFragment.PaymentDetails;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
-public class WishActivity extends BaseOmnomFragmentActivity implements View.OnClickListener,
-                                                                       ItemClickSupport.OnItemLongClickListener {
+public class WishActivity extends BaseOmnomModeSupportActivity implements View.OnClickListener,
+                                                                          ItemClickSupport.OnItemLongClickListener {
 
 	public static final int RESULT_CLEARED = 1;
 
@@ -70,13 +75,15 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 
 	public static final int RESULT_ORDER_DONE = 8;
 
-	public static void start(OmnomActivity activity, Restaurant restaurant, TableDataResponse table, Menu menu, UserOrder order,
+	public static void start(OmnomActivity activity, Restaurant restaurant, TableDataResponse table,
+	                         Menu menu, UserOrder order, EntranceData entranceData,
 	                         int code) {
 		final Intent intent = new Intent(activity.getActivity(), WishActivity.class);
 		intent.putExtra(EXTRA_ORDER, order);
 		intent.putExtra(EXTRA_TABLE, table);
 		intent.putExtra(EXTRA_RESTAURANT, restaurant);
 		intent.putExtra(EXTRA_RESTAURANT_MENU, menu);
+		intent.putExtra(EXTRA_ENTRANCE_DATA, entranceData);
 		activity.startForResult(intent, R.anim.slide_in_up, R.anim.nothing, code);
 	}
 
@@ -120,12 +127,18 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		final WishRequestItem item = new WishRequestItem(dish.id(), data.amount());
 		if(dish.modifiers() != null && dish.modifiers().size() > 0) {
 			for(Modifier modifier : dish.modifiers()) {
-				if(modifier != null) {
-					item.modifiers.add(new ModifierRequestItem(modifier.id()));
+				if(modifier != null && !TextUtils.isEmpty(modifier.id())) {
+					item.getModifiers().add(new ModifierRequestItem(modifier.id()));
 				}
 			}
 		}
 		return item;
+	}
+
+	private static WishRequest createWishRequest(final UserOrder order, final int time) {
+		final WishRequest wishRequest = createWishRequest(order);
+		wishRequest.setTime(time);
+		return wishRequest;
 	}
 
 	@InjectView(android.R.id.list)
@@ -210,7 +223,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		ViewUtils.setVisible(mPanelBottom, !isBar);
 		ViewUtils.setVisible(mPanelBottomBar, isBar);
 		ViewUtils.setVisible(mProgressBar, false);
-		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, this);
+		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, mEntranceData, this);
 		mLayoutManager = new LinearLayoutManager(this);
 		mList.setHasFixedSize(true);
 		mList.setLayoutManager(mLayoutManager);
@@ -225,7 +238,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 		api.getRecommendations(mTable.getRestaurantId()).subscribe(new Action1<Collection<OrderItem>>() {
 			@Override
 			public void call(final Collection<OrderItem> response) {
-				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, WishActivity.this);
+				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, mEntranceData, WishActivity.this);
 				mAdapter = adapter;
 				mList.swapAdapter(mAdapter, true);
 				ViewUtils.setVisible(mProgressBar, false);
@@ -279,9 +292,39 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 	private void doWish() {
 		if(RestaurantHelper.isBar(mRestaurant)) {
 			doWishBar();
+		} else if(mEntranceData instanceof TakeawayEntranceData) {
+			doAskAboutTime();
 		} else {
 			doWishDefault();
 		}
+	}
+
+	private void doAskAboutTime() {
+		TakeawayTimeFragment.show(getSupportFragmentManager(), R.id.fragment_container);
+	}
+
+	@Subscribe
+	public void onTakeawayTimePicked(TakeawayTimePickedEvent event) {
+		AnimationUtils.animateAlpha(mProgressBar, true);
+		final WishRequest wishRequest = createWishRequest(mOrder, event.getTimeValue());
+		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1<WishResponse>() {
+			@Override
+			public void call(final WishResponse wishResponse) {
+				final PaymentDetails paymentDetails = new PaymentDetails(2.0,
+				                                                         //mOrder.getTotalPrice().doubleValue(),
+				                                                         0,
+				                                                         TipsWay.DEFAULT, 0,
+				                                                         SplitWay.WASNT_USED);
+				CardsActivity.start(WishActivity.this,
+				                    mRestaurant,
+				                    mOrder,
+				                    wishResponse,
+				                    mEntranceData,
+				                    paymentDetails,
+				                    RestaurantHelper.getBackgroundColor(mRestaurant),
+				                    REQUEST_CODE_WISH_LIST);
+			}
+		}, OmnomObservable.loggerOnError(TAG));
 	}
 
 	@Override
@@ -363,6 +406,7 @@ public class WishActivity extends BaseOmnomFragmentActivity implements View.OnCl
 				                    mRestaurant,
 				                    mOrder,
 				                    wishResponse,
+				                    mEntranceData,
 				                    paymentDetails,
 				                    RestaurantHelper.getBackgroundColor(mRestaurant),
 				                    REQUEST_CODE_WISH_LIST);

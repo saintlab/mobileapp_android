@@ -31,8 +31,8 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 		return intent;
 	}
 
-	public static void start(BaseActivity context) {
-		start(context, R.anim.slide_in_right, R.anim.slide_out_left, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
+	public static void start(BaseFragmentActivity activity) {
+		start(activity, R.anim.slide_out_left, R.anim.slide_in_right, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
 
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
@@ -50,7 +50,6 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 		TableDataResponse table = RestaurantHelper.getTable(restaurant);
 		reportMixPanel(requestId, OnTableMixpanelEvent.METHOD_HASH, table);
 		mMenu = menu;
-		bindMenuData();
 		onDataLoaded(restaurant, table, RestaurantHelper.hasOrders(restaurant), requestId);
 	}
 

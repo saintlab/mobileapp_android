@@ -39,6 +39,11 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_WISH_RESPONSE = "com.omnom.android.wish.response";
 	public static final String EXTRA_TYPE = "com.omnom.android.type";
 	public static final String EXTRA_ORDER = "com.omnom.android.order";
+	public static final String EXTRA_ORDER_TIME = "com.omnom.android.order.time";
+	public static final String EXTRA_DELIVERY_ADDRESS = "com.omnom.android.delivery.address";
+	public static final String EXTRA_DELIVERY_TIME = "com.omnom.android.delivery.time";
+	public static final String EXTRA_TAKEAWAY_ADDRESS = "com.omnom.android.takeaway.address";
+	public static final String EXTRA_TAKEAWAY_AFTER = "com.omnom.android.takeaway.after";
 	public static final String EXTRA_USER_ORDER = "com.omnom.android.wish.order";
 	public static final String EXTRA_ORDER_DATA = "com.omnom.android.order.data";
 	public static final String EXTRA_PAYMENT_DETAILS = "com.omnom.android.payment.details";
@@ -56,6 +61,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_TRANSLATION_BUTTON = "com.omnom.android.extra.translation.btn";
 	public static final String EXTRA_TITLE_SIZE = "com.omnom.android.extra.title.height";
 	public static final String EXTRA_PIVOT_Y = "com.omnom.android.position.y";
+	public static final String EXTRA_ENTRANCE_DATA = "com.omnom.android.entrance.data";
 
 	public static final String EXTRA_URI = "com.omnom.android.uri";
 

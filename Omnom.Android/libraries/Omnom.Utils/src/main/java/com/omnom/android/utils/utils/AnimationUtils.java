@@ -12,12 +12,9 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-<<<<<<< HEAD
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-=======
 import android.widget.TextView;
->>>>>>> omnom/omnom_master_menu_merge
 
 import com.omnom.android.utils.R;
 
@@ -355,7 +352,6 @@ public class AnimationUtils {
 		});
 		va.start();
 	}
-<<<<<<< HEAD
 
 	public static void smoothScrollToPositionFromTop(final AbsListView view, final int position, final int duration, final Runnable callback) {
 		View child = getChildAtPosition(view, position);
@@ -408,7 +404,4 @@ public class AnimationUtils {
 			return null;
 		}
 	}
-
-=======
->>>>>>> omnom/omnom_master_menu_merge
 }

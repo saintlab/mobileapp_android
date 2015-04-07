@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <dimen name="order_items_list_height_collapsed">240dp</dimen>
     <dimen name="order_list_trasnlation_active">-240dp</dimen>
     <dimen name="order_payment_translation_y">0dp</dimen>
@@ -21,7 +22,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="drawable_padding_default">8dp</dimen>
-    <dimen name="drawable_padding_small">4dp</dimen>
     <dimen name="restaurant_cover_height_small">144dp</dimen>
     <dimen name="restaurant_cover_height_large">216dp</dimen>
     <dimen name="restaurant_distance_padding">12dp</dimen>
@@ -40,6 +40,7 @@
 
     <dimen name="image_button_size">48dp</dimen>
     <dimen name="wish_button_size">40dp</dimen>
+    <dimen name="takeaway_picker_height">196dp</dimen>
 
     <dimen name="btn_cancel_size">62dp</dimen>
     <dimen name="btn_edit_size">52dp</dimen>

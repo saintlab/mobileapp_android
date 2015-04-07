@@ -1,6 +1,5 @@
 package com.omnom.android.activity.validate;
 
-import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,15 +15,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
-<<<<<<< HEAD:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/ValidateActivity.java
-import android.view.ViewStub;
-import android.view.ViewTreeObserver;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-=======
->>>>>>> omnom/omnom_master_menu_merge:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/validate/ValidateActivity.java
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.omnom.android.OmnomApplication;
@@ -43,7 +33,7 @@ import com.omnom.android.activity.ValidateActivityBle21;
 import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.activity.ValidateActivityShortcut;
 import com.omnom.android.activity.WishActivity;
-import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
@@ -81,6 +71,7 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
 import com.omnom.android.utils.activity.OmnomActivity;
+import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.observable.ValidationObservable;
@@ -122,9 +113,9 @@ import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM_ANDROID;
 /**
  * Created by Ch3D on 08.10.2014.
  */
-public abstract class ValidateActivity extends BaseOmnomFragmentActivity
-		implements FragmentManager.OnBackStackChangedListener, SearchFragment.ItemClickListener<Item>,
-		           SearchFragment.FragmentCloseListener {
+public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
+		implements FragmentManager.OnBackStackChangedListener, SearchFragment.ItemClickListener<Item>, SearchFragment
+		.FragmentCloseListener {
 
 	public static final int REQUEST_CODE_ORDERS = 100;
 
@@ -179,6 +170,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			});
 		}
 	};
+
+	protected OmnomErrorHelper getErrorHelper() {return mViewHelper.getErrorHelper();}
 
 	public static void startDemo(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
 		start(context, enterAnim, exitAnim, animationType, true, -1);
@@ -305,13 +298,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	};
 
-<<<<<<< HEAD:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/ValidateActivity.java
-	@InjectView(R.id.txt_table)
-	protected TextView txtTable;
-
-	@InjectView(R.id.img_profile)
-	protected ImageView imgProfile;
-=======
 	final Target previewTarget = new Target() {
 		@Override
 		public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
@@ -325,7 +311,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			                                                     getResources().getDisplayMetrics().widthPixels))
 			                .into(backgroundTarget);
 		}
->>>>>>> omnom/omnom_master_menu_merge:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/validate/ValidateActivity.java
 
 		@Override
 		public void onBitmapFailed(Drawable errorDrawable) {
@@ -373,10 +358,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	protected Uri mData;
 
-	protected ValidateOrderHelper mOrderHelper;
-
-	protected ValidateViewHelper mViewHelper;
-
 	Restaurant currentRestaurant;
 
 	/**
@@ -409,7 +390,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	};
 
-	protected OmnomErrorHelper getErrorHelper() {return mViewHelper.getErrorHelper();}
+	protected ValidateOrderHelper mOrderHelper;
+
+	protected ValidateViewHelper mViewHelper;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -423,6 +406,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	protected void handleIntent(Intent intent) {
+		super.handleIntent(intent);
 		mAnimationType = intent.getIntExtra(EXTRA_LOADER_ANIMATION, EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 		mIsDemo = intent.getBooleanExtra(EXTRA_DEMO_MODE, false);
 		mSkipViewRendering = intent.getBooleanExtra(EXTRA_SKIP_VIEW_RENDERING, false);
@@ -461,8 +445,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			@Override
 			public void call(final MenuResponse menuResponse) {
 				mMenu = menuResponse.getMenu();
+				mEntranceData = RestaurantHelper.getEntranceData(restaurant);
 				onDataLoaded(restaurant, TableDataResponse.NULL);
-				bindMenuData();
 				mSkipViewRendering = true;
 			}
 		}, onError);
@@ -601,47 +585,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		clearErrors(true);
 		final int locationUpdateTimeout = ConfigurationService.LOCATION_UPDATE_TIMEOUT;
 		final int validateDuration = getResources().getInteger(R.integer.omnom_validate_duration);
-<<<<<<< HEAD:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/ValidateActivity.java
-		loader.startProgressAnimation(locationUpdateTimeout + validateDuration, new Runnable() {
-			@Override
-			public void run() {
-			}
-		});
-		mDataSubscription = AndroidObservable.bindActivity(this, configurationService.getConfigurationObservable())
-		                                     .subscribe(new Action1<ConfigurationResponse>() {
-			                                     @Override
-			                                     public void call(ConfigurationResponse configurationResponse) {
-				                                     final ValidateActivity activity = ValidateActivity.this;
-				                                     final UserResponse userResponse = configurationResponse.getUserResponse();
-				                                     updateConfiguration(configurationResponse.getConfig());
-				                                     correctMixpanelTime(userResponse);
-				                                     reportMixPanel(userResponse);
-				                                     OmnomApplication.get(getActivity()).cacheUserProfile(new UserProfile(userResponse));
-				                                     getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-				                                                               new AppLaunchMixpanelEvent(userResponse.getUser()));
-				                                     if(!BluetoothUtils.hasBleSupport(activity) && !isExternalLaunch()) {
-					                                     loader.stopProgressAnimation();
-					                                     loader.updateProgressMax(new Runnable() {
-						                                     @Override
-						                                     public void run() {
-							                                     RestaurantsListActivity.start(activity, true);
-						                                     }
-					                                     });
-				                                     } else {
-					                                     decode(false);
-				                                     }
-			                                     }
-		                                     }, new Action1<Throwable>() {
-			                                     @Override
-			                                     public void call(Throwable throwable) {
-				                                     if(throwable.getCause() instanceof UnknownHostException) {
-					                                     mErrorHelper.showInternetError(loadConfigsErrorListener);
-				                                     } else {
-					                                     mErrorHelper.showUnknownError(loadConfigsErrorListener);
-				                                     }
-			                                     }
-		                                     });
-=======
 		mViewHelper.startProgressAnimation(locationUpdateTimeout + validateDuration);
 
 		mDataSubscription = AppObservable.bindActivity(this, configurationService.getConfigurationObservable())
@@ -650,11 +593,11 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 			                                 public void call(ConfigurationResponse configurationResponse) {
 				                                 final ValidateActivity activity = ValidateActivity.this;
 				                                 final UserResponse userResponse = configurationResponse.getUserResponse();
+				                                 updateConfiguration(configurationResponse.getConfig());
 				                                 correctMixpanelTime(userResponse);
 				                                 reportMixPanel(userResponse);
 				                                 OmnomApplication.get(getActivity()).cacheUserProfile(new UserProfile(userResponse));
 
-				                                 updateConfiguration(configurationResponse.getConfig());
 				                                 getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 				                                                           new AppLaunchMixpanelEvent(userResponse.getUser()));
 				                                 if(!BluetoothUtils.hasBleSupport(activity) && !isExternalLaunch()) {
@@ -673,7 +616,6 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 				                                 }
 			                                 }
 		                                 });
->>>>>>> omnom/omnom_master_menu_merge:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/validate/ValidateActivity.java
 	}
 
 	private void updateConfiguration(final Config config) {
@@ -814,121 +756,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		                                   });
 	}
 
-<<<<<<< HEAD:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/ValidateActivity.java
-	private void onErrorClose() {
-		clearErrors(true);
-		ViewUtils.setVisible(txtErrorAdditional, false);
-		loader.animateLogoFast(RestaurantHelper.getLogo(mRestaurant),
-				R.drawable.ic_bill_white_normal);
-		loader.showProgress(false);
-		configureScreen(mRestaurant);
-		updateLightProfile(!mIsDemo);
-		ViewUtils.setVisible(imgPrevious, !mIsDemo);
-		ViewUtils.setVisible(txtLeave, mIsDemo);
-		ViewUtils.setVisible(getPanelBottom(), true);
-	}
-
-	private void showNoOrdersInfo() {
-		getSupportFragmentManager().beginTransaction()
-		                           .addToBackStack(null)
-		                           .setCustomAnimations(R.anim.slide_in_up,
-		                                                R.anim.slide_out_down,
-		                                                R.anim.slide_in_up,
-		                                                R.anim.slide_out_down)
-		                           .replace(R.id.fragment_container,
-		                                    NoOrdersFragment.newInstance
-				                                    (mTable.getInternalId()))
-		                           .commit();
-	}
-
-	protected void updateLightProfile(final boolean visible) {
-		updateProfile(R.drawable.ic_profile_white, visible);
-	}
-
-	private void updateProfile(final int backgroundResource, final boolean visible) {
-		if (mTable != null) {
-			txtTable.setText(String.valueOf(mTable.getInternalId()));
-			if (visible && !ViewUtils.isVisible(txtTable)) {
-				ViewUtils.setVisible(imgProfile, true);
-				if (txtTable.getTranslationX() == 0) {
-					ViewUtils.setVisible(imgProfile, true);
-					animateTable();
-				} else {
-					ViewUtils.setVisible(txtTable, false);
-				}
-			} else {
-				ViewUtils.setVisible(txtTable, visible);
-			}
-		} else {
-			ViewUtils.setVisible(txtTable, false);
-			imgProfile.setImageResource(backgroundResource);
-			ViewUtils.setVisible(imgProfile, visible);
-		}
-	}
-
-	protected void animateTable() {
-		ViewTreeObserver viewTreeObserver = imgProfile.getViewTreeObserver();
-		if (viewTreeObserver.isAlive()) {
-			viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-				@Override
-				public void onGlobalLayout() {
-					AndroidUtils.removeOnGlobalLayoutListener(imgProfile, this);
-					final int animationDuration = getResources().getInteger(R.integer.default_animation_duration_long);
-					AnimationUtils.animateAlpha(txtTable, true, new Runnable() {
-						@Override
-						public void run() {
-							final int translation = (imgProfile.getLeft() - txtTable.getLeft()) -
-									(txtTable.getWidth() - imgProfile.getWidth());
-							AnimationUtils.animateAlpha2(imgProfile, false, null, animationDuration);
-							txtTable.animate()
-									.translationX(translation)
-									.setDuration(animationDuration)
-									.setListener(new Animator.AnimatorListener() {
-										@Override
-										public void onAnimationStart(Animator animation) {
-
-										}
-
-										@Override
-										public void onAnimationEnd(Animator animation) {
-											postDelayed(animationDuration, new Runnable() {
-												@Override
-												public void run() {
-													AnimationUtils.animateAlpha2(imgProfile, true, null, animationDuration);
-													AnimationUtils.animateAlpha2(txtTable, false, null, animationDuration);
-												}
-											});
-										}
-
-										@Override
-										public void onAnimationCancel(Animator animation) {
-
-										}
-
-										@Override
-										public void onAnimationRepeat(Animator animation) {
-
-										}
-									})
-									.start();
-						}
-					}, animationDuration);
-				}
-			});
-		}
-	}
-
-	protected void hideProfile() {
-		ViewUtils.setVisible(txtTable, false);
-		ViewUtils.setVisible(imgProfile, false);
-	}
-
-	private void showOrders(final List<Order> orders, final String requestId) {
-		loader.hideLogo(new Runnable() {
-=======
 	protected void showOrders(final List<Order> orders, final String requestId) {
 		mViewHelper.showOrders(new Runnable() {
->>>>>>> omnom/omnom_master_menu_merge:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/validate/ValidateActivity.java
 			@Override
 			public void run() {
 				OrdersActivity.start(ValidateActivity.this, mRestaurant, new ArrayList<Order>(orders), requestId,
@@ -1003,13 +832,8 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		}
 	}
 
-<<<<<<< HEAD:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/ValidateActivity.java
 	@OnClick({R.id.img_profile, R.id.txt_table})
-	protected void onProfile(View v) {
-=======
-	@OnClick(R.id.img_profile)
 	public void onProfile(View v) {
->>>>>>> omnom/omnom_master_menu_merge:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/validate/ValidateActivity.java
 		final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
 		final String tableId = mTable != null ? mTable.getId() : null;
 		UserProfileActivity.startSliding(this, tableNumber, tableId);
@@ -1030,6 +854,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 		mRestaurant = restaurant;
 		mTable = table;
+		mEntranceData = RestaurantHelper.getEntranceData(mRestaurant);
+		bindMenuData();
+
 		mPaymentListener.initTableSocket(mTable);
 		onNewGuest(mTable);
 		animateRestaurantBackground(restaurant);
@@ -1041,26 +868,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 		final String bgImgUrl = RestaurantHelper.getBackground(restaurant, BACKGROUND_PREVIEW_WIDTH);
 		if(!TextUtils.isEmpty(bgImgUrl)) {
 			OmnomApplication.getPicasso(this)
-<<<<<<< HEAD:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/ValidateActivity.java
-					.load(bgImgUrl)
-					.into(previewTarget);
-		}
-	}
-
-	private void animateRestaurantLogo(final Restaurant restaurant) {
-		loader.post(new Runnable() {
-			@Override
-			public void run() {
-				loader.animateLogo(RestaurantHelper.getLogo(restaurant), R.drawable.ic_fork_n_knife,
-				                   getResources().getInteger(R.integer.default_animation_duration_short));
-			}
-		});
-		loader.animateColor(RestaurantHelper.getBackgroundColor(restaurant));
-=======
 			                .load(bgImgUrl)
 			                .into(previewTarget);
 		}
->>>>>>> omnom/omnom_master_menu_merge:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/validate/ValidateActivity.java
 	}
 
 	private void onNewGuest(TableDataResponse table) {
@@ -1100,7 +910,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	protected void onOrder() {
-		WishActivity.start(this, mRestaurant, mTable, mMenu, mOrderHelper.insureOrder(), REQUEST_CODE_WISH_LIST);
+		WishActivity.start(this, mRestaurant, mTable, mMenu, mOrderHelper.insureOrder(), mEntranceData, REQUEST_CODE_WISH_LIST);
 	}
 
 	protected boolean validateDemo() {
@@ -1186,11 +996,10 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	protected void handleRestaurant(final String method, final String requestId, final Restaurant restaurant) {
-		// TODO: Uncomment
-		//if(!restaurant.available()) {
-		//	getErrorHelper().showError(LoaderError.RESTAURANT_UNAVAILABLE, mInternetErrorClickListener);
-		//	return;
-		//}
+		if(!restaurant.available()) {
+			getErrorHelper().showError(LoaderError.RESTAURANT_UNAVAILABLE, mInternetErrorClickListener);
+			return;
+		}
 
 		// User in already in a restaurant there is no need to send them notification
 		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(getActivity()).getPreferences();
@@ -1226,15 +1035,7 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 
 	public void changeTable() {
 		clearErrors(true);
-<<<<<<< HEAD:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/ValidateActivity.java
-		AnimationUtils.animateAlpha(imgPrevious, false);
-		bottomView.animate().translationY(bottomView.getHeight());
-		loader.animateLogoFast(R.drawable.ic_fork_n_knife);
-		AnimationUtils.animateAlpha(imgProfile, false);
-		AnimationUtils.animateAlpha(txtTable, false);
-=======
 		mViewHelper.onChangeTable();
->>>>>>> omnom/omnom_master_menu_merge:Omnom.Android/Omnom/src/main/java/com/omnom/android/activity/validate/ValidateActivity.java
 		postDelayed(850, new Runnable() {
 			@Override
 			public void run() {
@@ -1260,10 +1061,9 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 					@Override
 					public Observable<MenuResponse> call(final RestaurantResponse restaurantResponse) {
 						if(restaurantResponse.hasOnlyRestaurant()) {
-							final Restaurant restaurant = restaurantResponse.getRestaurants().get(0);
-							return menuApi.getMenu(restaurant.id());
+							return RestaurantHelper.getMenuObservable(menuApi, restaurantResponse.getRestaurants().get(0));
 						}
-						return Observable.just(new MenuResponse());
+						return Observable.just(MenuResponse.EMPTY);
 					}
 				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
 					@Override
@@ -1275,7 +1075,17 @@ public abstract class ValidateActivity extends BaseOmnomFragmentActivity
 	}
 
 	protected void bindMenuData() {
-		mViewHelper.bindMenuData(mMenu, mOrderHelper);
+		if(mRestaurant == null) {
+			final IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Restaurant cannot be null");
+			illegalArgumentException.printStackTrace();
+			throw illegalArgumentException;
+		}
+
+		if(RestaurantHelper.isMenuEnabled(mRestaurant) && !mIsDemo) {
+			mViewHelper.bindMenuData(mMenu, mOrderHelper);
+		} else {
+			mViewHelper.hideMenu();
+		}
 	}
 
 	protected void updateOrderData(final OrderUpdateEvent event) {

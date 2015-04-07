@@ -56,6 +56,23 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private static final int SLIDE_UP = 1;
 
+	private class RestaurantsComparator implements Comparator<Restaurant> {
+
+		@Override
+		public int compare(Restaurant lhs, Restaurant rhs) {
+			if(lhs.distance() == null && rhs.distance() == null) {
+				return 0;
+			} else if(lhs.distance() == null) {
+				return -1;
+			} else if(rhs.distance() == null) {
+				return 1;
+			}
+
+			return (int) (lhs.distance() - rhs.distance()) * 10;
+		}
+
+	}
+
 	public static void start(BaseOmnomActivity activity) {
 		start(activity, false);
 	}
@@ -209,7 +226,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 		footer.findViewById(R.id.txt_info).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AndroidUtils.sendFeedbackEmail(getActivity(), R.string.email_subject_feedback);
+				AndroidUtils.sendFeedbackEmail(getActivity(), R.string.email_subject_feedback, R.string.email_subject_feedback);
 			}
 		});
 		list.addFooterView(footer);
@@ -234,6 +251,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 		mItemClicked = true;
 		mAdapter.setSelected(position);
+		list.smoothScrollToPositionFromTop(position, 0, SCROLL_DURATION);
 		selectedCover = (LoaderView) view.findViewById(R.id.cover);
 		animateRestaurant(position, view, height, paddingDiff, (position + 2 == list.getCount()));
 	}
@@ -241,7 +259,6 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	private void animateRestaurant(final int position, final View view, final int height,
 	                               final int paddingDiff, final boolean isLast) {
 		final int duration = getResources().getInteger(R.integer.default_animation_duration_short);
-<<<<<<< HEAD
 
 		panelTop.animate().translationYBy(-height).setDuration(duration).start();
 		panelDemo.animate().alpha(0).setDuration(duration).start();
@@ -266,23 +283,6 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 
 	private void animateLogo(final int duration) {
 		if (selectedCover != null) {
-=======
-		if(isLast) {
-			footer.animate().alpha(0).setDuration(duration).start();
-			topTranslation = -view.getTop();
-			listTranslation = -height;
-		} else {
-			topTranslation = 0;
-			listTranslation = -height;
-		}
-		panelTop.animate().translationYBy(-height).setDuration(duration).start();
-		refreshView.animate()
-		           .translationYBy(listTranslation + topTranslation + paddingDiff)
-		           .setDuration(duration)
-		           .start();
-		panelDemo.animate().alpha(0).setDuration(duration).start();
-		if(selectedCover != null) {
->>>>>>> omnom/omnom_master_menu_merge
 			AnimationUtils.scale(selectedCover, logoSizeLarge, duration);
 			selectedCover.scaleUp(duration, logoSizeLarge, true, new Runnable() {
 				@Override
@@ -382,23 +382,6 @@ public class RestaurantsListActivity extends BaseOmnomActivity implements Adapte
 	@Override
 	public int getLayoutResource() {
 		return R.layout.activity_restaurants_list;
-	}
-
-	private class RestaurantsComparator implements Comparator<Restaurant> {
-
-		@Override
-		public int compare(Restaurant lhs, Restaurant rhs) {
-			if(lhs.distance() == null && rhs.distance() == null) {
-				return 0;
-			} else if(lhs.distance() == null) {
-				return -1;
-			} else if(rhs.distance() == null) {
-				return 1;
-			}
-
-			return (int) (lhs.distance() - rhs.distance()) * 10;
-		}
-
 	}
 
 }
