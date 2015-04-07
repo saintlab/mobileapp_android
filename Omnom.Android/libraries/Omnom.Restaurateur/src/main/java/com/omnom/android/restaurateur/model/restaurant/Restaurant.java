@@ -78,6 +78,10 @@ public abstract class Restaurant implements Parcelable {
 		return ENTRANCE_MODE_BAR.equals(entranceMode());
 	}
 
+	public boolean isLunch() {
+		return ENTRANCE_MODE_LUNCH.equals(entranceMode());
+	}
+
 	public boolean isTakeAway() {
 		return ENTRANCE_MODE_TAKEAWAY.equals(entranceMode());
 	}
