@@ -1,5 +1,9 @@
 package com.omnom.android.fragment;
 
+import com.omnom.android.R;
+import com.omnom.android.utils.OmnomFont;
+import com.omnom.android.utils.utils.AndroidUtils;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -15,10 +19,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.omnom.android.R;
-import com.omnom.android.utils.OmnomFont;
-import com.omnom.android.utils.utils.AndroidUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -68,11 +68,12 @@ public class SearchFragment<T extends Parcelable> extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         itemsByName = new LinkedHashMap<String, T>();
-        if(getArguments() != null) {
+        if (getArguments() != null) {
             itemsNames = getArguments().getStringArrayList(ARG_NAMES);
             List<T> items = getArguments().getParcelableArrayList(ARG_ITEMS);
             if (items.size() != itemsNames.size()) {
-                throw new IllegalArgumentException("Number of names is not equals to number of items");
+                throw new IllegalArgumentException(
+                        "Number of names is not equals to number of items");
             }
             for (int i = 0; i < itemsNames.size(); i++) {
                 itemsByName.put(itemsNames.get(i), items.get(i));
@@ -90,7 +91,7 @@ public class SearchFragment<T extends Parcelable> extends Fragment {
     private void addItemClickListener(Activity activity) {
         try {
             itemClickListener = (ItemClickListener) activity;
-        } catch(ClassCastException e) {
+        } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement ItemClickListener");
         }
     }
@@ -98,14 +99,17 @@ public class SearchFragment<T extends Parcelable> extends Fragment {
     private void addFragmentCloseListener(Activity activity) {
         try {
             fragmentCloseListener = (FragmentCloseListener) activity;
-        } catch(ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement FragmentCloseListener");
+        } catch (ClassCastException e) {
+            throw new ClassCastException(
+                    activity.toString() + " must implement FragmentCloseListener");
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_search, container, false);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
+        final ViewGroup view = (ViewGroup) inflater
+                .inflate(R.layout.fragment_search, container, false);
         AndroidUtils.applyFont(getActivity(), view, OmnomFont.LSF_LE_REGULAR);
         ButterKnife.inject(this, view);
         return view;
@@ -116,7 +120,7 @@ public class SearchFragment<T extends Parcelable> extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         AndroidUtils.applyFont(getActivity(), list, OmnomFont.LSF_LE_REGULAR);
         adapter = new ArrayAdapter<String>(getActivity(), R.layout.item_search_list, R.id.txt_name,
-                                           itemsNames);
+                itemsNames);
         editSearch.setHint(itemsNames.get(new Random().nextInt(itemsNames.size())) + "...");
         list.setAdapter(adapter);
         list.setEmptyView(txtEmpty);
@@ -127,7 +131,8 @@ public class SearchFragment<T extends Parcelable> extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (itemClickListener != null) {
-                    itemClickListener.onItemClick(itemsByName.get((String) parent.getItemAtPosition(position)));
+                    itemClickListener.onItemClick(
+                            itemsByName.get((String) parent.getItemAtPosition(position)));
                 }
             }
         });
@@ -140,7 +145,7 @@ public class SearchFragment<T extends Parcelable> extends Fragment {
 
             @Override
             public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                          int arg3) {
+                    int arg3) {
             }
 
             @Override
@@ -151,13 +156,18 @@ public class SearchFragment<T extends Parcelable> extends Fragment {
 
     @OnClick(R.id.btn_close)
     protected void onClose() {
-        getActivity().getSupportFragmentManager().popBackStackImmediate();
+        getFragmentManager().popBackStack();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        AndroidUtils.showKeyboard(editSearch);
+        editSearch.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                AndroidUtils.showKeyboard(editSearch);
+            }
+        }, 350);
     }
 
     @Override
@@ -175,10 +185,12 @@ public class SearchFragment<T extends Parcelable> extends Fragment {
     }
 
     public interface ItemClickListener<T> {
+
         void onItemClick(T item);
     }
 
     public interface FragmentCloseListener {
+
         void onFragmentClose();
     }
 

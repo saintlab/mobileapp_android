@@ -13,13 +13,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.adapter.WishAdapter;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.entrance.TakeawayEntranceData;
-import com.omnom.android.adapter.WishAdapter;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.fragment.takeaway.TakeawayTimeFragment;
@@ -29,6 +28,7 @@ import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
+import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.mixpanel.model.SplitWay;
 import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
@@ -36,6 +36,7 @@ import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.restaurant.ModifierRequestItem;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.restaurant.WishForbiddenResponse;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishRequestItem;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
@@ -50,16 +51,20 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.support.ItemClickSupport;
 import com.squareup.otto.Subscribe;
 
+import org.apache.http.HttpStatus;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import retrofit.RetrofitError;
+import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 import static com.omnom.android.fragment.OrderFragment.PaymentDetails;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
@@ -87,20 +92,30 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		activity.startForResult(intent, R.anim.slide_in_up, R.anim.nothing, code);
 	}
 
-	private static void showOutOfSaleDialog(final Context context, final Collection<String> items) {
-		if(items == null || items.isEmpty()) {
+	private void showOutOfSaleDialog(final Context context, final Collection<WishRequestItem> forbiddenItems) {
+		if(forbiddenItems == null || forbiddenItems.isEmpty()) {
 			return;
 		}
-		final String itemsStr = StringUtils.concat(",\n", items);
+
+		final Collection<String> titles = getStoppedItems(forbiddenItems);
+
+		final String itemsStr = StringUtils.concat(",\n", titles);
 		final String message = context.getResources().getString(R.string.out_of_sale_message, itemsStr);
 		final AlertDialog dialog = DialogUtils.showDialog(context,
-		                                                  R.string.out_of_sale_title, message, R.string.ok,
+		                                                  R.string.out_of_sale_title, message,
+		                                                  R.string.ok,
 		                                                  new DialogInterface.OnClickListener() {
 			                                                  @Override
 			                                                  public void onClick(DialogInterface dialog, int which) {
-				                                                  Toast.makeText(context, "ok", Toast.LENGTH_SHORT).show();
+				                                                  for(final WishRequestItem item : forbiddenItems) {
+					                                                  final String id = item.getId();
+					                                                  mOrder.itemsTable().remove(id);
+					                                                  mAdapter.removeItem(MenuHelper.getItem(mMenu, id));
+				                                                  }
+				                                                  doWish();
 			                                                  }
-		                                                  }, R.string.cancel,
+		                                                  },
+		                                                  R.string.cancel,
 		                                                  new DialogInterface.OnClickListener() {
 			                                                  @Override
 			                                                  public void onClick(DialogInterface dialog, int which) {
@@ -218,6 +233,12 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		ViewUtils.setVisible(mProgressBar, false);
+	}
+
+	@Override
 	public void initUi() {
 		final boolean isBar = RestaurantHelper.isBar(mRestaurant);
 		ViewUtils.setVisible(mPanelBottom, !isBar);
@@ -235,22 +256,37 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	private void refresh() {
 		ViewUtils.setVisible(mProgressBar, true);
-		api.getRecommendations(mTable.getRestaurantId()).subscribe(new Action1<Collection<OrderItem>>() {
-			@Override
-			public void call(final Collection<OrderItem> response) {
-				final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, mEntranceData, WishActivity.this);
-				mAdapter = adapter;
-				mList.swapAdapter(mAdapter, true);
-				ViewUtils.setVisible(mProgressBar, false);
-				fakeScroll();
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(final Throwable throwable) {
-				Log.e(TAG, "Unable to get items on table", throwable);
-				ViewUtils.setVisible(mProgressBar, false);
-			}
-		});
+		api.getRecommendations(mTable.getRestaurantId())
+		   .flatMap(new Func1<Collection<OrderItem>, Observable<Collection<OrderItem>>>() {
+			   @Override
+			   public Observable<Collection<OrderItem>> call(
+					   Collection<OrderItem> orderItems) {
+				   final Collection<OrderItem> filtered = new ArrayList<OrderItem>();
+				   for(final OrderItem orderItem : orderItems) {
+					   if(mMenu.hasItem(orderItem.getId())) {
+						   filtered.add(orderItem);
+					   }
+				   }
+				   return Observable.just(filtered);
+			   }
+		   })
+		   .subscribe(new Action1<Collection<OrderItem>>() {
+			   @Override
+			   public void call(final Collection<OrderItem> response) {
+				   final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder,
+				                                               response, mEntranceData, WishActivity.this);
+				   mAdapter = adapter;
+				   mList.swapAdapter(mAdapter, true);
+				   ViewUtils.setVisible(mProgressBar, false);
+				   fakeScroll();
+			   }
+		   }, new Action1<Throwable>() {
+			   @Override
+			   public void call(final Throwable throwable) {
+				   Log.e(TAG, "Unable to get items on table", throwable);
+				   ViewUtils.setVisible(mProgressBar, false);
+			   }
+		   });
 	}
 
 	private void fakeScroll() {
@@ -310,11 +346,11 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1<WishResponse>() {
 			@Override
 			public void call(final WishResponse wishResponse) {
-				final PaymentDetails paymentDetails = new PaymentDetails(2.0,
-				                                                         //mOrder.getTotalPrice().doubleValue(),
-				                                                         0,
-				                                                         TipsWay.DEFAULT, 0,
-				                                                         SplitWay.WASNT_USED);
+				final PaymentDetails paymentDetails = new PaymentDetails(
+						mOrder.getTotalPrice().doubleValue(),
+						0,
+						TipsWay.DEFAULT, 0,
+						SplitWay.WASNT_USED);
 				CardsActivity.start(WishActivity.this,
 				                    mRestaurant,
 				                    mOrder,
@@ -324,11 +360,18 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 				                    RestaurantHelper.getBackgroundColor(mRestaurant),
 				                    REQUEST_CODE_WISH_LIST);
 			}
-		}, OmnomObservable.loggerOnError(TAG));
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			@Override
+			protected void onError(final Throwable throwable) {
+				ViewUtils.setVisible(mProgressBar, false);
+				Log.e(TAG, "restaurateur.wishes", throwable);
+			}
+		});
 	}
 
 	@Override
-	public boolean onItemLongClick(final RecyclerView parent, final View view, final int position, final long id) {
+	public boolean onItemLongClick(final RecyclerView parent, final View view, final int position,
+	                               final long id) {
 		final int itemType = mAdapter.getItemViewType(position);
 		if(itemType == WishAdapter.VIEW_TYPE_WISH_ITEM) {
 			final UserOrderData order = (UserOrderData) mAdapter.getItemAt(position);
@@ -382,7 +425,8 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	}
 
 	@Override
-	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+	protected void onActivityResult(final int requestCode, final int resultCode,
+	                                final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_WISH_LIST && resultCode == Activity.RESULT_OK) {
 			setResult(RESULT_ORDER_DONE);
@@ -397,11 +441,12 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1<WishResponse>() {
 			@Override
 			public void call(final WishResponse wishResponse) {
-				final PaymentDetails paymentDetails = new PaymentDetails(mOrder.getTotalPrice().doubleValue(),
-				                                                         0,
-				                                                         TipsWay.DEFAULT,
-				                                                         0,
-				                                                         SplitWay.WASNT_USED);
+				final PaymentDetails paymentDetails = new PaymentDetails(
+						mOrder.getTotalPrice().doubleValue(),
+						0,
+						TipsWay.DEFAULT,
+						0,
+						SplitWay.WASNT_USED);
 				CardsActivity.start(WishActivity.this,
 				                    mRestaurant,
 				                    mOrder,
@@ -411,49 +456,34 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 				                    RestaurantHelper.getBackgroundColor(mRestaurant),
 				                    REQUEST_CODE_WISH_LIST);
 			}
-		}, OmnomObservable.loggerOnError(TAG));
-
-		//api.wishes(mRestaurant.id(), wishRequest)
-		//   .flatMap(new Func1<WishResponse, Observable<BillResponse>>() {
-		//	   @Override
-		//	   public Observable<BillResponse> call(final WishResponse wishResponse) {
-		//		   if(!wishResponse.hasErrors()) {
-		//			   // TODO:
-		//			   //if(wishResponse.getRecommendations() != null && wishResponse.getRecommendations().size() > 0) {
-		//			   //   showOutOfSaleDialog(getActivity(), getStoppedItems(wishResponse.getRecommendations()));
-		//			   //   return Observable.empty();
-		//			   //} else {
-		//			   return api.bill(BillRequest.createForWish(mTable.getRestaurantId(), wishResponse.getId()));
-		//			   //}
-		//		   } else {
-		//			   showWishError(wishResponse);
-		//			   return Observable.empty();
-		//		   }
-		//	   }
-		//   }).subscribe(new Action1<BillResponse>() {
-		//	@Override
-		//	public void call(final BillResponse billResponse) {
-		//
-		//	}
-		//}, OmnomObservable.loggerOnError(TAG));
+		}, OmnomObservable.loggerOnError(TAG, new OmnomObservable.RetrofitErrorHandle() {
+			@Override
+			public void onRetrofitError(final RetrofitError error) {
+				AnimationUtils.animateAlpha(mProgressBar, false);
+				if(error != null && error.getResponse() != null && error.getResponse().getStatus() == HttpStatus.SC_CONFLICT) {
+					final WishForbiddenResponse forbiddenResponse = (WishForbiddenResponse) error.getBodyAs(WishForbiddenResponse.class);
+					showOutOfSaleDialog(getActivity(), forbiddenResponse.forbidden());
+				}
+			}
+		}));
 	}
 
-	//private void showWishError(final WishResponse wishResponse) {
-	//	if(wishResponse.getErrors() != null) {
-	//		showToast(this, wishResponse.getErrors().getMessage());
-	//	} else {
-	//		showToast(this, wishResponse.getError());
-	//	}
-	//}
-
-	private Collection<String> getStoppedItems(final List<String> items) {
+	private Collection<String> getStoppedItems(final Collection<WishRequestItem> items) {
 		final ArrayList<String> result = new ArrayList<String>();
-		for(final String id : items) {
-			final Item item = mMenu.findItem(id);
-			if(item != null) {
-				result.add(item.name());
+		Observable.from(items).map(new Func1<WishRequestItem, String>() {
+			@Override
+			public String call(final WishRequestItem wishRequestItem) {
+				final Item item = MenuHelper.getItem(mMenu, wishRequestItem.getId());
+				return item != null ? item.name() : null;
 			}
-		}
+		}).subscribe(new Action1<String>() {
+			@Override
+			public void call(final String s) {
+				if(!TextUtils.isEmpty(s)) {
+					result.add(s);
+				}
+			}
+		});
 		return result;
 	}
 
