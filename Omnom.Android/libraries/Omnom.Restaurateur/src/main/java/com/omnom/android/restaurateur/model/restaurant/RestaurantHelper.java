@@ -1,5 +1,9 @@
 package com.omnom.android.restaurateur.model.restaurant;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.text.TextUtils;
+
 import com.omnom.android.entrance.BarEntranceData;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.entrance.TableEntranceData;
@@ -11,10 +15,6 @@ import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.schedule.DailySchedule;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.utils.utils.StringUtils;
-
-import android.content.Context;
-import android.graphics.Color;
-import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -140,7 +140,8 @@ public class RestaurantHelper {
         if (restaurant == null) {
             return false;
         }
-        return restaurant.isBar();
+        return true;
+        // return restaurant.isBar();
     }
 
     public static boolean isLunch(final Restaurant restaurant) {

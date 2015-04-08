@@ -68,6 +68,22 @@ public class OmnomObservable {
 		};
 	}
 
+	public interface RetrofitErrorHandle {
+		void onRetrofitError(RetrofitError error);
+	}
+
+	public static Action1<Throwable> loggerOnError(final String tag, final RetrofitErrorHandle errorHandler) {
+		return new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				if(throwable instanceof RetrofitError && errorHandler != null) {
+					errorHandler.onRetrofitError((RetrofitError) throwable);
+				}
+				Log.w(tag, "loggerOnRetrofitError", throwable);
+			}
+		};
+	}
+
 	public static Action1<Throwable> loggerOnError(final String tag) {
 		return new Action1<Throwable>() {
 			@Override
