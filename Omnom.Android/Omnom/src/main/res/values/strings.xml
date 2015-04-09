@@ -207,4 +207,5 @@
     <string name="Tomorrow">Завтра</string>
     <string name="when_will_you_come">Когда вас ждать?</string>
     <string name="subject_add_my_address">Добавьте мой адрес</string>
+    <string name="your_wish_is_empty">Ваш заказ пуст</string>
 </resources>
