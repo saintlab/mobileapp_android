@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/view_subheader"
+    android:id="@+id/view_sticky"
     android:layout_width="match_parent"
     android:layout_height="@dimen/view_size_default">
 
@@ -15,5 +15,6 @@
         android:textAppearance="?android:textAppearanceLarge"
         android:textColor="@android:color/black"
         android:text="PLACEHOLDER"
+        android:tag="sticky"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 </FrameLayout>
