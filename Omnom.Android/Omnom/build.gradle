@@ -45,7 +45,7 @@ android {
         applicationId "com.omnom.android"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 60
+        versionCode 61
         versionName "1.2.1"
     }
 
