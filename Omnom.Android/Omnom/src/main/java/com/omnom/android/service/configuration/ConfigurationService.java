@@ -28,7 +28,7 @@ public class ConfigurationService {
 
 	private static final int RETRY_COUNT = 5;
 
-	public static final int LOCATION_UPDATE_TIMEOUT = 5000;
+	public static final int LOCATION_UPDATE_TIMEOUT = 2000;
 
 	protected Context context;
 

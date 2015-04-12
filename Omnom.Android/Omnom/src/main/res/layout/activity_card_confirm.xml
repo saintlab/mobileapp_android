@@ -1,5 +1,4 @@
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -15,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/view_size_default"
             android:background="@color/list_header"
-            android:padding="@dimen/activity_horizontal_margin_small"/>
+            android:padding="@dimen/activity_horizontal_margin_small" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -25,6 +24,8 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
                 android:animateLayoutChanges="true">
 
                 <com.omnom.android.utils.view.ErrorEdit
@@ -41,16 +42,37 @@
                     omnom:maxLength="7"
                     omnom:showClear="false"
                     omnom:textGravity="center"
-                    omnom:textSize="@dimen/font_large"/>
+                    omnom:textSize="@dimen/font_large" />
 
                 <TextView
                     android:id="@+id/txt_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/edit_amount"
-                    android:gravity="center"
-                    android:padding="@dimen/drawable_padding_default"
-                    android:text="@string/card_confirmation_text"/>
+                    android:paddingTop="@dimen/drawable_padding_default"
+                    android:paddingBottom="@dimen/drawable_padding_default"
+                    android:text="@string/card_confirmation_text"
+                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+
+                <TextView
+                    android:id="@+id/txt_money_back"
+                    android:paddingTop="16dp"
+                    android:layout_below="@+id/txt_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/light_blue"
+                    android:text="@string/info_money_back"
+                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+
+                <TextView
+                    android:id="@+id/txt_no_sms"
+                    android:paddingTop="16dp"
+                    android:layout_below="@+id/txt_money_back"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/light_blue"
+                    android:text="@string/info_no_sms"
+                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
 
             </RelativeLayout>
 
@@ -58,25 +80,17 @@
 
     </LinearLayout>
 
-
-
     <FrameLayout
         android:id="@+id/dark_transparent_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
-        android:background="@color/black_overlay"/>
+        android:background="@color/black_overlay" />
 
-    <RelativeLayout
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/pay_once_fragment_height_large"
-            android:layout_alignParentBottom="true"/>
-
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
 
 </FrameLayout>

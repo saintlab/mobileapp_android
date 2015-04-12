@@ -1,6 +1,5 @@
 package com.omnom.android.utils.observable;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -52,6 +51,7 @@ public class ValidationObservable {
 		});
 	}
 
+	@Deprecated
 	public static Observable<? extends ValidationObservable.Error> isBluetoothEnabled(final Context context) {
 		return Observable.create(new Observable.OnSubscribe<Error>() {
 			@Override
@@ -67,7 +67,7 @@ public class ValidationObservable {
 	}
 
 	public static Observable<? extends ValidationObservable.Error> validate(final Context context) {
-		return Observable.concat(hasConnection(context), isLocationEnabled(context), isBluetoothEnabled(context))
+		return Observable.concat(hasConnection(context), isLocationEnabled(context))
 		                 .timeout(TIMEOUT, TimeUnit.MILLISECONDS)
 		                 .delaySubscription(400, TimeUnit.MILLISECONDS)
 		                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
@@ -84,11 +84,7 @@ public class ValidationObservable {
 		if(isDemo) {
 			observableChain = hasConnection(context);
 		} else {
-			if(hasBluetooth()) {
-				observableChain = Observable.concat(hasConnection(context), isLocationEnabled(context), isBluetoothEnabled(context));
-			} else {
-				observableChain = Observable.concat(hasConnection(context), isLocationEnabled(context));
-			}
+			observableChain = Observable.concat(hasConnection(context), isLocationEnabled(context));
 		}
 		return observableChain
 				.timeout(TIMEOUT, TimeUnit.MILLISECONDS)
@@ -100,13 +96,5 @@ public class ValidationObservable {
 						return error != Error.OK;
 					}
 				});
-	}
-
-	public static Observable<? extends ValidationObservable.Error> validateSmart(final Context context) {
-		return validateSmart(context, false);
-	}
-
-	private static boolean hasBluetooth() {
-		return BluetoothAdapter.getDefaultAdapter() != null;
 	}
 }
