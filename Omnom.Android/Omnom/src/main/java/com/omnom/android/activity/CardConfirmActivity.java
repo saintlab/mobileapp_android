@@ -8,11 +8,7 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.TextWatcher;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -22,7 +18,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
@@ -36,8 +31,9 @@ import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
-import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.fragment.ConfirmMoneyBackFragment;
 import com.omnom.android.fragment.PayOnceFragment;
 import com.omnom.android.listener.DecimalKeyListener;
 import com.omnom.android.mixpanel.model.acquiring.CardAddedMixpanelEvent;
@@ -51,7 +47,6 @@ import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ErrorUtils;
 import com.omnom.android.utils.utils.StringUtils;
-import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEdit;
 import com.omnom.android.view.HeaderView;
 
@@ -63,6 +58,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
+import butterknife.OnClick;
 import rx.Subscription;
 import rx.android.app.AppObservable;
 import rx.functions.Action1;
@@ -74,10 +70,11 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 		implements PayOnceFragment.OnPayListener,
 		           PayOnceFragment.VisibilityListener {
 
-	private static final String TAG = CardConfirmActivity.class.getSimpleName();
 	public static final int TYPE_BIND_CONFIRM = 0;
 
 	public static final int TYPE_CONFIRM = 1;
+
+	private static final String TAG = CardConfirmActivity.class.getSimpleName();
 
 	@SuppressLint("NewApi")
 	public static void startAddConfirm(BaseOmnomFragmentActivity activity, final CardInfo card, int code,
@@ -147,6 +144,18 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 
 	private boolean isFirstEdit = true;
 
+	private Subscription mCardRegisterSubscription;
+
+	private int mType;
+
+	private Fragment payOnceFragment;
+
+	private boolean isKeyboardVisible = false;
+
+	private NumberFormat numberFormat;
+
+	private char decimalSeparator;
+
 	private View.OnClickListener mVerifyClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(final View v) {
@@ -161,23 +170,64 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 		}
 	};
 
-	private Subscription mCardRegisterSubscription;
+	private Fragment moneybackFragment;
 
-	private int mType;
+	@OnClick(R.id.txt_money_back)
+	protected void onMoneyBack() {
+		if(!isKeyboardVisible) {
+			showMoneyBackFragment();
+		} else {
+			AndroidUtils.hideKeyboard(mEditAmount.getEditText(), new ResultReceiver(new Handler()) {
+				@Override
+				protected void onReceiveResult(int resultCode, Bundle resultData) {
+					super.onReceiveResult(resultCode, resultData);
+					if(resultCode == InputMethodManager.RESULT_HIDDEN ||
+							resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN) {
+						showMoneyBackFragment();
+					}
+				}
+			});
+		}
+	}
 
-	private Fragment payOnceFragment;
+	private void showMoneyBackFragment() {
+		mEditAmount.getEditText().setEnabled(false);
+		if(moneybackFragment == null) {
+			moneybackFragment = ConfirmMoneyBackFragment.newInstance();
+		}
+		getSupportFragmentManager().beginTransaction()
+		                           .addToBackStack(null)
+		                           .setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
+		                                                R.anim.slide_in_up, R.anim.slide_out_down)
+		                           .add(R.id.fragment_container, moneybackFragment)
+		                           .commit();
+		AnimationUtils.animateAlpha(darkTransparentBackground, true);
+	}
 
-	private boolean isKeyboardVisible = false;
-
-	private NumberFormat numberFormat;
-
-	private char decimalSeparator;
+	@OnClick(R.id.txt_no_sms)
+	protected void onNoSms() {
+		if(!isKeyboardVisible) {
+			showPayOnceFragment();
+		} else {
+			AndroidUtils.hideKeyboard(mEditAmount.getEditText(), new ResultReceiver(new Handler()) {
+				@Override
+				protected void onReceiveResult(int resultCode, Bundle resultData) {
+					super.onReceiveResult(resultCode, resultData);
+					if(resultCode == InputMethodManager.RESULT_HIDDEN ||
+							resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN) {
+						showPayOnceFragment();
+					}
+				}
+			});
+		}
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (savedInstanceState == null) {
+		if(savedInstanceState == null) {
 			payOnceFragment = PayOnceFragment.newInstance(mAmount, mType);
+			moneybackFragment = ConfirmMoneyBackFragment.newInstance();
 		}
 	}
 
@@ -197,16 +247,16 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 		final EditText editText = mEditAmount.getEditText();
 		String amount = editText.getText().toString();
 		final String hint = getString(R.string.hint_confirm_amount);
-		if (amount.isEmpty()) {
+		if(amount.isEmpty()) {
 			editText.setText(hint);
 			amount = hint;
 		}
 		final String previousSeparator = AmountHelper.getSeparator(amount);
 		final String currentSeparator = String.valueOf(decimalSeparator);
-		if (previousSeparator != null && !previousSeparator.equals(currentSeparator)) {
+		if(previousSeparator != null && !previousSeparator.equals(currentSeparator)) {
 			editText.setText(amount.replace(previousSeparator, currentSeparator));
 		}
-		if (getConfirmAmount() == 0) {
+		if(getConfirmAmount() == 0) {
 			editText.setSelection(0);
 			editText.setTextColor(getResources().getColor(R.color.info_hint));
 		} else {
@@ -214,7 +264,6 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 			editText.requestFocus();
 			editText.setSelection(amount.length() - getCurrencySuffix().length());
 		}
-		ViewUtils.setVisible(mTextInfo, false);
 		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
 		mUser = mUserProfile.getUser();
 		mAcquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
@@ -233,19 +282,17 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 			registerCard();
 		} else {
 			// skip and wait until user submit verification amount
-			ViewUtils.setVisible(mTextInfo, true);
 			editText.setEnabled(true);
 			mPanelTop.setButtonRightEnabled(true);
 		}
 		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		addKeyboardListener(activityRootView);
-		if(mAmount == 0) {
-			int height = (int) getResources().getDimension(R.dimen.pay_once_fragment_height_small);
-			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-			                                                                           height);
-			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-			fragmentContainer.setLayoutParams(layoutParams);
-		}
+		// TODO:
+		//		if(mAmount == 0) {
+		//			int height = (int) getResources().getDimension(R.dimen.pay_once_fragment_height_small);
+		//			FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, height);
+		//			fragmentContainer.setLayoutParams(layoutParams);
+		//		}
 	}
 
 	private void addKeyboardListener(View activityRootView) {
@@ -276,7 +323,7 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 		editText.setOnKeyListener(new View.OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				if (isFirstEdit) {
+				if(isFirstEdit) {
 					editText.setText(StringUtils.EMPTY_STRING);
 					editText.setTextColor(getResources().getColor(android.R.color.black));
 					isFirstEdit = false;
@@ -323,11 +370,11 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(hasFocus) {
-					if (isFirstEdit) {
+					if(isFirstEdit) {
 						editText.setSelection(0);
 					} else {
 						int length = editText.getText().length();
-						if (length >= suffixLength + 1) {
+						if(length >= suffixLength + 1) {
 							editText.setSelection(length - suffixLength);
 						}
 					}
@@ -348,52 +395,52 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 		mCardRegisterSubscription = AppObservable.bindActivity(this,
-		                                                           mAcquiring.registerCard(acquiringData, wicketUser, mCard)
-		                                                                     .delaySubscription(1000, TimeUnit.MILLISECONDS)
-		                                                          )
-		                                             .subscribe(
-				                                             new Action1<CardRegisterPollingResponse>() {
-					                                             @Override
-					                                             public void call(CardRegisterPollingResponse response) {
-						                                             if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
-							                                             reportMixPanelSuccess(mCard);
-							                                             mCard.setCardId(response.getCardId());
-							                                             ViewUtils.setVisible(mTextInfo, true);
-							                                             mPanelTop.showProgress(false);
-							                                             mPanelTop.setButtonRightEnabled(true);
-							                                             mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
-							                                             final EditText editAmount = mEditAmount.getEditText();
-							                                             editAmount.setEnabled(true);
-							                                             AndroidUtils.showKeyboard(editAmount);
-						                                             } else {
-							                                             if (response.getError() != null) {
-								                                             reportMixPanelFail(mCard, response.getError());
-								                                             processCardRegisterError(response.getError().getDescr());
-							                                             } else {
-								                                             processCardRegisterError(getString(R.string.something_went_wrong_try_again));
-							                                             }
-						                                             }
-						                                             busy(false);
-					                                             }
-				                                             }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-					                                             @Override
-					                                             public void onError(Throwable throwable) {
-						                                             Log.w(TAG, "registerCard", throwable);
-						                                             processCardRegisterError(getCardRegisterErrorMessage(throwable));
-					                                             }
-				                                             });
+		                                                       mAcquiring.registerCard(acquiringData, wicketUser, mCard)
+		                                                                 .delaySubscription(1000, TimeUnit.MILLISECONDS)
+		                                                      )
+		                                         .subscribe(
+				                                         new Action1<CardRegisterPollingResponse>() {
+					                                         @Override
+					                                         public void call(CardRegisterPollingResponse response) {
+						                                         if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
+							                                         reportMixPanelSuccess(mCard);
+							                                         mCard.setCardId(response.getCardId());
+							                                         mPanelTop.showProgress(false);
+							                                         mPanelTop.setButtonRightEnabled(true);
+							                                         mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
+							                                         final EditText editAmount = mEditAmount.getEditText();
+							                                         editAmount.setEnabled(true);
+							                                         AndroidUtils.showKeyboard(editAmount);
+						                                         } else {
+							                                         if(response.getError() != null) {
+								                                         reportMixPanelFail(mCard, response.getError());
+								                                         processCardRegisterError(response.getError().getDescr());
+							                                         } else {
+								                                         processCardRegisterError(getString(
+										                                         R.string.something_went_wrong_try_again));
+							                                         }
+						                                         }
+						                                         busy(false);
+					                                         }
+				                                         }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					                                         @Override
+					                                         public void onError(Throwable throwable) {
+						                                         Log.w(TAG, "registerCard", throwable);
+						                                         processCardRegisterError(getCardRegisterErrorMessage(throwable));
+					                                         }
+				                                         });
 	}
 
 	private String getCardRegisterErrorMessage(final Throwable throwable) {
 		String errorMessage = getString(R.string.something_went_wrong_try_again);
-		if (throwable instanceof AcquiringResponseException) {
+		if(throwable instanceof AcquiringResponseException) {
 			final String code = ((AcquiringResponseException) throwable).getError().getCode();
-			if (code != null) {
-				if (code.equals(AcquiringPollingResponse.ERR_ARGUMENTS)) {
+			if(code != null) {
+				if(code.equals(AcquiringPollingResponse.ERR_ARGUMENTS)) {
 					errorMessage = getString(R.string.err_arguments);
 				}
 			}
-		} else if (ErrorUtils.isConnectionError(throwable)) {
+		} else if(ErrorUtils.isConnectionError(throwable)) {
 			errorMessage = getString(R.string.err_no_internet);
 		}
 
@@ -401,7 +448,6 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 	}
 
 	private void processCardRegisterError(final String errorMessage) {
-		ViewUtils.setVisible(mTextInfo, false);
 		mPanelTop.showProgress(false);
 		mEditAmount.setError(errorMessage);
 		mPanelTop.setButtonRightEnabled(true);
@@ -413,11 +459,13 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 	}
 
 	private void reportMixPanelSuccess(final CardInfo cardInfo) {
-		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed));
+		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo,
+		                                                                                 mScanUsed));
 	}
 
 	private void reportMixPanelFail(final CardInfo cardInfo, final AcquiringResponseError error) {
-		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed, error));
+		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed,
+		                                                                                 error));
 	}
 
 	public void verifyCard() {
@@ -432,30 +480,30 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 		mPanelTop.showProgress(true);
 		double amount = getConfirmAmount();
 		mCardVerifySubscribtion = AppObservable.bindActivity(this, mAcquiring.verifyCard(mAcquiringData, mUser, mCard, amount))
-		                                           .subscribe(new Action1<AcquiringResponse>() {
-			                                           @Override
-			                                           public void call(AcquiringResponse response) {
-				                                           if(response.getError() != null) {
-					                                           onVerificationError(getWrongChecksumMessage());
-				                                           } else {
-					                                           mPanelTop.showProgress(false);
-					                                           setResult(RESULT_OK);
-					                                           finish();
-				                                           }
-				                                           busy(false);
-			                                           }
-		                                           }, new Action1<Throwable>() {
-			                                           @Override
-			                                           public void call(Throwable throwable) {
-				                                           Log.w(TAG, "verifyCard", throwable);
-				                                           CharSequence errorMessage = getString(R.string.something_went_wrong_try_again);
-				                                           if (ErrorUtils.isConnectionError(throwable)) {
-					                                           errorMessage = getString(R.string.err_no_internet);
-				                                           }
-				                                           onVerificationError(errorMessage);
-				                                           busy(false);
-			                                           }
-		                                           });
+		                                       .subscribe(new Action1<AcquiringResponse>() {
+			                                       @Override
+			                                       public void call(AcquiringResponse response) {
+				                                       if(response.getError() != null) {
+					                                       onVerificationError(getString(R.string.wrong_checksum_short));
+				                                       } else {
+					                                       mPanelTop.showProgress(false);
+					                                       setResult(RESULT_OK);
+					                                       finish();
+				                                       }
+				                                       busy(false);
+			                                       }
+		                                       }, new Action1<Throwable>() {
+			                                       @Override
+			                                       public void call(Throwable throwable) {
+				                                       Log.w(TAG, "verifyCard", throwable);
+				                                       CharSequence errorMessage = getString(R.string.something_went_wrong_try_again);
+				                                       if(ErrorUtils.isConnectionError(throwable)) {
+					                                       errorMessage = getString(R.string.err_no_internet);
+				                                       }
+				                                       onVerificationError(errorMessage);
+				                                       busy(false);
+			                                       }
+		                                       });
 	}
 
 	private double getConfirmAmount() {
@@ -472,59 +520,28 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 	}
 
 	private void onVerificationError(final CharSequence errorMessage) {
-		ViewUtils.setVisible(mTextInfo, false);
 		mPanelTop.showProgress(false);
 		mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
 		mEditAmount.setError(errorMessage);
 	}
 
-	private SpannableString getWrongChecksumMessage() {
-		SpannableString spannableString = new SpannableString(getResources().getString(R.string.wrong_checksum));
-		ForegroundColorSpan colorSpan = new ForegroundColorSpan(getResources().getColor(R.color.link_color));
-		ClickableSpan clickableSpan = new ClickableSpan() {
-			@Override
-			public void onClick(View widget) {
-				if(!isKeyboardVisible) {
-					showPayOnceFragment();
-				} else {
-					AndroidUtils.hideKeyboard(mEditAmount.getEditText(), new ResultReceiver(new Handler()) {
-						@Override
-						protected void onReceiveResult(int resultCode, Bundle resultData) {
-							super.onReceiveResult(resultCode, resultData);
-							if(resultCode == InputMethodManager.RESULT_HIDDEN ||
-									resultCode == InputMethodManager.RESULT_UNCHANGED_HIDDEN) {
-								showPayOnceFragment();
-							}
-						}
-					});
-				}
-			}
-		};
-		int noSmsLength = getResources().getString(R.string.no_sms).length();
-		spannableString.setSpan(clickableSpan, spannableString.length() - noSmsLength, spannableString.length(),
-		                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		spannableString.setSpan(colorSpan, spannableString.length() - noSmsLength, spannableString.length(),
-		                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		return spannableString;
-	}
-
 	private void showPayOnceFragment() {
 		mEditAmount.getEditText().setEnabled(false);
-		if (payOnceFragment == null) {
+		if(payOnceFragment == null) {
 			payOnceFragment = PayOnceFragment.newInstance(mAmount, mType);
 		}
 		getSupportFragmentManager().beginTransaction()
 		                           .addToBackStack(null)
 		                           .setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
 		                                                R.anim.slide_in_up, R.anim.slide_out_down)
-		                           .replace(R.id.fragment_container, payOnceFragment)
+		                           .add(R.id.fragment_container, payOnceFragment)
 		                           .commit();
 		AnimationUtils.animateAlpha(darkTransparentBackground, true);
 	}
 
 	@Override
 	public void pay() {
-		if (mType == TYPE_BIND_CONFIRM) {
+		if(mType == TYPE_BIND_CONFIRM) {
 			Intent intent = new Intent();
 			intent.putExtra(EXTRA_CARD_DATA, mCard);
 			setResult(CardsActivity.RESULT_PAY, intent);
@@ -538,11 +555,22 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 	public void onVisibilityChanged(boolean isVisible) {
 		if(!isVisible) {
 			AndroidUtils.showKeyboard(mEditAmount.getEditText());
+		} else {
+			AndroidUtils.hideKeyboard(mEditAmount.getEditText());
 		}
 	}
 
 	@Override
 	public void onBackPressed() {
+		if(moneybackFragment != null && moneybackFragment.isVisible()) {
+			mEditAmount.getEditText().setEnabled(true);
+			AnimationUtils.animateAlpha(darkTransparentBackground, false);
+			getSupportFragmentManager().beginTransaction()
+			                           .setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down,
+			                                                R.anim.slide_in_up, R.anim.slide_out_down)
+			                           .detach(moneybackFragment)
+			                           .commit();
+		}
 		if(payOnceFragment != null && payOnceFragment.isVisible()) {
 			mEditAmount.getEditText().setEnabled(true);
 			AnimationUtils.animateAlpha(darkTransparentBackground, false);

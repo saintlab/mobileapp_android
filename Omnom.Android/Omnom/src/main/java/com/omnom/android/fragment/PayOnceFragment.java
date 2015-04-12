@@ -40,6 +40,9 @@ public class PayOnceFragment extends Fragment {
 	@InjectView(R.id.txt_pay_once)
 	protected TextView txtPayOnce;
 
+	@InjectView(R.id.txt_title)
+	protected TextView txtTitle;
+
 	@InjectView(R.id.btn_close)
 	protected ImageButton btnClose;
 
@@ -107,6 +110,10 @@ public class PayOnceFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_pay_once, container, false);
 		ButterKnife.inject(this, view);
+		AndroidUtils.applyFont(getActivity(), btnPay, OmnomFont.LSF_LE_REGULAR);
+		AndroidUtils.applyFont(getActivity(), txtSmsNotificationsOff, OmnomFont.LSF_LE_REGULAR);
+		AndroidUtils.applyFont(getActivity(), txtPayOnce, OmnomFont.LSF_LE_REGULAR);
+		AndroidUtils.applyFont(getActivity(), txtTitle, OmnomFont.LSF_LE_REGULAR);
 		return view;
 	}
 
@@ -120,9 +127,6 @@ public class PayOnceFragment extends Fragment {
 			}
 		});
 		if(mAmount > 0) {
-			AndroidUtils.applyFont(getActivity(), btnPay, OmnomFont.LSF_LE_REGULAR);
-			AndroidUtils.applyFont(getActivity(), txtSmsNotificationsOff, OmnomFont.OSF_REGULAR);
-			AndroidUtils.applyFont(getActivity(), txtPayOnce, OmnomFont.OSF_REGULAR);
 			final String text = AmountHelper.format(mAmount) + getActivity().getString(R.string.currency_suffix_ruble);
 			if(mType == CardConfirmActivity.TYPE_BIND_CONFIRM) {
 				btnPay.setText(getString(R.string.pay_amount, text));

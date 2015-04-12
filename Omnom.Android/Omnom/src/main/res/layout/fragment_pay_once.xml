@@ -1,11 +1,10 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@android:color/white"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingBottom="@dimen/activity_horizontal_margin">
+    android:padding="@dimen/activity_horizontal_margin">
 
     <ImageButton
         android:id="@+id/btn_close"
@@ -13,48 +12,49 @@
         android:layout_alignParentTop="true"
         style="@style/Button.Fragment.Bottom.Close" />
 
+    <TextView
+        android:id="@+id/txt_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Нет SMS"
+        android:textSize="@dimen/font_larger"
+        android:textColor="@color/profile_hint" />
+
+    <TextView
+        android:id="@+id/txt_sms_notifications_off"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:text="@string/sms_notifications_off"
+        android:textSize="@dimen/pay_once_font_size"
+        android:gravity="center"
+        android:textColor="@color/profile_hint" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="24dp" />
+
+    <TextView
+        android:id="@+id/txt_pay_once"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pay_once"
+        android:textSize="@dimen/pay_once_font_size"
+        android:gravity="center"
+        android:textColor="@color/profile_hint" />
+
     <Button
         android:id="@+id/btn_pay"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/pay_button_height"
         android:minWidth="@dimen/pay_button_minimum_width"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:layout_gravity="center"
         android:background="@drawable/btn_pay"
         android:textColor="@drawable/text_color_selector_white"
         android:textSize="@dimen/font_medium"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
         android:textAppearance="?android:textAppearanceMedium"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_above="@id/btn_pay"
-        android:layout_below="@id/btn_close">
-
-        <TextView
-            android:id="@+id/txt_sms_notifications_off"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="@string/sms_notifications_off"
-            android:textSize="@dimen/pay_once_font_size"
-            android:gravity="center"
-            android:textColor="@color/profile_hint" />
-
-        <TextView
-            android:id="@+id/txt_pay_once"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="@string/pay_once"
-            android:textSize="@dimen/pay_once_font_size"
-            android:gravity="center"
-            android:textColor="@color/profile_hint" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,35 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <ImageButton
+        android:id="@+id/btn_close"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        style="@style/Button.Fragment.Bottom.Close" />
+
+    <TextView
+        android:id="@+id/txt_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Почему списали деньги и когда их вернут?"
+        android:textSize="@dimen/font_larger"
+        android:textColor="@color/profile_hint" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <TextView
+        android:id="@+id/txt_sms_notifications_off"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/moneyback_info"
+        android:textSize="@dimen/pay_once_font_size"
+        android:textColor="@color/profile_hint" />
+
+</LinearLayout>
