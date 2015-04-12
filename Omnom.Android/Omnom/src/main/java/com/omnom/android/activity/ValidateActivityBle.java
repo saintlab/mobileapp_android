@@ -32,7 +32,6 @@ import java.util.LinkedList;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
-import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
@@ -58,7 +57,7 @@ public class ValidateActivityBle extends ValidateActivity {
 	@Override
 	public void initUi() {
 		super.initUi();
-		if(AndroidUtils.isJellyBeanMR2()) {
+		if(BluetoothUtils.isBluetoothEnabled(this) && AndroidUtils.isJellyBeanMR2()) {
 			initBle();
 		}
 	}
@@ -70,7 +69,6 @@ public class ValidateActivityBle extends ValidateActivity {
 		parser.setBeaconLayout(getResources().getString(R.string.redbear_beacon_layout));
 		mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 			@Override
-			@DebugLog
 			public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
 				runOnUiThread(new Runnable() {
 					@Override
@@ -195,8 +193,10 @@ public class ValidateActivityBle extends ValidateActivity {
 				                                       });
 			}
 		};
-		if(AndroidUtils.isJellyBeanMR2()) {
+		if(AndroidUtils.isJellyBeanMR2() && BluetoothUtils.isBluetoothEnabled(this)) {
 			scanBleDevices(true, endCallback);
+		} else {
+			endCallback.run();
 		}
 	}
 

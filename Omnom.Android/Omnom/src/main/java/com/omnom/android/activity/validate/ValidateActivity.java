@@ -140,39 +140,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	private static final String TAG = ValidateActivity.class.getSimpleName();
 
-	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
-		@Override
-		protected void onThrowable(Throwable throwable) {
-			Log.e(TAG, "onError", throwable);
-			mViewHelper.loader.stopProgressAnimation(true);
-			if(throwable instanceof RetrofitError) {
-				final RetrofitError cause = (RetrofitError) throwable;
-				if(cause.getResponse() != null) {
-					// TODO: Refactor this ugly piece of ... code
-					if(cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
-						EnteringActivity.start(ValidateActivity.this, true);
-						return;
-					}
-				}
-			}
-			if(throwable instanceof AuthServiceException) {
-				((OmnomApplication) getApplication()).logout();
-				EnteringActivity.start(ValidateActivity.this, true);
-				return;
-			}
-
-			getErrorHelper().showBackendError(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					clearErrors(true);
-					decode(true);
-				}
-			});
-		}
-	};
-
-	protected OmnomErrorHelper getErrorHelper() {return mViewHelper.getErrorHelper();}
-
 	public static void startDemo(BaseActivity context, int enterAnim, int exitAnim, int animationType) {
 		start(context, enterAnim, exitAnim, animationType, true, -1);
 	}
@@ -252,31 +219,10 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		return intent;
 	}
 
-	protected final View.OnClickListener mInternetErrorClickBillListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			onBill(findViewById(R.id.btn_bill));
-		}
-	};
-
 	protected final View.OnClickListener mInternetErrorClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			decode(true);
-		}
-	};
-
-	protected final View.OnClickListener mOnBillClickListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			onBill(findViewById(R.id.btn_bill));
-		}
-	};
-
-	protected final View.OnClickListener mOnOrderClickListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			onOrder();
 		}
 	};
 
@@ -287,29 +233,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 			AnimationUtils.animateDrawable(findViewById(R.id.root), findViewById(R.id.background),
 			                               drawable,
 			                               getResources().getInteger(R.integer.default_animation_duration_long));
-		}
-
-		@Override
-		public void onBitmapFailed(Drawable errorDrawable) {
-		}
-
-		@Override
-		public void onPrepareLoad(Drawable placeHolderDrawable) {
-		}
-	};
-
-	final Target previewTarget = new Target() {
-		@Override
-		public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
-			final Bitmap blurredBitmap = BitmapUtils.blur(bitmap, BACKGROUND_PREVIEW_BLUR_RADIUS);
-			final BitmapDrawable drawable = new BitmapDrawable(getResources(), blurredBitmap);
-			AnimationUtils.animateDrawable(getWindow().getDecorView(), findViewById(R.id.root),
-			                               drawable,
-			                               getResources().getInteger(R.integer.default_animation_duration_quick));
-			OmnomApplication.getPicasso(ValidateActivity.this)
-			                .load(RestaurantHelper.getBackground(currentRestaurant,
-			                                                     getResources().getDisplayMetrics().widthPixels))
-			                .into(backgroundTarget);
 		}
 
 		@Override
@@ -358,7 +281,41 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	protected Uri mData;
 
+	protected ValidateOrderHelper mOrderHelper;
+
+	protected final View.OnClickListener mOnOrderClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			onOrder();
+		}
+	};
+
+	protected ValidateViewHelper mViewHelper;
+
 	Restaurant currentRestaurant;
+
+	final Target previewTarget = new Target() {
+		@Override
+		public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
+			final Bitmap blurredBitmap = BitmapUtils.blur(bitmap, BACKGROUND_PREVIEW_BLUR_RADIUS);
+			final BitmapDrawable drawable = new BitmapDrawable(getResources(), blurredBitmap);
+			AnimationUtils.animateDrawable(getWindow().getDecorView(), findViewById(R.id.root),
+			                               drawable,
+			                               getResources().getInteger(R.integer.default_animation_duration_quick));
+			OmnomApplication.getPicasso(ValidateActivity.this)
+			                .load(RestaurantHelper.getBackground(currentRestaurant,
+			                                                     getResources().getDisplayMetrics().widthPixels))
+			                .into(backgroundTarget);
+		}
+
+		@Override
+		public void onBitmapFailed(Drawable errorDrawable) {
+		}
+
+		@Override
+		public void onPrepareLoad(Drawable placeHolderDrawable) {
+		}
+	};
 
 	/**
 	 * ConfirmPhoneActivity.TYPE_LOGIN or ConfirmPhoneActivity.TYPE_REGISTER
@@ -379,9 +336,56 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	private com.omnom.android.utils.drawable.TransitionDrawable bgTransitionDrawable;
 
+	protected BaseErrorHandler onError = new OmnomBaseErrorHandler(this) {
+		@Override
+		protected void onThrowable(Throwable throwable) {
+			Log.e(TAG, "onError", throwable);
+			mViewHelper.loader.stopProgressAnimation(true);
+			if(throwable instanceof RetrofitError) {
+				final RetrofitError cause = (RetrofitError) throwable;
+				if(cause.getResponse() != null) {
+					// TODO: Refactor this ugly piece of ... code
+					if(cause.getUrl().contains(Protocol.FIELD_LOGIN) && cause.getResponse().getStatus() != 200) {
+						EnteringActivity.start(ValidateActivity.this, true);
+						return;
+					}
+				}
+			}
+			if(throwable instanceof AuthServiceException) {
+				((OmnomApplication) getApplication()).logout();
+				EnteringActivity.start(ValidateActivity.this, true);
+				return;
+			}
+
+			getErrorHelper().showBackendError(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					clearErrors(true);
+					decode(true);
+				}
+			});
+		}
+	};
+
+	protected final View.OnClickListener mInternetErrorClickBillListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			onBill(findViewById(R.id.btn_bill));
+		}
+	};
+
+	protected final View.OnClickListener mOnBillClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			onBill(findViewById(R.id.btn_bill));
+		}
+	};
+
 	private PaymentEventListener mPaymentListener;
 
 	private ConfigurationService configurationService;
+
+	private Subscription mErrValidationSubscription;
 
 	private View.OnClickListener loadConfigsErrorListener = new View.OnClickListener() {
 		@Override
@@ -390,9 +394,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}
 	};
 
-	protected ValidateOrderHelper mOrderHelper;
-
-	protected ValidateViewHelper mViewHelper;
+	protected OmnomErrorHelper getErrorHelper() {return mViewHelper.getErrorHelper();}
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -496,6 +498,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		OmnomObservable.unsubscribe(mOrdersSubscription);
 		OmnomObservable.unsubscribe(mWaiterCallSubscribtion);
 		OmnomObservable.unsubscribe(mDataSubscription);
+		OmnomObservable.unsubscribe(mErrValidationSubscription);
 		mPaymentListener.onDestroy();
 	}
 
@@ -600,8 +603,10 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 				                                 getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 				                                                           new AppLaunchMixpanelEvent(userResponse.getUser()));
-				                                 if(!BluetoothUtils.hasBleSupport(activity) && !isExternalLaunch()) {
-					                                 mViewHelper.showRestaurants();
+				                                 final boolean hasBle = BluetoothUtils.hasBleSupport(activity);
+				                                 final boolean bleEnabled = BluetoothUtils.isBluetoothEnabled(getActivity());
+				                                 if((!hasBle || (hasBle && !bleEnabled)) && !isExternalLaunch()) {
+					                                 validateShowRestaurants();
 				                                 } else {
 					                                 decode(false);
 				                                 }
@@ -618,6 +623,38 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		                                 });
 	}
 
+	private void validateShowRestaurants() {
+		mErrValidationSubscription = AppObservable.bindActivity(ValidateActivity.this,
+		                                                        ValidationObservable.validate(ValidateActivity.this)
+		                                                                            .map(OmnomObservable.getValidationFunc(
+				                                                                            ValidateActivity.this,
+				                                                                            getErrorHelper(),
+				                                                                            new View.OnClickListener() {
+					                                                                            @Override
+					                                                                            public void onClick(View v) {
+						                                                                            validate();
+					                                                                            }
+				                                                                            })).isEmpty())
+		                                          .subscribe(new Action1<Boolean>() {
+			                                          @Override
+			                                          public void call(Boolean hasNoErrors) {
+				                                          if(hasNoErrors) {
+					                                          mViewHelper.showRestaurants();
+				                                          }
+			                                          }
+		                                          }, new Action1<Throwable>() {
+			                                          @Override
+			                                          public void call(Throwable throwable) {
+				                                          getErrorHelper().showInternetError(new View.OnClickListener() {
+					                                          @Override
+					                                          public void onClick(View v) {
+						                                          validate();
+					                                          }
+				                                          });
+			                                          }
+		                                          });
+	}
+
 	private void updateConfiguration(final Config config) {
 		mPushManager.register();
 		OmnomApplication.get(getActivity()).cacheConfig(config);
@@ -625,8 +662,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 			((AcquiringMailRu) mAcquiring).changeEndpoint(config.getAcquiringData().getBaseUrl());
 		}
 		getMixPanelHelper().addApi(OMNOM, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
-		getMixPanelHelper().addApi(OMNOM_ANDROID,
-		                           MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));
+		getMixPanelHelper().addApi(OMNOM_ANDROID, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));
 	}
 
 	private void correctMixpanelTime(final UserResponse userResponse) {
