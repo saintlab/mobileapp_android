@@ -462,7 +462,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mOrderHelper.updateWishUi();
 		mViewHelper.onResume();
 
-		if(mPaymentListener != null && mTable != null) {
+		if(mPaymentListener != null) {
 			mPaymentListener.initTableSocket(mTable);
 		}
 	}
@@ -694,9 +694,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				}
 			});
 		}
-		if(mTable != null) {
-			mPaymentListener.initTableSocket(mTable);
-		}
+		mPaymentListener.initTableSocket(mTable);
 		mFirstRun = false;
 	}
 
