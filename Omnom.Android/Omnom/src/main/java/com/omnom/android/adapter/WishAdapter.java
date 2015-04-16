@@ -257,7 +257,8 @@ public class WishAdapter extends RecyclerView.Adapter {
 				final boolean enabled = getSelectedItems().size() > 1;
 				ViewUtils.setVisible(panelAmount, enabled);
 				btnClear.setEnabled(enabled);
-				btnSend.setEnabled(enabled);
+				// TODO:
+				// btnSend.setEnabled(enabled);
 				break;
 		}
 	}
