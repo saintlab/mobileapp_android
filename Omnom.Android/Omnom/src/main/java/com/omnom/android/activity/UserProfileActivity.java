@@ -162,10 +162,6 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 		updateUserImage(StringUtils.EMPTY_STRING);
 		final String token = getPreferences().getAuthToken(this);
-		if(TextUtils.isEmpty(token)) {
-			forwardToIntro();
-			return;
-		}
 		profileSubscription = AppObservable.bindActivity(this, getProfileObservable(token)).subscribe(
 				new Action1<Pair<UserResponse, SupportInfoResponse>>() {
 					@Override
