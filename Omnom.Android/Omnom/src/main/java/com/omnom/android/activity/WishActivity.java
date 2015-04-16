@@ -1,6 +1,5 @@
 package com.omnom.android.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -335,7 +334,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	private void doWish() {
 		if(TextUtils.isEmpty(OmnomApplication.get(getActivity()).getAuthToken())) {
-			LoginActivity.start(this, AndroidUtils.getDevicePhoneNumber(this, R.string.phone_country_code), false);
+			LoginActivity.start(this, AndroidUtils.getDevicePhoneNumber(this, R.string.phone_country_code), REQUEST_CODE_LOGIN);
 			return;
 		}
 
@@ -441,9 +440,12 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	protected void onActivityResult(final int requestCode, final int resultCode,
 	                                final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(requestCode == REQUEST_CODE_WISH_LIST && resultCode == Activity.RESULT_OK) {
+		if(requestCode == REQUEST_CODE_WISH_LIST && resultCode == RESULT_OK) {
 			setResult(RESULT_ORDER_DONE);
 			super.finish();
+		}
+		if(requestCode == REQUEST_CODE_LOGIN && resultCode == RESULT_OK) {
+			doWish();
 		}
 	}
 

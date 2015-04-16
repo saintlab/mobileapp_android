@@ -33,18 +33,18 @@ import rx.functions.Action1;
 
 public class LoginActivity extends BaseOmnomActivity {
 
-	public static final int ERROR_AUTH_UNKNOWN_USER = 101;
-
 	private static final String TAG = LoginActivity.class.getSimpleName();
 
 	public static void start(OmnomActivity activity, String phone) {
-		start(activity, phone, true);
-	}
-
-	public static void start(OmnomActivity activity, String phone, boolean finishParent) {
 		final Intent intent = new Intent(activity.getActivity(), LoginActivity.class);
 		intent.putExtra(EXTRA_PHONE, phone);
-		activity.start(intent, R.anim.slide_in_right, R.anim.slide_out_left, finishParent);
+		activity.start(intent, R.anim.slide_in_right, R.anim.slide_out_left, true);
+	}
+
+	public static void start(OmnomActivity activity, String phone, int requestCode) {
+		final Intent intent = new Intent(activity.getActivity(), LoginActivity.class);
+		intent.putExtra(EXTRA_PHONE, phone);
+		activity.startForResult(intent, R.anim.slide_in_right, R.anim.slide_out_left, requestCode);
 	}
 
 	@InjectView(R.id.edit_phone)
@@ -167,6 +167,15 @@ public class LoginActivity extends BaseOmnomActivity {
 		});
 	}
 
+	@Override
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == REQUEST_CODE_LOGIN_CONFIRM && resultCode == RESULT_OK) {
+			setResult(RESULT_OK);
+			finish();
+		}
+	}
+
 	public void doProceed() {
 		if(!validate() || isBusy()) {
 			return;
@@ -188,8 +197,10 @@ public class LoginActivity extends BaseOmnomActivity {
 							                                                                     ConfirmPhoneActivity.class);
 							                                    intent.putExtra(EXTRA_PHONE, editPhone.getText());
 							                                    intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_LOGIN);
-							                                    start(intent, R.anim.slide_in_right, R.anim.slide_out_left,
-							                                          false);
+							                                    startForResult(intent,
+							                                                   R.anim.slide_in_right,
+							                                                   R.anim.slide_out_left,
+							                                                   REQUEST_CODE_LOGIN_CONFIRM);
 						                                    }
 					                                    });
 				                                    } else {
