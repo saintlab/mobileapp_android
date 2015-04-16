@@ -8,14 +8,22 @@ import com.omnom.android.auth.UserData;
  * Created by Ch3D on 25.09.2014.
  */
 public class UserResponse extends AuthResponse {
+
+	public static final UserResponse NULL = new UserResponse(UserData.NULL, STATUS_SUCCESS);
+
 	@Expose
 	private UserData user;
 
 	@Expose
 	@SerializedName("time")
-	private Long serverTime;
+	private long serverTime;
 
-	private transient Long responseTime;
+	private transient long responseTime;
+
+	public UserResponse(final UserData user, final String status) {
+		this.user = user;
+		setStatus(status);
+	}
 
 	public UserData getUser() {
 		return user;
@@ -25,7 +33,7 @@ public class UserResponse extends AuthResponse {
 		this.user = user;
 	}
 
-	public Long getServerTime() {
+	public long getServerTime() {
 		return serverTime;
 	}
 
@@ -33,7 +41,7 @@ public class UserResponse extends AuthResponse {
 		this.serverTime = serverTime;
 	}
 
-	public Long getResponseTime() {
+	public long getResponseTime() {
 		return responseTime;
 	}
 

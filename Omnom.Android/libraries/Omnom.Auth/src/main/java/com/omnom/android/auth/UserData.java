@@ -2,6 +2,7 @@ package com.omnom.android.auth;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.omnom.android.utils.utils.StringUtils;
 
 import java.util.HashMap;
 
@@ -10,16 +11,8 @@ import java.util.HashMap;
  */
 public class UserData {
 
-	public static UserData createTestUser() {
-		return create(5, "89833087335");
-	}
-
-	public static UserData create(final int id, final String phone) {
-		UserData userData = new UserData();
-		userData.id = id;
-		userData.phone = phone;
-		return userData;
-	}
+	public static final UserData NULL = new UserData(-1, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING,
+	                                                 StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
 
 	@Expose
 	private int id;
@@ -42,6 +35,26 @@ public class UserData {
 	@SerializedName("birth_date")
 	@Expose
 	private String birthDate;
+
+	public UserData() {
+
+	}
+
+	public UserData(final int id,
+	                final String name,
+	                final String nick,
+	                final String email,
+	                final String phone,
+	                final String avatar,
+	                final String birthDate) {
+		this.id = id;
+		this.name = name;
+		this.nick = nick;
+		this.email = email;
+		this.phone = phone;
+		this.avatar = avatar;
+		this.birthDate = birthDate;
+	}
 
 	public int getId() {
 		return id;
