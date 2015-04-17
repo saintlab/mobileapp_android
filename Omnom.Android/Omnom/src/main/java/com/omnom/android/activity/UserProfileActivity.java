@@ -102,7 +102,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	protected TextView mTxtTableNumber;
 
 	@InjectViews({R.id.img_user, R.id.txt_username, R.id.txt_login, R.id.txt_info,
-			R.id.delimiter_cards, R.id.btn_my_cards, R.id.btn_bottom, R.id.delimiter_logout})
+			R.id.delimiter_cards_top, R.id.delimiter_cards_bottom, R.id.btn_my_cards, R.id.btn_bottom, R.id.delimiter_logout})
 	protected List<View> mUserViews;
 
 	@InjectView(R.id.dark_transparent_background)

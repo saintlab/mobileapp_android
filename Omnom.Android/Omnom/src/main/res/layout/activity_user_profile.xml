@@ -54,7 +54,7 @@
                 omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
             <include
-                android:id="@+id/delimiter_cards"
+                android:id="@+id/delimiter_cards_top"
                 layout="@layout/delimiter_profile_vertical" />
 
             <Button
@@ -62,8 +62,9 @@
                 android:text="@string/bound_cards"
                 style="@style/Button.UserProfile.Data.Expandable" />
 
-            <include layout="@layout/delimiter_profile_vertical" />
-
+            <include
+                android:id="@+id/delimiter_cards_bottom"
+                layout="@layout/delimiter_profile_vertical" />
 
             <LinearLayout
                 android:id="@+id/panel_table_number"
