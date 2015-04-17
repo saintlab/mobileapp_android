@@ -36,15 +36,20 @@ import com.omnom.android.utils.drawable.RoundedDrawable;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
-import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.InjectViews;
 import butterknife.OnClick;
+import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.app.AppObservable;
@@ -78,6 +83,9 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	@InjectView(R.id.txt_login)
 	protected TextView mTxtLogin;
 
+	@InjectView(R.id.txt_sign_in)
+	protected TextView mTxtSignIn;
+
 	@InjectView(R.id.txt_info)
 	protected TextView mTxtInfo;
 
@@ -92,6 +100,10 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 	@InjectView(R.id.txt_table_number)
 	protected TextView mTxtTableNumber;
+
+	@InjectViews({R.id.img_user, R.id.txt_username, R.id.txt_login, R.id.txt_info,
+			R.id.delimiter_cards, R.id.btn_my_cards, R.id.btn_bottom, R.id.delimiter_logout})
+	protected List<View> mUserViews;
 
 	@InjectView(R.id.dark_transparent_background)
 	protected FrameLayout darkTransparentBackground;
@@ -115,6 +127,8 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 	private String supportPhone;
 
+	private Subscription mUserObservable;
+
 	@Override
 	protected void handleIntent(Intent intent) {
 		mTableNumber = intent.getIntExtra(EXTRA_TABLE_NUMBER, 0);
@@ -134,6 +148,11 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.btn_feedback)
 	protected void onFeedback() {
 		AndroidUtils.sendFeedbackEmail(this, R.string.send_feedback, com.omnom.android.utils.R.string.email_subject_feedback);
+	}
+
+	@OnClick(R.id.txt_sign_in)
+	protected void onSignIn() {
+		LoginActivity.start(this, AndroidUtils.getDevicePhoneNumber(this, R.string.phone_country_code), REQUEST_CODE_LOGIN);
 	}
 
 	@OnClick(R.id.btn_facebook)
@@ -161,7 +180,10 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 		}
 
 		updateUserImage(StringUtils.EMPTY_STRING);
-		final String token = getPreferences().getAuthToken(this);
+
+		final String token = OmnomApplication.get(getActivity()).getAuthToken();
+		showUserData(!TextUtils.isEmpty(token));
+
 		profileSubscription = AppObservable.bindActivity(this, getProfileObservable(token)).subscribe(
 				new Action1<Pair<UserResponse, SupportInfoResponse>>() {
 					@Override
@@ -196,15 +218,21 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 				});
 	}
 
+	@DebugLog
+	private void showUserData(final boolean visible) {
+		ViewUtils.setVisible(mTxtSignIn, !visible);
+		ButterKnife.apply(mUserViews, ViewUtils.VISIBLITY, visible);
+	}
+
 	private Observable<Pair<UserResponse, SupportInfoResponse>> getProfileObservable(final String token) {
 		return Observable.zip(authenticator.getUser(token), api.getSupportInfo(),
-				new Func2<UserResponse, SupportInfoResponse, Pair<UserResponse, SupportInfoResponse>>() {
-					@Override
-					public Pair<UserResponse, SupportInfoResponse> call(final UserResponse userResponse,
-					                 final SupportInfoResponse supportInfoResponse) {
-						return new Pair<UserResponse, SupportInfoResponse>(userResponse, supportInfoResponse);
-					}
-				}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		                      new Func2<UserResponse, SupportInfoResponse, Pair<UserResponse, SupportInfoResponse>>() {
+			                      @Override
+			                      public Pair<UserResponse, SupportInfoResponse> call(final UserResponse userResponse,
+			                                                                          final SupportInfoResponse supportInfoResponse) {
+				                      return new Pair<UserResponse, SupportInfoResponse>(userResponse, supportInfoResponse);
+			                      }
+		                      }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	private void initAppInfo() {
@@ -246,16 +274,36 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 			AndroidUtils.setBackground(mImgUser, null);
 			mImgUser.setPadding(0, 0, 0, 0);
 			OmnomApplication.getPicasso(this).load(url)
-								.placeholder(placeholderDrawable)
-			                    .resize(dimension, dimension).centerCrop()
-			                    .transform(RoundTransformation.create(dimension, 0))
-								.into(mImgUser);
+			                .placeholder(placeholderDrawable)
+			                .resize(dimension, dimension).centerCrop()
+			                .transform(RoundTransformation.create(dimension, 0))
+			                .into(mImgUser);
 		}
 	}
 
 	private RoundedDrawable getPlaceholderDrawable(int dimension) {
 		final Bitmap placeholderBmp = BitmapFactory.decodeResource(getResources(), R.drawable.empty_avatar);
 		return new RoundedDrawable(placeholderBmp, dimension, 0);
+	}
+
+	@Override
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == REQUEST_CODE_LOGIN && resultCode == RESULT_OK) {
+			final String token = OmnomApplication.get(getActivity()).getAuthToken();
+			mUserObservable = AppObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
+				@Override
+				public void call(final UserResponse userResponse) {
+					initUserData(userResponse.getUser());
+					showUserData(true);
+				}
+			}, new Action1<Throwable>() {
+				@Override
+				public void call(Throwable throwable) {
+					showToast(getActivity(), R.string.error_unknown_server_error);
+				}
+			});
+		}
 	}
 
 	@OnClick(R.id.btn_back)
@@ -335,7 +383,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 					public void call(AuthResponse authResponseBase) {
 						if(!authResponseBase.hasError()) {
 							((OmnomApplication) getApplication()).clearUserData();
-							forwardToIntro();
+							showUserData(false);
 						} else {
 							showToast(getActivity(), R.string.error_unknown_server_error);
 						}

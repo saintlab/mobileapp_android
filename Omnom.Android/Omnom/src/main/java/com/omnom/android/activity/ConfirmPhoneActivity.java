@@ -176,7 +176,8 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 			@Override
 			public void call(final AuthResponse authResponse) {
 				if(!authResponse.hasError()) {
-					((OmnomApplication) getApplication()).cacheAuthToken(authResponse.getToken());
+					final OmnomApplication omnomApp = OmnomApplication.get(getActivity());
+					omnomApp.cacheAuthToken(authResponse.getToken());
 					topPanel.setContentVisibility(false, false);
 					setResult(RESULT_OK);
 					finish();
