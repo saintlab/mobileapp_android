@@ -280,6 +280,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 				});
 				ViewUtils.setVisible(textError, true);
 				break;
+
 			case 109:
 				editPhone.setError(error.getMessage());
 				break;

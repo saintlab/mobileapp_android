@@ -2,6 +2,7 @@ package com.omnom.android.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -13,6 +14,8 @@ import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
+import com.omnom.android.auth.request.AuthRegisterRequest;
+import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
@@ -64,6 +67,8 @@ public class LoginActivity extends BaseOmnomActivity {
 	private String mPhone;
 
 	private Subscription mProceedSubscription;
+
+	private Subscription mRegisterSubscription;
 
 	@Override
 	public void initUi() {
@@ -148,25 +153,6 @@ public class LoginActivity extends BaseOmnomActivity {
 		mPhone = intent.getStringExtra(EXTRA_PHONE);
 	}
 
-	public void doChangePhone() {
-		AndroidUtils.hideKeyboard(editPhone);
-		final Intent intent = new Intent(this, ChangePhoneActivity.class);
-		start(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
-	}
-
-	public void doRegister() {
-		AndroidUtils.hideKeyboard(editPhone);
-		final Intent intent = new Intent(this, UserRegisterActivity.class);
-		intent.putExtra(EXTRA_PHONE, editPhone.getText().toString());
-		start(intent, R.anim.slide_in_up, R.anim.fake_fade_out_long, false);
-		postDelayed(getResources().getInteger(android.R.integer.config_longAnimTime), new Runnable() {
-			@Override
-			public void run() {
-				LoginActivity.this.finish();
-			}
-		});
-	}
-
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -176,17 +162,26 @@ public class LoginActivity extends BaseOmnomActivity {
 		}
 	}
 
-	public void doProceed() {
+	private void doProceed() {
 		if(!validate() || isBusy()) {
 			return;
 		}
+
+		doLogin();
+	}
+
+	private void doLogin() {
 		busy(true);
 		topPanel.showProgress(true);
+
 		mProceedSubscription = AppObservable.bindActivity(this, authenticator.authorizePhone(editPhone.getText(),
 		                                                                                     StringUtils.EMPTY_STRING))
 		                                    .subscribe(new Action1<AuthResponse>() {
 			                                    @Override
 			                                    public void call(AuthResponse authResponse) {
+				                                    topPanel.showProgress(false);
+				                                    busy(false);
+
 				                                    if(!authResponse.hasError()) {
 					                                    topPanel.setContentVisibility(false, false);
 					                                    postDelayed(getResources().getInteger(
@@ -204,12 +199,13 @@ public class LoginActivity extends BaseOmnomActivity {
 						                                    }
 					                                    });
 				                                    } else {
-					                                    final AuthError error = authResponse.getError();
-					                                    if(error != null) {
-						                                    editPhone.setError(error.getMessage());
-					                                    }
-					                                    topPanel.showProgress(false);
-					                                    busy(false);
+					                                    doRegister();
+					                                    //					                                    final AuthError error =
+					                                    // authResponse.getError();
+					                                    //					                                    if(error != null) {
+					                                    //						                                    showError(error
+					                                    // .getMessage());
+					                                    //					                                    }
 				                                    }
 			                                    }
 		                                    }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
@@ -223,6 +219,67 @@ public class LoginActivity extends BaseOmnomActivity {
 				                                    }
 			                                    }
 		                                    });
+	}
+
+	private void doRegister() {
+		busy(true);
+		topPanel.showProgress(true);
+
+		final AuthRegisterRequest request = AuthRegisterRequest.create(AndroidUtils.getInstallId(this),
+		                                                               StringUtils.EMPTY_STRING,
+		                                                               StringUtils.EMPTY_STRING,
+		                                                               StringUtils.EMPTY_STRING,
+		                                                               editPhone.getText(),
+		                                                               StringUtils.EMPTY_STRING);
+		mRegisterSubscription =
+				AppObservable.bindActivity(this, authenticator.register(request)).subscribe(new Action1<AuthRegisterResponse>() {
+					@Override
+					public void call(final AuthRegisterResponse authRegisterResponse) {
+						busy(false);
+						if(!authRegisterResponse.hasError()) {
+							topPanel.setContentVisibility(false, false);
+							postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
+								@Override
+								public void run() {
+									final Intent intent = new Intent(LoginActivity.this,
+									                                 ConfirmPhoneActivity.class);
+									intent.putExtra(EXTRA_PHONE, editPhone.getText());
+									intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_REGISTER);
+									startForResult(intent,
+									               R.anim.slide_in_right,
+									               R.anim.slide_out_left,
+									               REQUEST_CODE_LOGIN_CONFIRM);
+									topPanel.showProgress(false);
+								}
+							});
+						} else {
+							handleRegisterError(authRegisterResponse);
+						}
+					}
+				}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					@Override
+					public void onError(Throwable throwable) {
+						busy(false);
+						if(ErrorUtils.isConnectionError(throwable)) {
+							showError(getString(R.string.err_no_internet));
+						}
+						topPanel.showProgress(false);
+						Log.e(TAG, "doRegister ", throwable);
+					}
+				});
+	}
+
+	private void handleRegisterError(AuthRegisterResponse authRegisterResponse) {
+		topPanel.showProgress(false);
+		final AuthError error = authRegisterResponse.getError();
+		switch(error.getCode()) {
+			//case 107:
+			// doLogin();
+			//	break;
+
+			default:
+				showError(error.getMessage());
+		}
 	}
 
 	private void showError(final String message) {
@@ -248,10 +305,14 @@ public class LoginActivity extends BaseOmnomActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		OmnomObservable.unsubscribe(mProceedSubscription);
+		OmnomObservable.unsubscribe(mRegisterSubscription);
 	}
 
 	private boolean validate() {
-		// TODO: check
+		if(TextUtils.isEmpty(editPhone.getText())) {
+			showError(getString(R.string.you_forgot_to_enter_phone));
+			return false;
+		}
 		return true;
 	}
 
