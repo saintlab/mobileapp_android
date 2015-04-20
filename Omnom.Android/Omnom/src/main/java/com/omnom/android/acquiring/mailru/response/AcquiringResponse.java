@@ -27,4 +27,12 @@ public class AcquiringResponse {
 	public void setError(AcquiringResponseError error) {
 		this.error = error;
 	}
+
+	@Override
+	public String toString() {
+		return "AcquiringResponse{" +
+				"url='" + url + '\'' +
+				", error=" + error +
+				'}';
+	}
 }

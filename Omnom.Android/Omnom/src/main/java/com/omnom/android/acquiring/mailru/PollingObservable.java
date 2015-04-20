@@ -2,8 +2,10 @@ package com.omnom.android.acquiring.mailru;
 
 import android.net.http.AndroidHttpClient;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.google.gson.Gson;
+import com.omnom.android.BuildConfig;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
@@ -26,6 +28,8 @@ import rx.schedulers.Schedulers;
  * Created by Ch3D on 23.09.2014.
  */
 public class PollingObservable {
+
+	private static final String TAG = PollingObservable.class.getSimpleName();
 
 	private static void sleep() {
 		SystemClock.sleep(1000);
@@ -86,6 +90,47 @@ public class PollingObservable {
 						if(entity != null) {
 							final Reader reader = new InputStreamReader(entity.getContent());
 							final CardRegisterPollingResponse response = gson.fromJson(reader, CardRegisterPollingResponse.class);
+							if(BuildConfig.DEBUG && response != null) {
+								Log.i(TAG, response.toString());
+							}
+							if(!response.getStatus().equals(AcquiringPollingResponse.STATUS_CONTINUE)) {
+								next = response;
+							} else {
+								sleep();
+							}
+						} else {
+							sleep();
+						}
+					}
+					subscriber.onNext(next);
+					subscriber.onCompleted();
+				} catch(IOException e) {
+					subscriber.onError(e);
+				} finally {
+					client.close();
+					client = null;
+					gson = null;
+				}
+			}
+		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	public static Observable create(final AcquiringResponse acquiringResponse, final String id) {
+		return Observable.create(new Observable.OnSubscribe<AcquiringPollingResponse>() {
+			@Override
+			public void call(Subscriber<? super AcquiringPollingResponse> subscriber) {
+				Gson gson = new Gson();
+				AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+				try {
+					CardRegisterPollingResponse next = null;
+					while(next == null) {
+						final HttpResponse execute = client.execute(new HttpPost(acquiringResponse.getUrl()));
+						final HttpEntity entity = execute.getEntity();
+
+						if(entity != null) {
+							final Reader reader = new InputStreamReader(entity.getContent());
+							final CardRegisterPollingResponse response = gson.fromJson(reader, CardRegisterPollingResponse.class);
+							System.err.println(">>>> polling response = " + response.toString());
 							if(!response.getStatus().equals(AcquiringPollingResponse.STATUS_CONTINUE)) {
 								next = response;
 							} else {

@@ -30,7 +30,82 @@ public class CardInfo implements Parcelable {
 		}
 	};
 
+	public static class Builder {
+
+		private String cardId = StringUtils.EMPTY_STRING;
+
+		private String pan = StringUtils.EMPTY_STRING;
+
+		private String mixpanelPan = StringUtils.EMPTY_STRING;
+
+		private String expDate = StringUtils.EMPTY_STRING;
+
+		private String cvv = StringUtils.EMPTY_STRING;
+
+		private String holder = StringUtils.EMPTY_STRING;
+
+		private boolean addCard = false;
+
+		public Builder cardId(final String val) {
+			cardId = val;
+			return this;
+		}
+
+		public Builder pan(final String val) {
+			pan = val;
+			return this;
+		}
+
+		public Builder mixpanelPan(final String val) {
+			mixpanelPan = val;
+			return this;
+		}
+
+		public Builder expDate(final String val) {
+			expDate = val;
+			return this;
+		}
+
+		public Builder cvv(final String val) {
+			cvv = val;
+			return this;
+		}
+
+		public Builder holder(final String val) {
+			holder = val;
+			return this;
+		}
+
+		public Builder addCard(final boolean val) {
+			addCard = val;
+			return this;
+		}
+
+		public CardInfo build() {
+			return new CardInfo(this);
+		}
+
+	}
+
 	private static final String TEST_CARD_HOLDER = "Omnom";
+
+	public static CardInfo createTestCard() {
+		return new Builder()
+				.holder(TEST_CARD_HOLDER)
+				.pan("6011000000000004")
+				.expDate("12.2015")
+				.cvv("123")
+				.build();
+	}
+
+	public static CardInfo createTestCard(final CreditCard card) {
+		return new Builder()
+				.holder(TEST_CARD_HOLDER)
+				.pan(card.cardNumber)
+				.expDate(card.expiryMonth + "." + card.expiryYear)
+				.cvv(card.cvv)
+				.build();
+	}
 
 	@Expose
 	private String pan = StringUtils.EMPTY_STRING;
@@ -83,24 +158,6 @@ public class CardInfo implements Parcelable {
 		dest.writeString(cardId);
 	}
 
-	public static CardInfo createTestCard() {
-		return new Builder()
-				.holder(TEST_CARD_HOLDER)
-				.pan("6011000000000004")
-				.expDate("12.2015")
-				.cvv("123")
-				.build();
-	}
-
-	public static CardInfo createTestCard(final CreditCard card) {
-		return new Builder()
-				.holder(TEST_CARD_HOLDER)
-				.pan(card.cardNumber)
-				.expDate(card.expiryMonth + "." + card.expiryYear)
-				.cvv(card.cvv)
-				.build();
-	}
-
 	public String getPan() {
 		return pan;
 	}
@@ -142,6 +199,7 @@ public class CardInfo implements Parcelable {
 		map.put("pan", getPan());
 		map.put("cvv", getCvv());
 		map.put("exp_date", getExpDate());
+		map.put("add_card", Boolean.toString(addCard));
 	}
 
 	public HashMap<String, String> getCardInfoMap() {
@@ -152,7 +210,7 @@ public class CardInfo implements Parcelable {
 		} else {
 			cardInfo.put("pan", pan);
 			cardInfo.put("exp_date", expDate);
-			cardInfo.put("add_card", "0");
+			cardInfo.put("add_card", Boolean.toString(addCard));
 		}
 
 		if(!TextUtils.isEmpty(cvv)) {
@@ -171,57 +229,5 @@ public class CardInfo implements Parcelable {
 	public int describeContents() {
 		return 0;
 	}
-
-	public static class Builder {
-
-		private String cardId = StringUtils.EMPTY_STRING;
-		private String pan = StringUtils.EMPTY_STRING;
-		private String mixpanelPan = StringUtils.EMPTY_STRING;
-		private String expDate = StringUtils.EMPTY_STRING;
-		private String cvv = StringUtils.EMPTY_STRING;
-		private String holder = StringUtils.EMPTY_STRING;
-		private boolean addCard = false;
-
-		public Builder cardId(final String val) {
-			cardId = val;
-			return this;
-		}
-
-		public Builder pan(final String val) {
-			pan = val;
-			return this;
-		}
-
-		public Builder mixpanelPan(final String val) {
-			mixpanelPan = val;
-			return this;
-		}
-
-		public Builder expDate(final String val) {
-			expDate = val;
-			return this;
-		}
-
-		public Builder cvv(final String val) {
-			cvv = val;
-			return this;
-		}
-
-		public Builder holder(final String val) {
-			holder = val;
-			return this;
-		}
-
-		public Builder addCard(final boolean val) {
-			addCard = val;
-			return this;
-		}
-
-		public CardInfo build() {
-			return new CardInfo(this);
-		}
-
-	}
-
 
 }

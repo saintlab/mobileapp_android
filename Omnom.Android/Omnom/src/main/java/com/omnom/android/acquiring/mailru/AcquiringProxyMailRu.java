@@ -20,6 +20,7 @@ import java.util.Map;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
+import retrofit.http.FieldMap;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -82,5 +83,10 @@ public class AcquiringProxyMailRu implements AcquiringServiceMailRu {
 	@Override
 	public Observable<AcquiringTransactionExtendedResponse> checkTransactionExtended(HashMap<String, String> params) {
 		return mAcquiringService.checkTransactionExtended(params).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<AcquiringResponse> refund(@FieldMap final HashMap<String, String> params) {
+		return mAcquiringService.refund(params).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 }

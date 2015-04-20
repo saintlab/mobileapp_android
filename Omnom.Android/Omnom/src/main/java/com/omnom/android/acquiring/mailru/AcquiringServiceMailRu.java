@@ -41,4 +41,8 @@ public interface AcquiringServiceMailRu {
 	@FormUrlEncoded
 	@POST("/transaction/extcheck")
 	public Observable<AcquiringTransactionExtendedResponse> checkTransactionExtended(@FieldMap HashMap<String, String> params);
+
+	@FormUrlEncoded
+	@POST("/order/refund")
+	Observable<AcquiringResponse> refund(@FieldMap HashMap<String, String> parameters);
 }

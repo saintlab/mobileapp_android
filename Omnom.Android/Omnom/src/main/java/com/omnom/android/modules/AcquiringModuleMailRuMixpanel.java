@@ -2,12 +2,12 @@ package com.omnom.android.modules;
 
 import android.content.Context;
 
-import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.demo.DemoAcquiring;
 import com.omnom.android.acquiring.mailru.AcquiringMailRu;
 import com.omnom.android.acquiring.mailru.AcquiringServiceMailRu;
 import com.omnom.android.interceptors.mixpanel.AcquiringMailRuMixpanel;
+import com.omnom.android.mixpanel.MixPanelHelper;
 
 import javax.inject.Singleton;
 
