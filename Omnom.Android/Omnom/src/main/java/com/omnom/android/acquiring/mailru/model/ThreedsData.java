@@ -8,15 +8,21 @@ import com.google.gson.annotations.SerializedName;
  */
 public class ThreedsData {
 
-	@SerializedName("MD")
+	public static final String MD = "MD";
+
+	public static final String PA_REQ = "PaReq";
+
+	public static final String TERM_URL = "TermUrl";
+
+	@SerializedName(MD)
 	@Expose
 	private String mD;
 
-	@SerializedName("TermUrl")
+	@SerializedName(TERM_URL)
 	@Expose
 	private String termUrl;
 
-	@SerializedName("PaReq")
+	@SerializedName(PA_REQ)
 	@Expose
 	private String paReq;
 

@@ -6,6 +6,14 @@ import com.google.gson.annotations.Expose;
  * Created by Ch3D on 23.09.2014.
  */
 public class AcquiringResponseError {
+
+	public static AcquiringResponseError create(final String code, String descr) {
+		final AcquiringResponseError response = new AcquiringResponseError();
+		response.setCode(code);
+		response.setDescr(descr);
+		return response;
+	}
+
 	@Expose
 	private String code;
 

@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by Ch3D on 24.09.2014.
  */
 public class AcquiringPollingResponse {
+
 	/**
 	 * Ok status for mail acquiring.
 	 */
@@ -23,6 +24,12 @@ public class AcquiringPollingResponse {
 	public static final String STATUS_CONTINUE = "OK_CONTINUE";
 
 	public static final String ERR_ARGUMENTS = "ERR_ARGUMENTS";
+
+	public static AcquiringPollingResponse create(final String status) {
+		final AcquiringPollingResponse response = new AcquiringPollingResponse();
+		response.setStatus(status);
+		return response;
+	}
 
 	@Expose
 	private String status;

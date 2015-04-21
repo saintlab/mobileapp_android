@@ -8,6 +8,7 @@ import com.omnom.android.auth.AuthError;
  */
 public class AuthResponse {
 	public static final String STATUS_ERROR = "error";
+
 	public static final String STATUS_SUCCESS = "success";
 
 	public static AuthResponse create(String status, AuthError error) {
@@ -41,12 +42,12 @@ public class AuthResponse {
 		return error;
 	}
 
-	public boolean hasError() {
-		return status.equals(STATUS_ERROR);
-	}
-
 	public void setError(AuthError error) {
 		this.error = error;
+	}
+
+	public boolean hasError() {
+		return status.equals(STATUS_ERROR);
 	}
 
 	public String getStatus() {
