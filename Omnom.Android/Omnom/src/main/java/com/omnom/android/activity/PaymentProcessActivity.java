@@ -395,16 +395,17 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	private void checkResult(final AcquiringResponse response) {
 		final String acsUrl = response.getAcsUrl();
 		if(!TextUtils.isEmpty(acsUrl)) {
-			if(response.getThreedsData() == null) {
-				onPayError(new AcquiringResponseError());
-			} else {
-				final Uri acsUri = Uri.parse(acsUrl);
-				final Uri requestUrl = acsUri.buildUpon()
-				                             .appendQueryParameter(ThreedsData.MD, response.getThreedsData().getMD())
-				                             .appendQueryParameter(ThreedsData.TERM_URL, response.getThreedsData().getTermUrl())
-				                             .appendQueryParameter(ThreedsData.PA_REQ, response.getThreedsData().getPaReq()).build();
-				ThreeDSWebActivity.start(this, requestUrl.toString(), REQUEST_CODE_HANDLE_THREE_DS);
-			}
+			onPayError(new AcquiringResponseError());
+//			if(response.getThreedsData() == null) {
+//				onPayError(new AcquiringResponseError());
+//			} else {
+//				final Uri acsUri = Uri.parse(acsUrl);
+//				final Uri requestUrl = acsUri.buildUpon()
+//				                             .appendQueryParameter(ThreedsData.MD, response.getThreedsData().getMD())
+//				                             .appendQueryParameter(ThreedsData.TERM_URL, response.getThreedsData().getTermUrl())
+//				                             .appendQueryParameter(ThreedsData.PA_REQ, response.getThreedsData().getPaReq()).build();
+//				ThreeDSWebActivity.start(this, requestUrl.toString(), REQUEST_CODE_HANDLE_THREE_DS);
+//			}
 		} else {
 			mCheckSubscription = AppObservable.bindActivity(getActivity(), getAcquiring().checkResult(response))
 			                                  .subscribe(new Action1<AcquiringPollingResponse>() {
