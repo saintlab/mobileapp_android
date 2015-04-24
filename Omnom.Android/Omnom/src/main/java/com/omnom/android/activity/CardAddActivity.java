@@ -27,6 +27,7 @@ import com.omnom.android.utils.CardDataTextWatcher;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
 import com.omnom.android.utils.CardUtils;
+import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -278,7 +279,7 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mCardAddSubscribtion.unsubscribe();
+		OmnomObservable.unsubscribe(mCardAddSubscribtion);
 	}
 
 	@Override
