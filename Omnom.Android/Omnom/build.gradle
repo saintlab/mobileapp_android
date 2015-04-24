@@ -7,6 +7,7 @@ buildscript {
         classpath 'io.fabric.tools:gradle:1.15.2'
     }
 }
+
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'android-apt'
@@ -45,8 +46,8 @@ android {
         applicationId "com.omnom.android"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 62
-        versionName "1.2.2"
+        versionCode 63
+        versionName "1.2.3"
     }
 
     signingConfigs {

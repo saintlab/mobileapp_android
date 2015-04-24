@@ -4,6 +4,9 @@
 /.idea/workspace.xml
 .DS_Store
 /build
+gradlew
+gradlew.bat
+/gradle
 
 *.iml
 *.txt

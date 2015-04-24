@@ -70,6 +70,7 @@
     <string name="bind">Привязать</string>
     <string name="title_activity_card_confirm">CardConfirmActivity</string>
     <string name="card_binding">Привязка карты</string>
+    <string name="unable_to_bind_card">Не удаётся привязать карту</string>
     <string name="hint_confirm_amount">00.00&#160;</string>
     <string name="secure_payments">Платежи защищены</string>
     <string name="card_confirmation_text">Для&#160;привязки карты вам нужно подтвердить, что&#160;вы её&#160;владелец.\nОт банка должна прийти SMS о списании суммы (до 50 руб.). Укажите эту сумму в поле выше.</string>

@@ -11,6 +11,7 @@ import com.omnom.android.acquiring.mailru.response.CardDeleteResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
+import com.omnom.android.restaurateur.model.config.MerchantData;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -100,5 +101,15 @@ public class DemoAcquiring implements Acquiring {
 				subscriber.onCompleted();
 			}
 		}) {};
+	}
+
+	@Override
+	public Observable<AcquiringResponse> addCard(final AcquiringData acquiringData, final UserData user, final CardInfo cardInfo) {
+		return null;
+	}
+
+	@Override
+	public Observable<AcquiringResponse> refund(final AcquiringData acquiringData, final MerchantData merchantData, final String orderId) {
+		return null;
 	}
 }

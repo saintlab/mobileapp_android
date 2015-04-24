@@ -3,6 +3,7 @@ package com.omnom.android.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -28,12 +29,11 @@ import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.entrance.BarEntranceData;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.entrance.TableEntranceData;
-import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
-import com.omnom.android.activity.base.BaseOmnomActivity;
-import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.mixpanel.MixPanelHelper;
@@ -54,6 +54,7 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.observable.OmnomObservable;
+import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.validator.LongValidator;
 import com.omnom.android.validator.Validator;
@@ -391,19 +392,34 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	}
 
 	private void checkResult(final AcquiringResponse response) {
-		mCheckSubscription = AppObservable.bindActivity(getActivity(), getAcquiring().checkResult(response))
-		                                  .subscribe(new Action1<AcquiringPollingResponse>() {
-			                                  @Override
-			                                  public void call(final AcquiringPollingResponse response) {
-				                                  processResponse(response);
-			                                  }
-		                                  }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			                                  @Override
-			                                  public void onError(Throwable throwable) {
-				                                  Log.w(TAG, "checkResult", throwable);
-				                                  onUnknownError();
-			                                  }
-		                                  });
+		final String acsUrl = response.getAcsUrl();
+		if(!TextUtils.isEmpty(acsUrl)) {
+			onPayError(new AcquiringResponseError());
+//			if(response.getThreedsData() == null) {
+//				onPayError(new AcquiringResponseError());
+//			} else {
+//				final Uri acsUri = Uri.parse(acsUrl);
+//				final Uri requestUrl = acsUri.buildUpon()
+//				                             .appendQueryParameter(ThreedsData.MD, response.getThreedsData().getMD())
+//				                             .appendQueryParameter(ThreedsData.TERM_URL, response.getThreedsData().getTermUrl())
+//				                             .appendQueryParameter(ThreedsData.PA_REQ, response.getThreedsData().getPaReq()).build();
+//				ThreeDSWebActivity.start(this, requestUrl.toString(), REQUEST_CODE_HANDLE_THREE_DS);
+//			}
+		} else {
+			mCheckSubscription = AppObservable.bindActivity(getActivity(), getAcquiring().checkResult(response))
+			                                  .subscribe(new Action1<AcquiringPollingResponse>() {
+				                                  @Override
+				                                  public void call(final AcquiringPollingResponse response) {
+					                                  processResponse(response);
+				                                  }
+			                                  }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+				                                  @Override
+				                                  public void onError(Throwable throwable) {
+					                                  Log.w(TAG, "checkResult", throwable);
+					                                  onUnknownError();
+				                                  }
+			                                  });
+		}
 	}
 
 	private void processResponse(AcquiringPollingResponse response) {
@@ -485,6 +501,19 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 		if(resultCode == RESULT_OK && requestCode == REQUEST_THANKS) {
 			setResult(RESULT_OK);
 			finish();
+		}
+		if(requestCode == REQUEST_THANKS) {
+			if(resultCode == RESULT_OK) {
+				onPayOk(AcquiringPollingResponse.create(AcquiringResponse.STATUS_SUCCESS));
+			} else {
+				if(data != null && data.hasExtra(EXTRA_URI)) {
+					Uri responseUri = data.getParcelableExtra(EXTRA_URI);
+					onPayError(AcquiringResponseError.create(responseUri.getQueryParameter("code"),
+					                                         responseUri.getQueryParameter("code")));
+				} else {
+					onPayError(AcquiringResponseError.create(StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING));
+				}
+			}
 		}
 	}
 

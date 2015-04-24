@@ -6,6 +6,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -15,13 +16,18 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
+import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.auth.UserData;
 import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.utils.CardDataTextWatcher;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
 import com.omnom.android.utils.CardUtils;
+import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -32,11 +38,18 @@ import com.omnom.android.validator.card.ExpirationDateValidator;
 import com.omnom.android.validator.card.PanValidator;
 import com.omnom.android.view.HeaderView;
 
+import javax.inject.Inject;
+
 import butterknife.InjectView;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
+import rx.Subscription;
+import rx.android.app.AppObservable;
+import rx.functions.Action1;
+
+import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
 public class CardAddActivity extends BaseOmnomModeSupportActivity implements TextListener {
 
@@ -49,6 +62,8 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	private static final int REQUEST_CODE_CARD_IO = 101;
 
 	private static final int REQUEST_CODE_CARD_REGISTER = 102;
+
+	private static final String TAG = CardAddActivity.class.getSimpleName();
 
 	private class OnFocusChangeListener implements View.OnFocusChangeListener {
 
@@ -117,6 +132,9 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	@InjectView(R.id.txt_camera)
 	protected TextView mTextCamera;
 
+	@Inject
+	protected Acquiring mAcquiring;
+
 	private double mAmount;
 
 	private boolean mMinimized = false;
@@ -141,6 +159,8 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	private Validator cvvValidator;
 
 	private int mType;
+
+	private Subscription mCardAddSubscribtion;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -257,6 +277,12 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	}
 
 	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		OmnomObservable.unsubscribe(mCardAddSubscribtion);
+	}
+
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_CARD_REGISTER) {
@@ -288,20 +314,43 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 		final String cvv = mEditCardCvv.getText().toString();
 		final String holder = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getCardHolder();
 		return new CardInfo.Builder()
-						.pan(pan)
-						.mixpanelPan(pan)
-						.expDate(expDate)
-						.cvv(cvv)
-						.holder(holder)
-						.build();
+				.pan(pan)
+				.mixpanelPan(pan)
+				.expDate(expDate)
+				.cvv(cvv)
+				.holder(holder)
+				.addCard(true)
+				.build();
 	}
 
 	private void doBind() {
 		if(!validate()) {
 			return;
 		}
-		CardConfirmActivity.startAddConfirm(this, createCardInfo(), REQUEST_CODE_CARD_REGISTER,
-											mAmount, mScanUsed, mEntranceData);
+
+		mPanelTop.showProgress(true);
+
+		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
+		UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
+
+		mCardAddSubscribtion = AppObservable.bindActivity(this, mAcquiring.addCard(acquiringData, wicketUser, createCardInfo()))
+		                                    .subscribe(new Action1<AcquiringResponse>() {
+			                                    @Override
+			                                    public void call(final AcquiringResponse acquiringResponse) {
+				                                    if(acquiringResponse.getError() != null) {
+					                                    showToast(getActivity(), acquiringResponse.getError().getDescr());
+				                                    } else {
+					                                    setResult(RESULT_OK);
+					                                    finish();
+				                                    }
+			                                    }
+		                                    }, new Action1<Throwable>() {
+			                                    @Override
+			                                    public void call(final Throwable throwable) {
+				                                    showToast(getActivity(), R.string.unable_to_bind_card);
+				                                    Log.e(TAG, "doBind", throwable);
+			                                    }
+		                                    });
 	}
 
 	private void doPay() {
