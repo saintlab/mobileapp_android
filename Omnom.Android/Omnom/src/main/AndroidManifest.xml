@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.omnom.android">
+<manifest
+    package="com.omnom.android"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -323,6 +324,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White.Light"
             android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activity.OrderResultActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood.Light"
+            android:windowSoftInputMode="stateAlwaysHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
