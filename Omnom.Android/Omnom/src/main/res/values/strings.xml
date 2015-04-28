@@ -212,4 +212,9 @@
     <string name="info_money_back"><u>Почему списали деньги и когда их вернут?</u></string>
     <string name="info_no_sms"><u>Не пришла SMS?</u></string>
     <string name="wrong_checksum_short">Введена неверная проверочная сумма.</string>
+    <string name="wish_your_order_canceled">Ваш заказ отменён</string>
+    <string name="wish_your_order_ready">Ваш заказ готов</string>
+    <string name="wish_order_ready_info">Чтобы получить свой заказ, покажите бармену этот экран, или назовите ему номер и пин-код заказа.</string>
+    <string name="wish_order_canceled_info">Заказ не может быть выполнен заведением, и поэтому был отменён.\nОплата вернётся к вам на
+        карту\nв&#160;ближайшие несколько дней.</string>
 </resources>

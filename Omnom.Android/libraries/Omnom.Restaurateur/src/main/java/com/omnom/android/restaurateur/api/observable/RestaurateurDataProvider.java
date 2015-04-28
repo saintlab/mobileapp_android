@@ -216,6 +216,11 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	}
 
 	@Override
+	public Observable<WishResponse> getWish(final String wishId) {
+		return mDataService.getWish(wishId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
 	public Observable<Restaurant> getRestaurant(String restaurantId) {
 		return mDataService.getRestaurant(restaurantId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/order_ready_item_height"
     android:orientation="vertical">
 
     <include
@@ -16,12 +16,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"
-        android:maxLines="2"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
         android:paddingTop="@dimen/activity_vertical_margin_small"
-        android:singleLine="false"
-        android:text="TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE TITLE "
+        android:singleLine="true"
         android:textAppearance="?android:textAppearanceLarge"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
