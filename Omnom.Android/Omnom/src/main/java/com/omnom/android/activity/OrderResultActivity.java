@@ -3,6 +3,7 @@ package com.omnom.android.activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -117,6 +118,10 @@ public class OrderResultActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+		if(TextUtils.isEmpty(mId)) {
+			finish();
+		}
+
 		if(WISH_STATUS_CANCELED.equals(mStatus)) {
 			txtTitle.setText(getString(R.string.wish_your_order_canceled));
 			txtTitle.setTextColor(getResources().getColor(R.color.error_red));
