@@ -19,6 +19,8 @@ import com.omnom.android.utils.utils.ViewUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import hugo.weaving.DebugLog;
+
 /**
  * Created by Ch3D on 17.03.2015.
  */
@@ -128,6 +130,7 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 		return dy;
 	}
 
+	@DebugLog
 	private void drawHeader(final Canvas c, int dy, final View header) {
 		if(header != null && header.getVisibility() == View.VISIBLE) {
 			c.save();
@@ -189,7 +192,6 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 				}
 			}
 		} else {
-			ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, false);
 			RecyclerView.ViewHolder header = getHeaderViewByItem(childViewHolder);
 			if(header == null) {
 				return;
@@ -197,12 +199,23 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 			mFakeHeader = childViewHolder;
 			final MultiLevelRecyclerAdapter.Data item = mMenuAdapter.getItemAt(header.getPosition());
 			if(item == null || item.isGroup()) {
+				ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, false);
 				return;
 			}
+
+			ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, true);
+			drawSelectedBackground(mSubcategoriesView.mFakeStickyHeader);
+			final CharSequence title = ((TextView) header.itemView.findViewById(R.id.txt_title)).getText();
+			((TextView) mSubcategoriesView.mFakeStickyHeader.findViewById(R.id.txt_title)).setText(title);
+			if(nextIsHeader) {
+				mSubcategoriesView.mFakeStickyHeader.setTranslationY(header.itemView.getTop());
+			} else {
+				mSubcategoriesView.mFakeStickyHeader.setTranslationY(0);
+			}
+
 			RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) header.itemView.getLayoutParams();
 			if(!lp.isItemRemoved() && !lp.isViewInvalid()) {
-				drawHeader(c, (int) ViewCompat.getTranslationY(header.itemView) - getDy(nextIsHeader, decoratedBottom),
-				           header.itemView);
+				drawHeader(c, (int) ViewCompat.getTranslationY(header.itemView) - getDy(nextIsHeader, decoratedBottom), header.itemView);
 			}
 		}
 	}
