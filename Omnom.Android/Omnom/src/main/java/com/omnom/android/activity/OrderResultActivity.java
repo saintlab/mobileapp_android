@@ -120,6 +120,7 @@ public class OrderResultActivity extends BaseOmnomActivity {
 	public void initUi() {
 		if(TextUtils.isEmpty(mId)) {
 			finish();
+			return;
 		}
 
 		if(WISH_STATUS_CANCELED.equals(mStatus)) {
