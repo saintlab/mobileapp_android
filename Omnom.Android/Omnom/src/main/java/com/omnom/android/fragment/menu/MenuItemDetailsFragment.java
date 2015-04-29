@@ -237,7 +237,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			title.animate().translationY(-imgSize).setDuration(mDuration).start();
 		} else {
 			ViewUtils.setVisible2(info, false);
-			ViewUtils.setVisible2(additional, false);
+			ViewUtils.setVisible2(additional, TextUtils.isEmpty(additional.getText()));
 			ViewUtils.setVisible2(energy, false);
 		}
 
