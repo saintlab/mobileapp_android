@@ -2,6 +2,8 @@ package com.omnom.android.fragment.menu;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -41,6 +43,89 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	public static final String TAG = MenuItemDetailsFragment.class.getSimpleName();
 
+	public static class TransitionParams implements Parcelable {
+		public static final Creator<TransitionParams> CREATOR = new Creator<TransitionParams>() {
+
+			@Override
+			public TransitionParams createFromParcel(Parcel in) {
+				return new TransitionParams(in);
+			}
+
+			@Override
+			public TransitionParams[] newArray(int size) {
+				return new TransitionParams[size];
+			}
+		};
+
+		public static TransitionParams create(final int titleSize,
+		                                      final int translationContent,
+		                                      final int translationButton,
+		                                      final int btnMarginTop) {
+			return new TransitionParams(titleSize, translationContent, translationButton, btnMarginTop);
+		}
+
+		private int mTranslationTop;
+
+		private int mApplyTop;
+
+		private int mApplyMarginTop;
+
+		private int mPaddingTop;
+
+		private TransitionParams(final int paddingTop, final int translationTop, final int applyTop, final int applyMarginTop) {
+			mTranslationTop = translationTop;
+			mApplyTop = applyTop;
+			mApplyMarginTop = applyMarginTop;
+			mPaddingTop = paddingTop;
+		}
+
+		public TransitionParams(final Parcel parcel) {
+			mTranslationTop = parcel.readInt();
+			mApplyTop = parcel.readInt();
+			mApplyMarginTop = parcel.readInt();
+			mPaddingTop = parcel.readInt();
+		}
+
+		@Override
+		public String toString() {
+			return "TransitionParams{" +
+					"mTranslationTop=" + mTranslationTop +
+					", mApplyTop=" + mApplyTop +
+					", mApplyMarginTop=" + mApplyMarginTop +
+					", mPaddingTop=" + mPaddingTop +
+					'}';
+		}
+
+		public int getTranslationTop() {
+			return mTranslationTop;
+		}
+
+		public int getApplyTop() {
+			return mApplyTop;
+		}
+
+		public int getApplyMarginTop() {
+			return mApplyMarginTop;
+		}
+
+		public int getPaddingTop() {
+			return mPaddingTop;
+		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(final Parcel dest, final int flags) {
+			dest.writeInt(mTranslationTop);
+			dest.writeInt(mApplyTop);
+			dest.writeInt(mApplyMarginTop);
+			dest.writeInt(mPaddingTop);
+		}
+	}
+
 	private static final String ARG_POSITION = "position";
 
 	private static final ViewFilter sViewFilter = new ViewFilter() {
@@ -52,19 +137,14 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	public static Fragment newInstance(Menu menu, final UserOrder order, final Item item,
 	                                   final int position,
-	                                   final int titleSize,
-	                                   final int translationContent,
-	                                   final int translationButton, final int btnMarginTop) {
+	                                   TransitionParams params) {
 		final MenuItemDetailsFragment fragment = new MenuItemDetailsFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(Extras.EXTRA_ORDER, order);
 		args.putInt(ARG_POSITION, position);
-		args.putInt(Extras.EXTRA_TRANSLATION_CONTENT, translationContent);
-		args.putInt(Extras.EXTRA_TRANSLATION_BUTTON, translationButton);
-		args.putInt(Extras.EXTRA_MARGIN, btnMarginTop);
-		args.putInt(Extras.EXTRA_TITLE_SIZE, titleSize);
 		args.putParcelable(Extras.EXTRA_MENU_ITEM, item);
 		args.putParcelable(Extras.EXTRA_RESTAURANT_MENU, menu);
+		args.putParcelable(Extras.EXTRA_TRANSITION_PARAMS, params);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -75,26 +155,29 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	                        final int translationY,
 	                        final int top,
 	                        final int btnMarginTop) {
+
+		final TransitionParams params = TransitionParams.create(titleSize, translationY, top, btnMarginTop);
 		manager.beginTransaction()
 		       .addToBackStack(null)
 		       .setCustomAnimations(R.anim.fade_in,
 		                            R.anim.fade_out_medium,
 		                            R.anim.fade_in,
 		                            R.anim.fade_out_medium)
-		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item, position, titleSize, translationY, top,
-		                                                           btnMarginTop),
+		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item, position, params),
 		            MenuItemDetailsFragment.TAG)
 		       .commit();
 	}
 
-	public static void show(final FragmentManager manager, Menu menu, final UserOrder order, final Item item, final int position) {
+	public static void show(final FragmentManager manager, Menu menu, final UserOrder order,
+	                        final Item item, final int position, int titleSize) {
+		final TransitionParams params = TransitionParams.create(titleSize, 0, 0, 0);
 		manager.beginTransaction()
 		       .addToBackStack(null)
 		       .setCustomAnimations(R.anim.fade_in,
 		                            R.anim.fade_out_medium,
 		                            R.anim.fade_in,
 		                            R.anim.fade_out_medium)
-		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item, position, -1, 0, 0, 0), MenuItemDetailsFragment.TAG)
+		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item, position, params), MenuItemDetailsFragment.TAG)
 		       .commit();
 	}
 
@@ -173,8 +256,6 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	private int mImgHeight;
 
-	private int mTranslationTop;
-
 	private TextView energy;
 
 	private TextView additional;
@@ -191,13 +272,9 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	private int mDuration;
 
-	private int mPaddingTop;
-
-	private int mApplyTop;
-
 	private boolean mAnimate = true;
 
-	private int mApplyMarginTop;
+	private TransitionParams mTransitionParams;
 
 	@OnClick(R.id.btn_close)
 	public void onClose() {
@@ -215,34 +292,37 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	}
 
 	private void animateClose() {
-		final int imgSize = getResources().getDimensionPixelSize(R.dimen.menu_dish_image_height);
-
 		final View btnApply = mView.findViewById(R.id.btn_apply);
-		final int top = btnApply.getTop();
-
 		final boolean noPhoto = TextUtils.isEmpty(mItem.photo());
 
+		final int imgSize = getResources().getDimensionPixelSize(R.dimen.menu_dish_image_height);
+		final int applyMarginTop = mTransitionParams.getApplyMarginTop();
+		final int translationTop = mTransitionParams.getTranslationTop();
+		final int paddingTop = mTransitionParams.getPaddingTop();
+		final int applyTop = mTransitionParams.getApplyTop();
+		final int top = btnApply.getTop();
+
 		AnimationUtils.animateAlpha3(mPanelRecommendations, false);
-
-		if(mApplyMarginTop == 0 && noPhoto) {
+		if(applyMarginTop == 0 && noPhoto) {
 			// Do nothing
-		} else if(mApplyTop != 0 && noPhoto) {
-			btnApply.animate().translationY(mApplyTop + (title.getTop() - top) - mApplyMarginTop).setDuration(mDuration).start();
+		} else {
+			if(applyTop != 0 && noPhoto) {
+				btnApply.animate().translationY(applyTop + (title.getTop() - top) - applyMarginTop).setDuration(
+						mDuration).start();
+			}
 		}
-		if(mApplyMarginTop != 0) {
-			btnApply.animate().translationY(mApplyMarginTop).setDuration(mDuration).start();
+		if(applyMarginTop != 0) {
+			btnApply.animate().translationY(applyMarginTop).setDuration(mDuration).start();
 		}
-
-		if(mTranslationTop > 0) {
-			mView.findViewById(R.id.root).animate().translationY(mTranslationTop).setDuration(mDuration).start();
+		if(translationTop > 0) {
+			mView.findViewById(R.id.root).animate().translationY(translationTop).setDuration(mDuration).start();
 		}
 		if(!noPhoto) {
 			ViewUtils.setVisible(info, false);
 			ViewUtils.setVisible(additional, false);
 			ViewUtils.setVisible(energy, false);
-
 			AnimationUtils.scaleHeight(logo, imgSize, mDuration);
-			rl.animate().translationY(mPaddingTop).setDuration(mDuration).start();
+			rl.animate().translationY(paddingTop).setDuration(mDuration).start();
 			title.animate().translationY(-imgSize).setDuration(mDuration).start();
 		} else {
 			if(!TextUtils.isEmpty(info.getText())) {
@@ -272,13 +352,8 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			mPosition = getArguments().getInt(ARG_POSITION);
 			mItem = getArguments().getParcelable(Extras.EXTRA_MENU_ITEM);
 			mMenu = getArguments().getParcelable(Extras.EXTRA_RESTAURANT_MENU);
-			mTranslationTop = getArguments().getInt(Extras.EXTRA_TRANSLATION_CONTENT, 0);
-			mApplyTop = getArguments().getInt(Extras.EXTRA_TRANSLATION_BUTTON, 0);
-			mApplyMarginTop = getArguments().getInt(Extras.EXTRA_MARGIN, 0);
-			mPaddingTop = getArguments().getInt(Extras.EXTRA_TITLE_SIZE, getResources().getDimensionPixelSize(R.dimen.view_size_default));
-			if(mPaddingTop == -1) {
-				mPaddingTop = getResources().getDimensionPixelSize(R.dimen.view_size_default);
-			}
+
+			mTransitionParams = getArguments().getParcelable(Extras.EXTRA_TRANSITION_PARAMS);
 		}
 		if(mOrder == null) {
 			mOrder = UserOrder.create();
@@ -315,8 +390,8 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	public void onResume() {
 		super.onResume();
 		if(mAnimate) {
-			if(mTranslationTop > 0) {
-				mView.findViewById(R.id.root).animate().translationY(mTranslationTop).setDuration(0).start();
+			if(mTransitionParams.getTranslationTop() > 0) {
+				mView.findViewById(R.id.root).animate().translationY(mTransitionParams.getTranslationTop()).setDuration(0).start();
 			}
 
 			ViewUtils.setVisible(info, false);
@@ -325,13 +400,13 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			ViewUtils.setVisible(mPanelRecommendations, false);
 
 			final View btnApply = mView.findViewById(R.id.btn_apply);
-			btnApply.setTranslationY(mApplyMarginTop);
+			btnApply.setTranslationY(mTransitionParams.getApplyMarginTop());
 
 			final boolean emptyPhoto = TextUtils.isEmpty(mItem.photo());
 			if(emptyPhoto) {
 				ViewUtils.setVisible(rl, false);
 			} else {
-				rl.animate().translationY(mPaddingTop).setDuration(0).start();
+				rl.animate().translationY(mTransitionParams.getPaddingTop()).setDuration(0).start();
 				title.animate().translationY(-getResources().getDimensionPixelSize(R.dimen.menu_dish_image_height)).setDuration(0).start();
 			}
 			OmnomApplication.getPicasso(getActivity()).load(mItem.photo()).into(logo);

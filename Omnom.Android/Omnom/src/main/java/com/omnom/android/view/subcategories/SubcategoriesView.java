@@ -318,7 +318,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		}
 		if(!(item instanceof MenuCategoryItems.HeaderItem) && !(item instanceof MenuCategoryItems.SubHeaderItem)) {
 			final int position = mMenuAdapter.getItemPosition(item);
-			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position);
+			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position,
+			                             getResources().getDimensionPixelSize(R.dimen.view_size_default));
 		}
 	}
 
