@@ -257,6 +257,9 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 		final View btnApply = findById(v, R.id.btn_apply);
 		final int position = (Integer) btnApply.getTag(R.id.position);
+		final View panelDescription = findById(v, R.id.panel_description);
+		final int descrTop = panelDescription.getTop();
+		final int btnMarginTop = getApplyMarginTop(btnApply, panelDescription, descrTop);
 
 		if(top != 0) {
 			mSmoothScroller.setTargetPosition(childPosition);
@@ -266,13 +269,22 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 				public void run() {
 					final int btnTranslation = btnApply.getTop() - findById(v, R.id.txt_title).getTop();
 					final int contentTranslation = v.getTop();
-					showDetails(itemData.getItem(), position, findById(v, R.id.txt_title).getHeight(), contentTranslation, btnTranslation);
+					showDetails(itemData.getItem(), position, findById(v, R.id.txt_title).getHeight(), contentTranslation,
+					            btnTranslation, btnMarginTop);
 				}
 			}, getResources().getInteger(R.integer.default_animation_duration_short));
 		} else {
 			final int btnTranslation = btnApply.getTop() - findById(v, R.id.txt_title).getTop();
-			showDetails(itemData.getItem(), position, findById(v, R.id.txt_title).getHeight(), 0, btnTranslation);
+			showDetails(itemData.getItem(), position, findById(v, R.id.txt_title).getHeight(), 0, btnTranslation, btnMarginTop);
 		}
+	}
+
+	private int getApplyMarginTop(final View btnApply, final View panelDescription, final int descrTop) {
+		int btnMarginTop = 0;
+		if(panelDescription.getVisibility() == View.VISIBLE) {
+			btnMarginTop = btnApply.getTop() - descrTop - ((MarginLayoutParams) btnApply.getLayoutParams()).topMargin;
+		}
+		return btnMarginTop;
 	}
 
 	public void showAddFragment(final Item item, int pos) {
@@ -288,13 +300,15 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	}
 
 	public void showDetails(final Item item, final int position, final int titleSize, final int contentTranslation, final int
-			btnTranslation) {
+			btnTranslation, final int btnMarginTop) {
 		if(item == null) {
 			return;
 		}
 		if(!(item instanceof MenuCategoryItems.HeaderItem) && !(item instanceof MenuCategoryItems.SubHeaderItem)) {
-			MenuItemDetailsFragment
-					.show(getFragmentManager(), mMenu, mOrder, item, position, titleSize, contentTranslation, btnTranslation);
+			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position, titleSize,
+			                             contentTranslation,
+			                             btnTranslation,
+			                             btnMarginTop);
 		}
 	}
 

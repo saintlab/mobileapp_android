@@ -57,6 +57,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_RESTAURANT_MENU_CATEGORY = "com.omnom.android.restaurant.menu.category";
 	public static final String EXTRA_POSITION = "com.omnom.android.position";
 	public static final String EXTRA_TRANSLATION_CONTENT = "com.omnom.android.extra.translation.content";
+	public static final String EXTRA_TRANSITION_PARAMS = "com.omnom.android.extra.transition.params";
 	public static final String EXTRA_TRANSLATION_TOP = "com.omnom.android.extra.translation.top";
 	public static final String EXTRA_TRANSLATION_BUTTON = "com.omnom.android.extra.translation.btn";
 	public static final String EXTRA_TITLE_SIZE = "com.omnom.android.extra.title.height";

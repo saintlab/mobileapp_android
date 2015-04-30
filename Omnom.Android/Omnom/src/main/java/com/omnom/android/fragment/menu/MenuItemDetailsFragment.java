@@ -54,13 +54,14 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	                                   final int position,
 	                                   final int titleSize,
 	                                   final int translationContent,
-	                                   final int translationButton) {
+	                                   final int translationButton, final int btnMarginTop) {
 		final MenuItemDetailsFragment fragment = new MenuItemDetailsFragment();
 		final Bundle args = new Bundle();
 		args.putParcelable(Extras.EXTRA_ORDER, order);
 		args.putInt(ARG_POSITION, position);
 		args.putInt(Extras.EXTRA_TRANSLATION_CONTENT, translationContent);
 		args.putInt(Extras.EXTRA_TRANSLATION_BUTTON, translationButton);
+		args.putInt(Extras.EXTRA_MARGIN, btnMarginTop);
 		args.putInt(Extras.EXTRA_TITLE_SIZE, titleSize);
 		args.putParcelable(Extras.EXTRA_MENU_ITEM, item);
 		args.putParcelable(Extras.EXTRA_RESTAURANT_MENU, menu);
@@ -72,14 +73,16 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	                        final int position,
 	                        final int titleSize,
 	                        final int translationY,
-	                        final int top) {
+	                        final int top,
+	                        final int btnMarginTop) {
 		manager.beginTransaction()
 		       .addToBackStack(null)
 		       .setCustomAnimations(R.anim.fade_in,
 		                            R.anim.fade_out_medium,
 		                            R.anim.fade_in,
 		                            R.anim.fade_out_medium)
-		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item, position, titleSize, translationY, top),
+		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item, position, titleSize, translationY, top,
+		                                                           btnMarginTop),
 		            MenuItemDetailsFragment.TAG)
 		       .commit();
 	}
@@ -91,7 +94,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		                            R.anim.fade_out_medium,
 		                            R.anim.fade_in,
 		                            R.anim.fade_out_medium)
-		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item, position, -1, 0, 0), MenuItemDetailsFragment.TAG)
+		       .add(R.id.root, MenuItemDetailsFragment.newInstance(menu, order, item, position, -1, 0, 0, 0), MenuItemDetailsFragment.TAG)
 		       .commit();
 	}
 
@@ -194,6 +197,8 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	private boolean mAnimate = true;
 
+	private int mApplyMarginTop;
+
 	@OnClick(R.id.btn_close)
 	public void onClose() {
 		if(mScroll.getScrollY() != 0) {
@@ -217,16 +222,20 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 		final boolean noPhoto = TextUtils.isEmpty(mItem.photo());
 
-		AnimationUtils.animateAlpha(mPanelRecommendations, false);
+		AnimationUtils.animateAlpha3(mPanelRecommendations, false);
 
-		if(mApplyTop != 0 && noPhoto) {
-			btnApply.animate().translationY(mApplyTop + (title.getTop() - top)).setDuration(mDuration).start();
+		if(mApplyMarginTop == 0 && noPhoto) {
+			// Do nothing
+		} else if(mApplyTop != 0 && noPhoto) {
+			btnApply.animate().translationY(mApplyTop + (title.getTop() - top) - mApplyMarginTop).setDuration(mDuration).start();
+		}
+		if(mApplyMarginTop != 0) {
+			btnApply.animate().translationY(mApplyMarginTop).setDuration(mDuration).start();
 		}
 
 		if(mTranslationTop > 0) {
 			mView.findViewById(R.id.root).animate().translationY(mTranslationTop).setDuration(mDuration).start();
 		}
-
 		if(!noPhoto) {
 			ViewUtils.setVisible(info, false);
 			ViewUtils.setVisible(additional, false);
@@ -236,9 +245,15 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			rl.animate().translationY(mPaddingTop).setDuration(mDuration).start();
 			title.animate().translationY(-imgSize).setDuration(mDuration).start();
 		} else {
-			ViewUtils.setVisible2(info, false);
-			ViewUtils.setVisible2(additional, TextUtils.isEmpty(additional.getText()));
-			ViewUtils.setVisible2(energy, false);
+			if(!TextUtils.isEmpty(info.getText())) {
+				ViewUtils.setVisible2(info, false);
+			}
+			if(!TextUtils.isEmpty(additional.getText())) {
+				ViewUtils.setVisible2(additional, false);
+			}
+			if(!TextUtils.isEmpty(energy.getText())) {
+				ViewUtils.setVisible2(energy, false);
+			}
 		}
 
 		iv.postDelayed(new Runnable() {
@@ -259,6 +274,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			mMenu = getArguments().getParcelable(Extras.EXTRA_RESTAURANT_MENU);
 			mTranslationTop = getArguments().getInt(Extras.EXTRA_TRANSLATION_CONTENT, 0);
 			mApplyTop = getArguments().getInt(Extras.EXTRA_TRANSLATION_BUTTON, 0);
+			mApplyMarginTop = getArguments().getInt(Extras.EXTRA_MARGIN, 0);
 			mPaddingTop = getArguments().getInt(Extras.EXTRA_TITLE_SIZE, getResources().getDimensionPixelSize(R.dimen.view_size_default));
 			if(mPaddingTop == -1) {
 				mPaddingTop = getResources().getDimensionPixelSize(R.dimen.view_size_default);
@@ -308,6 +324,9 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 			ViewUtils.setVisible(energy, false);
 			ViewUtils.setVisible(mPanelRecommendations, false);
 
+			final View btnApply = mView.findViewById(R.id.btn_apply);
+			btnApply.setTranslationY(mApplyMarginTop);
+
 			final boolean emptyPhoto = TextUtils.isEmpty(mItem.photo());
 			if(emptyPhoto) {
 				ViewUtils.setVisible(rl, false);
@@ -329,6 +348,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 					mView.findViewById(R.id.root).animate().translationY(0).setDuration(mDuration).start();
 					rl.animate().translationY(0).setDuration(mDuration).start();
 					title.animate().translationY(0).setDuration(mDuration).start();
+					btnApply.animate().translationY(0).setDuration(mDuration).start();
 
 					AnimationUtils.scaleHeight(logo, mImgHeight, mDuration);
 					AnimationUtils.animateAlpha(info, info.getText().length() > 0);

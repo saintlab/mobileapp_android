@@ -19,8 +19,6 @@ import com.omnom.android.utils.utils.ViewUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import hugo.weaving.DebugLog;
-
 /**
  * Created by Ch3D on 17.03.2015.
  */
@@ -130,7 +128,6 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 		return dy;
 	}
 
-	@DebugLog
 	private void drawHeader(final Canvas c, int dy, final View header) {
 		if(header != null && header.getVisibility() == View.VISIBLE) {
 			c.save();
