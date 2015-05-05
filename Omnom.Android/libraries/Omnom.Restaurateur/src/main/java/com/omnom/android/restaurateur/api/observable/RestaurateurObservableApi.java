@@ -105,7 +105,7 @@ public interface RestaurateurObservableApi {
 
 	public Observable<Restaurant> link(long orderId, double amount, double tip);
 
-	public Observable<Config> getConfig();
+	public Observable<Config> getConfig(String token);
 
 	public Observable<SupportInfoResponse> getSupportInfo();
 

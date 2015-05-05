@@ -77,7 +77,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	public static final int RESULT_BILL = 2;
 
-	public static final int RESULT_OK = 4;
+	public static final int RESULT_SUCCESS = 4;
 
 	public static final int RESULT_ORDER_DONE = 8;
 
@@ -204,7 +204,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	@OnClick(R.id.btn_bill)
 	public void onBill() {
-		setResult(RESULT_BILL | (mClear ? RESULT_CLEARED : RESULT_OK), getResultData());
+		setResult(RESULT_BILL | (mClear ? RESULT_CLEARED : RESULT_SUCCESS), getResultData());
 		super.finish();
 		overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 	}
@@ -212,7 +212,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	@Override
 	public void finish() {
 		final boolean cleared = mClear || mOrder.getSelectedItems().size() == 0;
-		setResult(cleared ? RESULT_CLEARED : RESULT_OK, getResultData());
+		setResult(cleared ? RESULT_CLEARED : RESULT_SUCCESS, getResultData());
 		super.finish();
 		overridePendingTransition(R.anim.nothing, R.anim.slide_out_down);
 	}
@@ -440,7 +440,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	protected void onActivityResult(final int requestCode, final int resultCode,
 	                                final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(requestCode == REQUEST_CODE_WISH_LIST && resultCode == RESULT_OK) {
+		if(requestCode == REQUEST_CODE_WISH_LIST && resultCode == RESULT_SUCCESS) {
 			setResult(RESULT_ORDER_DONE);
 			super.finish();
 		}

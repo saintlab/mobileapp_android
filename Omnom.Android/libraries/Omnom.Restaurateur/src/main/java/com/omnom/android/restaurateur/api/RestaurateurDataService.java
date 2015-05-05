@@ -36,6 +36,7 @@ import java.util.List;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
+import retrofit.http.Header;
 import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
@@ -111,10 +112,8 @@ public interface RestaurateurDataService {
 	                            @Path(Protocol.FIELD_AMOUNT) double amount,
 	                            @Path(Protocol.FIELD_TIP) double tip);
 
-	// Token for getting configuration even if user is not specified
-	// @Headers("X-Authentication-Token: uv5zoaRsh9uff1yiSh8Dub4oc0hum3")
 	@GET("/mobile/config")
-	Observable<Config> getConfig();
+	Observable<Config> getConfig(@Header(Protocol.HEADER_AUTH_TOKEN) String token);
 
 	@POST("/qr/bind")
 	Observable<TableDataResponse> bindQrCode(@Body QRCodeBindRequest request);

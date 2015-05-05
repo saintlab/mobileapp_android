@@ -201,8 +201,8 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	}
 
 	@Override
-	public Observable<Config> getConfig() {
-		return mDataService.getConfig().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<Config> getConfig(String token) {
+		return mDataService.getConfig(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

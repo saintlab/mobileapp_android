@@ -43,6 +43,7 @@ public class RestaurateurModule {
 					@Override
 					public void intercept(RequestFacade request) {
 						super.intercept(request);
+
 						final String token = tokenProvider.getAuthToken();
 						if(!TextUtils.isEmpty(token)) {
 							request.addHeader(Protocol.HEADER_AUTH_TOKEN, token);

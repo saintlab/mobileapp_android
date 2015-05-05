@@ -590,7 +590,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		final int validateDuration = getResources().getInteger(R.integer.omnom_validate_duration);
 		mViewHelper.startProgressAnimation(locationUpdateTimeout + validateDuration);
 
-		mDataSubscription = AppObservable.bindActivity(this, configurationService.getConfigurationObservable())
+		mDataSubscription = AppObservable.bindActivity(this, configurationService.getConfigurationObservable(getConfigToken()))
 		                                 .subscribe(new Action1<ConfigurationResponse>() {
 			                                 @Override
 			                                 public void call(ConfigurationResponse configurationResponse) {
@@ -622,6 +622,14 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				                                 }
 			                                 }
 		                                 });
+	}
+
+	private String getConfigToken() {
+		final String authToken = OmnomApplication.get(getActivity()).getAuthToken();
+		if(TextUtils.isEmpty(authToken)) {
+			return getString(R.string.default_config_auth_token);
+		}
+		return null;
 	}
 
 	private void validateShowRestaurants() {
@@ -657,10 +665,12 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	}
 
 	private void updateConfiguration(final Config config) {
-		mPushManager.register();
 		OmnomApplication.get(getActivity()).cacheConfig(config);
 		if(mAcquiring instanceof AcquiringMailRu) {
 			((AcquiringMailRu) mAcquiring).changeEndpoint(config.getAcquiringData().getBaseUrl());
+		}
+		if(!TextUtils.isEmpty(OmnomApplication.get(getActivity()).getAuthToken())) {
+			mPushManager.register();
 		}
 		getMixPanelHelper().addApi(OMNOM, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
 		getMixPanelHelper().addApi(OMNOM_ANDROID, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));

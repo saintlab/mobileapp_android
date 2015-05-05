@@ -17,6 +17,7 @@ import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
+import com.omnom.android.push.PushNotificationManager;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -61,6 +62,9 @@ public class LoginActivity extends BaseOmnomActivity {
 
 	@Inject
 	protected AuthService authenticator;
+
+	@Inject
+	protected PushNotificationManager mPushManager;
 
 	private boolean mFirstStart = true;
 
@@ -157,6 +161,7 @@ public class LoginActivity extends BaseOmnomActivity {
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_LOGIN_CONFIRM && resultCode == RESULT_OK) {
+			mPushManager.register();
 			setResult(RESULT_OK);
 			finish();
 		}

@@ -214,9 +214,9 @@ public class RestaurateurMixpanelProxy extends RestaurateurDataProvider {
 	}
 
 	@Override
-	public Observable<Config> getConfig() {
+	public Observable<Config> getConfig(String token) {
 		mMixHelper.track(OMNOM_ANDROID, "restarateur.getConfig ->", StringUtils.EMPTY_STRING);
-		return super.getConfig().doOnNext(new Action1<Config>() {
+		return super.getConfig(token).doOnNext(new Action1<Config>() {
 			@Override
 			public void call(Config response) {
 				mMixHelper.track(OMNOM_ANDROID, "restarateur.getConfig <-", response);
