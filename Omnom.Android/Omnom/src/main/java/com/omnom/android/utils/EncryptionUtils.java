@@ -13,8 +13,10 @@ import java.util.TreeSet;
  * Created by Ch3D on 24.09.2014.
  */
 public class EncryptionUtils {
+	public static final String UTF_8 = "UTF-8";
+
 	private static final String ALGORITHM_SHA_1 = "SHA-1";
-	private static final String UTF_8 = "UTF-8";
+
 	private static final String HEX_FORMAT = "%02x";
 
 	public static String encryptPassword(String password) {

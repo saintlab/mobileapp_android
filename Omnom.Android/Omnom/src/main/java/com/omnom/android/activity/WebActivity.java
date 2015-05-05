@@ -18,8 +18,6 @@ import butterknife.OnClick;
  */
 public class WebActivity extends BaseOmnomActivity {
 
-	public static final String SCHEME_PREFIX_HTTP = "http://";
-
 	public static void start(OmnomActivity context, final String url) {
 		context.start(createIntent(context.getActivity(), url), R.anim.slide_in_up, R.anim.nothing, false);
 	}
@@ -42,9 +40,6 @@ public class WebActivity extends BaseOmnomActivity {
 			return;
 		}
 		mWebView.clearCache(true);
-		if(!mUriString.startsWith(SCHEME_PREFIX_HTTP)) {
-			mUriString = SCHEME_PREFIX_HTTP + mUriString;
-		}
 		mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.loadUrl(mUriString);

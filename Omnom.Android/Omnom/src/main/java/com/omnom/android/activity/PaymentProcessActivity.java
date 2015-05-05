@@ -25,6 +25,7 @@ import com.omnom.android.acquiring.demo.DemoAcquiring;
 import com.omnom.android.acquiring.mailru.OrderInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.MailRuExtra;
+import com.omnom.android.acquiring.mailru.model.ThreedsData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
@@ -195,6 +196,8 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	@Nullable
 	private Restaurant mRestaurant;
 
+	private boolean mFirstRun = true;
+
 	@Override
 	public void initUi() {
 		mPayChecker = new PaymentChecker(this);
@@ -226,7 +229,10 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	@Override
 	protected void onStart() {
 		super.onStart();
-		pay(mDetails.getAmount(), mDetails.getTip());
+		if(mFirstRun) {
+			mFirstRun = false;
+			pay(mDetails.getAmount(), mDetails.getTip());
+		}
 	}
 
 	@Override
@@ -392,24 +398,13 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	}
 
 	private void checkResult(final AcquiringResponse response) {
-		final String acsUrl = response.getAcsUrl();
-		if(!TextUtils.isEmpty(acsUrl)) {
-			onPayError(new AcquiringResponseError());
-//			if(response.getThreedsData() == null) {
-//				onPayError(new AcquiringResponseError());
-//			} else {
-//				final Uri acsUri = Uri.parse(acsUrl);
-//				final Uri requestUrl = acsUri.buildUpon()
-//				                             .appendQueryParameter(ThreedsData.MD, response.getThreedsData().getMD())
-//				                             .appendQueryParameter(ThreedsData.TERM_URL, response.getThreedsData().getTermUrl())
-//				                             .appendQueryParameter(ThreedsData.PA_REQ, response.getThreedsData().getPaReq()).build();
-//				ThreeDSWebActivity.start(this, requestUrl.toString(), REQUEST_CODE_HANDLE_THREE_DS);
-//			}
+		if(!TextUtils.isEmpty(response.getAcsUrl())) {
+			processThreeDs(response);
 		} else {
 			mCheckSubscription = AppObservable.bindActivity(getActivity(), getAcquiring().checkResult(response))
-			                                  .subscribe(new Action1<AcquiringPollingResponse>() {
+			                                  .subscribe(new Action1<AcquiringResponse>() {
 				                                  @Override
-				                                  public void call(final AcquiringPollingResponse response) {
+				                                  public void call(final AcquiringResponse response) {
 					                                  processResponse(response);
 				                                  }
 			                                  }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
@@ -422,12 +417,31 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 		}
 	}
 
-	private void processResponse(AcquiringPollingResponse response) {
-		Log.i(TAG, "status = " + response.getStatus());
-		if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
-			onPayOk(response);
+	private void processThreeDs(final AcquiringResponse response) {
+		final String acsUrl = response.getAcsUrl();
+		if(response.getThreedsData() == null) {
+			onPayError(new AcquiringResponseError());
 		} else {
-			onPayError(response.getError());
+			final Uri acsUri = Uri.parse(acsUrl);
+			final Uri requestUrl = acsUri.buildUpon()
+			                             .appendQueryParameter(ThreedsData.MD, response.getThreedsData().getMD())
+			                             .appendQueryParameter(ThreedsData.TERM_URL, response.getThreedsData().getTermUrl())
+			                             .appendQueryParameter(ThreedsData.PA_REQ, response.getThreedsData().getPaReq())
+			                             .build();
+			ThreeDSWebActivity.start(this, requestUrl.toString(), REQUEST_CODE_HANDLE_THREE_DS);
+		}
+	}
+
+	private void processResponse(AcquiringResponse response) {
+		Log.d(TAG, "status = " + response.getStatus());
+		if(!TextUtils.isEmpty(response.getAcsUrl())) {
+			processThreeDs(response);
+		} else {
+			if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
+				onPayOk(response);
+			} else {
+				onPayError(response.getError());
+			}
 		}
 	}
 
@@ -502,6 +516,16 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 			setResult(RESULT_OK);
 			finish();
 		}
+
+		if(requestCode == REQUEST_CODE_HANDLE_THREE_DS) {
+			if(resultCode == RESULT_OK) {
+				onPayOk(AcquiringPollingResponse.create(AcquiringPollingResponse.STATUS_OK));
+			} else {
+				final Uri uriData = (data != null && data.getData() != null) ? data.getData() : Uri.EMPTY;
+				onPayError(AcquiringResponseError.create("", "Не удалось провести 3DS транзакцию. URL=" + uriData.toString()));
+			}
+		}
+
 		if(requestCode == REQUEST_THANKS) {
 			if(resultCode == RESULT_OK) {
 				onPayOk(AcquiringPollingResponse.create(AcquiringResponse.STATUS_SUCCESS));
