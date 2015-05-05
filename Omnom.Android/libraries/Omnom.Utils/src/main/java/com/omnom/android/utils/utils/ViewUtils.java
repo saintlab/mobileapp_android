@@ -14,6 +14,7 @@ import butterknife.ButterKnife;
 
 import static com.omnom.android.utils.utils.AnimationUtils.animateAlpha;
 import static com.omnom.android.utils.utils.AnimationUtils.animateAlpha2;
+import static com.omnom.android.utils.utils.AnimationUtils.animateAlpha3;
 
 /**
  * Created by Ch3D on 29.07.2014.
@@ -45,6 +46,13 @@ public class ViewUtils {
 		@Override
 		public void set(View view, Boolean value, int index) {
 			animateAlpha2(view, value);
+		}
+	};
+
+	public static final ButterKnife.Setter<View, Boolean> VISIBLITY_ALPHA3 = new ButterKnife.Setter<View, Boolean>() {
+		@Override
+		public void set(View view, Boolean value, int index) {
+			animateAlpha3(view, value);
 		}
 	};
 

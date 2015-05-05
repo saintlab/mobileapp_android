@@ -1,6 +1,7 @@
 package com.omnom.android.utils.utils;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -427,5 +428,15 @@ public class AndroidUtils {
 
 	public static int getScreenHeightPixels(final Context context) {
 		return context.getResources().getDisplayMetrics().heightPixels;
+	}
+
+	public static void openBrowser(Context context, final String url, final String errMsg) {
+		final Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(Uri.parse(url));
+		try {
+			context.startActivity(i);
+		} catch(ActivityNotFoundException e) {
+			Toast.makeText(context, errMsg, Toast.LENGTH_LONG).show();
+		}
 	}
 }

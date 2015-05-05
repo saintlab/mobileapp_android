@@ -140,7 +140,8 @@ public class RestaurantHelper {
 		if(restaurant == null) {
 			return false;
 		}
-		return restaurant.isBar();
+		// return restaurant.isBar();
+		return true;
 	}
 
 	public static boolean isLunch(final Restaurant restaurant) {
