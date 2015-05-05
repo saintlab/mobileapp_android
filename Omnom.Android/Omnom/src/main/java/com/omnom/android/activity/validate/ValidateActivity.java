@@ -614,6 +614,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		                                 }, new Action1<Throwable>() {
 			                                 @Override
 			                                 public void call(Throwable throwable) {
+				                                 Log.e(TAG, "loadConfigs", throwable);
 				                                 if(throwable.getCause() instanceof UnknownHostException) {
 					                                 getErrorHelper().showInternetError(loadConfigsErrorListener);
 				                                 } else {
