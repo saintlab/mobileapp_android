@@ -15,7 +15,6 @@ import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
-import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
@@ -213,16 +212,16 @@ public class RestaurateurMixpanelProxy extends RestaurateurDataProvider {
 		});
 	}
 
-	@Override
-	public Observable<Config> getConfig(String token) {
-		mMixHelper.track(OMNOM_ANDROID, "restarateur.getConfig ->", StringUtils.EMPTY_STRING);
-		return super.getConfig(token).doOnNext(new Action1<Config>() {
-			@Override
-			public void call(Config response) {
-				mMixHelper.track(OMNOM_ANDROID, "restarateur.getConfig <-", response);
-			}
-		});
-	}
+//	@Override
+//	public Observable<Config> getConfig(String token) {
+//		mMixHelper.track(OMNOM_ANDROID, "restarateur.getConfig ->", StringUtils.EMPTY_STRING);
+//		return super.getConfig(token).doOnNext(new Action1<Config>() {
+//			@Override
+//			public void call(Config response) {
+//				mMixHelper.track(OMNOM_ANDROID, "restarateur.getConfig <-", response);
+//			}
+//		});
+//	}
 
 	@Override
 	public Observable<SupportInfoResponse> getSupportInfo() {

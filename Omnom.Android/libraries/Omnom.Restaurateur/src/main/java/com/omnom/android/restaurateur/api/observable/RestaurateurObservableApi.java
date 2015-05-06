@@ -8,7 +8,6 @@ import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
-import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
@@ -104,8 +103,6 @@ public interface RestaurateurObservableApi {
 	public Observable<BillResponse> bill(BillRequest request);
 
 	public Observable<Restaurant> link(long orderId, double amount, double tip);
-
-	public Observable<Config> getConfig(String token);
 
 	public Observable<SupportInfoResponse> getSupportInfo();
 

@@ -53,6 +53,7 @@ import com.omnom.android.notifier.api.observable.NotifierObservableApi;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.protocol.Protocol;
 import com.omnom.android.push.PushNotificationManager;
+import com.omnom.android.restaurateur.api.ConfigDataService;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
@@ -248,6 +249,9 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	protected RestaurateurObservableApi api;
 
 	@Inject
+	protected ConfigDataService configApi;
+
+	@Inject
 	protected Acquiring mAcquiring;
 
 	@Inject
@@ -402,7 +406,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mData = getIntent().getData();
 		mViewHelper = new ValidateViewHelper(this);
 		configurationService =
-				new ConfigurationService(this, authenticator, api, mAcquiring,
+				new ConfigurationService(this, authenticator, configApi, mAcquiring,
 				                         OmnomApplication.get(getActivity()).getAuthToken());
 	}
 
@@ -590,7 +594,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		final int validateDuration = getResources().getInteger(R.integer.omnom_validate_duration);
 		mViewHelper.startProgressAnimation(locationUpdateTimeout + validateDuration);
 
-		mDataSubscription = AppObservable.bindActivity(this, configurationService.getConfigurationObservable(getConfigToken()))
+		mDataSubscription = AppObservable.bindActivity(this, configurationService.getConfigurationObservable())
 		                                 .subscribe(new Action1<ConfigurationResponse>() {
 			                                 @Override
 			                                 public void call(ConfigurationResponse configurationResponse) {
@@ -622,14 +626,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				                                 }
 			                                 }
 		                                 });
-	}
-
-	private String getConfigToken() {
-		final String authToken = OmnomApplication.get(getActivity()).getAuthToken();
-		if(TextUtils.isEmpty(authToken)) {
-			return getString(R.string.default_config_auth_token);
-		}
-		return null;
 	}
 
 	private void validateShowRestaurants() {

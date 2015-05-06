@@ -7,6 +7,8 @@ import com.omnom.android.interceptors.mixpanel.RestaurateurMixpanelProxy;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.protocol.BaseRequestInterceptor;
 import com.omnom.android.protocol.Protocol;
+import com.omnom.android.restaurateur.api.ConfigDataService;
+import com.omnom.android.restaurateur.api.observable.ConfigDataProvider;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.utils.AuthTokenProvider;
 
@@ -20,8 +22,6 @@ import dagger.Provides;
  */
 @Module(complete = false, library = true)
 public class RestaurateurMixpanelModule {
-	public static final String PLATFORM_ANDROID = "Android";
-
 	private AuthTokenProvider tokenProvider;
 
 	private int mEndpointResId;
@@ -30,7 +30,8 @@ public class RestaurateurMixpanelModule {
 
 	private Context mContext;
 
-	public RestaurateurMixpanelModule(final AuthTokenProvider tokenProvider, final int endpointResId, final MixPanelHelper mixPanelHelper) {
+	public RestaurateurMixpanelModule(final AuthTokenProvider tokenProvider, final int endpointResId, final MixPanelHelper
+			mixPanelHelper) {
 		this.tokenProvider = tokenProvider;
 		this.mEndpointResId = endpointResId;
 		mMixPanelHelper = mixPanelHelper;
@@ -39,7 +40,7 @@ public class RestaurateurMixpanelModule {
 
 	@Provides
 	@Singleton
-	RestaurateurObservableApi providerLinkerApi() {
+	RestaurateurObservableApi provideRestaurantApi() {
 		return RestaurateurMixpanelProxy.create(
 				mContext.getString(mEndpointResId),
 				new BaseRequestInterceptor(mContext) {
@@ -52,5 +53,11 @@ public class RestaurateurMixpanelModule {
 						}
 					}
 				}, mMixPanelHelper);
+	}
+
+	@Provides
+	@Singleton
+	ConfigDataService providerConfigApi() {
+		return ConfigDataProvider.create(mContext.getString(mEndpointResId), new BaseRequestInterceptor(mContext));
 	}
 }

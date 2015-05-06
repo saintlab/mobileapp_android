@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool name="config_background_ble_enabled">false</bool>
-    <string name="default_config_auth_token">uv5zoaRsh9uff1yiSh8Dub4oc0hum3</string>
 </resources>

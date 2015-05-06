@@ -8,7 +8,7 @@ import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
+import com.omnom.android.restaurateur.api.ConfigDataService;
 import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.service.location.LocationService;
 import com.omnom.android.utils.utils.LocationUtils;
@@ -32,7 +32,7 @@ public class ConfigurationService {
 
 	protected final AuthService authenticator;
 
-	protected final RestaurateurObservableApi restaurantApi;
+	protected final ConfigDataService restaurantApi;
 
 	protected final Acquiring acquiring;
 
@@ -44,12 +44,12 @@ public class ConfigurationService {
 
 	public ConfigurationService(final Context context,
 	                            final AuthService authenticator,
-	                            final RestaurateurObservableApi restaurantApi,
+	                            final ConfigDataService configApi,
 	                            final Acquiring acquiring,
 	                            final String authToken) {
 		this.context = context;
 		this.authenticator = authenticator;
-		this.restaurantApi = restaurantApi;
+		this.restaurantApi = configApi;
 		this.acquiring = acquiring;
 		this.authToken = authToken;
 		this.locationService = new LocationService(context);
@@ -60,8 +60,8 @@ public class ConfigurationService {
 	 *
 	 * @return observable of all configuration items
 	 */
-	public Observable<ConfigurationResponse> getConfigurationObservable(String token) {
-		return Observable.zip(getConfigObservable(token),
+	public Observable<ConfigurationResponse> getConfigurationObservable() {
+		return Observable.zip(getConfigObservable(),
 		                      getCombinedUserAndLocationObservables(),
 		                      new Func2<Config, ConfigurationResponse, ConfigurationResponse>() {
 			                      @Override
@@ -75,8 +75,8 @@ public class ConfigurationService {
 		                      }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
-	private Observable<Config> getConfigObservable(String token) {
-		return restaurantApi.getConfig(token).retry(RETRY_COUNT);
+	private Observable<Config> getConfigObservable() {
+		return restaurantApi.getConfig().retry(RETRY_COUNT);
 	}
 
 	/**
