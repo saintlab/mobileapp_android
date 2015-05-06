@@ -7,7 +7,7 @@ import com.omnom.android.acquiring.mailru.model.ThreedsData;
 /**
  * Created by Ch3D on 23.09.2014.
  */
-public class AcquiringResponse {
+public class AcquiringResponse extends AcquiringPollingResponse {
 	public static final String STATUS_SUCCESS = "success";
 
 	public static final String STATUS_FAILED = "failed";
@@ -17,38 +17,16 @@ public class AcquiringResponse {
 	private String acsUrl;
 
 	@Expose
-	private String url;
-
-	@Expose
 	@SerializedName("threeds_data")
 	private ThreedsData threedsData;
-
-	@Expose
-	private AcquiringResponseError error;
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public AcquiringResponseError getError() {
-		return error;
-	}
-
-	public void setError(AcquiringResponseError error) {
-		this.error = error;
-	}
 
 	@Override
 	public String toString() {
 		return "AcquiringResponse{" +
 				"acsUrl='" + acsUrl + '\'' +
-				", url='" + url + '\'' +
+				", url='" + getUrl() + '\'' +
 				", threedsData=" + threedsData +
-				", error=" + error +
+				", error=" + getError() +
 				'}';
 	}
 

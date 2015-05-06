@@ -17,6 +17,7 @@ import com.omnom.android.activity.RestaurantActivity;
 import com.omnom.android.activity.RestaurantsListActivity;
 import com.omnom.android.activity.ThanksActivity;
 import com.omnom.android.activity.ThanksDemoActivity;
+import com.omnom.android.activity.ThreeDSWebActivity;
 import com.omnom.android.activity.UserProfileActivity;
 import com.omnom.android.activity.UserRegisterActivity;
 import com.omnom.android.activity.ValidateActivityBle;
@@ -64,7 +65,7 @@ import dagger.Module;
 		LunchOrderAcceptedActivity.class, TakeawayOrderAcceptedActivity.class,
 		ThanksActivity.class, ThanksDemoActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
 		PaymentProcessActivity.class, RestaurantsListActivity.class, RestaurantActivity.class, WishActivity.class, WishSentActivity.class,
-		WebActivity.class,
+		WebActivity.class, ThreeDSWebActivity.class,
 		/* services */
 		BackgroundBleService.class,
 		/* fragments */

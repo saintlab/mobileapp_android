@@ -1,7 +1,6 @@
 package com.omnom.android.acquiring.api;
 
 import com.omnom.android.acquiring.mailru.model.CardInfo;
-import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardDeleteResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
@@ -17,7 +16,7 @@ import rx.Observable;
 public interface Acquiring {
 	public Observable<AcquiringResponse> pay(AcquiringData acquiringData, PaymentInfo paymentInfo);
 
-	public Observable<AcquiringPollingResponse> checkResult(final AcquiringResponse acquiringResponse);
+	public Observable<AcquiringResponse> checkResult(final AcquiringResponse acquiringResponse);
 
 	public Observable<CardDeleteResponse> deleteCard(AcquiringData acquiringData, UserData user, CardInfo cardInfo);
 
