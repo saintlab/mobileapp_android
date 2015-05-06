@@ -10,12 +10,15 @@ import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
+import com.omnom.android.utils.EncryptionUtils;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
@@ -75,21 +78,40 @@ public class PollingObservable {
 		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
-	public static Observable<AcquiringPollingResponse> create(final AcquiringResponse cardResponse) {
-		return Observable.create(new Observable.OnSubscribe<AcquiringPollingResponse>() {
+	public static String readFully(InputStream inputStream, String encoding)
+			throws IOException {
+		return new String(readFully(inputStream), encoding);
+	}
+
+	private static byte[] readFully(InputStream inputStream)
+			throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int length = 0;
+		while((length = inputStream.read(buffer)) != -1) {
+			baos.write(buffer, 0, length);
+		}
+		return baos.toByteArray();
+	}
+
+	public static Observable<AcquiringResponse> create(final AcquiringResponse cardResponse) {
+		return Observable.create(new Observable.OnSubscribe<AcquiringResponse>() {
 			@Override
-			public void call(Subscriber<? super AcquiringPollingResponse> subscriber) {
+			public void call(Subscriber<? super AcquiringResponse> subscriber) {
 				Gson gson = new Gson();
 				AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
 				try {
-					CardRegisterPollingResponse next = null;
+					AcquiringResponse next = null;
 					while(next == null) {
 						final HttpResponse execute = client.execute(new HttpPost(cardResponse.getUrl()));
 						final HttpEntity entity = execute.getEntity();
 
 						if(entity != null) {
-							final Reader reader = new InputStreamReader(entity.getContent());
-							final CardRegisterPollingResponse response = gson.fromJson(reader, CardRegisterPollingResponse.class);
+							final String resp = readFully(entity.getContent(), EncryptionUtils.UTF_8);
+							if(BuildConfig.DEBUG) {
+								Log.d(TAG, "Mail_ru polling response = " + resp);
+							}
+							final AcquiringResponse response = gson.fromJson(resp, AcquiringResponse.class);
 							if(BuildConfig.DEBUG && response != null) {
 								Log.i(TAG, response.toString());
 							}

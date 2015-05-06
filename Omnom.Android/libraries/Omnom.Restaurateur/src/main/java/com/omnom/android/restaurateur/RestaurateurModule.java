@@ -5,6 +5,8 @@ import android.text.TextUtils;
 
 import com.omnom.android.protocol.BaseRequestInterceptor;
 import com.omnom.android.protocol.Protocol;
+import com.omnom.android.restaurateur.api.ConfigDataService;
+import com.omnom.android.restaurateur.api.observable.ConfigDataProvider;
 import com.omnom.android.restaurateur.api.observable.RestaurateurDataProvider;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.utils.AuthTokenProvider;
@@ -19,9 +21,6 @@ import dagger.Provides;
  */
 @Module(complete = false, library = true)
 public class RestaurateurModule {
-
-	public static final String PLATFORM_ANDROID = "Android";
-
 	private AuthTokenProvider tokenProvider;
 
 	private int mEndpointResId;
@@ -36,7 +35,7 @@ public class RestaurateurModule {
 
 	@Provides
 	@Singleton
-	RestaurateurObservableApi providerLinkerApi() {
+	RestaurateurObservableApi providerRestaurantApi() {
 		return RestaurateurDataProvider.create(
 				mContext.getString(mEndpointResId),
 				new BaseRequestInterceptor(mContext) {
@@ -49,5 +48,11 @@ public class RestaurateurModule {
 						}
 					}
 				});
+	}
+
+	@Provides
+	@Singleton
+	ConfigDataService providerConfigApi() {
+		return ConfigDataProvider.create(mContext.getString(mEndpointResId), new BaseRequestInterceptor(mContext));
 	}
 }

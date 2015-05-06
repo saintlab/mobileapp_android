@@ -1,6 +1,7 @@
 package com.omnom.android.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -135,6 +136,13 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		topPanel.setTitle(R.string.enter);
 		topPanel.setContentVisibility(false, true);
 		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 1);
+		topPanel.setBackgroundColor(Color.WHITE);
+		topPanel.setButtonLeftDrawable(R.drawable.btn_previous, new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				onBackPressed();
+			}
+		});
 
 		edit1.addTextChangedListener(new Watcher(edit1));
 		edit2.addTextChangedListener(new Watcher(edit2));
@@ -168,10 +176,13 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 			@Override
 			public void call(final AuthResponse authResponse) {
 				if(!authResponse.hasError()) {
-					((OmnomApplication) getApplication()).cacheAuthToken(authResponse.getToken());
+					final OmnomApplication omnomApp = OmnomApplication.get(getActivity());
+					omnomApp.cacheAuthToken(authResponse.getToken());
 					topPanel.setContentVisibility(false, false);
+					setResult(RESULT_OK);
 					finish();
-					EnteringActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, 0, type);
+					// EnteringActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, 0,
+					// type);
 				} else {
 					edit1.setText(StringUtils.EMPTY_STRING);
 					edit2.setText(StringUtils.EMPTY_STRING);

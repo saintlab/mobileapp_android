@@ -53,6 +53,7 @@ import com.omnom.android.notifier.api.observable.NotifierObservableApi;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.protocol.Protocol;
 import com.omnom.android.push.PushNotificationManager;
+import com.omnom.android.restaurateur.api.ConfigDataService;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
@@ -248,6 +249,9 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	protected RestaurateurObservableApi api;
 
 	@Inject
+	protected ConfigDataService configApi;
+
+	@Inject
 	protected Acquiring mAcquiring;
 
 	@Inject
@@ -402,7 +406,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mData = getIntent().getData();
 		mViewHelper = new ValidateViewHelper(this);
 		configurationService =
-				new ConfigurationService(this, authenticator, api, mAcquiring,
+				new ConfigurationService(this, authenticator, configApi, mAcquiring,
 				                         OmnomApplication.get(getActivity()).getAuthToken());
 	}
 
@@ -462,7 +466,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mOrderHelper.updateWishUi();
 		mViewHelper.onResume();
 
-		if(mPaymentListener != null && mTable != null) {
+		if(mPaymentListener != null) {
 			mPaymentListener.initTableSocket(mTable);
 		}
 	}
@@ -614,6 +618,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		                                 }, new Action1<Throwable>() {
 			                                 @Override
 			                                 public void call(Throwable throwable) {
+				                                 Log.e(TAG, "loadConfigs", throwable);
 				                                 if(throwable.getCause() instanceof UnknownHostException) {
 					                                 getErrorHelper().showInternetError(loadConfigsErrorListener);
 				                                 } else {
@@ -656,10 +661,12 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	}
 
 	private void updateConfiguration(final Config config) {
-		mPushManager.register();
 		OmnomApplication.get(getActivity()).cacheConfig(config);
 		if(mAcquiring instanceof AcquiringMailRu) {
 			((AcquiringMailRu) mAcquiring).changeEndpoint(config.getAcquiringData().getBaseUrl());
+		}
+		if(!TextUtils.isEmpty(OmnomApplication.get(getActivity()).getAuthToken())) {
+			mPushManager.register();
 		}
 		getMixPanelHelper().addApi(OMNOM, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
 		getMixPanelHelper().addApi(OMNOM_ANDROID, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));
@@ -693,9 +700,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				}
 			});
 		}
-		if(mTable != null) {
-			mPaymentListener.initTableSocket(mTable);
-		}
+		mPaymentListener.initTableSocket(mTable);
 		mFirstRun = false;
 	}
 

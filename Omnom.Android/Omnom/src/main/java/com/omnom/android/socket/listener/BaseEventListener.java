@@ -14,51 +14,54 @@ import java.net.URISyntaxException;
  */
 public class BaseEventListener {
 
-    private static final String TAG = PaymentEventListener.class.getSimpleName();
+	private static final String TAG = PaymentEventListener.class.getSimpleName();
 
-    protected final OmnomActivity mActivity;
+	protected final OmnomActivity mActivity;
 
-    protected OmnomSocketBase mTableSocket;
+	protected OmnomSocketBase mTableSocket;
 
-    public BaseEventListener(final OmnomActivity activity) {
-        mActivity = activity;
-    }
+	public BaseEventListener(final OmnomActivity activity) {
+		mActivity = activity;
+	}
 
+	public void initTableSocket(final String tableId) {
+		try {
+			mTableSocket = OmnomSocketFactory.initTable(mActivity.getActivity(), tableId);
+			mTableSocket.connect();
+			mTableSocket.subscribe(this);
+			mTableSocket.subscribe(mActivity);
+		} catch(URISyntaxException e) {
+			Log.e(TAG, "Unable to initiate socket connection");
+		}
+	}
 
-    public void initTableSocket(final String tableId) {
-        try {
-            mTableSocket = OmnomSocketFactory.initTable(mActivity.getActivity(), tableId);
-            mTableSocket.connect();
-            mTableSocket.subscribe(this);
-            mTableSocket.subscribe(mActivity);
-        } catch(URISyntaxException e) {
-            Log.e(TAG, "Unable to initiate socket connection");
-        }
-    }
+	public void initTableSocket(final TableDataResponse table) {
+		if(table != null && table != TableDataResponse.NULL) {
+			try {
+				mTableSocket = OmnomSocketFactory.init(mActivity.getActivity(), table);
+				mTableSocket.connect();
+				mTableSocket.subscribe(this);
+				mTableSocket.subscribe(mActivity);
+			} catch(URISyntaxException e) {
+				Log.e(TAG, "Unable to initiate socket connection");
+			}
+		} else {
+			Log.d(TAG, "unable to init websocket for table = " + table);
+		}
+	}
 
-    public void initTableSocket(final TableDataResponse table) {
-        try {
-            mTableSocket = OmnomSocketFactory.init(mActivity.getActivity(), table);
-            mTableSocket.connect();
-            mTableSocket.subscribe(this);
-            mTableSocket.subscribe(mActivity);
-        } catch(URISyntaxException e) {
-            Log.e(TAG, "Unable to initiate socket connection");
-        }
-    }
+	public void onPause() {
+		if(mTableSocket != null) {
+			mTableSocket.unsubscribe(this);
+			mTableSocket.unsubscribe(mActivity);
+			mTableSocket.disconnect();
+			mTableSocket.destroy();
+			mTableSocket = null;
+		}
+	}
 
-    public void onPause() {
-        if(mTableSocket != null) {
-            mTableSocket.unsubscribe(this);
-            mTableSocket.unsubscribe(mActivity);
-            mTableSocket.disconnect();
-            mTableSocket.destroy();
-            mTableSocket = null;
-        }
-    }
+	public void onDestroy() {
 
-    public void onDestroy() {
-
-    }
+	}
 
 }

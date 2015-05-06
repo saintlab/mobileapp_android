@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.omnom.android">
+<manifest
+    package="com.omnom.android"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -320,6 +321,12 @@
         <activity
             android:name=".activity.WebActivity"
             android:label="@string/title_activity_wish_sent"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White.Light"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity
+            android:name=".activity.ThreeDSWebActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White.Light"
             android:windowSoftInputMode="stateAlwaysHidden" />

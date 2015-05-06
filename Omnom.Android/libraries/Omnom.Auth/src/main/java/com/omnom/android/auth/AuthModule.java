@@ -13,6 +13,7 @@ import dagger.Provides;
 @Module(complete = false, library = true)
 public class AuthModule {
 	private Context mContext;
+
 	private int mEndpointId;
 
 	public AuthModule(final Context context, final int endpointId) {
@@ -23,6 +24,6 @@ public class AuthModule {
 	@Provides
 	@Singleton
 	AuthService providerAuthenticator() {
-		return new WicketAuthenticator(mContext, mContext.getString(mEndpointId));
+		return new PostponedWicketAuthenticator(mContext, mContext.getString(mEndpointId));
 	}
 }

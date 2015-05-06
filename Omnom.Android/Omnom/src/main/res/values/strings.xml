@@ -212,4 +212,8 @@
     <string name="info_money_back"><u>Почему списали деньги и когда их вернут?</u></string>
     <string name="info_no_sms"><u>Не пришла SMS?</u></string>
     <string name="wrong_checksum_short">Введена неверная проверочная сумма.</string>
+    <string name="support_unavailable">Извините, в данный момент поддержка не доступна. Пожалуйста, попробуйте позже</string>
+    <string name="license_agreement_clickable">Пользовательского соглашения</string>
+    <string name="license_agreement_info">Нажимая Далее, вы выражаете согласие с условиями Пользовательского соглашения</string>
+    <string name="enter_your_phone_number">Укажите ваш номер телефона</string>
 </resources>

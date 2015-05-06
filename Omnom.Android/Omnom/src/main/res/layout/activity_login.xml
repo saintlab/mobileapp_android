@@ -1,61 +1,50 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <com.omnom.android.view.HeaderView
         android:id="@+id/panel_top"
         android:layout_width="match_parent"
         android:layout_height="@dimen/view_size_default"
         android:background="@color/list_header"
-        android:padding="@dimen/activity_horizontal_margin_small"/>
+        android:padding="@dimen/activity_horizontal_margin_small" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="@dimen/activity_vertical_margin_medium"
+        android:paddingBottom="@dimen/activity_vertical_margin_small"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/transparent_black"
+        android:text="@string/enter_your_phone_number" />
 
     <com.omnom.android.utils.view.ErrorEdit
         android:id="@+id/edit_phone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/panel_top"
         android:padding="@dimen/activity_horizontal_margin"
         omnom:inputType="phone"
-        omnom:textSize="@dimen/font_medium"
+        omnom:textSize="@dimen/font_larger"
         omnom:font="regular_le"
-        omnom:hint="@string/phone_number"
         omnom:imeOptions="actionDone"
         omnom:showClear="true"
-        omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel"/>
+        omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel" />
 
-    <TextView
-        android:id="@+id/txt_change_phone"
+    <Space
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/edit_phone"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:gravity="left|center_vertical"
-        android:text="@string/phone_changed"
-        android:textAppearance="?android:textAppearanceSmall"
-        android:textColor="@color/light_blue" />
+        android:layout_height="48dp" />
 
     <TextView
         android:id="@+id/txt_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_change_phone"
         android:gravity="center"
-        android:text="@string/login_havent_account_yet"
+        android:text="@string/license_agreement_info"
         android:textAppearance="?android:textAppearance"
-        android:textColor="@color/transparent_black"
-        android:visibility="gone"/>
+        android:textColorLink="@color/text_blue"
+        android:textColor="@color/transparent_black" />
 
-    <TextView
-        android:id="@+id/txt_register"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_info"
-        android:gravity="center"
-        android:text="@string/login_havent_account_registration"
-        android:textAppearance="?android:textAppearance"
-        android:textColor="@color/light_blue"
-        android:visibility="gone" />
-
-</RelativeLayout>
+</LinearLayout>

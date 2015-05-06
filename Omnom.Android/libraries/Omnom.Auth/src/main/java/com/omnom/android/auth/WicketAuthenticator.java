@@ -1,6 +1,7 @@
 package com.omnom.android.auth;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -58,6 +59,9 @@ public class WicketAuthenticator implements AuthService {
 
 	@Override
 	public Observable<UserResponse> getUser(String token) {
+		if(TextUtils.isEmpty(token)) {
+			return Observable.just(UserResponse.NULL);
+		}
 		return authService.getUser(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 

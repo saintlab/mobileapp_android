@@ -27,7 +27,7 @@ public class ThreeDSWebActivity extends WebActivity {
 				if(Boolean.TRUE.toString().equalsIgnoreCase(strSuccess)) {
 					setResult(RESULT_OK);
 				} else {
-					setResult(RESULT_CANCELED, new Intent().putExtra(EXTRA_URI, uri));
+					setResult(RESULT_CANCELED, new Intent().setData(uri));
 				}
 				finish();
 				return true;
