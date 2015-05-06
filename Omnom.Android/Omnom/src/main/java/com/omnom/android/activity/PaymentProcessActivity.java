@@ -54,7 +54,6 @@ import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.loader.LoaderView;
-import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.validator.LongValidator;
@@ -67,8 +66,6 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 /**
@@ -152,12 +149,6 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	protected List<View> errorViews;
 
 	protected OmnomErrorHelper mErrorHelper;
-
-	private Subscription mBillSubscription;
-
-	private Subscription mPaySubscription;
-
-	private Subscription mCheckSubscription;
 
 	private OrderFragment.PaymentDetails mDetails;
 
@@ -252,9 +243,6 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 		super.onDestroy();
 		mPaymentListener.onDestroy();
 		loader.onDestroy();
-		OmnomObservable.unsubscribe(mBillSubscription);
-		OmnomObservable.unsubscribe(mPaySubscription);
-		OmnomObservable.unsubscribe(mCheckSubscription);
 	}
 
 	private void pay(final double amount, final int tip) {
@@ -275,39 +263,38 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	}
 
 	private void processPayment(final double amount, final int tip) {
-		final Activity activity = getActivity();
-
 		final BillRequest request = createBillRequest(amount);
-		mBillSubscription = AppObservable.bindActivity(activity, api.bill(request)).subscribe(new Action1<BillResponse>() {
-			@Override
-			public void call(final BillResponse response) {
-				final String status = response.getStatus();
-				if(BillResponse.STATUS_NEW.equals(status) && !response.hasErrors()) {
-					tryToPay(mCardInfo, response, amount, tip);
-				} else {
-					Log.w(TAG, "processPayment status = " + status);
-					if(response.getError() != null) {
-						Log.w(TAG, response.getError());
-					} else if(response.getErrors() != null) {
-						Log.w(TAG, response.getErrors().toString());
-					}
-					if(BillResponse.STATUS_RESTAURANT_NOT_AVAILABLE.equals(status)) {
-						mErrorHelper.showError(LoaderError.RESTAURANT_UNAVAILABLE, mFinishClickListener);
-					} else if(BillResponse.STATUS_PAID.equals(status) || BillResponse.STATUS_ORDER_CLOSED.equals(status)) {
-						onOrderClosed();
-					} else {
+		subscribe(api.bill(request),
+		          new Action1<BillResponse>() {
+			          @Override
+			          public void call(final BillResponse response) {
+				          final String status = response.getStatus();
+				          if(BillResponse.STATUS_NEW.equals(status) && !response.hasErrors()) {
+					          tryToPay(mCardInfo, response, amount, tip);
+				          } else {
+					          Log.w(TAG, "processPayment status = " + status);
+					          if(response.getError() != null) {
+						          Log.w(TAG, response.getError());
+					          } else if(response.getErrors() != null) {
+						          Log.w(TAG, response.getErrors().toString());
+					          }
+					          if(BillResponse.STATUS_RESTAURANT_NOT_AVAILABLE.equals(status)) {
+						          mErrorHelper.showError(LoaderError.RESTAURANT_UNAVAILABLE, mFinishClickListener);
+					          } else if(BillResponse.STATUS_PAID.equals(status) || BillResponse.STATUS_ORDER_CLOSED.equals(status)) {
+						          onOrderClosed();
+					          } else {
+						          onUnknownError();
+					          }
+
+				          }
+			          }
+		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					@Override
+					public void onError(Throwable throwable) {
+						Log.w(TAG, "processPayment", throwable);
 						onUnknownError();
 					}
-
-				}
-			}
-		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			@Override
-			public void onError(Throwable throwable) {
-				Log.w(TAG, "processPayment", throwable);
-				onUnknownError();
-			}
-		});
+				});
 	}
 
 	private BillRequest createBillRequest(final double amount) {
@@ -366,29 +353,29 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 			mPayChecker.onPrePayment(mDetails);
 		}
 
-		mPaySubscription = AppObservable.bindActivity(getActivity(), getAcquiring().pay(acquiringData, paymentInfo))
-		                                .subscribe(new Action1<AcquiringResponse>() {
-			                                @Override
-			                                public void call(final AcquiringResponse response) {
-				                                if(response.getError() != null) {
-					                                Log.w(TAG, response.getError().toString());
-					                                onPayError(response.getError());
-				                                } else {
-					                                mTransactionUrl = response.getUrl();
-					                                mDetails.setTransactionUrl(mTransactionUrl);
-					                                if(mPayChecker != null) {
-						                                mPayChecker.onPaymentRequested(mDetails);
-					                                }
-					                                checkResult(response);
-				                                }
-			                                }
-		                                }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			                                @Override
-			                                public void onError(Throwable throwable) {
-				                                Log.w(TAG, "pay", throwable);
-				                                onUnknownError();
-			                                }
-		                                });
+		subscribe(getAcquiring().pay(acquiringData, paymentInfo),
+		          new Action1<AcquiringResponse>() {
+			          @Override
+			          public void call(final AcquiringResponse response) {
+				          if(response.getError() != null) {
+					          Log.w(TAG, response.getError().toString());
+					          onPayError(response.getError());
+				          } else {
+					          mTransactionUrl = response.getUrl();
+					          mDetails.setTransactionUrl(mTransactionUrl);
+					          if(mPayChecker != null) {
+						          mPayChecker.onPaymentRequested(mDetails);
+					          }
+					          checkResult(response);
+				          }
+			          }
+		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					@Override
+					public void onError(Throwable throwable) {
+						Log.w(TAG, "pay", throwable);
+						onUnknownError();
+					}
+				});
 	}
 
 	private void onSimilarPayment(final AcquiringResponseError error) {
@@ -401,19 +388,19 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 		if(!TextUtils.isEmpty(response.getAcsUrl())) {
 			processThreeDs(response);
 		} else {
-			mCheckSubscription = AppObservable.bindActivity(getActivity(), getAcquiring().checkResult(response))
-			                                  .subscribe(new Action1<AcquiringResponse>() {
-				                                  @Override
-				                                  public void call(final AcquiringResponse response) {
-					                                  processResponse(response);
-				                                  }
-			                                  }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-				                                  @Override
-				                                  public void onError(Throwable throwable) {
-					                                  Log.w(TAG, "checkResult", throwable);
-					                                  onUnknownError();
-				                                  }
-			                                  });
+			subscribe(getAcquiring().checkResult(response),
+			          new Action1<AcquiringResponse>() {
+				          @Override
+				          public void call(final AcquiringResponse response) {
+					          processResponse(response);
+				          }
+			          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+						@Override
+						public void onError(Throwable throwable) {
+							Log.w(TAG, "checkResult", throwable);
+							onUnknownError();
+						}
+					});
 		}
 	}
 

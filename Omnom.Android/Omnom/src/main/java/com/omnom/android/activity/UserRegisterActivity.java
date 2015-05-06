@@ -19,7 +19,6 @@ import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.utils.ObservableUtils;
-import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.ErrorUtils;
@@ -36,8 +35,6 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 /**
@@ -84,8 +81,6 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 	private boolean mFirstStart = true;
 
 	private GregorianCalendar gc;
-
-	private Subscription mRegisterSubscription;
 
 	@Override
 	protected void handleIntent(final Intent intent) {
@@ -230,27 +225,27 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		final AuthRegisterRequest request = AuthRegisterRequest
 				.create(AndroidUtils.getInstallId(this), editName.getText(), StringUtils.EMPTY_STRING, editEmail.getText(),
 				        editPhone.getText(), editBirth.getText().toString().replace(DELIMITER_DATE_UI, DELIMITER_DATE_WICKET));
-		mRegisterSubscription =
-				AppObservable.bindActivity(this, authenticator.register(request)).subscribe(new Action1<AuthRegisterResponse>() {
-					@Override
-					public void call(final AuthRegisterResponse authRegisterResponse) {
-						if(!authRegisterResponse.hasError()) {
-							topPanel.setContentVisibility(false, false);
-							postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
-								@Override
-								public void run() {
-									final Intent intent = new Intent(UserRegisterActivity.this, ConfirmPhoneActivity.class);
-									intent.putExtra(EXTRA_PHONE, request.getPhone());
-									intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_REGISTER);
-									start(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
-									topPanel.showProgress(false);
-								}
-							});
-						} else {
-							handleRegisterError(authRegisterResponse);
-						}
-					}
-				}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+		subscribe(authenticator.register(request),
+		          new Action1<AuthRegisterResponse>() {
+			          @Override
+			          public void call(final AuthRegisterResponse authRegisterResponse) {
+				          if(!authRegisterResponse.hasError()) {
+					          topPanel.setContentVisibility(false, false);
+					          postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
+						          @Override
+						          public void run() {
+							          final Intent intent = new Intent(UserRegisterActivity.this, ConfirmPhoneActivity.class);
+							          intent.putExtra(EXTRA_PHONE, request.getPhone());
+							          intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_REGISTER);
+							          start(intent, R.anim.slide_in_right, R.anim.slide_out_left, false);
+							          topPanel.showProgress(false);
+						          }
+					          });
+				          } else {
+					          handleRegisterError(authRegisterResponse);
+				          }
+			          }
+		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					@Override
 					public void onError(Throwable throwable) {
 						if(ErrorUtils.isConnectionError(throwable)) {
@@ -289,12 +284,6 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 				textError.setText(error.getMessage());
 				ViewUtils.setVisible(textError, true);
 		}
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		OmnomObservable.unsubscribe(mRegisterSubscription);
 	}
 
 	private boolean validate() {

@@ -4,7 +4,7 @@ import android.location.Location;
 import android.os.Bundle;
 
 import com.omnom.android.OmnomApplication;
-import com.omnom.android.activity.helper.ActivityHelper;
+import com.omnom.android.activity.helper.LocationActivityHelper;
 import com.omnom.android.activity.helper.OmnomActivityHelper;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.mixpanel.MixPanelHelper;
@@ -16,7 +16,7 @@ import com.omnom.android.utils.activity.BaseActivity;
  */
 public abstract class BaseOmnomActivity extends BaseActivity {
 
-	protected ActivityHelper activityHelper;
+	protected LocationActivityHelper locationHelper;
 
 	private boolean isBusy;
 
@@ -27,18 +27,18 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		activityHelper = new OmnomActivityHelper(getActivity());
+		locationHelper = new OmnomActivityHelper(getActivity());
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		activityHelper.onStart();
+		locationHelper.onStart();
 	}
 
 	@Override
 	protected void onDestroy() {
-		activityHelper.onDestroy();
+		locationHelper.onDestroy();
 		getMixPanelHelper().flush();
 		super.onDestroy();
 	}
@@ -56,7 +56,9 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 	}
 
 	protected Location getLocation() {
-		return activityHelper.getLocation();
+		return locationHelper.getLocation();
 	}
+
+
 
 }

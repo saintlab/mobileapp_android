@@ -20,7 +20,6 @@ import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.push.PushNotificationManager;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
-import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 import com.omnom.android.utils.utils.ErrorUtils;
@@ -31,8 +30,6 @@ import com.omnom.android.view.HeaderView;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 public class LoginActivity extends BaseOmnomActivity {
@@ -69,10 +66,6 @@ public class LoginActivity extends BaseOmnomActivity {
 	private boolean mFirstStart = true;
 
 	private String mPhone;
-
-	private Subscription mProceedSubscription;
-
-	private Subscription mRegisterSubscription;
 
 	@Override
 	public void initUi() {
@@ -179,51 +172,50 @@ public class LoginActivity extends BaseOmnomActivity {
 		busy(true);
 		topPanel.showProgress(true);
 
-		mProceedSubscription = AppObservable.bindActivity(this, authenticator.authorizePhone(editPhone.getText(),
-		                                                                                     StringUtils.EMPTY_STRING))
-		                                    .subscribe(new Action1<AuthResponse>() {
-			                                    @Override
-			                                    public void call(AuthResponse authResponse) {
-				                                    topPanel.showProgress(false);
-				                                    busy(false);
+		subscribe(authenticator.authorizePhone(editPhone.getText(), StringUtils.EMPTY_STRING),
+		          new Action1<AuthResponse>() {
+			          @Override
+			          public void call(AuthResponse authResponse) {
+				          topPanel.showProgress(false);
+				          busy(false);
 
-				                                    if(!authResponse.hasError()) {
-					                                    topPanel.setContentVisibility(false, false);
-					                                    postDelayed(getResources().getInteger(
-							                                    R.integer.default_animation_duration_short), new Runnable() {
-						                                    @Override
-						                                    public void run() {
-							                                    final Intent intent = new Intent(LoginActivity.this,
-							                                                                     ConfirmPhoneActivity.class);
-							                                    intent.putExtra(EXTRA_PHONE, editPhone.getText());
-							                                    intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_LOGIN);
-							                                    startForResult(intent,
-							                                                   R.anim.slide_in_right,
-							                                                   R.anim.slide_out_left,
-							                                                   REQUEST_CODE_LOGIN_CONFIRM);
-						                                    }
-					                                    });
-				                                    } else {
-					                                    doRegister();
-					                                    //					                                    final AuthError error =
-					                                    // authResponse.getError();
-					                                    //					                                    if(error != null) {
-					                                    //						                                    showError(error
-					                                    // .getMessage());
-					                                    //					                                    }
-				                                    }
-			                                    }
-		                                    }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			                                    @Override
-			                                    public void onError(Throwable throwable) {
-				                                    Log.e(TAG, ":authorizePhone doProceed ", throwable);
-				                                    if(ErrorUtils.isConnectionError(throwable)) {
-					                                    showError(getString(R.string.err_no_internet));
-				                                    } else {
-					                                    showError(getString(R.string.something_went_wrong));
-				                                    }
-			                                    }
-		                                    });
+				          if(!authResponse.hasError()) {
+					          topPanel.setContentVisibility(false, false);
+					          postDelayed(getResources().getInteger(
+							          R.integer.default_animation_duration_short), new Runnable() {
+						          @Override
+						          public void run() {
+							          final Intent intent = new Intent(LoginActivity.this,
+							                                           ConfirmPhoneActivity.class);
+							          intent.putExtra(EXTRA_PHONE, editPhone.getText());
+							          intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_LOGIN);
+							          startForResult(intent,
+							                         R.anim.slide_in_right,
+							                         R.anim.slide_out_left,
+							                         REQUEST_CODE_LOGIN_CONFIRM);
+						          }
+					          });
+				          } else {
+					          doRegister();
+					          //					                                    final AuthError error =
+					          // authResponse.getError();
+					          //					                                    if(error != null) {
+					          //						                                    showError(error
+					          // .getMessage());
+					          //					                                    }
+				          }
+			          }
+		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					@Override
+					public void onError(Throwable throwable) {
+						Log.e(TAG, ":authorizePhone doProceed ", throwable);
+						if(ErrorUtils.isConnectionError(throwable)) {
+							showError(getString(R.string.err_no_internet));
+						} else {
+							showError(getString(R.string.something_went_wrong));
+						}
+					}
+				});
 	}
 
 	private void doRegister() {
@@ -236,32 +228,32 @@ public class LoginActivity extends BaseOmnomActivity {
 		                                                               StringUtils.EMPTY_STRING,
 		                                                               editPhone.getText(),
 		                                                               StringUtils.EMPTY_STRING);
-		mRegisterSubscription =
-				AppObservable.bindActivity(this, authenticator.register(request)).subscribe(new Action1<AuthRegisterResponse>() {
-					@Override
-					public void call(final AuthRegisterResponse authRegisterResponse) {
-						busy(false);
-						if(!authRegisterResponse.hasError()) {
-							topPanel.setContentVisibility(false, false);
-							postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
-								@Override
-								public void run() {
-									final Intent intent = new Intent(LoginActivity.this,
-									                                 ConfirmPhoneActivity.class);
-									intent.putExtra(EXTRA_PHONE, editPhone.getText());
-									intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_REGISTER);
-									startForResult(intent,
-									               R.anim.slide_in_right,
-									               R.anim.slide_out_left,
-									               REQUEST_CODE_LOGIN_CONFIRM);
-									topPanel.showProgress(false);
-								}
-							});
-						} else {
-							handleRegisterError(authRegisterResponse);
-						}
-					}
-				}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+		subscribe(authenticator.register(request),
+		          new Action1<AuthRegisterResponse>() {
+			          @Override
+			          public void call(final AuthRegisterResponse authRegisterResponse) {
+				          busy(false);
+				          if(!authRegisterResponse.hasError()) {
+					          topPanel.setContentVisibility(false, false);
+					          postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
+						          @Override
+						          public void run() {
+							          final Intent intent = new Intent(LoginActivity.this,
+							                                           ConfirmPhoneActivity.class);
+							          intent.putExtra(EXTRA_PHONE, editPhone.getText());
+							          intent.putExtra(EXTRA_CONFIRM_TYPE, ConfirmPhoneActivity.TYPE_REGISTER);
+							          startForResult(intent,
+							                         R.anim.slide_in_right,
+							                         R.anim.slide_out_left,
+							                         REQUEST_CODE_LOGIN_CONFIRM);
+							          topPanel.showProgress(false);
+						          }
+					          });
+				          } else {
+					          handleRegisterError(authRegisterResponse);
+				          }
+			          }
+		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 					@Override
 					public void onError(Throwable throwable) {
 						busy(false);
@@ -304,13 +296,6 @@ public class LoginActivity extends BaseOmnomActivity {
 	public void finish() {
 		super.finish();
 		overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		OmnomObservable.unsubscribe(mProceedSubscription);
-		OmnomObservable.unsubscribe(mRegisterSubscription);
 	}
 
 	private boolean validate() {

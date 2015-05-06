@@ -7,10 +7,14 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.LocationUtils;
 
+import rx.Observable;
+import rx.Subscription;
+import rx.functions.Action1;
+
 /**
  * Created by mvpotter on 1/27/2015.
  */
-public class OmnomActivityHelper implements ActivityHelper {
+public class OmnomActivityHelper implements LocationActivityHelper {
 
 	private static final String TAG = OmnomActivityHelper.class.getSimpleName();
 
@@ -58,8 +62,23 @@ public class OmnomActivityHelper implements ActivityHelper {
 	}
 
 	@Override
+	public Observable bind(final Observable observable) {
+		throw new UnsupportedOperationException("Should not be called");
+	}
+
+	@Override
+	public Subscription subscribe(final Observable observable, final Action1<? extends Object> onNext, final Action1<Throwable> onError) {
+		throw new UnsupportedOperationException("Should not be called");
+	}
+
+	@Override
+	public void unsubscribe(final Subscription subscription) {
+		throw new UnsupportedOperationException("Should not be called");
+	}
+
+	@Override
 	public Location getLocation() {
-		if (mCurrentLocation == null) {
+		if(mCurrentLocation == null) {
 			mCurrentLocation = LocationUtils.getLastKnownLocation(mActivity);
 		}
 		return mCurrentLocation;

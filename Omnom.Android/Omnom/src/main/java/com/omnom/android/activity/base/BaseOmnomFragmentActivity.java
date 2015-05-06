@@ -3,7 +3,7 @@ package com.omnom.android.activity.base;
 import android.os.Bundle;
 
 import com.omnom.android.OmnomApplication;
-import com.omnom.android.activity.helper.ActivityHelper;
+import com.omnom.android.activity.helper.LocationActivityHelper;
 import com.omnom.android.activity.helper.OmnomActivityHelper;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.mixpanel.MixPanelHelper;
@@ -17,7 +17,7 @@ public abstract class BaseOmnomFragmentActivity extends BaseFragmentActivity {
 
 	private static final String TAG = BaseOmnomFragmentActivity.class.getSimpleName();
 
-	protected ActivityHelper activityHelper;
+	protected LocationActivityHelper activityHelper;
 
 	private boolean isBusy;
 

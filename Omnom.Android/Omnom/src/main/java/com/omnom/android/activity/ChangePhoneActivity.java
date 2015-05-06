@@ -14,7 +14,6 @@ import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
-import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ErrorUtils;
 import com.omnom.android.utils.view.ErrorEdit;
@@ -23,8 +22,6 @@ import com.omnom.android.view.HeaderView;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 public class ChangePhoneActivity extends BaseOmnomActivity {
@@ -45,8 +42,6 @@ public class ChangePhoneActivity extends BaseOmnomActivity {
 	protected AuthService authenticator;
 
 	private boolean mFirstStart = true;
-
-	private Subscription mProceedSubscription;
 
 	@Override
 	public void initUi() {
@@ -74,8 +69,6 @@ public class ChangePhoneActivity extends BaseOmnomActivity {
 			}
 		});
 	}
-
-
 
 	@Override
 	protected void onResume() {
@@ -118,42 +111,42 @@ public class ChangePhoneActivity extends BaseOmnomActivity {
 		}
 		busy(true);
 		topPanel.showProgress(true);
-		mProceedSubscription = AppObservable.bindActivity(this, authenticator.changePhone(editPhone.getText()))
-		                                        .subscribe(new Action1<AuthResponse>() {
-			                                        @Override
-			                                        public void call(AuthResponse authResponse) {
-				                                        if(!authResponse.hasError()) {
-					                                        topPanel.setContentVisibility(false, false);
-					                                        postDelayed(getResources().getInteger(
-							                                        R.integer.default_animation_duration_short), new Runnable() {
-						                                        @Override
-						                                        public void run() {
-							                                        final Intent intent = new Intent(ChangePhoneActivity.this,
-							                                                                         ChangePhoneSuccessActivity.class);
-							                                        startForResult(intent, R.anim.slide_in_right, R.anim.slide_out_left,
-									                                        CHANGE_PHONE_SUCCESS_REQUEST);
-						                                        }
-					                                        });
-				                                        } else {
-					                                        final AuthError error = authResponse.getError();
-					                                        if(error != null) {
-						                                        editPhone.setError(error.getMessage());
-					                                        }
-					                                        topPanel.showProgress(false);
-					                                        busy(false);
-				                                        }
-			                                        }
-		                                        }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			                                        @Override
-			                                        public void onError(Throwable throwable) {
-				                                        Log.e(TAG, ":changePhone doProceed ", throwable);
-				                                        if (ErrorUtils.isConnectionError(throwable)) {
-					                                        showError(getString(R.string.err_no_internet));
-				                                        } else {
-					                                        showError(getString(R.string.something_went_wrong));
-				                                        }
-			                                        }
-		                                        });
+		subscribe(authenticator.changePhone(editPhone.getText()),
+		          new Action1<AuthResponse>() {
+			          @Override
+			          public void call(AuthResponse authResponse) {
+				          if(!authResponse.hasError()) {
+					          topPanel.setContentVisibility(false, false);
+					          postDelayed(getResources().getInteger(
+							          R.integer.default_animation_duration_short), new Runnable() {
+						          @Override
+						          public void run() {
+							          final Intent intent = new Intent(ChangePhoneActivity.this,
+							                                           ChangePhoneSuccessActivity.class);
+							          startForResult(intent, R.anim.slide_in_right, R.anim.slide_out_left,
+							                         CHANGE_PHONE_SUCCESS_REQUEST);
+						          }
+					          });
+				          } else {
+					          final AuthError error = authResponse.getError();
+					          if(error != null) {
+						          editPhone.setError(error.getMessage());
+					          }
+					          topPanel.showProgress(false);
+					          busy(false);
+				          }
+			          }
+		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					@Override
+					public void onError(Throwable throwable) {
+						Log.e(TAG, ":changePhone doProceed ", throwable);
+						if(ErrorUtils.isConnectionError(throwable)) {
+							showError(getString(R.string.err_no_internet));
+						} else {
+							showError(getString(R.string.something_went_wrong));
+						}
+					}
+				});
 	}
 
 	private void showError(final String message) {
@@ -172,7 +165,7 @@ public class ChangePhoneActivity extends BaseOmnomActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == CHANGE_PHONE_SUCCESS_REQUEST && resultCode == RESULT_OK) {
+		if(requestCode == CHANGE_PHONE_SUCCESS_REQUEST && resultCode == RESULT_OK) {
 			finish();
 		}
 	}
@@ -181,12 +174,6 @@ public class ChangePhoneActivity extends BaseOmnomActivity {
 	public void finish() {
 		super.finish();
 		overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		OmnomObservable.unsubscribe(mProceedSubscription);
 	}
 
 	@Override

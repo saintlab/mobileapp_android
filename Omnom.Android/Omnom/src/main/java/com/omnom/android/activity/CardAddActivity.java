@@ -27,7 +27,6 @@ import com.omnom.android.utils.CardDataTextWatcher;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
 import com.omnom.android.utils.CardUtils;
-import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -45,8 +44,6 @@ import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
@@ -159,8 +156,6 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	private Validator cvvValidator;
 
 	private int mType;
-
-	private Subscription mCardAddSubscribtion;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -277,12 +272,6 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	}
 
 	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		OmnomObservable.unsubscribe(mCardAddSubscribtion);
-	}
-
-	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_CARD_REGISTER) {
@@ -333,24 +322,23 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
 		UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
 
-		mCardAddSubscribtion = AppObservable.bindActivity(this, mAcquiring.addCard(acquiringData, wicketUser, createCardInfo()))
-		                                    .subscribe(new Action1<AcquiringResponse>() {
-			                                    @Override
-			                                    public void call(final AcquiringResponse acquiringResponse) {
-				                                    if(acquiringResponse.getError() != null) {
-					                                    showToast(getActivity(), acquiringResponse.getError().getDescr());
-				                                    } else {
-					                                    setResult(RESULT_OK);
-					                                    finish();
-				                                    }
-			                                    }
-		                                    }, new Action1<Throwable>() {
-			                                    @Override
-			                                    public void call(final Throwable throwable) {
-				                                    showToast(getActivity(), R.string.unable_to_bind_card);
-				                                    Log.e(TAG, "doBind", throwable);
-			                                    }
-		                                    });
+		subscribe(mAcquiring.addCard(acquiringData, wicketUser, createCardInfo()), new Action1<AcquiringResponse>() {
+			@Override
+			public void call(final AcquiringResponse acquiringResponse) {
+				if(acquiringResponse.getError() != null) {
+					showToast(getActivity(), acquiringResponse.getError().getDescr());
+				} else {
+					setResult(RESULT_OK);
+					finish();
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(final Throwable throwable) {
+				showToast(getActivity(), R.string.unable_to_bind_card);
+				Log.e(TAG, "doBind", throwable);
+			}
+		});
 	}
 
 	private void doPay() {
