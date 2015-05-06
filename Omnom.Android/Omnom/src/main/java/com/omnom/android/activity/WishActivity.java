@@ -440,7 +440,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	protected void onActivityResult(final int requestCode, final int resultCode,
 	                                final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(requestCode == REQUEST_CODE_WISH_LIST && resultCode == RESULT_SUCCESS) {
+		if(requestCode == REQUEST_CODE_WISH_LIST && resultCode == RESULT_OK) {
 			setResult(RESULT_ORDER_DONE);
 			super.finish();
 		}
