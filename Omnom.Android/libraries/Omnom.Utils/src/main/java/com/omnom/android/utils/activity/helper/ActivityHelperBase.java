@@ -68,6 +68,7 @@ public abstract class ActivityHelperBase implements ActivityHelperWithAnimation 
 		final Iterator<Subscription> iterator = mSubscriptions.iterator();
 		while(iterator.hasNext()) {
 			unsubscribe(iterator.next());
+			iterator.remove();
 		}
 	}
 
@@ -127,6 +128,5 @@ public abstract class ActivityHelperBase implements ActivityHelperWithAnimation 
 	@Override
 	public void unsubscribe(final Subscription subscription) {
 		OmnomObservable.unsubscribe(subscription);
-		mSubscriptions.remove(subscription);
 	}
 }
