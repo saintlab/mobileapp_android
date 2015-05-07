@@ -26,6 +26,8 @@ import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.helper.PaymentDataTable;
+import com.omnom.android.activity.helper.PaymentDataWish;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.entrance.EntranceData;
@@ -419,10 +421,9 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 			                               new Action1<CardsResponse>() {
 				                               @Override
 				                               public void call(final CardsResponse cards) {
-					                               final List<Card> cardsList = cards.getCards();
-					                               mList.setAdapter(new CardsAdapter(getActivity(), cardsList, false));
-					                               boolean isSelected = selectCard((CardsAdapter) mList.getAdapter(),
-					                                                               mPreferences.getCardId(getActivity()));
+					                               final CardsAdapter adapter = new CardsAdapter(getActivity(), cards.getCards(), false);
+					                               mList.setAdapter(adapter);
+					                               boolean isSelected = selectCard(adapter, mPreferences.getCardId(getActivity()));
 					                               if(mBtnPay != null) {
 						                               mBtnPay.setEnabled(isSelected);
 					                               }
@@ -514,11 +515,24 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	private void pay(final CardInfo cardInfo) {
 		if(mDetails != null) {
 			if(mOrder != null) {
-				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mOrder, cardInfo, mIsDemo, mRestaurant,
-				                             mEntranceData);
+				final PaymentDataTable data = new PaymentDataTable.Builder().setOrder(mOrder)
+				                                                            .setCardInfo(cardInfo)
+				                                                            .setDetails(mDetails)
+				                                                            .setEntranceData(mEntranceData)
+				                                                            .setRestaurant(mRestaurant)
+				                                                            .build();
+
+				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, data, mIsDemo);
 			} else {
-				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mUserOrder, cardInfo, mWishResponse, mIsDemo,
-				                             mRestaurant, mEntranceData);
+				final PaymentDataWish data = new PaymentDataWish.Builder().setOrder(mUserOrder)
+				                                                          .setCardInfo(cardInfo)
+				                                                          .setDetails(mDetails)
+				                                                          .setEntranceData(mEntranceData)
+				                                                          .setRestaurant(mRestaurant)
+				                                                          .setWishResponse(mWishResponse)
+				                                                          .build();
+
+				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, data, mIsDemo);
 			}
 		}
 	}

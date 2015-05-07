@@ -30,6 +30,8 @@ import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.helper.PaymentDataTable;
+import com.omnom.android.activity.helper.PaymentDataWish;
 import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.entrance.BarEntranceData;
@@ -81,34 +83,30 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 
 	private static final int REQUEST_THANKS = 100;
 
-	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
-	                         final Order order, CardInfo cardInfo, final boolean isDemo,
-	                         final Restaurant restaurant, EntranceData entranceData) {
+	public static void start(final Activity activity, final int code, final PaymentDataTable data, final boolean isDemo) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
-		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
-		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(restaurant));
-		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
-		intent.putExtra(Extras.EXTRA_ORDER, order);
+		intent.putExtra(Extras.EXTRA_RESTAURANT, data.getRestaurant());
+		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(data.getRestaurant()));
+		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, data.getDetails());
+		intent.putExtra(Extras.EXTRA_ORDER, data.getOrder());
 		intent.putExtra(Extras.EXTRA_PAYMENT_TYPE, MailRuExtra.PAYMENT_TYPE_ORDER);
-		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
+		intent.putExtra(Extras.EXTRA_CARD_DATA, data.getCardInfo());
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
-		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, entranceData);
+		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, data.getEntranceData());
 		activity.startActivityForResult(intent, code);
 	}
 
-	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
-	                         final UserOrder order, CardInfo cardInfo, WishResponse wishResponse, final boolean isDemo,
-	                         final Restaurant restaurant, EntranceData entranceData) {
+	public static void start(final Activity activity, final int code, final PaymentDataWish data, final boolean isDemo) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
-		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
-		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(restaurant));
-		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
-		intent.putExtra(Extras.EXTRA_USER_ORDER, order);
+		intent.putExtra(Extras.EXTRA_RESTAURANT, data.getRestaurant());
+		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(data.getRestaurant()));
+		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, data.getDetails());
+		intent.putExtra(Extras.EXTRA_USER_ORDER, data.getOrder());
 		intent.putExtra(Extras.EXTRA_PAYMENT_TYPE, MailRuExtra.PAYMENT_TYPE_WISH);
-		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
-		intent.putExtra(Extras.EXTRA_WISH_RESPONSE, wishResponse);
+		intent.putExtra(Extras.EXTRA_CARD_DATA, data.getCardInfo());
+		intent.putExtra(Extras.EXTRA_WISH_RESPONSE, data.getWishResponse());
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
-		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, entranceData);
+		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, data.getEntranceData());
 		activity.startActivityForResult(intent, code);
 	}
 
