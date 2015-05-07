@@ -136,6 +136,9 @@ public interface RestaurateurDataService {
 	Observable<WishResponse> wishes(@Path(Protocol.FIELD_ID) String restaurantId,
 	                                @Body WishRequest request);
 
+	@GET("/wishes/{id}")
+	Observable<WishResponse> getWish(@Path(Protocol.FIELD_ID) String wishId);
+
 	@PUT("/restaurants/{id}")
 	Observable<Restaurant> setRssiThreshold(@Path(Protocol.FIELD_ID) String restaurantId,
 	                                        @Body RssiThresholdRequest request);

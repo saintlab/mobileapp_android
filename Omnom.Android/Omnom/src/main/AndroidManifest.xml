@@ -115,8 +115,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="omnom" />
+                <data
+                    android:host="app"
+                    android:scheme="omnom" />
             </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -330,6 +333,28 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White.Light"
             android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity
+            android:name=".activity.OrderResultActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood.Light"
+            android:windowSoftInputMode="stateAlwaysHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="wish"
+                    android:scheme="omnom" />
+
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

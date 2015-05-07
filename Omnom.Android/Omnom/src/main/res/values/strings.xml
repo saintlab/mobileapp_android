@@ -216,4 +216,9 @@
     <string name="license_agreement_clickable">Пользовательского соглашения</string>
     <string name="license_agreement_info">Нажимая Далее, вы выражаете согласие с условиями Пользовательского соглашения</string>
     <string name="enter_your_phone_number">Укажите ваш номер телефона</string>
+    <string name="wish_your_order_canceled">Ваш заказ отменён</string>
+    <string name="wish_your_order_ready">Ваш заказ готов</string>
+    <string name="wish_order_ready_info">Чтобы получить свой заказ, покажите бармену этот экран, или назовите ему номер и пин-код заказа.</string>
+    <string name="wish_order_canceled_info">Заказ не может быть выполнен заведением, и поэтому был отменён.\nОплата вернётся к вам на
+        карту\nв&#160;ближайшие несколько дней.</string>
 </resources>
