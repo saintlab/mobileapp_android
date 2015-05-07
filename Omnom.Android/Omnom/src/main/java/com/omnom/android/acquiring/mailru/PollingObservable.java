@@ -102,7 +102,7 @@ public class PollingObservable {
 				AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
 				try {
 					AcquiringResponse next = null;
-					while(next == null) {
+					while(next == null && !subscriber.isUnsubscribed()) {
 						final HttpResponse execute = client.execute(new HttpPost(cardResponse.getUrl()));
 						final HttpEntity entity = execute.getEntity();
 
