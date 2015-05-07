@@ -17,6 +17,9 @@ import com.squareup.otto.Bus;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import rx.Observable;
+import rx.Subscription;
+import rx.functions.Action1;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
@@ -84,6 +87,12 @@ public abstract class BaseFragmentActivity extends FragmentActivity implements O
 		mHelper.onPostCreate();
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mHelper.onDestroy();
+	}
+
 	protected final void postDelayed(long delay, Runnable action) {
 		findViewById(android.R.id.content).postDelayed(action, delay);
 	}
@@ -142,6 +151,17 @@ public abstract class BaseFragmentActivity extends FragmentActivity implements O
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	public Subscription subscribe(final Observable observable, final Action1<? extends Object> onNext, final Action1<Throwable>
+			onError) {
+		return mHelper.subscribe(observable, onNext, onError);
+	}
+
+	@Override
+	public void unsubscribe(final Subscription subscription) {
+		mHelper.unsubscribe(subscription);
 	}
 
 	@Override

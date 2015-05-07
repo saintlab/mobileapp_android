@@ -34,7 +34,6 @@ import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.drawable.RoundTransformation;
 import com.omnom.android.utils.drawable.RoundedDrawable;
 import com.omnom.android.utils.observable.BaseErrorHandler;
-import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.DialogUtils;
@@ -51,8 +50,6 @@ import butterknife.InjectViews;
 import butterknife.OnClick;
 import hugo.weaving.DebugLog;
 import rx.Observable;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -117,17 +114,11 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	@Inject
 	protected NotifierObservableApi notifierApi;
 
-	private Subscription profileSubscription;
-
-	private Subscription logoutSubscription;
-
 	private int mTableNumber;
 
 	private String mTableId;
 
 	private String supportPhone;
-
-	private Subscription mUserObservable;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -188,26 +179,26 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 		final String token = OmnomApplication.get(getActivity()).getAuthToken();
 		showUserData(!TextUtils.isEmpty(token));
 
-		profileSubscription = AppObservable.bindActivity(this, getProfileObservable(token)).subscribe(
-				new Action1<Pair<UserResponse, SupportInfoResponse>>() {
-					@Override
-					public void call(Pair<UserResponse, SupportInfoResponse> response) {
-						final UserResponse userResponse = response.first;
-						if(userResponse.hasError() && UserProfileHelper.hasAuthError(userResponse)) {
-							((OmnomApplication) getApplication()).logout();
-							forwardToIntro();
-							return;
-						}
-						UserProfile profile = new UserProfile(userResponse);
-						OmnomApplication.get(getActivity()).cacheUserProfile(profile);
-						initUserData(userResponse.getUser());
+		subscribe(getProfileObservable(token),
+		          new Action1<Pair<UserResponse, SupportInfoResponse>>() {
+			          @Override
+			          public void call(Pair<UserResponse, SupportInfoResponse> response) {
+				          final UserResponse userResponse = response.first;
+				          if(userResponse.hasError() && UserProfileHelper.hasAuthError(userResponse)) {
+					          ((OmnomApplication) getApplication()).logout();
+					          forwardToIntro();
+					          return;
+				          }
+				          UserProfile profile = new UserProfile(userResponse);
+				          OmnomApplication.get(getActivity()).cacheUserProfile(profile);
+				          initUserData(userResponse.getUser());
 
-						final SupportInfoResponse supportInfoResponse = response.second;
-						if(!supportInfoResponse.hasErrors()) {
-							supportPhone = supportInfoResponse.getPhone();
-						}
-					}
-				}, new BaseErrorHandler(getActivity()) {
+				          final SupportInfoResponse supportInfoResponse = response.second;
+				          if(!supportInfoResponse.hasErrors()) {
+					          supportPhone = supportInfoResponse.getPhone();
+				          }
+			          }
+		          }, new BaseErrorHandler(getActivity()) {
 					@Override
 					protected void onTokenExpired() {
 
@@ -253,13 +244,6 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 		EnteringActivity.start(this, true);
 	}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		OmnomObservable.unsubscribe(profileSubscription);
-		OmnomObservable.unsubscribe(logoutSubscription);
-	}
-
 	private void initUserData(UserData user) {
 		if(user == null) {
 			showToast(this, R.string.error_user_not_found);
@@ -301,18 +285,19 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_LOGIN && resultCode == RESULT_OK) {
 			final String token = OmnomApplication.get(getActivity()).getAuthToken();
-			mUserObservable = AppObservable.bindActivity(this, authenticator.getUser(token)).subscribe(new Action1<UserResponse>() {
-				@Override
-				public void call(final UserResponse userResponse) {
-					initUserData(userResponse.getUser());
-					showUserData(true);
-				}
-			}, new Action1<Throwable>() {
-				@Override
-				public void call(Throwable throwable) {
-					showToast(getActivity(), R.string.error_unknown_server_error);
-				}
-			});
+			subscribe(authenticator.getUser(token),
+			          new Action1<UserResponse>() {
+				          @Override
+				          public void call(final UserResponse userResponse) {
+					          initUserData(userResponse.getUser());
+					          showUserData(true);
+				          }
+			          }, new Action1<Throwable>() {
+						@Override
+						public void call(Throwable throwable) {
+							showToast(getActivity(), R.string.error_unknown_server_error);
+						}
+					});
 		}
 	}
 
@@ -387,18 +372,18 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 				return authenticator.logout(token);
 			}
 		});
-		logoutSubscription = AppObservable.bindActivity(this, logoutObservable).subscribe(
-				new Action1<AuthResponse>() {
-					@Override
-					public void call(AuthResponse authResponseBase) {
-						if(!authResponseBase.hasError()) {
-							((OmnomApplication) getApplication()).clearUserData();
-							showUserData(false);
-						} else {
-							showToast(getActivity(), R.string.error_unknown_server_error);
-						}
-					}
-				}, new Action1<Throwable>() {
+		subscribe(logoutObservable,
+		          new Action1<AuthResponse>() {
+			          @Override
+			          public void call(AuthResponse authResponseBase) {
+				          if(!authResponseBase.hasError()) {
+					          ((OmnomApplication) getApplication()).clearUserData();
+					          showUserData(false);
+				          } else {
+					          showToast(getActivity(), R.string.error_unknown_server_error);
+				          }
+			          }
+		          }, new Action1<Throwable>() {
 					@Override
 					public void call(Throwable throwable) {
 						showToast(getActivity(), R.string.error_unknown_server_error);

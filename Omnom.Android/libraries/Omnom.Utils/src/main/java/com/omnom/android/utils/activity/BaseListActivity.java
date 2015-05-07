@@ -13,6 +13,9 @@ import com.omnom.android.utils.activity.helper.ActivityHelperWithAnimation;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 
 import butterknife.ButterKnife;
+import rx.Observable;
+import rx.Subscription;
+import rx.functions.Action1;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
@@ -56,6 +59,23 @@ public abstract class BaseListActivity extends ListActivity implements OmnomActi
 	protected void onResume() {
 		super.onStop();
 		mHelper.onResume();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mHelper.onDestroy();
+	}
+
+	@Override
+	public Subscription subscribe(final Observable observable, final Action1<? extends Object> onNext, final Action1<Throwable>
+			onError) {
+		return mHelper.subscribe(observable, onNext, onError);
+	}
+
+	@Override
+	public void unsubscribe(final Subscription subscription) {
+		mHelper.unsubscribe(subscription);
 	}
 
 	@Override
