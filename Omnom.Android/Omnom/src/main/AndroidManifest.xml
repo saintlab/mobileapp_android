@@ -346,8 +346,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="wish"
-                    android:scheme="omnom" />
+                    android:host="omnom.mobi"
+                    android:pathPattern=".*"
+                    android:scheme="https" />
+
+                <data
+                    android:host="omnom.mobi"
+                    android:pathPattern=".*"
+                    android:scheme="http" />
 
             </intent-filter>
             <intent-filter>
