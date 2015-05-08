@@ -32,6 +32,7 @@ import com.omnom.android.activity.order.BarOrderAcceptedActivity;
 import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.activity.order.LunchOrderAcceptedActivity;
 import com.omnom.android.activity.order.TakeawayOrderAcceptedActivity;
+import com.omnom.android.fragment.BarTipsFragment;
 import com.omnom.android.fragment.BillItemsFragment;
 import com.omnom.android.fragment.BillSplitFragment;
 import com.omnom.android.fragment.BillSplitPersonsFragment;
@@ -73,6 +74,6 @@ import dagger.Module;
 		SplashFragment.class, EnteringFragment.class, OrderFragment.class, BillSplitFragment.class, BillItemsFragment.class,
 		BillSplitPersonsFragment.class, EditHashFragment.class, OrderFragment.class, MenuItemAddFragment.class,
 		DeliveryDetailsFragment.class, MenuItemDetailsFragment.class, BillSplitFragment.class, BillItemsFragment.class,
-		BillSplitPersonsFragment.class, DeliveryOptionsFragment.class, TakeawayTimeFragment.class},
+		BillSplitPersonsFragment.class, DeliveryOptionsFragment.class, TakeawayTimeFragment.class, BarTipsFragment.class},
 		complete = false)
 public class OmnomApplicationModule {}

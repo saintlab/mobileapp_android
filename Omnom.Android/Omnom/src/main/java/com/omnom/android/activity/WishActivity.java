@@ -19,6 +19,9 @@ import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.adapter.WishAdapter;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.entrance.TakeawayEntranceData;
+import com.omnom.android.fragment.BarTipsEvent;
+import com.omnom.android.fragment.BarTipsFragment;
+import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.fragment.takeaway.TakeawayTimeFragment;
@@ -32,6 +35,7 @@ import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.mixpanel.model.SplitWay;
 import com.omnom.android.mixpanel.model.TipsWay;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
+import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.restaurant.ModifierRequestItem;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -45,7 +49,6 @@ import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
-import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -54,6 +57,7 @@ import com.squareup.otto.Subscribe;
 
 import org.apache.http.HttpStatus;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -80,6 +84,8 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	public static final int RESULT_SUCCESS = 4;
 
 	public static final int RESULT_ORDER_DONE = 8;
+
+	private static final int DEFAULT_TIPS_VALUE = 10;
 
 	public static void start(OmnomActivity activity, Restaurant restaurant, TableDataResponse table,
 	                         Menu menu, UserOrder order, EntranceData entranceData,
@@ -156,6 +162,10 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	private LinearLayoutManager mLayoutManager;
 
+	private int mTipsValue = DEFAULT_TIPS_VALUE;
+
+	private boolean mBusy = false;
+
 	private void showOutOfSaleDialog(final Context context,
 	                                 final Collection<WishRequestItem> forbiddenItems) {
 		if(forbiddenItems == null || forbiddenItems.isEmpty()) {
@@ -202,6 +212,12 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		WebActivity.start(this, RestaurantHelper.getBarUri(mRestaurant));
 	}
 
+	@Subscribe
+	public void onBarTipsEvent(BarTipsEvent event) {
+		mTipsValue = event.getTipValue();
+		doWish();
+	}
+
 	@OnClick(R.id.btn_bill)
 	public void onBill() {
 		setResult(RESULT_BILL | (mClear ? RESULT_CLEARED : RESULT_SUCCESS), getResultData());
@@ -235,10 +251,15 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		mMenu = intent.getParcelableExtra(EXTRA_RESTAURANT_MENU);
 	}
 
+	private void setBusy(boolean busy) {
+		mBusy = busy;
+		ViewUtils.setVisible(mProgressBar, busy);
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
-		ViewUtils.setVisible(mProgressBar, false);
+		setBusy(false);
 	}
 
 	@Override
@@ -246,7 +267,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		final boolean isBar = RestaurantHelper.isBar(mRestaurant);
 		ViewUtils.setVisible(mPanelBottom, !isBar);
 		ViewUtils.setVisible(mPanelBottomBar, isBar);
-		ViewUtils.setVisible(mProgressBar, false);
+		setBusy(false);
 		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, mEntranceData, this);
 		mLayoutManager = new LinearLayoutManager(this);
 		mList.setHasFixedSize(true);
@@ -258,7 +279,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	}
 
 	private void refresh() {
-		ViewUtils.setVisible(mProgressBar, true);
+		setBusy(true);
 		api.getRecommendations(mRestaurant.id())
 		   .flatMap(new Func1<Collection<OrderItem>, Observable<Collection<OrderItem>>>() {
 			   @Override
@@ -284,14 +305,14 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 				   final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, mEntranceData, WishActivity.this);
 				   mAdapter = adapter;
 				   mList.swapAdapter(mAdapter, true);
-				   ViewUtils.setVisible(mProgressBar, false);
+				   setBusy(false);
 				   fakeScroll();
 			   }
 		   }, new Action1<Throwable>() {
 			   @Override
 			   public void call(final Throwable throwable) {
 				   Log.e(TAG, "Unable to get items on table", throwable);
-				   ViewUtils.setVisible(mProgressBar, false);
+				   setBusy(false);
 			   }
 		   });
 	}
@@ -309,13 +330,21 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	@Override
 	public void onClick(final View v) {
+		if(isBusy()) {
+			return;
+		}
+
 		switch(v.getId()) {
 			case R.id.btn_clear:
 				doClear();
 				break;
 
 			case R.id.btn_send:
-				doWish();
+				if(RestaurantHelper.isBar(mRestaurant)) {
+					doPickTips();
+				} else {
+					doWish();
+				}
 				break;
 
 			case R.id.btn_refresh:
@@ -330,6 +359,10 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 				                         getItem(v), -1);
 				break;
 		}
+	}
+
+	private void doPickTips() {
+		BarTipsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mOrder.getTotalPrice().doubleValue(), mTipsValue);
 	}
 
 	private void doWish() {
@@ -353,7 +386,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	@Subscribe
 	public void onTakeawayTimePicked(TakeawayTimePickedEvent event) {
-		AnimationUtils.animateAlpha(mProgressBar, true);
+		setBusy(true);
 		final WishRequest wishRequest = createWishRequest(mOrder, event.getTimeValue());
 		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1<WishResponse>() {
 			@Override
@@ -375,7 +408,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			protected void onError(final Throwable throwable) {
-				ViewUtils.setVisible(mProgressBar, false);
+				setBusy(false);
 				Log.e(TAG, "restaurateur.wishes", throwable);
 			}
 		});
@@ -445,7 +478,11 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 			super.finish();
 		}
 		if(requestCode == REQUEST_CODE_LOGIN && resultCode == RESULT_OK) {
-			doWish();
+			if(RestaurantHelper.isBar(mRestaurant)) {
+				doPickTips();
+			} else {
+				doWish();
+			}
 		}
 	}
 
@@ -455,17 +492,24 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 			return;
 		}
 
-		AnimationUtils.animateAlpha(mProgressBar, true);
+		setBusy(true);
 		final WishRequest wishRequest = createWishRequest(mOrder);
+
+		final int tipsAmount = OrderHelper.getTipsAmount(mOrder.getTotalPrice(), mTipsValue);
+		final OrderFragment.TipData tips = new OrderFragment.TipData(BigDecimal.valueOf(tipsAmount),
+		                                                             mTipsValue,
+		                                                             OrderFragment.TipData.TYPE_PERCENT);
+		final BigDecimal amountTips = tips.getAmount();
+		final BigDecimal amountToPay = mOrder.getTotalPrice().add(amountTips);
 
 		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1<WishResponse>() {
 			@Override
 			public void call(final WishResponse wishResponse) {
 				final PaymentDetails paymentDetails = new PaymentDetails(
-						mOrder.getTotalPrice().doubleValue(),
-						0,
-						TipsWay.DEFAULT,
-						0,
+						amountToPay.doubleValue(),
+						amountTips.intValue() * 100,
+						TipsWay.MANUAL_PERCENTAGES,
+						tips.getValue(),
 						SplitWay.WASNT_USED);
 				CardsActivity.start(WishActivity.this,
 				                    mRestaurant,
@@ -479,7 +523,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		}, OmnomObservable.loggerOnError(TAG, new OmnomObservable.RetrofitErrorHandle() {
 			@Override
 			public void onRetrofitError(final RetrofitError error) {
-				AnimationUtils.animateAlpha(mProgressBar, false);
+				setBusy(false);
 				if(error != null && error.getResponse() != null
 						&& error.getResponse().getStatus() == HttpStatus.SC_CONFLICT) {
 					final WishForbiddenResponse forbiddenResponse
@@ -515,7 +559,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1() {
 			@Override
 			public void call(final Object o) {
-				ViewUtils.setVisible(mProgressBar, false);
+				setBusy(false);
 				WishSentActivity.start(WishActivity.this, REQUEST_CODE_WISH_LIST);
 				doClear();
 				showToast(getActivity(), getString(R.string.your_wish_processed));
@@ -523,7 +567,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			protected void onError(final Throwable throwable) {
-				ViewUtils.setVisible(mProgressBar, false);
+				setBusy(false);
 				Log.e(TAG, "restaurateur.wishes", throwable);
 			}
 		});

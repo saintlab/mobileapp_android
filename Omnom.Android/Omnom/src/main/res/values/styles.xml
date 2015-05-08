@@ -367,4 +367,21 @@
         <item name="android:contentDescription">@null</item>
     </style>
 
+    <style name="Button.Pay">
+        <item name="android:background">@drawable/btn_pay</item>
+    </style>
+
+    <style name="Button.Pay.Green">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/pay_button_height</item>
+        <item name="android:minWidth">@dimen/pay_button_minimum_width</item>
+        <item name="android:layout_marginTop">@dimen/activity_horizontal_margin_medium</item>
+        <item name="android:layout_marginBottom">@dimen/pay_button_margin_bottom</item>
+        <item name="android:background">@drawable/btn_pay_green</item>
+        <item name="android:textColor">@drawable/text_color_selector_white</item>
+        <item name="android:textSize">@dimen/font_medium</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_alignParentBottom">true</item>
+    </style>
+
 </resources>

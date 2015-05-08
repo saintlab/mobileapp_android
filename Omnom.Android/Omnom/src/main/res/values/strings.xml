@@ -221,4 +221,6 @@
     <string name="wish_order_ready_info">Чтобы получить свой заказ, покажите бармену этот экран, или назовите ему номер и пин-код заказа.</string>
     <string name="wish_order_canceled_info">Заказ не может быть выполнен заведением, и поэтому был отменён.\nОплата вернётся к вам на
         карту\nв&#160;ближайшие несколько дней.</string>
+    <string name="barmen_tips_positive">+ Чай бармену :-)</string>
+    <string name="barmen_tips_negative">+ Чай бармену :-(</string>
 </resources>
