@@ -36,9 +36,9 @@ public class ConfigurationService {
 
 	protected final Acquiring acquiring;
 
-	protected final LocationService locationService;
-
 	protected final String authToken;
+
+	protected LocationService locationService;
 
 	protected Context context;
 
@@ -177,5 +177,10 @@ public class ConfigurationService {
 						                 });
 			                 }
 		                 });
+	}
+
+	public void onDestroy() {
+		locationService.onDestroy();
+		locationService = null;
 	}
 }

@@ -1,5 +1,6 @@
 package com.omnom.android.activity;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -53,6 +54,17 @@ public class ValidateActivityBle extends ValidateActivity {
 		super.initUi();
 		if(BluetoothUtils.isBluetoothEnabled(this) && AndroidUtils.isJellyBeanMR2()) {
 			initBle();
+		}
+	}
+
+	@SuppressLint("NewApi")
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if(AndroidUtils.isJellyBeanMR2()) {
+			mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			mLeScanCallback = null;
+			mBluetoothAdapter = null;
 		}
 	}
 

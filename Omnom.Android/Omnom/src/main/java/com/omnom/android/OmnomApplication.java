@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.omnom.android.menu.MenuModule;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.modules.AcquiringModuleMailRuMixpanel;
@@ -28,17 +29,19 @@ import com.omnom.android.utils.BaseOmnomApplication;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.StringUtils;
+import com.squareup.leakcanary.LeakCanary;
 import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Stack;
 
 import javax.inject.Inject;
 
 import dagger.ObjectGraph;
+import io.fabric.sdk.android.Fabric;
 import rx.functions.Action1;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
@@ -73,7 +76,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	private JsonPreferenceProvider preferenceHelper;
 
-	private Stack<Activity> activityStack = new Stack<Activity>();
+	private HashSet<Activity> activityStack = new HashSet<Activity>();
 
 	private MixPanelHelper mixPanelHelper;
 
@@ -114,8 +117,8 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		// FIXME: possible migration to bugsense
-		// Fabric.with(this, new Crashlytics());
+		LeakCanary.install(this);
+		Fabric.with(this, new Crashlytics());
 		CalligraphyConfig.initDefault(OmnomFont.OSF_REGULAR.getPath(), R.attr.fontPath);
 		mixPanelHelper = new MixPanelHelper();
 
@@ -131,7 +134,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
 			@Override
 			public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-				activityStack.push(activity);
+				activityStack.add(activity);
 			}
 
 			@Override
@@ -161,7 +164,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 			@Override
 			public void onActivityDestroyed(Activity activity) {
-				activityStack.pop();
+				activityStack.remove(activity);
 			}
 		});
 	}

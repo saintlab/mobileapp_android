@@ -395,9 +395,8 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		super.onCreate(savedInstanceState);
 		mData = getIntent().getData();
 		mViewHelper = new ValidateViewHelper(this);
-		configurationService =
-				new ConfigurationService(this, authenticator, configApi, mAcquiring,
-				                         OmnomApplication.get(getActivity()).getAuthToken());
+		configurationService = new ConfigurationService(getApplicationContext(), authenticator, configApi, mAcquiring,
+		                                                OmnomApplication.get(getActivity()).getAuthToken());
 	}
 
 	@Override
@@ -486,6 +485,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		configurationService.onDestroy();
 		mOrderHelper = null;
 		mViewHelper.onDestroy();
 		mViewHelper = null;

@@ -74,12 +74,8 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 		public void onFocusChange(View v, boolean hasFocus) {
 			ErrorEditText editText = (ErrorEditText) v;
 			if(!hasFocus) {
-				String value = editText.getText().toString();
-				if(validator.validate(value)) {
-					editText.setError(false);
-				} else {
-					editText.setError(true);
-				}
+				final String value = editText.getText().toString();
+				editText.setError(!validator.validate(value));
 			} else {
 				editText.setError(false);
 			}
@@ -132,8 +128,6 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	@Inject
 	protected Acquiring mAcquiring;
 
-	private double mAmount;
-
 	private boolean mMinimized = false;
 
 	private int panelY;
@@ -143,11 +137,6 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	private int cameraX;
 
 	private int panelX;
-
-	/**
-	 * Used for mixpanel analytics
-	 */
-	private boolean mScanUsed = false;
 
 	private Validator panValidator;
 
@@ -284,7 +273,6 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 		}
 		if(requestCode == REQUEST_CODE_CARD_IO) {
 			if(data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
-				mScanUsed = true;
 				final CreditCard scanResult = data.getParcelableExtra(CardIOActivity.EXTRA_SCAN_RESULT);
 				postDelayed(350, new Runnable() {
 					@Override
@@ -415,7 +403,6 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	@Override
 	protected void handleIntent(Intent intent) {
 		super.handleIntent(intent);
-		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);
 		mType = intent.getIntExtra(EXTRA_TYPE, TYPE_BIND);
 	}
 

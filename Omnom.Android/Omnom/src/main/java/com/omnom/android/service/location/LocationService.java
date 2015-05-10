@@ -94,4 +94,8 @@ public class LocationService {
 			}
 		});
 	}
+
+	public void onDestroy() {
+		locationManager = null;
+	}
 }
