@@ -131,7 +131,9 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	private static WishRequest createWishRequestTips(final UserOrder order, final int tipsQuantity) {
 		final WishRequest wishRequest = createWishRequest(order);
-		wishRequest.addItem(WishRequestItem.createTip(tipsQuantity));
+		if(tipsQuantity > 0) {
+			wishRequest.addItem(WishRequestItem.createTip(tipsQuantity));
+		}
 		return wishRequest;
 	}
 

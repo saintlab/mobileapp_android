@@ -15,8 +15,10 @@ import com.omnom.android.BuildConfig;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.EnteringActivity;
+import com.omnom.android.activity.OrderResultActivity;
 import com.omnom.android.activity.WebActivity;
 import com.omnom.android.mixpanel.MixPanelHelper;
+import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.utils.StringUtils;
 
 import org.json.JSONException;
@@ -29,6 +31,8 @@ public class PushWooshService extends PushGCMIntentService {
 
 	public static final String ARG_ANDROID_PAYLOAD = "aps";
 
+	public static final String ARG_WISH = "wish";
+
 	public static final String ARG_HASH = "hash";
 
 	public static final String ARG_ALERT = "alert";
@@ -38,6 +42,10 @@ public class PushWooshService extends PushGCMIntentService {
 	public static final String ARG_WISH_URL = "url";
 
 	public static final String EVENT_PUSH_RECEIVED = "PUSH_RECEIVED";
+
+	public static final String ARG_WISH_ID = "id";
+
+	public static final String ARG_WISH_STATUS = "status";
 
 	private static final String TAG = PushWooshService.class.getSimpleName();
 
@@ -76,12 +84,13 @@ public class PushWooshService extends PushGCMIntentService {
 		Intent actionIntent = getEnteringIntent(context);
 
 		try {
-			final JSONObject json = new JSONObject(dataIntent.getStringExtra(ARG_ANDROID_PAYLOAD));
-			final JSONObject objAlert = json.getJSONObject(ARG_ALERT);
+			final JSONObject jsonWish = new JSONObject(dataIntent.getStringExtra(ARG_WISH));
+			final JSONObject jsonAps = new JSONObject(dataIntent.getStringExtra(ARG_ANDROID_PAYLOAD));
+			final JSONObject objAlert = jsonAps.getJSONObject(ARG_ALERT);
 			info = objAlert.optString(ARG_BODY, info);
-			// TODO: Исправить имя аргумента на реальное
-			final String url = objAlert.optString(ARG_WISH_URL, StringUtils.EMPTY_STRING);
-			actionIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+			actionIntent = new Intent(context, OrderResultActivity.class);
+			actionIntent.putExtra(Extras.EXTRA_WISH_ID, jsonWish.optString(ARG_WISH_ID));
+			actionIntent.putExtra(Extras.EXTRA_WISH_STATUS, jsonWish.optString(ARG_WISH_STATUS));
 		} catch(JSONException e) {
 			Log.e(TAG, "showWishNotification", e);
 		}
