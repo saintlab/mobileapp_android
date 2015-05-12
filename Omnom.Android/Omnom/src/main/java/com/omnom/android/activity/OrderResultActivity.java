@@ -41,7 +41,7 @@ public class OrderResultActivity extends BaseOmnomActivity {
 
 	public static final String WISH_STATUS_READY = "ready";
 
-	public static final int DURATION_ITEM_TRANSITION = 100;
+	public static final int DURATION_ITEM_TRANSITION = 150;
 
 	private static final String TAG = OrderResultActivity.class.getSimpleName();
 
@@ -101,7 +101,7 @@ public class OrderResultActivity extends BaseOmnomActivity {
 		mData = getIntent().getData();
 		if(mData != null) {
 			mStatus = mData.getQueryParameter(PARAM_STATUS);
-			mId = mData.getQueryParameter(PARAM_ID);
+			mId = mData.getLastPathSegment();
 		}
 
 		// parse extras data - started by push
@@ -120,6 +120,12 @@ public class OrderResultActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
+
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
 		if(TextUtils.isEmpty(mId)) {
 			Log.d(TAG, "Unable to show data for wishId = " + mId + " status = " + mStatus);
 			finish();
@@ -170,8 +176,14 @@ public class OrderResultActivity extends BaseOmnomActivity {
 		if(items == null) {
 			return;
 		}
+		final int delay = getResources().getInteger(R.integer.default_animation_duration_short);
 		for(final WishResponseItem item : items) {
-			addItem(item);
+			postDelayed(delay, new Runnable() {
+				@Override
+				public void run() {
+					addItem(item);
+				}
+			});
 		}
 	}
 
