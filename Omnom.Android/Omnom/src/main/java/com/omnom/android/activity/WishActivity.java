@@ -129,6 +129,12 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		return wishRequest;
 	}
 
+	private static WishRequest createWishRequestTips(final UserOrder order, final int tipsQuantity) {
+		final WishRequest wishRequest = createWishRequest(order);
+		wishRequest.addItem(WishRequestItem.createTip(tipsQuantity));
+		return wishRequest;
+	}
+
 	@InjectView(android.R.id.list)
 	protected RecyclerView mList;
 
@@ -362,21 +368,31 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	}
 
 	private void doPickTips() {
-		BarTipsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mOrder.getTotalPrice().doubleValue(), mTipsValue);
+		if(!checkUser()) {
+			BarTipsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mOrder.getTotalPrice().doubleValue(), mTipsValue);
+		}
+	}
+
+	/**
+	 * @return whether user ought to pass through logging-in process
+	 */
+	private boolean checkUser() {
+		if(TextUtils.isEmpty(OmnomApplication.get(getActivity()).getAuthToken())) {
+			LoginActivity.start(this, AndroidUtils.getDevicePhoneNumber(this, R.string.phone_country_code), REQUEST_CODE_LOGIN);
+			return true;
+		}
+		return false;
 	}
 
 	private void doWish() {
-		if(TextUtils.isEmpty(OmnomApplication.get(getActivity()).getAuthToken())) {
-			LoginActivity.start(this, AndroidUtils.getDevicePhoneNumber(this, R.string.phone_country_code), REQUEST_CODE_LOGIN);
-			return;
-		}
-
-		if(RestaurantHelper.isBar(mRestaurant)) {
-			doWishBar();
-		} else if(mEntranceData instanceof TakeawayEntranceData) {
-			doAskAboutTime();
-		} else {
-			doWishDefault();
+		if(!checkUser()) {
+			if(RestaurantHelper.isBar(mRestaurant)) {
+				doWishBar();
+			} else if(mEntranceData instanceof TakeawayEntranceData) {
+				doAskAboutTime();
+			} else {
+				doWishDefault();
+			}
 		}
 	}
 
@@ -493,7 +509,6 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		}
 
 		setBusy(true);
-		final WishRequest wishRequest = createWishRequest(mOrder);
 
 		final int tipsAmount = OrderHelper.getTipsAmount(mOrder.getTotalPrice(), mTipsValue);
 		final OrderFragment.TipData tips = new OrderFragment.TipData(BigDecimal.valueOf(tipsAmount),
@@ -501,6 +516,8 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		                                                             OrderFragment.TipData.TYPE_PERCENT);
 		final BigDecimal amountTips = tips.getAmount();
 		final BigDecimal amountToPay = mOrder.getTotalPrice().add(amountTips);
+
+		final WishRequest wishRequest = createWishRequestTips(mOrder, amountTips.intValue());
 
 		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1<WishResponse>() {
 			@Override
