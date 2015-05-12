@@ -31,14 +31,9 @@ public class RestaurantHelper {
 	public static String getAddress(final Context context, final Restaurant restaurant) {
 		final Address address = restaurant.address();
 		if(address != null) {
-			final String floor = !TextUtils.isEmpty(address.getFloor())
-					? address.getFloor() + context.getString(R.string.floor_suffix)
-					: StringUtils.EMPTY_STRING;
 			return StringUtils.concat(context.getString(R.string.restaurant_address_delimiter),
-			                          address.getCity(),
-			                          address.getStreet(),
-			                          address.getBuilding(),
-			                          floor);
+			                          address.getCity() + StringUtils.NEXT_STRING,
+			                          getAddressSmall(context, restaurant));
 		}
 		return StringUtils.EMPTY_STRING;
 	}
@@ -46,15 +41,18 @@ public class RestaurantHelper {
 	public static String getAddressSmall(final Context context, final Restaurant restaurant) {
 		final Address address = restaurant.address();
 		if(address != null) {
-			final String floor = !TextUtils.isEmpty(address.getFloor())
-					? StringUtils.WHITESPACE + address.getFloor()
-					+ StringUtils.NON_BREAKING_WHITESPACE +
-					context.getString(R.string.floor_suffix) : StringUtils.EMPTY_STRING;
 			return StringUtils.concat(context.getString(R.string.restaurant_address_delimiter),
 			                          address.getStreet() + StringUtils.WHITESPACE + address.getBuilding(),
-			                          floor);
+			                          getFloorString(context, address));
 		}
 		return StringUtils.EMPTY_STRING;
+	}
+
+	private static String getFloorString(final Context context, final Address address) {
+		return !TextUtils.isEmpty(address.getFloor())
+				? StringUtils.WHITESPACE + address.getFloor()
+				+ StringUtils.NON_BREAKING_WHITESPACE +
+				context.getString(R.string.floor_suffix) : StringUtils.EMPTY_STRING;
 	}
 
 	public static String getLogo(Restaurant restaurant) {

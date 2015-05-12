@@ -68,13 +68,13 @@ public class RestaurantsAdapter extends BaseAdapter {
 			cover.setColor(RestaurantHelper.getBackgroundColor(item));
 			cover.animateLogo(logo, R.drawable.transparent, 0);
 
-			final String addressSmall = RestaurantHelper.getAddressSmall(context, item);
-			if(!TextUtils.isEmpty(addressSmall)) {
+			final String address = RestaurantHelper.getAddress(context, item);
+			if(!TextUtils.isEmpty(address)) {
 				ViewUtils.setVisible(txtInfo, true);
-				txtInfo.setText(addressSmall);
+				txtInfo.setText(address);
 				if(item.distance() != null) {
 					final String distance = StringUtils.formatDistance(item.distance());
-					final String addressWithDistance = addressSmall + " " + distance;
+					final String addressWithDistance = address + " " + distance;
 					SpannableString s = SpannableString.valueOf(addressWithDistance);
 					s.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.info_hint)),
 					          addressWithDistance.indexOf(distance), addressWithDistance.length(),
