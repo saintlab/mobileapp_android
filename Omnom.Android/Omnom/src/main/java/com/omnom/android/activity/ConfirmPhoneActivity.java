@@ -18,6 +18,8 @@ import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
+import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
@@ -29,6 +31,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
@@ -165,28 +168,36 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	private void doConfirm() {
 		btnRequestCode.setEnabled(false);
-		subscribe(getAuthObservable(),
-		          new Action1<AuthResponse>() {
+		final OmnomApplication omnomApp = OmnomApplication.get(getActivity());
+		final Observable<UserResponse> userResponseObservable = getAuthObservable().flatMap(
+				new Func1<AuthResponse, Observable<UserResponse>>() {
+					@Override
+					public Observable<UserResponse> call(final AuthResponse authResponse) {
+						if(!authResponse.hasError()) {
+							final String token = authResponse.getToken();
+							omnomApp.cacheAuthToken(token);
+							return authenticator.getUser(token);
+						} else {
+							edit1.setText(StringUtils.EMPTY_STRING);
+							edit2.setText(StringUtils.EMPTY_STRING);
+							edit3.setText(StringUtils.EMPTY_STRING);
+							edit4.setText(StringUtils.EMPTY_STRING);
+							edit1.requestFocus();
+							final Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
+							panelDigits.startAnimation(animation);
+						}
+						return Observable.empty();
+					}
+				});
+
+		subscribe(userResponseObservable,
+		          new Action1<UserResponse>() {
 			          @Override
-			          public void call(final AuthResponse authResponse) {
-				          if(!authResponse.hasError()) {
-					          final OmnomApplication omnomApp = OmnomApplication.get(getActivity());
-					          omnomApp.cacheAuthToken(authResponse.getToken());
-					          topPanel.setContentVisibility(false, false);
-					          setResult(RESULT_OK);
-					          finish();
-					          // EnteringActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_instant, R.anim
-					          // .fake_fade_out_instant, 0,
-					          // type);
-				          } else {
-					          edit1.setText(StringUtils.EMPTY_STRING);
-					          edit2.setText(StringUtils.EMPTY_STRING);
-					          edit3.setText(StringUtils.EMPTY_STRING);
-					          edit4.setText(StringUtils.EMPTY_STRING);
-					          edit1.requestFocus();
-					          final Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
-					          panelDigits.startAnimation(animation);
-				          }
+			          public void call(final UserResponse authResponse) {
+				          omnomApp.cacheUserProfile(new UserProfile(authResponse));
+				          topPanel.setContentVisibility(false, false);
+				          setResult(RESULT_OK);
+				          finish();
 				          btnRequestCode.setEnabled(true);
 			          }
 		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {

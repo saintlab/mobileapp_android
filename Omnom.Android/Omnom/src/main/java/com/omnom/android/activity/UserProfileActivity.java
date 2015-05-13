@@ -285,20 +285,8 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_LOGIN && resultCode == RESULT_OK) {
 			final OmnomApplication app = OmnomApplication.get(getActivity());
-			subscribe(authenticator.getUser(app.getAuthToken()),
-			          new Action1<UserResponse>() {
-				          @Override
-				          public void call(final UserResponse userResponse) {
-					          app.cacheUserProfile(new UserProfile(userResponse));
-					          initUserData(userResponse.getUser());
-					          showUserData(true);
-				          }
-			          }, new Action1<Throwable>() {
-						@Override
-						public void call(Throwable throwable) {
-							showToast(getActivity(), R.string.error_unknown_server_error);
-						}
-					});
+			initUserData(app.getUserProfile().getUser());
+			showUserData(true);
 		}
 	}
 

@@ -372,6 +372,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	}
 
 	private void onRemoveSuccess(final Card card) {
+		isPaymentRequest = false;
 		final CardsAdapter adapter = (CardsAdapter) mList.getAdapter();
 		adapter.remove(card);
 		updateCardsSelection(adapter, card);
