@@ -93,6 +93,8 @@ public class OrderResultActivity extends BaseOmnomActivity {
 	@Nullable
 	private String mId;
 
+	private boolean mFirstRun = true;
+
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -126,50 +128,55 @@ public class OrderResultActivity extends BaseOmnomActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(TextUtils.isEmpty(mId)) {
-			Log.d(TAG, "Unable to show data for wishId = " + mId + " status = " + mStatus);
-			finish();
-			return;
-		}
-
-		if(WISH_STATUS_CANCELED.equals(mStatus)) {
-			txtTitle.setText(getString(R.string.wish_your_order_canceled));
-			txtTitle.setTextColor(getResources().getColor(R.color.error_red));
-			txtInfo.setText(getString(R.string.wish_order_canceled_info));
-		} else {
-			txtTitle.setText(getString(R.string.wish_your_order_ready));
-			txtTitle.setTextColor(getResources().getColor(R.color.order_accepted_color));
-			txtInfo.setText(getString(R.string.wish_order_ready_info));
-		}
-
-		AnimationUtils.animateAlpha(viewOrderNumber, false, 0);
-		AnimationUtils.animateAlpha(viewPinCode, false, 0);
-
-		viewHeader.setButtonLeft(R.string.close, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				onBackPressed();
+		if(mFirstRun) {
+			if(TextUtils.isEmpty(mId)) {
+				Log.d(TAG, "Unable to show data for wishId = " + mId + " status = " + mStatus);
+				finish();
+				return;
 			}
-		});
-		viewHeader.showProgress(true);
-		subscribe(api.getWish(mId),
-		          new Action1<WishResponse>() {
-			          @Override
-			          public void call(final WishResponse wishResponse) {
-				          viewHeader.showProgress(false);
-				          AnimationUtils.animateAlpha(viewOrderNumber, true);
-				          AnimationUtils.animateAlpha(viewPinCode, true);
-				          txtPinCode.setText(wishResponse.code());
-				          txtOrderNumber.setText(wishResponse.internalTableId());
-				          addItems(wishResponse.items());
-			          }
-		          }, new Action1<Throwable>() {
-					@Override
-					public void call(final Throwable throwable) {
-						viewHeader.showProgress(false);
-						Log.e(TAG, "api.getWish id = " + mId, throwable);
-					}
-				});
+
+			if(WISH_STATUS_CANCELED.equals(mStatus)) {
+				txtTitle.setText(getString(R.string.wish_your_order_canceled));
+				txtTitle.setTextColor(getResources().getColor(R.color.error_red));
+				txtInfo.setText(getString(R.string.wish_order_canceled_info));
+			} else {
+				txtTitle.setText(getString(R.string.wish_your_order_ready));
+				txtTitle.setTextColor(getResources().getColor(R.color.order_accepted_color));
+				txtInfo.setText(getString(R.string.wish_order_ready_info));
+			}
+
+			AnimationUtils.animateAlpha(viewOrderNumber, false, 0);
+			AnimationUtils.animateAlpha(viewPinCode, false, 0);
+
+			viewHeader.setButtonLeft(R.string.close, new View.OnClickListener() {
+				@Override
+				public void onClick(final View v) {
+					onBackPressed();
+				}
+			});
+			viewHeader.showProgress(true);
+			subscribe(api.getWish(mId),
+			          new Action1<WishResponse>() {
+				          @Override
+				          public void call(final WishResponse wishResponse) {
+					          viewHeader.showProgress(false);
+					          AnimationUtils.animateAlpha(viewOrderNumber, true);
+					          AnimationUtils.animateAlpha(viewPinCode, true);
+					          txtPinCode.setText(wishResponse.code());
+					          txtOrderNumber.setText(wishResponse.internalTableId());
+					          addItems(wishResponse.items());
+				          }
+			          }, new Action1<Throwable>() {
+						@Override
+						public void call(final Throwable throwable) {
+							viewHeader.showProgress(false);
+							Log.e(TAG, "api.getWish id = " + mId, throwable);
+						}
+					});
+
+			mFirstRun = false;
+		}
+
 	}
 
 	private void addItems(final List<WishResponseItem> items) {

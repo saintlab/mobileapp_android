@@ -89,6 +89,7 @@ public class PushWooshService extends PushGCMIntentService {
 			final JSONObject objAlert = jsonAps.getJSONObject(ARG_ALERT);
 			info = objAlert.optString(ARG_BODY, info);
 			actionIntent = new Intent(context, OrderResultActivity.class);
+
 			actionIntent.putExtra(Extras.EXTRA_WISH_ID, jsonWish.optString(ARG_WISH_ID));
 			actionIntent.putExtra(Extras.EXTRA_WISH_STATUS, jsonWish.optString(ARG_WISH_STATUS));
 		} catch(JSONException e) {
@@ -108,12 +109,14 @@ public class PushWooshService extends PushGCMIntentService {
 		                                         .setSmallIcon(R.drawable.ic_app)
 		                                         .setDefaults(Notification.DEFAULT_ALL)
 		                                         .setTicker(title)
-		                                         .setContentIntent(PendingIntent.getActivity(context, 0, intent, 0))
+		                                         .setContentIntent(PendingIntent.getActivity(context,
+		                                                                                     0,
+		                                                                                     intent,
+		                                                                                     PendingIntent.FLAG_UPDATE_CURRENT))
 		                                         .setStyle(new NotificationCompat.BigTextStyle().bigText(info))
 		                                         .build();
 
-		NotificationManager nm = (NotificationManager) context
-				.getSystemService(NOTIFICATION_SERVICE);
+		NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
 		nm.notify(0, notification);
 	}
 
