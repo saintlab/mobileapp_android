@@ -23,4 +23,6 @@ public abstract class Settings implements Parcelable {
 	public abstract boolean hasPreOrder();
 
 	public abstract boolean hasBar();
+
+	public abstract boolean hasBarTips();
 }

@@ -247,4 +247,11 @@ public class RestaurantHelper {
 		}
 		return TableEntranceData.create();
 	}
+
+	public static boolean isBarTipsEnabled(final Restaurant restaurant) {
+		if(restaurant == null || restaurant.settings() == null) {
+			return false;
+		}
+		return restaurant.settings().hasBarTips();
+	}
 }

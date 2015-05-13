@@ -348,7 +348,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 				break;
 
 			case R.id.btn_send:
-				if(RestaurantHelper.isBar(mRestaurant)) {
+				if(RestaurantHelper.isBar(mRestaurant) && RestaurantHelper.isBarTipsEnabled(mRestaurant)) {
 					doPickTips();
 				} else {
 					doWish();
@@ -496,7 +496,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 			super.finish();
 		}
 		if(requestCode == REQUEST_CODE_LOGIN && resultCode == RESULT_OK) {
-			if(RestaurantHelper.isBar(mRestaurant)) {
+			if(RestaurantHelper.isBar(mRestaurant) && RestaurantHelper.isBarTipsEnabled(mRestaurant)) {
 				doPickTips();
 			} else {
 				doWish();
