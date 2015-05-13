@@ -62,7 +62,9 @@ public class ValidateActivityBle extends ValidateActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		if(AndroidUtils.isJellyBeanMR2()) {
-			mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			if(mBluetoothAdapter != null) {
+				mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			}
 			mLeScanCallback = null;
 			mBluetoothAdapter = null;
 		}
