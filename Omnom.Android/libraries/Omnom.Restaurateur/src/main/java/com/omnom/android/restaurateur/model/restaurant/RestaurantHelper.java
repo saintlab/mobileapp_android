@@ -4,10 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
 
-import com.omnom.android.entrance.BarEntranceData;
-import com.omnom.android.entrance.EntranceData;
-import com.omnom.android.entrance.TableEntranceData;
-import com.omnom.android.entrance.TakeawayEntranceData;
 import com.omnom.android.menu.api.observable.MenuObservableApi;
 import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.restaurateur.R;
@@ -235,16 +231,6 @@ public class RestaurantHelper {
 
 	public static boolean hasTakeaway(final Restaurant restaurant) {
 		return false;
-	}
-
-	public static EntranceData getEntranceData(final Restaurant restaurant) {
-		if(isBar(restaurant)) {
-			return BarEntranceData.create();
-		}
-		if(isTakeAway(restaurant)) {
-			return TakeawayEntranceData.create();
-		}
-		return TableEntranceData.create();
 	}
 
 	public static boolean isBarTipsEnabled(final Restaurant restaurant) {

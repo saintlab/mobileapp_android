@@ -38,6 +38,7 @@ import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.entrance.EntranceDataFactory;
 import com.omnom.android.fragment.SearchFragment;
 import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
@@ -440,7 +441,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 			@Override
 			public void call(final MenuResponse menuResponse) {
 				mMenu = menuResponse.getMenu();
-				mEntranceData = RestaurantHelper.getEntranceData(restaurant);
+				mEntranceData = EntranceDataFactory.create(restaurant);
 				onDataLoaded(restaurant, TableDataResponse.NULL);
 				mSkipViewRendering = true;
 			}
@@ -880,7 +881,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 		mRestaurant = restaurant;
 		mTable = table;
-		mEntranceData = RestaurantHelper.getEntranceData(mRestaurant);
+		mEntranceData = EntranceDataFactory.create(mRestaurant);
 		bindMenuData();
 
 		mPaymentListener.initTableSocket(mTable);
