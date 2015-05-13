@@ -140,8 +140,7 @@ public class RestaurantHelper {
 		if(restaurant == null) {
 			return false;
 		}
-		// return restaurant.isBar();
-		return true;
+		return restaurant.isBar();
 	}
 
 	public static boolean isLunch(final Restaurant restaurant) {
@@ -249,9 +248,6 @@ public class RestaurantHelper {
 	}
 
 	public static boolean isBarTipsEnabled(final Restaurant restaurant) {
-		if(restaurant == null || restaurant.settings() == null) {
-			return false;
-		}
-		return restaurant.settings().hasBarTips();
+		return restaurant != null && restaurant.settings() != null && restaurant.settings().hasBarTips();
 	}
 }
