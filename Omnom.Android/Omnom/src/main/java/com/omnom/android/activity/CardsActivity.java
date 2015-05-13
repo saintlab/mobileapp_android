@@ -313,9 +313,10 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	}
 
 	private void removeCard(final Card card) {
-		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
-		final UserData userData = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		final String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
+		final OmnomApplication app = OmnomApplication.get(getActivity());
+		final AcquiringData acquiringData = app.getConfig().getAcquiringData();
+		final UserData userData = app.getUserProfile().getUser();
+		final String cvv = app.getConfig().getAcquiringData().getTestCvv();
 		final CardInfo cardInfo = new CardInfo.Builder()
 				.cardId(card.getExternalCardId())
 				.pan(card.getMaskedPan())

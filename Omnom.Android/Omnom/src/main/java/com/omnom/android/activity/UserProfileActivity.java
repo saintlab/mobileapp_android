@@ -284,11 +284,12 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_LOGIN && resultCode == RESULT_OK) {
-			final String token = OmnomApplication.get(getActivity()).getAuthToken();
-			subscribe(authenticator.getUser(token),
+			final OmnomApplication app = OmnomApplication.get(getActivity());
+			subscribe(authenticator.getUser(app.getAuthToken()),
 			          new Action1<UserResponse>() {
 				          @Override
 				          public void call(final UserResponse userResponse) {
+					          app.cacheUserProfile(new UserProfile(userResponse));
 					          initUserData(userResponse.getUser());
 					          showUserData(true);
 				          }
