@@ -196,12 +196,6 @@ public class LoginActivity extends BaseOmnomActivity {
 					          });
 				          } else {
 					          doRegister();
-					          //					                                    final AuthError error =
-					          // authResponse.getError();
-					          //					                                    if(error != null) {
-					          //						                                    showError(error
-					          // .getMessage());
-					          //					                                    }
 				          }
 			          }
 		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
