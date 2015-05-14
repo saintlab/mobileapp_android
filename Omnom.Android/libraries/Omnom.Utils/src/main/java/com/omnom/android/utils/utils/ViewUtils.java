@@ -2,6 +2,8 @@ package com.omnom.android.utils.utils;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.drawable.GradientDrawable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -72,6 +74,8 @@ public class ViewUtils {
 			view.setEnabled(value);
 		}
 	};
+
+	private static final String TAG = ViewUtils.class.getSimpleName();
 
 	public static int dipToPixels(final Context context, final float dips) {
 		final float scale = context.getResources().getDisplayMetrics().density;
@@ -168,5 +172,19 @@ public class ViewUtils {
 				container.removeView(view);
 			}
 		}
+	}
+
+	public static void setDrawableColor(final GradientDrawable sd, final int color) {
+		sd.setColor(color);
+		sd.invalidateSelf();
+	}
+
+	public static void setBackgroundDrawableColor(final View view, final int color) {
+		final GradientDrawable drawable = (GradientDrawable) view.getBackground();
+		if(drawable == null) {
+			Log.d(TAG, "Unable to set drawable color for view with id = " + view.getId());
+			return;
+		}
+		setDrawableColor(drawable, color);
 	}
 }

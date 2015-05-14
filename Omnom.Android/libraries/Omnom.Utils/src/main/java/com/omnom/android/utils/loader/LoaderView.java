@@ -61,6 +61,11 @@ public class LoaderView extends FrameLayout {
 
 	public static final int WRONG_TABLE_NUMBER = -1;
 
+	public static int getLoaderSizeDefault(Context context) {
+		final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+		return (int) (displayMetrics.widthPixels * LOADER_WIDTH_SCALE + 0.5);
+	}
+
 	protected ImageView mImgLoader;
 
 	protected ImageView mImgLogo;
@@ -173,11 +178,6 @@ public class LoaderView extends FrameLayout {
 		});
 	}
 
-	public static int getLoaderSizeDefault(Context context) {
-		final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-		return (int) (displayMetrics.widthPixels * LOADER_WIDTH_SCALE + 0.5);
-	}
-
 	public int getLoaderSizeDefault() {
 		if(mDefaultLoaderSize == -1) {
 			mDefaultLoaderSize = getLoaderSizeDefault(getContext());
@@ -254,10 +254,8 @@ public class LoaderView extends FrameLayout {
 	}
 
 	public void setColor(final int color) {
-		final GradientDrawable sd = (GradientDrawable) mImgLoader.getDrawable();
-		sd.setColor(color);
+		ViewUtils.setDrawableColor((GradientDrawable) mImgLoader.getDrawable(), color);
 		currentColor = color;
-		sd.invalidateSelf();
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -272,8 +270,7 @@ public class LoaderView extends FrameLayout {
 		final LayerDrawable progressDrawable = (LayerDrawable) mProgressBar.getProgressDrawable();
 		if(progressDrawable != null) {
 			final RotateDrawable rotateDrawable = (RotateDrawable) progressDrawable.findDrawableByLayerId(android.R.id.progress);
-			GradientDrawable shape = (GradientDrawable) rotateDrawable.getDrawable();
-			shape.setColor(color);
+			ViewUtils.setDrawableColor((GradientDrawable) rotateDrawable.getDrawable(), color);
 		}
 	}
 

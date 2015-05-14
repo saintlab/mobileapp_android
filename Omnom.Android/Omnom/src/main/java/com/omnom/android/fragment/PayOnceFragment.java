@@ -1,7 +1,6 @@
 package com.omnom.android.fragment;
 
 import android.app.Activity;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -27,9 +26,32 @@ import butterknife.InjectView;
  */
 public class PayOnceFragment extends Fragment {
 
+	/**
+	 * Listener for pay button click event.
+	 */
+	public interface OnPayListener {
+		void pay();
+	}
+
+	/**
+	 * Listener for fragment visibility state.
+	 */
+	public interface VisibilityListener {
+		void onVisibilityChanged(boolean isVisible);
+	}
+
 	private static final String ARG_AMOUNT = "amount";
 
 	private static final String ARG_TYPE = "type";
+
+	public static Fragment newInstance(final double amount, final int type) {
+		final PayOnceFragment fragment = new PayOnceFragment();
+		final Bundle args = new Bundle();
+		args.putDouble(ARG_AMOUNT, amount);
+		args.putInt(ARG_TYPE, type);
+		fragment.setArguments(args);
+		return fragment;
+	}
 
 	@InjectView(R.id.btn_pay)
 	protected Button btnPay;
@@ -53,15 +75,6 @@ public class PayOnceFragment extends Fragment {
 	private double mAmount;
 
 	private int mType;
-
-	public static Fragment newInstance(final double amount, final int type) {
-		final PayOnceFragment fragment = new PayOnceFragment();
-		final Bundle args = new Bundle();
-		args.putDouble(ARG_AMOUNT, amount);
-		args.putInt(ARG_TYPE, type);
-		fragment.setArguments(args);
-		return fragment;
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -143,27 +156,12 @@ public class PayOnceFragment extends Fragment {
 					}
 				}
 			});
-			GradientDrawable sd = (GradientDrawable) btnPay.getBackground();
-			sd.setColor(getResources().getColor(R.color.btn_pay_green));
-			sd.invalidateSelf();
+
+			ViewUtils.setBackgroundDrawableColor(btnPay, getResources().getColor(R.color.btn_pay_green));
 		} else {
 			ViewUtils.setVisible(btnPay, false);
 			ViewUtils.setVisible(txtPayOnce, false);
 		}
-	}
-
-	/**
-	 * Listener for pay button click event.
-	 */
-	public interface OnPayListener {
-		void pay();
-	}
-
-	/**
-	 * Listener for fragment visibility state.
-	 */
-	public interface VisibilityListener {
-		void onVisibilityChanged(boolean isVisible);
 	}
 
 }

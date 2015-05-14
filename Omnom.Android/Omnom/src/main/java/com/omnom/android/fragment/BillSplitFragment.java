@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -30,6 +29,7 @@ import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.HeaderView;
 import com.squareup.otto.Bus;
 
@@ -160,9 +160,7 @@ public class BillSplitFragment extends Fragment {
 			}
 		});
 
-		GradientDrawable sd = (GradientDrawable) mBtnCommit.getBackground();
-		sd.setColor(getResources().getColor(R.color.btn_pay_green));
-		sd.invalidateSelf();
+		ViewUtils.setBackgroundDrawableColor(mBtnCommit, getResources().getColor(R.color.btn_pay_green));
 
 		mHeader.setTxtTitleMedium(R.string.split_the_bill);
 		mHeader.setButtonLeftDrawable(R.drawable.ic_cross_black, new View.OnClickListener() {

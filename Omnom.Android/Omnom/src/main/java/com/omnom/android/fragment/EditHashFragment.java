@@ -1,7 +1,6 @@
 package com.omnom.android.fragment;
 
 import android.app.Activity;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -281,8 +280,7 @@ public class EditHashFragment extends Fragment {
 	private void onHashChange() {
 		isError = false;
 		txtEnterHash.setText(getString(R.string.enter_hash));
-		GradientDrawable drawable = (GradientDrawable) hashUnderline.getBackground();
-		drawable.setColor(getResources().getColor(R.color.enter_hash_color));
+		ViewUtils.setBackgroundDrawableColor(hashUnderline, getResources().getColor(R.color.enter_hash_color));
 		editHash.setTextColor(getResources().getColor(android.R.color.black));
 		txtEnterHash.setTextColor(getResources().getColor(R.color.qr_hint_color));
 	}
@@ -292,9 +290,9 @@ public class EditHashFragment extends Fragment {
 		ViewUtils.setVisible(progressBar, false);
 		isError = true;
 		txtEnterHash.setText(message);
-		GradientDrawable drawable = (GradientDrawable) hashUnderline.getBackground();
-		int color = getResources().getColor(R.color.cadre_border);
-		drawable.setColor(color);
+
+		final int color = getResources().getColor(R.color.cadre_border);
+		ViewUtils.setBackgroundDrawableColor(hashUnderline, color);
 		editHash.setTextColor(color);
 		txtEnterHash.setTextColor(color);
 	}

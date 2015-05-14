@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -255,9 +254,9 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 		if(mDetails != null && mBtnPay != null) {
 			final String text = AmountHelper.format(mDetails.getAmount()) + getString(R.string.currency_suffix_ruble);
 			mBtnPay.setText(getString(R.string.pay_amount, text));
-			GradientDrawable sd = (GradientDrawable) mBtnPay.getBackground();
-			sd.setColor(getResources().getColor(R.color.btn_pay_green));
-			sd.invalidateSelf();
+
+			ViewUtils.setBackgroundDrawableColor(mBtnPay, getResources().getColor(R.color.btn_pay_green));
+
 			if(!mIsDemo) {
 				mBtnPay.setEnabled(false);
 			}

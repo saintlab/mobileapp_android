@@ -9,7 +9,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -42,9 +41,9 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.CardsActivity;
 import com.omnom.android.activity.OrdersActivity;
-import com.omnom.android.entrance.TableEntranceData;
 import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.entrance.TableEntranceData;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.listener.DecimalKeyListener;
@@ -719,9 +718,8 @@ public class OrderFragment extends Fragment {
 					}
 				}
 			});
-			GradientDrawable sd = (GradientDrawable) btnPay.getBackground();
-			sd.setColor(getResources().getColor(android.R.color.white));
-			sd.invalidateSelf();
+
+			ViewUtils.setBackgroundDrawableColor(btnPay, getResources().getColor(android.R.color.white));
 
 			btnApply = (ImageButton) inflate.findViewById(R.id.btn_apply);
 			btnApply.setOnClickListener(new View.OnClickListener() {
