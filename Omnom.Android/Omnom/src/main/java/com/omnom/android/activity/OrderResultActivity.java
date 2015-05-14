@@ -103,7 +103,7 @@ public class OrderResultActivity extends BaseOmnomActivity {
 		mData = getIntent().getData();
 		if(mData != null) {
 			mStatus = mData.getQueryParameter(PARAM_STATUS);
-			mId = mData.getLastPathSegment();
+			mId = mData.getQueryParameter(PARAM_ID);
 		}
 
 		// parse extras data - started by push
