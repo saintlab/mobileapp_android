@@ -244,16 +244,11 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 				AnimationUtils.animateAlpha(mTextCamera, false);
 				mImgCamera.animate().x(mPanelCard.getMeasuredWidth() - mImgCamera.getMeasuredWidth()).start();
 				mImgCamera.animate().translationYBy(-v).start();
-				mEditCardCvv.animate().translationY(-v).start();
-				mEditCardExpDate.animate().translationY(-v).start();
-				mEditCardNumber.animate().translationY(-v).start();
+				AnimationUtils.translationY(-v, mEditCardCvv, mEditCardExpDate, mEditCardNumber);
 			} else {
 				AnimationUtils.animateAlpha(mTextCamera, true);
 				mImgCamera.animate().x(cameraX - panelX).start();
-				mImgCamera.animate().translationY(0).start();
-				mEditCardCvv.animate().translationY(0).start();
-				mEditCardExpDate.animate().translationY(0).start();
-				mEditCardNumber.animate().translationY(0).start();
+				AnimationUtils.translationY(0, mImgCamera, mEditCardCvv, mEditCardExpDate, mEditCardNumber);
 				AndroidUtils.setBackground(mImgCamera, getResources().getDrawable(R.drawable.scan_frame));
 			}
 			mMinimized = minimize;
@@ -289,15 +284,14 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 		final String pan = CardUtils.preparePan(mEditCardNumber.getText().toString());
 		final String expDate = CardUtils.prepareExpDate(mEditCardExpDate.getText().toString());
 		final String cvv = mEditCardCvv.getText().toString();
-		final String holder = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getCardHolder();
-		return new CardInfo.Builder()
-				.pan(pan)
-				.mixpanelPan(pan)
-				.expDate(expDate)
-				.cvv(cvv)
-				.holder(holder)
-				.addCard(true)
-				.build();
+		final String holder = getApp().getConfig().getAcquiringData().getCardHolder();
+		return new CardInfo.Builder().pan(pan)
+		                             .mixpanelPan(pan)
+		                             .expDate(expDate)
+		                             .cvv(cvv)
+		                             .holder(holder)
+		                             .addCard(true)
+		                             .build();
 	}
 
 	private void doBind() {
@@ -307,8 +301,9 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 
 		mPanelTop.showProgress(true);
 
-		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
-		UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
+		final OmnomApplication app = getApp();
+		final AcquiringData acquiringData = app.getConfig().getAcquiringData();
+		UserData wicketUser = app.getUserProfile().getUser();
 
 		subscribe(mAcquiring.addCard(acquiringData, wicketUser, createCardInfo()), new Action1<AcquiringResponse>() {
 			@Override

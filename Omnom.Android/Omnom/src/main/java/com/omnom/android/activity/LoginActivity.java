@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
-import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
@@ -222,12 +221,7 @@ public class LoginActivity extends BaseOmnomActivity {
 		busy(true);
 		topPanel.showProgress(true);
 
-		final AuthRegisterRequest request = AuthRegisterRequest.create(AndroidUtils.getInstallId(this),
-		                                                               StringUtils.EMPTY_STRING,
-		                                                               StringUtils.EMPTY_STRING,
-		                                                               StringUtils.EMPTY_STRING,
-		                                                               editPhone.getText(),
-		                                                               StringUtils.EMPTY_STRING);
+		final AuthRegisterRequest request = AuthRegisterRequest.create(AndroidUtils.getInstallId(this), editPhone.getText());
 		subscribe(authenticator.register(request),
 		          new Action1<AuthRegisterResponse>() {
 			          @Override
@@ -268,15 +262,7 @@ public class LoginActivity extends BaseOmnomActivity {
 
 	private void handleRegisterError(AuthRegisterResponse authRegisterResponse) {
 		topPanel.showProgress(false);
-		final AuthError error = authRegisterResponse.getError();
-		switch(error.getCode()) {
-			//case 107:
-			// doLogin();
-			//	break;
-
-			default:
-				showError(error.getMessage());
-		}
+		showError(authRegisterResponse.getError().getMessage());
 	}
 
 	private void showError(final String message) {

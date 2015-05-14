@@ -1,6 +1,7 @@
 package com.omnom.android.auth.request;
 
 import com.google.gson.annotations.Expose;
+import com.omnom.android.utils.utils.StringUtils;
 
 /**
  * Created by Ch3D on 25.09.2014.
@@ -10,6 +11,12 @@ public class AuthRegisterRequest {
 	                                         String phone,
 	                                         String birthDate) {
 		return new AuthRegisterRequest(installId, name, nick, email, phone, birthDate);
+	}
+
+	public static AuthRegisterRequest create(String installId,
+	                                         String phone) {
+		return create(installId, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING, phone,
+		              StringUtils.EMPTY_STRING);
 	}
 
 	@Expose

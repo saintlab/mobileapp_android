@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.adapter.WishAdapter;
@@ -379,7 +378,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	 * @return whether user ought to pass through logging-in process
 	 */
 	private boolean checkUser() {
-		if(TextUtils.isEmpty(OmnomApplication.get(getActivity()).getAuthToken())) {
+		if(TextUtils.isEmpty(getApp().getAuthToken())) {
 			LoginActivity.start(this, AndroidUtils.getDevicePhoneNumber(this, R.string.phone_country_code), REQUEST_CODE_LOGIN);
 			return true;
 		}

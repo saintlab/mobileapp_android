@@ -30,6 +30,10 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 		locationHelper = new OmnomActivityHelper(getActivity());
 	}
 
+	protected final OmnomApplication getApp() {
+		return OmnomApplication.get(getActivity());
+	}
+
 	@Override
 	protected void onStart() {
 		super.onStart();
@@ -58,7 +62,5 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 	protected Location getLocation() {
 		return locationHelper.getLocation();
 	}
-
-
 
 }

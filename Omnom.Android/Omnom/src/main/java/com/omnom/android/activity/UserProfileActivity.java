@@ -176,7 +176,8 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 		updateUserImage(StringUtils.EMPTY_STRING);
 
-		final String token = OmnomApplication.get(getActivity()).getAuthToken();
+		final OmnomApplication app = getApp();
+		final String token = app.getAuthToken();
 		showUserData(!TextUtils.isEmpty(token));
 
 		subscribe(getProfileObservable(token),
@@ -185,12 +186,12 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 			          public void call(Pair<UserResponse, SupportInfoResponse> response) {
 				          final UserResponse userResponse = response.first;
 				          if(userResponse.hasError() && UserProfileHelper.hasAuthError(userResponse)) {
-					          ((OmnomApplication) getApplication()).logout();
+					          app.logout();
 					          forwardToIntro();
 					          return;
 				          }
 				          UserProfile profile = new UserProfile(userResponse);
-				          OmnomApplication.get(getActivity()).cacheUserProfile(profile);
+				          app.cacheUserProfile(profile);
 				          initUserData(userResponse.getUser());
 
 				          final SupportInfoResponse supportInfoResponse = response.second;
@@ -284,8 +285,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == REQUEST_CODE_LOGIN && resultCode == RESULT_OK) {
-			final OmnomApplication app = OmnomApplication.get(getActivity());
-			initUserData(app.getUserProfile().getUser());
+			initUserData(getApp().getUserProfile().getUser());
 			showUserData(true);
 		}
 	}

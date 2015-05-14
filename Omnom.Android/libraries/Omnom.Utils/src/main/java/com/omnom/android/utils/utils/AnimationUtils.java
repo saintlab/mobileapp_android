@@ -353,11 +353,12 @@ public class AnimationUtils {
 		va.start();
 	}
 
-	public static void smoothScrollToPositionFromTop(final AbsListView view, final int position, final int duration, final Runnable callback) {
+	public static void smoothScrollToPositionFromTop(final AbsListView view, final int position, final int duration, final Runnable
+			callback) {
 		View child = getChildAtPosition(view, position);
 		// There's no need to scroll if child is already at top or view is already scrolled to its end
-		if ((child != null) && ((child.getTop() == 0) || ((child.getTop() > 0) && !view.canScrollVertically(1)))) {
-			if (callback != null) {
+		if((child != null) && ((child.getTop() == 0) || ((child.getTop() > 0) && !view.canScrollVertically(1)))) {
+			if(callback != null) {
 				view.post(callback);
 			}
 			return;
@@ -366,7 +367,7 @@ public class AnimationUtils {
 		view.setOnScrollListener(new AbsListView.OnScrollListener() {
 			@Override
 			public void onScrollStateChanged(final AbsListView view, final int scrollState) {
-				if (scrollState == SCROLL_STATE_IDLE) {
+				if(scrollState == SCROLL_STATE_IDLE) {
 					view.setOnScrollListener(null);
 
 					// Fix for scrolling bug
@@ -374,7 +375,7 @@ public class AnimationUtils {
 						@Override
 						public void run() {
 							view.setSelection(position);
-							if (callback != null) {
+							if(callback != null) {
 								view.post(callback);
 							}
 						}
@@ -398,10 +399,19 @@ public class AnimationUtils {
 
 	private static View getChildAtPosition(final AdapterView view, final int position) {
 		final int index = position - view.getFirstVisiblePosition();
-		if ((index >= 0) && (index < view.getChildCount())) {
+		if((index >= 0) && (index < view.getChildCount())) {
 			return view.getChildAt(index);
 		} else {
 			return null;
+		}
+	}
+
+	public static void translationY(final int value, final View... views) {
+		if(views == null || views.length < 1) {
+			return;
+		}
+		for(final View view : views) {
+			view.animate().translationY(value).start();
 		}
 	}
 }

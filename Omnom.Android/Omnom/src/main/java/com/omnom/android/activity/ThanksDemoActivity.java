@@ -3,7 +3,6 @@ package com.omnom.android.activity;
 import android.app.Activity;
 import android.content.Intent;
 
-import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.restaurateur.model.order.Order;
@@ -50,7 +49,7 @@ public class ThanksDemoActivity extends ThanksActivity {
 			postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 				@Override
 				public void run() {
-					final UserData user = OmnomApplication.get(getActivity()).getUserProfile().getUser();
+					final UserData user = getApp().getUserProfile().getUser();
 					mPaymentListener.onPaymentEvent(PaymentSocketEvent.createDemoEvent(user, mAmount, (int) AmountHelper.toDouble(mTips)));
 					mFirstRun = false;
 				}

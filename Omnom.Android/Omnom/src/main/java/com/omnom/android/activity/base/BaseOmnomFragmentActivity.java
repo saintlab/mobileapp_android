@@ -27,6 +27,10 @@ public abstract class BaseOmnomFragmentActivity extends BaseFragmentActivity {
 		activityHelper = new OmnomActivityHelper(getActivity());
 	}
 
+	protected final OmnomApplication getApp() {
+		return OmnomApplication.get(getActivity());
+	}
+
 	@Override
 	protected void onStart() {
 		super.onStart();

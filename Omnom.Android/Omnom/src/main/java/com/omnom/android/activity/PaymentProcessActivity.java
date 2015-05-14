@@ -303,8 +303,9 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	}
 
 	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final int tip) {
-		final UserData user = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
+		final OmnomApplication app = getApp();
+		final UserData user = app.getUserProfile().getUser();
+		final AcquiringData acquiringData = app.getConfig().getAcquiringData();
 		pay(billData, card, acquiringData, user, amount, tip);
 	}
 

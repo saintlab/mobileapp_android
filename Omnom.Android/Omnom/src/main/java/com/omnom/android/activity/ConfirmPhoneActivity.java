@@ -168,7 +168,7 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	private void doConfirm() {
 		btnRequestCode.setEnabled(false);
-		final OmnomApplication omnomApp = OmnomApplication.get(getActivity());
+		final OmnomApplication omnomApp = getApp();
 		final Observable<UserResponse> userResponseObservable = getAuthObservable().flatMap(
 				new Func1<AuthResponse, Observable<UserResponse>>() {
 					@Override

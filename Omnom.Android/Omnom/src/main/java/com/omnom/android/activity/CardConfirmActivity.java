@@ -257,9 +257,10 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 			editText.requestFocus();
 			editText.setSelection(amount.length() - getCurrencySuffix().length());
 		}
-		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
+		final OmnomApplication app = getApp();
+		UserProfile mUserProfile = app.getUserProfile();
 		mUser = mUserProfile.getUser();
-		mAcquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
+		mAcquiringData = app.getConfig().getAcquiringData();
 		mPanelTop.setTitleBig(R.string.card_binding);
 		mPanelTop.setButtonRightEnabled(false);
 		mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
@@ -385,8 +386,9 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 			return;
 		}
 		mPanelTop.showProgress(true);
-		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
-		UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
+		final OmnomApplication app = getApp();
+		final AcquiringData acquiringData = app.getConfig().getAcquiringData();
+		UserData wicketUser = app.getUserProfile().getUser();
 		subscribe(mAcquiring.registerCard(acquiringData, wicketUser, mCard).delaySubscription(1000, TimeUnit.MILLISECONDS),
 		          new Action1<CardRegisterPollingResponse>() {
 			          @Override

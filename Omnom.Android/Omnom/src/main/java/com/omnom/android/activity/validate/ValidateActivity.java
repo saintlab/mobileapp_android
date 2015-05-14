@@ -397,7 +397,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mData = getIntent().getData();
 		mViewHelper = new ValidateViewHelper(this);
 		configurationService = new ConfigurationService(getApplicationContext(), authenticator, configApi, mAcquiring,
-		                                                OmnomApplication.get(getActivity()).getAuthToken());
+		                                                getApp().getAuthToken());
 	}
 
 	@Override
@@ -590,7 +590,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				updateConfiguration(configurationResponse.getConfig());
 				correctMixpanelTime(userResponse);
 				reportMixPanel(userResponse);
-				OmnomApplication.get(getActivity()).cacheUserProfile(new UserProfile(userResponse));
+				getApp().cacheUserProfile(new UserProfile(userResponse));
 
 				getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
 				                          new AppLaunchMixpanelEvent(userResponse.getUser()));
@@ -647,11 +647,13 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	}
 
 	private void updateConfiguration(final Config config) {
-		OmnomApplication.get(getActivity()).cacheConfig(config);
+		final OmnomApplication app = getApp();
+
+		app.cacheConfig(config);
 		if(mAcquiring instanceof AcquiringMailRu) {
 			((AcquiringMailRu) mAcquiring).changeEndpoint(config.getAcquiringData().getBaseUrl());
 		}
-		if(!TextUtils.isEmpty(OmnomApplication.get(getActivity()).getAuthToken())) {
+		if(!TextUtils.isEmpty(app.getAuthToken())) {
 			mPushManager.register();
 		}
 		getMixPanelHelper().addApi(OMNOM, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
@@ -1028,7 +1030,8 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}
 
 		// User in already in a restaurant there is no need to send them notification
-		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(getActivity()).getPreferences();
+		final PreferenceHelper preferences = (PreferenceHelper) getPreferences();
+
 		preferences.saveNotificationDetails(this, restaurant.id());
 		final TableDataResponse table = RestaurantHelper.getTable(restaurant);
 		if(table != null) {

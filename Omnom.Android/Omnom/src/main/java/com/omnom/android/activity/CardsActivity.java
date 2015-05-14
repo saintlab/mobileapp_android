@@ -231,7 +231,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	@Override
 	public void initUi() {
 		ViewUtils.setVisible(mDelimiter, true);
-		mPreferences = OmnomApplication.get(getActivity()).getPreferences();
+		mPreferences = getPreferences();
 
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
 			@Override
@@ -275,7 +275,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 						adapter.notifyDataSetChanged();
 					}
 				} else {
-					String cvv = OmnomApplication.get(activity).getConfig().getAcquiringData().getTestCvv();
+					String cvv = getApp().getConfig().getAcquiringData().getTestCvv();
 					final CardInfo cardInfo = new CardInfo.Builder()
 							.cardId(card.getExternalCardId())
 							.cvv(cvv)
@@ -502,7 +502,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 		if(mList != null && mList.getAdapter() != null) {
 			final Card card = ((CardsAdapter) mList.getAdapter()).getSelectedCard();
 			if(card != null) {
-				String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
+				String cvv = getApp().getConfig().getAcquiringData().getTestCvv();
 				final CardInfo cardInfo = new CardInfo.Builder()
 						.cardId(cardId)
 						.pan(card.getMaskedPan())
