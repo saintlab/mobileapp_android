@@ -450,13 +450,11 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 	}
 
 	private void reportMixPanelSuccess(final CardInfo cardInfo) {
-		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo,
-		                                                                                 mScanUsed));
+		track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed));
 	}
 
 	private void reportMixPanelFail(final CardInfo cardInfo, final AcquiringResponseError error) {
-		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed,
-		                                                                                 error));
+		track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed, error));
 	}
 
 	public void verifyCard() {

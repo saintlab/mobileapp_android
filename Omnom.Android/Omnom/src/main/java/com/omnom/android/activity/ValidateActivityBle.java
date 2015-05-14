@@ -206,10 +206,9 @@ public class ValidateActivityBle extends ValidateActivity {
 		if(tableDataResponse == null) {
 			return;
 		}
-		getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-		                          OnTableMixpanelEvent.create(requestId, getUserData(),
-		                                                      tableDataResponse.getRestaurantId(),
-		                                                      tableDataResponse.getId(), method));
+		track(MixPanelHelper.Project.OMNOM, OnTableMixpanelEvent.create(requestId, getUserData(),
+		                                                                tableDataResponse.getRestaurantId(),
+		                                                                tableDataResponse.getId(), method));
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)

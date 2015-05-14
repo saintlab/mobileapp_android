@@ -476,18 +476,14 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 
 	private void reportMixPanelSuccess() {
 		if(!mIsDemo && !BuildConfig.DEBUG) {
-			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-			                          new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
-			getMixPanelHelper().trackRevenue(MixPanelHelper.Project.OMNOM,
-			                                 String.valueOf(getUserData().getId()), mDetails, mBillData);
+			track(MixPanelHelper.Project.OMNOM, new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
+			trackRevenue(MixPanelHelper.Project.OMNOM, String.valueOf(getUserData().getId()), mDetails, mBillData);
 		}
 	}
 
 	private void reportMixPanelFail(final AcquiringResponseError error) {
 		if(!mIsDemo && !BuildConfig.DEBUG) {
-			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-			                          new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
-			                                                   mCardInfo, error));
+			track(MixPanelHelper.Project.OMNOM, new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo, error));
 		}
 	}
 

@@ -585,16 +585,15 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				, new Action1<ConfigurationResponse>() {
 			@Override
 			public void call(ConfigurationResponse configurationResponse) {
-				final ValidateActivity activity = ValidateActivity.this;
 				final UserResponse userResponse = configurationResponse.getUserResponse();
 				updateConfiguration(configurationResponse.getConfig());
 				correctMixpanelTime(userResponse);
 				reportMixPanel(userResponse);
 				getApp().cacheUserProfile(new UserProfile(userResponse));
 
-				getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
+				track(MixPanelHelper.Project.OMNOM,
 				                          new AppLaunchMixpanelEvent(userResponse.getUser()));
-				final boolean hasBle = BluetoothUtils.hasBleSupport(activity);
+				final boolean hasBle = BluetoothUtils.hasBleSupport(ValidateActivity.this);
 				final boolean bleEnabled = BluetoothUtils.isBluetoothEnabled(getActivity());
 				if((!hasBle || (hasBle && !bleEnabled)) && !isExternalLaunch()) {
 					validateShowRestaurants();

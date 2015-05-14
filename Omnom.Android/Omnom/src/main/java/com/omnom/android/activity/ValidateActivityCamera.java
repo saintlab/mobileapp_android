@@ -209,10 +209,10 @@ public class ValidateActivityCamera extends ValidateActivity {
 	@Override
 	protected void reportMixPanel(final String requestId, final String method, final TableDataResponse tableDataResponse) {
 		if(tableDataResponse != null) {
-			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-			                          OnTableMixpanelEvent.create(requestId, getUserData(),
-			                                                      tableDataResponse.getRestaurantId(),
-			                                                      tableDataResponse.getId(), method));
+			track(MixPanelHelper.Project.OMNOM,
+			      OnTableMixpanelEvent.create(requestId, getUserData(),
+			                                  tableDataResponse.getRestaurantId(),
+			                                  tableDataResponse.getId(), method));
 		}
 	}
 

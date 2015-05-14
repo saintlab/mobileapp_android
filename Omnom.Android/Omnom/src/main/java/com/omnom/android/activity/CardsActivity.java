@@ -363,11 +363,11 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	}
 
 	private void reportMixPanelSuccess(final CardInfo cardInfo) {
-		getMixPanelHelper().track(OMNOM, new CardDeletedMixpanelEvent(getUserData(), cardInfo));
+		track(OMNOM, new CardDeletedMixpanelEvent(getUserData(), cardInfo));
 	}
 
 	private void reportMixPanelFail(final CardInfo cardInfo, final AcquiringResponseError error) {
-		getMixPanelHelper().track(OMNOM, new CardDeletedMixpanelEvent(getUserData(), cardInfo, error));
+		track(OMNOM, new CardDeletedMixpanelEvent(getUserData(), cardInfo, error));
 	}
 
 	private void onRemoveSuccess(final Card card) {
