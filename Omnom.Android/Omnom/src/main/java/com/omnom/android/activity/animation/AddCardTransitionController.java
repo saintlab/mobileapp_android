@@ -12,7 +12,7 @@ import java.lang.ref.WeakReference;
 /**
  * Created by Ch3D on 15.05.2015.
  */
-public class AddCardTransitionController extends TransitionController {
+public class AddCardTransitionController extends ActivityTransitionController {
 	int panelY = 0;
 
 	int cameraY = 0;

@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,8 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.activity.animation.MenuItemTransitionController;
 import com.omnom.android.adapter.MenuCategoryItems;
 import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.model.Item;
@@ -30,6 +31,7 @@ import com.omnom.android.utils.utils.ViewFilter;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.squareup.otto.Subscribe;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -276,6 +278,8 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 	private TransitionParams mTransitionParams;
 
+	private MenuItemTransitionController mTransitionController;
+
 	@OnClick(R.id.btn_close)
 	public void onClose() {
 		if(mScroll.getScrollY() != 0) {
@@ -292,61 +296,13 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	}
 
 	private void animateClose() {
-		final View btnApply = mView.findViewById(R.id.btn_apply);
-		final boolean noPhoto = TextUtils.isEmpty(mItem.photo());
-
-		final int imgSize = getResources().getDimensionPixelSize(R.dimen.menu_dish_image_height);
-		final int applyMarginTop = mTransitionParams.getApplyMarginTop();
-		final int translationTop = mTransitionParams.getTranslationTop();
-		final int paddingTop = mTransitionParams.getPaddingTop();
-		final int applyTop = mTransitionParams.getApplyTop();
-		final int top = btnApply.getTop();
-
-		AnimationUtils.animateAlpha3(mPanelRecommendations, false);
-		if(applyMarginTop == 0 && noPhoto) {
-			// Do nothing
-		} else {
-			if(applyTop != 0 && noPhoto) {
-				btnApply.animate().translationY(applyTop + (title.getTop() - top) - applyMarginTop).setDuration(
-						mDuration).start();
-			}
-		}
-		if(applyMarginTop != 0) {
-			btnApply.animate().translationY(applyMarginTop).setDuration(mDuration).start();
-		}
-		if(translationTop > 0) {
-			mView.findViewById(R.id.root).animate().translationY(translationTop).setDuration(mDuration).start();
-		}
-		if(!noPhoto) {
-			ViewUtils.setVisible(info, false);
-			ViewUtils.setVisible(additional, false);
-			ViewUtils.setVisible(energy, false);
-			AnimationUtils.scaleHeight(logo, imgSize, mDuration);
-			rl.animate().translationY(paddingTop).setDuration(mDuration).start();
-			title.animate().translationY(-imgSize).setDuration(mDuration).start();
-		} else {
-			if(!TextUtils.isEmpty(info.getText())) {
-				ViewUtils.setVisible2(info, false);
-			}
-			if(!TextUtils.isEmpty(additional.getText())) {
-				ViewUtils.setVisible2(additional, false);
-			}
-			if(!TextUtils.isEmpty(energy.getText())) {
-				ViewUtils.setVisible2(energy, false);
-			}
-		}
-
-		iv.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				getFragmentManager().popBackStack();
-			}
-		}, mDuration);
+		mTransitionController.animateClose(mTransitionParams, !TextUtils.isEmpty(mItem.photo()), mDuration);
 	}
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater,
 	                         @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState) {
+		mDuration = getResources().getInteger(R.integer.default_animation_duration_short);
 		if(getArguments() != null) {
 			mOrder = getArguments().getParcelable(Extras.EXTRA_ORDER);
 			mPosition = getArguments().getInt(ARG_POSITION);
@@ -358,7 +314,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		if(mOrder == null) {
 			mOrder = UserOrder.create();
 		}
-		mDuration = getResources().getInteger(R.integer.default_animation_duration_short);
+		mTransitionController = new MenuItemTransitionController(new WeakReference<FragmentActivity>(getActivity()));
 		return getActivity().getLayoutInflater().inflate(R.layout.fragment_menu_item_details, null);
 	}
 
@@ -390,48 +346,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 	public void onResume() {
 		super.onResume();
 		if(mAnimate) {
-			if(mTransitionParams.getTranslationTop() > 0) {
-				mView.findViewById(R.id.root).animate().translationY(mTransitionParams.getTranslationTop()).setDuration(0).start();
-			}
-
-			ViewUtils.setVisible(info, false);
-			ViewUtils.setVisible(additional, false);
-			ViewUtils.setVisible(energy, false);
-			ViewUtils.setVisible(mPanelRecommendations, false);
-
-			final View btnApply = mView.findViewById(R.id.btn_apply);
-			btnApply.setTranslationY(mTransitionParams.getApplyMarginTop());
-
-			final boolean emptyPhoto = TextUtils.isEmpty(mItem.photo());
-			if(emptyPhoto) {
-				ViewUtils.setVisible(rl, false);
-			} else {
-				rl.animate().translationY(mTransitionParams.getPaddingTop()).setDuration(0).start();
-				title.animate().translationY(-getResources().getDimensionPixelSize(R.dimen.menu_dish_image_height)).setDuration(0).start();
-			}
-			OmnomApplication.getPicasso(getActivity()).load(mItem.photo()).into(logo);
-			iv.post(new Runnable() {
-				@Override
-				public void run() {
-					mImgHeight = iv.getHeight();
-					ViewUtils.setVisible(iv, false);
-				}
-			});
-			iv.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					mView.findViewById(R.id.root).animate().translationY(0).setDuration(mDuration).start();
-					rl.animate().translationY(0).setDuration(mDuration).start();
-					title.animate().translationY(0).setDuration(mDuration).start();
-					btnApply.animate().translationY(0).setDuration(mDuration).start();
-
-					AnimationUtils.scaleHeight(logo, mImgHeight, mDuration);
-					AnimationUtils.animateAlpha(info, info.getText().length() > 0);
-					AnimationUtils.animateAlpha(additional, additional.getText().length() > 0);
-					AnimationUtils.animateAlpha(energy, energy.getText().length() > 0);
-					AnimationUtils.animateAlpha(mPanelRecommendations, mItem.hasRecommendations());
-				}
-			}, emptyPhoto ? 0 : getResources().getInteger(R.integer.default_animation_duration_quick));
+			mTransitionController.onResume(mTransitionParams, mItem, mDuration);
 			mAnimate = false;
 		}
 	}
