@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 import com.omnom.android.R;
@@ -29,7 +30,6 @@ import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.view.SimpleListView;
-import com.omnom.android.view.stateful.StatefulLinearLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -123,7 +123,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity
 	protected View panelDemo;
 
 	@InjectView(R.id.scan_qr)
-	protected StatefulLinearLayout scanQr;
+	protected TextView scanQr;
 
 	@Inject
 	RestaurateurObservableApi api;
@@ -145,9 +145,8 @@ public class RestaurantsListActivity extends BaseOmnomActivity
 
 	private int logoSizeLarge;
 
-	@OnClick({R.id.scan_qr})
-	public void doQrShortcut(final StatefulLinearLayout statefulView) {
-		statefulView.setKeepStatePressed(true);
+	@OnClick(R.id.scan_qr)
+	public void doQrShortcut() {
 		ValidateActivityShortcut.start(this, R.anim.slide_in_right, R.anim.slide_out_left,
 		                               EXTRA_LOADER_ANIMATION_SCALE_DOWN);
 	}
@@ -196,7 +195,6 @@ public class RestaurantsListActivity extends BaseOmnomActivity
 	@Override
 	protected void onStart() {
 		super.onStart();
-		scanQr.setKeepStatePressed(false);
 		scanQr.setPressed(false);
 	}
 
