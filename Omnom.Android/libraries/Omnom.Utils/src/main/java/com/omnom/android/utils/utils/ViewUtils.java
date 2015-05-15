@@ -15,8 +15,8 @@ import java.util.List;
 import butterknife.ButterKnife;
 
 import static com.omnom.android.utils.utils.AnimationUtils.animateAlpha;
-import static com.omnom.android.utils.utils.AnimationUtils.animateAlpha2;
 import static com.omnom.android.utils.utils.AnimationUtils.animateAlphaGone;
+import static com.omnom.android.utils.utils.AnimationUtils.animateAlphaSkipTag;
 
 /**
  * Created by Ch3D on 29.07.2014.
