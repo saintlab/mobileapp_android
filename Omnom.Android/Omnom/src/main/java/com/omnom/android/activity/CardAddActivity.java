@@ -19,6 +19,7 @@ import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
+import com.omnom.android.activity.animation.AddCardTransitionController;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.entrance.EntranceData;
@@ -28,7 +29,6 @@ import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
 import com.omnom.android.utils.CardUtils;
 import com.omnom.android.utils.utils.AndroidUtils;
-import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEditText;
 import com.omnom.android.validator.Validator;
@@ -36,6 +36,8 @@ import com.omnom.android.validator.card.CvvValidator;
 import com.omnom.android.validator.card.ExpirationDateValidator;
 import com.omnom.android.validator.card.PanValidator;
 import com.omnom.android.view.HeaderView;
+
+import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
@@ -128,16 +130,6 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	@Inject
 	protected Acquiring mAcquiring;
 
-	private boolean mMinimized = false;
-
-	private int panelY;
-
-	private int cameraY;
-
-	private int cameraX;
-
-	private int panelX;
-
 	private Validator panValidator;
 
 	private Validator expDateValidator;
@@ -145,6 +137,8 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	private Validator cvvValidator;
 
 	private int mType;
+
+	private AddCardTransitionController mTransitionController;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +150,8 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 
 	@Override
 	public void initUi() {
+		mTransitionController = new AddCardTransitionController(new WeakReference<Activity>(this));
+
 		mCheckSaveCard.setChecked(true);
 		mPanelTop.setButtonRightEnabled(false);
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
@@ -215,44 +211,9 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 
 	@Override
 	public void onTextChanged(final CharSequence s) {
-		animteCamera(mEditCardCvv.length() > 0 || mEditCardExpDate.length() > 0 || mEditCardNumber.length() > 0);
+		final boolean minimize = mEditCardCvv.length() > 0 || mEditCardExpDate.length() > 0 || mEditCardNumber.length() > 0;
+		mTransitionController.animteCamera(minimize);
 		mPanelTop.setButtonRightEnabled(validate());
-	}
-
-	private void animteCamera(final boolean minimize) {
-		int[] sp = new int[2];
-		mPanelCard.getLocationOnScreen(sp);
-		if(panelY == 0) {
-			panelY = sp[1];
-		}
-		if(panelX == 0) {
-			panelX = sp[0];
-		}
-
-		mImgCamera.getLocationOnScreen(sp);
-		if(cameraY == 0) {
-			cameraY = sp[1];
-		}
-		if(cameraX == 0) {
-			cameraX = sp[0];
-		}
-
-		if(mMinimized != minimize) {
-			final int v = (int) ((cameraY - panelY) / 1.5f);
-			if(minimize) {
-				AndroidUtils.setBackground(mImgCamera, null);
-				AnimationUtils.animateAlpha(mTextCamera, false);
-				mImgCamera.animate().x(mPanelCard.getMeasuredWidth() - mImgCamera.getMeasuredWidth()).start();
-				mImgCamera.animate().translationYBy(-v).start();
-				AnimationUtils.translationY(-v, mEditCardCvv, mEditCardExpDate, mEditCardNumber);
-			} else {
-				AnimationUtils.animateAlpha(mTextCamera, true);
-				mImgCamera.animate().x(cameraX - panelX).start();
-				AnimationUtils.translationY(0, mImgCamera, mEditCardCvv, mEditCardExpDate, mEditCardNumber);
-				AndroidUtils.setBackground(mImgCamera, getResources().getDrawable(R.drawable.scan_frame));
-			}
-			mMinimized = minimize;
-		}
 	}
 
 	@Override
