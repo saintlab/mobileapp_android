@@ -121,6 +121,9 @@ public class AnimationUtils {
 		animateAlpha(view, visible, view.getResources().getInteger(R.integer.default_animation_duration_short));
 	}
 
+	/**
+	 * Animate view's alpha skipping current visibility-tag value
+	 */
 	public static void animateAlphaSkipTag(final View view, final boolean visible) {
 		animateAlphaSkipTag(view, visible, null, view.getResources().getInteger(R.integer.default_animation_duration_short));
 	}
@@ -154,6 +157,9 @@ public class AnimationUtils {
 				    alpha(visible ? 1 : 0).start();
 	}
 
+	/**
+	 * Animate view's alpha and set visibility to {@link android.view.View#VISIBLE} or {@link android.view.View#GONE}
+	 */
 	public static void animateAlphaGone(final View view, final boolean visible) {
 		if(view == null) {
 			return;
@@ -180,6 +186,9 @@ public class AnimationUtils {
 				    }).alpha(visible ? 1 : 0).start();
 	}
 
+	/**
+	 * Animate view's alpha skipping current visibility-tag value
+	 */
 	public static void animateAlphaSkipTag(final View view, final boolean visible, final Runnable callback, long duration) {
 		if(view == null) {
 			return;
