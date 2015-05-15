@@ -256,7 +256,16 @@ public class LoginActivity extends BaseOmnomActivity {
 
 	private void handleRegisterError(AuthRegisterResponse authRegisterResponse) {
 		topPanel.showProgress(false);
-		showError(authRegisterResponse.getError().getMessage());
+		switch(authRegisterResponse.getError().getCode()) {
+			case 101:
+			case 105:
+				showError(getString(R.string.unknown_user));
+				break;
+
+			default:
+				showError(authRegisterResponse.getError().getMessage());
+				break;
+		}
 	}
 
 	private void showError(final String message) {

@@ -223,4 +223,5 @@
         карту\nв&#160;ближайшие несколько дней.</string>
     <string name="barmen_tips_positive">+ Чай бармену :-)</string>
     <string name="barmen_tips_negative">+ Чай бармену :-(</string>
+    <string name="unknown_user">Неизвестный пользователь</string>
 </resources>
