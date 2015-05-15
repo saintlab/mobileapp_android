@@ -33,7 +33,7 @@ public class MenuHelper {
 	                                        TextView txtDetails) {
 		final String text = getNutritionalString(context, details);
 		final boolean notEmpty = !TextUtils.isEmpty(text);
-		ViewUtils.setVisible(txtDetails, notEmpty);
+		ViewUtils.setVisibleGone(txtDetails, notEmpty);
 		txtDetails.setText(notEmpty ? text : StringUtils.EMPTY_STRING);
 	}
 
@@ -181,7 +181,7 @@ public class MenuHelper {
 
 		final String result = sb.toString();
 		final boolean empty = TextUtils.isEmpty(result);
-		ViewUtils.setVisible(txtDetails, !empty);
+		ViewUtils.setVisibleGone(txtDetails, !empty);
 		if(!empty) {
 			txtDetails.setText(result);
 		}

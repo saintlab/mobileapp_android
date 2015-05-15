@@ -336,7 +336,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		refresh();
 
 		final String description = mItem.description();
-		ViewUtils.setVisible(mTxtAdditional, !TextUtils.isEmpty(description));
+		ViewUtils.setVisibleGone(mTxtAdditional, !TextUtils.isEmpty(description));
 		mTxtAdditional.setText(description);
 
 		MenuHelper.bindNutritionalValue(view.getContext(), mItem.details(), mTxtEnergy);

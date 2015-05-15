@@ -260,7 +260,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	private void setBusy(boolean busy) {
 		mBusy = busy;
-		ViewUtils.setVisible(mProgressBar, busy);
+		ViewUtils.setVisibleGone(mProgressBar, busy);
 	}
 
 	@Override
@@ -272,8 +272,8 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	@Override
 	public void initUi() {
 		final boolean isBar = RestaurantHelper.isBar(mRestaurant);
-		ViewUtils.setVisible(mPanelBottom, !isBar);
-		ViewUtils.setVisible(mPanelBottomBar, isBar);
+		ViewUtils.setVisibleGone(mPanelBottom, !isBar);
+		ViewUtils.setVisibleGone(mPanelBottomBar, isBar);
 		setBusy(false);
 		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, mEntranceData, this);
 		mLayoutManager = new LinearLayoutManager(this);

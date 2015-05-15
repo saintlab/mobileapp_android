@@ -181,7 +181,7 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 
 				if(item.getParent() instanceof CategoryData) {
 					final CategoryData cat = (CategoryData) item.getParent();
-					ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, true);
+					ViewUtils.setVisibleGone(mSubcategoriesView.mFakeStickyHeader, true);
 					drawSelectedBackground(mSubcategoriesView.mFakeStickyHeader);
 					((TextView) mSubcategoriesView.mFakeStickyHeader.findViewById(R.id.txt_title)).setText(cat.getName());
 				} else {
@@ -196,11 +196,11 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 			mFakeHeader = childViewHolder;
 			final MultiLevelRecyclerAdapter.Data item = mMenuAdapter.getItemAt(header.getPosition());
 			if(item == null || item.isGroup()) {
-				ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, false);
+				ViewUtils.setVisibleGone(mSubcategoriesView.mFakeStickyHeader, false);
 				return;
 			}
 
-			ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, true);
+			ViewUtils.setVisibleGone(mSubcategoriesView.mFakeStickyHeader, true);
 			drawSelectedBackground(mSubcategoriesView.mFakeStickyHeader);
 			final CharSequence title = ((TextView) header.itemView.findViewById(R.id.txt_title)).getText();
 			((TextView) mSubcategoriesView.mFakeStickyHeader.findViewById(R.id.txt_title)).setText(title);

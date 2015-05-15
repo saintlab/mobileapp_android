@@ -250,7 +250,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 					public void onError(Throwable throwable) {
 						if(ErrorUtils.isConnectionError(throwable)) {
 							textError.setText(getString(R.string.err_no_internet));
-							ViewUtils.setVisible(textError, true);
+							ViewUtils.setVisibleGone(textError, true);
 						}
 						topPanel.showProgress(false);
 						Log.e(TAG, "doRegister ", throwable);
@@ -273,7 +273,7 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 						LoginActivity.start(UserRegisterActivity.this, editPhone.getText());
 					}
 				});
-				ViewUtils.setVisible(textError, true);
+				ViewUtils.setVisibleGone(textError, true);
 				break;
 
 			case 109:
@@ -282,12 +282,12 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 
 			default:
 				textError.setText(error.getMessage());
-				ViewUtils.setVisible(textError, true);
+				ViewUtils.setVisibleGone(textError, true);
 		}
 	}
 
 	private boolean validate() {
-		ViewUtils.setVisible(textError, false);
+		ViewUtils.setVisibleGone(textError, false);
 		final String name = editName.getText();
 		final String email = editEmail.getText();
 		final String phone = editPhone.getText();

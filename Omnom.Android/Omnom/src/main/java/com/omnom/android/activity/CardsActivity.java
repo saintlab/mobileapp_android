@@ -229,7 +229,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 
 	@Override
 	public void initUi() {
-		ViewUtils.setVisible(mDelimiter, true);
+		ViewUtils.setVisibleGone(mDelimiter, true);
 		mPreferences = getPreferences();
 
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {

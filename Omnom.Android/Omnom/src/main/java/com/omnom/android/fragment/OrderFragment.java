@@ -649,17 +649,17 @@ public class OrderFragment extends Fragment {
 		initFooter(false);
 		if(mFooterView2 != null) {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
-			ViewUtils.setVisible(billSplit2, false);
+			ViewUtils.setVisibleGone(billSplit2, false);
 		}
-		ViewUtils.setVisible(mHeader, false);
+		ViewUtils.setVisibleGone(mHeader, false);
 		list.setSwipeEnabled(false);
 		if(isAnimated) {
 			AnimationUtils.animateAlpha3(getPanelPayment(), false);
 			getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0).start();
 			AnimationUtils.animateAlpha(txtTitle, true);
 		} else {
-			ViewUtils.setVisible(getPanelPayment(), false);
-			ViewUtils.setVisible(txtTitle, true);
+			ViewUtils.setVisibleGone(getPanelPayment(), false);
+			ViewUtils.setVisibleGone(txtTitle, true);
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
 			mFragmentView.setScaleY(FRAGMENT_SCALE_RATIO_SMALL);
 		}
@@ -791,7 +791,7 @@ public class OrderFragment extends Fragment {
 				((OrdersActivity) getActivity()).close();
 			}
 		});
-		ViewUtils.setVisible(mHeader, false);
+		ViewUtils.setVisibleGone(mHeader, false);
 
 		if(mAnimate) {
 			mFragmentView.setScaleX(FRAGMENT_SCALE_RATIO_SMALL);
@@ -799,7 +799,7 @@ public class OrderFragment extends Fragment {
 			mFragmentView.animate().translationYBy(-mListHeight).setDuration(0).start();
 			mFragmentView.animate().translationYBy(mListHeight).setStartDelay((mPosition + 1) * 200).setDuration(500).start();
 		} else if(mSingle) {
-			ViewUtils.setVisible(getPanelPayment(), true);
+			ViewUtils.setVisibleGone(getPanelPayment(), true);
 			list.setTranslationY(mListTraslationActive);
 			zoomInFragment((OrdersActivity) getActivity());
 		} else {
@@ -913,9 +913,9 @@ public class OrderFragment extends Fragment {
 		}
 		if(mFooterView2 != null) {
 			final View billSplit2 = mFooterView2.findViewById(R.id.panel_container);
-			ViewUtils.setVisible(billSplit2, true);
+			ViewUtils.setVisibleGone(billSplit2, true);
 		}
-		ViewUtils.setVisible(mHeader, true);
+		ViewUtils.setVisibleGone(mHeader, true);
 		AnimationUtils.animateAlpha(getPanelPayment(), true);
 		AnimationUtils.animateAlpha(txtTitle, false);
 		AndroidUtils.scrollEnd(list);
@@ -958,8 +958,8 @@ public class OrderFragment extends Fragment {
 	private void updateAmount(final String amount) {
 		final boolean isEverythingPaid = isEverythingPaid(getOrder());
 		list.setSwipeEnabled(!isEverythingPaid);
-		ViewUtils.setVisible2(btnEdit, !isEverythingPaid);
-		ViewUtils.setVisible(txtPaymentTitle, !isEverythingPaid);
+		ViewUtils.setVisibleInvisible(btnEdit, !isEverythingPaid);
+		ViewUtils.setVisibleGone(txtPaymentTitle, !isEverythingPaid);
         editAmount.setFocusable(!isEverythingPaid);
         final float density = getResources().getDisplayMetrics().density;
 		if (isEverythingPaid) {
@@ -989,10 +989,10 @@ public class OrderFragment extends Fragment {
 					txtAlreadyPaid.setText(getString(R.string.already_paid, AmountHelper.format(paidAmount) + currencySuffix));
 				}
 				if(!isEditMode) {
-					ViewUtils.setVisible2(txtAlreadyPaid, true);
+					ViewUtils.setVisibleInvisible(txtAlreadyPaid, true);
 				}
 			} else {
-				ViewUtils.setVisible2(txtAlreadyPaid, false);
+				ViewUtils.setVisibleInvisible(txtAlreadyPaid, false);
 			}
 		}
 	}
@@ -1025,9 +1025,9 @@ public class OrderFragment extends Fragment {
 							ButterKnife.apply(viewsAmountHide, ViewUtils.VISIBLITY_ALPHA2, !isVisible);
 							ButterKnife.apply(viewsAmountShow, ViewUtils.VISIBLITY_ALPHA2, isVisible);
 
-							ViewUtils.setVisible(radioGroup, !isVisible);
-							ViewUtils.setVisible2(btnEdit, !isVisible);
-							ViewUtils.setVisible2(btnApply, isVisible);
+							ViewUtils.setVisibleGone(radioGroup, !isVisible);
+							ViewUtils.setVisibleInvisible(btnEdit, !isVisible);
+							ViewUtils.setVisibleInvisible(btnApply, isVisible);
 
 							list.animate().translationYBy(isVisible ? mListTraslationActive : -mListTraslationActive).start();
 							getPanelPayment().animate().yBy(isVisible ? mPaymentTranslationY : -mPaymentTranslationY).start();
@@ -1102,8 +1102,8 @@ public class OrderFragment extends Fragment {
 		if(mFooterView1 != null) {
 			final View billSplit = mFooterView1.findViewById(R.id.btn_bill_split);
 			final View layoutOverall = mFooterView1.findViewById(R.id.layout_overall);
-			ViewUtils.setVisible(billSplit, isZoomedIn);
-			ViewUtils.setVisible(layoutOverall, !isZoomedIn);
+			ViewUtils.setVisibleGone(billSplit, isZoomedIn);
+			ViewUtils.setVisibleGone(layoutOverall, !isZoomedIn);
 		}
 	}
 
@@ -1234,25 +1234,25 @@ public class OrderFragment extends Fragment {
 		getPanelPayment().animate().yBy(visible ? -mTipsTranslationY : mTipsTranslationY).start();
 		editMode(visible);
 
-		ViewUtils.setVisible(editAmount, !visible);
+		ViewUtils.setVisibleGone(editAmount, !visible);
 
-		ViewUtils.setVisible(pickerTips, visible);
-		ViewUtils.setVisible(txtTipsHint, visible);
-		ViewUtils.setVisible(txtCustomTips, visible);
-		ViewUtils.setVisible(txtTipsAmountHint, visible);
+		ViewUtils.setVisibleGone(pickerTips, visible);
+		ViewUtils.setVisibleGone(txtTipsHint, visible);
+		ViewUtils.setVisibleGone(txtCustomTips, visible);
+		ViewUtils.setVisibleGone(txtTipsAmountHint, visible);
 
-		ViewUtils.setVisible2(btnApply, visible);
-		ViewUtils.setVisible2(btnEdit, !visible && !isEverythingPaid(getOrder()));
-		ViewUtils.setVisible2(radioGroup, !visible);
-		ViewUtils.setVisible2(txtPaymentTitle, !visible && !isEverythingPaid(getOrder()));
-		ViewUtils.setVisible2(txtAlreadyPaid, getOrder().getPaidAmount() > 0 && !visible);
-		ViewUtils.setVisible2(txtTipsTitle, !visible);
-		ViewUtils.setVisible2(btnPay, !visible);
+		ViewUtils.setVisibleInvisible(btnApply, visible);
+		ViewUtils.setVisibleInvisible(btnEdit, !visible && !isEverythingPaid(getOrder()));
+		ViewUtils.setVisibleInvisible(radioGroup, !visible);
+		ViewUtils.setVisibleInvisible(txtPaymentTitle, !visible && !isEverythingPaid(getOrder()));
+		ViewUtils.setVisibleInvisible(txtAlreadyPaid, getOrder().getPaidAmount() > 0 && !visible);
+		ViewUtils.setVisibleInvisible(txtTipsTitle, !visible);
+		ViewUtils.setVisibleInvisible(btnPay, !visible);
 
 		btnApply.setAlpha(1.0f);
 		btnApply.invalidate();
 		btnApply.invalidateDrawable(btnApply.getDrawable());
-		ViewUtils.setVisible2(btnCancel, visible);
+		ViewUtils.setVisibleInvisible(btnCancel, visible);
 		btnCancel.setAlpha(1.0f);
 		btnCancel.invalidate();
 		btnCancel.invalidateDrawable(btnCancel.getDrawable());
@@ -1265,7 +1265,7 @@ public class OrderFragment extends Fragment {
 		isEditMode = isActive;
 		final boolean orderControlsEnabled = !isActive && isMenuVisible();
 		list.setSwipeEnabled(orderControlsEnabled);
-		ViewUtils.setVisible(mHeader, orderControlsEnabled);
+		ViewUtils.setVisibleGone(mHeader, orderControlsEnabled);
 		if(mFooterView1 != null) {
 			mFooterView1.findViewById(R.id.btn_bill_split).setEnabled(orderControlsEnabled);
 		}

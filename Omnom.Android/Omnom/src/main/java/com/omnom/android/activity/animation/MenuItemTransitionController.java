@@ -65,21 +65,21 @@ public class MenuItemTransitionController extends FragmentActivityTransitionCont
 			mFragmentView.findViewById(R.id.root).animate().translationY(translationTop).setDuration(duration).start();
 		}
 		if(hasPhoto) {
-			ViewUtils.setVisible(info, false);
-			ViewUtils.setVisible(additional, false);
-			ViewUtils.setVisible(energy, false);
+			ViewUtils.setVisibleGone(info, false);
+			ViewUtils.setVisibleGone(additional, false);
+			ViewUtils.setVisibleGone(energy, false);
 			AnimationUtils.scaleHeight(logo, imgSize, duration);
 			rl.animate().translationY(paddingTop).setDuration(duration).start();
 			title.animate().translationY(-imgSize).setDuration(duration).start();
 		} else {
 			if(!TextUtils.isEmpty(info.getText())) {
-				ViewUtils.setVisible2(info, false);
+				ViewUtils.setVisibleInvisible(info, false);
 			}
 			if(!TextUtils.isEmpty(additional.getText())) {
-				ViewUtils.setVisible2(additional, false);
+				ViewUtils.setVisibleInvisible(additional, false);
 			}
 			if(!TextUtils.isEmpty(energy.getText())) {
-				ViewUtils.setVisible2(energy, false);
+				ViewUtils.setVisibleInvisible(energy, false);
 			}
 		}
 
@@ -113,17 +113,17 @@ public class MenuItemTransitionController extends FragmentActivityTransitionCont
 			mFragmentView.findViewById(R.id.root).animate().translationY(transitionParams.getTranslationTop()).setDuration(0).start();
 		}
 
-		ViewUtils.setVisible(info, false);
-		ViewUtils.setVisible(additional, false);
-		ViewUtils.setVisible(energy, false);
-		ViewUtils.setVisible(panelRecommendations, false);
+		ViewUtils.setVisibleGone(info, false);
+		ViewUtils.setVisibleGone(additional, false);
+		ViewUtils.setVisibleGone(energy, false);
+		ViewUtils.setVisibleGone(panelRecommendations, false);
 
 		final View btnApply = mFragmentView.findViewById(R.id.btn_apply);
 		btnApply.setTranslationY(transitionParams.getApplyMarginTop());
 		boolean hasPhoto = !TextUtils.isEmpty(item.photo());
 
 		if(!hasPhoto) {
-			ViewUtils.setVisible(rl, false);
+			ViewUtils.setVisibleGone(rl, false);
 		} else {
 			rl.animate().translationY(transitionParams.getPaddingTop()).setDuration(0).start();
 			title.animate().translationY(-activity.getResources().getDimensionPixelSize(R.dimen.menu_dish_image_height)).setDuration(0)
@@ -134,7 +134,7 @@ public class MenuItemTransitionController extends FragmentActivityTransitionCont
 			@Override
 			public void run() {
 				mImgHeight[0] = iv.getHeight();
-				ViewUtils.setVisible(iv, false);
+				ViewUtils.setVisibleGone(iv, false);
 			}
 		});
 		iv.postDelayed(new Runnable() {

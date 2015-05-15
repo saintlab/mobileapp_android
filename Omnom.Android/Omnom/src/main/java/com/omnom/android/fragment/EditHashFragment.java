@@ -189,7 +189,7 @@ public class EditHashFragment extends Fragment {
 				if(actionId == EditorInfo.IME_ACTION_DONE) {
 					if(!isBusy() && !editHash.getText().toString().isEmpty()) {
 						setBusy(true);
-						ViewUtils.setVisible(progressBar, true);
+						ViewUtils.setVisibleGone(progressBar, true);
 						editHash.setTextColor(getResources().getColor(R.color.enter_hash_color));
 						loadTable(editHash.getText().toString());
 					}
@@ -261,8 +261,8 @@ public class EditHashFragment extends Fragment {
 						if(!TextUtils.isEmpty(decodeResponse.getError())) {
 							showError(getString(R.string.error_unknown_hash));
 						} else if(decodeResponse.hasOnlyRestaurant()) {
-							ViewUtils.setVisible(progressBar, false);
-							ViewUtils.setVisible(imgSuccess, true);
+							ViewUtils.setVisibleGone(progressBar, false);
+							ViewUtils.setVisibleGone(imgSuccess, true);
 							Restaurant restaurant = decodeResponse.getRestaurants().get(0);
 							mTableFoundListener.onTableFound(decodeResponse.getRequestId(), restaurant, mMenu);
 						} else {
@@ -287,7 +287,7 @@ public class EditHashFragment extends Fragment {
 
 	private void showError(final String message) {
 		setBusy(false);
-		ViewUtils.setVisible(progressBar, false);
+		ViewUtils.setVisibleGone(progressBar, false);
 		isError = true;
 		txtEnterHash.setText(message);
 

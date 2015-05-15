@@ -260,10 +260,10 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 			return;
 		}
 
-		ViewUtils.setVisible(txtBar, RestaurantHelper.hasBar(mRestaurant));
-		ViewUtils.setVisible(txtImInside, RestaurantHelper.hasTableOrder(mRestaurant));
-		ViewUtils.setVisible(txtLunch, RestaurantHelper.hasPreOrder(mRestaurant));
-		ViewUtils.setVisible(txtTakeaway, RestaurantHelper.hasTakeaway(mRestaurant));
+		ViewUtils.setVisibleGone(txtBar, RestaurantHelper.hasBar(mRestaurant));
+		ViewUtils.setVisibleGone(txtImInside, RestaurantHelper.hasTableOrder(mRestaurant));
+		ViewUtils.setVisibleGone(txtLunch, RestaurantHelper.hasPreOrder(mRestaurant));
+		ViewUtils.setVisibleGone(txtTakeaway, RestaurantHelper.hasTakeaway(mRestaurant));
 
 		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 		logoSizeSmall = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_SMALL + 0.5);
@@ -282,7 +282,7 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 		if(!TextUtils.isEmpty(phone)) {
 			btnCall.setText(PhoneNumberUtils.formatNumber(phone));
 		} else {
-			ViewUtils.setVisible(btnCall, false);
+			ViewUtils.setVisibleGone(btnCall, false);
 		}
 	}
 

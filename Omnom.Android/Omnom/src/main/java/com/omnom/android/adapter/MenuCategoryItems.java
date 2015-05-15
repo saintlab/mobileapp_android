@@ -111,7 +111,7 @@ public class MenuCategoryItems {
 			btnApply.setTag(item);
 
 			final boolean hasRecommendations = item.hasRecommendations();
-			ViewUtils.setVisible(panelRecommendations, hasRecommendations);
+			ViewUtils.setVisibleGone(panelRecommendations, hasRecommendations);
 
 			if(hasRecommendations) {
 				showRecommendations(item, order, menu);
@@ -147,15 +147,15 @@ public class MenuCategoryItems {
 
 			final boolean skipRecommendations = !showRecommendations || !hasRecommendations;
 			if(skipRecommendations) {
-				ViewUtils.setVisible(panelRecommendations, false);
+				ViewUtils.setVisibleGone(panelRecommendations, false);
 			} else {
 				if(!isRecommendationsVisible() && hasRecommendations && !recommendationsAdded) {
-					ViewUtils.setVisible(panelRecommendations, false);
+					ViewUtils.setVisibleGone(panelRecommendations, false);
 				}
 				if(showRecommendations) {
 					if(isRecommendationsVisible()) {
 						if(!recommendationsAdded) {
-							ViewUtils.setVisible(panelRecommendations, true);
+							ViewUtils.setVisibleGone(panelRecommendations, true);
 							showRecommendations(item, order, menu);
 						} else {
 							updateRecommendations(order, menu);
@@ -179,7 +179,7 @@ public class MenuCategoryItems {
 
 		private void bindDescription(final Item item) {
 			if(panelDescription != null) {
-				ViewUtils.setVisible(panelDescription, item.hasDescription());
+				ViewUtils.setVisibleGone(panelDescription, item.hasDescription());
 				txtDescription.setText(item.description() + "..");
 			}
 		}
@@ -234,7 +234,7 @@ public class MenuCategoryItems {
 		private void bindImage(final Item item) {
 			final String photo = item.photo();
 			final boolean hasPhoto = !TextUtils.isEmpty(photo);
-			ViewUtils.setVisible(imgIcon, hasPhoto);
+			ViewUtils.setVisibleGone(imgIcon, hasPhoto);
 			if(hasPhoto) {
 				OmnomApplication.getPicasso(getContext()).load(photo).into(imgIcon);
 			}
@@ -245,7 +245,7 @@ public class MenuCategoryItems {
 		}
 
 		public void showDivider(final boolean show) {
-			ViewUtils.setVisible(viewDelimiter, show);
+			ViewUtils.setVisibleGone(viewDelimiter, show);
 		}
 
 		public void setDividerPadding(final int dividerPadding) {

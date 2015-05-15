@@ -63,7 +63,7 @@ public class ViewUtils {
 		public void set(View view, Boolean value, int index) {
 			if(view != null) {
 				view.setAlpha(value ? 1 : 0);
-				setVisible(view, value);
+				setVisibleGone(view, value);
 			}
 		}
 	};
@@ -95,21 +95,21 @@ public class ViewUtils {
 		}
 	}
 
-	public static void setVisible(View view, boolean visible) {
+	public static void setVisibleGone(View view, boolean visible) {
 		if(view != null) {
 			view.setVisibility(visible ? View.VISIBLE : View.GONE);
 			view.setTag(visible);
 		}
 	}
 
-	public static void setVisible2(View view, boolean visible) {
+	public static void setVisibleInvisible(View view, boolean visible) {
 		if(view != null) {
 			view.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
 			view.setTag(visible);
 		}
 	}
 
-	public static void setVisible(List<View> buttonViews, boolean visible) {
+	public static void setVisibleGone(List<View> buttonViews, boolean visible) {
 		ButterKnife.apply(buttonViews, VISIBLITY, visible);
 	}
 

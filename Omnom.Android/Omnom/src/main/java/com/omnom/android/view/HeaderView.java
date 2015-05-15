@@ -93,30 +93,30 @@ public class HeaderView extends RelativeLayout {
 
 	public void setTitle(final int resId) {
 		txtTitle.setText(resId);
-		ViewUtils.setVisible(txtTitleBig, false);
-		ViewUtils.setVisible(txtTitleMedium, false);
-		ViewUtils.setVisible(txtTitle, true);
+		ViewUtils.setVisibleGone(txtTitleBig, false);
+		ViewUtils.setVisibleGone(txtTitleMedium, false);
+		ViewUtils.setVisibleGone(txtTitle, true);
 	}
 
 	public void setTxtTitleMedium(final int resId) {
 		txtTitleMedium.setText(resId);
-		ViewUtils.setVisible(txtTitleBig, false);
-		ViewUtils.setVisible(txtTitleMedium, true);
-		ViewUtils.setVisible(txtTitle, false);
+		ViewUtils.setVisibleGone(txtTitleBig, false);
+		ViewUtils.setVisibleGone(txtTitleMedium, true);
+		ViewUtils.setVisibleGone(txtTitle, false);
 	}
 
 	public void setTitleBig(final int resId) {
 		txtTitleBig.setText(resId);
-		ViewUtils.setVisible(txtTitleBig, true);
-		ViewUtils.setVisible(txtTitleMedium, false);
-		ViewUtils.setVisible(txtTitle, false);
+		ViewUtils.setVisibleGone(txtTitleBig, true);
+		ViewUtils.setVisibleGone(txtTitleMedium, false);
+		ViewUtils.setVisibleGone(txtTitle, false);
 	}
 
 	public void setTitleBig(final String title, OnClickListener listener) {
 		txtTitleBig.setText(title);
 		txtTitleBig.setOnClickListener(listener);
-		ViewUtils.setVisible(txtTitleBig, true);
-		ViewUtils.setVisible(txtTitle, false);
+		ViewUtils.setVisibleGone(txtTitleBig, true);
+		ViewUtils.setVisibleGone(txtTitle, false);
 	}
 
 	public void setButtonRight(final int resId, OnClickListener listener) {
@@ -187,24 +187,24 @@ public class HeaderView extends RelativeLayout {
 	}
 
 	public void setRigthButtonVisibile(boolean visibile) {
-		ViewUtils.setVisible(btnRight, visibile);
+		ViewUtils.setVisibleGone(btnRight, visibile);
 	}
 
 	public void showProgress(final boolean show) {
 		if(show) {
 			mBtnRightLastVisibility = btnRight.getVisibility();
 			mBtnRightDrawableLastVisibility = btnRightDrawable.getVisibility();
-			ViewUtils.setVisible(btnRight, false);
-			ViewUtils.setVisible(btnRightDrawable, false);
-			ViewUtils.setVisible(progress, true);
+			ViewUtils.setVisibleGone(btnRight, false);
+			ViewUtils.setVisibleGone(btnRightDrawable, false);
+			ViewUtils.setVisibleGone(progress, true);
 		} else {
 			if(mBtnRightLastVisibility == VISIBLE) {
-				ViewUtils.setVisible(btnRight, true);
+				ViewUtils.setVisibleGone(btnRight, true);
 			}
 			if(mBtnRightDrawableLastVisibility == VISIBLE) {
-				ViewUtils.setVisible(btnRightDrawable, true);
+				ViewUtils.setVisibleGone(btnRightDrawable, true);
 			}
-			ViewUtils.setVisible(progress, false);
+			ViewUtils.setVisibleGone(progress, false);
 		}
 		updateTitleRules();
 	}

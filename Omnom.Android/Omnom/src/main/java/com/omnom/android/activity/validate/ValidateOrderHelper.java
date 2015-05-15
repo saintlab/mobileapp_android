@@ -62,12 +62,12 @@ public class ValidateOrderHelper {
 		final boolean hasWishItems = mOrder != null && totalAmount.compareTo(BigDecimal.ZERO) > 0;
 
 		if(hasWishItems) {
-			ViewUtils.setVisible(btnOrder, true);
+			ViewUtils.setVisibleGone(btnOrder, true);
 			btnOrder.setText(AmountHelper.format(totalAmount) + mActivity.getString(R.string.currency_suffix_ruble));
 			btnOrder.setTextColor(Color.WHITE);
 			btnOrder.setBackgroundResource(R.drawable.btn_rounded_blue);
 		} else {
-			ViewUtils.setVisible(btnOrder, false);
+			ViewUtils.setVisibleGone(btnOrder, false);
 			btnOrder.setTextColor(Color.GRAY);
 			btnOrder.setText(mActivity.getString(R.string.your_order));
 			btnOrder.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
@@ -75,7 +75,7 @@ public class ValidateOrderHelper {
 
 		if(mActivity.getBottomView() != null) {
 			View btnBill = findById(mActivity.getBottomView(), R.id.btn_bill);
-			ViewUtils.setVisible(btnBill, !hasWishItems);
+			ViewUtils.setVisibleGone(btnBill, !hasWishItems);
 		}
 	}
 

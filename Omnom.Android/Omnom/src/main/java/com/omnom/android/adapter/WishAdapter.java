@@ -222,8 +222,8 @@ public class WishAdapter extends RecyclerView.Adapter {
 				ivh.btnApply.setTag(data);
 				ivh.btnApply.setOnClickListener(mClickListener);
 				MenuHelper.bindDetails(mContext, data.item().details(), ivh.txtInfo, false);
-				ViewUtils.setVisible(ivh.viewDivider, getItemViewType(position + 1) != VIEW_TYPE_WISH_FOOTER_LABEL);
-				ViewUtils.setVisible(ivh.viewDivider, getItemViewType(position + 1) != VIEW_TYPE_WISH_FOOTER);
+				ViewUtils.setVisibleGone(ivh.viewDivider, getItemViewType(position + 1) != VIEW_TYPE_WISH_FOOTER_LABEL);
+				ViewUtils.setVisibleGone(ivh.viewDivider, getItemViewType(position + 1) != VIEW_TYPE_WISH_FOOTER);
 				break;
 
 			case VIEW_TYPE_TABLE_ITEM:
@@ -255,7 +255,7 @@ public class WishAdapter extends RecyclerView.Adapter {
 				txtAmount.setText(AmountHelper.format(mOrder.getTotalPrice()) + mContext.getString(R.string.currency_suffix_ruble));
 
 				final boolean enabled = getSelectedItems().size() > 1;
-				ViewUtils.setVisible(panelAmount, enabled);
+				ViewUtils.setVisibleGone(panelAmount, enabled);
 				btnClear.setEnabled(enabled);
 				// TODO:
 				// btnSend.setEnabled(enabled);

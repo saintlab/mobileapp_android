@@ -150,7 +150,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 		mItemAnimationsSupported = AndroidUtils.isRecyclerItemAnimationSupported();
 
-		ViewUtils.setVisible(mFakeStickyHeader, false);
+		ViewUtils.setVisibleGone(mFakeStickyHeader, false);
 
 		mLayoutManager = new LinearLayoutManager(getContext());
 		mSmoothScroller = new MenuSmoothScroller(getContext(), mLayoutManager, MenuSmoothScroller.MODE_DEFAULT);
@@ -245,7 +245,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		mLayoutManager.scrollToPositionWithOffset(newPos, 0);
 		mMenuAdapter.notifyItemChanged(newPos);
 		if(!mMenuAdapter.hasExpandedGroups()) {
-			ViewUtils.setVisible(mFakeStickyHeader, false);
+			ViewUtils.setVisibleGone(mFakeStickyHeader, false);
 		}
 		restoreHeadersStyle();
 	}
@@ -356,7 +356,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	@OnClick(R.id.btn_close_menu)
 	public void onClose() {
 		mHeaderItemDecorator.restoreHeadersStyle();
-		ViewUtils.setVisible(mFakeStickyHeader, false);
+		ViewUtils.setVisibleGone(mFakeStickyHeader, false);
 		getActivity().collapseSlidingPanel();
 		AnimationUtils.animateAlpha3(mImgClose, false);
 		AnimationUtils.animateAlpha3(mImgSearch, false);
@@ -431,14 +431,14 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	}
 
 	public void restoreHeadersStyle() {
-		ViewUtils.setVisible(mFakeStickyHeader, false);
+		ViewUtils.setVisibleGone(mFakeStickyHeader, false);
 		mHeaderItemDecorator.restoreHeadersStyle();
 	}
 
 	public void collapseInstant() {
 		restoreHeadersStyle();
-		ViewUtils.setVisible(mImgClose, false);
-		ViewUtils.setVisible(mImgSearch, false);
+		ViewUtils.setVisibleGone(mImgClose, false);
+		ViewUtils.setVisibleGone(mImgSearch, false);
 	}
 
 }

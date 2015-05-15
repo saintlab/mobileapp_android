@@ -282,7 +282,7 @@ public class LoaderView extends FrameLayout {
 		if(animate) {
 			AnimationUtils.animateAlpha(mProgressBar, visible);
 		} else {
-			ViewUtils.setVisible(mProgressBar, visible);
+			ViewUtils.setVisibleGone(mProgressBar, visible);
 		}
 	}
 
@@ -290,7 +290,7 @@ public class LoaderView extends FrameLayout {
 		if(animate) {
 			AnimationUtils.animateAlpha(mProgressBar, visible, callback);
 		} else {
-			ViewUtils.setVisible(mProgressBar, visible);
+			ViewUtils.setVisibleGone(mProgressBar, visible);
 		}
 	}
 

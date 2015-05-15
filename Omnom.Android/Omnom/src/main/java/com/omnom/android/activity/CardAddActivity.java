@@ -162,7 +162,7 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 			}
 		});
 		mCheckSaveCard.setChecked(mType != TYPE_ENTER_AND_PAY);
-		ViewUtils.setVisible(mCheckSaveCard, mType == TYPE_BIND_OR_PAY);
+		ViewUtils.setVisibleGone(mCheckSaveCard, mType == TYPE_BIND_OR_PAY);
 		setUpCardEditFields();
 	}
 

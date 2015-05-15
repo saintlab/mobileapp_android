@@ -70,7 +70,7 @@ public class RestaurantsAdapter extends BaseAdapter {
 
 			final String address = RestaurantHelper.getAddress(context, item);
 			if(!TextUtils.isEmpty(address)) {
-				ViewUtils.setVisible(txtInfo, true);
+				ViewUtils.setVisibleGone(txtInfo, true);
 				txtInfo.setText(address);
 				if(item.distance() != null) {
 					final String distance = StringUtils.formatDistance(item.distance());
@@ -82,13 +82,13 @@ public class RestaurantsAdapter extends BaseAdapter {
 					txtInfo.setText(s);
 				}
 			} else {
-				ViewUtils.setVisible(txtInfo, false);
+				ViewUtils.setVisibleGone(txtInfo, false);
 			}
 			final String openedTime = RestaurantHelper.getOpenedTime(context, item, weekDay);
 			if(TextUtils.isEmpty(openedTime)) {
-				ViewUtils.setVisible(txtSchedule, false);
+				ViewUtils.setVisibleGone(txtSchedule, false);
 			} else {
-				ViewUtils.setVisible(txtSchedule, true);
+				ViewUtils.setVisibleGone(txtSchedule, true);
 				txtSchedule.setText(openedTime);
 			}
 		}

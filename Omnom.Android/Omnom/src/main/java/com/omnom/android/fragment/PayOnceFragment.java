@@ -159,8 +159,8 @@ public class PayOnceFragment extends Fragment {
 
 			ViewUtils.setBackgroundDrawableColor(btnPay, getResources().getColor(R.color.btn_pay_green));
 		} else {
-			ViewUtils.setVisible(btnPay, false);
-			ViewUtils.setVisible(txtPayOnce, false);
+			ViewUtils.setVisibleGone(btnPay, false);
+			ViewUtils.setVisibleGone(txtPayOnce, false);
 		}
 	}
 

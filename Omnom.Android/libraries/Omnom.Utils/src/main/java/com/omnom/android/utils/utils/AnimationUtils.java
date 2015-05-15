@@ -145,7 +145,7 @@ public class AnimationUtils {
 
 		view.setAlpha(visible ? 0 : 1);
 		if(visible) {
-			ViewUtils.setVisible(view, visible);
+			ViewUtils.setVisibleGone(view, visible);
 		}
 		view.setTag(visible);
 		view.animate().setDuration(duration).
@@ -165,7 +165,7 @@ public class AnimationUtils {
 		}
 		view.setAlpha(visible ? 0 : 1);
 		if(visible) {
-			ViewUtils.setVisible(view, visible);
+			ViewUtils.setVisibleGone(view, visible);
 		}
 		view.setTag(visible);
 		view.animate().setDuration(view.getResources().getInteger(R.integer.default_animation_duration_short)).
@@ -174,7 +174,7 @@ public class AnimationUtils {
 					    @Override
 					    public void onAnimationEnd(Animator animation) {
 						    if(!visible) {
-							    ViewUtils.setVisible(view, false);
+							    ViewUtils.setVisibleGone(view, false);
 						    }
 					    }
 				    }).alpha(visible ? 1 : 0).start();
@@ -186,7 +186,7 @@ public class AnimationUtils {
 		}
 		view.setAlpha(visible ? 0 : 1);
 		if(visible) {
-			ViewUtils.setVisible2(view, visible);
+			ViewUtils.setVisibleInvisible(view, visible);
 		}
 		view.setTag(visible);
 		view.animate().setDuration(duration).

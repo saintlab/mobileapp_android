@@ -128,7 +128,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	public void clearErrors(Restaurant restaurant, final boolean animateLogo) {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-		ViewUtils.setVisible(txtErrorAdditional, false);
+		ViewUtils.setVisibleGone(txtErrorAdditional, false);
 		if(animateLogo) {
 			if(restaurant == null) {
 				loader.animateLogo(R.drawable.ic_fork_n_knife);
@@ -176,8 +176,8 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	public void collapseSlidingPanelInstant() {
 		menuCategories.collapseInstant();
 		slidingPanel.smoothSlideToInstant(0);
-		ViewUtils.setVisible(imgProfile, true);
-		ViewUtils.setVisible(imgPrevious, true); // TODO: RestaurantHelper.isLunch?
+		ViewUtils.setVisibleGone(imgProfile, true);
+		ViewUtils.setVisibleGone(imgPrevious, true); // TODO: RestaurantHelper.isLunch?
 		loader.showLogo();
 	}
 
@@ -321,11 +321,11 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	private void updateProfile(final int backgroundResource, final boolean visible) {
 		imgProfile.setImageResource(backgroundResource);
-		ViewUtils.setVisible(imgProfile, visible);
+		ViewUtils.setVisibleGone(imgProfile, visible);
 	}
 
 	protected void hideProfile() {
-		ViewUtils.setVisible(imgProfile, false);
+		ViewUtils.setVisibleGone(imgProfile, false);
 	}
 
 	public View getPanelBottom() {
@@ -334,11 +334,11 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	public void beforeShowOrders() {
 		hideProfile();
-		ViewUtils.setVisible(imgPrevious, false);
-		ViewUtils.setVisible(getPanelBottom(), false);
+		ViewUtils.setVisibleGone(imgPrevious, false);
+		ViewUtils.setVisibleGone(getPanelBottom(), false);
 		AnimationUtils.animateAlpha(slidingPanel, false);
 		AnimationUtils.animateAlpha(menuGradientPanel, false);
-		ViewUtils.setVisible(txtLeave, false);
+		ViewUtils.setVisibleGone(txtLeave, false);
 		loader.animateLogo(R.drawable.ic_bill_white_normal);
 		loader.startProgressAnimation(10000, null);
 	}
@@ -352,7 +352,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		final boolean isLunch = RestaurantHelper.isLunch(restaurant);
 
 		if(bottomView == null) {
-			ViewUtils.setVisible(findById(mActivity, R.id.txt_bar), isBar);
+			ViewUtils.setVisibleGone(findById(mActivity, R.id.txt_bar), isBar);
 			if(isBar || isLunch) {
 				stubBottomMenu.setLayoutResource(R.layout.layout_bar);
 			} else {
@@ -397,7 +397,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 				                      showNoOrdersInfo(table);
 			                      }
 		                      });
-		ViewUtils.setVisible(txtErrorAdditional, true);
+		ViewUtils.setVisibleGone(txtErrorAdditional, true);
 		final int tableNumber = table != null ? table.getInternalId() : 0;
 		mErrorHelper.showNoOrders(new View.OnClickListener() {
 			@Override
@@ -414,15 +414,15 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	protected void onErrorClose(Restaurant mRestaurant, boolean mIsDemo) {
 		mActivity.clearErrors(true);
-		ViewUtils.setVisible(txtErrorAdditional, false);
+		ViewUtils.setVisibleGone(txtErrorAdditional, false);
 		loader.animateLogoFast(RestaurantHelper.getLogo(mRestaurant),
 		                       R.drawable.ic_bill_white_normal);
 		loader.showProgress(false);
 		mActivity.configureScreen(mRestaurant);
 		updateLightProfile(!mIsDemo);
-		ViewUtils.setVisible(imgPrevious, !mIsDemo);
-		ViewUtils.setVisible(txtLeave, mIsDemo);
-		ViewUtils.setVisible(getPanelBottom(), true);
+		ViewUtils.setVisibleGone(imgPrevious, !mIsDemo);
+		ViewUtils.setVisibleGone(txtLeave, mIsDemo);
+		ViewUtils.setVisibleGone(getPanelBottom(), true);
 		AnimationUtils.animateAlpha(menuGradientPanel, true);
 		AnimationUtils.animateAlpha(slidingPanel, true);
 	}
@@ -457,12 +457,12 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		loader.scaleDown(null, new Runnable() {
 			@Override
 			public void run() {
-				ViewUtils.setVisible(getPanelBottom(), true);
+				ViewUtils.setVisibleGone(getPanelBottom(), true);
 				AnimationUtils.animateAlpha(menuGradientPanel, true);
 				AnimationUtils.animateAlpha(slidingPanel, true);
 				updateLightProfile(!isDemo);
-				ViewUtils.setVisible(imgPrevious, !isDemo);
-				ViewUtils.setVisible(txtLeave, isDemo);
+				ViewUtils.setVisibleGone(imgPrevious, !isDemo);
+				ViewUtils.setVisibleGone(txtLeave, isDemo);
 				loader.animateLogo(RestaurantHelper.getLogo(restaurant),
 				                   R.drawable.ic_fork_n_knife);
 				loader.showLogo();
@@ -480,9 +480,9 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 			public void run() {
 				mActivity.configureScreen(restaurant);
 				updateLightProfile(!mIsDemo);
-				ViewUtils.setVisible(imgPrevious, !mIsDemo);
-				ViewUtils.setVisible(txtLeave, mIsDemo);
-				ViewUtils.setVisible(getPanelBottom(), true);
+				ViewUtils.setVisibleGone(imgPrevious, !mIsDemo);
+				ViewUtils.setVisibleGone(txtLeave, mIsDemo);
+				ViewUtils.setVisibleGone(getPanelBottom(), true);
 				AnimationUtils.animateAlpha(menuGradientPanel, true);
 				AnimationUtils.animateAlpha(slidingPanel, true);
 				getPanelBottom().animate().translationY(0)
@@ -533,13 +533,13 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	}
 
 	public void showBack(final boolean visible) {
-		ViewUtils.setVisible(imgPrevious, visible);
+		ViewUtils.setVisibleGone(imgPrevious, visible);
 	}
 
 	public void bindMenuData(final Menu menu, ValidateOrderHelper orderHelper) {
 		final boolean hasMenu = menu != null && !menu.isEmpty();
-		ViewUtils.setVisible(slidingPanel, hasMenu);
-		ViewUtils.setVisible(menuCategories, hasMenu);
+		ViewUtils.setVisibleGone(slidingPanel, hasMenu);
+		ViewUtils.setVisibleGone(menuCategories, hasMenu);
 		slidingPanel.setTouchEnabled(hasMenu);
 		if(menu != null) {
 			menuCategories.bind(menu, orderHelper.insureOrder());
@@ -555,7 +555,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	}
 
 	public void showSearchFragment(Map<String, Item> itemsByName) {
-		ViewUtils.setVisible(bottomView, false);
+		ViewUtils.setVisibleGone(bottomView, false);
 		mActivity.getSupportFragmentManager().beginTransaction()
 		         .addToBackStack(null)
 		         .setCustomAnimations(R.anim.slide_in_up,
@@ -568,7 +568,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	}
 
 	public void onSearchFragmentClose() {
-		ViewUtils.setVisible(bottomView, true);
+		ViewUtils.setVisibleGone(bottomView, true);
 	}
 
 	public void showMenuItemDetails(final Item item) {
@@ -586,7 +586,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	public void hideMenu() {
 		slidingPanel.setTouchEnabled(false);
-		ViewUtils.setVisible(slidingPanel, false);
-		ViewUtils.setVisible(menuCategories, false);
+		ViewUtils.setVisibleGone(slidingPanel, false);
+		ViewUtils.setVisibleGone(menuCategories, false);
 	}
 }

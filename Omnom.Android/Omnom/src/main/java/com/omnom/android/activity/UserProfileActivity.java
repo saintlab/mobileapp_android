@@ -166,12 +166,12 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 		initAppInfo();
 
 		if(mTableNumber > 0) {
-			ViewUtils.setVisible(panelTableNumber, true);
-			ViewUtils.setVisible(delimiterTableNumber, true);
+			ViewUtils.setVisibleGone(panelTableNumber, true);
+			ViewUtils.setVisibleGone(delimiterTableNumber, true);
 			mTxtTableNumber.setText(getString(R.string.table_number_format, String.valueOf(mTableNumber)));
 		} else {
-			ViewUtils.setVisible(panelTableNumber, false);
-			ViewUtils.setVisible(delimiterTableNumber, false);
+			ViewUtils.setVisibleGone(panelTableNumber, false);
+			ViewUtils.setVisibleGone(delimiterTableNumber, false);
 		}
 
 		updateUserImage(StringUtils.EMPTY_STRING);
@@ -216,7 +216,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 	@DebugLog
 	private void showUserData(final boolean visible) {
-		ViewUtils.setVisible(mTxtSignIn, !visible);
+		ViewUtils.setVisibleGone(mTxtSignIn, !visible);
 		ButterKnife.apply(mUserViews, ViewUtils.VISIBLITY, visible);
 	}
 

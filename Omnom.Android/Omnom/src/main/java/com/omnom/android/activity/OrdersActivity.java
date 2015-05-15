@@ -294,7 +294,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 				currentFragment.downscale(true);
 				AnimationUtils.animateAlpha(mTextInfo, true);
 				AnimationUtils.animateAlpha(mIndicator, true);
-				ViewUtils.setVisible(mBtnClose, true);
+				ViewUtils.setVisibleGone(mBtnClose, true);
 				return;
 			} else {
 				if(!currentFragment.onBackPressed()) {
@@ -347,7 +347,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 		mPager.setEnabled(visible);
 		AnimationUtils.animateAlpha(mTextInfo, visible);
 		AnimationUtils.animateAlpha(mIndicator, visible);
-		ViewUtils.setVisible(mBtnClose, visible);
+		ViewUtils.setVisibleGone(mBtnClose, visible);
 		final ObjectAnimator fl = getFragmentAnimation(position - 1, visible);
 		final ObjectAnimator fr = getFragmentAnimation(position + 1, visible);
 		if(fl != null && fr != null) {

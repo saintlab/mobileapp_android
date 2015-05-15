@@ -153,9 +153,9 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 			if (position < getItemCount() - 1) {
 				final Data itemAt = getItemAt(position + 1);
-				ViewUtils.setVisible(viewDelimiter, !(itemAt instanceof CategoryData));
+				ViewUtils.setVisibleGone(viewDelimiter, !(itemAt instanceof CategoryData));
 			} else {
-				ViewUtils.setVisible(viewDelimiter, false);
+				ViewUtils.setVisibleGone(viewDelimiter, false);
 			}
 
 			MenuHelper.bindTitle(txtTitle, item);
@@ -185,7 +185,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 		private void bindDescription(final Item item) {
 			if (panelDescription != null && item != null) {
-				ViewUtils.setVisible(panelDescription, item.hasDescription());
+				ViewUtils.setVisibleGone(panelDescription, item.hasDescription());
 				txtDescription.setText(item.description() + "..");
 			}
 		}
@@ -201,7 +201,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		private void bindImage(final Item item) {
 			final String photo = item.photo();
 			final boolean hasPhoto = !TextUtils.isEmpty(photo);
-			ViewUtils.setVisible(imgIcon, hasPhoto);
+			ViewUtils.setVisibleGone(imgIcon, hasPhoto);
 			if (hasPhoto) {
 				OmnomApplication.getPicasso(getContext()).load(photo).into(imgIcon);
 			}
@@ -330,7 +330,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 				ivh.bind(item, mUserOrder, mMenu, position, false);
 
 				if (viewType == VIEW_TYPE_ITEM && item.hasRecommendations() && ivh.isRecommendationsVisible()) {
-					ViewUtils.setVisible(ivh.viewDelimiter, false);
+					ViewUtils.setVisibleGone(ivh.viewDelimiter, false);
 				}
 				break;
 

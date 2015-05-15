@@ -292,7 +292,7 @@ public class ValidationActivity extends BaseActivity {
 			loader.scaleUp(new Runnable() {
 				@Override
 				public void run() {
-					ViewUtils.setVisible(panelBottom, false);
+					ViewUtils.setVisibleGone(panelBottom, false);
 					RestaurantsListActivity.start(getActivity(), items);
 					finish();
 				}
