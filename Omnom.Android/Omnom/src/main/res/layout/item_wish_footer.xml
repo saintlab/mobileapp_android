@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+<FrameLayout
     android:id="@+id/root"
-    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:baselineAligned="false"
     android:gravity="center">
 
     <include
@@ -17,51 +16,53 @@
         android:layout_marginRight="@dimen/activity_vertical_margin_large" />
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:paddingTop="@dimen/activity_vertical_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:baselineAligned="false"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/activity_vertical_margin_medium"
+        android:paddingRight="@dimen/activity_vertical_margin_medium"
+        android:paddingTop="@dimen/activity_vertical_margin">
 
         <FrameLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom">
+            android:layout_gravity="bottom"
+            android:layout_weight="1">
 
             <Button
                 android:id="@+id/btn_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/wish_button_size"
-                android:layout_gravity="center"
+                android:layout_gravity="left"
+                android:background="@drawable/btn_rounded_bordered_grey"
                 android:paddingLeft="@dimen/activity_horizontal_margin_medium"
                 android:paddingRight="@dimen/activity_horizontal_margin_medium"
-                android:textColor="@drawable/text_color_selector_grey"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:background="@drawable/btn_rounded_bordered_grey"
                 android:text="@string/wish_clear"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textColor="@drawable/text_color_selector_grey"
                 omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
         </FrameLayout>
 
         <RelativeLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:id="@+id/panel_top"
-                android:layout_alignRight="@+id/btn_send"
-                android:paddingBottom="@dimen/activity_vertical_margin"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/btn_send"
+                android:gravity="center"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:paddingRight="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toLeftOf="@+id/txt_amount"
-                    android:layout_centerVertical="true"
                     android:singleLine="true"
                     android:text="@string/wish_footer_total"
                     android:textAppearance="?android:textAppearanceMedium"
@@ -71,8 +72,6 @@
                     android:id="@+id/txt_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
                     android:singleLine="true"
                     android:textAppearance="?android:textAppearanceMedium"
                     omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
@@ -81,20 +80,19 @@
 
             <Button
                 android:id="@+id/btn_send"
-                android:layout_below="@+id/panel_top"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/wish_button_size"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/panel_top"
                 android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_centerHorizontal="true"
+                android:background="@drawable/btn_rounded_blue"
                 android:paddingLeft="@dimen/activity_horizontal_margin_medium"
                 android:paddingRight="@dimen/activity_horizontal_margin_medium"
-                android:textColor="@android:color/white"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:background="@drawable/btn_rounded_blue"
                 android:text="@string/wish_order"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textColor="@android:color/white"
                 omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
         </RelativeLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>
