@@ -114,6 +114,6 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 		btnCommit.setTag(R.id.picker, mPicker.getValue());
 		btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_PERSON);
 		btnCommit.setClickable(true);
-		AnimationUtils.animateAlpha3(btnCommit, true);
+		AnimationUtils.animateAlphaGone(btnCommit, true);
 	}
 }

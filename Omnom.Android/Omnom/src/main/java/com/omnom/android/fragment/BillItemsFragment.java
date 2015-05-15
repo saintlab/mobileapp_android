@@ -128,12 +128,12 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 			final String text = getString(R.string.bill_split_amount_, AmountHelper.format(amount));
 			btnCommit.setClickable(true);
 			AnimationUtils.animateAlpha(viewBehindBtn, true);
-			AnimationUtils.animateAlpha3(btnCommit, true);
+			AnimationUtils.animateAlphaGone(btnCommit, true);
 			btnCommit.setText(text);
 		} else {
 			btnCommit.setClickable(false);
 			AnimationUtils.animateAlpha(viewBehindBtn, false);
-			AnimationUtils.animateAlpha3(btnCommit, false);
+			AnimationUtils.animateAlphaGone(btnCommit, false);
 		}
 	}
 }

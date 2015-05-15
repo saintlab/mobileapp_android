@@ -235,14 +235,14 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 				final float loaderFactor = 1.0f - slideOffset;
 
 				if(loaderFactor < 0.85f) {
-					AnimationUtils.animateAlpha3(imgProfile, false);
-					AnimationUtils.animateAlpha3(imgPrevious, false);
-					AnimationUtils.animateAlpha3(txtBar, false);
+					AnimationUtils.animateAlphaGone(imgProfile, false);
+					AnimationUtils.animateAlphaGone(imgPrevious, false);
+					AnimationUtils.animateAlphaGone(txtBar, false);
 					loader.hideLogo();
 				} else {
-					AnimationUtils.animateAlpha3(imgProfile, true);
-					AnimationUtils.animateAlpha3(imgPrevious, true);
-					AnimationUtils.animateAlpha3(txtBar, true);
+					AnimationUtils.animateAlphaGone(imgProfile, true);
+					AnimationUtils.animateAlphaGone(imgPrevious, true);
+					AnimationUtils.animateAlphaGone(txtBar, true);
 					loader.showLogo();
 				}
 				loader.scaleDown((int) (loader.getLoaderSizeDefault() * loaderFactor), 0, null);

@@ -49,7 +49,7 @@ public class MenuItemTransitionController extends FragmentActivityTransitionCont
 		final View rl = mFragmentView.findViewById(R.id.panel_container);
 		final ImageView iv = (ImageView) mFragmentView.findViewById(R.id.img_icon);
 
-		AnimationUtils.animateAlpha3(panelRecommendations, false);
+		AnimationUtils.animateAlphaGone(panelRecommendations, false);
 		if(applyMarginTop == 0 && !hasPhoto) {
 			// Do nothing
 		} else {

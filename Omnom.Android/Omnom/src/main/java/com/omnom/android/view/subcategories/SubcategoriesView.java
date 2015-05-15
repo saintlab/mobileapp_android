@@ -331,16 +331,16 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	public void onPanelCollapsed(final View panel) {
 		mTouchEnabled = false;
 		mItemTouchListener.setTouchEnabled(mTouchEnabled);
-		AnimationUtils.animateAlpha3(mImgClose, false);
-		AnimationUtils.animateAlpha3(mImgSearch, false);
+		AnimationUtils.animateAlphaGone(mImgClose, false);
+		AnimationUtils.animateAlphaGone(mImgSearch, false);
 	}
 
 	@Override
 	public void onPanelExpanded(final View panel) {
 		mTouchEnabled = true;
 		mItemTouchListener.setTouchEnabled(mTouchEnabled);
-		AnimationUtils.animateAlpha3(mImgClose, true);
-		AnimationUtils.animateAlpha3(mImgSearch, true);
+		AnimationUtils.animateAlphaGone(mImgClose, true);
+		AnimationUtils.animateAlphaGone(mImgSearch, true);
 
 	}
 
@@ -358,8 +358,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		mHeaderItemDecorator.restoreHeadersStyle();
 		ViewUtils.setVisibleGone(mFakeStickyHeader, false);
 		getActivity().collapseSlidingPanel();
-		AnimationUtils.animateAlpha3(mImgClose, false);
-		AnimationUtils.animateAlpha3(mImgSearch, false);
+		AnimationUtils.animateAlphaGone(mImgClose, false);
+		AnimationUtils.animateAlphaGone(mImgSearch, false);
 	}
 
 	@OnClick(R.id.btn_search_menu)

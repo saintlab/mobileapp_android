@@ -654,7 +654,7 @@ public class OrderFragment extends Fragment {
 		ViewUtils.setVisibleGone(mHeader, false);
 		list.setSwipeEnabled(false);
 		if(isAnimated) {
-			AnimationUtils.animateAlpha3(getPanelPayment(), false);
+			AnimationUtils.animateAlphaGone(getPanelPayment(), false);
 			getListClickAnimator(FRAGMENT_SCALE_RATIO_SMALL, 0).start();
 			AnimationUtils.animateAlpha(txtTitle, true);
 		} else {

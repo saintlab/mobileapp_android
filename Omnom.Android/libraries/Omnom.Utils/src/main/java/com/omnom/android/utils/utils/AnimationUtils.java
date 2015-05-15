@@ -121,8 +121,8 @@ public class AnimationUtils {
 		animateAlpha(view, visible, view.getResources().getInteger(R.integer.default_animation_duration_short));
 	}
 
-	public static void animateAlpha2(final View view, final boolean visible) {
-		animateAlpha2(view, visible, null, view.getResources().getInteger(R.integer.default_animation_duration_short));
+	public static void animateAlphaSkipTag(final View view, final boolean visible) {
+		animateAlphaSkipTag(view, visible, null, view.getResources().getInteger(R.integer.default_animation_duration_short));
 	}
 
 	public static void animateAlpha(final View view, final boolean visible, long duration) {
@@ -154,7 +154,7 @@ public class AnimationUtils {
 				    alpha(visible ? 1 : 0).start();
 	}
 
-	public static void animateAlpha3(final View view, final boolean visible) {
+	public static void animateAlphaGone(final View view, final boolean visible) {
 		if(view == null) {
 			return;
 		}
@@ -180,7 +180,7 @@ public class AnimationUtils {
 				    }).alpha(visible ? 1 : 0).start();
 	}
 
-	public static void animateAlpha2(final View view, final boolean visible, final Runnable callback, long duration) {
+	public static void animateAlphaSkipTag(final View view, final boolean visible, final Runnable callback, long duration) {
 		if(view == null) {
 			return;
 		}
