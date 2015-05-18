@@ -107,8 +107,8 @@ public class OrderResultActivity extends BaseOmnomActivity {
 		}
 
 		// parse extras data - started by push
-		final Bundle extras = getIntent().getExtras();
-		if(extras != null) {
+		if(getIntent().hasExtra(EXTRA_WISH_STATUS) && getIntent().hasExtra(EXTRA_WISH_ID)) {
+			final Bundle extras = getIntent().getExtras();
 			mStatus = extras.getString(EXTRA_WISH_STATUS);
 			mId = extras.getString(EXTRA_WISH_ID);
 		}
