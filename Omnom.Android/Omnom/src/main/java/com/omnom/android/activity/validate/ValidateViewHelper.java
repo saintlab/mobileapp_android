@@ -3,6 +3,7 @@ package com.omnom.android.activity.validate;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.graphics.Color;
+import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.RestaurantsListActivity;
+import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.fragment.SearchFragment;
 import com.omnom.android.menu.model.Item;
@@ -109,6 +111,9 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	protected View bottomView;
 
+	@Nullable
+	private EntranceData mEntranceData;
+
 	private ValueAnimator mColorAnimator;
 
 	private OmnomErrorHelper mErrorHelper;
@@ -140,11 +145,15 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	}
 
 	public View.OnClickListener getBillClickListener() {
-		if(RestaurantHelper.isBar(mActivity.mRestaurant)
+		if(isBarMode()
 				|| RestaurantHelper.isLunch(mActivity.mRestaurant)) {
 			return mActivity.mOnOrderClickListener;
 		}
 		return mActivity.mOnBillClickListener;
+	}
+
+	private boolean isBarMode() {
+		return mEntranceData != null && mEntranceData.getType() == EntranceData.TYPE_BAR;
 	}
 
 	public void onDestroy() {
@@ -242,7 +251,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 				} else {
 					AnimationUtils.animateAlphaGone(imgProfile, true);
 					AnimationUtils.animateAlphaGone(imgPrevious, true);
-					AnimationUtils.animateAlphaGone(txtBar, true);
+					AnimationUtils.animateAlphaGone(txtBar, isBarMode());
 					loader.showLogo();
 				}
 				loader.scaleDown((int) (loader.getLoaderSizeDefault() * loaderFactor), 0, null);
@@ -348,7 +357,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		final boolean promoEnabled = false; //RestaurantHelper.isPromoEnabled(restaurant);
 		// FIXME: uncomment the code below when waiter call is implemented
 		final boolean waiterEnabled = false; //RestaurantHelper.isWaiterEnabled(restaurant);
-		final boolean isBar = RestaurantHelper.isBar(restaurant);
+		final boolean isBar = isBarMode();
 		final boolean isLunch = RestaurantHelper.isLunch(restaurant);
 
 		if(bottomView == null) {
@@ -588,5 +597,9 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		slidingPanel.setTouchEnabled(false);
 		ViewUtils.setVisibleGone(slidingPanel, false);
 		ViewUtils.setVisibleGone(menuCategories, false);
+	}
+
+	public void setEntranceData(final EntranceData entranceData) {
+		mEntranceData = entranceData;
 	}
 }

@@ -442,6 +442,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 			public void call(final MenuResponse menuResponse) {
 				mMenu = menuResponse.getMenu();
 				mEntranceData = EntranceDataFactory.create(restaurant);
+				mViewHelper.setEntranceData(mEntranceData);
 				onDataLoaded(restaurant, TableDataResponse.NULL);
 				mSkipViewRendering = true;
 			}
@@ -592,7 +593,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				getApp().cacheUserProfile(new UserProfile(userResponse));
 
 				track(MixPanelHelper.Project.OMNOM,
-				                          new AppLaunchMixpanelEvent(userResponse.getUser()));
+				      new AppLaunchMixpanelEvent(userResponse.getUser()));
 				final boolean hasBle = BluetoothUtils.hasBleSupport(ValidateActivity.this);
 				final boolean bleEnabled = BluetoothUtils.isBluetoothEnabled(getActivity());
 				if((!hasBle || (hasBle && !bleEnabled)) && !isExternalLaunch()) {
@@ -883,6 +884,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mRestaurant = restaurant;
 		mTable = table;
 		mEntranceData = EntranceDataFactory.create(mRestaurant);
+		mViewHelper.setEntranceData(mEntranceData);
 		bindMenuData();
 
 		mPaymentListener.initTableSocket(mTable);

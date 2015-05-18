@@ -19,6 +19,11 @@ public abstract class TakeawayEntranceData implements EntranceData {
 		return new AutoParcel_TakeawayEntranceData(orderTime, takeawayAddress, takeawayAfter);
 	}
 
+	@Override
+	public int getType() {
+		return TYPE_TAKEAWAY;
+	}
+
 	@Nullable
 	public abstract Date orderTime();
 
