@@ -39,6 +39,7 @@ import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.restaurant.ModifierRequestItem;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.restaurateur.model.restaurant.WishComments;
 import com.omnom.android.restaurateur.model.restaurant.WishForbiddenResponse;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishRequestItem;
@@ -124,7 +125,10 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	private static WishRequest createWishRequest(final UserOrder order, final int time) {
 		final WishRequest wishRequest = createWishRequest(order);
-		wishRequest.setTime(time);
+		final WishComments comments = new WishComments();
+		comments.setTakeAwayIntervalMinutes(time);
+		wishRequest.setComments(comments);
+		wishRequest.setTags(WishRequest.TAG_TAKEAWAY);
 		return wishRequest;
 	}
 
