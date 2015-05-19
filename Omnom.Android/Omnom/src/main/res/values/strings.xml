@@ -224,4 +224,5 @@
     <string name="barmen_tips_positive">+ Чай бармену :-)</string>
     <string name="barmen_tips_negative">+ Чай бармену :-(</string>
     <string name="unknown_user">Неизвестный пользователь</string>
+    <string name="wish_result_item">%1$s x %2$s</string>
 </resources>

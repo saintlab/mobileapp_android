@@ -201,7 +201,8 @@ public class OrderResultActivity extends BaseOmnomActivity {
 		final View view = LayoutInflater.from(this).inflate(R.layout.item_order_result, viewContent, false);
 		final ItemViewHolder itemViewHolder = new ItemViewHolder(view);
 		itemViewHolder.txtTitle.setText(item.title());
-		itemViewHolder.txtInfo.setText(AmountHelper.format(item.pricePerItem()) + getString(R.string.currency_suffix_ruble));
+		itemViewHolder.txtInfo.setText(getString(R.string.wish_result_item, item.quantity(), AmountHelper.format(item.pricePerItem())
+				+ getString(R.string.currency_suffix_ruble)));
 		AnimationUtils.scaleHeight(view, 0, 0);
 		viewContent.addView(view);
 		AnimationUtils.scaleHeight(view, getResources().getDimensionPixelSize(R.dimen.order_ready_item_height), DURATION_ITEM_TRANSITION);
