@@ -185,6 +185,8 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	public void collapseSlidingPanelInstant() {
 		menuCategories.collapseInstant();
 		slidingPanel.smoothSlideToInstant(0);
+		imgProfile.setAlpha(1.0f);
+		imgPrevious.setAlpha(1.0f);
 		ViewUtils.setVisibleGone(imgProfile, true);
 		ViewUtils.setVisibleGone(imgPrevious, true); // TODO: RestaurantHelper.isLunch?
 		loader.showLogo();
