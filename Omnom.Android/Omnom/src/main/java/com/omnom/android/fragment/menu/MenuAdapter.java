@@ -55,22 +55,6 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 	public static final int COLOR_CATEGORY = Color.TRANSPARENT;
 
-	/**
-	 * Index of item for which MenuItemAddFragment is shown
-	 */
-	private int selected = -1;
-
-	public void resetState() {
-		if (selected != -1) {
-			notifyItemChanged(selected);
-		}
-		selected = -1;
-	}
-
-	public void setSelected(int selected) {
-		this.selected = selected;
-	}
-
 	public static class CategoryViewHolder extends RecyclerView.ViewHolder {
 
 		@InjectView(R.id.txt_title)
@@ -103,6 +87,13 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		@InjectView(R.id.delimiter)
 		@Optional
 		protected View viewDelimiter;
+
+		/**
+		 * This view is used to draw bottom border when there is only one recommended item itself
+		 */
+		@InjectView(R.id.delimiter_bottom)
+		@Optional
+		protected View viewDelimiterTopBottom;
 
 		@InjectView(R.id.btn_apply)
 		@Optional
@@ -143,7 +134,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		}
 
 		public void bind(final Item item, UserOrder order, Menu menu, int position, boolean detailed) {
-			if (item == null) {
+			if(item == null) {
 				return;
 			}
 
@@ -151,7 +142,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 			bindImage(item);
 			bindDescription(item);
 
-			if (position < getItemCount() - 1) {
+			if(position < getItemCount() - 1) {
 				final Data itemAt = getItemAt(position + 1);
 				ViewUtils.setVisibleGone(viewDelimiter, !(itemAt instanceof CategoryData));
 			} else {
@@ -167,7 +158,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		}
 
 		private void bindApply(Item item, int position) {
-			if (isRecommendationsVisible()) {
+			if(isRecommendationsVisible()) {
 				btnApply.setBackgroundResource(R.drawable.btn_wish_added);
 				btnApply.setText(StringUtils.EMPTY_STRING);
 			} else {
@@ -184,7 +175,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		}
 
 		private void bindDescription(final Item item) {
-			if (panelDescription != null && item != null) {
+			if(panelDescription != null && item != null) {
 				ViewUtils.setVisibleGone(panelDescription, item.hasDescription());
 				txtDescription.setText(item.description() + "..");
 			}
@@ -202,7 +193,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 			final String photo = item.photo();
 			final boolean hasPhoto = !TextUtils.isEmpty(photo);
 			ViewUtils.setVisibleGone(imgIcon, hasPhoto);
-			if (hasPhoto) {
+			if(hasPhoto) {
 				OmnomApplication.getPicasso(getContext()).load(photo).into(imgIcon);
 			}
 		}
@@ -213,7 +204,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 	}
 
 	public static int getCategoryColor(final int viewType) {
-		switch (viewType) {
+		switch(viewType) {
 			case VIEW_TYPE_CATEGORY:
 				return COLOR_CATEGORY;
 
@@ -241,6 +232,11 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 	private final View.OnClickListener mApplyClickListener;
 
+	/**
+	 * Index of item for which MenuItemAddFragment is shown
+	 */
+	private int selected = -1;
+
 	private HeaderItemDecorator mDecorator;
 
 	private Context mContext;
@@ -261,6 +257,17 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		mInflater = LayoutInflater.from(mContext);
 	}
 
+	public void resetState() {
+		if(selected != -1) {
+			notifyItemChanged(selected);
+		}
+		selected = -1;
+	}
+
+	public void setSelected(int selected) {
+		this.selected = selected;
+	}
+
 	@Override
 	public long getItemId(final int position) {
 		final Data itemAt = getItemAt(position);
@@ -271,7 +278,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 	public RecyclerView.ViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
 		View v;
 		RecyclerView.ViewHolder viewHolder;
-		switch (viewType) {
+		switch(viewType) {
 			case VIEW_TYPE_ITEM:
 				v = mInflater.inflate(R.layout.item_menu_dish, parent, false);
 				viewHolder = new ItemViewHolder(v, mApplyClickListener, mItemClickListener);
@@ -319,7 +326,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 	@Override
 	public void onBindViewHolder(final RecyclerView.ViewHolder viewHolder, final int position) {
 		int viewType = getItemViewType(position);
-		switch (viewType) {
+		switch(viewType) {
 			case VIEW_TYPE_ITEM:
 			case VIEW_TYPE_RECOMMENDATION_BOTTOM:
 			case VIEW_TYPE_RECOMMENDATION_TOP:
@@ -329,8 +336,15 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 				ivh.updateState(mUserOrder, item);
 				ivh.bind(item, mUserOrder, mMenu, position, false);
 
-				if (viewType == VIEW_TYPE_ITEM && item.hasRecommendations() && ivh.isRecommendationsVisible()) {
+				if(viewType == VIEW_TYPE_ITEM && item.hasRecommendations() && ivh.isRecommendationsVisible()) {
 					ViewUtils.setVisibleGone(ivh.viewDelimiter, false);
+				}
+				if(viewType == VIEW_TYPE_RECOMMENDATION_TOP && !isLast(position) && getItemViewType(position + 1)
+						!= VIEW_TYPE_RECOMMENDATION_BOTTOM) {
+					ViewUtils.setVisibleGone(ivh.viewDelimiterTopBottom, true);
+					ViewUtils.setVisibleGone(ivh.viewDelimiter, false);
+				} else {
+					ViewUtils.setVisibleGone(ivh.viewDelimiterTopBottom, false);
 				}
 				break;
 
@@ -339,8 +353,8 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 			case VIEW_TYPE_SUBSUBCATEGORY:
 				CategoryViewHolder cvh = (CategoryViewHolder) viewHolder;
 				CategoryData category = (CategoryData) getItemAt(position);
-				if (mDecorator != null) {
-					if (!category.isGroup() && category.getChildren() != null && category.getChildren().size() > 0) {
+				if(mDecorator != null) {
+					if(!category.isGroup() && category.getChildren() != null && category.getChildren().size() > 0) {
 						mDecorator.drawSelectedBackground(cvh.itemView);
 					} else {
 						mDecorator.restoreHeaderView(cvh);
@@ -355,12 +369,16 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 		}
 	}
 
+	private boolean isLast(final int position) {
+		return position == getItemCount() - 1;
+	}
+
 	@Override
 	public int getItemViewType(int position) {
 		final Data data = getItemAt(position);
-		if (data instanceof CategoryData) {
+		if(data instanceof CategoryData) {
 			final CategoryData categoryData = (CategoryData) data;
-			switch (categoryData.getLevel()) {
+			switch(categoryData.getLevel()) {
 				case 0:
 					return VIEW_TYPE_CATEGORY;
 				case 1:
@@ -369,9 +387,9 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 					return VIEW_TYPE_SUBSUBCATEGORY;
 			}
 		}
-		if (data instanceof ItemData) {
+		if(data instanceof ItemData) {
 			final ItemData itemData = (ItemData) data;
-			switch (itemData.getType()) {
+			switch(itemData.getType()) {
 				case ItemData.TYPE_NORMAL:
 					return VIEW_TYPE_ITEM;
 
@@ -387,9 +405,9 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 	}
 
 	public int getItemPosition(final Item item) {
-		for (int i = 0; i < getItemCount(); i++) {
+		for(int i = 0; i < getItemCount(); i++) {
 			final Data data = getItemAt(i);
-			if (data instanceof ItemData && ((ItemData) data).getItem().id().equals(item.id())) {
+			if(data instanceof ItemData && ((ItemData) data).getItem().id().equals(item.id())) {
 				return i;
 			}
 		}
@@ -398,5 +416,16 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 	public void setDecorator(final HeaderItemDecorator headerItemDecorator) {
 		mDecorator = headerItemDecorator;
+	}
+
+	public ArrayList<Integer> getItemPositions(final Item item) {
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		for(int i = 0; i < getItemCount(); i++) {
+			final Data data = getItemAt(i);
+			if(data instanceof ItemData && ((ItemData) data).getItem().id().equals(item.id())) {
+				result.add(i);
+			}
+		}
+		return result;
 	}
 }

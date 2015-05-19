@@ -8,6 +8,7 @@ import com.omnom.android.R;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrder;
+import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -39,9 +40,14 @@ public class ValidateOrderHelper {
 		if(mOrder == null) {
 			return;
 		}
+
 		final Item item = event.getItem();
+		// check whether item is already ordered - if true -> we shouldn't add recommendation items
+		// to avoid duplication
+		final UserOrderData userOrderData = mOrder.itemsTable().get(item.id());
+		final boolean alreadyOrdered = userOrderData != null && userOrderData.amount() > 0;
 		mOrder.addItem(item, event.getCount(), event.getSelectedModifiersIds());
-		mViewHelper.menuCategories.refresh(event);
+		mViewHelper.menuCategories.refresh(event, alreadyOrdered);
 		updateWishUi();
 	}
 

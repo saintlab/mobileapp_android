@@ -35,6 +35,7 @@ import com.omnom.android.utils.view.OmnomRecyclerView;
 import com.omnom.android.view.MenuSmoothScroller;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -381,16 +382,26 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		// Do nothing
 	}
 
-	public void refresh(final OrderUpdateEvent event) {
+	public void refresh(final OrderUpdateEvent event, final boolean alreadyOrdered) {
 		if(event == null || event.getItem() == null) {
 			return;
 		}
 		final Item item = event.getItem();
+
 		mOrder.addItem(item, event.getCount(), event.getSelectedModifiersIds());
 		mMenuAdapter.notifyItemChanged(event.getPosition());
 
+		final ArrayList<Integer> positions = mMenuAdapter.getItemPositions(item);
+		for(final Integer position : positions) {
+			mMenuAdapter.notifyItemChanged(position);
+		}
+
 		if(event.getPosition() > 0 && item.hasRecommendations()) {
 			if(event.getCount() > 0) {
+				if(alreadyOrdered) {
+					// skip
+					return;
+				}
 				final List<String> recommendations = item.recommendations();
 				final int size = recommendations.size();
 				for(int i = 0; i < size; i++) {
