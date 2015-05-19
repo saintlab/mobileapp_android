@@ -20,6 +20,7 @@ import com.omnom.android.utils.utils.AmountHelper;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -62,6 +63,12 @@ public class WishListAdapter extends BaseAdapter {
 		@Override
 		public int amount() {
 			return 0;
+		}
+
+		@Nullable
+		@Override
+		public List<String> modifiers() {
+			return Collections.EMPTY_LIST;
 		}
 
 		@Nullable

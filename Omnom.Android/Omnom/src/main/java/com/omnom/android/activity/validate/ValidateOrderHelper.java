@@ -40,7 +40,7 @@ public class ValidateOrderHelper {
 			return;
 		}
 		final Item item = event.getItem();
-		mOrder.addItem(item, event.getCount());
+		mOrder.addItem(item, event.getCount(), event.getSelectedModifiersIds());
 		mViewHelper.menuCategories.refresh(event);
 		updateWishUi();
 	}

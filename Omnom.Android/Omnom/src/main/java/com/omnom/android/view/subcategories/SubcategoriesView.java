@@ -386,7 +386,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 			return;
 		}
 		final Item item = event.getItem();
-		mOrder.addItem(item, event.getCount());
+		mOrder.addItem(item, event.getCount(), event.getSelectedModifiersIds());
 		mMenuAdapter.notifyItemChanged(event.getPosition());
 
 		if(event.getPosition() > 0 && item.hasRecommendations()) {

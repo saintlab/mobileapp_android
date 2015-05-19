@@ -11,8 +11,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.omnom.android.R;
-import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.entrance.DeliveryEntranceData;
+import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
@@ -26,6 +26,7 @@ import com.omnom.android.utils.utils.ViewUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -93,6 +94,12 @@ public class WishAdapter extends RecyclerView.Adapter {
 		@Override
 		public int amount() {
 			return 0;
+		}
+
+		@Nullable
+		@Override
+		public List<String> modifiers() {
+			return Collections.EMPTY_LIST;
 		}
 
 		@Nullable
@@ -240,8 +247,8 @@ public class WishAdapter extends RecyclerView.Adapter {
 				final TextView lunchOrderInfo = (TextView) holder.itemView.findViewById(R.id.lunch_order_info);
 				final DeliveryEntranceData entranceData = (DeliveryEntranceData) mEntranceData;
 				lunchOrderInfo.setText(mContext.getString(R.string.wish_lunch_order_info,
-									   LUNCH_DATE_FORMAT.format(entranceData.deliveryTime()),
-									   entranceData.deliveryAddress()));
+				                                          LUNCH_DATE_FORMAT.format(entranceData.deliveryTime()),
+				                                          entranceData.deliveryAddress()));
 				break;
 
 			case VIEW_TYPE_WISH_FOOTER:
@@ -271,7 +278,7 @@ public class WishAdapter extends RecyclerView.Adapter {
 	private List<UserOrderData> getSelectedItems() {
 		if(_lazy_selected_data == null) {
 			final List<UserOrderData> selectedItems = mOrder.getSelectedItems();
-			if (mEntranceData instanceof DeliveryEntranceData) {
+			if(mEntranceData instanceof DeliveryEntranceData) {
 				selectedItems.add(new UserOrderDataFooterLabel());
 			}
 			selectedItems.add(new UserOrderDataFooter());

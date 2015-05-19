@@ -27,7 +27,6 @@ import com.omnom.android.fragment.takeaway.TakeawayTimeFragment;
 import com.omnom.android.fragment.takeaway.TakeawayTimePickedEvent;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
-import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.menu.utils.MenuHelper;
@@ -113,11 +112,10 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		}
 		final Item dish = data.item();
 		final WishRequestItem item = new WishRequestItem(dish.id(), data.amount());
-		if(dish.modifiers() != null && dish.modifiers().size() > 0) {
-			for(Modifier modifier : dish.modifiers()) {
-				if(modifier != null && !TextUtils.isEmpty(modifier.id())) {
-					item.getModifiers().add(new ModifierRequestItem(modifier.id()));
-				}
+
+		if(data.modifiers() != null && !data.modifiers().isEmpty()) {
+			for(final String id : data.modifiers()) {
+				item.getModifiers().add(new ModifierRequestItem(id));
 			}
 		}
 		return item;
@@ -446,7 +444,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 				DialogUtils.showDeleteDialog(this, title, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						onOrderUpdate(new OrderUpdateEvent(order.item(), 0, position));
+						onOrderUpdate(new OrderUpdateEvent(order.item(), 0, position, Collections.EMPTY_LIST));
 					}
 				});
 				return true;
@@ -480,7 +478,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		}
 		mOrderChanged = true;
 		final Item item = event.getItem();
-		mOrder.addItem(item, event.getCount());
+		mOrder.addItem(item, event.getCount(), event.getSelectedModifiersIds());
 		if(event.getCount() > 0) {
 			mAdapter.clearCache();
 			mAdapter.notifyDataSetChanged();
