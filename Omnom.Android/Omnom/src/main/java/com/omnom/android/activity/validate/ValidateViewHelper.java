@@ -504,7 +504,8 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 					loader.postDelayed(new Runnable() {
 						@Override
 						public void run() {
-							mActivity.showOrders(restaurant.orders(), requestId);
+							mActivity.onBill(mActivity.findViewById(R.id.btn_bill));
+							// mActivity.showOrders(restaurant.orders(), requestId);
 						}
 					}, mActivity.getResources()
 					            .getInteger(R.integer.default_animation_duration_short));

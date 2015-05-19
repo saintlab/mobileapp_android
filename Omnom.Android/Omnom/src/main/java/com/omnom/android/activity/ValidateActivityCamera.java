@@ -258,7 +258,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 			final TableDataResponse table = RestaurantHelper.getTable(restaurant);
 			if(table != null) {
 				reportMixPanel(decodeResponse.getRequestId(), method, table);
-				onDataLoaded(restaurant, RestaurantHelper.getTable(restaurant), RestaurantHelper.hasOrders(restaurant),
+				onDataLoaded(restaurant,
+				             RestaurantHelper.getTable(restaurant),
+				             RestaurantHelper.hasOrders(restaurant) || RestaurantHelper.hasOnlyTable(restaurant),
 				             decodeResponse.getRequestId());
 				// TODO: For debug purposes
 				//if(BuildConfig.DEBUG) {
