@@ -261,7 +261,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 				onDataLoaded(restaurant,
 				             RestaurantHelper.getTable(restaurant),
 				             RestaurantHelper.hasOrders(restaurant) || RestaurantHelper.hasOnlyTable(restaurant),
-				             decodeResponse.getRequestId());
+				             decodeResponse.getRequestId(), null);
 				// TODO: For debug purposes
 				//if(BuildConfig.DEBUG) {
 				//onDataLoaded(restaurant, restaurant.tables().get(0), true, decodeResponse.getRequestId());

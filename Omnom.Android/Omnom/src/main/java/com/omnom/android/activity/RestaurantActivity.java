@@ -21,6 +21,7 @@ import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.activity.validate.ValidateActivity;
 import com.omnom.android.adapter.RestaurantsAdapter;
+import com.omnom.android.entrance.BarEntranceData;
 import com.omnom.android.entrance.TakeawayEntranceData;
 import com.omnom.android.fragment.delivery.DeliveryDetailsFragment;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
@@ -117,7 +118,6 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 
 	@OnClick(R.id.txt_bar)
 	protected void doBar() {
-		// TODO: BarEntranceData.create("#orderNumber", "#pinCode")
 		if(!mFinishing) {
 			mEnterBar = true;
 			scrollView.smoothScrollTo(0, 0);
@@ -129,7 +129,7 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 				@Override
 				public void run() {
 					ValidateActivity.start(RestaurantActivity.this, R.anim.fade_in, R.anim.fake_fade_out,
-					                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, mRestaurant);
+					                       EXTRA_LOADER_ANIMATION_SCALE_DOWN, mRestaurant, BarEntranceData.create());
 				}
 			});
 		}
@@ -161,7 +161,6 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 	protected void doTakeAway() {
 		if(!mFinishing) {
 			if(validateOrderTime()) {
-				// TODO: create TakeawayEntranceData and pass to ValidateActivity intent (Extras.EXTRA_ENTRANCE_DATA)
 				final Date orderDate = new Date();
 				final String takeawayAfter = "????? 1.5 ????";
 				final String takeawayAddress = "??????? 13";
@@ -263,7 +262,9 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 		ViewUtils.setVisibleGone(txtBar, RestaurantHelper.hasBar(mRestaurant));
 		ViewUtils.setVisibleGone(txtImInside, RestaurantHelper.hasTableOrder(mRestaurant));
 		ViewUtils.setVisibleGone(txtLunch, RestaurantHelper.hasLunch(mRestaurant));
-		ViewUtils.setVisibleGone(txtTakeaway, RestaurantHelper.hasTakeaway(mRestaurant));
+		// ViewUtils.setVisibleGone(txtTakeaway, RestaurantHelper.hasTakeaway(mRestaurant));
+		// TODO: Temporary hide take-away mode
+		ViewUtils.setVisibleGone(txtTakeaway, false);
 
 		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 		logoSizeSmall = (int) (displayMetrics.widthPixels * RestaurantsListActivity.LOGO_SCALE_SMALL + 0.5);
