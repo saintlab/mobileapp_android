@@ -694,6 +694,8 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	protected abstract void decode(boolean startProgressAnimation);
 
+
+
 	public void onBill(final View v) {
 		final int fragmentsCount = getSupportFragmentManager().getBackStackEntryCount();
 		final int startDelay = getResources().getInteger(R.integer.default_animation_duration_quick);

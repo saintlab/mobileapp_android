@@ -2,6 +2,7 @@ package com.omnom.android.activity;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,6 +27,7 @@ import com.omnom.android.socket.listener.OrderCloseEventListener;
 import com.omnom.android.socket.listener.OrderCreateEventListener;
 import com.omnom.android.socket.listener.OrderUpdateEventListener;
 import com.omnom.android.socket.listener.PaymentEventListener;
+import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.DialogUtils;
@@ -219,10 +221,10 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void initUi() {
-        listenersSet = new ListenersSet(new PaymentEventListener(this),
-                       new OrderCreateEventListener(this, this),
-                       new OrderUpdateEventListener(this, this),
-		               new OrderCloseEventListener(this, this));
+		listenersSet = new ListenersSet(new PaymentEventListener(this),
+		                                new OrderCreateEventListener(this, this),
+		                                new OrderUpdateEventListener(this, this),
+		                                new OrderCloseEventListener(this, this));
 		mPagerAdapter = new OrdersPagerAdapter(getSupportFragmentManager(), orders, requestId, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 4.5);
@@ -270,6 +272,13 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 	@Override
 	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == Extras.REQUEST_CODE_LOGIN && resultCode == Activity.RESULT_OK) {
+			final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
+			if(currentFragment != null) {
+				currentFragment.showCardsActivity();
+			}
+			return;
+		}
 		if(requestCode == REQUEST_CODE_CARDS && resultCode == RESULT_OK) {
 			close();
 		}
