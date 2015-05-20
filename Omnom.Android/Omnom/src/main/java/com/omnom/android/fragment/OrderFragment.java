@@ -791,6 +791,9 @@ public class OrderFragment extends Fragment {
 				((OrdersActivity) getActivity()).close();
 			}
 		});
+		if(!mSingle) {
+			mHeader.setTitleBigDrawableRight(R.drawable.ic_modifier_group_dropdown);
+		}
 		ViewUtils.setVisibleGone(mHeader, false);
 
 		if(mAnimate) {

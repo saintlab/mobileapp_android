@@ -1,6 +1,7 @@
 package com.omnom.android.view;
 
 import android.content.Context;
+import android.support.annotation.DrawableRes;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -170,6 +171,11 @@ public class HeaderView extends RelativeLayout {
 	public void setPaging(final int count, final int index) {
 		pageIndicator.setFake(true, count);
 		pageIndicator.setCurrentItem(index);
+	}
+
+	public void setTitleBigDrawableRight(final @DrawableRes int resId) {
+		txtTitleBig.setCompoundDrawablePadding(getResources().getDimensionPixelOffset(R.dimen.drawable_padding_small));
+		txtTitleBig.setCompoundDrawablesWithIntrinsicBounds(0, 0, resId, 0);
 	}
 
 	public void setContentVisibility(final boolean visible, final boolean now) {

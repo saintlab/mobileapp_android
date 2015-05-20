@@ -23,6 +23,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="drawable_padding_default">8dp</dimen>
+    <dimen name="drawable_padding_small">4dp</dimen>
     <dimen name="restaurant_cover_height_small">144dp</dimen>
     <dimen name="restaurant_cover_height_large">216dp</dimen>
     <dimen name="restaurant_distance_padding">12dp</dimen>
