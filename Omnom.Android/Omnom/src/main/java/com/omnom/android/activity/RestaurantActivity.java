@@ -262,7 +262,7 @@ public class RestaurantActivity extends BaseOmnomFragmentActivity {
 
 		ViewUtils.setVisibleGone(txtBar, RestaurantHelper.hasBar(mRestaurant));
 		ViewUtils.setVisibleGone(txtImInside, RestaurantHelper.hasTableOrder(mRestaurant));
-		ViewUtils.setVisibleGone(txtLunch, RestaurantHelper.hasPreOrder(mRestaurant));
+		ViewUtils.setVisibleGone(txtLunch, RestaurantHelper.hasLunch(mRestaurant));
 		ViewUtils.setVisibleGone(txtTakeaway, RestaurantHelper.hasTakeaway(mRestaurant));
 
 		final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();

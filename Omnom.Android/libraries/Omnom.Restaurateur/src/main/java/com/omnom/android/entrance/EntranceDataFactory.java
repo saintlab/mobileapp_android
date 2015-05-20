@@ -2,7 +2,6 @@ package com.omnom.android.entrance;
 
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
-import com.omnom.android.restaurateur.model.restaurant.Settings;
 
 /**
  * Created by Ch3D on 13.05.2015.
@@ -13,10 +12,7 @@ public class EntranceDataFactory {
 			return TableEntranceData.create();
 		}
 
-		final Settings settings = restaurant.settings();
-		final boolean hasBar = settings.hasBar();
-		final boolean hasNonBar = settings.hasPreOrder() || settings.hasTableOrder();
-		if(RestaurantHelper.isBar(restaurant) || (hasBar && !hasNonBar)) {
+		if(RestaurantHelper.isBar(restaurant)) {
 			return BarEntranceData.create();
 		}
 

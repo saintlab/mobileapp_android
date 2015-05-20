@@ -218,19 +218,23 @@ public class RestaurantHelper {
 	}
 
 	public static boolean hasBar(final Restaurant restaurant) {
-		return restaurant.settings() != null && restaurant.settings().hasBar();
+		return restaurant != null && restaurant.entranceModes() != null
+				&& restaurant.entranceModes().contains(Restaurant.ENTRANCE_MODE_BAR);
 	}
 
 	public static boolean hasTableOrder(final Restaurant restaurant) {
-		return restaurant.settings() != null && restaurant.settings().hasTableOrder();
+		return restaurant != null && restaurant.entranceModes() != null
+				&& restaurant.entranceModes().contains(Restaurant.ENTRANCE_MODE_ON_TABLE);
 	}
 
-	public static boolean hasPreOrder(final Restaurant restaurant) {
-		return restaurant.settings() != null && restaurant.settings().hasPreOrder();
+	public static boolean hasLunch(final Restaurant restaurant) {
+		return restaurant != null && restaurant.entranceModes() != null
+				&& restaurant.entranceModes().contains(Restaurant.ENTRANCE_MODE_LUNCH);
 	}
 
 	public static boolean hasTakeaway(final Restaurant restaurant) {
-		return false;
+		return restaurant != null && restaurant.entranceModes() != null
+				&& restaurant.entranceModes().contains(Restaurant.ENTRANCE_MODE_TAKEAWAY);
 	}
 
 	public static boolean isBarTipsEnabled(final Restaurant restaurant) {
