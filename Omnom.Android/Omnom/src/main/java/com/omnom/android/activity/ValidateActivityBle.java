@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.util.Pair;
 import android.view.View;
 
@@ -41,6 +42,7 @@ public class ValidateActivityBle extends ValidateActivity {
 
 	private static final String TAG = ValidateActivityBle.class.getSimpleName();
 
+	@Nullable
 	protected BluetoothAdapter mBluetoothAdapter;
 
 	protected BeaconParser parser;
@@ -213,6 +215,14 @@ public class ValidateActivityBle extends ValidateActivity {
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	protected void scanBleDevices(final boolean enable, final Runnable endCallback) {
+		// Sometimes due to bug in android BluetoothAdapter is null
+		// We have to handle this case
+		if(mBluetoothAdapter == null) {
+			if(endCallback != null) {
+				endCallback.run();
+			}
+			return;
+		}
 		if(enable) {
 			mBeacons.clear();
 			findViewById(android.R.id.content).postDelayed(new Runnable() {
