@@ -128,7 +128,7 @@ dependencies {
         exclude group: 'com.squareup.dagger'
     }
     compile files('libs/card.io.jar')
-    compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.4@aar') {
         transitive = true;
     }
     compile files('libs/pushwoosh-2.9.0.jar')
