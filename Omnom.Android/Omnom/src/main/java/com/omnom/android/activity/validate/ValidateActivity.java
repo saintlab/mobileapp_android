@@ -40,6 +40,7 @@ import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.entrance.EntranceDataFactory;
+import com.omnom.android.entrance.EntranceDataHelper;
 import com.omnom.android.fragment.SearchFragment;
 import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
@@ -429,7 +430,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	private void startValidation() {
 		if(!mSkipViewRendering) {
-			if(RestaurantHelper.isBar(mRestaurant) || (mEntranceData != null && mEntranceData.getType() == EntranceData.TYPE_BAR)) {
+			if(RestaurantHelper.isBar(mRestaurant) || (EntranceDataHelper.isBar(mEntranceData))) {
 				handleBar(mRestaurant, mEntranceData);
 				return;
 			}

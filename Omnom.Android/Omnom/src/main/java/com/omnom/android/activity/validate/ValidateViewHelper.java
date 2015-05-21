@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.RestaurantsListActivity;
 import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.entrance.EntranceDataHelper;
 import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.fragment.SearchFragment;
 import com.omnom.android.menu.model.Item;
@@ -145,15 +146,10 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	}
 
 	public View.OnClickListener getBillClickListener() {
-		if(isBarMode()
-				|| RestaurantHelper.isLunch(mActivity.mRestaurant)) {
+		if(EntranceDataHelper.isBar(mEntranceData) || RestaurantHelper.isLunch(mActivity.mRestaurant)) {
 			return mActivity.mOnOrderClickListener;
 		}
 		return mActivity.mOnBillClickListener;
-	}
-
-	private boolean isBarMode() {
-		return mEntranceData != null && mEntranceData.getType() == EntranceData.TYPE_BAR;
 	}
 
 	public void onDestroy() {
@@ -253,7 +249,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 				} else {
 					AnimationUtils.animateAlphaGone(imgProfile, true);
 					AnimationUtils.animateAlphaGone(imgPrevious, true);
-					AnimationUtils.animateAlphaGone(txtBar, isBarMode());
+					AnimationUtils.animateAlphaGone(txtBar, EntranceDataHelper.isBar(mEntranceData));
 					loader.showLogo();
 				}
 				loader.scaleDown((int) (loader.getLoaderSizeDefault() * loaderFactor), 0, null);
@@ -359,7 +355,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		final boolean promoEnabled = false; //RestaurantHelper.isPromoEnabled(restaurant);
 		// FIXME: uncomment the code below when waiter call is implemented
 		final boolean waiterEnabled = false; //RestaurantHelper.isWaiterEnabled(restaurant);
-		final boolean isBar = isBarMode();
+		final boolean isBar = EntranceDataHelper.isBar(mEntranceData);
 		final boolean isLunch = RestaurantHelper.isLunch(restaurant);
 
 		if(bottomView == null) {

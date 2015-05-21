@@ -17,7 +17,7 @@ import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.adapter.WishAdapter;
 import com.omnom.android.entrance.EntranceData;
-import com.omnom.android.entrance.TakeawayEntranceData;
+import com.omnom.android.entrance.EntranceDataHelper;
 import com.omnom.android.fragment.BarTipsEvent;
 import com.omnom.android.fragment.BarTipsFragment;
 import com.omnom.android.fragment.OrderFragment;
@@ -258,6 +258,9 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		mTable = intent.getParcelableExtra(EXTRA_TABLE);
 		mRestaurant = intent.getParcelableExtra(EXTRA_RESTAURANT);
 		mMenu = intent.getParcelableExtra(EXTRA_RESTAURANT_MENU);
+		if(mEntranceData == null) {
+			throw new IllegalArgumentException("EntranceData cannot be null");
+		}
 	}
 
 	private void setBusy(boolean busy) {
@@ -349,7 +352,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 				break;
 
 			case R.id.btn_send:
-				if(RestaurantHelper.isBar(mRestaurant) && RestaurantHelper.isBarTipsEnabled(mRestaurant)) {
+				if(EntranceDataHelper.isBar(mEntranceData) && RestaurantHelper.isBarTipsEnabled(mRestaurant)) {
 					doPickTips();
 				} else {
 					doWish();
@@ -389,9 +392,9 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	private void doWish() {
 		if(!checkUser()) {
-			if(RestaurantHelper.isBar(mRestaurant)) {
+			if(EntranceDataHelper.isBar(mEntranceData)) {
 				doWishBar();
-			} else if(mEntranceData instanceof TakeawayEntranceData) {
+			} else if(EntranceDataHelper.isTakeAway(mEntranceData)) {
 				doAskAboutTime();
 			} else {
 				doWishDefault();
