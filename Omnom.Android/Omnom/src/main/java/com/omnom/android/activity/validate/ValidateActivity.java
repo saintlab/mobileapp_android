@@ -451,11 +451,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 			@Override
 			public void call(final MenuResponse menuResponse) {
 				mMenu = menuResponse.getMenu();
-				if(entranceData == null) {
-					mEntranceData = EntranceDataFactory.create(restaurant);
-				} else {
-					mEntranceData = entranceData;
-				}
+				ensureEntranceData(entranceData, mRestaurant);
 				mViewHelper.setEntranceData(mEntranceData);
 				onDataLoaded(restaurant, TableDataResponse.NULL, mEntranceData);
 				mSkipViewRendering = true;
@@ -463,6 +459,14 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}, onError);
 
 		mFirstRun = false;
+	}
+
+	private void ensureEntranceData(final EntranceData entranceData, final Restaurant restaurant) {
+		if(entranceData == null) {
+			mEntranceData = EntranceDataFactory.create(restaurant);
+		} else {
+			mEntranceData = entranceData;
+		}
 	}
 
 	@Override
@@ -898,13 +902,9 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 		mRestaurant = restaurant;
 		mTable = table;
-		mEntranceData = EntranceDataFactory.create(mRestaurant);
-		if(entranceData == null) {
-			mViewHelper.setEntranceData(mEntranceData);
-		} else {
-			mEntranceData = entranceData;
-		}
 
+		ensureEntranceData(entranceData, mRestaurant);
+		mViewHelper.setEntranceData(mEntranceData);
 		bindMenuData();
 
 		mPaymentListener.initTableSocket(mTable);
