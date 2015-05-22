@@ -1,8 +1,10 @@
 package com.omnom.android.socket.listener;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.omnom.android.socket.event.OrderUpdateSocketEvent;
+import com.omnom.android.utils.Extras;
 import com.squareup.otto.Subscribe;
 
 /**
@@ -10,25 +12,15 @@ import com.squareup.otto.Subscribe;
  */
 public class OrderUpdateEventListener extends BaseEventListener {
 
-	public interface OrderUpdateListener {
-		void onOrderUpdateEvent(OrderUpdateSocketEvent event);
-	}
-
-	private OrderUpdateListener mListener;
-
-	public OrderUpdateEventListener(final Context context, final OrderUpdateListener listener) {
+	public OrderUpdateEventListener(final Context context) {
 		super(context);
-		mListener = listener;
 	}
 
 	@Subscribe
 	public void onOrderUpdateEvent(final OrderUpdateSocketEvent event) {
-		mHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				mListener.onOrderUpdateEvent(event);
-			}
-		});
+		final Intent intent = new Intent(Extras.ACTION_EVENT_ORDER_UPDATE);
+		intent.putExtra(Extras.ACTION_EVENT_ORDER_UPDATE, event);
+		mContext.sendOrderedBroadcast(intent, null);
 	}
 
 }

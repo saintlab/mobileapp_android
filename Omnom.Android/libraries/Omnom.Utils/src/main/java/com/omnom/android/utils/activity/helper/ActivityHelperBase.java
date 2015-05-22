@@ -11,10 +11,14 @@ import com.omnom.android.utils.preferences.PreferenceProvider;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
 import rx.android.app.AppObservable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
 
 /**
@@ -129,4 +133,6 @@ public abstract class ActivityHelperBase implements ActivityHelperWithAnimation 
 	public void unsubscribe(final Subscription subscription) {
 		OmnomObservable.unsubscribe(subscription);
 	}
+
+
 }

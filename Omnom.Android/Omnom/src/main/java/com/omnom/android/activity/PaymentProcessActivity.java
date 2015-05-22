@@ -50,8 +50,6 @@ import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
-import com.omnom.android.socket.event.PaymentSocketEvent;
-import com.omnom.android.socket.listener.SilentPaymentEventListener;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
@@ -73,7 +71,7 @@ import rx.functions.Action1;
 /**
  * Created by mvpotter on 24/11/14.
  */
-public class PaymentProcessActivity extends BaseOmnomModeSupportActivity implements SilentPaymentEventListener.PaymentListener {
+public class PaymentProcessActivity extends BaseOmnomModeSupportActivity {
 
 	public static final int SIMILAR_PAYMENTS_TIMEOUT = 60 * 1000;
 
@@ -159,12 +157,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 
 	private int mAccentColor;
 
-	private SilentPaymentEventListener mPaymentListener;
-
 	private String mTransactionUrl;
-
-	@Nullable
-	private PaymentSocketEvent mPaymentEvent;
 
 	private int mBillId;
 
@@ -191,19 +184,10 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	public void initUi() {
 		mPayChecker = new PaymentChecker(this);
 
-		mPaymentListener = new SilentPaymentEventListener(this, this);
 		mErrorHelper = new OmnomErrorHelper(loader, txtError, btnBottom, txtBottom, btnDemo, errorViews);
 		loader.scaleDown();
 		loader.setColor(getResources().getColor(android.R.color.black));
 		loader.setProgressColor(getResources().getColor(R.color.payment_progress_color));
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if(mOrder != null) {
-			mPaymentListener.initTableSocket(mOrder.getTableId());
-		}
 	}
 
 	@Override
@@ -225,12 +209,6 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	}
 
 	@Override
-	protected void onStop() {
-		super.onStop();
-		mPaymentListener.onPause();
-	}
-
-	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putString(Extras.EXTRA_TRANSACTION_URL, mTransactionUrl);
@@ -239,7 +217,6 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mPaymentListener.onDestroy();
 		loader.onDestroy();
 	}
 
@@ -443,7 +420,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mDetails.getAmount(), mDetails.getTip());
 				} else {
 					if(mEntranceData instanceof TableEntranceData) {
-						ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
+						ThanksActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor);
 					} else {
 						if(mEntranceData instanceof BarEntranceData) {
 							final EntranceData barEntranceData = BarEntranceData.create(mWishResponse);
@@ -504,7 +481,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 				onPayOk(AcquiringPollingResponse.create(AcquiringPollingResponse.STATUS_OK));
 			} else {
 				final Uri uriData = (data != null && data.getData() != null) ? data.getData() : Uri.EMPTY;
-				onPayError(AcquiringResponseError.create("", "Не удалось провести 3DS транзакцию. URL=" + uriData.toString()));
+				onPayError(AcquiringResponseError.create("", getString(R.string.unable_to_process_transaction) + uriData.toString()));
 			}
 		}
 
@@ -543,10 +520,5 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 		mUserOrder = intent.getParcelableExtra(Extras.EXTRA_USER_ORDER);
 		mCardInfo = intent.getParcelableExtra(Extras.EXTRA_CARD_DATA);
 		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);
-	}
-
-	@Override
-	public void onPaymentEvent(final PaymentSocketEvent event) {
-		mPaymentEvent = event;
 	}
 }

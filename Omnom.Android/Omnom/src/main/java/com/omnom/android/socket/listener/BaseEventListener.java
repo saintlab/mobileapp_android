@@ -17,23 +17,23 @@ public class BaseEventListener {
 
 	private static final String TAG = PaymentEventListener.class.getSimpleName();
 
-	protected final Context mActivity;
+	protected final Context mContext;
 
 	protected final Handler mHandler;
 
 	protected OmnomSocketBase mTableSocket;
 
 	public BaseEventListener(final Context context) {
-		mActivity = context;
+		mContext = context;
 		mHandler = new Handler();
 	}
 
 	public void initTableSocket(final String tableId) {
 		try {
-			mTableSocket = OmnomSocketFactory.initTable(mActivity, tableId);
+			mTableSocket = OmnomSocketFactory.initTable(mContext, tableId);
 			mTableSocket.connect();
 			mTableSocket.subscribe(this);
-			mTableSocket.subscribe(mActivity);
+			mTableSocket.subscribe(mContext);
 		} catch(URISyntaxException e) {
 			Log.e(TAG, "Unable to initiate socket connection");
 		}
@@ -42,10 +42,10 @@ public class BaseEventListener {
 	public void initTableSocket(final TableDataResponse table) {
 		if(table != null && table != TableDataResponse.NULL) {
 			try {
-				mTableSocket = OmnomSocketFactory.init(mActivity, table);
+				mTableSocket = OmnomSocketFactory.init(mContext, table);
 				mTableSocket.connect();
 				mTableSocket.subscribe(this);
-				mTableSocket.subscribe(mActivity);
+				mTableSocket.subscribe(mContext);
 			} catch(URISyntaxException e) {
 				Log.e(TAG, "Unable to initiate socket connection");
 			}
@@ -57,7 +57,7 @@ public class BaseEventListener {
 	public void onPause() {
 		if(mTableSocket != null) {
 			mTableSocket.unsubscribe(this);
-			mTableSocket.unsubscribe(mActivity);
+			mTableSocket.unsubscribe(mContext);
 			mTableSocket.disconnect();
 			mTableSocket.destroy();
 			mTableSocket = null;

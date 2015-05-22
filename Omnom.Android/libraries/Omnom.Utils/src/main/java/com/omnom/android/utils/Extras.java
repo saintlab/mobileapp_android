@@ -92,4 +92,7 @@ public interface Extras extends Preferences {
 	public static final int REQUEST_CODE_HANDLE_THREE_DS = 5004;
 
 	public static final String ACTION_EVENT_PAYMENT = "com.saintlab.android.event.payment";
+	public static final String ACTION_EVENT_ORDER_CREATE = "com.saintlab.android.order.create";
+	public static final String ACTION_EVENT_ORDER_CLOSE = "com.saintlab.android.order.close";
+	public static final String ACTION_EVENT_ORDER_UPDATE = "com.saintlab.android.order.update";
 }

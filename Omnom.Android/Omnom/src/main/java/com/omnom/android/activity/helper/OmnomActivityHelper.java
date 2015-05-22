@@ -2,13 +2,21 @@ package com.omnom.android.activity.helper;
 
 import android.app.Activity;
 import android.location.Location;
+import android.util.Log;
 
 import com.omnom.android.OmnomApplication;
+import com.omnom.android.socket.event.PaymentSocketEvent;
+import com.omnom.android.utils.CroutonHelper;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.LocationUtils;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
 
 /**
@@ -17,6 +25,34 @@ import rx.functions.Action1;
 public class OmnomActivityHelper implements LocationActivityHelper {
 
 	private static final String TAG = OmnomActivityHelper.class.getSimpleName();
+
+	public static Subscription processPaymentEvents(final Activity activity) {
+		final List<PaymentSocketEvent> events = OmnomApplication.get(activity).getPaymentEvents();
+		if(!events.isEmpty()) {
+			return Observable.from(events)
+			                 .buffer(5, TimeUnit.SECONDS, 1, AndroidSchedulers.mainThread())
+			                 .subscribe(new Action1<List<PaymentSocketEvent>>() {
+				                 @Override
+				                 public void call(final List<PaymentSocketEvent> paymentSocketEvents) {
+					                 if(!paymentSocketEvents.isEmpty()) {
+						                 final PaymentSocketEvent paymentEvent = paymentSocketEvents.get(0);
+						                 CroutonHelper.showPaymentNotification(activity, paymentEvent.getPaymentData());
+					                 }
+				                 }
+			                 }, new Action1<Throwable>() {
+				                 @Override
+				                 public void call(final Throwable throwable) {
+					                 Log.e(TAG, "processPaymentEvents", throwable);
+				                 }
+			                 }, new Action0() {
+				                 @Override
+				                 public void call() {
+					                 OmnomApplication.get(activity).clearPaymentEvents();
+				                 }
+			                 });
+		}
+		return null;
+	}
 
 	protected final Activity mActivity;
 
