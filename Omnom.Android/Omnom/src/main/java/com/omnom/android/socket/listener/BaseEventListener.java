@@ -50,7 +50,7 @@ public class BaseEventListener {
 				Log.e(TAG, "Unable to initiate socket connection");
 			}
 		} else {
-			Log.d(TAG, "unable to init websocket for table = " + table);
+			Log.d(TAG, "unable to connect websocket for table = " + table);
 		}
 	}
 

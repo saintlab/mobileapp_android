@@ -30,8 +30,7 @@ import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.socket.PaymentEventIntentFilter;
 import com.omnom.android.socket.event.PaymentSocketEvent;
-import com.omnom.android.socket.listener.BaseEventListener;
-import com.omnom.android.socket.listener.PaymentEventListener;
+import com.omnom.android.socket.listener.TableSocketListener;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
 import com.omnom.android.utils.Extras;
@@ -97,7 +96,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	private Picasso _lazy_Picasso;
 
-	private BaseEventListener mPaymentListener;
+	private TableSocketListener mTableSocketListener;
 
 	private Stack<PaymentSocketEvent> mPaymentEvents;
 
@@ -279,17 +278,25 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	}
 
 	public void connectTableSocket(final TableDataResponse table) {
-		if(mPaymentListener != null) {
-			throw new IllegalArgumentException("Table socket already present");
+		// clear previous unhandled events
+		mPaymentEvents.clear();
+
+		// check whether there is an active socket
+		if(mTableSocketListener != null) {
+			mTableSocketListener.disconnect();
 		}
-		mPaymentListener = new PaymentEventListener(this);
-		mPaymentListener.initTableSocket(table);
+
+		// initiate new connection
+		mTableSocketListener = new TableSocketListener(this);
+		mTableSocketListener.connect(table);
 	}
 
 	public void disconnectTableSocket() {
-		if(mPaymentListener != null && mPaymentListener.isConnected()) {
-			mPaymentListener.onPause();
-			mPaymentListener.onDestroy();
+		// clear previous unhandled events
+		mPaymentEvents.clear();
+
+		if(mTableSocketListener != null) {
+			mTableSocketListener.disconnect();
 		}
 	}
 
