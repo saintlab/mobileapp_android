@@ -1,7 +1,9 @@
 package com.omnom.android.activity.validate;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -64,13 +66,15 @@ import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
+import com.omnom.android.restaurateur.model.order.PaymentData;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.service.configuration.ConfigurationResponse;
 import com.omnom.android.service.configuration.ConfigurationService;
-import com.omnom.android.socket.listener.PaymentEventListener;
+import com.omnom.android.utils.CroutonHelper;
+import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
@@ -331,6 +335,16 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}
 	};
 
+	private BroadcastReceiver mPaymentReceiver = new
+
+			BroadcastReceiver() {
+				@Override
+				public void onReceive(final Context context, final Intent intent) {
+					CroutonHelper.showPaymentNotification(getActivity(), intent.<PaymentData>getParcelableExtra(EXTRA_PAYMENT_EVENT));
+					abortBroadcast();
+				}
+			};
+
 	/**
 	 * ConfirmPhoneActivity.TYPE_LOGIN or ConfirmPhoneActivity.TYPE_REGISTER
 	 */
@@ -388,8 +402,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 			onBill(findViewById(R.id.btn_bill));
 		}
 	};
-
-	private PaymentEventListener mPaymentListener;
 
 	private ConfigurationService configurationService;
 
@@ -473,18 +485,22 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		final IntentFilter filter = new IntentFilter(Extras.ACTION_EVENT_PAYMENT);
+		filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY - 1);
+
+		registerReceiver(mPaymentReceiver, filter);
+
 		mOrderHelper.updateWishUi();
 		mViewHelper.onResume();
-
-		if(mPaymentListener != null) {
-			mPaymentListener.initTableSocket(mTable);
-		}
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mPaymentListener.onPause();
+
+		unregisterReceiver(mPaymentReceiver);
+
 		if(mRestaurant == null) {
 			mViewHelper.onPause();
 		}
@@ -506,11 +522,11 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		getApp().disconnectTableSocket();
 		configurationService.onDestroy();
 		mOrderHelper = null;
 		mViewHelper.onDestroy();
 		mViewHelper = null;
-		mPaymentListener.onDestroy();
 	}
 
 	@Override
@@ -559,7 +575,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mViewHelper.init();
 		mOrderHelper = new ValidateOrderHelper(this, mViewHelper);
 
-		mPaymentListener = new PaymentEventListener(this);
 		bgTransitionDrawable = new com.omnom.android.utils.drawable.TransitionDrawable(
 				getResources().getInteger(R.integer.default_animation_duration_short),
 				new Drawable[]{new ColorDrawable(getResources().getColor(R.color.transparent)),
@@ -707,7 +722,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				}
 			});
 		}
-		mPaymentListener.initTableSocket(mTable);
 		mFirstRun = false;
 	}
 
@@ -904,11 +918,12 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mRestaurant = restaurant;
 		mTable = table;
 
+		getApp().connectTableSocket(table);
+
 		ensureEntranceData(entranceData, mRestaurant);
 		mViewHelper.setEntranceData(mEntranceData);
 		bindMenuData();
 
-		mPaymentListener.initTableSocket(mTable);
 		onNewGuest(mTable);
 		animateRestaurantBackground(restaurant);
 		mViewHelper.onDataLoaded(restaurant, table, forwardToBill, mIsDemo, requestId);

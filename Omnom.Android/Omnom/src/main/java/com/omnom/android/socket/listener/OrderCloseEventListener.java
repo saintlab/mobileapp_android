@@ -1,7 +1,8 @@
 package com.omnom.android.socket.listener;
 
+import android.content.Context;
+
 import com.omnom.android.socket.event.OrderCloseSocketEvent;
-import com.omnom.android.utils.activity.OmnomActivity;
 import com.squareup.otto.Subscribe;
 
 /**
@@ -9,21 +10,20 @@ import com.squareup.otto.Subscribe;
  */
 public class OrderCloseEventListener extends BaseEventListener {
 
-    public interface OrderCloseListener {
+	public interface OrderCloseListener {
 		void onOrderCloseEvent(OrderCloseSocketEvent event);
 	}
 
 	private OrderCloseListener mListener;
 
-	public OrderCloseEventListener(final OmnomActivity activity,
-	                               final OrderCloseListener listener) {
-		super(activity);
+	public OrderCloseEventListener(final Context context, final OrderCloseListener listener) {
+		super(context);
 		mListener = listener;
 	}
 
 	@Subscribe
 	public void onOrderCloseEvent(final OrderCloseSocketEvent event) {
-		mActivity.getActivity().runOnUiThread(new Runnable() {
+		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
 				mListener.onOrderCloseEvent(event);

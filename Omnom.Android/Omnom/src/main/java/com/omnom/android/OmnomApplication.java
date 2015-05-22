@@ -2,7 +2,10 @@ package com.omnom.android;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -24,8 +27,13 @@ import com.omnom.android.push.PushNotificationManager;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.config.Config;
+import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.socket.event.PaymentSocketEvent;
+import com.omnom.android.socket.listener.BaseEventListener;
+import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
+import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.StringUtils;
@@ -36,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Stack;
 
 import javax.inject.Inject;
 
@@ -87,6 +96,10 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	private Picasso _lazy_Picasso;
 
+	private BaseEventListener mPaymentListener;
+
+	private Stack<PaymentSocketEvent> mPaymentEvents;
+
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
 		                     new OmnomApplicationModule(),
@@ -120,6 +133,17 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		Fabric.with(this, new Crashlytics());
 		CalligraphyConfig.initDefault(OmnomFont.OSF_REGULAR.getPath(), R.attr.fontPath);
 		mixPanelHelper = new MixPanelHelper();
+		mPaymentEvents = new Stack<PaymentSocketEvent>();
+
+		final IntentFilter filter = new IntentFilter(Extras.ACTION_EVENT_PAYMENT);
+		filter.setPriority(IntentFilter.SYSTEM_LOW_PRIORITY + 1);
+
+		registerReceiver(new BroadcastReceiver() {
+			@Override
+			public void onReceive(final Context context, final Intent intent) {
+				mPaymentEvents.add((PaymentSocketEvent) intent.getParcelableExtra(Extras.EXTRA_PAYMENT_EVENT));
+			}
+		}, filter);
 
 		objectGraph = ObjectGraph.create(getModules().toArray());
 		for(final Object obj : injectList) {
@@ -254,5 +278,20 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		final int memoryClass = am.getMemoryClass();
 		// Target ~25% of the available heap.
 		return 1024 * 1024 * memoryClass / 4;
+	}
+
+	public void connectTableSocket(final TableDataResponse table) {
+		if(mPaymentListener != null) {
+			throw new IllegalArgumentException("Table socket already present");
+		}
+		mPaymentListener = new PaymentEventListener(this);
+		mPaymentListener.initTableSocket(table);
+	}
+
+	public void disconnectTableSocket() {
+		if(mPaymentListener != null && mPaymentListener.isConnected()) {
+			mPaymentListener.onPause();
+			mPaymentListener.onDestroy();
+		}
 	}
 }

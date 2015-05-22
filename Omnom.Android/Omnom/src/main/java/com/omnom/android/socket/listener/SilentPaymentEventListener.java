@@ -1,7 +1,8 @@
 package com.omnom.android.socket.listener;
 
+import android.content.Context;
+
 import com.omnom.android.socket.event.PaymentSocketEvent;
-import com.omnom.android.utils.activity.OmnomActivity;
 import com.squareup.otto.Subscribe;
 
 /**
@@ -17,14 +18,14 @@ public class SilentPaymentEventListener extends PaymentEventListener {
 
 	private PaymentListener mListener;
 
-	public SilentPaymentEventListener(final OmnomActivity activity, PaymentListener listener) {
-		super(activity);
+	public SilentPaymentEventListener(final Context context, PaymentListener listener) {
+		super(context);
 		mListener = listener;
 	}
 
 	@Subscribe
 	public void onPaymentEvent(final PaymentSocketEvent event) {
-		if (mListener != null) {
+		if(mListener != null) {
 			mListener.onPaymentEvent(event);
 		}
 	}

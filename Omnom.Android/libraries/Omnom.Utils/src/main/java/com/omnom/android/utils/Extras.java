@@ -90,4 +90,6 @@ public interface Extras extends Preferences {
 	public static final int REQUEST_CODE_WISH_LIST = 5002;
 	public static final int REQUEST_CODE_MENU_SUBCATEGORY = 5003;
 	public static final int REQUEST_CODE_HANDLE_THREE_DS = 5004;
+
+	public static final String ACTION_EVENT_PAYMENT = "com.saintlab.android.event.payment";
 }

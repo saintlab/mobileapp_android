@@ -1,11 +1,12 @@
 package com.omnom.android.socket.listener;
 
+import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.socket.OmnomSocketBase;
 import com.omnom.android.socket.OmnomSocketFactory;
-import com.omnom.android.utils.activity.OmnomActivity;
 
 import java.net.URISyntaxException;
 
@@ -16,17 +17,20 @@ public class BaseEventListener {
 
 	private static final String TAG = PaymentEventListener.class.getSimpleName();
 
-	protected final OmnomActivity mActivity;
+	protected final Context mActivity;
+
+	protected final Handler mHandler;
 
 	protected OmnomSocketBase mTableSocket;
 
-	public BaseEventListener(final OmnomActivity activity) {
-		mActivity = activity;
+	public BaseEventListener(final Context context) {
+		mActivity = context;
+		mHandler = new Handler();
 	}
 
 	public void initTableSocket(final String tableId) {
 		try {
-			mTableSocket = OmnomSocketFactory.initTable(mActivity.getActivity(), tableId);
+			mTableSocket = OmnomSocketFactory.initTable(mActivity, tableId);
 			mTableSocket.connect();
 			mTableSocket.subscribe(this);
 			mTableSocket.subscribe(mActivity);
@@ -38,7 +42,7 @@ public class BaseEventListener {
 	public void initTableSocket(final TableDataResponse table) {
 		if(table != null && table != TableDataResponse.NULL) {
 			try {
-				mTableSocket = OmnomSocketFactory.init(mActivity.getActivity(), table);
+				mTableSocket = OmnomSocketFactory.init(mActivity, table);
 				mTableSocket.connect();
 				mTableSocket.subscribe(this);
 				mTableSocket.subscribe(mActivity);
@@ -58,6 +62,10 @@ public class BaseEventListener {
 			mTableSocket.destroy();
 			mTableSocket = null;
 		}
+	}
+
+	public boolean isConnected() {
+		return mTableSocket != null && mTableSocket.isConnected();
 	}
 
 	public void onDestroy() {
