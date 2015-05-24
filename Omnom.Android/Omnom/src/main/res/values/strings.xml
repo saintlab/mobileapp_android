@@ -225,4 +225,5 @@
     <string name="barmen_tips_negative">+ Чай бармену :-(</string>
     <string name="unknown_user">Неизвестный пользователь</string>
     <string name="wish_result_item">%1$s x %2$s</string>
+    <string name="unable_to_process_transaction">Ну удалость провести транзакцию. URL=</string>
 </resources>

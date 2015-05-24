@@ -1,11 +1,12 @@
 package com.omnom.android.socket.listener;
 
+import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.socket.OmnomSocketBase;
 import com.omnom.android.socket.OmnomSocketFactory;
-import com.omnom.android.utils.activity.OmnomActivity;
 
 import java.net.URISyntaxException;
 
@@ -16,20 +17,23 @@ public class BaseEventListener {
 
 	private static final String TAG = PaymentEventListener.class.getSimpleName();
 
-	protected final OmnomActivity mActivity;
+	protected final Context mContext;
+
+	protected final Handler mHandler;
 
 	protected OmnomSocketBase mTableSocket;
 
-	public BaseEventListener(final OmnomActivity activity) {
-		mActivity = activity;
+	public BaseEventListener(final Context context) {
+		mContext = context;
+		mHandler = new Handler();
 	}
 
 	public void initTableSocket(final String tableId) {
 		try {
-			mTableSocket = OmnomSocketFactory.initTable(mActivity.getActivity(), tableId);
+			mTableSocket = OmnomSocketFactory.initTable(mContext, tableId);
 			mTableSocket.connect();
 			mTableSocket.subscribe(this);
-			mTableSocket.subscribe(mActivity);
+			mTableSocket.subscribe(mContext);
 		} catch(URISyntaxException e) {
 			Log.e(TAG, "Unable to initiate socket connection");
 		}
@@ -38,26 +42,30 @@ public class BaseEventListener {
 	public void initTableSocket(final TableDataResponse table) {
 		if(table != null && table != TableDataResponse.NULL) {
 			try {
-				mTableSocket = OmnomSocketFactory.init(mActivity.getActivity(), table);
+				mTableSocket = OmnomSocketFactory.init(mContext, table);
 				mTableSocket.connect();
 				mTableSocket.subscribe(this);
-				mTableSocket.subscribe(mActivity);
+				mTableSocket.subscribe(mContext);
 			} catch(URISyntaxException e) {
 				Log.e(TAG, "Unable to initiate socket connection");
 			}
 		} else {
-			Log.d(TAG, "unable to init websocket for table = " + table);
+			Log.d(TAG, "unable to connect websocket for table = " + table);
 		}
 	}
 
 	public void onPause() {
 		if(mTableSocket != null) {
 			mTableSocket.unsubscribe(this);
-			mTableSocket.unsubscribe(mActivity);
+			mTableSocket.unsubscribe(mContext);
 			mTableSocket.disconnect();
 			mTableSocket.destroy();
 			mTableSocket = null;
 		}
+	}
+
+	public boolean isConnected() {
+		return mTableSocket != null && mTableSocket.isConnected();
 	}
 
 	public void onDestroy() {

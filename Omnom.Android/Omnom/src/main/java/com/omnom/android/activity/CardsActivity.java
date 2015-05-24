@@ -41,7 +41,6 @@ import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
-import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -181,8 +180,6 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 
 	private String mTableId;
 
-	private PaymentEventListener mPaymentListener;
-
 	private boolean isPaymentRequest = true;
 
 	@Nullable
@@ -245,10 +242,6 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 					onAdd();
 				}
 			});
-		}
-
-		if(!TextUtils.isEmpty(mTableId)) {
-			mPaymentListener = new PaymentEventListener(this);
 		}
 
 		if(mDetails != null && mBtnPay != null) {
@@ -562,14 +555,6 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 		}
 	}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		if(mPaymentListener != null) {
-			mPaymentListener.onPause();
-		}
-	}
-
 	public void onAdd() {
 		int type = CardAddActivity.TYPE_BIND;
 		if(mDetails != null) {
@@ -580,19 +565,8 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		if(mPaymentListener != null) {
-			mPaymentListener.onPause();
-		}
-	}
-
-	@Override
 	protected void onResume() {
 		super.onResume();
 		loadCards();
-		if(mPaymentListener != null) {
-			mPaymentListener.initTableSocket(mTableId);
-		}
 	}
 }

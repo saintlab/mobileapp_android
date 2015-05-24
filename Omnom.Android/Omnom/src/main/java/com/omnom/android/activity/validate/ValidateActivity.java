@@ -1,7 +1,9 @@
 package com.omnom.android.activity.validate;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -34,6 +36,7 @@ import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.activity.ValidateActivityShortcut;
 import com.omnom.android.activity.WishActivity;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.helper.OmnomActivityHelper;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
@@ -70,7 +73,8 @@ import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.service.configuration.ConfigurationResponse;
 import com.omnom.android.service.configuration.ConfigurationService;
-import com.omnom.android.socket.listener.PaymentEventListener;
+import com.omnom.android.socket.ActivityPaymentBroadcastReceiver;
+import com.omnom.android.socket.PaymentEventIntentFilter;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
@@ -104,6 +108,7 @@ import javax.inject.Inject;
 import butterknife.OnClick;
 import retrofit.RetrofitError;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -331,6 +336,8 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}
 	};
 
+	private BroadcastReceiver mPaymentReceiver;
+
 	/**
 	 * ConfirmPhoneActivity.TYPE_LOGIN or ConfirmPhoneActivity.TYPE_REGISTER
 	 */
@@ -389,8 +396,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}
 	};
 
-	private PaymentEventListener mPaymentListener;
-
 	private ConfigurationService configurationService;
 
 	private View.OnClickListener loadConfigsErrorListener = new View.OnClickListener() {
@@ -399,6 +404,10 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 			loadConfigs();
 		}
 	};
+
+	private Subscription mPaymentEventsSubscription;
+
+	private PaymentEventIntentFilter mPaymentFilter;
 
 	protected OmnomErrorHelper getErrorHelper() {return mViewHelper.getErrorHelper();}
 
@@ -409,6 +418,9 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mViewHelper = new ValidateViewHelper(this);
 		configurationService = new ConfigurationService(getApplicationContext(), authenticator, configApi, mAcquiring,
 		                                                getApp().getAuthToken());
+
+		mPaymentReceiver = new ActivityPaymentBroadcastReceiver(this);
+		mPaymentFilter = new PaymentEventIntentFilter(IntentFilter.SYSTEM_HIGH_PRIORITY - 1);
 	}
 
 	@Override
@@ -473,18 +485,40 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		registerReceiver(mPaymentReceiver, mPaymentFilter);
+		mPaymentEventsSubscription = OmnomActivityHelper.processPaymentEvents(getActivity());
+
+		//		List<PaymentSocketEvent> events = getApp().getPaymentEvents();
+		//		if(!events.isEmpty()) {
+		//			mPaymentEventsSubscription = Observable.from(events).buffer(5, TimeUnit.SECONDS, 1, AndroidSchedulers.mainThread())
+		// .subscribe(
+		//					new Action1<List<PaymentSocketEvent>>() {
+		//						@Override
+		//						public void call(final List<PaymentSocketEvent> paymentSocketEvents) {
+		//							if(!paymentSocketEvents.isEmpty()) {
+		//								CroutonHelper.showPaymentNotification(getActivity(), paymentSocketEvents.get(0).getPaymentData());
+		//							}
+		//						}
+		//					}, onError, new Action0() {
+		//						@Override
+		//						public void call() {
+		//							getApp().clearPaymentEvents();
+		//						}
+		//					});
+		//		}
+
 		mOrderHelper.updateWishUi();
 		mViewHelper.onResume();
-
-		if(mPaymentListener != null) {
-			mPaymentListener.initTableSocket(mTable);
-		}
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mPaymentListener.onPause();
+
+		unregisterReceiver(mPaymentReceiver);
+		unsubscribe(mPaymentEventsSubscription);
+
 		if(mRestaurant == null) {
 			mViewHelper.onPause();
 		}
@@ -506,11 +540,11 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		getApp().disconnectTableSocket();
 		configurationService.onDestroy();
 		mOrderHelper = null;
 		mViewHelper.onDestroy();
 		mViewHelper = null;
-		mPaymentListener.onDestroy();
 	}
 
 	@Override
@@ -559,7 +593,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mViewHelper.init();
 		mOrderHelper = new ValidateOrderHelper(this, mViewHelper);
 
-		mPaymentListener = new PaymentEventListener(this);
 		bgTransitionDrawable = new com.omnom.android.utils.drawable.TransitionDrawable(
 				getResources().getInteger(R.integer.default_animation_duration_short),
 				new Drawable[]{new ColorDrawable(getResources().getColor(R.color.transparent)),
@@ -672,9 +705,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		if(mAcquiring instanceof AcquiringMailRu) {
 			((AcquiringMailRu) mAcquiring).changeEndpoint(config.getAcquiringData().getBaseUrl());
 		}
-		if(!TextUtils.isEmpty(app.getAuthToken())) {
-			mPushManager.register();
-		}
+		mPushManager.register();
 		getMixPanelHelper().addApi(OMNOM, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
 		getMixPanelHelper().addApi(OMNOM_ANDROID, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));
 	}
@@ -707,7 +738,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				}
 			});
 		}
-		mPaymentListener.initTableSocket(mTable);
 		mFirstRun = false;
 	}
 
@@ -904,11 +934,12 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mRestaurant = restaurant;
 		mTable = table;
 
+		getApp().connectTableSocket(table);
+
 		ensureEntranceData(entranceData, mRestaurant);
 		mViewHelper.setEntranceData(mEntranceData);
 		bindMenuData();
 
-		mPaymentListener.initTableSocket(mTable);
 		onNewGuest(mTable);
 		animateRestaurantBackground(restaurant);
 		mViewHelper.onDataLoaded(restaurant, table, forwardToBill, mIsDemo, requestId);

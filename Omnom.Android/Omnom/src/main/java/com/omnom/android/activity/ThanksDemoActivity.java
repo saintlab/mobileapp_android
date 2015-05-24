@@ -7,6 +7,7 @@ import com.omnom.android.R;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.socket.event.PaymentSocketEvent;
+import com.omnom.android.utils.CroutonHelper;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.utils.AmountHelper;
 
@@ -50,7 +51,10 @@ public class ThanksDemoActivity extends ThanksActivity {
 				@Override
 				public void run() {
 					final UserData user = getApp().getUserProfile().getUser();
-					mPaymentListener.onPaymentEvent(PaymentSocketEvent.createDemoEvent(user, mAmount, (int) AmountHelper.toDouble(mTips)));
+					final PaymentSocketEvent demoEvent = PaymentSocketEvent.createDemoEvent(user,
+					                                                                        mAmount,
+					                                                                        (int) AmountHelper.toDouble(mTips));
+					CroutonHelper.showPaymentNotification(getActivity(), demoEvent.getPaymentData());
 					mFirstRun = false;
 				}
 			});

@@ -13,7 +13,7 @@ import com.omnom.android.utils.utils.AmountHelper;
  * Created by Ch3D on 26.11.2014.
  */
 public class PaymentSocketEvent extends BaseSocketEvent implements Parcelable {
-	public static final Creator<PaymentSocketEvent> CREATOR = new Creator<PaymentSocketEvent>() {
+	public static final Parcelable.Creator<PaymentSocketEvent> CREATOR = new Parcelable.Creator<PaymentSocketEvent>() {
 
 		@Override
 		public PaymentSocketEvent createFromParcel(Parcel in) {
@@ -56,5 +56,10 @@ public class PaymentSocketEvent extends BaseSocketEvent implements Parcelable {
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
 		dest.writeParcelable(mPaymentData, flags);
+	}
+
+	@Override
+	public String getType() {
+		return SocketEvent.EVENT_PAYMENT;
 	}
 }
