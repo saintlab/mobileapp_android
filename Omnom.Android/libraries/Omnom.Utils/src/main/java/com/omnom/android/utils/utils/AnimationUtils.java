@@ -183,6 +183,11 @@ public class AnimationUtils {
 							    ViewUtils.setVisibleGone(view, false);
 						    }
 					    }
+
+					    @Override
+					    public void onAnimationCancel(final Animator animation) {
+						    ViewUtils.setVisibleGone(view, visible);
+					    }
 				    }).alpha(visible ? 1 : 0).start();
 	}
 

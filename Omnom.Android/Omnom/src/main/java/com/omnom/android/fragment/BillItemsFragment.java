@@ -136,4 +136,14 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 			AnimationUtils.animateAlphaGone(btnCommit, false);
 		}
 	}
+
+	@Override
+	public void onOrderUpdate(final Order order) {
+		if(mAdapter != null) {
+			mAdapter.clearSelection();
+			mAdapter = new OrderItemsAdapter(getActivity(), order.getItems(), mStates, false);
+			setListAdapter(mAdapter);
+			updateAmount();
+		}
+	}
 }

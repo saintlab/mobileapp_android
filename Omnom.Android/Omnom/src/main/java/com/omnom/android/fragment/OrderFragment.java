@@ -596,6 +596,12 @@ public class OrderFragment extends Fragment {
 			updatePaymentTipsAmount(amount, tipsButtons);
 		}
 		updateOverallAmount(mFooterView1);
+
+		// update split fragment if it is present
+		final BillSplitFragment splitFragment = (BillSplitFragment) getFragmentManager().findFragmentByTag(BillSplitFragment.TAG);
+		if(splitFragment != null) {
+			splitFragment.onOrderUpdate(order);
+		}
 	}
 
 	private boolean isEverythingPaid(final Order order) {

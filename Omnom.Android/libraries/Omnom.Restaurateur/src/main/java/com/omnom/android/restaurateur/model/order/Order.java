@@ -2,6 +2,7 @@ package com.omnom.android.restaurateur.model.order;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
 import com.omnom.android.utils.utils.AmountHelper;
@@ -80,6 +81,7 @@ public class Order implements Parcelable {
 	@Expose
 	private OrderTips tips;
 
+	@Nullable
 	@Expose
 	private OrderPaid paid;
 
@@ -334,7 +336,7 @@ public class Order implements Parcelable {
 	}
 
 	public double getPaidTip() {
-		return AmountHelper.toDouble(paid.getTip());
+		return paid != null ? AmountHelper.toDouble(paid.getTip()) : 0;
 	}
 
 }

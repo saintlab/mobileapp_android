@@ -99,6 +99,8 @@ public class BillSplitFragment extends Fragment {
 
 	private int mListHeight;
 
+	private BillSplitPagerAdapter mAdapter;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
@@ -170,12 +172,12 @@ public class BillSplitFragment extends Fragment {
 			}
 		});
 
-		final BillSplitPagerAdapter adapter = new BillSplitPagerAdapter(getChildFragmentManager(), mOrder, mStates, mGuestsCount);
-		mPager.setAdapter(adapter);
+		mAdapter = new BillSplitPagerAdapter(getChildFragmentManager(), mOrder, mStates, mGuestsCount);
+		mPager.setAdapter(mAdapter);
 		mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageScrolled(final int i, final float v, final int i2) {
-				final Fragment currentFragment = adapter.getCurrentFragment();
+				final Fragment currentFragment = mAdapter.getCurrentFragment(i);
 				if(currentFragment instanceof SplitFragment) {
 					final SplitFragment f = (SplitFragment) currentFragment;
 					f.updateAmount();
@@ -184,7 +186,7 @@ public class BillSplitFragment extends Fragment {
 
 			@Override
 			public void onPageSelected(final int i) {
-				final Fragment currentFragment = adapter.getCurrentFragment();
+				final Fragment currentFragment = mAdapter.getCurrentFragment(i);
 				if(currentFragment instanceof SplitFragment) {
 					final SplitFragment f = (SplitFragment) currentFragment;
 					f.updateAmount();
@@ -193,11 +195,7 @@ public class BillSplitFragment extends Fragment {
 
 			@Override
 			public void onPageScrollStateChanged(final int i) {
-				final Fragment currentFragment = adapter.getCurrentFragment();
-				if(currentFragment instanceof SplitFragment) {
-					final SplitFragment f = (SplitFragment) currentFragment;
-					f.updateAmount();
-				}
+				// Do nothing
 			}
 		});
 		mPager.setCurrentItem(2 - mType);
@@ -255,6 +253,18 @@ public class BillSplitFragment extends Fragment {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mStates = getArguments().getParcelable(ARG_STATES);
 			mGuestsCount = getArguments().getInt(ARG_GUESTS, 1);
+		}
+	}
+
+	public void onOrderUpdate(final Order order) {
+		mOrder = order;
+		final Fragment item1 = mAdapter.getCurrentFragment(0);
+		if(item1 instanceof SplitFragment && !item1.isDetached() && !item1.isHidden()) {
+			((SplitFragment) item1).onOrderUpdate(order);
+		}
+		final Fragment item2 = mAdapter.getCurrentFragment(1);
+		if(item2 instanceof SplitFragment && !item2.isDetached() && !item2.isHidden()) {
+			((SplitFragment) item2).onOrderUpdate(order);
 		}
 	}
 }

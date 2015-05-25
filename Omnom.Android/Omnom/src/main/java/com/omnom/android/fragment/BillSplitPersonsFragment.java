@@ -71,8 +71,6 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 		mPicker.setOnValueChangedListener(this);
 		mPicker.setValue(mGuestsCount);
 		mPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-		// onValueChanged(1);
-		// updateAmount();
 	}
 
 	@Override
@@ -115,5 +113,11 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 		btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_PERSON);
 		btnCommit.setClickable(true);
 		AnimationUtils.animateAlphaGone(btnCommit, true);
+	}
+
+	@Override
+	public void onOrderUpdate(final Order order) {
+		mOrder = order;
+		updateAmount();
 	}
 }

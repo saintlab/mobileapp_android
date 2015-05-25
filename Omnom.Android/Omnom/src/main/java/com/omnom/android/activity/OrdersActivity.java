@@ -263,7 +263,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 		registerReceiver(mPaymentReceiver, mPaymentFilter);
 		registerReceiver(mOrderEventReceiver, mOrderEventsFilter);
 		mPaymentEventsSubscription = OmnomActivityHelper.processPaymentEvents(getActivity());
-		
+
 		OmnomActivityHelper.processPaymentEvents(getActivity());
 	}
 
