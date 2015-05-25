@@ -36,7 +36,6 @@ import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.OrdersViewPager;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
-import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,11 +126,6 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 		mOrderEventsFilter = new OrderEventIntentFilter();
 	}
 
-	@Subscribe
-	public void onPayment(final PaymentSocketEvent event) {
-		updateOrder(event.getPaymentData().getOrder());
-	}
-
 	@Override
 	public void onOrderCreateEvent(final OrderCreateSocketEvent event) {
 		if(orders != null) {
@@ -153,12 +147,12 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 	@Override
 	public void onOrderPaymentEvent(final PaymentSocketEvent event) {
 		final Order order = event.getPaymentData().getOrder();
-		updateOrder(order);
+		updateOrder(order, true);
 	}
 
 	@Override
 	public void onOrderUpdateEvent(final OrderUpdateSocketEvent event) {
-		updateOrder(event.getOrder());
+		updateOrder(event.getOrder(), false);
 	}
 
 	@Override
@@ -181,7 +175,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 		}
 	}
 
-	private void updateOrder(final Order order) {
+	private void updateOrder(final Order order, final boolean skipDialog) {
 		final int position = replaceOrder(orders, order);
 		if(order != null && position >= 0 && mPagerAdapter != null) {
 			getActivity().runOnUiThread(new Runnable() {
@@ -190,7 +184,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 					mPagerAdapter.updateOrders(orders);
 					final Fragment currentFragment = findFragmentByPosition(position);
 					if(currentFragment != null) {
-						((OrderFragment) currentFragment).onOrderUpdate(order);
+						((OrderFragment) currentFragment).onOrderUpdate(order, skipDialog);
 					}
 				}
 			});

@@ -568,9 +568,9 @@ public class OrderFragment extends Fragment {
 		}
 	}
 
-	public void onOrderUpdate(final Order order) {
+	public void onOrderUpdate(final Order order, final boolean skipDialog) {
 		if(order != null && order.getId().equals(getOrder().getId())) {
-			if(!isDownscaled()) {
+			if(!isDownscaled() && !skipDialog) {
 				mLastAmount = new BigDecimal(order.getAmountToPay());
 				DialogUtils.showDialog(getActivity(), R.string.order_updated, R.string.update,
 				                       new DialogInterface.OnClickListener() {
