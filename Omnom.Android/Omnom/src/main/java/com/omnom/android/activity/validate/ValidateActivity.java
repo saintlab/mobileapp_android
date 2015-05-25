@@ -894,6 +894,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	public void onProfile(View v) {
 		final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
 		final String tableId = mTable != null ? mTable.getId() : null;
+		mViewHelper.onProfile();
 		UserProfileActivity.startSliding(this, tableNumber, tableId);
 	}
 

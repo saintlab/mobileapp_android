@@ -1,13 +1,17 @@
 package com.omnom.android.activity.validate;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.graphics.Color;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
@@ -55,6 +59,8 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	private static final String TAG_SEARCH_FRAGMENT = "search_fragment";
 
 	private final ValidateActivity mActivity;
+
+	private final Handler mHandler;
 
 	@InjectView(R.id.loader)
 	protected LoaderView loader;
@@ -119,9 +125,12 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	private OmnomErrorHelper mErrorHelper;
 
+	private TableDataResponse mTable;
+
 	public ValidateViewHelper(ValidateActivity activity) {
 		mActivity = activity;
 		ButterKnife.inject(this, activity);
+		mHandler = new Handler();
 	}
 
 	public void onResume() {
@@ -245,6 +254,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 					AnimationUtils.animateAlphaGone(imgProfile, false);
 					AnimationUtils.animateAlphaGone(imgPrevious, false);
 					AnimationUtils.animateAlphaGone(txtBar, false);
+					AnimationUtils.animateAlphaGone(txtTable, false);
 					loader.hideLogo();
 				} else {
 					AnimationUtils.animateAlphaGone(imgProfile, true);
@@ -329,9 +339,70 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	private void updateProfile(final int backgroundResource, final boolean visible) {
 		imgProfile.setImageResource(backgroundResource);
 		ViewUtils.setVisibleGone(imgProfile, visible);
+		if(mTable != null) {
+			final boolean isTable = mEntranceData.getType() == EntranceData.TYPE_TABLE;
+			if(isTable) {
+				txtTable.setText(String.valueOf(mTable.getInternalId()));
+				if(visible && !ViewUtils.isVisible(txtTable)) {
+					if(txtTable.getTranslationX() == 0) {
+						ViewUtils.setVisibleGone(imgProfile, true);
+					}
+					animateTable();
+				} else {
+					ViewUtils.setVisibleGone(txtTable, visible);
+				}
+			} else {
+				ViewUtils.setVisibleGone(txtTable, false);
+			}
+		} else {
+			ViewUtils.setVisibleGone(txtTable, false);
+			imgProfile.setImageResource(backgroundResource);
+			ViewUtils.setVisibleGone(imgProfile, visible);
+		}
+	}
+
+	private void animateTable() {
+		final ViewTreeObserver viewTreeObserver = imgProfile.getViewTreeObserver();
+		if(viewTreeObserver.isAlive()) {
+			viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+				@Override
+				public void onGlobalLayout() {
+					AndroidUtils.removeOnGlobalLayoutListener(imgProfile, this);
+					final int animationDuration = mActivity.getResources().getInteger(R.integer.default_animation_duration_long);
+					AnimationUtils.animateAlpha(txtTable, true, new Runnable() {
+						@Override
+						public void run() {
+							final int translation = (imgProfile.getLeft() - txtTable.getLeft()) -
+									(txtTable.getWidth() - imgProfile.getWidth());
+							txtTable.animate()
+							        .translationX(translation)
+							        .setDuration(animationDuration)
+							        .setListener(new AnimatorListenerAdapter() {
+								        @Override
+								        public void onAnimationEnd(final Animator animation) {
+									        mHandler.postDelayed(new Runnable() {
+										        @Override
+										        public void run() {
+											        final boolean isMenuExpanded =
+													        slidingPanel.getPanelState() != SlidingUpPanelLayout.PanelState.DRAGGING;
+											        AnimationUtils.animateAlphaSkipTag(imgProfile, !isMenuExpanded, null,
+											                                           animationDuration);
+											        AnimationUtils.animateAlphaSkipTag(txtTable, false, null, animationDuration);
+										        }
+									        }, animationDuration);
+								        }
+							        })
+							        .start();
+							AnimationUtils.animateAlphaSkipTag(imgProfile, false, null, animationDuration);
+						}
+					}, animationDuration);
+				}
+			});
+		}
 	}
 
 	protected void hideProfile() {
+		ViewUtils.setVisibleGone(txtTable, false);
 		ViewUtils.setVisibleGone(imgProfile, false);
 	}
 
@@ -480,6 +551,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	public void onDataLoaded(final Restaurant restaurant, final TableDataResponse table,
 	                         final boolean forwardToBill, final boolean
 			                         mIsDemo, final String requestId) {
+		mTable = table;
 		animateRestaurantLogo(restaurant);
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
@@ -600,5 +672,9 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	public void setEntranceData(final EntranceData entranceData) {
 		mEntranceData = entranceData;
+	}
+
+	public void onProfile() {
+		AnimationUtils.animateAlpha(txtTable, false);
 	}
 }
