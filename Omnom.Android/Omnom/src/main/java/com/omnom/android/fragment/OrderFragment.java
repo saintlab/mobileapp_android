@@ -571,6 +571,7 @@ public class OrderFragment extends Fragment {
 	public void onOrderUpdate(final Order order) {
 		if(order != null && order.getId().equals(getOrder().getId())) {
 			if(!isDownscaled()) {
+				mLastAmount = new BigDecimal(order.getAmountToPay());
 				DialogUtils.showDialog(getActivity(), R.string.order_updated, R.string.update,
 				                       new DialogInterface.OnClickListener() {
 					                       @Override
@@ -985,7 +986,7 @@ public class OrderFragment extends Fragment {
 	private void updateAmount(final String amount) {
 		final boolean isEverythingPaid = isEverythingPaid(getOrder());
 		list.setSwipeEnabled(!isEverythingPaid);
-		ViewUtils.setVisibleInvisible(btnEdit, !isEverythingPaid);
+		ViewUtils.setVisibleInvisible(btnEdit, !isEverythingPaid && mMode != MODE_AMOUNT);
 		ViewUtils.setVisibleGone(txtPaymentTitle, !isEverythingPaid);
 		editAmount.setFocusable(!isEverythingPaid);
 		final float density = getResources().getDisplayMetrics().density;
