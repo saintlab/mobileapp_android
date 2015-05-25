@@ -14,10 +14,22 @@ import com.omnom.android.utils.Extras;
  */
 public class ActivityPaymentBroadcastReceiver extends BroadcastReceiver {
 
+	public interface PaymentListener {
+
+		void onOrderPaymentEvent(PaymentSocketEvent event);
+	}
+
 	private final Activity mActivity;
 
-	public ActivityPaymentBroadcastReceiver(Activity activity) {
+	private final PaymentListener mListener;
+
+	public ActivityPaymentBroadcastReceiver(Activity activity, PaymentListener listener) {
 		mActivity = activity;
+		mListener = listener;
+	}
+
+	public ActivityPaymentBroadcastReceiver(Activity activity) {
+		this(activity, null);
 	}
 
 	@Override
@@ -25,5 +37,8 @@ public class ActivityPaymentBroadcastReceiver extends BroadcastReceiver {
 		final PaymentSocketEvent paymentSocketEvent = intent.getParcelableExtra(Extras.EXTRA_PAYMENT_EVENT);
 		CroutonHelper.showPaymentNotification(mActivity, paymentSocketEvent.getPaymentData());
 		abortBroadcast();
+		if(mListener != null) {
+			mListener.onOrderPaymentEvent(paymentSocketEvent);
+		}
 	}
 }

@@ -81,10 +81,7 @@ public class Order implements Parcelable {
 	private OrderTips tips;
 
 	@Expose
-	private int paidAmount;
-
-	@Expose
-	private int paidTip;
+	private OrderPaid paid;
 
 	private Order() {
 
@@ -107,8 +104,15 @@ public class Order implements Parcelable {
 		isClosed = parcel.readInt() == 1;
 		id = parcel.readString();
 		tips = parcel.readParcelable(OrderTips.class.getClassLoader());
-		paidAmount = parcel.readInt();
-		paidTip = parcel.readInt();
+		paid = parcel.readParcelable(OrderPaid.class.getClassLoader());
+	}
+
+	public OrderPaid getPaid() {
+		return paid;
+	}
+
+	public void setPaid(final OrderPaid paid) {
+		this.paid = paid;
 	}
 
 	@Override
@@ -129,8 +133,7 @@ public class Order implements Parcelable {
 		parcel.writeInt(isClosed ? 1 : 0);
 		parcel.writeString(id);
 		parcel.writeParcelable(tips, flags);
-		parcel.writeInt(paidAmount);
-		parcel.writeInt(paidTip);
+		parcel.writeParcelable(paid, flags);
 	}
 
 	public int getGuests() {
@@ -262,11 +265,10 @@ public class Order implements Parcelable {
 	}
 
 	public double getPaidAmount() {
-		return AmountHelper.toDouble(paidAmount - paidTip);
-	}
-
-	public void setPaidAmount(int paidAmount) {
-		this.paidAmount = paidAmount;
+		if(paid == null) {
+			return 0;
+		}
+		return AmountHelper.toDouble(paid.getAmount());
 	}
 
 	@Override
@@ -332,10 +334,7 @@ public class Order implements Parcelable {
 	}
 
 	public double getPaidTip() {
-		return AmountHelper.toDouble(paidTip);
+		return AmountHelper.toDouble(paid.getTip());
 	}
 
-	public void setPaidTip(int paidTip) {
-		this.paidTip = paidTip;
-	}
 }

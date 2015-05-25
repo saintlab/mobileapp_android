@@ -590,7 +590,7 @@ public class OrderFragment extends Fragment {
 		mAdapter.updateItems(mOrder.getItems());
 		AndroidUtils.scrollEnd(list);
 		initAlreadyPaid();
-		if(!isAmountModified && editAmount != null) {
+		if(editAmount != null) {
 			updateAmount(AmountHelper.format(order.getAmountToPay()) + getCurrencySuffix());
 			final BigDecimal amount = getEnteredAmount();
 			updatePaymentTipsAmount(amount, tipsButtons);

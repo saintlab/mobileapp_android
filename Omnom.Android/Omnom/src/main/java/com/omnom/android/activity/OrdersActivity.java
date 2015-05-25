@@ -43,8 +43,10 @@ import java.util.List;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.Subscription;
 
-public class OrdersActivity extends BaseOmnomFragmentActivity implements OrderEventBroadcastReceiver.Listener {
+public class OrdersActivity extends BaseOmnomFragmentActivity
+		implements OrderEventBroadcastReceiver.Listener, ActivityPaymentBroadcastReceiver.PaymentListener {
 
 	public static final int REQUEST_CODE_CARDS = 100;
 
@@ -114,10 +116,12 @@ public class OrdersActivity extends BaseOmnomFragmentActivity implements OrderEv
 
 	private OrderEventIntentFilter mOrderEventsFilter;
 
+	private Subscription mPaymentEventsSubscription;
+
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mPaymentReceiver = new ActivityPaymentBroadcastReceiver(this);
+		mPaymentReceiver = new ActivityPaymentBroadcastReceiver(this, this);
 		mOrderEventReceiver = new OrderEventBroadcastReceiver(this);
 		mPaymentFilter = new PaymentEventIntentFilter(IntentFilter.SYSTEM_HIGH_PRIORITY - 1);
 		mOrderEventsFilter = new OrderEventIntentFilter();
@@ -144,6 +148,12 @@ public class OrdersActivity extends BaseOmnomFragmentActivity implements OrderEv
 				}
 			});
 		}
+	}
+
+	@Override
+	public void onOrderPaymentEvent(final PaymentSocketEvent event) {
+		final Order order = event.getPaymentData().getOrder();
+		updateOrder(order);
 	}
 
 	@Override
@@ -252,6 +262,8 @@ public class OrdersActivity extends BaseOmnomFragmentActivity implements OrderEv
 
 		registerReceiver(mPaymentReceiver, mPaymentFilter);
 		registerReceiver(mOrderEventReceiver, mOrderEventsFilter);
+		mPaymentEventsSubscription = OmnomActivityHelper.processPaymentEvents(getActivity());
+		
 		OmnomActivityHelper.processPaymentEvents(getActivity());
 	}
 
@@ -260,13 +272,8 @@ public class OrdersActivity extends BaseOmnomFragmentActivity implements OrderEv
 		super.onPause();
 		unregisterReceiver(mPaymentReceiver);
 		unregisterReceiver(mOrderEventReceiver);
-		// listenersSet.onPause();
-	}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		// listenersSet.onDestroy();
+		unsubscribe(mPaymentEventsSubscription);
 	}
 
 	@Override

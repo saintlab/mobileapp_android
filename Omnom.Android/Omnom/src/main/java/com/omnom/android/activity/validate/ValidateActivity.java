@@ -488,26 +488,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 		registerReceiver(mPaymentReceiver, mPaymentFilter);
 		mPaymentEventsSubscription = OmnomActivityHelper.processPaymentEvents(getActivity());
-
-		//		List<PaymentSocketEvent> events = getApp().getPaymentEvents();
-		//		if(!events.isEmpty()) {
-		//			mPaymentEventsSubscription = Observable.from(events).buffer(5, TimeUnit.SECONDS, 1, AndroidSchedulers.mainThread())
-		// .subscribe(
-		//					new Action1<List<PaymentSocketEvent>>() {
-		//						@Override
-		//						public void call(final List<PaymentSocketEvent> paymentSocketEvents) {
-		//							if(!paymentSocketEvents.isEmpty()) {
-		//								CroutonHelper.showPaymentNotification(getActivity(), paymentSocketEvents.get(0).getPaymentData());
-		//							}
-		//						}
-		//					}, onError, new Action0() {
-		//						@Override
-		//						public void call() {
-		//							getApp().clearPaymentEvents();
-		//						}
-		//					});
-		//		}
-
 		mOrderHelper.updateWishUi();
 		mViewHelper.onResume();
 	}

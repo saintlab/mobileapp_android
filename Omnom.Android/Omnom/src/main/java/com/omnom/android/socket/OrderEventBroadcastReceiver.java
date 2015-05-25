@@ -7,6 +7,7 @@ import android.content.Intent;
 import com.omnom.android.socket.event.OrderCloseSocketEvent;
 import com.omnom.android.socket.event.OrderCreateSocketEvent;
 import com.omnom.android.socket.event.OrderUpdateSocketEvent;
+import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.utils.Extras;
 
 /**
@@ -20,6 +21,8 @@ public class OrderEventBroadcastReceiver extends BroadcastReceiver {
 		void onOrderUpdateEvent(final OrderUpdateSocketEvent event);
 
 		void onOrderCloseEvent(final OrderCloseSocketEvent event);
+
+		void onOrderPaymentEvent(final PaymentSocketEvent event);
 	}
 
 	private final Listener mListener;
@@ -36,10 +39,12 @@ public class OrderEventBroadcastReceiver extends BroadcastReceiver {
 		} else if(Extras.ACTION_EVENT_ORDER_CREATE.equals(intent.getAction())) {
 			final OrderCreateSocketEvent parcelableExtra = intent.getParcelableExtra(Extras.ACTION_EVENT_ORDER_CREATE);
 			mListener.onOrderCreateEvent(parcelableExtra);
-
 		} else if(Extras.ACTION_EVENT_ORDER_UPDATE.equals(intent.getAction())) {
 			final OrderUpdateSocketEvent parcelableExtra = intent.getParcelableExtra(Extras.ACTION_EVENT_ORDER_UPDATE);
 			mListener.onOrderUpdateEvent(parcelableExtra);
+		} else if(Extras.ACTION_EVENT_PAYMENT.equals(intent.getAction())) {
+			final PaymentSocketEvent parcelableExtra = intent.getParcelableExtra(Extras.ACTION_EVENT_PAYMENT);
+			mListener.onOrderPaymentEvent(parcelableExtra);
 		}
 	}
 }
