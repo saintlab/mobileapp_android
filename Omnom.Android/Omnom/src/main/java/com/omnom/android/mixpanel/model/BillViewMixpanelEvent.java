@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.restaurateur.model.order.Order;
-import com.omnom.android.utils.utils.AmountHelper;
 
 /**
  * Created by mvpotter on 21/11/14.
@@ -15,15 +14,15 @@ public final class BillViewMixpanelEvent extends AbstractBaseMixpanelEvent {
 	private String requestId;
 
 	@Expose
-	private int amount;
+	private double amount;
 
 	@Expose
 	@SerializedName("paid_amount")
-	private int paidAmount;
+	private double paidAmount;
 
 	@Expose
 	@SerializedName("paid_tip_amount")
-	private int paidTipAmount;
+	private double paidTipAmount;
 
 	@Expose
 	@SerializedName("order_id")
@@ -41,9 +40,9 @@ public final class BillViewMixpanelEvent extends AbstractBaseMixpanelEvent {
 		super(userData);
 		this.requestId = requestId;
 		if(order != null) {
-			this.amount = AmountHelper.toInt(order.getTotalAmount());
-			this.paidAmount = AmountHelper.toInt(order.getPaidAmount());
-			this.paidTipAmount = AmountHelper.toInt(order.getPaidTip());
+			this.amount = order.getTotalAmount();
+			this.paidAmount = order.getPaidAmount();
+			this.paidTipAmount = order.getPaidTip();
 			this.orderId = order.getId();
 			this.restaurantId = order.getRestaurantId();
 			this.tableId = order.getTableId();
@@ -59,15 +58,15 @@ public final class BillViewMixpanelEvent extends AbstractBaseMixpanelEvent {
 		return requestId;
 	}
 
-	public int getAmount() {
+	public double getAmount() {
 		return amount;
 	}
 
-	public int getPaidAmount() {
+	public double getPaidAmount() {
 		return paidAmount;
 	}
 
-	public int getPaidTipAmount() {
+	public double getPaidTipAmount() {
 		return paidTipAmount;
 	}
 

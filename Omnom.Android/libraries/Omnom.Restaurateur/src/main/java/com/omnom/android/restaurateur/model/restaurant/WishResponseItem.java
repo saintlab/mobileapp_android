@@ -3,6 +3,8 @@ package com.omnom.android.restaurateur.model.restaurant;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 import com.omnom.android.utils.generation.AutoGson;
 
 import auto.parcel.AutoParcel;
@@ -21,6 +23,10 @@ public abstract class WishResponseItem implements Parcelable {
 
 	@Nullable
 	public abstract double pricePerItem();
+
+	public Money pricePerItem(Currency currency) {
+		return Money.createFractional(pricePerItem(), currency);
+	}
 
 	@Nullable
 	public abstract String internalId();

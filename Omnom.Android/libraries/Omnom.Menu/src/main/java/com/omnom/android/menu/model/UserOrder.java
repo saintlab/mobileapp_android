@@ -3,6 +3,8 @@ package com.omnom.android.menu.model;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 import com.omnom.android.utils.generation.AutoGson;
 
 import java.math.BigDecimal;
@@ -60,6 +62,19 @@ public abstract class UserOrder implements Parcelable {
 			}
 		}
 		return result;
+	}
+
+	public Money getTotalPrice(Currency currency) {
+		double result = 0;
+		final Set<Map.Entry<String, UserOrderData>> entries = itemsTable().entrySet();
+		for(Map.Entry<String, UserOrderData> entry : entries) {
+			final UserOrderData value = entry.getValue();
+			if(value != null && value.item() != null) {
+				final double amount = value.item().price() * value.amount();
+				result += amount;
+			}
+		}
+		return Money.createFractional(result, currency);
 	}
 
 	public void addItem(final Item item, int count, final List<String> selectedModifiersIds) {

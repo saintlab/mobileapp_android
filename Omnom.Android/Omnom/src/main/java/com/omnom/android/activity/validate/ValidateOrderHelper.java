@@ -5,14 +5,13 @@ import android.view.View;
 import android.widget.Button;
 
 import com.omnom.android.R;
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.ViewUtils;
-
-import java.math.BigDecimal;
 
 import static butterknife.ButterKnife.findById;
 
@@ -64,12 +63,12 @@ public class ValidateOrderHelper {
 			return;
 		}
 
-		final BigDecimal totalAmount = mOrder.getTotalPrice();
-		final boolean hasWishItems = mOrder != null && totalAmount.compareTo(BigDecimal.ZERO) > 0;
+		final Money totalAmount = mOrder.getTotalPrice(Currency.RU);
+		final boolean hasWishItems = mOrder != null && !totalAmount.isNegativeOrZero();
 
 		if(hasWishItems) {
 			ViewUtils.setVisibleGone(btnOrder, true);
-			btnOrder.setText(AmountHelper.format(totalAmount) + mActivity.getString(R.string.currency_suffix_ruble));
+			btnOrder.setText(totalAmount.getReadableCurrencyValue());
 			btnOrder.setTextColor(Color.WHITE);
 			btnOrder.setBackgroundResource(R.drawable.btn_rounded_blue);
 		} else {

@@ -13,10 +13,10 @@ import android.widget.TextView;
 import com.omnom.android.BuildConfig;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
+import com.omnom.android.currency.Currency;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
 import com.omnom.android.restaurateur.model.restaurant.WishResponseItem;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.view.HeaderView;
 
@@ -201,8 +201,8 @@ public class OrderResultActivity extends BaseOmnomActivity {
 		final View view = LayoutInflater.from(this).inflate(R.layout.item_order_result, viewContent, false);
 		final ItemViewHolder itemViewHolder = new ItemViewHolder(view);
 		itemViewHolder.txtTitle.setText(item.title());
-		itemViewHolder.txtInfo.setText(getString(R.string.wish_result_item, item.quantity(), AmountHelper.format(item.pricePerItem())
-				+ getString(R.string.currency_suffix_ruble)));
+		itemViewHolder.txtInfo.setText(getString(R.string.wish_result_item, item.quantity(), item.pricePerItem(Currency.RU)
+		                                                                                         .getReadableCurrencyValue()));
 		AnimationUtils.scaleHeight(view, 0, 0);
 		viewContent.addView(view);
 		AnimationUtils.scaleHeight(view, getResources().getDimensionPixelSize(R.dimen.order_ready_item_height), DURATION_ITEM_TRANSITION);

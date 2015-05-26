@@ -120,7 +120,7 @@ public class MixPanelHelper {
 	public void track(final Project project, final String event, final Object request) {
 		try {
 			JSONObject json;
-			if (request instanceof List) {
+			if(request instanceof List) {
 				json = new JSONObject();
 				json.put("list", new JSONArray(mGson.toJson(request)));
 			} else {
@@ -196,7 +196,7 @@ public class MixPanelHelper {
 	                         final OrderFragment.PaymentDetails details,
 	                         final BillResponse billData) {
 		final int tipValue = details.getTipValue(); // already in kopeks
-		final double totalAmount = details.getAmount() * 100; // translate into kopeks
+		final double totalAmount = details.getAmount().getFractionalValue(); // translate into kopeks
 
 		final Map<String, Number> userPayment = new HashMap<String, Number>();
 		final double billSum = totalAmount - tipValue;

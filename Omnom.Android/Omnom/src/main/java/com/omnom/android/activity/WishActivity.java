@@ -16,6 +16,8 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.adapter.WishAdapter;
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.entrance.EntranceDataHelper;
 import com.omnom.android.fragment.BarTipsEvent;
@@ -56,7 +58,6 @@ import com.squareup.otto.Subscribe;
 
 import org.apache.http.HttpStatus;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -375,7 +376,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 	private void doPickTips() {
 		if(!checkUser()) {
-			BarTipsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mOrder.getTotalPrice().doubleValue(), mTipsValue);
+			BarTipsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mOrder.getTotalPrice(Currency.RU), mTipsValue);
 		}
 	}
 
@@ -414,8 +415,8 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 			@Override
 			public void call(final WishResponse wishResponse) {
 				final PaymentDetails paymentDetails = new PaymentDetails(
-						mOrder.getTotalPrice().doubleValue(),
-						0,
+						mOrder.getTotalPrice(Currency.RU),
+						Money.ZERO,
 						TipsWay.DEFAULT, 0,
 						SplitWay.WASNT_USED);
 				CardsActivity.start(WishActivity.this,
@@ -516,21 +517,21 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 		setBusy(true);
 
-		final int tipsAmount = OrderHelper.getTipsAmount(mOrder.getTotalPrice(), mTipsValue);
-		final OrderFragment.TipData tips = new OrderFragment.TipData(BigDecimal.valueOf(tipsAmount),
+		final Money tipsAmount = OrderHelper.getTipsAmount(mOrder.getTotalPrice(Currency.RU), mTipsValue);
+		final OrderFragment.TipData tips = new OrderFragment.TipData(tipsAmount,
 		                                                             mTipsValue,
 		                                                             OrderFragment.TipData.TYPE_PERCENT);
-		final BigDecimal amountTips = tips.getAmount();
-		final BigDecimal amountToPay = mOrder.getTotalPrice().add(amountTips);
+		final Money amountTips = tips.getAmount();
+		final Money amountToPay = mOrder.getTotalPrice(Currency.RU).add(tipsAmount);
 
-		final WishRequest wishRequest = createWishRequestTips(mOrder, amountTips.intValue());
+		final WishRequest wishRequest = createWishRequestTips(mOrder, amountTips.getBaseValue().intValue());
 
 		api.wishes(mRestaurant.id(), wishRequest).subscribe(new Action1<WishResponse>() {
 			@Override
 			public void call(final WishResponse wishResponse) {
 				final PaymentDetails paymentDetails = new PaymentDetails(
-						amountToPay.doubleValue(),
-						amountTips.intValue() * 100,
+						amountToPay,
+						amountTips,
 						TipsWay.MANUAL_PERCENTAGES,
 						tips.getValue(),
 						SplitWay.WASNT_USED);

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 
 import com.omnom.android.R;
+import com.omnom.android.currency.Currency;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -54,7 +55,7 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 			holder.txtPrice.setTextColor(mTextColorDefault);
 		}
 		holder.txtTitle.setText(item.getTitle());
-		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPricePerItem()));
+		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPricePerItem(Currency.RU)));
 	}
 
 	public void setIgnoreSelection(boolean ignoreSelection) {

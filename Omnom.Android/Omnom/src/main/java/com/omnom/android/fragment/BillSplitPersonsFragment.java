@@ -11,9 +11,10 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.utils.OmnomFont;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.view.NumberPicker;
@@ -92,7 +93,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 		updateAmount();
 	}
 
-	private BigDecimal getAmount() {
+	private Money getAmount() {
 		final int value = mPicker.getValue();
 		double amountToPay = mOrder.getAmountToPay();
 		if(value > 1) {
@@ -100,14 +101,15 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 		}
 		final double v = amountToPay / value;
 		final BigDecimal bigDecimal = new BigDecimal(String.valueOf(v));
-		return bigDecimal.setScale(2, RoundingMode.HALF_UP);
+		final BigDecimal roundedValue = bigDecimal.setScale(2, RoundingMode.HALF_UP);
+		return Money.createFractional(roundedValue.doubleValue(), Currency.RU);
 	}
 
 	@Override
 	public void updateAmount() {
 		final Button btnCommit = (Button) getActivity().findViewById(R.id.btn_commit);
-		final BigDecimal amount = getAmount();
-		btnCommit.setText(getString(R.string.bill_split_amount_, AmountHelper.format(amount)));
+		final Money amount = getAmount();
+		btnCommit.setText(getString(R.string.bill_split_amount_, amount.getReadableValue()));
 		btnCommit.setTag(R.id.edit_amount, amount);
 		btnCommit.setTag(R.id.picker, mPicker.getValue());
 		btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_PERSON);

@@ -34,6 +34,7 @@ import com.omnom.android.activity.helper.PaymentDataTable;
 import com.omnom.android.activity.helper.PaymentDataWish;
 import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.currency.Money;
 import com.omnom.android.entrance.BarEntranceData;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.entrance.TableEntranceData;
@@ -220,7 +221,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity {
 		loader.onDestroy();
 	}
 
-	private void pay(final double amount, final int tip) {
+	private void pay(final Money amount, final Money tip) {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
 		loader.setLogo(R.drawable.ic_flying_credit_card);
 		loader.startProgressAnimation(getResources().getInteger(R.integer.payment_duration), new Runnable() {
@@ -237,7 +238,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity {
 		}
 	}
 
-	private void processPayment(final double amount, final int tip) {
+	private void processPayment(final Money amount, final Money tip) {
 		final BillRequest request = createBillRequest(amount);
 		subscribe(api.bill(request),
 		          new Action1<BillResponse>() {
@@ -272,22 +273,22 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity {
 				});
 	}
 
-	private BillRequest createBillRequest(final double amount) {
+	private BillRequest createBillRequest(final Money amount) {
 		if(mOrder != null) {
 			return BillRequest.create(amount, mOrder);
 		}
 		return BillRequest.createForWish(mWishResponse.restaurantId(), mWishResponse.id());
 	}
 
-	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final int tip) {
+	private void tryToPay(final CardInfo card, BillResponse billData, final Money amount, final Money tip) {
 		final OmnomApplication app = getApp();
 		final UserData user = app.getUserProfile().getUser();
 		final AcquiringData acquiringData = app.getConfig().getAcquiringData();
 		pay(billData, card, acquiringData, user, amount, tip);
 	}
 
-	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, double amount,
-	                 int tip) {
+	private void pay(BillResponse billData, final CardInfo cardInfo, final AcquiringData acquiringData, UserData user, Money amount,
+	                 Money tip) {
 		final String mailRestaurantId = billData.getMailRestaurantId();
 		if(!restaurantIdValidator.validate(mailRestaurantId) && !mIsDemo) {
 			AcquiringResponseError error = new AcquiringResponseError();

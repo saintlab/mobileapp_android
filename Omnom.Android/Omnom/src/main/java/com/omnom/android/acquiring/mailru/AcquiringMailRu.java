@@ -20,6 +20,8 @@ import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.acquiring.mailru.response.RegisterCardResponse;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.config.MerchantData;
 import com.omnom.android.utils.EncryptionUtils;
@@ -52,7 +54,7 @@ public class AcquiringMailRu implements Acquiring {
 
 	public static final String PARAM_AMOUNT = "amount";
 
-	public static final double AMOUNT_ADD_CARD = 1.0;
+	public static final Money AMOUNT_ADD_CARD = Money.createFractional(100, Currency.RU);
 
 	private static final String TAG = AcquiringMailRu.class.getSimpleName();
 
@@ -165,7 +167,7 @@ public class AcquiringMailRu implements Acquiring {
 
 	@Override
 	public Observable<AcquiringResponse> addCard(final AcquiringData acquiringData, final UserData user, final CardInfo cardInfo) {
-		final ExtraData extra = MailRuExtra.create(0, StringUtils.EMPTY_STRING, MailRuExtra.PAYMENT_TYPE_ORDER);
+		final ExtraData extra = MailRuExtra.create(Money.ZERO, StringUtils.EMPTY_STRING, MailRuExtra.PAYMENT_TYPE_ORDER);
 		final OrderInfoMailRu order = OrderInfoMailRu.create(AMOUNT_ADD_CARD, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
 

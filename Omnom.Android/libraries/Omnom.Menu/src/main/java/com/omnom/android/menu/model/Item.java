@@ -4,6 +4,8 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 import com.omnom.android.utils.generation.AutoGson;
 import com.omnom.android.utils.utils.StringUtils;
 
@@ -44,6 +46,10 @@ public abstract class Item implements Parcelable {
 
 	@Nullable
 	public abstract double price();
+
+	public Money price(Currency currency) {
+		return Money.createFractional(price(), currency);
+	}
 
 	@Nullable
 	public abstract Details details();
