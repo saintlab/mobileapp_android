@@ -26,7 +26,7 @@ public class Money implements Parcelable {
 		}
 	};
 
-	public static final Money ZERO = create(0, Currency.NULL);
+	public static final Money ZERO = createFractional(0, Currency.NULL);
 
 	public static final Money createFractional(long fractionalAmount, Currency currency) {
 		return new Money(fractionalAmount, currency);
@@ -195,5 +195,10 @@ public class Money implements Parcelable {
 
 	public boolean isGreatherOrEquals(final Money value) {
 		return isGreatherThan(value) || mFractionalAmount == value.getFractionalValue();
+	}
+
+	public Money round() {
+		final long round = Math.round(mBaseAmount.doubleValue());
+		return create(round, getCurrency());
 	}
 }
