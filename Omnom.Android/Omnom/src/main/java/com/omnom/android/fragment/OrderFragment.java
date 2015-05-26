@@ -1251,9 +1251,8 @@ public class OrderFragment extends Fragment {
 
 	private void updateCustomTipsText(final int newVal) {
 		txtCustomTips.setText(getString(R.string.tip_percent, newVal));
-		final Money amountToCountTips = isEverythingPaid(getOrder()) ? getOrder().getPaidMoney(Currency.RU) :
-				getEnteredAmount();
-		final Money tips = OrderHelper.getTipsAmount(amountToCountTips, newVal);
+		final Money amount = isEverythingPaid(getOrder()) ? getOrder().getPaidMoney(Currency.RU) : getEnteredAmount();
+		final Money tips = OrderHelper.getTipsAmount(amount, newVal).round();
 		txtTipsAmountHint.setText(getString(R.string.tip_hint_or, tips.getReadableCurrencyValue()));
 	}
 
