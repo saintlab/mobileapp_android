@@ -675,6 +675,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	}
 
 	public void onProfile() {
+		AnimationUtils.animateAlpha(imgProfile, true);
 		AnimationUtils.animateAlpha(txtTable, false);
 	}
 }
