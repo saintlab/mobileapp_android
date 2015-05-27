@@ -7,8 +7,6 @@ import com.omnom.android.utils.utils.StringUtils;
 
 import java.math.BigDecimal;
 
-import hugo.weaving.DebugLog;
-
 /**
  * Created by Ch3D on 26.05.2015.
  */
@@ -58,7 +56,7 @@ public class Money implements Parcelable {
 		if(fractionalAmount == 0) {
 			mBaseAmount = BigDecimal.ZERO;
 		} else {
-			mBaseAmount = BigDecimal.valueOf(fractionalAmount / currency.getFractionalFactor());
+			mBaseAmount = BigDecimal.valueOf(fractionalAmount).divide(currency.getDecimalFactor());
 		}
 		mCurrency = currency;
 	}
@@ -99,7 +97,7 @@ public class Money implements Parcelable {
 	}
 
 	public String getReadableCurrencyValue() {
-		return getReadableValue() + "\u00A0" + mCurrency.getSymbol();
+		return getReadableValue() + StringUtils.NON_BREAKING_WHITESPACE + mCurrency.getSymbol();
 	}
 
 	@Override
@@ -122,7 +120,6 @@ public class Money implements Parcelable {
 		return mFractionalAmount < money.getFractionalValue();
 	}
 
-	@DebugLog
 	public boolean isLessOrEquals(final Money money) {
 		return mFractionalAmount <= money.getFractionalValue();
 	}

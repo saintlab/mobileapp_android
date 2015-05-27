@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import com.omnom.android.utils.utils.StringUtils;
 
+import java.math.BigDecimal;
+
 /**
  * Created by Ch3D on 26.05.2015.
  */
@@ -29,6 +31,8 @@ public class Currency implements Parcelable {
 
 	private final long mFactor;
 
+	private final BigDecimal mDecimalFactor;
+
 	private final boolean mIsFractional;
 
 	private final String mSymbol;
@@ -37,12 +41,18 @@ public class Currency implements Parcelable {
 		mFactor = parcel.readLong();
 		mIsFractional = parcel.readInt() == 1;
 		mSymbol = parcel.readString();
+		mDecimalFactor = BigDecimal.valueOf(mFactor);
 	}
 
 	private Currency(long factor, boolean isFractional, String symbol) {
 		mFactor = factor;
 		mIsFractional = isFractional;
 		mSymbol = symbol;
+		mDecimalFactor = BigDecimal.valueOf(factor);
+	}
+
+	public BigDecimal getDecimalFactor() {
+		return mDecimalFactor;
 	}
 
 	public boolean isFractional() {

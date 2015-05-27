@@ -1,6 +1,0 @@
-<resources>
-    <!-- Default screen margins, per the Android Design guidelines.
-    Nexus S
-    -->
-    <dimen name="view_size_default">48dp</dimen>
-</resources>
