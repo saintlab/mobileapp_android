@@ -384,10 +384,16 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 										        @Override
 										        public void run() {
 											        final boolean isMenuExpanded =
-													        slidingPanel.getPanelState() != SlidingUpPanelLayout.PanelState.DRAGGING;
-											        AnimationUtils.animateAlphaSkipTag(imgProfile, !isMenuExpanded, null,
-											                                           animationDuration);
-											        AnimationUtils.animateAlphaSkipTag(txtTable, false, null, animationDuration);
+													        slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED;
+											        AnimationUtils.animateAlphaSkipTag(txtTable, false, new Runnable() {
+												        @Override
+												        public void run() {
+													        AnimationUtils.animateAlphaSkipTag(imgProfile,
+													                                           !isMenuExpanded,
+													                                           null,
+													                                           animationDuration);
+												        }
+											        }, animationDuration);
 										        }
 									        }, animationDuration);
 								        }
