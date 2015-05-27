@@ -6,11 +6,17 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'LICENSE.txt'
+    }
+
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
 
     buildTypes {
@@ -24,14 +30,20 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
+    // test
+    testCompile 'org.mockito:mockito-core:1.9.5'
+    testCompile 'junit:junit:4.12'
+    androidTestCompile 'com.android.support.test:runner:0.2'
+    // Set this dependency to use JUnit 4 rules
+    androidTestCompile 'com.android.support.test:rules:0.2'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
+
     // auto-parcel
     compile 'com.github.frankiesardo:auto-parcel:' + auto_parcel_version
     apt 'com.github.frankiesardo:auto-parcel-processor:' + auto_parcel_version
-
     compile 'com.google.code.gson:gson:' + gson_version
     compile 'com.android.support:support-v4:' + support_v4_version
     compile 'com.android.support:recyclerview-v7:' + recyclerview_v7_version
-
     // square
     compile 'com.squareup.okhttp:okhttp:' + okhttp_version
     compile 'com.squareup.okhttp:okhttp-urlconnection:' + okhttp_version
@@ -40,10 +52,8 @@ dependencies {
     compile 'com.squareup:otto:' + otto_version
     compile 'com.squareup.dagger:dagger:' + dagger_version
     apt 'com.squareup.dagger:dagger-compiler:' + dagger_version
-
     //rx
     compile 'io.reactivex:rxjava:' + rxjava_version
     compile 'io.reactivex:rxandroid:' + rxandroid_version
-
     compile 'uk.co.chrisjenx:calligraphy:' + calligraphy_version
 }
