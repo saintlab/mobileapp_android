@@ -192,7 +192,13 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 				          }
 				          UserProfile profile = new UserProfile(userResponse);
 				          app.cacheUserProfile(profile);
-				          initUserData(userResponse.getUser());
+
+				          postDelayed(getResources().getInteger(android.R.integer.config_longAnimTime), new Runnable() {
+					          @Override
+					          public void run() {
+						          initUserData(userResponse.getUser());
+					          }
+				          });
 
 				          final SupportInfoResponse supportInfoResponse = response.second;
 				          if(!supportInfoResponse.hasErrors()) {
@@ -251,10 +257,19 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 			finish();
 			return;
 		}
+
+		AnimationUtils.animateAlpha(mTxtInfo, false);
+		AnimationUtils.animateAlpha(mTxtLogin, false);
+		AnimationUtils.animateAlpha(mTxtUsername, false);
+
 		mTxtInfo.setText(user.getPhone());
 		mTxtLogin.setText(user.getEmail());
 		mTxtUsername.setText(user.getName());
 		updateUserImage(user.getAvatar());
+
+		AnimationUtils.animateAlpha(mTxtInfo, true);
+		AnimationUtils.animateAlpha(mTxtLogin, true);
+		AnimationUtils.animateAlpha(mTxtUsername, true);
 	}
 
 	private void updateUserImage(String url) {
