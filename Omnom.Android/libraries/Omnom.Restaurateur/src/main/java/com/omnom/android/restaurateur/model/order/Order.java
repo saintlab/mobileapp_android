@@ -270,7 +270,7 @@ public class Order implements Parcelable {
 		if(paid == null) {
 			return 0;
 		}
-		return AmountHelper.toDouble(paid.getAmount());
+		return AmountHelper.toDouble(paid.getAmount() - paid.getTip());
 	}
 
 	@Override
