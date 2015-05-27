@@ -374,6 +374,11 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 	}
 
 	private void doPickTips() {
+		if(mOrder.getSelectedItems().isEmpty()) {
+			showToast(this, getString(R.string.your_wish_is_empty));
+			return;
+		}
+
 		if(!checkUser()) {
 			BarTipsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mOrder.getTotalPrice().doubleValue(), mTipsValue);
 		}
