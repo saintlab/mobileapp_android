@@ -189,7 +189,7 @@ public class MoneyTest {
 		                       .equals(Money.create(9, Currency.RU)));
 
 		Assert.assertFalse(Money.create(8.4, Currency.RU).round()
-		                       .equals(Money.create(9, Currency.RU)));
+		                        .equals(Money.create(9, Currency.RU)));
 
 		Assert.assertTrue(Money.create(8.4, Currency.RU).round()
 		                       .equals(Money.create(8, Currency.RU)));
@@ -216,6 +216,12 @@ public class MoneyTest {
 		Assert.assertTrue(Money.create(1, Currency.RU)
 		                       .multiply(-3.5)
 		                       .equals(Money.createFractional(-350, Currency.RU)));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testMoneyOperationFail() {
+		Money.createFractional(100, Currency.RU).plus(Money.createFractional(100, Currency.US));
+		Money.createFractional(100, Currency.RU).subtract(Money.createFractional(100, Currency.US));
 	}
 
 	@Test
