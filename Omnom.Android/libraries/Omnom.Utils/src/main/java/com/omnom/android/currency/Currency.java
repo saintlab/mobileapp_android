@@ -27,6 +27,8 @@ public class Currency implements Parcelable {
 
 	public static final Currency RU = new Currency(100, true, "\uF5FC");
 
+	public static final Currency US = new Currency(100, true, "\uFE69");
+
 	public static final Currency NULL = new Currency(1, false, StringUtils.EMPTY_STRING);
 
 	private final long mFactor;
@@ -49,6 +51,39 @@ public class Currency implements Parcelable {
 		mIsFractional = isFractional;
 		mSymbol = symbol;
 		mDecimalFactor = BigDecimal.valueOf(factor);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if(this == o) {
+			return true;
+		}
+		if(o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		final Currency currency = (Currency) o;
+
+		if(mFactor != currency.mFactor) {
+			return false;
+		}
+		if(mIsFractional != currency.mIsFractional) {
+			return false;
+		}
+		if(mDecimalFactor != null ? !mDecimalFactor.equals(currency.mDecimalFactor) : currency.mDecimalFactor != null) {
+			return false;
+		}
+		return !(mSymbol != null ? !mSymbol.equals(currency.mSymbol) : currency.mSymbol != null);
+
+	}
+
+	@Override
+	public int hashCode() {
+		int result = (int) (mFactor ^ (mFactor >>> 32));
+		result = 31 * result + (mDecimalFactor != null ? mDecimalFactor.hashCode() : 0);
+		result = 31 * result + (mIsFractional ? 1 : 0);
+		result = 31 * result + (mSymbol != null ? mSymbol.hashCode() : 0);
+		return result;
 	}
 
 	public BigDecimal getDecimalFactor() {
