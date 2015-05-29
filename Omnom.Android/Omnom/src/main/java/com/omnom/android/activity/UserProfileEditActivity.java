@@ -11,10 +11,10 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.Pair;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.camera.CropImageIntentBuilder;
@@ -23,15 +23,17 @@ import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.UserData;
-import com.omnom.android.auth.response.RecoveryResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.fragment.UserPhotoOptionsFragment;
+import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
+import com.omnom.android.restaurateur.model.restaurant.FileUploadReponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.drawable.RoundTransformation;
 import com.omnom.android.utils.drawable.RoundedDrawable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.DateUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -49,8 +51,9 @@ import javax.inject.Inject;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import retrofit.mime.TypedFile;
+import rx.Observable;
 import rx.functions.Action1;
-import rx.functions.Func2;
+import rx.functions.Func1;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 
@@ -88,14 +91,23 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 	@InjectView(R.id.txt_phone)
 	protected TextView mTxtPhone;
 
+	@InjectView(R.id.txt_done)
+	protected TextView mTxtDone;
+
 	@InjectView(R.id.edit_birth)
 	protected ErrorEditText mEditBirth;
+
+	@InjectView(R.id.progress)
+	protected ProgressBar mProgressBar;
 
 	@InjectView(R.id.img_user)
 	protected ImageView mImgUser;
 
 	@Inject
 	protected AuthService authenticator;
+
+	@Inject
+	protected RestaurateurObservableApi api;
 
 	private GregorianCalendar mCalendar;
 
@@ -114,6 +126,8 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 	private int mFlags;
 
 	private boolean mFirstStart = true;
+
+	private boolean mBusy;
 
 	@Override
 	protected void handleIntent(final Intent intent) {
@@ -145,6 +159,7 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 		mBaseOnErrorHandler = new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 			@Override
 			protected void onError(final Throwable throwable) {
+				setBusy(false);
 				Log.e(TAG, "updateUser", throwable);
 			}
 		};
@@ -170,7 +185,7 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 			}
 		});
 
-		updateUserImage(StringUtils.EMPTY_STRING);
+		// pre-init with cached data
 		initUserData(getUserData());
 	}
 
@@ -249,20 +264,20 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 		finish();
 	}
 
-	@OnClick(R.id.txt_change_phone)
-	public void onChangePhone() {
-		final String authToken = OmnomApplication.get(getActivity()).getAuthToken();
-		authenticator.getRecoveryUri(authToken).subscribe(new Action1<RecoveryResponse>() {
-			@Override
-			public void call(final RecoveryResponse recoveryResponse) {
-				if(recoveryResponse.isSuccess()) {
-					WebActivity.start(UserProfileEditActivity.this, recoveryResponse.getLink());
-				} else {
-					showToast(getActivity(), R.string.something_went_wrong_try_again);
-				}
-			}
-		}, mBaseOnErrorHandler);
-	}
+	//	@OnClick(R.id.txt_change_phone)
+	//	public void onChangePhone() {
+	//		final String authToken = OmnomApplication.get(getActivity()).getAuthToken();
+	//		authenticator.getRecoveryUri(authToken).subscribe(new Action1<RecoveryResponse>() {
+	//			@Override
+	//			public void call(final RecoveryResponse recoveryResponse) {
+	//				if(recoveryResponse.isSuccess()) {
+	//					WebActivity.start(UserProfileEditActivity.this, recoveryResponse.getLink());
+	//				} else {
+	//					showToast(getActivity(), R.string.something_went_wrong_try_again);
+	//				}
+	//			}
+	//		}, mBaseOnErrorHandler);
+	//	}
 
 	@Override
 	public void finish() {
@@ -273,10 +288,10 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 	@OnClick(R.id.txt_done)
 	public void onDone() {
 		if(validate()) {
+			setBusy(true);
 			final String authToken = OmnomApplication.get(getActivity()).getAuthToken();
 			if(mImageChanged) {
-				final rx.Observable<UserResponse> avatarObservable = authenticator.updateAvatar(authToken, new TypedFile("image/jpeg",
-				                                                                                                         mCroppedImageFile));
+				final rx.Observable<FileUploadReponse> avatarObservable = api.updateAvatar(new TypedFile("image/jpeg", mCroppedImageFile));
 
 				final rx.Observable<UserResponse> userResponseObservable = authenticator.updateUser(authToken,
 				                                                                                    mEditName.getText(),
@@ -284,30 +299,29 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 				                                                                                    mEditBirth.getText().toString(),
 				                                                                                    StringUtils.EMPTY_STRING);
 
-				rx.Observable.zip(avatarObservable, userResponseObservable,
-				                  new Func2<UserResponse, UserResponse, Pair<UserResponse, UserResponse>>() {
-					                  @Override
-					                  public Pair<UserResponse, UserResponse> call(final UserResponse avatarResponse,
-					                                                               final UserResponse userResponse) {
-						                  return Pair.create(avatarResponse, userResponse);
-					                  }
-				                  })
-				             .subscribe(new Action1<Pair<UserResponse, UserResponse>>() {
-					             @Override
-					             public void call(final Pair<UserResponse, UserResponse> pair) {
-						             final UserProfile userProfile = new UserProfile(pair.second);
-						             userProfile.getUser().setAvatar(pair.first.getUser().getAvatar());
-
-						             OmnomApplication.get(getActivity()).cacheUserProfile(userProfile.getUser());
-
-						             final Intent data = new Intent();
-						             data.putExtra(EXTRA_USER_DATA, pair.second.getUser());
-						             data.putExtra(EXTRA_USER_AVATAR, mCroppedImageFile.getAbsolutePath());
-
-						             setResult(RESULT_OK, data);
-						             finish();
-					             }
-				             }, mBaseOnErrorHandler);
+				avatarObservable
+						.flatMap(new Func1<FileUploadReponse, Observable<UserResponse>>() {
+							@Override
+							public Observable<UserResponse> call(final FileUploadReponse fileUploadReponse) {
+								return authenticator.updateUser(authToken,
+								                                mEditName.getText(),
+								                                mEditEmail.getText(),
+								                                mEditBirth.getText().toString(),
+								                                fileUploadReponse.url());
+							}
+						})
+						.subscribe(new Action1<UserResponse>() {
+							@Override
+							public void call(final UserResponse userResponse) {
+								setBusy(false);
+								OmnomApplication.get(getActivity()).cacheUserProfile(new UserProfile(userResponse));
+								final Intent data = new Intent();
+								data.putExtra(EXTRA_USER_DATA, userResponse.getUser());
+								data.putExtra(EXTRA_USER_AVATAR, mCroppedImageFile.getAbsolutePath());
+								setResult(RESULT_OK, data);
+								finish();
+							}
+						}, mBaseOnErrorHandler);
 			} else {
 				authenticator.updateUser(authToken, mEditName.getText(), mEditEmail.getText(), mEditBirth.getText().toString(),
 				                         mAvatarCleared ? StringUtils.EMPTY_STRING : getUserData().getAvatar())
@@ -315,6 +329,7 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 						             new Action1<UserResponse>() {
 							             @Override
 							             public void call(final UserResponse userResponse) {
+								             setBusy(false);
 								             final Intent data = new Intent();
 								             data.putExtra(EXTRA_USER_DATA, userResponse.getUser());
 								             setResult(RESULT_OK, data);
@@ -325,23 +340,17 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 		}
 	}
 
+	private void setBusy(final boolean busy) {
+		mBusy = busy;
+		AnimationUtils.animateAlphaGone(mTxtDone, !busy);
+		AnimationUtils.animateAlphaGone(mProgressBar, busy);
+	}
+
 	private boolean validate() {
 		boolean valid = true;
-		if(TextUtils.isEmpty(mEditBirth.getText())) {
+		if(TextUtils.isEmpty(mEditBirth.getText()) || mEditBirth.isError()) {
 			valid &= false;
 			mEditBirth.setError(true, getString(R.string.you_forgot_to_enter_birth_date));
-		}
-		if(TextUtils.isEmpty(mEditName.getText())) {
-			valid &= false;
-			mEditBirth.setError(true, getString(R.string.you_forgot_to_enter_name));
-		}
-		if(TextUtils.isEmpty(mEditEmail.getText())) {
-			valid &= false;
-			mEditBirth.setError(true, getString(R.string.you_forgot_to_enter_email));
-		}
-		if(!AndroidUtils.isValidEmail(mEditEmail.getText())) {
-			valid &= false;
-			mEditBirth.setError(true, getString(R.string.invalid_email));
 		}
 		return valid;
 	}

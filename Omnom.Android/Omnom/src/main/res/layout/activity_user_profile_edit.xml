@@ -71,6 +71,7 @@
                     android:layout_centerVertical="true"
                     android:text="Сменить"
                     android:textColor="@color/light_blue"
+                    android:visibility="gone"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
@@ -102,6 +103,14 @@
         android:textColor="@drawable/text_color_selector"
         android:textAppearance="?android:attr/textAppearanceLarge"
         omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_margin="8dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_gravity="right|top"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/txt_done"

@@ -39,6 +39,7 @@ import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -83,6 +84,9 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	@InjectView(R.id.txt_sign_in)
 	protected TextView mTxtSignIn;
 
+	@InjectView(R.id.txt_edit)
+	protected TextView mTxtEdit;
+
 	@InjectView(R.id.txt_info)
 	protected TextView mTxtInfo;
 
@@ -119,6 +123,8 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	private String mTableId;
 
 	private String supportPhone;
+
+	private int mAvatarSize;
 
 	@Override
 	protected void handleIntent(Intent intent) {
@@ -163,6 +169,8 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 	@Override
 	public void initUi() {
+		mAvatarSize = getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
+
 		initAppInfo();
 
 		if(mTableNumber > 0) {
@@ -174,55 +182,60 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 			ViewUtils.setVisibleGone(delimiterTableNumber, false);
 		}
 
-		updateUserImage(StringUtils.EMPTY_STRING);
-
 		final OmnomApplication app = getApp();
 		final String token = app.getAuthToken();
 		showUserData(!TextUtils.isEmpty(token));
 
-		subscribe(getProfileObservable(token),
-		          new Action1<Pair<UserResponse, SupportInfoResponse>>() {
-			          @Override
-			          public void call(Pair<UserResponse, SupportInfoResponse> response) {
-				          final UserResponse userResponse = response.first;
-				          if(userResponse.hasError() && UserProfileHelper.hasAuthError(userResponse)) {
-					          app.logout();
-					          forwardToIntro();
-					          return;
-				          }
-				          UserProfile profile = new UserProfile(userResponse);
-				          app.cacheUserProfile(profile);
-
-				          postDelayed(getResources().getInteger(android.R.integer.config_longAnimTime), new Runnable() {
-					          @Override
-					          public void run() {
-						          initUserData(userResponse.getUser());
+		// pre-init with cached data
+		final UserData userData = getUserData();
+		if(userData != null) {
+			initUserData(userData);
+		} else {
+			subscribe(getProfileObservable(token),
+			          new Action1<Pair<UserResponse, SupportInfoResponse>>() {
+				          @Override
+				          public void call(Pair<UserResponse, SupportInfoResponse> response) {
+					          final UserResponse userResponse = response.first;
+					          if(userResponse.hasError() && UserProfileHelper.hasAuthError(userResponse)) {
+						          app.logout();
+						          forwardToIntro();
+						          return;
 					          }
-				          });
+					          UserProfile profile = new UserProfile(userResponse);
+					          app.cacheUserProfile(profile);
 
-				          final SupportInfoResponse supportInfoResponse = response.second;
-				          if(!supportInfoResponse.hasErrors()) {
-					          supportPhone = supportInfoResponse.getPhone();
+					          postDelayed(getResources().getInteger(android.R.integer.config_longAnimTime), new Runnable() {
+						          @Override
+						          public void run() {
+							          initUserData(userResponse.getUser());
+						          }
+					          });
+
+					          final SupportInfoResponse supportInfoResponse = response.second;
+					          if(!supportInfoResponse.hasErrors()) {
+						          supportPhone = supportInfoResponse.getPhone();
+					          }
 				          }
-			          }
-		          }, new BaseErrorHandler(getActivity()) {
-					@Override
-					protected void onTokenExpired() {
+			          }, new BaseErrorHandler(getActivity()) {
+						@Override
+						protected void onTokenExpired() {
 
-					}
+						}
 
-					@Override
-					protected void onThrowable(Throwable throwable) {
-						showToastLong(getActivity(), R.string.error_server_unavailable_please_try_again);
-						Log.e(TAG, "getUserProfile", throwable);
-						finish();
-					}
-				});
+						@Override
+						protected void onThrowable(Throwable throwable) {
+							showToastLong(getActivity(), R.string.error_server_unavailable_please_try_again);
+							Log.e(TAG, "getUserProfile", throwable);
+							finish();
+						}
+					});
+		}
 	}
 
 	@DebugLog
 	private void showUserData(final boolean visible) {
 		ViewUtils.setVisibleGone(mTxtSignIn, !visible);
+		ViewUtils.setVisibleGone(mTxtEdit, visible);
 		ButterKnife.apply(mUserViews, ViewUtils.VISIBLITY, visible);
 	}
 
@@ -311,15 +324,52 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		busy(false);
 		if(requestCode == REQUEST_CODE_LOGIN && resultCode == RESULT_OK) {
 			initUserData(getApp().getUserProfile().getUser());
 			showUserData(true);
+		}
+		if(resultCode == RESULT_OK && requestCode == REQUEST_CODE_USER_PROFILE_EDIT) {
+			final Picasso picasso = OmnomApplication.getPicasso(this);
+			final String avaPath = data.getStringExtra(EXTRA_USER_AVATAR);
+			if(!TextUtils.isEmpty(avaPath)) {
+				mImgUser.setPadding(0, 0, 0, 0);
+				RoundedDrawable.setScaledRoundedDrawable(mImgUser, BitmapFactory.decodeFile(avaPath), mAvatarSize);
+			}
+
+			final UserData userData = data.getParcelableExtra(EXTRA_USER_DATA);
+			if(userData != null) {
+				final UserProfile userProfile = new UserProfile(new UserResponse(userData, StringUtils.EMPTY_STRING));
+				OmnomApplication.get(getActivity()).cacheUserProfile(userProfile);
+				initUserData(userData);
+
+				// load into the cache
+				final String avatar = userData.getAvatar();
+				if(!TextUtils.isEmpty(avatar)) {
+					picasso.load(avatar).fetch();
+				} else {
+					updateUserImage(null);
+				}
+			}
 		}
 	}
 
 	@OnClick(R.id.btn_back)
 	public void onBack() {
 		onBackPressed();
+	}
+
+	@OnClick(R.id.img_user)
+	protected void onAvatar() {
+		if(!isBusy()) {
+			busy(true);
+			UserProfileEditActivity.start(this, UserProfileEditActivity.FLAG_CHANGE_AVATAR);
+		}
+	}
+
+	@OnClick(R.id.txt_edit)
+	public void onEditProfile() {
+		UserProfileEditActivity.start(this);
 	}
 
 	@Override

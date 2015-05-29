@@ -329,6 +329,14 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <activity
+            android:name=".activity.UserProfileEditActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White.Light"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity android:name="com.android.camera.CropImage" />
+
+        <activity
             android:name=".activity.ThreeDSWebActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White.Light"

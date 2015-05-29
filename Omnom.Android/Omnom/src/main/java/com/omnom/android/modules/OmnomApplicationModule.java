@@ -20,6 +20,7 @@ import com.omnom.android.activity.ThanksActivity;
 import com.omnom.android.activity.ThanksDemoActivity;
 import com.omnom.android.activity.ThreeDSWebActivity;
 import com.omnom.android.activity.UserProfileActivity;
+import com.omnom.android.activity.UserProfileEditActivity;
 import com.omnom.android.activity.UserRegisterActivity;
 import com.omnom.android.activity.ValidateActivityBle;
 import com.omnom.android.activity.ValidateActivityBle21;
@@ -40,6 +41,7 @@ import com.omnom.android.fragment.EditHashFragment;
 import com.omnom.android.fragment.EnteringFragment;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.fragment.SplashFragment;
+import com.omnom.android.fragment.UserPhotoOptionsFragment;
 import com.omnom.android.fragment.delivery.DeliveryDetailsFragment;
 import com.omnom.android.fragment.delivery.DeliveryOptionsFragment;
 import com.omnom.android.fragment.menu.MenuItemAddFragment;
@@ -67,13 +69,14 @@ import dagger.Module;
 		LunchOrderAcceptedActivity.class, TakeawayOrderAcceptedActivity.class,
 		ThanksActivity.class, ThanksDemoActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
 		PaymentProcessActivity.class, RestaurantsListActivity.class, RestaurantActivity.class, WishActivity.class, WishSentActivity.class,
-		WebActivity.class, OrderResultActivity.class, ThreeDSWebActivity.class,
+		WebActivity.class, OrderResultActivity.class, ThreeDSWebActivity.class, UserProfileEditActivity.class,
 		/* services */
 		BackgroundBleService.class,
 		/* fragments */
 		SplashFragment.class, EnteringFragment.class, OrderFragment.class, BillSplitFragment.class, BillItemsFragment.class,
 		BillSplitPersonsFragment.class, EditHashFragment.class, OrderFragment.class, MenuItemAddFragment.class,
 		DeliveryDetailsFragment.class, MenuItemDetailsFragment.class, BillSplitFragment.class, BillItemsFragment.class,
-		BillSplitPersonsFragment.class, DeliveryOptionsFragment.class, TakeawayTimeFragment.class, BarTipsFragment.class},
+		BillSplitPersonsFragment.class, DeliveryOptionsFragment.class, TakeawayTimeFragment.class, BarTipsFragment.class,
+		UserPhotoOptionsFragment.class},
 		complete = false)
 public class OmnomApplicationModule {}
