@@ -1,0 +1,123 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:baselineAligned="false"
+            android:gravity="center_horizontal">
+
+            <ImageView
+                android:id="@+id/img_user"
+                android:layout_marginTop="72dp"
+                android:layout_width="@dimen/profile_avatar_size"
+                android:layout_height="@dimen/profile_avatar_size"
+                android:src="@drawable/empty_avatar"
+                android:contentDescription="@null" />
+
+            <com.omnom.android.utils.view.ErrorEdit
+                android:id="@+id/edit_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                omnom:inputType="name"
+                omnom:imeOptions="actionNext"
+                omnom:hint="@string/name"
+                omnom:textSize="@dimen/font_large"
+                omnom:showClear="true"
+                omnom:font="regular_le"
+                omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel" />
+
+            <com.omnom.android.utils.view.ErrorEdit
+                android:id="@+id/edit_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                omnom:inputType="email"
+                omnom:imeOptions="actionNext"
+                omnom:hint="@string/email"
+                omnom:textSize="@dimen/font_large"
+                omnom:showClear="true"
+                omnom:font="regular_le"
+                omnom:iconClear="@android:drawable/ic_menu_close_clear_cancel" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/txt_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:clickable="false"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"
+                    style="@style/EditText" />
+
+                <TextView
+                    android:id="@+id/txt_change_phone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:text="Сменить"
+                    android:textColor="@color/light_blue"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+            </RelativeLayout>
+
+
+            <com.omnom.android.utils.view.ErrorEditText
+                android:id="@+id/edit_birth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:clickable="true"
+                android:hint="@string/birth_date"
+                android:textSize="@dimen/font_large"
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/txt_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_gravity="left|top"
+        android:paddingLeft="12dp"
+        android:gravity="center"
+        android:text="@string/cancel"
+        android:textColor="@drawable/text_color_selector"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    <TextView
+        android:id="@+id/txt_done"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_gravity="right|top"
+        android:paddingRight="12dp"
+        android:gravity="center"
+        android:text="@string/ready"
+        android:textColor="@drawable/text_color_selector"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</FrameLayout>
