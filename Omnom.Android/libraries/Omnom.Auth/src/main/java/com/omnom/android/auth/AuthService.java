@@ -9,8 +9,8 @@ import retrofit.http.Body;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
+import retrofit.http.Header;
 import retrofit.http.POST;
-import retrofit.http.Query;
 import rx.Observable;
 
 /**
@@ -27,9 +27,8 @@ public interface AuthService {
 	public Observable<AuthResponse> authorizeEmail(@Field(Protocol.FIELD_EMAIL) String email,
 	                                               @Field(Protocol.FIELD_CODE) String code);
 
-	@FormUrlEncoded
 	@POST("/logout")
-	public Observable<AuthResponse> logout(@Field(Protocol.FIELD_TOKEN) String token);
+	public Observable<AuthResponse> logout(@Header(com.omnom.android.protocol.Protocol.HEADER_AUTH_TOKEN) String token);
 
 	@POST("/register")
 	public Observable<AuthRegisterResponse> register(@Body AuthRegisterRequest request);
@@ -44,7 +43,7 @@ public interface AuthService {
 	public Observable<AuthResponse> confirmResend(@Field(Protocol.FIELD_PHONE) String phone);
 
 	@GET("/user")
-	public Observable<UserResponse> getUser(@Query(Protocol.FIELD_TOKEN) String token);
+	public Observable<UserResponse> getUser(@Header(com.omnom.android.protocol.Protocol.HEADER_AUTH_TOKEN) String token);
 
 	@FormUrlEncoded
 	@POST("/user/geo")
