@@ -267,9 +267,9 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 		mTxtUsername.setText(user.getName());
 		updateUserImage(user.getAvatar());
 
-		AnimationUtils.animateAlpha(mTxtInfo, true);
-		AnimationUtils.animateAlpha(mTxtLogin, true);
-		AnimationUtils.animateAlpha(mTxtUsername, true);
+		AnimationUtils.animateAlpha(mTxtInfo, !TextUtils.isEmpty(mTxtInfo.getText()));
+		AnimationUtils.animateAlpha(mTxtLogin, !TextUtils.isEmpty(mTxtLogin.getText()));
+		AnimationUtils.animateAlpha(mTxtUsername, !TextUtils.isEmpty(mTxtUsername.getText()));
 	}
 
 	private void updateUserImage(String url) {
