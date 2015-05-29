@@ -267,9 +267,21 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 		mTxtUsername.setText(user.getName());
 		updateUserImage(user.getAvatar());
 
-		AnimationUtils.animateAlpha(mTxtInfo, !TextUtils.isEmpty(mTxtInfo.getText()));
-		AnimationUtils.animateAlpha(mTxtLogin, !TextUtils.isEmpty(mTxtLogin.getText()));
-		AnimationUtils.animateAlpha(mTxtUsername, !TextUtils.isEmpty(mTxtUsername.getText()));
+		smartAnimateText(mTxtInfo);
+		smartAnimateText(mTxtLogin);
+		smartAnimateText(mTxtUsername);
+	}
+
+	/**
+	 * Animate textView alpha is TextView has some text, otherwise set it's visibility to {@link android.view.View#GONE}
+	 */
+	private void smartAnimateText(final TextView txtView) {
+		final boolean hasText = !TextUtils.isEmpty(txtView.getText());
+		if(hasText) {
+			AnimationUtils.animateAlpha(txtView, hasText);
+		} else {
+			ViewUtils.setVisibleGone(txtView, hasText);
+		}
 	}
 
 	private void updateUserImage(String url) {
