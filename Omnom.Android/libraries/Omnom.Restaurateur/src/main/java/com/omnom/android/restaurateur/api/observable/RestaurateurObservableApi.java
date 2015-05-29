@@ -14,6 +14,7 @@ import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
+import com.omnom.android.restaurateur.model.restaurant.FileUploadReponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
@@ -25,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 import altbeacon.beacon.Beacon;
+import retrofit.mime.TypedFile;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -109,4 +111,6 @@ public interface RestaurateurObservableApi {
 	Observable<WishResponse> wishes(String restId, WishRequest request);
 
 	Observable<WishResponse> getWish(String wishId);
+
+	Observable<FileUploadReponse> updateAvatar(TypedFile image);
 }

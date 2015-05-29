@@ -7,6 +7,9 @@ public interface Protocol {
 	public static final String FIELD_EMAIL = "email";
 	public static final String FIELD_PHONE = "phone";
 	public static final String FIELD_TOKEN = "token";
+	public static final String FIELD_NAME = "name";
+	public static final String FIELD_BIRTH = "birth_date";
+	public static final String FIELD_AVATAR = "avatar";
 	public static final String FIELD_CODE = "code";
 
 	public static final String FIELD_LONGITUDE = "longitude";

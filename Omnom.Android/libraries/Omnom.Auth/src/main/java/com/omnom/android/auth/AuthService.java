@@ -63,4 +63,10 @@ public interface AuthService {
 	@FormUrlEncoded
 	@POST("/recover")
 	Observable<AuthResponse> changePhone(@Field(Protocol.FIELD_PHONE) String phone);
+
+	@FormUrlEncoded
+	@POST("/user")
+	public Observable<UserResponse> updateUser(@Field(Protocol.FIELD_TOKEN) String token, @Field(Protocol.FIELD_NAME) String name,
+	                                           @Field(Protocol.FIELD_EMAIL) String email, @Field(Protocol.FIELD_BIRTH) String birth,
+	                                           @Field(Protocol.FIELD_AVATAR) String avaUrl);
 }

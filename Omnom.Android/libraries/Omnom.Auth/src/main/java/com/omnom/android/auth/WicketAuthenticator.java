@@ -99,4 +99,14 @@ public class WicketAuthenticator implements AuthService {
 	public Observable<AuthResponse> changePhone(@Field(Protocol.FIELD_PHONE) String phone) {
 		return authService.changePhone(phone).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
+
+	@Override
+	public Observable<UserResponse> updateUser(
+			@Field(Protocol.FIELD_TOKEN) final String token,
+			@Field(Protocol.FIELD_NAME) final String name,
+			@Field(Protocol.FIELD_EMAIL) final String email,
+			@Field(Protocol.FIELD_BIRTH) final String birth, @Field(Protocol.FIELD_AVATAR) final String avaUrl) {
+		return authService.updateUser(token, name, email, birth, avaUrl).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
+	}
 }

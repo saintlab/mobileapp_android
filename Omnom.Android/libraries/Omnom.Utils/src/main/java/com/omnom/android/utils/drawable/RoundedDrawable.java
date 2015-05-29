@@ -24,20 +24,32 @@ import com.omnom.android.utils.R;
 public class RoundedDrawable extends Drawable {
 	private static final boolean USE_VIGNETTE = false;
 
-	private final float mCornerRadius;
-	private final RectF mRect = new RectF();
-	private final BitmapShader mBitmapShader;
-	private final Paint mPaint;
-	private final int mMargin;
+	public static void setScaledRoundedDrawable(ImageView imgView, Bitmap bitmap, final int outSize) {
+		setRoundedDrawable(imgView, Bitmap.createScaledBitmap(bitmap, outSize, outSize, false), 0);
+	}
 
 	public static void setRoundedDrawable(ImageView imgView, Bitmap bitmap) {
 		setRoundedDrawable(imgView, bitmap, 0);
 	}
-
+	
 	public static void setRoundedDrawable(ImageView imgView, Bitmap bitmap, int margin) {
 		final int cornerRadius = imgView.getResources().getDimensionPixelSize(R.dimen.profile_avatar_size);
 		imgView.setImageDrawable(new RoundedDrawable(bitmap, cornerRadius, margin));
 	}
+
+	public static void setRoundedDrawable(ImageView imgView, Bitmap bitmap, int margin, int cornerRadius) {
+		imgView.setImageDrawable(new RoundedDrawable(bitmap, cornerRadius, margin));
+	}
+
+	private final float mCornerRadius;
+
+	private final RectF mRect = new RectF();
+
+	private final BitmapShader mBitmapShader;
+
+	private final Paint mPaint;
+
+	private final int mMargin;
 
 	public RoundedDrawable(Bitmap bitmap, float cornerRadius, int margin) {
 		mCornerRadius = cornerRadius;
@@ -56,7 +68,7 @@ public class RoundedDrawable extends Drawable {
 		super.onBoundsChange(bounds);
 		mRect.set(mMargin, mMargin, bounds.width() - mMargin, bounds.height() - mMargin);
 
-		if (USE_VIGNETTE) {
+		if(USE_VIGNETTE) {
 			RadialGradient vignette =
 					new RadialGradient(mRect.centerX(), mRect.centerY() * 1.0f / 0.7f, mRect.centerX() * 1.3f, new int[]{0, 0, 0x7f000000},
 					                   new float[]{0.0f, 0.7f, 1.0f}, Shader.TileMode.CLAMP);
