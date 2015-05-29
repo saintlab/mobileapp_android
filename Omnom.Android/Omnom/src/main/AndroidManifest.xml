@@ -334,7 +334,9 @@
             android:theme="@style/Theme.White.Light"
             android:windowSoftInputMode="stateAlwaysHidden" />
 
-        <activity android:name="com.android.camera.CropImage" />
+        <activity
+            android:name="com.android.camera.CropImage"
+            android:theme="@style/Theme.CropImage" />
 
         <activity
             android:name=".activity.ThreeDSWebActivity"

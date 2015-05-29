@@ -63,6 +63,12 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 
 	public static final int FLAG_CHANGE_AVATAR = 1;
 
+	public static final int CROP_IMAGE_WIDTH = 640;
+
+	public static final int CROP_IMAGE_HEIGHT = CROP_IMAGE_WIDTH;
+
+	public static final String CROP_TEMP_FILE = "crop.jpg";
+
 	private static final int TAKE_PHOTO_CODE = 11;
 
 	private static final int ANDROID_CROP_IMAGE = 12;
@@ -216,11 +222,11 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 	}
 
 	private void cropImage(final Uri data) {
-		mCroppedImageFile = new File(getFilesDir(), "crop.jpg");
+		mCroppedImageFile = new File(getFilesDir(), CROP_TEMP_FILE);
 		final Uri croppedImage = Uri.fromFile(mCroppedImageFile);
 
-		CropImageIntentBuilder cropImage = new CropImageIntentBuilder(640, 640, croppedImage);
-		cropImage.setOutlineColor(getResources().getColor(R.color.transparent_black));
+		CropImageIntentBuilder cropImage = new CropImageIntentBuilder(CROP_IMAGE_WIDTH, CROP_IMAGE_HEIGHT, croppedImage);
+		cropImage.setOutlineColor(getResources().getColor(android.R.color.white));
 		cropImage.setSourceImage(data);
 
 		startActivityForResult(cropImage.getIntent(this), ANDROID_CROP_IMAGE);
