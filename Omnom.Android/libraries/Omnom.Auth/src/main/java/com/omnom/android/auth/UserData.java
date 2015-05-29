@@ -1,5 +1,8 @@
 package com.omnom.android.auth;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.omnom.android.utils.utils.StringUtils;
@@ -9,10 +12,22 @@ import java.util.HashMap;
 /**
  * Created by Ch3D on 03.09.2014.
  */
-public class UserData {
+public class UserData implements Parcelable {
 
 	public static final UserData NULL = new UserData(-1, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING,
 	                                                 StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
+
+	public static final Creator<UserData> CREATOR = new Creator<UserData>() {
+		@Override
+		public UserData createFromParcel(Parcel in) {
+			return new UserData(in);
+		}
+
+		@Override
+		public UserData[] newArray(int size) {
+			return new UserData[size];
+		}
+	};
 
 	@Expose
 	private int id;
@@ -54,6 +69,16 @@ public class UserData {
 		this.phone = phone;
 		this.avatar = avatar;
 		this.birthDate = birthDate;
+	}
+
+	private UserData(Parcel in) {
+		id = in.readInt();
+		name = in.readString();
+		nick = in.readString();
+		email = in.readString();
+		phone = in.readString();
+		avatar = in.readString();
+		birthDate = in.readString();
 	}
 
 	public int getId() {
@@ -130,5 +155,21 @@ public class UserData {
 				", phone='" + phone + '\'' +
 				", birthDate='" + birthDate + '\'' +
 				'}';
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(final Parcel dest, final int flags) {
+		dest.writeInt(id);
+		dest.writeString(name);
+		dest.writeString(nick);
+		dest.writeString(email);
+		dest.writeString(phone);
+		dest.writeString(avatar);
+		dest.writeString(birthDate);
 	}
 }

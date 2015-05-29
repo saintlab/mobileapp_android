@@ -121,6 +121,7 @@ dependencies {
     compile project(':libraries:Omnom.Menu')
     compile project(':libraries:SlidingUpPanel:library')
     compile project(':libraries:recyclerview-animators:animators')
+    compile project(':libraries:android-cropimage:CropImage')
     compile project(':libraries:Io.Socket.Client')
     compile project(':libraries:Io.Engine.Client')
 

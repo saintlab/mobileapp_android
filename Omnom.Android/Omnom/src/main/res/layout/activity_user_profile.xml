@@ -197,6 +197,18 @@
         android:scaleType="centerInside"
         android:src="@drawable/ic_cross_black" />
 
+    <TextView
+        android:id="@+id/txt_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:paddingRight="12dp"
+        android:gravity="center"
+        android:layout_gravity="right|top"
+        android:text="@string/change"
+        android:textColor="@drawable/text_color_selector"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
     <FrameLayout
         android:id="@+id/dark_transparent_background"
         android:layout_width="match_parent"

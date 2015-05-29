@@ -23,6 +23,7 @@ import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
+import com.omnom.android.restaurateur.model.restaurant.FileUploadReponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
@@ -41,6 +42,7 @@ import altbeacon.beacon.Beacon;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
+import retrofit.mime.TypedFile;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -209,6 +211,11 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	@Override
 	public Observable<WishResponse> getWish(final String wishId) {
 		return mDataService.getWish(wishId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<FileUploadReponse> updateAvatar(final TypedFile file) {
+		return mDataService.updateAvatar(file).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

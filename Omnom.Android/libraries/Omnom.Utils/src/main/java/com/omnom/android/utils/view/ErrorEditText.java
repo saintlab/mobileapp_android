@@ -14,6 +14,8 @@ public class ErrorEditText extends EditText {
 
 	private ColorStateList mTextColors = null;
 
+	private boolean mIsError;
+
 	public ErrorEditText(Context context) {
 		super(context);
 		init();
@@ -38,13 +40,6 @@ public class ErrorEditText extends EditText {
 		return false;
 	}
 
-	public void setError(boolean error) {
-		setBackgroundResource(error ? R.drawable.textfield_error_mtrl_alpha : getDefaultDrawable());
-		if(!error && mTextColors != null) {
-			setTextColor(mTextColors);
-		}
-	}
-
 	public void setError(boolean error, String errorText) {
 		if(error) {
 			setText(errorText);
@@ -64,5 +59,17 @@ public class ErrorEditText extends EditText {
 			mDefaultDrawableId = (resId == -1) ? R.drawable.edit_text : resId;
 		}
 		return mDefaultDrawableId;
+	}
+
+	public boolean isError() {
+		return mIsError;
+	}
+
+	public void setError(boolean error) {
+		mIsError = error;
+		setBackgroundResource(error ? R.drawable.textfield_error_mtrl_alpha : getDefaultDrawable());
+		if(!error && mTextColors != null) {
+			setTextColor(mTextColors);
+		}
 	}
 }
