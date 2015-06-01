@@ -1,6 +1,7 @@
 package com.omnom.android.restaurateur.model.bill;
 
 import com.google.gson.annotations.Expose;
+import com.omnom.android.currency.Money;
 import com.omnom.android.restaurateur.model.order.Order;
 
 /**
@@ -24,8 +25,8 @@ public class BillRequest {
 		return billRequest;
 	}
 
-	public static BillRequest create(double amount, Order order) {
-		return create(Double.toString(amount), order.getRestaurantId(), order.getTableId(), order.getId());
+	public static BillRequest create(Money amount, Order order) {
+		return create(amount.getReadableValue(), order.getRestaurantId(), order.getTableId(), order.getId());
 	}
 
 	@Expose

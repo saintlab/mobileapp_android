@@ -32,6 +32,7 @@ import com.omnom.android.acquiring.mailru.response.CardRegisterPollingResponse;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.currency.Money;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.fragment.ConfirmMoneyBackFragment;
 import com.omnom.android.fragment.PayOnceFragment;
@@ -94,7 +95,7 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 
 	@SuppressLint("NewApi")
 	public static void startConfirm(BaseOmnomFragmentActivity activity, final CardInfo card, int code,
-	                                double amount) {
+	                                Money amount) {
 		final Intent intent = new Intent(activity, CardConfirmActivity.class);
 		intent.putExtra(EXTRA_CARD_DATA, card);
 		intent.putExtra(EXTRA_TYPE, TYPE_CONFIRM);
@@ -133,7 +134,7 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 
 	private AcquiringData mAcquiringData;
 
-	private double mAmount;
+	private Money mAmount;
 
 	private boolean mScanUsed;
 
@@ -229,7 +230,7 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 		super.handleIntent(intent);
 		mCard = intent.getParcelableExtra(EXTRA_CARD_DATA);
 		mType = intent.getIntExtra(EXTRA_TYPE, TYPE_BIND_CONFIRM);
-		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);
+		mAmount = intent.getParcelableExtra(EXTRA_ORDER_AMOUNT);
 		mScanUsed = intent.getBooleanExtra(EXTRA_SCAN_USED, false);
 	}
 

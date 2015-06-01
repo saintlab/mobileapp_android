@@ -5,7 +5,8 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
-import com.omnom.android.utils.utils.AmountHelper;
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -270,7 +271,14 @@ public class Order implements Parcelable {
 		if(paid == null) {
 			return 0;
 		}
-		return AmountHelper.toDouble(paid.getAmount() - paid.getTip());
+		return paid.getAmount() - paid.getTip();
+	}
+
+	public Money getPaidMoney(Currency currency) {
+		if(getPaidAmount() > 0) {
+			return Money.createFractional(getPaidAmount(), currency);
+		}
+		return Money.ZERO;
 	}
 
 	@Override
@@ -331,12 +339,28 @@ public class Order implements Parcelable {
 		return sum.doubleValue();
 	}
 
+	public Money getTotalMoney(Currency currency) {
+		double sum = 0;
+		for(final OrderItem item : items) {
+			sum += item.getPriceTotal();
+		}
+		return Money.create(sum, currency);
+	}
+
 	public double getAmountToPay() {
 		return Math.max(getTotalAmount() - getPaidAmount(), 0);
 	}
 
+	public Money getMoneyToPay(Currency currency) {
+		final Money toPay = getTotalMoney(currency).subtract(getPaidMoney(currency));
+		if(!toPay.isNegativeOrZero()) {
+			return toPay;
+		}
+		return Money.ZERO;
+	}
+
 	public double getPaidTip() {
-		return paid != null ? AmountHelper.toDouble(paid.getTip()) : 0;
+		return paid != null ? paid.getTip() : 0;
 	}
 
 }

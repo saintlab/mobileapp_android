@@ -10,6 +10,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -146,9 +148,9 @@ public class OrderItemsAdapter extends BaseAdapter {
 			return;
 		}
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
-		if (mCheckedStates.get(position)) {
+		if(mCheckedStates.get(position)) {
 			final int nextPosition = position + 1;
-			if (mCheckedStates.get(nextPosition)) {
+			if(mCheckedStates.get(nextPosition)) {
 				AndroidUtils.setBackground(holder.divider, mContext.getResources().getDrawable(R.drawable.divider_list_padding_green));
 			} else {
 				AndroidUtils.setBackground(holder.divider, mContext.getResources().getDrawable(R.drawable.divider_list_padding_white));
@@ -164,7 +166,8 @@ public class OrderItemsAdapter extends BaseAdapter {
 			holder.txtPrice.setTextColor(mColorPriceNormal);
 		}
 		holder.txtTitle.setText(item.getTitle());
-		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPricePerItem()));
+		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(),
+		                                                         Money.createFractional(item.getPricePerItem(), Currency.RU)));
 	}
 
 	public void setSelected(final int position, final boolean selected) {
@@ -195,12 +198,12 @@ public class OrderItemsAdapter extends BaseAdapter {
 		mCheckedStates = states;
 	}
 
-    public void updateItems(final List<OrderItem> items) {
-        if (mItems != null && items != null && mItems.size() != items.size()) {
-            clearSelection();
-        }
-        this.mItems = items;
-        notifyDataSetChanged();
-    }
+	public void updateItems(final List<OrderItem> items) {
+		if(mItems != null && items != null && mItems.size() != items.size()) {
+			clearSelection();
+		}
+		this.mItems = items;
+		notifyDataSetChanged();
+	}
 
 }

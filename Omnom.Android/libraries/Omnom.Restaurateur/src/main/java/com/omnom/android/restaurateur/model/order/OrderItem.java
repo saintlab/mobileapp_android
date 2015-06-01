@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,22 +25,31 @@ public class OrderItem implements Parcelable {
 			return new OrderItem[size];
 		}
 	};
+
 	@Expose
 	private String guestId;
+
 	@Expose
 	private double quantity;
+
 	@Expose
 	private double priceTotal;
+
 	@Expose
 	private double pricePerItem;
+
 	@Expose
 	private String internalId;
+
 	@Expose
 	private String title;
+
 	@Expose
 	private String id;
+
 	@Expose
 	private List<Object> modifiers = new ArrayList<Object>();
+
 	@Expose
 	private Boolean isModifier;
 
@@ -98,6 +109,10 @@ public class OrderItem implements Parcelable {
 
 	public void setPricePerItem(double pricePerItem) {
 		this.pricePerItem = pricePerItem;
+	}
+
+	public Money getPricePerItem(Currency currency) {
+		return Money.create(getPricePerItem(), currency);
 	}
 
 	public String getInternalId() {

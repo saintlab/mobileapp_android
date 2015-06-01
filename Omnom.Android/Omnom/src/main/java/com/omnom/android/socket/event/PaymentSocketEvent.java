@@ -4,10 +4,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.omnom.android.auth.UserData;
+import com.omnom.android.currency.Money;
 import com.omnom.android.restaurateur.model.order.PaymentData;
 import com.omnom.android.restaurateur.model.order.Transaction;
 import com.omnom.android.utils.UserHelper;
-import com.omnom.android.utils.utils.AmountHelper;
 
 /**
  * Created by Ch3D on 26.11.2014.
@@ -26,10 +26,10 @@ public class PaymentSocketEvent extends BaseSocketEvent implements Parcelable {
 		}
 	};
 
-	public static PaymentSocketEvent createDemoEvent(UserData userData, double amount, int tips) {
+	public static PaymentSocketEvent createDemoEvent(UserData userData, Money amount, Money tips) {
 		final PaymentData data = new PaymentData();
 		data.setUser(UserHelper.toPaymentUser(userData));
-		data.setTransaction(new Transaction(AmountHelper.toInt(amount - tips), 0));
+		data.setTransaction(new Transaction((int) amount.subtract(tips).getFractionalValue(), 0));
 		return new PaymentSocketEvent(data);
 	}
 

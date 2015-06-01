@@ -14,14 +14,14 @@ import android.widget.HeaderViewListAdapter;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.OrderItemsAdapter;
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.squareup.otto.Bus;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -107,25 +107,25 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 		super.onViewCreated(view, savedInstanceState);
 	}
 
-	private BigDecimal getAmount() {
-		BigDecimal result = BigDecimal.ZERO;
+	private Money getAmount() {
+		double result = 0;
 		final List<OrderItem> selectedItems = mAdapter.getSelectedItems();
 		for(final OrderItem item : selectedItems) {
-			result = result.add(BigDecimal.valueOf(item.getPriceTotal()));
+			result += item.getPriceTotal();
 		}
-		return result;
+		return Money.createFractional(result, Currency.RU);
 	}
 
 	@Override
 	public void updateAmount() {
 		final Button btnCommit = (Button) getActivity().findViewById(R.id.btn_commit);
 		final View viewBehindBtn = getActivity().findViewById(R.id.view_behind_btn);
-		final BigDecimal amount = getAmount();
+		final Money amount = getAmount();
 		boolean showPayBtn = (mAdapter != null && !mAdapter.getSelectedItems().isEmpty());
 		if(showPayBtn) {
 			btnCommit.setTag(R.id.edit_amount, amount);
 			btnCommit.setTag(R.id.split_type, BillSplitFragment.SPLIT_TYPE_ITEMS);
-			final String text = getString(R.string.bill_split_amount_, AmountHelper.format(amount));
+			final String text = getString(R.string.bill_split_amount_, amount.getReadableValue());
 			btnCommit.setClickable(true);
 			AnimationUtils.animateAlpha(viewBehindBtn, true);
 			AnimationUtils.animateAlphaGone(btnCommit, true);

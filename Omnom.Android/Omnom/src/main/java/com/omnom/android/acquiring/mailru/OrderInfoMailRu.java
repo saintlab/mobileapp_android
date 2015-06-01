@@ -1,17 +1,20 @@
 package com.omnom.android.acquiring.mailru;
 
 import com.omnom.android.acquiring.OrderInfo;
+import com.omnom.android.currency.Money;
 
 /**
  * Created by Ch3D on 24.09.2014.
  */
 public class OrderInfoMailRu implements OrderInfo {
-	public static OrderInfoMailRu create(double amount, String orderId, String orderMsg) {
-		return new OrderInfoMailRu(amount, orderId, orderMsg);
+	public static OrderInfoMailRu create(Money amount, String orderId, String orderMsg) {
+		return new OrderInfoMailRu(amount.getFractionalValue(), orderId, orderMsg);
 	}
 
 	private double amount;
+
 	private String orderId;
+
 	private String orderMsg;
 
 	private OrderInfoMailRu(double amount, String orderId, String orderMsg) {

@@ -13,14 +13,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.currency.Money;
 import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.restaurateur.model.order.OrderHelper;
 import com.omnom.android.utils.OmnomFont;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.view.NumberPicker;
-
-import java.math.BigDecimal;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -37,22 +35,22 @@ public class BarTipsFragment extends BaseFragment {
 
 	public static final String PERCENT_SUFFIX = "%";
 
+	public static final String SYM_PLUS = "+";
+
 	private static final String ARG_VALUE = "tips_value";
 
 	private static final String ARG_AMOUNT = "order_amount";
 
-	public static final String SYM_PLUS = "+";
-
-	public static BarTipsFragment newInstance(int currenValue, final double amount) {
+	public static BarTipsFragment newInstance(int currenValue, final Money amount) {
 		final BarTipsFragment fragment = new BarTipsFragment();
 		final Bundle args = new Bundle();
 		args.putInt(ARG_VALUE, currenValue);
-		args.putDouble(ARG_AMOUNT, amount);
+		args.putParcelable(ARG_AMOUNT, amount);
 		fragment.setArguments(args);
 		return fragment;
 	}
 
-	public static void show(final FragmentManager fragmentManager, final @IdRes int containerId, final double amount, final int tipValue) {
+	public static void show(final FragmentManager fragmentManager, final @IdRes int containerId, final Money amount, final int tipValue) {
 		fragmentManager.beginTransaction()
 		               .addToBackStack(null)
 		               .setCustomAnimations(R.anim.fade_in,
@@ -80,7 +78,7 @@ public class BarTipsFragment extends BaseFragment {
 
 	private boolean mFirstStart = true;
 
-	private double mAmount;
+	private Money mAmount;
 
 	private int mTipsValue;
 
@@ -92,7 +90,7 @@ public class BarTipsFragment extends BaseFragment {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if(getArguments() != null) {
-			mAmount = getArguments().getDouble(ARG_AMOUNT, 0);
+			mAmount = getArguments().getParcelable(ARG_AMOUNT);
 			mTipsValue = getArguments().getInt(ARG_VALUE, 0);
 		}
 	}
@@ -131,9 +129,9 @@ public class BarTipsFragment extends BaseFragment {
 	}
 
 	private void updateOkButton() {
-		final int tipsAmount = OrderHelper.getTipsAmount(BigDecimal.valueOf(mAmount), mTipsValue);
-		btnOk.setText(SYM_PLUS + AmountHelper.format(tipsAmount) + getString(R.string.currency_suffix_ruble));
-		txtInfo.setText(getString(tipsAmount > 0 ? R.string.barmen_tips_positive : R.string.barmen_tips_negative));
+		final Money tipsAmount = OrderHelper.getTipsAmount(mAmount, mTipsValue);
+		btnOk.setText(SYM_PLUS + tipsAmount.getReadableCurrencyValue());
+		txtInfo.setText(getString(!tipsAmount.isNegativeOrZero() ? R.string.barmen_tips_positive : R.string.barmen_tips_negative));
 	}
 
 	@Override

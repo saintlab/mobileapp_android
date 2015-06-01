@@ -11,12 +11,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.currency.Currency;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.restaurateur.model.order.OrderItem;
-import com.omnom.android.utils.utils.AmountHelper;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -217,7 +217,7 @@ public class WishListAdapter extends BaseAdapter {
 				final UserOrderData data = (UserOrderData) item;
 				holder.txtTitle.setText(data.item().name());
 
-				final String price = AmountHelper.format(data.item().price()) + mContext.getString(R.string.currency_suffix_ruble);
+				final String price = data.item().price(Currency.RU).getReadableCurrencyValue();
 				holder.txtPrice.setText(mContext.getString(R.string.wish_items_price_detailed, data.amount(), price));
 				holder.txtPrice.setTag(data);
 				holder.txtPrice.setOnClickListener(mClickListener);
@@ -229,8 +229,7 @@ public class WishListAdapter extends BaseAdapter {
 				final OrderItem orderItem = (OrderItem) item;
 				tableItemHolder.txtTitle.setText(orderItem.getTitle());
 
-				final String itemPrice = AmountHelper.format(orderItem.getPricePerItem()) + mContext.getString(
-						R.string.currency_suffix_ruble);
+				final String itemPrice = orderItem.getPricePerItem(Currency.RU).getReadableCurrencyValue();
 				tableItemHolder.txtPrice.setText(itemPrice);
 				tableItemHolder.txtPrice.setTag(orderItem);
 				tableItemHolder.txtPrice.setOnClickListener(mClickListener);

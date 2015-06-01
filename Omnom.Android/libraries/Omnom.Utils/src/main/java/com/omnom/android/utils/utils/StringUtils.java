@@ -3,6 +3,8 @@ package com.omnom.android.utils.utils;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.omnom.android.currency.Money;
+
 import java.util.Collection;
 
 import hugo.weaving.DebugLog;
@@ -14,18 +16,18 @@ public class StringUtils {
 
 	public static final String NEXT_STRING = "\n";
 
-	private static final String TAG = StringUtils.class.getSimpleName();
-
 	public static final String EMPTY_STRING = "";
 
 	public static final String WHITESPACE = " ";
 
 	public static final String NON_BREAKING_WHITESPACE = "\u00A0";
 
+	private static final String TAG = StringUtils.class.getSimpleName();
+
 	private static final int METERS_IN_KILOMETER = 1000;
 
 	public static String concat(String delimiter, Collection<String> data) {
-		if (data == null || data.isEmpty()) {
+		if(data == null || data.isEmpty()) {
 			return StringUtils.EMPTY_STRING;
 		}
 		String[] dataArray = new String[data.size()];
@@ -34,7 +36,7 @@ public class StringUtils {
 	}
 
 	public static String concat(String delimiter, String... data) {
-		if (data == null || data.length == 0) {
+		if(data == null || data.length == 0) {
 			return StringUtils.EMPTY_STRING;
 		}
 		final StringBuilder sb = new StringBuilder();
@@ -52,7 +54,7 @@ public class StringUtils {
 
 	public static String formatCurrency(final String decimalSeparator, final String s) {
 		String regexDecimalSeparator = decimalSeparator;
-		if (regexDecimalSeparator.equals(".")) {
+		if(regexDecimalSeparator.equals(".")) {
 			regexDecimalSeparator = "\\.";
 		}
 		return s.indexOf(decimalSeparator) < 0 ? s : s.replaceAll("0*$", "").replaceAll(regexDecimalSeparator + "$", "");
@@ -120,16 +122,16 @@ public class StringUtils {
 	 * @return distance in meters or kilometers
 	 */
 	public static String formatDistance(final double distance) {
-		if ((int) distance / METERS_IN_KILOMETER > 0) {
+		if((int) distance / METERS_IN_KILOMETER > 0) {
 			return String.format("~%.2fкм", (distance / METERS_IN_KILOMETER));
 		} else {
 			return String.format("~%dм", (int) distance);
 		}
 	}
 
-	public static String formatOrderItemPrice(final double quantity, final double pricePerItem) {
-		final String pricePerItemStr = AmountHelper.format(pricePerItem);
-		if (quantity != 1.0) {
+	public static String formatOrderItemPrice(final double quantity, final Money pricePerItem) {
+		final String pricePerItemStr = pricePerItem.getReadableValue();
+		if(quantity != 1.0) {
 			return String.format("%.1f x %s", quantity, pricePerItemStr);
 		} else {
 			return pricePerItemStr;

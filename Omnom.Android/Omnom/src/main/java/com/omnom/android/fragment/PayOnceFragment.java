@@ -13,8 +13,8 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.CardConfirmActivity;
+import com.omnom.android.currency.Money;
 import com.omnom.android.utils.OmnomFont;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -44,10 +44,10 @@ public class PayOnceFragment extends Fragment {
 
 	private static final String ARG_TYPE = "type";
 
-	public static Fragment newInstance(final double amount, final int type) {
+	public static Fragment newInstance(final Money amount, final int type) {
 		final PayOnceFragment fragment = new PayOnceFragment();
 		final Bundle args = new Bundle();
-		args.putDouble(ARG_AMOUNT, amount);
+		args.putParcelable(ARG_AMOUNT, amount);
 		args.putInt(ARG_TYPE, type);
 		fragment.setArguments(args);
 		return fragment;
@@ -72,7 +72,7 @@ public class PayOnceFragment extends Fragment {
 
 	private VisibilityListener mVisibilityListener;
 
-	private double mAmount;
+	private Money mAmount;
 
 	private int mType;
 
@@ -80,7 +80,7 @@ public class PayOnceFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if(getArguments() != null) {
-			mAmount = getArguments().getDouble(ARG_AMOUNT);
+			mAmount = getArguments().getParcelable(ARG_AMOUNT);
 			mType = getArguments().getInt(ARG_TYPE);
 		}
 	}
@@ -139,8 +139,8 @@ public class PayOnceFragment extends Fragment {
 				getActivity().onBackPressed();
 			}
 		});
-		if(mAmount > 0) {
-			final String text = AmountHelper.format(mAmount) + getActivity().getString(R.string.currency_suffix_ruble);
+		if(!mAmount.isNegativeOrZero()) {
+			final String text = mAmount.getReadableCurrencyValue();
 			if(mType == CardConfirmActivity.TYPE_BIND_CONFIRM) {
 				btnPay.setText(getString(R.string.pay_amount, text));
 			} else {

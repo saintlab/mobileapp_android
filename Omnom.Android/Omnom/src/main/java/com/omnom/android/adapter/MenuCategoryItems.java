@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.currency.Currency;
 import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.menu.model.Category;
 import com.omnom.android.menu.model.Details;
@@ -22,7 +23,6 @@ import com.omnom.android.menu.model.MenuItemState;
 import com.omnom.android.menu.model.Modifier;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewFilter;
@@ -122,7 +122,7 @@ public class MenuCategoryItems {
 				btnApply.setText(StringUtils.EMPTY_STRING);
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
-				btnApply.setText(AmountHelper.format(item.price()) + getContext().getString(R.string.currency_suffix_ruble));
+				btnApply.setText(item.price(Currency.RU).getReadableCurrencyValue());
 			}
 		}
 
@@ -173,7 +173,7 @@ public class MenuCategoryItems {
 				btnApply.setText(StringUtils.EMPTY_STRING);
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
-				btnApply.setText(AmountHelper.format(item.price()) + getContext().getString(R.string.currency_suffix_ruble));
+				btnApply.setText(item.price(Currency.RU).getReadableCurrencyValue());
 			}
 		}
 

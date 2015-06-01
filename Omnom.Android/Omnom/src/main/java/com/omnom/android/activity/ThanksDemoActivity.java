@@ -5,11 +5,11 @@ import android.content.Intent;
 
 import com.omnom.android.R;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.currency.Money;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.socket.event.PaymentSocketEvent;
 import com.omnom.android.utils.CroutonHelper;
 import com.omnom.android.utils.Extras;
-import com.omnom.android.utils.utils.AmountHelper;
 
 /**
  * Created by Ch3D on 04.12.2014.
@@ -20,8 +20,8 @@ public class ThanksDemoActivity extends ThanksActivity {
 	                         final Order order,
 	                         final int code,
 	                         final int color,
-	                         final double amount,
-	                         final int tips) {
+	                         final Money amount,
+	                         final Money tips) {
 		final Intent intent = new Intent(activity, ThanksDemoActivity.class);
 		intent.putExtra(EXTRA_ACCENT_COLOR, color);
 		intent.putExtra(EXTRA_ORDER, order);
@@ -30,30 +30,30 @@ public class ThanksDemoActivity extends ThanksActivity {
 		activity.startActivityForResult(intent, code);
 	}
 
-	private double mAmount;
+	private Money mAmount;
 
-	private int mTips;
+	private Money mTips;
 
 	private boolean mFirstRun = true;
 
 	@Override
 	protected void handleIntent(final Intent intent) {
 		super.handleIntent(intent);
-		mAmount = intent.getDoubleExtra(Extras.EXTRA_ORDER_AMOUNT, -1);
-		mTips = intent.getIntExtra(Extras.EXTRA_ORDER_TIPS, 0);
+		mAmount = intent.getParcelableExtra(Extras.EXTRA_ORDER_AMOUNT);
+		mTips = intent.getParcelableExtra(Extras.EXTRA_ORDER_TIPS);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(mFirstRun && mAmount != -1) {
+		if(mFirstRun && mAmount != null) {
 			postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 				@Override
 				public void run() {
 					final UserData user = getApp().getUserProfile().getUser();
 					final PaymentSocketEvent demoEvent = PaymentSocketEvent.createDemoEvent(user,
 					                                                                        mAmount,
-					                                                                        (int) AmountHelper.toDouble(mTips));
+					                                                                        mTips);
 					CroutonHelper.showPaymentNotification(getActivity(), demoEvent.getPaymentData());
 					mFirstRun = false;
 				}

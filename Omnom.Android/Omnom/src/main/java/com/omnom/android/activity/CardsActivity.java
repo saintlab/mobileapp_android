@@ -29,6 +29,7 @@ import com.omnom.android.activity.helper.PaymentDataTable;
 import com.omnom.android.activity.helper.PaymentDataWish;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.currency.Money;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.menu.model.UserOrder;
@@ -45,7 +46,6 @@ import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.preferences.PreferenceProvider;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -245,7 +245,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 		}
 
 		if(mDetails != null && mBtnPay != null) {
-			final String text = AmountHelper.format(mDetails.getAmount()) + getString(R.string.currency_suffix_ruble);
+			final String text = mDetails.getAmount().getReadableCurrencyValue();
 			mBtnPay.setText(getString(R.string.pay_amount, text));
 
 			ViewUtils.setBackgroundDrawableColor(mBtnPay, getResources().getColor(R.color.btn_pay_green));
@@ -273,7 +273,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 							.cvv(cvv)
 							.build();
 					CardConfirmActivity.startConfirm(CardsActivity.this, cardInfo, REQUEST_CODE_CARD_CONFIRM,
-					                                 mDetails != null ? mDetails.getAmount() : 0);
+					                                 mDetails != null ? mDetails.getAmount() : Money.ZERO);
 				}
 			}
 		});
@@ -549,7 +549,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 				Log.w(TAG, "Card info is null");
 			}
 		} else if(resultCode == RESULT_ENTER_CARD_AND_PAY) {
-			CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : 0,
+			CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : Money.ZERO,
 			                      CardAddActivity.TYPE_ENTER_AND_PAY, mEntranceData,
 			                      REQUEST_CODE_CARD_ADD);
 		}
@@ -560,7 +560,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 		if(mDetails != null) {
 			type = CardAddActivity.TYPE_BIND_OR_PAY;
 		}
-		CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : 0,
+		CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : Money.ZERO,
 		                      type, mEntranceData, REQUEST_CODE_CARD_ADD);
 	}
 

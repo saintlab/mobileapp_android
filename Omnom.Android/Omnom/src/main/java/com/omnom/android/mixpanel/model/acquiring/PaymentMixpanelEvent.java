@@ -6,7 +6,6 @@ import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.model.SplitWay;
 import com.omnom.android.mixpanel.model.TipsWay;
-import com.omnom.android.utils.utils.AmountHelper;
 
 /**
  * Created by Ch3D on 22.12.2014.
@@ -14,6 +13,7 @@ import com.omnom.android.utils.utils.AmountHelper;
 public class PaymentMixpanelEvent extends AbstractAcquiringMixpanelEvent {
 
 	public static final String EVENT_TITLE = "payment_success";
+
 	public static final String FAIL_EVENT_TITLE = "ERROR_MAIL_CARD_PAY";
 
 	private final String orderId;
@@ -22,7 +22,7 @@ public class PaymentMixpanelEvent extends AbstractAcquiringMixpanelEvent {
 
 	private final String restaurantId;
 
-	private final int tipsSum;
+	private final long tipsSum;
 
 	private final String tipsWay;
 
@@ -32,7 +32,7 @@ public class PaymentMixpanelEvent extends AbstractAcquiringMixpanelEvent {
 
 	private final int percent;
 
-	private final int totalAmount;
+	private final long totalAmount;
 
 	private final int billId;
 
@@ -48,12 +48,12 @@ public class PaymentMixpanelEvent extends AbstractAcquiringMixpanelEvent {
 		orderId = details.getOrderId();
 		tableId = details.getTableId();
 		restaurantId = details.getRestaurantName();
-		billSum = AmountHelper.toInt(details.getAmount()) - details.getTip();
-        tipsSum = details.getTip();
+		billSum = details.getAmount().subtract(details.getTip()).getFractionalValue();
+		tipsSum = details.getTip().getFractionalValue();
 		percent = details.getTipValue();
 		tipsWay = TipsWay.values()[details.getTipsWay()].name().toLowerCase();
 		split = SplitWay.values()[details.getSplitWay()].name().toLowerCase();
-		totalAmount = AmountHelper.toInt(details.getAmount());
+		totalAmount = details.getAmount().getFractionalValue();
 	}
 
 	@Override

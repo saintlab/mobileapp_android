@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.currency.Currency;
 import com.omnom.android.entrance.DeliveryEntranceData;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.menu.model.Item;
@@ -18,7 +19,6 @@ import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.menu.utils.MenuHelper;
 import com.omnom.android.restaurateur.model.order.OrderItem;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
@@ -224,7 +224,7 @@ public class WishAdapter extends RecyclerView.Adapter {
 				final UserOrderData data = (UserOrderData) getItemAt(position);
 				ivh.txtTitle.setText(data.item().name());
 
-				final String price = AmountHelper.format(data.item().price()) + mContext.getString(R.string.currency_suffix_ruble);
+				final String price = data.item().price(Currency.RU).getReadableCurrencyValue();
 				ivh.btnApply.setText(mContext.getString(R.string.wish_items_price_detailed, data.amount(), price));
 				ivh.btnApply.setTag(data);
 				ivh.btnApply.setOnClickListener(mClickListener);
@@ -259,7 +259,7 @@ public class WishAdapter extends RecyclerView.Adapter {
 
 				btnClear.setOnClickListener(mClickListener);
 				btnSend.setOnClickListener(mClickListener);
-				txtAmount.setText(AmountHelper.format(mOrder.getTotalPrice()) + mContext.getString(R.string.currency_suffix_ruble));
+				txtAmount.setText(mOrder.getTotalPrice(Currency.RU).getReadableCurrencyValue());
 
 				final boolean enabled = getSelectedItems().size() > 1;
 				ViewUtils.setVisibleGone(panelAmount, enabled);

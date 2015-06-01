@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.omnom.android.acquiring.ExtraData;
+import com.omnom.android.currency.Money;
 import com.omnom.android.utils.utils.StringUtils;
 
 /**
@@ -14,17 +15,17 @@ public class MailRuExtra extends ExtraData {
 
 	public static final String PAYMENT_TYPE_WISH = "wish";
 
-	public static MailRuExtra create(int tip, String restaurant_id, String type) {
-		return new MailRuExtra(tip, restaurant_id, type);
+	public static MailRuExtra create(Money tip, String restaurant_id, String type) {
+		return new MailRuExtra(tip.getFractionalValue(), restaurant_id, type);
 	}
 
-	private int tip;
+	private long tip;
 
 	private String restaurantId;
 
 	private String type;
 
-	private MailRuExtra(int tip, String restaurant_id, String type) {
+	private MailRuExtra(long tip, String restaurant_id, String type) {
 		if(!PAYMENT_TYPE_ORDER.equals(type) && !PAYMENT_TYPE_WISH.equals(type)) {
 			throw new IllegalArgumentException("Wrong type argument : " + type);
 		}

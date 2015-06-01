@@ -22,6 +22,7 @@ import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.activity.animation.AddCardTransitionController;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.currency.Money;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.utils.CardDataTextWatcher;
@@ -85,7 +86,7 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	}
 
 	@SuppressLint("NewApi")
-	public static void start(Activity activity, double amount, int type, EntranceData entranceData, int code) {
+	public static void start(Activity activity, Money amount, int type, EntranceData entranceData, int code) {
 		final Intent intent = new Intent(activity, CardAddActivity.class);
 		intent.putExtra(EXTRA_ORDER_AMOUNT, amount);
 		intent.putExtra(EXTRA_TYPE, type);

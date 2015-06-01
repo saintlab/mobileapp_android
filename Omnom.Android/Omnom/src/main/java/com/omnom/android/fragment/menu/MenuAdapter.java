@@ -15,12 +15,12 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.MultiLevelRecyclerAdapter;
+import com.omnom.android.currency.Currency;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.MenuItemState;
 import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.utils.MenuHelper;
-import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.subcategories.HeaderItemDecorator;
@@ -164,12 +164,12 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 			} else {
 				if(selected == position) {
 					btnApply.setBackgroundResource(R.drawable.bg_rounded_blue_normal);
-					btnApply.setText(AmountHelper.format(item.price()) + getContext().getString(R.string.currency_suffix_ruble));
+					btnApply.setText(item.price(Currency.RU).getReadableCurrencyValue());
 					btnApply.setTextColor(Color.WHITE);
 				} else {
 					btnApply.setBackgroundResource(R.drawable.btn_rounded_menu_price);
 					btnApply.setTextColor(mContext.getResources().getColorStateList(R.drawable.text_color_selector_menu_price));
-					btnApply.setText(AmountHelper.format(item.price()) + getContext().getString(R.string.currency_suffix_ruble));
+					btnApply.setText(item.price(Currency.RU).getReadableCurrencyValue());
 				}
 			}
 		}

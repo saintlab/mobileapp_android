@@ -11,9 +11,10 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.order.PaymentData;
-import com.omnom.android.utils.utils.AmountHelper;
 
 import java.math.BigDecimal;
 
@@ -49,24 +50,21 @@ public class CroutonHelper {
 		final UserData user = userProfile != null ? userProfile.getUser() : null;
 		final boolean sameUser = user != null && data.getUser().getId() == user.getId();
 
-		final int tip = data.getTransaction().getTip();
-		final int amount = data.getTransaction().getAmount();
+		final Money tip = Money.createFractional(data.getTransaction().getTip(), Currency.RU);
+		final Money amount = Money.createFractional(data.getTransaction().getAmount(), Currency.RU);
+		final Money paid = amount.subtract(tip);
 
-		final BigDecimal paid = BigDecimal.valueOf(amount - tip);
-		final BigDecimal paidInRubles = paid.divide(DIVIDER);
-		final BigDecimal tipInRubles = BigDecimal.valueOf(tip).divide(DIVIDER);
-
-		if(sameUser && tip > 0 && paidInRubles.compareTo(BigDecimal.ZERO) <= 0) {
+		if(sameUser && !tip.isNegativeOrZero() && paid.isNegativeOrZero()) {
 			// current user paid only tip
 			msg = activity.getString(com.omnom.android.R.string.balk_notification_user_tips_only,
 			                         data.getUser().getName(),
-			                         AmountHelper.format(tipInRubles));
-		} else if(sameUser && tip > 0 && paidInRubles.compareTo(BigDecimal.ZERO) > 0) {
+			                         tip.getReadableValue());
+		} else if(sameUser && !tip.isNegativeOrZero() && !paid.isNegativeOrZero()) {
 			// current user paid some amount + tip
 			msg = activity.getString(com.omnom.android.R.string.balk_notification_user_paid_tips,
 			                         data.getUser().getName(),
-			                         AmountHelper.format(paidInRubles),
-			                         AmountHelper.format(tipInRubles));
+			                         paid.getReadableValue(),
+			                         tip.getReadableValue());
 
 			// make text font smaller
 			((TextView) view.findViewById(com.omnom.android.R.id.txt_message)).setTextSize(TypedValue.COMPLEX_UNIT_PX,
@@ -76,7 +74,7 @@ public class CroutonHelper {
 			// another user paid
 			msg = activity.getString(com.omnom.android.R.string.balk_notification_user_paid_,
 			                         data.getUser().getName(),
-			                         AmountHelper.format(paidInRubles));
+			                         paid.getReadableValue());
 		}
 
 		((TextView) view.findViewById(com.omnom.android.R.id.txt_message)).setText(msg);
