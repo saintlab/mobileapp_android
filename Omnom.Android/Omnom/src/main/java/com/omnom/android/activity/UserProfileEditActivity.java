@@ -298,13 +298,6 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 			final String authToken = OmnomApplication.get(getActivity()).getAuthToken();
 			if(mImageChanged) {
 				final rx.Observable<FileUploadReponse> avatarObservable = api.updateAvatar(new TypedFile("image/jpeg", mCroppedImageFile));
-
-				final rx.Observable<UserResponse> userResponseObservable = authenticator.updateUser(authToken,
-				                                                                                    mEditName.getText(),
-				                                                                                    mEditEmail.getText(),
-				                                                                                    mEditBirth.getText().toString(),
-				                                                                                    StringUtils.EMPTY_STRING);
-
 				avatarObservable
 						.flatMap(new Func1<FileUploadReponse, Observable<UserResponse>>() {
 							@Override
