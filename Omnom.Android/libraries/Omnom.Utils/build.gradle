@@ -25,13 +25,13 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // test
-    testCompile 'org.mockito:mockito-core:1.9.5'
-    testCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support:support-annotations:22.2.0'
-    androidTestCompile 'com.android.support.test:runner:0.2'
+    testCompile 'org.mockito:mockito-core:' + MOCKITO_CORE_VERSION
+    testCompile 'junit:junit:' + JUNIT_VERSION
+    androidTestCompile 'com.android.support:support-annotations:' + SUPPORT_ANNOTATIONS_VERSION
+    androidTestCompile 'com.android.support.test:runner:' + SUPPORT_TEST_VERSION
     // Set this dependency to use JUnit 4 rules
-    androidTestCompile 'com.android.support.test:rules:0.2'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
+    androidTestCompile 'com.android.support.test:rules:' + SUPPORT_TEST_VERSION
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:' + ESPRESSO_CORE_VERSION
 
     // auto-parcel
     compile 'com.github.frankiesardo:auto-parcel:' + AUTO_PARCEL_VERSION
@@ -39,6 +39,7 @@ dependencies {
     compile 'com.google.code.gson:gson:' + GSON_VERSION
     compile 'com.android.support:support-v4:' + SUPPORT_V4_VERSION
     compile 'com.android.support:recyclerview-v7:' + RECYCLERVIEW_V7_VERSION
+
     // square
     compile 'com.squareup.okhttp:okhttp:' + OKHTTP_VERSION
     compile 'com.squareup.okhttp:okhttp-urlconnection:' + OKHTTP_VERSION
@@ -47,6 +48,7 @@ dependencies {
     compile 'com.squareup:otto:' + OTTO_VERSION
     compile 'com.squareup.dagger:dagger:' + DAGGER_VERSION
     apt 'com.squareup.dagger:dagger-compiler:' + DAGGER_VERSION
+
     //rx
     compile 'io.reactivex:rxjava:' + RXJAVA_VERSION
     compile 'io.reactivex:rxandroid:' + RXANDROID_VERSION
