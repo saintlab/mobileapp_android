@@ -6,17 +6,11 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
-    packagingOptions {
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'LICENSE.txt'
-    }
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
 
     buildTypes {
@@ -29,14 +23,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-
-    // test
-    testCompile 'org.mockito:mockito-core:1.9.5'
-    testCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support.test:runner:0.2'
-    // Set this dependency to use JUnit 4 rules
-    androidTestCompile 'com.android.support.test:rules:0.2'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
 
     // auto-parcel
     compile 'com.github.frankiesardo:auto-parcel:' + auto_parcel_version
