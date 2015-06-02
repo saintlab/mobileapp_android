@@ -138,5 +138,5 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.2.4@aar') {
         transitive = true;
     }
-    compile files('libs/pushwoosh-2.9.0.jar')
+    compile 'com.pushwoosh:pushwoosh:2.9.10'
 }
