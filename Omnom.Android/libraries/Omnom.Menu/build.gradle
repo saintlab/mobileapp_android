@@ -3,12 +3,12 @@ apply plugin: 'hugo'
 apply plugin: 'android-apt'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion COMPILE_SDK_VERSION as int
+    buildToolsVersion BUILD_TOOL_VERSION as String
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 21
+        minSdkVersion MIN_SDK_VERSION as int
+        targetSdkVersion TARGET_SDK_VERSION as int
         versionCode 1
         versionName "1.0"
     }
@@ -23,12 +23,12 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.squareup.dagger:dagger:' + dagger_version
-    apt 'com.squareup.dagger:dagger-compiler:' + dagger_version
+    compile 'com.squareup.dagger:dagger:' + DAGGER_VERSION
+    apt 'com.squareup.dagger:dagger-compiler:' + DAGGER_VERSION
 
     // auto-parcel
-    compile 'com.github.frankiesardo:auto-parcel:' + auto_parcel_version
-    apt 'com.github.frankiesardo:auto-parcel-processor:' + auto_parcel_version
+    compile 'com.github.frankiesardo:auto-parcel:' + AUTO_PARCEL_VERSION
+    apt 'com.github.frankiesardo:auto-parcel-processor:' + AUTO_PARCEL_VERSION
 
     compile project(':libraries:Omnom.Utils')
     compile project(':libraries:Omnom.Auth')

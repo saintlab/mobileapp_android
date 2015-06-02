@@ -140,5 +140,10 @@ public class ItemClickSupport {
 
             return false;
         }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(final boolean b) {
+
+        }
     }
 }

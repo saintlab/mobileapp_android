@@ -532,5 +532,10 @@ public class ItemSelectionSupport {
         boolean performItemLongClick(RecyclerView parent, View view, int position, long id) {
             return true;
         }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(final boolean b) {
+
+        }
     }
 }

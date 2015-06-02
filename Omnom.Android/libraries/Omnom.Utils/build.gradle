@@ -3,12 +3,12 @@ apply plugin: 'hugo'
 apply plugin: 'android-apt'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion COMPILE_SDK_VERSION as int
+    buildToolsVersion BUILD_TOOL_VERSION as String
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 21
+        minSdkVersion MIN_SDK_VERSION as int
+        targetSdkVersion TARGET_SDK_VERSION as int
         versionCode 1
         versionName "1.0"
     }
@@ -24,22 +24,31 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
+    // test
+    testCompile 'org.mockito:mockito-core:1.9.5'
+    testCompile 'junit:junit:4.12'
+    androidTestCompile 'com.android.support:support-annotations:22.2.0'
+    androidTestCompile 'com.android.support.test:runner:0.2'
+    // Set this dependency to use JUnit 4 rules
+    androidTestCompile 'com.android.support.test:rules:0.2'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
+
     // auto-parcel
-    compile 'com.github.frankiesardo:auto-parcel:' + auto_parcel_version
-    apt 'com.github.frankiesardo:auto-parcel-processor:' + auto_parcel_version
-    compile 'com.google.code.gson:gson:' + gson_version
-    compile 'com.android.support:support-v4:' + support_v4_version
-    compile 'com.android.support:recyclerview-v7:' + recyclerview_v7_version
+    compile 'com.github.frankiesardo:auto-parcel:' + AUTO_PARCEL_VERSION
+    apt 'com.github.frankiesardo:auto-parcel-processor:' + AUTO_PARCEL_VERSION
+    compile 'com.google.code.gson:gson:' + GSON_VERSION
+    compile 'com.android.support:support-v4:' + SUPPORT_V4_VERSION
+    compile 'com.android.support:recyclerview-v7:' + RECYCLERVIEW_V7_VERSION
     // square
-    compile 'com.squareup.okhttp:okhttp:' + okhttp_version
-    compile 'com.squareup.okhttp:okhttp-urlconnection:' + okhttp_version
-    compile 'com.jakewharton:butterknife:' + butter_knife_version
-    compile 'com.squareup.picasso:picasso:' + picasso_version
-    compile 'com.squareup:otto:' + otto_version
-    compile 'com.squareup.dagger:dagger:' + dagger_version
-    apt 'com.squareup.dagger:dagger-compiler:' + dagger_version
+    compile 'com.squareup.okhttp:okhttp:' + OKHTTP_VERSION
+    compile 'com.squareup.okhttp:okhttp-urlconnection:' + OKHTTP_VERSION
+    compile 'com.jakewharton:butterknife:' + BUTTER_KNIFE_VERSION
+    compile 'com.squareup.picasso:picasso:' + PICASSO_VERSION
+    compile 'com.squareup:otto:' + OTTO_VERSION
+    compile 'com.squareup.dagger:dagger:' + DAGGER_VERSION
+    apt 'com.squareup.dagger:dagger-compiler:' + DAGGER_VERSION
     //rx
-    compile 'io.reactivex:rxjava:' + rxjava_version
-    compile 'io.reactivex:rxandroid:' + rxandroid_version
-    compile 'uk.co.chrisjenx:calligraphy:' + calligraphy_version
+    compile 'io.reactivex:rxjava:' + RXJAVA_VERSION
+    compile 'io.reactivex:rxandroid:' + RXANDROID_VERSION
+    compile 'uk.co.chrisjenx:calligraphy:' + CALLIGRAPHY_VERSION
 }

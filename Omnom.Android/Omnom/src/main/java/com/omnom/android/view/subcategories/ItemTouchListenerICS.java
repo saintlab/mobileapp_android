@@ -34,4 +34,9 @@ public class ItemTouchListenerICS extends ItemTouchListenerBase {
 			return onGestureHandle(e);
 		}
 	}
+
+	@Override
+	public void onRequestDisallowInterceptTouchEvent(final boolean b) {
+
+	}
 }

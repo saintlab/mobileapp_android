@@ -19,8 +19,8 @@ repositories {
 apply plugin: 'hugo'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion COMPILE_SDK_VERSION as int
+    buildToolsVersion BUILD_TOOL_VERSION as String
 
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
@@ -31,8 +31,8 @@ android {
         production {
         }
 
-	    staging {
-	    }
+        staging {
+        }
 
         laaaab {
         }
@@ -44,8 +44,8 @@ android {
 
     defaultConfig {
         applicationId "com.omnom.android"
-        minSdkVersion 15
-        targetSdkVersion 21
+        minSdkVersion MIN_SDK_VERSION as int
+        targetSdkVersion TARGET_SDK_VERSION as int
         versionCode 60
         versionName "1.2.12"
     }
@@ -81,30 +81,27 @@ android {
             resValue "string", "app_name", "Omnom Debug"
         }
 
-	    stageRelease.initWith(buildTypes.release)
-	    stageRelease {
-		    applicationIdSuffix '.staging'
-		    resValue "string", "app_name", "Omnom Staging"
-	    }
+        stageRelease.initWith(buildTypes.release)
+        stageRelease {
+            applicationIdSuffix '.staging'
+            resValue "string", "app_name", "Omnom Staging"
+        }
     }
 }
 
 dependencies {
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.3'
-
     compile 'org.java-websocket:Java-WebSocket:1.3.0@jar'
 
     // auto-parcel
-    compile 'com.github.frankiesardo:auto-parcel:' + auto_parcel_version
-    apt 'com.github.frankiesardo:auto-parcel-processor:' + auto_parcel_version
+    compile 'com.github.frankiesardo:auto-parcel:' + AUTO_PARCEL_VERSION
+    apt 'com.github.frankiesardo:auto-parcel-processor:' + AUTO_PARCEL_VERSION
 
     // other
     compile 'com.nhaarman.listviewanimations:lib-core:3.1.0@aar'
     compile 'com.nineoldandroids:library:2.4.0'
 
-    compile 'com.squareup.dagger:dagger:' + dagger_version
-    apt 'com.squareup.dagger:dagger-compiler:' + dagger_version
+    compile 'com.squareup.dagger:dagger:' + DAGGER_VERSION
+    apt 'com.squareup.dagger:dagger-compiler:' + DAGGER_VERSION
 
     compile 'com.mixpanel.android:mixpanel-android:4.4.1@aar'
     compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
@@ -128,6 +125,14 @@ dependencies {
     androidTestCompile('com.jakewharton.espresso:espresso:1.1-r3') {
         exclude group: 'com.squareup.dagger'
     }
+    // test
+    testCompile 'org.mockito:mockito-core:1.9.5'
+    testCompile 'junit:junit:4.12'
+    androidTestCompile 'com.android.support.test:runner:0.2'
+    androidTestCompile 'com.android.support:support-annotations:22.2.0'
+    // Set this dependency to use JUnit 4 rules
+    androidTestCompile 'com.android.support.test:rules:0.2'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
 
     compile files('libs/card.io.jar')
     compile('com.crashlytics.sdk.android:crashlytics:2.2.4@aar') {

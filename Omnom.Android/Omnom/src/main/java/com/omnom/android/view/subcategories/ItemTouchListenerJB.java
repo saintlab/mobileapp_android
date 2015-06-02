@@ -34,4 +34,9 @@ public class ItemTouchListenerJB extends ItemTouchListenerBase {
 		}
 		return !mTouchEnabled;
 	}
+
+	@Override
+	public void onRequestDisallowInterceptTouchEvent(final boolean b) {
+
+	}
 }
