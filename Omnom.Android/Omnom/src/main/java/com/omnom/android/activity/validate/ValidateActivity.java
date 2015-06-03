@@ -30,7 +30,7 @@ import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.activity.RestaurantActivity;
 import com.omnom.android.activity.RestaurantsListActivity;
 import com.omnom.android.activity.UserProfileActivity;
-import com.omnom.android.activity.ValidateActivityBle;
+import com.omnom.android.activity.ValidateActivityBle18;
 import com.omnom.android.activity.ValidateActivityBle21;
 import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.activity.ValidateActivityShortcut;
@@ -207,7 +207,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	private static Intent createIntent(final Context context, final int animationType,
 	                                   final boolean isDemo, final int userEnterType, final Uri data) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
-		final Class validateActivityBleClass = AndroidUtils.isLollipop() ? ValidateActivityBle21.class : ValidateActivityBle.class;
+		final Class validateActivityBleClass = AndroidUtils.isLollipop() ? ValidateActivityBle21.class : ValidateActivityBle18.class;
 		final boolean isBleReadyDevice = hasBle & AndroidUtils.isJellyBeanMR2();
 
 		final Intent intent = new Intent(context,
@@ -293,7 +293,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	protected boolean mSkipViewRendering = false;
 
-	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBackgroundFunction;
+	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBgFunc;
 
 	@Nullable
 	protected Menu mMenu;
@@ -581,7 +581,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		bgTransitionDrawable.setCrossFadeEnabled(true);
 		mViewHelper.setBackground(bgTransitionDrawable);
 
-		mPreloadBackgroundFunction = new Func1<RestaurantResponse, RestaurantResponse>() {
+		mPreloadBgFunc = new Func1<RestaurantResponse, RestaurantResponse>() {
 			@Override
 			public RestaurantResponse call(final RestaurantResponse decodeResponse) {
 				final List<Restaurant> restaurants = decodeResponse.getRestaurants();

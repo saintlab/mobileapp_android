@@ -23,6 +23,7 @@ import com.omnom.android.activity.UserProfileActivity;
 import com.omnom.android.activity.UserProfileEditActivity;
 import com.omnom.android.activity.UserRegisterActivity;
 import com.omnom.android.activity.ValidateActivityBle;
+import com.omnom.android.activity.ValidateActivityBle18;
 import com.omnom.android.activity.ValidateActivityBle21;
 import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.activity.ValidateActivityShortcut;
@@ -61,15 +62,14 @@ import dagger.Module;
 		/* activities */
 		EnteringActivity.class, UserRegisterActivity.class, EnteringActivity.class,
 		ConfirmPhoneActivity.class, LoginActivity.class, ChangePhoneActivity.class, ChangePhoneSuccessActivity.class,
-		ValidateActivityBle.class, ValidateActivityCamera.class,
-		ValidateActivityShortcut.class, ValidateActivityBle.class, ValidateActivityBle21.class, OrdersActivity.class, CardsActivity.class,
-		UserProfileActivity.class,
-		CardAddActivity.class, CardConfirmActivity.class,
-		BaseOrderAcceptedActivity.class, BarOrderAcceptedActivity.class,
-		LunchOrderAcceptedActivity.class, TakeawayOrderAcceptedActivity.class,
-		ThanksActivity.class, ThanksDemoActivity.class, CaptureActivity.class, OmnomQRCaptureActivity.class,
-		PaymentProcessActivity.class, RestaurantsListActivity.class, RestaurantActivity.class, WishActivity.class, WishSentActivity.class,
-		WebActivity.class, OrderResultActivity.class, ThreeDSWebActivity.class, UserProfileEditActivity.class,
+		ValidateActivityBle.class, ValidateActivityCamera.class, ValidateActivityShortcut.class, ValidateActivityBle.class,
+		ValidateActivityBle21.class, ValidateActivityBle18.class,
+		OrdersActivity.class, CardsActivity.class, UserProfileActivity.class, CardAddActivity.class, CardConfirmActivity.class,
+		BaseOrderAcceptedActivity.class, BarOrderAcceptedActivity.class, LunchOrderAcceptedActivity.class,
+		TakeawayOrderAcceptedActivity.class, ThanksActivity.class, ThanksDemoActivity.class, CaptureActivity.class,
+		OmnomQRCaptureActivity.class, PaymentProcessActivity.class, RestaurantsListActivity.class, RestaurantActivity.class,
+		WishActivity.class, WishSentActivity.class, WebActivity.class, OrderResultActivity.class, ThreeDSWebActivity.class,
+		UserProfileEditActivity.class,
 		/* services */
 		BackgroundBleService.class,
 		/* fragments */

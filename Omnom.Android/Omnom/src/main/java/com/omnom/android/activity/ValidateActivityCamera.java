@@ -219,9 +219,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 	private void loadTable(final String data) {
 		final Observable<RestaurantResponse> restaurantObservable;
 		if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction())) {
-			restaurantObservable = api.decode(new HashDecodeRequest(data), mPreloadBackgroundFunction);
+			restaurantObservable = api.decode(new HashDecodeRequest(data), mPreloadBgFunc);
 		} else {
-			restaurantObservable = api.decode(new QrDecodeRequest(data), mPreloadBackgroundFunction);
+			restaurantObservable = api.decode(new QrDecodeRequest(data), mPreloadBgFunc);
 		}
 
 		subscribe(concatMenuObservable(restaurantObservable),
