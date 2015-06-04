@@ -17,8 +17,6 @@ import rx.Observable;
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class ValidateActivityBle18 extends ValidateActivityBle {
 
-	private static final String TAG = ValidateActivityBle18.class.getSimpleName();
-
 	@Subscribe
 	public void onOrderUpdate(OrderUpdateEvent event) {
 		updateOrderData(event);

@@ -26,26 +26,14 @@ import rx.functions.Action0;
  */
 public class BluetoothObservable {
 
-	private static class ScanCallbackWrapper {
-		private BleScanCallback mCallback;
+	private final static class ScanCallbackWrapper<T> {
+		private T mCallback;
 
-		public BleScanCallback getCallback() {
+		public T getCallback() {
 			return mCallback;
 		}
 
-		public void setCallback(final BleScanCallback callback) {
-			mCallback = callback;
-		}
-	}
-
-	private static class ScanCallbackWrapperJB {
-		private BleScanCallbackJB mCallback;
-
-		public BleScanCallbackJB getCallback() {
-			return mCallback;
-		}
-
-		public void setCallback(final BleScanCallbackJB callback) {
+		public void setCallback(final T callback) {
 			mCallback = callback;
 		}
 	}
@@ -120,7 +108,7 @@ public class BluetoothObservable {
 	private static class SubscriberHandler extends Handler {
 		public static final int MSG_SCAN_STOP = 1;
 
-		public SubscriberHandler(final Subscriber<? extends Object> subscriber) {
+		public SubscriberHandler(final Subscriber<?> subscriber) {
 			super(new Callback() {
 				@Override
 				public boolean handleMessage(final Message msg) {
@@ -143,7 +131,7 @@ public class BluetoothObservable {
 	                                                         final BluetoothLeScanner scanner,
 	                                                         final ScanSettings scanSettings,
 	                                                         final int duration) {
-		final ScanCallbackWrapper callbackWrapper = new ScanCallbackWrapper();
+		final ScanCallbackWrapper<BleScanCallback> callbackWrapper = new ScanCallbackWrapper<>();
 		return Observable.create(new Observable.OnSubscribe<Beacon>() {
 			@Override
 			public void call(final Subscriber<? super Beacon> subscriber) {
@@ -171,7 +159,7 @@ public class BluetoothObservable {
 	public static Observable<Beacon> getScanResultObservableJB(final BeaconParser parser,
 	                                                           final BluetoothAdapter adapter,
 	                                                           final int duration) {
-		final ScanCallbackWrapperJB callbackWrapper = new ScanCallbackWrapperJB();
+		final ScanCallbackWrapper<BleScanCallbackJB> callbackWrapper = new ScanCallbackWrapper<>();
 		return Observable.create(new Observable.OnSubscribe<Beacon>() {
 			@Override
 			public void call(final Subscriber<? super Beacon> subscriber) {

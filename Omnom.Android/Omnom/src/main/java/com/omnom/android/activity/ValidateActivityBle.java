@@ -71,7 +71,7 @@ public abstract class ValidateActivityBle extends ValidateActivity {
 
 	protected BeaconParser parser;
 
-	protected LinkedList<BeaconRecord> mBeacons = new LinkedList<BeaconRecord>();
+	protected LinkedList<BeaconRecord> mBeacons = new LinkedList<>();
 
 	protected final Action1<Beacon> mOnNextScanAction = new Action1<Beacon>() {
 		@Override

@@ -175,8 +175,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 	}
 
 	private void findTable(final String tableData) {
-		final TableDataResponse[] table = new TableDataResponse[1];
-
 		subscribe(ValidationObservable.validateSmart(this, mIsDemo)
 		                              .map(OmnomObservable.getValidationFunc(this,
 		                                                                     getErrorHelper(),
@@ -188,7 +186,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 				          if(hasNoErrors) {
 					          loadTable(tableData);
 				          } else {
-					          reportMixPanel(null, OnTableMixpanelEvent.METHOD_QR, table[0]);
 					          startErrorTransition();
 					          final View viewById = findViewById(R.id.panel_bottom);
 					          if(viewById != null) {

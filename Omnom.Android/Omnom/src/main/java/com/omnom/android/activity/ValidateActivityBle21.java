@@ -19,8 +19,6 @@ import rx.Observable;
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class ValidateActivityBle21 extends ValidateActivityBle {
 
-	private static final String TAG = ValidateActivityBle21.class.getSimpleName();
-
 	private ScanSettings getScanSettings() {
 		ScanSettings.Builder builder = new ScanSettings.Builder();
 		builder.setReportDelay(0);
