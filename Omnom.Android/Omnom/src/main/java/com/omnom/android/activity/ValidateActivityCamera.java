@@ -175,8 +175,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 	}
 
 	private void findTable(final String tableData) {
-		final TableDataResponse[] table = new TableDataResponse[1];
-
 		subscribe(ValidationObservable.validateSmart(this, mIsDemo)
 		                              .map(OmnomObservable.getValidationFunc(this,
 		                                                                     getErrorHelper(),
@@ -188,7 +186,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 				          if(hasNoErrors) {
 					          loadTable(tableData);
 				          } else {
-					          reportMixPanel(null, OnTableMixpanelEvent.METHOD_QR, table[0]);
 					          startErrorTransition();
 					          final View viewById = findViewById(R.id.panel_bottom);
 					          if(viewById != null) {
@@ -219,9 +216,9 @@ public class ValidateActivityCamera extends ValidateActivity {
 	private void loadTable(final String data) {
 		final Observable<RestaurantResponse> restaurantObservable;
 		if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction())) {
-			restaurantObservable = api.decode(new HashDecodeRequest(data), mPreloadBackgroundFunction);
+			restaurantObservable = api.decode(new HashDecodeRequest(data), mPreloadBgFunc);
 		} else {
-			restaurantObservable = api.decode(new QrDecodeRequest(data), mPreloadBackgroundFunction);
+			restaurantObservable = api.decode(new QrDecodeRequest(data), mPreloadBgFunc);
 		}
 
 		subscribe(concatMenuObservable(restaurantObservable),

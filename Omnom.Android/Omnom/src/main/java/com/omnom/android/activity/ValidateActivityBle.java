@@ -2,10 +2,8 @@ package com.omnom.android.activity;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.os.Build;
-import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
@@ -34,22 +32,100 @@ import java.util.LinkedList;
 
 import altbeacon.beacon.Beacon;
 import altbeacon.beacon.BeaconParser;
+import hugo.weaving.DebugLog;
 import retrofit.RetrofitError;
 import rx.Observable;
+import rx.Subscription;
+import rx.functions.Action0;
 import rx.functions.Action1;
 
-public class ValidateActivityBle extends ValidateActivity {
+public abstract class ValidateActivityBle extends ValidateActivity {
+
+	public static class OnScanComplete implements Action0 {
+
+		private final Subscription mSubscription;
+
+		private final Runnable mCallback;
+
+		private OnScanComplete(Subscription subscription, Runnable callback) {
+			mSubscription = subscription;
+			mCallback = callback;
+		}
+
+		@Override
+		public void call() {
+			OmnomObservable.unsubscribe(mSubscription);
+			mCallback.run();
+		}
+	}
 
 	private static final String TAG = ValidateActivityBle.class.getSimpleName();
 
-	@Nullable
-	protected BluetoothAdapter mBluetoothAdapter;
+	protected final Action1<Throwable> mOnErrorScan = new Action1<Throwable>() {
+		@Override
+		@DebugLog
+		public void call(final Throwable throwable) {
+			Log.e(TAG, "scanBleDevices", throwable);
+		}
+	};
 
 	protected BeaconParser parser;
 
-	protected LinkedList<BeaconRecord> mBeacons = new LinkedList<BeaconRecord>();
+	protected LinkedList<BeaconRecord> mBeacons = new LinkedList<>();
 
-	private BluetoothAdapter.LeScanCallback mLeScanCallback;
+	protected final Action1<Beacon> mOnNextScanAction = new Action1<Beacon>() {
+		@Override
+		@DebugLog
+		public void call(final Beacon beacon) {
+			BeaconRecord record = find(mBeacons, beacon);
+			if(record == null) {
+				record = BeaconRecord.create(beacon);
+				mBeacons.add(record);
+			}
+			record.addRssi(new RssiRecord(beacon.getRssi(), System.currentTimeMillis()));
+		}
+	};
+
+	private final Runnable endCallback = new Runnable() {
+		@Override
+		public void run() {
+			decodeBeacons();
+		}
+	};
+
+	protected Subscription mBleScanSubscription;
+
+	protected final OnScanComplete mOnCompleteScan = new OnScanComplete(mBleScanSubscription, endCallback);
+
+	private void decodeBeacons() {
+		final Observable<RestaurantResponse> decodeObservable =
+				api.decode(new BeaconDecodeRequest(getResources().getInteger(R.integer.ble_scan_duration),
+				                                   Collections.unmodifiableList(mBeacons)), mPreloadBgFunc);
+
+		subscribe(concatMenuObservable(decodeObservable),
+		          new Action1<Pair<RestaurantResponse, MenuResponse>>() {
+			          @Override
+			          public void call(final Pair<RestaurantResponse, MenuResponse> pair) {
+				          final RestaurantResponse response = pair.first;
+				          if(response.hasErrors()) {
+					          startErrorTransition();
+					          getErrorHelper().showErrorDemo(LoaderError.BACKEND_ERROR, mInternetErrorClickListener);
+				          } else {
+					          handleDecodeResponse(OnTableMixpanelEvent.METHOD_BLUETOOTH, response);
+				          }
+			          }
+		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					@Override
+					protected void onError(final Throwable throwable) {
+						startErrorTransition();
+						if(throwable instanceof RetrofitError) {
+							getErrorHelper().showErrorDemo(LoaderError.BACKEND_ERROR, mInternetErrorClickListener);
+						} else {
+							getErrorHelper().showErrorDemo(LoaderError.NO_CONNECTION_TRY, mInternetErrorClickListener);
+						}
+					}
+				});
+	}
 
 	@Override
 	public void initUi() {
@@ -64,39 +140,14 @@ public class ValidateActivityBle extends ValidateActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		if(AndroidUtils.isJellyBeanMR2()) {
-			if(mBluetoothAdapter != null) {
-				mBluetoothAdapter.stopLeScan(mLeScanCallback);
-			}
-			mLeScanCallback = null;
-			mBluetoothAdapter = null;
+			OmnomObservable.unsubscribe(mBleScanSubscription);
 		}
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	protected void initBle() {
-		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		parser = new BeaconParser();
 		parser.setBeaconLayout(getResources().getString(R.string.redbear_beacon_layout));
-		mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
-			@Override
-			public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						final Beacon beacon = parser.fromScanData(scanRecord, rssi, device);
-						if(beacon == null) {
-							return;
-						}
-						BeaconRecord record = find(mBeacons, beacon);
-						if(record == null) {
-							record = BeaconRecord.create(beacon);
-							mBeacons.add(record);
-						}
-						record.addRssi(new RssiRecord(beacon.getRssi(), System.currentTimeMillis()));
-					}
-				});
-			}
-		};
 	}
 
 	protected BeaconRecord find(final LinkedList<BeaconRecord> beacons, final Beacon beacon) {
@@ -129,13 +180,12 @@ public class ValidateActivityBle extends ValidateActivity {
 		subscribe(ValidationObservable.validateSmart(this, mIsDemo)
 		                              .map(OmnomObservable.getValidationFunc(this,
 		                                                                     getErrorHelper(),
-		                                                                     mInternetErrorClickListener))
-		                              .isEmpty(),
+		                                                                     mInternetErrorClickListener)).isEmpty(),
 		          new Action1<Boolean>() {
 			          @Override
 			          public void call(Boolean hasNoErrors) {
 				          if(hasNoErrors) {
-					          readBeacons();
+					          scanBleDevices(getResources().getInteger(R.integer.ble_scan_duration));
 				          } else {
 					          startErrorTransition();
 					          final View viewById = findViewById(R.id.panel_bottom);
@@ -153,56 +203,6 @@ public class ValidateActivityBle extends ValidateActivity {
 				});
 	}
 
-	private void readBeacons() {
-		final Runnable endCallback = new Runnable() {
-			@Override
-			public void run() {
-				final Observable<RestaurantResponse> decodeObservable = api.decode(new BeaconDecodeRequest(
-						                                                                   getResources().getInteger(
-								                                                                   R.integer.ble_scan_duration),
-						                                                                   Collections.unmodifiableList(mBeacons)),
-				                                                                   mPreloadBackgroundFunction);
-
-				subscribe(concatMenuObservable(decodeObservable),
-				          new Action1<Pair<RestaurantResponse, MenuResponse>>() {
-					          @Override
-					          public void call(final Pair<RestaurantResponse, MenuResponse> pair) {
-						          RestaurantResponse response = pair.first;
-						          if(response.hasErrors()) {
-							          startErrorTransition();
-							          getErrorHelper().showErrorDemo(
-									          LoaderError.BACKEND_ERROR,
-									          mInternetErrorClickListener);
-						          } else {
-							          handleDecodeResponse(OnTableMixpanelEvent.METHOD_BLUETOOTH,
-							                               response);
-						          }
-					          }
-				          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-							@Override
-							protected void onError(final Throwable throwable) {
-								if(throwable instanceof RetrofitError) {
-									startErrorTransition();
-									getErrorHelper().showErrorDemo(
-											LoaderError.BACKEND_ERROR,
-											mInternetErrorClickListener);
-								} else {
-									startErrorTransition();
-									getErrorHelper().showErrorDemo(
-											LoaderError.NO_CONNECTION_TRY,
-											mInternetErrorClickListener);
-								}
-							}
-						});
-			}
-		};
-		if(AndroidUtils.isJellyBeanMR2() && BluetoothUtils.isBluetoothEnabled(this)) {
-			scanBleDevices(true, endCallback);
-		} else {
-			endCallback.run();
-		}
-	}
-
 	@Override
 	protected void reportMixPanel(final String requestId, final String method, final TableDataResponse tableDataResponse) {
 		if(tableDataResponse == null) {
@@ -213,37 +213,23 @@ public class ValidateActivityBle extends ValidateActivity {
 		                                                                tableDataResponse.getId(), method));
 	}
 
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-	protected void scanBleDevices(final boolean enable, final Runnable endCallback) {
-		// Sometimes due to bug in android BluetoothAdapter is null
-		// We have to handle this case
-		if(mBluetoothAdapter == null) {
-			if(endCallback != null) {
-				endCallback.run();
-			}
-			return;
-		}
-		if(enable) {
-			mBeacons.clear();
-			findViewById(android.R.id.content).postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					mBluetoothAdapter.stopLeScan(mLeScanCallback);
-					if(endCallback != null) {
-						endCallback.run();
-					}
-				}
-			}, getResources().getInteger(R.integer.ble_scan_duration));
-			mBluetoothAdapter.startLeScan(mLeScanCallback);
+	protected final void scanBleDevices(final int scanDuration) {
+		if(!BluetoothUtils.isBluetoothEnabled(this)) {
+			endCallback.run();
 		} else {
-			if(BluetoothUtils.isAdapterStateOn(mBluetoothAdapter)) {
-				mBluetoothAdapter.stopLeScan(mLeScanCallback);
-			}
-			if(endCallback != null) {
-				endCallback.run();
-			}
+			startBleScan(scanDuration);
 		}
 	}
+
+	protected final void startBleScan(final int scanDuration) {
+		mBeacons.clear();
+		final Observable<Beacon> scanResultObservable = getBeaconsObservable(scanDuration);
+		mBleScanSubscription = scanResultObservable.subscribe(mOnNextScanAction,
+		                                                      mOnErrorScan,
+		                                                      mOnCompleteScan);
+	}
+
+	protected abstract Observable<Beacon> getBeaconsObservable(final int scanDuration);
 
 	@Subscribe
 	public void onOrderUpdate(OrderUpdateEvent event) {
