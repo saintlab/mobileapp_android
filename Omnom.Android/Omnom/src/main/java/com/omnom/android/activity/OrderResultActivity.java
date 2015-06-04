@@ -153,8 +153,8 @@ public class OrderResultActivity extends BaseOmnomActivity {
 				public void onClick(final View v) {
 					onBackPressed();
 				}
-			});
-			viewHeader.showProgress(true);
+			})
+			          .showProgress(true);
 			subscribe(api.getWish(mId),
 			          new Action1<WishResponse>() {
 				          @Override

@@ -27,6 +27,7 @@ import static butterknife.ButterKnife.findById;
  * Created by Ch3D on 01.10.2014.
  */
 public class HeaderView extends RelativeLayout {
+
 	private TextView txtTitle;
 
 	private TextView txtTitleMedium;
@@ -81,7 +82,7 @@ public class HeaderView extends RelativeLayout {
 		setClickable(true);
 
 		ViewTreeObserver viewTreeObserver = txtTitleBig.getViewTreeObserver();
-		if (viewTreeObserver.isAlive()) {
+		if(viewTreeObserver.isAlive()) {
 			viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 				@Override
 				public void onGlobalLayout() {
@@ -92,50 +93,56 @@ public class HeaderView extends RelativeLayout {
 		}
 	}
 
-	public void setTitle(final int resId) {
+	public HeaderView setTitle(final int resId) {
 		txtTitle.setText(resId);
 		ViewUtils.setVisibleGone(txtTitleBig, false);
 		ViewUtils.setVisibleGone(txtTitleMedium, false);
 		ViewUtils.setVisibleGone(txtTitle, true);
+		return this;
 	}
 
-	public void setTxtTitleMedium(final int resId) {
+	public HeaderView setTxtTitleMedium(final int resId) {
 		txtTitleMedium.setText(resId);
 		ViewUtils.setVisibleGone(txtTitleBig, false);
 		ViewUtils.setVisibleGone(txtTitleMedium, true);
 		ViewUtils.setVisibleGone(txtTitle, false);
+		return this;
 	}
 
-	public void setTitleBig(final int resId) {
+	public HeaderView setTitleBig(final int resId) {
 		txtTitleBig.setText(resId);
 		ViewUtils.setVisibleGone(txtTitleBig, true);
 		ViewUtils.setVisibleGone(txtTitleMedium, false);
 		ViewUtils.setVisibleGone(txtTitle, false);
+		return this;
 	}
 
-	public void setTitleBig(final String title, OnClickListener listener) {
+	public HeaderView setTitleBig(final String title, OnClickListener listener) {
 		txtTitleBig.setText(title);
 		txtTitleBig.setOnClickListener(listener);
 		ViewUtils.setVisibleGone(txtTitleBig, true);
 		ViewUtils.setVisibleGone(txtTitle, false);
+		return this;
 	}
 
-	public void setButtonRight(final int resId, OnClickListener listener) {
+	public HeaderView setButtonRight(final int resId, OnClickListener listener) {
 		setButton(btnRight, resId, listener);
 		updateTitleRules();
+		return this;
 	}
 
 	public Button getBtnRight() {
 		return btnRight;
 	}
 
-	public void setButtonLeft(final int resId, OnClickListener listener) {
+	public HeaderView setButtonLeft(final int resId, OnClickListener listener) {
 		setButton(btnLeft, resId, listener);
+		return this;
 	}
 
 	private void updateTitleRules() {
 		LayoutParams layoutParams = (LayoutParams) txtTitleBig.getLayoutParams();
-		if (btnRight.getVisibility() == VISIBLE && ViewUtils.intersect(txtTitleBig, btnRight)) {
+		if(btnRight.getVisibility() == VISIBLE && ViewUtils.intersect(txtTitleBig, btnRight)) {
 			layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
 			layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
 			layoutParams.addRule(RelativeLayout.LEFT_OF, R.id.btn_right);
@@ -146,43 +153,51 @@ public class HeaderView extends RelativeLayout {
 		}
 	}
 
-	private void setButton(Button btn, int resId, final OnClickListener listener) {
+	private HeaderView setButton(Button btn, int resId, final OnClickListener listener) {
 		btn.setText(resId);
 		btn.setOnClickListener(listener);
 		btn.setVisibility(View.VISIBLE);
+		return this;
 	}
 
-	public void setButtonRightDrawable(final int resId, OnClickListener listener) {
+	public HeaderView setButtonRightDrawable(final int resId, OnClickListener listener) {
 		btnRight.setVisibility(View.GONE);
 		setButtonDrawable(btnRightDrawable, resId, listener);
+		return this;
 	}
 
-	public void setButtonLeftDrawable(final int resId, OnClickListener listener) {
+	public HeaderView setButtonLeftDrawable(final int resId, OnClickListener listener) {
 		btnLeft.setVisibility(View.GONE);
 		setButtonDrawable(btnLeftDrawable, resId, listener);
+		return this;
 	}
 
-	private void setButtonDrawable(ImageButton btn, final int resId, final OnClickListener listener) {
+	private HeaderView setButtonDrawable(ImageButton btn, final int resId, final OnClickListener listener) {
 		btn.setBackgroundResource(resId);
 		btn.setOnClickListener(listener);
 		btn.setVisibility(View.VISIBLE);
+		return this;
 	}
 
-	public void setPaging(final int count, final int index) {
+	public HeaderView setPaging(final int count, final int index) {
 		pageIndicator.setFake(true, count);
 		pageIndicator.setCurrentItem(index);
+		return this;
 	}
 
-	public void setTitleBigDrawableRight(final @DrawableRes int resId) {
+	public HeaderView setTitleBigDrawableRight(final @DrawableRes int resId) {
 		txtTitleBig.setCompoundDrawablePadding(getResources().getDimensionPixelOffset(R.dimen.drawable_padding_small));
 		txtTitleBig.setCompoundDrawablesWithIntrinsicBounds(0, 0, resId, 0);
+		return this;
 	}
 
-	public void setContentVisibility(final boolean visible, final boolean now) {
+	public HeaderView setContentVisibility(final boolean visible, final boolean now) {
 		final View[] views = new View[]{btnRight, txtTitle, pageIndicator, btnLeft};
 		ButterKnife.apply(Arrays.asList(views), now ? ViewUtils.VISIBLITY_ALPHA_NOW : ViewUtils.VISIBLITY_ALPHA, visible);
+		return this;
 	}
 
+	@Override
 	public void setEnabled(final boolean enabled) {
 		btnRight.setEnabled(enabled);
 		btnLeft.setEnabled(enabled);
@@ -192,11 +207,12 @@ public class HeaderView extends RelativeLayout {
 		return pageIndicator.getAlpha() == 0;
 	}
 
-	public void setRigthButtonVisibile(boolean visibile) {
+	public HeaderView setRigthButtonVisibile(boolean visibile) {
 		ViewUtils.setVisibleGone(btnRight, visibile);
+		return this;
 	}
 
-	public void showProgress(final boolean show) {
+	public HeaderView showProgress(final boolean show) {
 		if(show) {
 			mBtnRightLastVisibility = btnRight.getVisibility();
 			mBtnRightDrawableLastVisibility = btnRightDrawable.getVisibility();
@@ -213,13 +229,16 @@ public class HeaderView extends RelativeLayout {
 			ViewUtils.setVisibleGone(progress, false);
 		}
 		updateTitleRules();
+		return this;
 	}
 
-	public void showButtonRight(final boolean show) {
+	public HeaderView showButtonRight(final boolean show) {
 		AnimationUtils.animateAlpha(btnRight, show);
+		return this;
 	}
 
-	public void setButtonRightEnabled(final boolean enabled) {
+	public HeaderView setButtonRightEnabled(final boolean enabled) {
 		btnRight.setEnabled(enabled);
+		return this;
 	}
 }

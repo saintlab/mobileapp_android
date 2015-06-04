@@ -61,13 +61,13 @@ public class ThanksActivity extends BaseOmnomActivity {
 	@Override
 	public void initUi() {
 		AndroidUtils.setAccentColor(getWindow(), mAccentColor);
-		topPanel.setTitleBig(R.string.bill);
-		topPanel.setButtonLeft(R.string.ready, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				onBackPressed();
-			}
-		});
+		topPanel.setTitleBig(R.string.bill)
+		        .setButtonLeft(R.string.ready, new View.OnClickListener() {
+			        @Override
+			        public void onClick(final View v) {
+				        onBackPressed();
+			        }
+		        });
 	}
 
 	@Override

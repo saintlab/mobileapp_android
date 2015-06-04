@@ -45,19 +45,20 @@ public class ChangePhoneActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		topPanel.setTitleBig(R.string.change_phone_title);
-		topPanel.setButtonLeftDrawable(R.drawable.ic_action_previous_item, new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-		});
-		topPanel.setButtonRight(R.string.proceed, new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				doProceed();
-			}
-		});
+		topPanel.setTitleBig(R.string.change_phone_title)
+		        .setButtonLeftDrawable(R.drawable.ic_action_previous_item, new View.OnClickListener() {
+			        @Override
+			        public void onClick(View v) {
+				        finish();
+			        }
+		        })
+		        .setButtonRight(R.string.proceed, new View.OnClickListener() {
+			        @Override
+			        public void onClick(View v) {
+				        doProceed();
+			        }
+		        });
+
 		editPhone.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {

@@ -1,7 +1,6 @@
 package com.omnom.android.activity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -128,17 +127,16 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		topPanel.setRigthButtonVisibile(false);
-		topPanel.setTitle(R.string.enter);
-		topPanel.setContentVisibility(false, true);
-		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 1);
-		topPanel.setBackgroundColor(Color.WHITE);
-		topPanel.setButtonLeftDrawable(R.drawable.btn_previous, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				onBackPressed();
-			}
-		});
+		topPanel.setRigthButtonVisibile(false)
+		        .setTitle(R.string.enter)
+		        .setContentVisibility(false, true)
+		        .setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 1)
+		        .setButtonLeftDrawable(R.drawable.btn_previous, new View.OnClickListener() {
+			        @Override
+			        public void onClick(final View v) {
+				        onBackPressed();
+			        }
+		        });
 
 		edit1.addTextChangedListener(new Watcher(edit1));
 		edit2.addTextChangedListener(new Watcher(edit2));

@@ -261,16 +261,16 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 		UserProfile mUserProfile = app.getUserProfile();
 		mUser = mUserProfile.getUser();
 		mAcquiringData = app.getConfig().getAcquiringData();
-		mPanelTop.setTitleBig(R.string.card_binding);
-		mPanelTop.setButtonRightEnabled(false);
-		mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
-		mPanelTop.setButtonLeftDrawable(R.drawable.btn_previous, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				setResult(RESULT_CANCELED);
-				finish();
-			}
-		});
+		mPanelTop.setTitleBig(R.string.card_binding)
+		         .setButtonRightEnabled(false)
+		         .setButtonRight(R.string.bind, mVerifyClickListener)
+		         .setButtonLeftDrawable(R.drawable.btn_previous, new View.OnClickListener() {
+			         @Override
+			         public void onClick(final View v) {
+				         setResult(RESULT_CANCELED);
+				         finish();
+			         }
+		         });
 		initAmount();
 		if(mType == TYPE_BIND_CONFIRM) {
 			registerCard();

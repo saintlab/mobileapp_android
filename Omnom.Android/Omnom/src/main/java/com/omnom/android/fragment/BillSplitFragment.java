@@ -164,13 +164,13 @@ public class BillSplitFragment extends Fragment {
 
 		ViewUtils.setBackgroundDrawableColor(mBtnCommit, getResources().getColor(R.color.btn_pay_green));
 
-		mHeader.setTxtTitleMedium(R.string.split_the_bill);
-		mHeader.setButtonLeftDrawable(R.drawable.ic_cross_black, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				hide();
-			}
-		});
+		mHeader.setTxtTitleMedium(R.string.split_the_bill)
+		       .setButtonLeftDrawable(R.drawable.ic_cross_black, new View.OnClickListener() {
+			       @Override
+			       public void onClick(final View v) {
+				       hide();
+			       }
+		       });
 
 		mAdapter = new BillSplitPagerAdapter(getChildFragmentManager(), mOrder, mStates, mGuestsCount);
 		mPager.setAdapter(mAdapter);

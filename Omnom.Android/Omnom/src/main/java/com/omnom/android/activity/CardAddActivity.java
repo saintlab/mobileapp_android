@@ -153,14 +153,14 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 		mTransitionController = new AddCardTransitionController(new WeakReference<Activity>(this));
 
 		mCheckSaveCard.setChecked(true);
-		mPanelTop.setButtonRightEnabled(false);
-		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				AndroidUtils.hideKeyboard(mEditCardExpDate);
-				finish();
-			}
-		});
+		mPanelTop.setButtonRightEnabled(false)
+		         .setButtonLeft(R.string.cancel, new View.OnClickListener() {
+			         @Override
+			         public void onClick(final View v) {
+				         AndroidUtils.hideKeyboard(mEditCardExpDate);
+				         finish();
+			         }
+		         });
 		mCheckSaveCard.setChecked(mType != TYPE_ENTER_AND_PAY);
 		ViewUtils.setVisibleGone(mCheckSaveCard, mType == TYPE_BIND_OR_PAY);
 		setUpCardEditFields();

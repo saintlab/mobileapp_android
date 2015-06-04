@@ -1,7 +1,6 @@
 package com.omnom.android.activity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -68,22 +67,21 @@ public class LoginActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		topPanel.setBackgroundColor(Color.WHITE);
-		topPanel.setTitle(R.string.enter);
-		topPanel.setButtonRight(R.string.proceed, new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				doProceed();
-			}
-		});
-		topPanel.setButtonLeftDrawable(R.drawable.ic_cross_black, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				onBackPressed();
-			}
-		});
-		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 0);
-		topPanel.setContentVisibility(false, true);
+		topPanel.setTitle(R.string.enter)
+		        .setButtonRight(R.string.proceed, new View.OnClickListener() {
+			        @Override
+			        public void onClick(View v) {
+				        doProceed();
+			        }
+		        })
+		        .setButtonLeftDrawable(R.drawable.ic_cross_black, new View.OnClickListener() {
+			        @Override
+			        public void onClick(final View v) {
+				        onBackPressed();
+			        }
+		        })
+		        .setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 0)
+		        .setContentVisibility(false, true);
 		editPhone.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {

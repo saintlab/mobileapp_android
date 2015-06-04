@@ -96,15 +96,15 @@ public class UserRegisterActivity extends BaseOmnomActivity {
 		gc = new GregorianCalendar();
 		gc.add(Calendar.YEAR, -YEAR_OFFSET);
 
-		topPanel.setTitle(R.string.create_account);
-		topPanel.setContentVisibility(false, true);
-		topPanel.setButtonRight(R.string.proceed, new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				doRegister(v);
-			}
-		});
-		topPanel.setPaging(FAKE_PAGE_COUNT, 0);
+		topPanel.setTitle(R.string.create_account)
+		        .setContentVisibility(false, true)
+		        .setButtonRight(R.string.proceed, new View.OnClickListener() {
+			        @Override
+			        public void onClick(View v) {
+				        doRegister(v);
+			        }
+		        })
+		        .setPaging(FAKE_PAGE_COUNT, 0);
 
 		editPhone.getEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override

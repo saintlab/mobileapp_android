@@ -396,8 +396,8 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	private void loadCards() {
 		OmnomObservable.unsubscribe(mCardsSubscription);
 
-		mPanelTop.showProgress(true);
-		mPanelTop.showButtonRight(false);
+		mPanelTop.showProgress(true)
+		         .showButtonRight(false);
 
 		final Drawable divider = mList.getDivider();
 		if(divider != null) {
@@ -407,8 +407,8 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 		if(mIsDemo) {
 			final List<DemoCard> demoCards = Arrays.asList(new DemoCard());
 			mList.setAdapter(new CardsAdapter(getActivity(), demoCards, true));
-			mPanelTop.showProgress(false);
-			mPanelTop.showButtonRight(true);
+			mPanelTop.showProgress(false)
+			         .showButtonRight(true);
 		} else {
 			mList.setAdapter(null);
 			mCardsSubscription = subscribe(api.getCards().delaySubscription(1000, TimeUnit.MILLISECONDS),
@@ -421,15 +421,15 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 					                               if(mBtnPay != null) {
 						                               mBtnPay.setEnabled(isSelected);
 					                               }
-					                               mPanelTop.showProgress(false);
-					                               mPanelTop.showButtonRight(true);
+					                               mPanelTop.showProgress(false)
+					                                        .showButtonRight(true);
 				                               }
 			                               },
 			                               new ObservableUtils.BaseOnErrorHandler(getActivity()) {
 				                               @Override
 				                               public void onError(Throwable throwable) {
-					                               mPanelTop.showProgress(false);
-					                               mPanelTop.showButtonRight(true);
+					                               mPanelTop.showProgress(false)
+					                                        .showButtonRight(true);
 				                               }
 			                               });
 		}
