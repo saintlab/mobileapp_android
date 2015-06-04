@@ -89,4 +89,8 @@ public class AcquiringProxyMailRu implements AcquiringServiceMailRu {
 	public Observable<AcquiringResponse> refund(@FieldMap final HashMap<String, String> params) {
 		return mAcquiringService.refund(params).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
+
+	public Context getContext() {
+		return mContext;
+	}
 }

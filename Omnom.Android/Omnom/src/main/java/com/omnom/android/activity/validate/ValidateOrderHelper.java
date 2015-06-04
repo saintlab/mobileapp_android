@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.view.View;
 import android.widget.Button;
 
+import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.currency.Currency;
 import com.omnom.android.currency.Money;
@@ -19,9 +20,12 @@ import static butterknife.ButterKnife.findById;
  * Created by Ch3D on 13.03.2015.
  */
 public class ValidateOrderHelper {
+
 	private final ValidateActivity mActivity;
 
 	private final ValidateViewHelper mViewHelper;
+
+	private final Currency mCurrency;
 
 	private UserOrder mOrder;
 
@@ -29,6 +33,7 @@ public class ValidateOrderHelper {
 		mActivity = activity;
 		mViewHelper = viewHelper;
 		mOrder = order;
+		mCurrency = OmnomApplication.getCurrency(activity);
 	}
 
 	public ValidateOrderHelper(final ValidateActivity activity, ValidateViewHelper viewHelper) {
@@ -63,8 +68,8 @@ public class ValidateOrderHelper {
 			return;
 		}
 
-		final Money totalAmount = mOrder.getTotalPrice(Currency.RU);
-		final boolean hasWishItems = mOrder != null && !totalAmount.isNegativeOrZero();
+		final Money totalAmount = mOrder.getTotalPrice(mCurrency);
+		final boolean hasWishItems = !totalAmount.isNegativeOrZero();
 
 		if(hasWishItems) {
 			ViewUtils.setVisibleGone(btnOrder, true);

@@ -226,6 +226,10 @@ public class MoneyTest {
 
 	@Test
 	public void testMoneySum() {
+		Assert.assertTrue(Money.getZero(Currency.RU)
+		                       .plus(Money.createFractional(100, Currency.RU))
+		                       .equals(Money.createFractional(100, Currency.RU)));
+
 		// 100 + 200 = 300
 		Assert.assertTrue(Money.createFractional(100, Currency.RU)
 		                       .plus(Money.createFractional(200, Currency.RU))

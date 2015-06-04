@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
-import com.omnom.android.currency.Currency;
 import com.omnom.android.currency.Money;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.utils.OmnomFont;
@@ -29,6 +28,7 @@ import butterknife.InjectView;
  * Created by Ch3D on 11.11.2014.
  */
 public class BillSplitPersonsFragment extends Fragment implements NumberPicker.OnValueChangeListener, SplitFragment {
+
 	private static final String ARG_ORDER = "order";
 
 	private static final String ARG_GUESTS = "guests";
@@ -102,7 +102,7 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 		final double v = amountToPay / value;
 		final BigDecimal bigDecimal = new BigDecimal(String.valueOf(v));
 		final BigDecimal roundedValue = bigDecimal.setScale(2, RoundingMode.HALF_UP);
-		return Money.createFractional(roundedValue.doubleValue(), Currency.RU);
+		return Money.createFractional(roundedValue.doubleValue(), OmnomApplication.getCurrency(getActivity()));
 	}
 
 	@Override

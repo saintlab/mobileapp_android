@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.animation.MenuItemTransitionController;
 import com.omnom.android.adapter.MenuCategoryItems;
@@ -197,7 +198,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 				final View itemView = inflater.inflate(R.layout.item_menu_dish, null, false);
 				itemView.setOnClickListener(itemClickListener);
 
-				MenuCategoryItems.ViewHolder holder = new MenuCategoryItems.ViewHolder(itemView);
+				MenuCategoryItems.ViewHolder holder = new MenuCategoryItems.ViewHolder(itemView, OmnomApplication.getCurrency(context));
 				holder.updateState(order, recommendedItem);
 				holder.bind(recommendedItem, order, menu, -1, false, false);
 				holder.showDivider(index != recommendations.size());
@@ -331,7 +332,7 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 
 		final View viewRoot = view.findViewById(R.id.root);
 		ButterKnife.inject(this, view);
-		holder = new MenuCategoryItems.ViewHolder(viewRoot, this, null);
+		holder = new MenuCategoryItems.ViewHolder(viewRoot, OmnomApplication.getCurrency(getActivity()), this, null);
 		holder.showDivider(false);
 		refresh();
 

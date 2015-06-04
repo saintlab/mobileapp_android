@@ -12,12 +12,13 @@ import java.util.List;
  * Created by Ch3D on 20.10.2014.
  */
 public class OrderHelper {
-	public static Money getTipsAmount(final @Nullable Order order, int percent) {
-		if(order == null) {
-			return Money.ZERO;
-		}
 
-		return getTipsAmount(Money.createFractional(order.getAmountToPay(), Currency.RU), percent);
+	@Deprecated
+	public static Money getTipsAmount(final @Nullable Order order, int percent, final Currency currency) {
+		if(order == null) {
+			return Money.getZero(currency);
+		}
+		return getTipsAmount(Money.createFractional(order.getAmountToPay(), currency), percent);
 	}
 
 	/**
@@ -50,7 +51,7 @@ public class OrderHelper {
 		} else {
 			final int thresholdIndex = getThresholdIndex(order, amount);
 			final int integer = tipsValues.get(position).getAmounts().get(thresholdIndex);
-			final Money tip = Money.createFractional(integer, Currency.RU);
+			final Money tip = Money.createFractional(integer, amount.getCurrency());
 			tipsValue = tip.getBaseValue().intValue();
 		}
 
@@ -68,7 +69,7 @@ public class OrderHelper {
 		int thresholdIndex = thresholds.size();
 		for(int i = 0; i < thresholds.size(); i++) {
 			final int thresholdValue = thresholds.get(i);
-			if(amount.isLessOrEquals(Money.createFractional(thresholdValue, Currency.RU))) {
+			if(amount.isLessOrEquals(Money.createFractional(thresholdValue, amount.getCurrency()))) {
 				thresholdIndex = i;
 				break;
 			}
@@ -89,6 +90,6 @@ public class OrderHelper {
 		}
 		List<Integer> thresholds = order.getTips().getThresholds();
 		final Integer maxThreshold = thresholds.get(thresholds.size() - 1);
-		return amount.isGreatherThan(Money.createFractional(maxThreshold, Currency.RU));
+		return amount.isGreatherThan(Money.createFractional(maxThreshold, amount.getCurrency()));
 	}
 }

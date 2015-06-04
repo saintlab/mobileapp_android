@@ -17,6 +17,7 @@ import java.util.List;
  * Created by Ch3D on 02.12.2014.
  */
 public class OrderItemsAdapterSimple extends OrderItemsAdapter {
+
 	private final int mTextColorDefault;
 
 	private final int mTextColorSelected;
@@ -28,10 +29,11 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 	private boolean mIgnoreSelection = false;
 
 	public OrderItemsAdapterSimple(final Context context,
+	                               final Currency currency,
 	                               final List<OrderItem> items,
 	                               final SparseBooleanArrayParcelable states,
 	                               final boolean addFakeView) {
-		super(context, items, states, addFakeView);
+		super(context, currency, items, states, addFakeView);
 		mTextColorSelected = mContext.getResources().getColor(R.color.text_color_black);
 		mTextColorDefault = mContext.getResources().getColor(R.color.order_item_unselected);
 	}
@@ -55,7 +57,7 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 			holder.txtPrice.setTextColor(mTextColorDefault);
 		}
 		holder.txtTitle.setText(item.getTitle());
-		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPricePerItem(Currency.RU)));
+		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPricePerItem(getCurrency())));
 	}
 
 	public void setIgnoreSelection(boolean ignoreSelection) {

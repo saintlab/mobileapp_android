@@ -56,6 +56,8 @@ public class OrderItemsAdapter extends BaseAdapter {
 
 	private final int mColorPriceNormal;
 
+	private final Currency mCurrency;
+
 	protected SparseBooleanArray mCheckedStates;
 
 	protected Context mContext;
@@ -64,18 +66,26 @@ public class OrderItemsAdapter extends BaseAdapter {
 
 	private List<OrderItem> mItems;
 
-	public OrderItemsAdapter(final Context context, final List<OrderItem> orders, boolean addFakeView) {
-		this(context, orders, new SparseBooleanArrayParcelable(), addFakeView);
+	public OrderItemsAdapter(final Context context, final Currency currency, final List<OrderItem> orders, boolean addFakeView) {
+		this(context, currency, orders, new SparseBooleanArrayParcelable(), addFakeView);
 	}
 
-	public OrderItemsAdapter(final Context context, final List<OrderItem> items, final SparseBooleanArrayParcelable states, boolean
-			addFakeView) {
+	public OrderItemsAdapter(final Context context,
+	                         final Currency currency,
+	                         final List<OrderItem> items,
+	                         final SparseBooleanArrayParcelable states,
+	                         final boolean addFakeView) {
 		mContext = context;
+		mCurrency = currency;
 		mAddFakeView = addFakeView;
 		mItems = items;
 		mInflater = LayoutInflater.from(mContext);
 		mCheckedStates = states;
 		mColorPriceNormal = mContext.getResources().getColor(R.color.order_item_price);
+	}
+
+	public Currency getCurrency() {
+		return mCurrency;
 	}
 
 	@Override
@@ -167,7 +177,7 @@ public class OrderItemsAdapter extends BaseAdapter {
 		}
 		holder.txtTitle.setText(item.getTitle());
 		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(),
-		                                                         Money.createFractional(item.getPricePerItem(), Currency.RU)));
+		                                                         Money.createFractional(item.getPricePerItem(), mCurrency)));
 	}
 
 	public void setSelected(final int position, final boolean selected) {

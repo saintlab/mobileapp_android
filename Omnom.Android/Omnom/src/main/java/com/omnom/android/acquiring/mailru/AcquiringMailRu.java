@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.omnom.android.OmnomApplication;
 import com.omnom.android.acquiring.AcquiringResponseException;
 import com.omnom.android.acquiring.AcquiringType;
 import com.omnom.android.acquiring.ExtraData;
@@ -54,8 +55,6 @@ public class AcquiringMailRu implements Acquiring {
 
 	public static final String PARAM_AMOUNT = "amount";
 
-	public static final Money AMOUNT_ADD_CARD = Money.createFractional(100, Currency.RU);
-
 	private static final String TAG = AcquiringMailRu.class.getSimpleName();
 
 	private final Gson gson;
@@ -66,6 +65,7 @@ public class AcquiringMailRu implements Acquiring {
 
 	public AcquiringMailRu(AcquiringProxyMailRu acquiringProxyMailRu) {
 		mApiProxy = acquiringProxyMailRu;
+		mContext = acquiringProxyMailRu.getContext();
 		gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 	}
 
@@ -167,8 +167,13 @@ public class AcquiringMailRu implements Acquiring {
 
 	@Override
 	public Observable<AcquiringResponse> addCard(final AcquiringData acquiringData, final UserData user, final CardInfo cardInfo) {
-		final ExtraData extra = MailRuExtra.create(Money.ZERO, StringUtils.EMPTY_STRING, MailRuExtra.PAYMENT_TYPE_ORDER);
-		final OrderInfoMailRu order = OrderInfoMailRu.create(AMOUNT_ADD_CARD, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
+		final Currency currency = OmnomApplication.getCurrency(mContext);
+		final Money moneyAddCard = Money.createFractional(100, currency);
+
+		final ExtraData extra = MailRuExtra.create(Money.getZero(currency), StringUtils.EMPTY_STRING,
+		                                           MailRuExtra.PAYMENT_TYPE_ORDER);
+
+		final OrderInfoMailRu order = OrderInfoMailRu.create(moneyAddCard, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
 
 		return pay(acquiringData, paymentInfo)

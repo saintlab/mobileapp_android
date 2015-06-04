@@ -117,6 +117,8 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 
 		private MenuItemState mState = MenuItemState.NONE;
 
+		private Currency mCurrency;
+
 		public ItemViewHolder(final View v) {
 			this(v, null, null);
 		}
@@ -127,6 +129,7 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 			ButterKnife.inject(this, convertView);
 			mApplyClickListener = applyClickListener;
 			mClickListener = clickListener;
+			mCurrency = OmnomApplication.getCurrency(mContext);
 		}
 
 		private Context getContext() {
@@ -164,12 +167,12 @@ public class MenuAdapter extends MultiLevelRecyclerAdapter {
 			} else {
 				if(selected == position) {
 					btnApply.setBackgroundResource(R.drawable.bg_rounded_blue_normal);
-					btnApply.setText(item.price(Currency.RU).getReadableCurrencyValue());
+					btnApply.setText(item.price(mCurrency).getReadableCurrencyValue());
 					btnApply.setTextColor(Color.WHITE);
 				} else {
 					btnApply.setBackgroundResource(R.drawable.btn_rounded_menu_price);
 					btnApply.setTextColor(mContext.getResources().getColorStateList(R.drawable.text_color_selector_menu_price));
-					btnApply.setText(item.price(Currency.RU).getReadableCurrencyValue());
+					btnApply.setText(item.price(mCurrency).getReadableCurrencyValue());
 				}
 			}
 		}

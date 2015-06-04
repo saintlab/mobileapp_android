@@ -101,11 +101,14 @@ public class WishListAdapter extends BaseAdapter {
 
 	private final LayoutInflater mInflater;
 
+	private final Currency mCurrency;
+
 	private View.OnClickListener mClickListener;
 
 	private List<UserOrderData> _lazy_selected_data;
 
-	public WishListAdapter(Context context, UserOrder order, Collection<OrderItem> tableItems, View.OnClickListener clickListener) {
+	public WishListAdapter(Context context, Currency currency, UserOrder order, Collection<OrderItem> tableItems, View.OnClickListener
+			clickListener) {
 		mClickListener = clickListener;
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
@@ -114,6 +117,7 @@ public class WishListAdapter extends BaseAdapter {
 		if(mTableItems.size() > 0) {
 			mTableItems.add(0, new OrderItemHeader());
 		}
+		mCurrency = currency;
 	}
 
 	@Override
@@ -217,7 +221,7 @@ public class WishListAdapter extends BaseAdapter {
 				final UserOrderData data = (UserOrderData) item;
 				holder.txtTitle.setText(data.item().name());
 
-				final String price = data.item().price(Currency.RU).getReadableCurrencyValue();
+				final String price = data.item().price(mCurrency).getReadableCurrencyValue();
 				holder.txtPrice.setText(mContext.getString(R.string.wish_items_price_detailed, data.amount(), price));
 				holder.txtPrice.setTag(data);
 				holder.txtPrice.setOnClickListener(mClickListener);
@@ -229,7 +233,7 @@ public class WishListAdapter extends BaseAdapter {
 				final OrderItem orderItem = (OrderItem) item;
 				tableItemHolder.txtTitle.setText(orderItem.getTitle());
 
-				final String itemPrice = orderItem.getPricePerItem(Currency.RU).getReadableCurrencyValue();
+				final String itemPrice = orderItem.getPricePerItem(mCurrency).getReadableCurrencyValue();
 				tableItemHolder.txtPrice.setText(itemPrice);
 				tableItemHolder.txtPrice.setTag(orderItem);
 				tableItemHolder.txtPrice.setOnClickListener(mClickListener);

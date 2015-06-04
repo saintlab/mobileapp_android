@@ -16,7 +16,6 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.adapter.WishAdapter;
-import com.omnom.android.currency.Currency;
 import com.omnom.android.currency.Money;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.entrance.EntranceDataHelper;
@@ -281,7 +280,12 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		ViewUtils.setVisibleGone(mPanelBottom, !isBar);
 		ViewUtils.setVisibleGone(mPanelBottomBar, isBar);
 		setBusy(false);
-		mAdapter = new WishAdapter(this, mOrder, Collections.EMPTY_LIST, mEntranceData, this);
+		mAdapter = new WishAdapter(this,
+		                           getCurrency(),
+		                           mOrder,
+		                           Collections.EMPTY_LIST,
+		                           mEntranceData,
+		                           this);
 		mLayoutManager = new LinearLayoutManager(this);
 		mList.setHasFixedSize(true);
 		mList.setLayoutManager(mLayoutManager);
@@ -315,7 +319,12 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		   .subscribe(new Action1<Collection<OrderItem>>() {
 			   @Override
 			   public void call(final Collection<OrderItem> response) {
-				   final WishAdapter adapter = new WishAdapter(WishActivity.this, mOrder, response, mEntranceData, WishActivity.this);
+				   final WishAdapter adapter = new WishAdapter(WishActivity.this,
+				                                               getCurrency(),
+				                                               mOrder,
+				                                               response,
+				                                               mEntranceData,
+				                                               WishActivity.this);
 				   mAdapter = adapter;
 				   mList.swapAdapter(mAdapter, true);
 				   setBusy(false);
@@ -381,7 +390,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 		}
 
 		if(!checkUser()) {
-			BarTipsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mOrder.getTotalPrice(Currency.RU), mTipsValue);
+			BarTipsFragment.show(getSupportFragmentManager(), R.id.fragment_container, mOrder.getTotalPrice(getCurrency()), mTipsValue);
 		}
 	}
 
@@ -420,8 +429,8 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 			@Override
 			public void call(final WishResponse wishResponse) {
 				final PaymentDetails paymentDetails = new PaymentDetails(
-						mOrder.getTotalPrice(Currency.RU),
-						Money.ZERO,
+						mOrder.getTotalPrice(getCurrency()),
+						getZero(),
 						TipsWay.DEFAULT, 0,
 						SplitWay.WASNT_USED);
 				CardsActivity.start(WishActivity.this,
@@ -522,12 +531,12 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 
 		setBusy(true);
 
-		final Money tipsAmount = OrderHelper.getTipsAmount(mOrder.getTotalPrice(Currency.RU), mTipsValue);
+		final Money tipsAmount = OrderHelper.getTipsAmount(mOrder.getTotalPrice(getCurrency()), mTipsValue);
 		final OrderFragment.TipData tips = new OrderFragment.TipData(tipsAmount,
 		                                                             mTipsValue,
 		                                                             OrderFragment.TipData.TYPE_PERCENT);
 		final Money amountTips = tips.getAmount();
-		final Money amountToPay = mOrder.getTotalPrice(Currency.RU).add(tipsAmount);
+		final Money amountToPay = mOrder.getTotalPrice(getCurrency()).add(tipsAmount);
 
 		final WishRequest wishRequest = createWishRequestTips(mOrder, amountTips.getBaseValue().intValue());
 

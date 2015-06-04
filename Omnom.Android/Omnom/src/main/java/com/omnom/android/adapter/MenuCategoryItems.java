@@ -46,6 +46,8 @@ public class MenuCategoryItems {
 		@Nullable
 		private final View.OnClickListener mRecommendationClickListener;
 
+		private final Currency mCurrency;
+
 		@InjectView(R.id.txt_title)
 		protected TextView txtTitle;
 
@@ -87,15 +89,18 @@ public class MenuCategoryItems {
 
 		private View.OnClickListener mClickListener;
 
-		public ViewHolder(View convertView) {
-			this(convertView, null, null);
+		public ViewHolder(View convertView, Currency currency) {
+			this(convertView, currency, null, null);
 		}
 
-		public ViewHolder(final View convertView, final View.OnClickListener applyClickListener,
+		public ViewHolder(final View convertView,
+		                  final Currency currency,
+		                  final View.OnClickListener applyClickListener,
 		                  final View.OnClickListener clickListener) {
 			ButterKnife.inject(this, convertView);
 			mRecommendationClickListener = applyClickListener;
 			mClickListener = clickListener;
+			mCurrency = currency;
 		}
 
 		private Context getContext() {return btnApply.getContext();}
@@ -122,7 +127,7 @@ public class MenuCategoryItems {
 				btnApply.setText(StringUtils.EMPTY_STRING);
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
-				btnApply.setText(item.price(Currency.RU).getReadableCurrencyValue());
+				btnApply.setText(item.price(mCurrency).getReadableCurrencyValue());
 			}
 		}
 
@@ -173,7 +178,7 @@ public class MenuCategoryItems {
 				btnApply.setText(StringUtils.EMPTY_STRING);
 			} else {
 				btnApply.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
-				btnApply.setText(item.price(Currency.RU).getReadableCurrencyValue());
+				btnApply.setText(item.price(mCurrency).getReadableCurrencyValue());
 			}
 		}
 

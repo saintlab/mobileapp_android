@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.omnom.android.utils.utils.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 
 /**
  * Created by Ch3D on 26.05.2015.
@@ -24,7 +25,7 @@ public class Money implements Parcelable {
 		}
 	};
 
-	public static final Money ZERO = createFractional(0, Currency.NULL);
+	private static final HashMap<Currency, Money> sZeroMap = new HashMap<>();
 
 	public static final Money createFractional(long fractionalAmount, Currency currency) {
 		return new Money(fractionalAmount, currency);
@@ -34,9 +35,25 @@ public class Money implements Parcelable {
 		return new Money((long) fractionalAmount, currency);
 	}
 
+	/**
+	 * Use this method with caution - it will return #Money with value calculated
+	 * based on amount and currency's fraction factor
+	 *
+	 * @return Money = {@code amount} * {@code currency.getFractionalFactor()}
+	 */
 	@Deprecated
 	public static final Money create(double amount, Currency currency) {
 		return createFractional((long) (amount * currency.getFractionalFactor()), currency);
+	}
+
+	public static Money getZero(Currency currency) {
+		Money money = sZeroMap.get(currency);
+		if(money != null) {
+			return money;
+		}
+		money = Money.createFractional(0, currency);
+		sZeroMap.put(currency, money);
+		return money;
 	}
 
 	private final long mFractionalAmount;
@@ -74,14 +91,14 @@ public class Money implements Parcelable {
 	}
 
 	public final Money plus(final Money m1) {
-		if(m1.getCurrency() != getCurrency() && m1.mCurrency != Currency.NULL && mCurrency != Currency.NULL) {
+		if(m1.getCurrency() != getCurrency()) {
 			throw new IllegalArgumentException("Unable to sum different currencies");
 		}
 		return new Money(getFractionalValue() + m1.getFractionalValue(), getCurrency());
 	}
 
 	public final Money subtract(final Money m1) {
-		if(m1.getCurrency() != getCurrency() && m1.mCurrency != Currency.NULL && mCurrency != Currency.NULL) {
+		if(m1.getCurrency() != getCurrency()) {
 			throw new IllegalArgumentException("Unable to sum different currencies");
 		}
 		return new Money(getFractionalValue() - m1.getFractionalValue(), getCurrency());
@@ -167,7 +184,7 @@ public class Money implements Parcelable {
 		}
 
 		if(mFractionalAmount <= 0 || percent == 0) {
-			return Money.ZERO;
+			return Money.getZero(getCurrency());
 		}
 
 		return createFractional(mFractionalAmount * ((double) percent / (double) 100), mCurrency);
@@ -197,5 +214,13 @@ public class Money implements Parcelable {
 	public Money round() {
 		final long round = Math.round(mBaseAmount.doubleValue());
 		return create(round, getCurrency());
+	}
+
+	public String toDebugString() {
+		return "Money{" +
+				"mFractionalAmount=" + mFractionalAmount +
+				", mCurrency=" + mCurrency.getCode() +
+				", mBaseAmount=" + mBaseAmount +
+				'}';
 	}
 }

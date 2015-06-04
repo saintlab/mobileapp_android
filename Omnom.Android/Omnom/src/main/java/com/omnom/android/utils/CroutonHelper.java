@@ -50,8 +50,9 @@ public class CroutonHelper {
 		final UserData user = userProfile != null ? userProfile.getUser() : null;
 		final boolean sameUser = user != null && data.getUser().getId() == user.getId();
 
-		final Money tip = Money.createFractional(data.getTransaction().getTip(), Currency.RU);
-		final Money amount = Money.createFractional(data.getTransaction().getAmount(), Currency.RU);
+		final Currency currency = OmnomApplication.getCurrency(activity);
+		final Money tip = Money.createFractional(data.getTransaction().getTip(), currency);
+		final Money amount = Money.createFractional(data.getTransaction().getAmount(), currency);
 		final Money paid = amount.subtract(tip);
 
 		if(sameUser && !tip.isNegativeOrZero() && paid.isNegativeOrZero()) {

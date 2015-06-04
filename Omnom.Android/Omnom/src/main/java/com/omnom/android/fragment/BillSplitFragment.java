@@ -23,7 +23,6 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.BillSplitPagerAdapter;
-import com.omnom.android.currency.Currency;
 import com.omnom.android.currency.Money;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
@@ -158,7 +157,7 @@ public class BillSplitFragment extends Fragment {
 				final Object guestsCountTag = mBtnCommit.getTag(R.id.picker);
 				final int guestsCount = guestsCountTag == null ? 1 : (Integer) guestsCountTag;
 				if(tag != null) {
-					final Money money = Money.createFractional(tag.doubleValue(), Currency.RU);
+					final Money money = Money.createFractional(tag.doubleValue(), OmnomApplication.getCurrency(getActivity()));
 					mBus.post(new OrderSplitCommitEvent(mOrder.getId(), guestsCount, mStates, money, tagSplitType));
 					hide();
 				}

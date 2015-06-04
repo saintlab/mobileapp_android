@@ -29,7 +29,6 @@ import com.omnom.android.activity.helper.PaymentDataTable;
 import com.omnom.android.activity.helper.PaymentDataWish;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.auth.UserData;
-import com.omnom.android.currency.Money;
 import com.omnom.android.entrance.EntranceData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.menu.model.UserOrder;
@@ -273,7 +272,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 							.cvv(cvv)
 							.build();
 					CardConfirmActivity.startConfirm(CardsActivity.this, cardInfo, REQUEST_CODE_CARD_CONFIRM,
-					                                 mDetails != null ? mDetails.getAmount() : Money.ZERO);
+					                                 mDetails != null ? mDetails.getAmount() : getZero());
 				}
 			}
 		});
@@ -549,7 +548,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 				Log.w(TAG, "Card info is null");
 			}
 		} else if(resultCode == RESULT_ENTER_CARD_AND_PAY) {
-			CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : Money.ZERO,
+			CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : getZero(),
 			                      CardAddActivity.TYPE_ENTER_AND_PAY, mEntranceData,
 			                      REQUEST_CODE_CARD_ADD);
 		}
@@ -560,7 +559,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 		if(mDetails != null) {
 			type = CardAddActivity.TYPE_BIND_OR_PAY;
 		}
-		CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : Money.ZERO,
+		CardAddActivity.start(this, mDetails != null ? mDetails.getAmount() : getZero(),
 		                      type, mEntranceData, REQUEST_CODE_CARD_ADD);
 	}
 

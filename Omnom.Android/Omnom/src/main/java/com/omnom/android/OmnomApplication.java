@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.omnom.android.currency.Currency;
 import com.omnom.android.menu.MenuModule;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.modules.AcquiringModuleMailRuMixpanel;
@@ -72,6 +73,11 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		return OmnomApplication.get(context.getApplicationContext()).getOrCreatePicasso();
 	}
 
+	public static Currency getCurrency(Context context) {
+		final OmnomApplication omnomApplication = get(context);
+		return omnomApplication.mCurrency;
+	}
+
 	private final List<Object> injectList = new ArrayList<Object>();
 
 	@Inject
@@ -99,6 +105,12 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	private TableSocketListener mTableSocketListener;
 
 	private Stack<PaymentSocketEvent> mPaymentEvents;
+
+	private Currency mCurrency;
+
+	public void setCurrency(final Currency currency) {
+		mCurrency = currency;
+	}
 
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
@@ -134,6 +146,8 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		CalligraphyConfig.initDefault(OmnomFont.OSF_REGULAR.getPath(), R.attr.fontPath);
 		mixPanelHelper = new MixPanelHelper();
 		mPaymentEvents = new Stack<PaymentSocketEvent>();
+
+		setCurrency(Currency.RU);
 
 		registerReceiver(new BroadcastReceiver() {
 			@Override

@@ -7,7 +7,6 @@ import com.omnom.android.currency.Currency;
 import com.omnom.android.currency.Money;
 import com.omnom.android.utils.generation.AutoGson;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,30 +50,17 @@ public abstract class UserOrder implements Parcelable {
 		return data != null && data.amount() > 0;
 	}
 
-	public BigDecimal getTotalPrice() {
-		BigDecimal result = BigDecimal.ZERO;
+	public Money getTotalPrice(Currency currency) {
+		Money result = Money.getZero(currency);
 		final Set<Map.Entry<String, UserOrderData>> entries = itemsTable().entrySet();
 		for(Map.Entry<String, UserOrderData> entry : entries) {
 			final UserOrderData value = entry.getValue();
 			if(value != null && value.item() != null) {
-				final double amount = value.item().price() * value.amount();
-				result = result.add(BigDecimal.valueOf(amount));
+				final Money price = value.item().price(currency).multiply(value.amount());
+ 				result = result.plus(price);
 			}
 		}
 		return result;
-	}
-
-	public Money getTotalPrice(Currency currency) {
-		double result = 0;
-		final Set<Map.Entry<String, UserOrderData>> entries = itemsTable().entrySet();
-		for(Map.Entry<String, UserOrderData> entry : entries) {
-			final UserOrderData value = entry.getValue();
-			if(value != null && value.item() != null) {
-				final double amount = value.item().price() * value.amount();
-				result += amount;
-			}
-		}
-		return Money.createFractional(result, currency);
 	}
 
 	public void addItem(final Item item, int count, final List<String> selectedModifiersIds) {

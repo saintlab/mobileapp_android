@@ -48,7 +48,7 @@ public abstract class Item implements Parcelable {
 	public abstract double price();
 
 	public Money price(Currency currency) {
-		return Money.createFractional(price(), currency);
+		return Money.create(price(), currency);
 	}
 
 	@Nullable

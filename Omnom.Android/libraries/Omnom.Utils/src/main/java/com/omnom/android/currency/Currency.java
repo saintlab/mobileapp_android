@@ -3,8 +3,6 @@ package com.omnom.android.currency;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.omnom.android.utils.utils.StringUtils;
-
 import java.math.BigDecimal;
 
 /**
@@ -25,11 +23,9 @@ public class Currency implements Parcelable {
 		}
 	};
 
-	public static final Currency RU = new Currency(100, true, "\uF5FC");
+	public static final Currency RU = new Currency(100, true, "\uF5FC", "RUR");
 
-	public static final Currency US = new Currency(100, true, "\uFE69");
-
-	public static final Currency NULL = new Currency(1, false, StringUtils.EMPTY_STRING);
+	public static final Currency US = new Currency(100, true, "\uFE69", "USD");
 
 	private final long mFactor;
 
@@ -39,17 +35,21 @@ public class Currency implements Parcelable {
 
 	private final String mSymbol;
 
+	private final String mCode;
+
 	public Currency(Parcel parcel) {
 		mFactor = parcel.readLong();
 		mIsFractional = parcel.readInt() == 1;
 		mSymbol = parcel.readString();
+		mCode = parcel.readString();
 		mDecimalFactor = BigDecimal.valueOf(mFactor);
 	}
 
-	private Currency(long factor, boolean isFractional, String symbol) {
+	private Currency(long factor, boolean isFractional, String symbol, final String code) {
 		mFactor = factor;
 		mIsFractional = isFractional;
 		mSymbol = symbol;
+		mCode = code;
 		mDecimalFactor = BigDecimal.valueOf(factor);
 	}
 
@@ -73,7 +73,10 @@ public class Currency implements Parcelable {
 		if(mDecimalFactor != null ? !mDecimalFactor.equals(currency.mDecimalFactor) : currency.mDecimalFactor != null) {
 			return false;
 		}
-		return !(mSymbol != null ? !mSymbol.equals(currency.mSymbol) : currency.mSymbol != null);
+		if(mSymbol != null ? !mSymbol.equals(currency.mSymbol) : currency.mSymbol != null) {
+			return false;
+		}
+		return !(mCode != null ? !mCode.equals(currency.mCode) : currency.mCode != null);
 
 	}
 
@@ -83,6 +86,7 @@ public class Currency implements Parcelable {
 		result = 31 * result + (mDecimalFactor != null ? mDecimalFactor.hashCode() : 0);
 		result = 31 * result + (mIsFractional ? 1 : 0);
 		result = 31 * result + (mSymbol != null ? mSymbol.hashCode() : 0);
+		result = 31 * result + (mCode != null ? mCode.hashCode() : 0);
 		return result;
 	}
 
@@ -112,5 +116,15 @@ public class Currency implements Parcelable {
 		dest.writeLong(mFactor);
 		dest.writeInt(mIsFractional ? 1 : 0);
 		dest.writeString(mSymbol);
+		dest.writeString(mCode);
+	}
+
+	@Override
+	public String toString() {
+		return mSymbol;
+	}
+
+	public String getCode() {
+		return mCode;
 	}
 }

@@ -6,6 +6,8 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.activity.helper.LocationActivityHelper;
 import com.omnom.android.activity.helper.OmnomActivityHelper;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
@@ -28,6 +30,14 @@ public abstract class BaseOmnomFragmentActivity extends BaseFragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		activityHelper = new OmnomActivityHelper(getActivity());
+	}
+
+	protected Money getZero() {
+		return Money.getZero(getCurrency());
+	}
+
+	protected Currency getCurrency() {
+		return OmnomApplication.getCurrency(this);
 	}
 
 	protected final OmnomApplication getApp() {

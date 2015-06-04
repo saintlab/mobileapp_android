@@ -14,7 +14,6 @@ import android.widget.HeaderViewListAdapter;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.OrderItemsAdapter;
-import com.omnom.android.currency.Currency;
 import com.omnom.android.currency.Money;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderItem;
@@ -80,7 +79,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 	@Override
 	public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		mAdapter = new OrderItemsAdapter(getActivity(), mOrder.getItems(), mStates, false);
+		mAdapter = new OrderItemsAdapter(getActivity(), OmnomApplication.getCurrency(getActivity()), mOrder.getItems(), mStates, false);
 		getListView().setDividerHeight(0);
 		final View footerView = LayoutInflater.from(getActivity()).inflate(R.layout.item_order_footer_empty, null, false);
 		getListView().addFooterView(footerView);
@@ -113,7 +112,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 		for(final OrderItem item : selectedItems) {
 			result += item.getPriceTotal();
 		}
-		return Money.createFractional(result, Currency.RU);
+		return Money.createFractional(result, OmnomApplication.getCurrency(getActivity()));
 	}
 
 	@Override
@@ -141,7 +140,7 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 	public void onOrderUpdate(final Order order) {
 		if(mAdapter != null) {
 			mAdapter.clearSelection();
-			mAdapter = new OrderItemsAdapter(getActivity(), order.getItems(), mStates, false);
+			mAdapter = new OrderItemsAdapter(getActivity(), OmnomApplication.getCurrency(getActivity()), order.getItems(), mStates, false);
 			setListAdapter(mAdapter);
 			updateAmount();
 		}

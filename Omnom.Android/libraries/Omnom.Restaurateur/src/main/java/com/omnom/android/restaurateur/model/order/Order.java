@@ -278,7 +278,7 @@ public class Order implements Parcelable {
 		if(getPaidAmount() > 0) {
 			return Money.createFractional(getPaidAmount(), currency);
 		}
-		return Money.ZERO;
+		return Money.getZero(currency);
 	}
 
 	@Override
@@ -356,7 +356,7 @@ public class Order implements Parcelable {
 		if(!toPay.isNegativeOrZero()) {
 			return toPay;
 		}
-		return Money.ZERO;
+		return Money.getZero(currency);
 	}
 
 	public double getPaidTip() {

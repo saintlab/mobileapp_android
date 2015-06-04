@@ -132,13 +132,15 @@ public class WishAdapter extends RecyclerView.Adapter {
 
 	private final LayoutInflater mInflater;
 
+	private final Currency mCurrency;
+
 	private ArrayList<OrderItem> mTableItems;
 
 	private EntranceData mEntranceData;
 
 	private List<UserOrderData> _lazy_selected_data;
 
-	public WishAdapter(Context context, UserOrder order, Collection<OrderItem> tableItems,
+	public WishAdapter(Context context, Currency currency, UserOrder order, Collection<OrderItem> tableItems,
 	                   EntranceData entranceData, View.OnClickListener clickListener) {
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
@@ -149,6 +151,7 @@ public class WishAdapter extends RecyclerView.Adapter {
 		if(mTableItems.size() > 0) {
 			mTableItems.add(0, new OrderItemHeader());
 		}
+		mCurrency = currency;
 	}
 
 	@Override
@@ -224,7 +227,7 @@ public class WishAdapter extends RecyclerView.Adapter {
 				final UserOrderData data = (UserOrderData) getItemAt(position);
 				ivh.txtTitle.setText(data.item().name());
 
-				final String price = data.item().price(Currency.RU).getReadableCurrencyValue();
+				final String price = data.item().price(mCurrency).getReadableCurrencyValue();
 				ivh.btnApply.setText(mContext.getString(R.string.wish_items_price_detailed, data.amount(), price));
 				ivh.btnApply.setTag(data);
 				ivh.btnApply.setOnClickListener(mClickListener);
@@ -259,7 +262,7 @@ public class WishAdapter extends RecyclerView.Adapter {
 
 				btnClear.setOnClickListener(mClickListener);
 				btnSend.setOnClickListener(mClickListener);
-				txtAmount.setText(mOrder.getTotalPrice(Currency.RU).getReadableCurrencyValue());
+				txtAmount.setText(mOrder.getTotalPrice(mCurrency).getReadableCurrencyValue());
 
 				final boolean enabled = getSelectedItems().size() > 1;
 				ViewUtils.setVisibleGone(panelAmount, enabled);
