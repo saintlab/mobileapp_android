@@ -18,7 +18,7 @@ public class OrderHelper {
 		if(order == null) {
 			return Money.getZero(currency);
 		}
-		return getTipsAmount(Money.createFractional(order.getAmountToPay(), currency), percent);
+		return getTipsAmount(order.getAmountToPay(currency), percent);
 	}
 
 	/**

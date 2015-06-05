@@ -607,12 +607,6 @@ public class OrderFragment extends Fragment {
 		}
 	}
 
-	private boolean isEverythingPaid(final Order order) {
-		final Money paidMoney = Money.createFractional(order.getPaidAmount(), mCurrency);
-		final Money totalMoney = order.getTotalMoney(mCurrency);
-		return paidMoney.isGreatherOrEquals(totalMoney);
-	}
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
@@ -929,7 +923,7 @@ public class OrderFragment extends Fragment {
 					if(activity.checkFragment(OrderFragment.this)) {
 						zoomInFragment(activity);
 					}
-				} else if(!isEverythingPaid(getOrder())) {
+				} else if(!getOrder().isEverythingPaid(mCurrency)) {
 					splitBill();
 				}
 			}
@@ -971,7 +965,8 @@ public class OrderFragment extends Fragment {
 	private void sendBillViewEvent(String requestId, UserData user, Order order) {
 		final OrdersActivity activity = (OrdersActivity) getActivity();
 		if(!activity.isDemo()) {
-			MixpanelEvent billViewEvent = new BillViewMixpanelEvent(UserHelper.getUserData(getActivity()), requestId, order, user);
+			MixpanelEvent billViewEvent = new BillViewMixpanelEvent(UserHelper.getUserData(getActivity()),
+			                                                        mCurrency, requestId, order, user);
 			OmnomApplication.getMixPanelHelper(getActivity()).track(MixPanelHelper.Project.OMNOM, billViewEvent);
 		}
 	}
@@ -993,7 +988,7 @@ public class OrderFragment extends Fragment {
 	}
 
 	private void updateAmount(final String amount) {
-		final boolean isEverythingPaid = isEverythingPaid(getOrder());
+		final boolean isEverythingPaid = getOrder().isEverythingPaid(mCurrency);
 		list.setSwipeEnabled(!isEverythingPaid);
 		ViewUtils.setVisibleInvisible(btnEdit, !isEverythingPaid && mMode != MODE_AMOUNT);
 		ViewUtils.setVisibleGone(txtPaymentTitle, !isEverythingPaid);
@@ -1017,7 +1012,7 @@ public class OrderFragment extends Fragment {
 		final Money paidMoney = getOrder().getPaidMoney(mCurrency);
 		if(txtAlreadyPaid != null) {
 			if(!paidMoney.isNegativeOrZero()) {
-				if(isEverythingPaid(getOrder())) {
+				if(getOrder().isEverythingPaid(mCurrency)) {
 					txtAlreadyPaid.setText(getString(R.string.paid_of,
 					                                 paidMoney.getReadableCurrencyValue(),
 					                                 getOrder().getTotalMoney(mCurrency).getReadableCurrencyValue()));
@@ -1115,7 +1110,7 @@ public class OrderFragment extends Fragment {
 			@Override
 			public void onClick(final View v) {
 				if(!isDownscaled()) {
-					if(!isEverythingPaid(getOrder())) {
+					if(!getOrder().isEverythingPaid(mCurrency)) {
 						splitBill();
 					}
 				} else {
@@ -1257,7 +1252,7 @@ public class OrderFragment extends Fragment {
 
 	private void updateCustomTipsText(final int newVal) {
 		txtCustomTips.setText(getString(R.string.tip_percent, newVal));
-		final Money amount = isEverythingPaid(getOrder()) ? getOrder().getPaidMoney(mCurrency) : getEnteredAmount();
+		final Money amount = getOrder().isEverythingPaid(mCurrency) ? getOrder().getPaidMoney(mCurrency) : getEnteredAmount();
 		final Money tips = OrderHelper.getTipsAmount(amount, newVal).round();
 		txtTipsAmountHint.setText(getString(R.string.tip_hint_or, tips.getReadableCurrencyValue()));
 	}
@@ -1274,11 +1269,12 @@ public class OrderFragment extends Fragment {
 		ViewUtils.setVisibleGone(txtCustomTips, visible);
 		ViewUtils.setVisibleGone(txtTipsAmountHint, visible);
 
+		final boolean everythingPaid = getOrder().isEverythingPaid(mCurrency);
 		ViewUtils.setVisibleInvisible(btnApply, visible);
-		ViewUtils.setVisibleInvisible(btnEdit, !visible && !isEverythingPaid(getOrder()));
+		ViewUtils.setVisibleInvisible(btnEdit, !visible && !everythingPaid);
 		ViewUtils.setVisibleInvisible(radioGroup, !visible);
-		ViewUtils.setVisibleInvisible(txtPaymentTitle, !visible && !isEverythingPaid(getOrder()));
-		ViewUtils.setVisibleInvisible(txtAlreadyPaid, getOrder().getPaidAmount() > 0 && !visible);
+		ViewUtils.setVisibleInvisible(txtPaymentTitle, !visible && !everythingPaid);
+		ViewUtils.setVisibleInvisible(txtAlreadyPaid, !getOrder().getPaidMoney(mCurrency).isNegativeOrZero() && !visible);
 		ViewUtils.setVisibleInvisible(txtTipsTitle, !visible);
 		ViewUtils.setVisibleInvisible(btnPay, !visible);
 
@@ -1373,8 +1369,8 @@ public class OrderFragment extends Fragment {
 		if(OrderHelper.isPercentTips(getOrder(), amount) || selectedTipsButton.getId() == otherTips.getId()) {
 			final int percent = (Integer) selectedTipsButton.getTag();
 
-			final Money amountToCountTips = isEverythingPaid(getOrder()) ?
-					Money.createFractional(getOrder().getPaidAmount(), mCurrency) : amount;
+			final Money amountToCountTips = getOrder().isEverythingPaid(mCurrency) ?
+					getOrder().getPaidMoney(mCurrency) : amount;
 
 			final Money tipsAmount = OrderHelper.getTipsAmount(amountToCountTips, percent);
 			return new TipData(tipsAmount, percent, TipData.TYPE_PERCENT);
@@ -1391,7 +1387,7 @@ public class OrderFragment extends Fragment {
 	private void updatePaymentTipsAmount(final Money amount, final List<CompoundButton> tipsButtons) {
 		Money resultAmount = amount;
 		final boolean percentTips = OrderHelper.isPercentTips(getOrder(), amount);
-		if(amount.isZero() && getOrder().getPaidAmount() == 0) {
+		if(amount.isZero() && getOrder().getPaidMoney(mCurrency).isZero()) {
 			resultAmount = amount;
 			radioGroup.clearCheck();
 			radioGroup.setEnabled(false);

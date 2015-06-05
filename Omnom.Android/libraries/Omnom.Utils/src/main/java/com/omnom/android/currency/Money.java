@@ -2,6 +2,7 @@ package com.omnom.android.currency;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.omnom.android.utils.utils.StringUtils;
 
@@ -26,6 +27,16 @@ public class Money implements Parcelable {
 	};
 
 	private static final HashMap<Currency, Money> sZeroMap = new HashMap<>();
+
+	private static final String TAG = Money.class.getSimpleName();
+
+	public static Money max(Money money1, Money money2) {
+		return money1.isGreatherThan(money2) ? money1 : money2;
+	}
+
+	public static Money min(Money money1, Money money2) {
+		return money1.isLessThan(money2) ? money1 : money2;
+	}
 
 	public static final Money createFractional(long fractionalAmount, Currency currency) {
 		return new Money(fractionalAmount, currency);
@@ -180,10 +191,11 @@ public class Money implements Parcelable {
 
 	public Money getPercent(final int percent) {
 		if(percent < 0) {
-			throw new IllegalArgumentException("Wrong percent parameter value = " + percent);
+			// throw new IllegalArgumentException("Wrong percent parameter value = " + percent);
+			Log.w(TAG, "Trying to get " + percent + "% of " + toDebugString());
 		}
 
-		if(mFractionalAmount <= 0 || percent == 0) {
+		if(mFractionalAmount <= 0 || percent <= 0) {
 			return Money.getZero(getCurrency());
 		}
 
@@ -222,5 +234,11 @@ public class Money implements Parcelable {
 				", mCurrency=" + mCurrency.getCode() +
 				", mBaseAmount=" + mBaseAmount +
 				'}';
+	}
+
+	public Money divide(final int value) {
+		final float breRoundValue = (float) (getFractionalValue()) / (float) value;
+		final BigDecimal bigDecimalValue = new BigDecimal(String.valueOf(breRoundValue)).setScale(0, BigDecimal.ROUND_UP);
+		return Money.createFractional(Math.round(bigDecimalValue.floatValue()), mCurrency);
 	}
 }

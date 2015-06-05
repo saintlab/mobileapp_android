@@ -11,15 +11,13 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.currency.Currency;
 import com.omnom.android.currency.Money;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.view.NumberPicker;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -94,15 +92,12 @@ public class BillSplitPersonsFragment extends Fragment implements NumberPicker.O
 	}
 
 	private Money getAmount() {
-		final int value = mPicker.getValue();
-		double amountToPay = mOrder.getAmountToPay();
-		if(value > 1) {
-			amountToPay = mOrder.getTotalAmount();
+		final Currency currency = OmnomApplication.getCurrency(getActivity());
+		final int personsCount = mPicker.getValue();
+		if(personsCount == 1) {
+			return mOrder.getTotalAmount(currency);
 		}
-		final double v = amountToPay / value;
-		final BigDecimal bigDecimal = new BigDecimal(String.valueOf(v));
-		final BigDecimal roundedValue = bigDecimal.setScale(2, RoundingMode.HALF_UP);
-		return Money.createFractional(roundedValue.doubleValue(), OmnomApplication.getCurrency(getActivity()));
+		return mOrder.getTotalAmount(currency).divide(personsCount);
 	}
 
 	@Override

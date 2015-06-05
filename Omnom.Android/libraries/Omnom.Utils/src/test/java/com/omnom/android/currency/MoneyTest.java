@@ -29,6 +29,12 @@ public class MoneyTest {
 		Assert.assertEquals(Money.createFractional(210, Currency.RU).getBaseValue(), BigDecimal.valueOf(2.1));
 		Assert.assertEquals(Money.createFractional(210, Currency.RU).getBaseValue(), BigDecimal.valueOf(2.10));
 
+		Assert.assertEquals(Money.createFractional(12301, Currency.RU).getBaseValue(), BigDecimal.valueOf(123.01));
+		Assert.assertEquals(Money.createFractional(12301, Currency.RU).getFractionalValue(), 12301);
+
+		Assert.assertEquals(Money.createFractional(69501, Currency.RU).getFractionalValue(), 69501);
+		Assert.assertEquals(Money.createFractional(69501, Currency.RU).getBaseValue(), BigDecimal.valueOf(695.01));
+
 		Assert.assertEquals(Money.create(210, Currency.RU).getBaseValue(), BigDecimal.valueOf(210));
 		Assert.assertEquals(Money.create(210, Currency.RU).getFractionalValue(), 21000);
 
@@ -193,6 +199,36 @@ public class MoneyTest {
 
 		Assert.assertTrue(Money.create(8.4, Currency.RU).round()
 		                       .equals(Money.create(8, Currency.RU)));
+	}
+
+	@Test
+	public void testDivide() {
+		// 695.01 / 2 = 347,505 -> must be rouneded to 347,51
+		Assert.assertTrue(Money.createFractional(69501, Currency.RU)
+		                       .divide(2)
+		                       .equals(Money.createFractional(34751, Currency.RU)));
+
+		// 695.01 / 4 = 173,7525 -> must be rouneded to 173,76
+		Assert.assertTrue(Money.createFractional(69501, Currency.RU)
+		                       .divide(4)
+		                       .equals(Money.createFractional(17376, Currency.RU)));
+
+		// 695.01 / 4 = 173,7525 -> must be rouneded to 173,76
+		Assert.assertTrue(Money.createFractional(69501, Currency.RU)
+		                       .divide(5)
+		                       .equals(Money.createFractional(13901, Currency.RU)));
+
+		Assert.assertTrue(Money.createFractional(69501, Currency.RU)
+		                       .divide(2)
+		                       .equals(Money.create(347.51, Currency.RU)));
+
+		Assert.assertFalse(Money.createFractional(69501, Currency.RU)
+		                        .divide(2)
+		                        .equals(Money.create(347.50, Currency.RU)));
+
+		Assert.assertFalse(Money.createFractional(69501, Currency.RU)
+		                        .divide(2)
+		                        .equals(Money.create(347.52, Currency.RU)));
 	}
 
 	@Test

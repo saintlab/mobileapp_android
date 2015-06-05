@@ -3,6 +3,7 @@ package com.omnom.android.mixpanel.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.currency.Currency;
 import com.omnom.android.restaurateur.model.order.Order;
 
 /**
@@ -36,13 +37,13 @@ public final class BillViewMixpanelEvent extends AbstractBaseMixpanelEvent {
 	@SerializedName("table_id")
 	private String tableId;
 
-	public BillViewMixpanelEvent(UserData userData, final String requestId, final Order order, final UserData user) {
+	public BillViewMixpanelEvent(UserData userData, Currency currency, final String requestId, final Order order, final UserData user) {
 		super(userData);
 		this.requestId = requestId;
 		if(order != null) {
-			this.amount = order.getTotalAmount();
-			this.paidAmount = order.getPaidAmount();
-			this.paidTipAmount = order.getPaidTip();
+			this.amount = order.getTotalAmount(currency).getFractionalValue();
+			this.paidAmount = order.getPaidMoney(currency).getFractionalValue();
+			this.paidTipAmount = order.getPaidTip(currency).getFractionalValue();
 			this.orderId = order.getId();
 			this.restaurantId = order.getRestaurantId();
 			this.tableId = order.getTableId();

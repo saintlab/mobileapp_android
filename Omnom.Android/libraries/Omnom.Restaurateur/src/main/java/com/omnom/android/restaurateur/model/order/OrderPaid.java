@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
+import com.omnom.android.currency.Currency;
+import com.omnom.android.currency.Money;
 
 /**
  * Created by Ch3D on 24.05.2015.
@@ -37,20 +39,12 @@ public class OrderPaid implements Parcelable {
 		tip = parcel.readInt();
 	}
 
-	public int getAmount() {
-		return amount;
+	public Money getAmount(Currency currency) {
+		return Money.createFractional(amount, currency);
 	}
 
-	public void setAmount(final int amount) {
-		this.amount = amount;
-	}
-
-	public int getTip() {
-		return tip;
-	}
-
-	public void setTip(final int tip) {
-		this.tip = tip;
+	public Money getTip(Currency currency) {
+		return Money.createFractional(tip, currency);
 	}
 
 	@Override

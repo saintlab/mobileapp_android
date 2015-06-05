@@ -8,7 +8,6 @@ import com.google.gson.annotations.Expose;
 import com.omnom.android.currency.Currency;
 import com.omnom.android.currency.Money;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -267,18 +266,11 @@ public class Order implements Parcelable {
 		this.tips = tips;
 	}
 
-	public double getPaidAmount() {
-		if(paid == null) {
-			return 0;
-		}
-		return paid.getAmount() - paid.getTip();
-	}
-
 	public Money getPaidMoney(Currency currency) {
-		if(getPaidAmount() > 0) {
-			return Money.createFractional(getPaidAmount(), currency);
+		if(paid == null) {
+			return Money.getZero(currency);
 		}
-		return Money.getZero(currency);
+		return paid.getAmount(currency).subtract(paid.getTip(currency));
 	}
 
 	@Override
@@ -331,12 +323,12 @@ public class Order implements Parcelable {
 		return 0;
 	}
 
-	public double getTotalAmount() {
-		BigDecimal sum = BigDecimal.ZERO;
+	public Money getTotalAmount(Currency currency) {
+		Money result = Money.getZero(currency);
 		for(final OrderItem item : items) {
-			sum = sum.add(BigDecimal.valueOf(item.getPriceTotal()));
+			result = result.plus(Money.create(item.getPriceTotal(), currency));
 		}
-		return sum.doubleValue();
+		return result;
 	}
 
 	public Money getTotalMoney(Currency currency) {
@@ -347,8 +339,8 @@ public class Order implements Parcelable {
 		return Money.create(sum, currency);
 	}
 
-	public double getAmountToPay() {
-		return Math.max(getTotalAmount() - getPaidAmount(), 0);
+	public Money getAmountToPay(Currency currency) {
+		return Money.max(getTotalAmount(currency).subtract(getPaidMoney(currency)), Money.getZero(currency));
 	}
 
 	public Money getMoneyToPay(Currency currency) {
@@ -359,8 +351,13 @@ public class Order implements Parcelable {
 		return Money.getZero(currency);
 	}
 
-	public double getPaidTip() {
-		return paid != null ? paid.getTip() : 0;
+	public Money getPaidTip(Currency currency) {
+		return paid != null ? paid.getTip(currency) : Money.getZero(currency);
 	}
 
+	public boolean isEverythingPaid(final Currency currency) {
+		final Money paidMoney = getPaidMoney(currency);
+		final Money totalMoney = getTotalMoney(currency);
+		return paidMoney.isGreatherOrEquals(totalMoney);
+	}
 }
