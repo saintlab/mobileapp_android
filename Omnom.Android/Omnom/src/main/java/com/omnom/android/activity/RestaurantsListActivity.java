@@ -201,8 +201,7 @@ public class RestaurantsListActivity extends BaseOmnomActivity
 	private void refresh() {
 		Observable<RestaurantsResponse> restaurantsObservable;
 		if(getLocation() != null) {
-			restaurantsObservable = api
-					.getRestaurantsAll(getLocation().getLatitude(), getLocation().getLongitude());
+			restaurantsObservable = api.getRestaurantsAll(getLocation().getLatitude(), getLocation().getLongitude());
 		} else {
 			restaurantsObservable = api.getRestaurantsAll();
 		}
