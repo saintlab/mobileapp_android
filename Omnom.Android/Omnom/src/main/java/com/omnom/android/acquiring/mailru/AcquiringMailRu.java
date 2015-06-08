@@ -165,7 +165,7 @@ public class AcquiringMailRu implements Acquiring {
 
 	@Override
 	public Observable<AcquiringResponse> addCard(final AcquiringData acquiringData, final UserData user, final CardInfo cardInfo) {
-		final ExtraData extra = MailRuExtra.create(0, StringUtils.EMPTY_STRING, MailRuExtra.PAYMENT_TYPE_ORDER);
+		final ExtraData extra = MailRuExtra.create(0, StringUtils.EMPTY_STRING, MailRuExtra.PAYMENT_TYPE_CARD);
 		final OrderInfoMailRu order = OrderInfoMailRu.create(AMOUNT_ADD_CARD, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
 

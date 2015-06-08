@@ -14,6 +14,8 @@ public class MailRuExtra extends ExtraData {
 
 	public static final String PAYMENT_TYPE_WISH = "wish";
 
+	public static final String PAYMENT_TYPE_CARD = "card";
+
 	public static MailRuExtra create(int tip, String restaurant_id, String type) {
 		return new MailRuExtra(tip, restaurant_id, type);
 	}
