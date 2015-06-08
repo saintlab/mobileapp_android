@@ -164,7 +164,7 @@ public class OrderItemsAdapter extends BaseAdapter {
 			holder.txtPrice.setTextColor(mColorPriceNormal);
 		}
 		holder.txtTitle.setText(item.getTitle());
-		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPricePerItem()));
+		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPriceTotal()));
 	}
 
 	public void setSelected(final int position, final boolean selected) {

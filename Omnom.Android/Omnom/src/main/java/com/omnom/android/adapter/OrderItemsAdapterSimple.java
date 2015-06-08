@@ -54,7 +54,7 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 			holder.txtPrice.setTextColor(mTextColorDefault);
 		}
 		holder.txtTitle.setText(item.getTitle());
-		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPricePerItem()));
+		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPriceTotal()));
 	}
 
 	public void setIgnoreSelection(boolean ignoreSelection) {
