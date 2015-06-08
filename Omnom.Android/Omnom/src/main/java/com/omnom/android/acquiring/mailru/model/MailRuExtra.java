@@ -27,7 +27,7 @@ public class MailRuExtra extends ExtraData {
 	private String type;
 
 	private MailRuExtra(int tip, String restaurant_id, String type) {
-		if(!PAYMENT_TYPE_ORDER.equals(type) && !PAYMENT_TYPE_WISH.equals(type)) {
+		if(!PAYMENT_TYPE_ORDER.equals(type) && !PAYMENT_TYPE_WISH.equals(type) && !PAYMENT_TYPE_CARD.equals(type)) {
 			throw new IllegalArgumentException("Wrong type argument : " + type);
 		}
 		this.tip = tip;
