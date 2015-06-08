@@ -23,6 +23,7 @@ import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.auth.request.UserUpdateRequest;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.fragment.UserPhotoOptionsFragment;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
@@ -302,11 +303,9 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 						.flatMap(new Func1<FileUploadReponse, Observable<UserResponse>>() {
 							@Override
 							public Observable<UserResponse> call(final FileUploadReponse fileUploadReponse) {
-								return authenticator.updateUser(authToken,
-								                                mEditName.getText(),
-								                                mEditEmail.getText(),
-								                                mEditBirth.getText().toString(),
-								                                fileUploadReponse.url());
+								return authenticator.updateUser(
+										new UserUpdateRequest(authToken, mEditName.getText(), mEditEmail.getText(),
+										                      mEditBirth.getText().toString(), fileUploadReponse.url()));
 							}
 						})
 						.subscribe(new Action1<UserResponse>() {
@@ -322,8 +321,9 @@ public class UserProfileEditActivity extends BaseOmnomFragmentActivity {
 							}
 						}, mBaseOnErrorHandler);
 			} else {
-				authenticator.updateUser(authToken, mEditName.getText(), mEditEmail.getText(), mEditBirth.getText().toString(),
-				                         mAvatarCleared ? StringUtils.EMPTY_STRING : getUserData().getAvatar())
+				authenticator.updateUser(
+						new UserUpdateRequest(authToken, mEditName.getText(), mEditEmail.getText(), mEditBirth.getText().toString(),
+						                      mAvatarCleared ? StringUtils.EMPTY_STRING : getUserData().getAvatar()))
 				             .subscribe(
 						             new Action1<UserResponse>() {
 							             @Override

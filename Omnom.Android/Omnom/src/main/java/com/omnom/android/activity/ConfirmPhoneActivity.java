@@ -16,6 +16,9 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
+import com.omnom.android.auth.request.UserAuthorizeByPhoneRequest;
+import com.omnom.android.auth.request.UserConfirmPhoneRequest;
+import com.omnom.android.auth.request.UserPhoneConfirmResendRequest;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.restaurateur.model.UserProfile;
@@ -210,9 +213,9 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	private Observable<AuthResponse> getAuthObservable() {
 		Observable<AuthResponse> observable;
 		if(type == TYPE_REGISTER) {
-			observable = authenticator.confirm(phone, getCode());
+			observable = authenticator.confirm(new UserConfirmPhoneRequest(phone, getCode()));
 		} else if(type == TYPE_LOGIN) {
-			observable = authenticator.authorizePhone(phone, getCode());
+			observable = authenticator.authorizePhone(new UserAuthorizeByPhoneRequest(phone, getCode()));
 		} else {
 			throw new RuntimeException("Wrong confirm type = " + type);
 		}
@@ -276,9 +279,9 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 	private Observable<AuthResponse> getRequestCodeObservable() {
 		Observable<AuthResponse> observable;
 		if(type == TYPE_REGISTER) {
-			observable = authenticator.confirmResend(phone);
+			observable = authenticator.confirmResend(new UserPhoneConfirmResendRequest(phone));
 		} else if(type == TYPE_LOGIN) {
-			observable = authenticator.authorizePhone(phone, StringUtils.EMPTY_STRING);
+			observable = authenticator.authorizePhone(new UserAuthorizeByPhoneRequest(phone, StringUtils.EMPTY_STRING));
 		} else {
 			throw new RuntimeException("Wrong confirm type = " + type);
 		}

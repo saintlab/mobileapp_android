@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
+import com.omnom.android.auth.request.UserAuthLoginPassRequest;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.protocol.Protocol;
@@ -305,7 +306,7 @@ public class ValidationActivity extends BaseActivity {
 		onError.setDataHolder(UserDataHolder.create(mUsername, mPassword));
 		if(TextUtils.isEmpty(token)) {
 			mAuthDataSubscription = AppObservable
-					.bindActivity(this, mAuthenticator.authenticate(mUsername, mPassword).flatMap(
+					.bindActivity(this, mAuthenticator.authenticate(new UserAuthLoginPassRequest(mUsername, mPassword)).flatMap(
 							new Func1<AuthResponse, Observable<RestaurantsResponse>>() {
 								@Override
 								public Observable<RestaurantsResponse> call(AuthResponse response) {

@@ -2,9 +2,15 @@ package com.omnom.android.interceptors.mixpanel;
 
 import android.content.Context;
 
-import com.omnom.android.auth.Protocol;
+import com.omnom.android.auth.request.UserAuthorizeByPhoneRequest;
+import com.omnom.android.auth.request.UserAuthorizeEmailByRequest;
+import com.omnom.android.auth.request.UserConfirmPhoneRequest;
+import com.omnom.android.auth.request.UserLogLocationRequest;
+import com.omnom.android.auth.request.UserAuthLoginPassRequest;
+import com.omnom.android.auth.request.UserRemindEmailRequest;
 import com.omnom.android.auth.WicketAuthenticator;
 import com.omnom.android.auth.request.AuthRegisterRequest;
+import com.omnom.android.auth.request.UserRecoverPhoneRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
@@ -12,7 +18,6 @@ import com.omnom.android.mixpanel.MixPanelHelper;
 
 import java.util.HashMap;
 
-import retrofit.http.Field;
 import rx.Observable;
 import rx.functions.Action1;
 
@@ -43,12 +48,12 @@ public class WicketMixpanelAuthenticator extends WicketAuthenticator {
 	}
 
 	@Override
-	public Observable<AuthResponse> confirm(String phone, String code) {
+	public Observable<AuthResponse> confirm(final UserConfirmPhoneRequest userConfirmPhoneRequest) {
 		mParams.clear();
-		mParams.put("phone", phone);
-		mParams.put("code", code);
+		mParams.put("phone", userConfirmPhoneRequest.getPhone());
+		mParams.put("code", userConfirmPhoneRequest.getCode());
 		mMixHelper.track(OMNOM_ANDROID, "auth.confirm ->", mParams);
-		return super.confirm(phone, code).doOnNext(new Action1<AuthResponse>() {
+		return super.confirm(userConfirmPhoneRequest).doOnNext(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "auth.confirm <-", response);
@@ -70,13 +75,14 @@ public class WicketMixpanelAuthenticator extends WicketAuthenticator {
 	}
 
 	@Override
-	public Observable<AuthResponse> logLocation(double longitude, double latitude, String token) {
+	public Observable<AuthResponse> logLocation(final UserLogLocationRequest userLogLocationRequest) {
 		mParams.clear();
-		mParams.put("longitude", String.valueOf(longitude));
-		mParams.put("latitude", String.valueOf(latitude));
-		mParams.put("token", token);
+		mParams.put("longitude", String.valueOf(userLogLocationRequest.getLongitude()));
+		mParams.put("latitude", String.valueOf(userLogLocationRequest.getLatitude()));
+		mParams.put("token", userLogLocationRequest.getToken());
 		mMixHelper.track(OMNOM_ANDROID, "auth.logLocation ->", mParams);
-		return super.logLocation(longitude, latitude, token).doOnNext(new Action1<AuthResponse>() {
+		return super.logLocation(
+				userLogLocationRequest).doOnNext(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "auth.logLocation <-", response);
@@ -85,12 +91,12 @@ public class WicketMixpanelAuthenticator extends WicketAuthenticator {
 	}
 
 	@Override
-	public Observable<AuthResponse> authorizePhone(String phone, String code) {
+	public Observable<AuthResponse> authorizePhone(final UserAuthorizeByPhoneRequest userAuthorizeByPhoneRequest) {
 		mParams.clear();
-		mParams.put("phone", phone);
-		mParams.put("code", code);
+		mParams.put("phone", userAuthorizeByPhoneRequest.getPhone());
+		mParams.put("code", userAuthorizeByPhoneRequest.getCode());
 		mMixHelper.track(OMNOM_ANDROID, "auth.authorizePhone ->", mParams);
-		return super.authorizePhone(phone, code).doOnNext(new Action1<AuthResponse>() {
+		return super.authorizePhone(userAuthorizeByPhoneRequest).doOnNext(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "auth.authorizePhone <-", response);
@@ -99,12 +105,12 @@ public class WicketMixpanelAuthenticator extends WicketAuthenticator {
 	}
 
 	@Override
-	public Observable<AuthResponse> authorizeEmail(String email, String code) {
+	public Observable<AuthResponse> authorizeEmail(final UserAuthorizeEmailByRequest userAuthorizeEmailByRequest) {
 		mParams.clear();
-		mParams.put("email", email);
-		mParams.put("code", code);
+		mParams.put("email", userAuthorizeEmailByRequest.getEmail());
+		mParams.put("code", userAuthorizeEmailByRequest.getCode());
 		mMixHelper.track(OMNOM_ANDROID, "auth.authorizeEmail ->", mParams);
-		return super.authorizeEmail(email, code).doOnNext(new Action1<AuthResponse>() {
+		return super.authorizeEmail(userAuthorizeEmailByRequest).doOnNext(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "auth.authorizeEmail <-", response);
@@ -126,12 +132,12 @@ public class WicketMixpanelAuthenticator extends WicketAuthenticator {
 	}
 
 	@Override
-	public Observable<AuthResponse> authenticate(String username, String password) {
+	public Observable<AuthResponse> authenticate(final UserAuthLoginPassRequest userAuthLoginPassRequest) {
 		mParams.clear();
-		mParams.put("username", username);
-		mParams.put("password", password);
+		mParams.put("login", userAuthLoginPassRequest.getLogin());
+		mParams.put("password", userAuthLoginPassRequest.getPassword());
 		mMixHelper.track(OMNOM_ANDROID, "auth.authenticate ->", mParams);
-		return super.authenticate(username, password).doOnNext(new Action1<AuthResponse>() {
+		return super.authenticate(userAuthLoginPassRequest).doOnNext(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "auth.authenticate <-", response);
@@ -140,11 +146,11 @@ public class WicketMixpanelAuthenticator extends WicketAuthenticator {
 	}
 
 	@Override
-	public Observable<AuthResponse> remindPassword(String email) {
+	public Observable<AuthResponse> remindPassword(final UserRemindEmailRequest userRemindEmailRequest) {
 		mParams.clear();
-		mParams.put("email", email);
+		mParams.put("email", userRemindEmailRequest.getEmail());
 		mMixHelper.track(OMNOM_ANDROID, "auth.remindPassword ->", mParams);
-		return super.remindPassword(email).doOnNext(new Action1<AuthResponse>() {
+		return super.remindPassword(userRemindEmailRequest).doOnNext(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "auth.remindPassword <-", response);
@@ -153,11 +159,11 @@ public class WicketMixpanelAuthenticator extends WicketAuthenticator {
 	}
 
 	@Override
-	public Observable<AuthResponse> changePhone(@Field(Protocol.FIELD_PHONE) String phone) {
+	public Observable<AuthResponse> changePhone(final UserRecoverPhoneRequest userRecoverPhoneRequest) {
 		mParams.clear();
-		mParams.put("phone", phone);
+		mParams.put("phone", userRecoverPhoneRequest.getPhone());
 		mMixHelper.track(OMNOM_ANDROID, "auth.changePhone ->", mParams);
-		return super.changePhone(phone).doOnNext(new Action1<AuthResponse>() {
+		return super.changePhone(userRecoverPhoneRequest).doOnNext(new Action1<AuthResponse>() {
 			@Override
 			public void call(AuthResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "auth.changePhone <-", response);

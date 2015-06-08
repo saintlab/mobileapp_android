@@ -13,6 +13,7 @@ import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.request.AuthRegisterRequest;
+import com.omnom.android.auth.request.UserAuthorizeByPhoneRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.push.PushNotificationManager;
@@ -169,7 +170,7 @@ public class LoginActivity extends BaseOmnomActivity {
 		busy(true);
 		topPanel.showProgress(true);
 
-		subscribe(authenticator.authorizePhone(editPhone.getText(), StringUtils.EMPTY_STRING),
+		subscribe(authenticator.authorizePhone(new UserAuthorizeByPhoneRequest(editPhone.getText(), StringUtils.EMPTY_STRING)),
 		          new Action1<AuthResponse>() {
 			          @Override
 			          public void call(AuthResponse authResponse) {

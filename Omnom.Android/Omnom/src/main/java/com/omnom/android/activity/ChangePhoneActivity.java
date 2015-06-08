@@ -12,6 +12,7 @@ import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
+import com.omnom.android.auth.request.UserRecoverPhoneRequest;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -112,7 +113,7 @@ public class ChangePhoneActivity extends BaseOmnomActivity {
 		}
 		busy(true);
 		topPanel.showProgress(true);
-		subscribe(authenticator.changePhone(editPhone.getText()),
+		subscribe(authenticator.changePhone(new UserRecoverPhoneRequest(editPhone.getText())),
 		          new Action1<AuthResponse>() {
 			          @Override
 			          public void call(AuthResponse authResponse) {

@@ -6,6 +6,7 @@ import android.location.Location;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
+import com.omnom.android.auth.request.UserLogLocationRequest;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.restaurateur.api.ConfigDataService;
@@ -130,9 +131,7 @@ public class ConfigurationService {
 			return Observable.just(authResponse);
 		} else {
 			return authenticator.logLocation(
-					location.getLongitude(),
-					location.getLatitude(),
-					authToken)
+					new UserLogLocationRequest(location.getLongitude(), location.getLatitude(), authToken))
 			                    .onErrorReturn(new Func1<Throwable, AuthResponse>() {
 				                    @Override
 				                    public AuthResponse call(Throwable throwable) {

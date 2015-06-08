@@ -3,6 +3,7 @@ package com.omnom.android.auth;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.omnom.android.auth.request.UserLogLocationRequest;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 
@@ -25,11 +26,12 @@ public class PostponedWicketAuthenticator extends WicketAuthenticator {
 	}
 
 	@Override
-	public Observable<AuthResponse> logLocation(final double longitude, final double latitude, final String token) {
-		if(TextUtils.isEmpty(token)) {
+	public Observable<AuthResponse> logLocation(final UserLogLocationRequest userLogLocationRequest) {
+		if(TextUtils.isEmpty(userLogLocationRequest.getToken())) {
 			return Observable.just(AuthResponse.create(AuthResponse.STATUS_SUCCESS, null));
 		}
-		return super.logLocation(longitude, latitude, token);
+		return super.logLocation(
+				userLogLocationRequest);
 	}
 
 	@Override

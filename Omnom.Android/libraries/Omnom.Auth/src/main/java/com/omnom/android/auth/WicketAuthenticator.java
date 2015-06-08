@@ -7,6 +7,15 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.omnom.android.auth.request.AuthRegisterRequest;
+import com.omnom.android.auth.request.UserAuthLoginPassRequest;
+import com.omnom.android.auth.request.UserAuthorizeByPhoneRequest;
+import com.omnom.android.auth.request.UserAuthorizeEmailByRequest;
+import com.omnom.android.auth.request.UserConfirmPhoneRequest;
+import com.omnom.android.auth.request.UserLogLocationRequest;
+import com.omnom.android.auth.request.UserPhoneConfirmResendRequest;
+import com.omnom.android.auth.request.UserRecoverPhoneRequest;
+import com.omnom.android.auth.request.UserRemindEmailRequest;
+import com.omnom.android.auth.request.UserUpdateRequest;
 import com.omnom.android.auth.response.AuthRegisterResponse;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
@@ -15,7 +24,6 @@ import com.omnom.android.protocol.BaseRequestInterceptor;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
-import retrofit.http.Field;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -48,13 +56,15 @@ public class WicketAuthenticator implements AuthService {
 	}
 
 	@Override
-	public Observable<AuthResponse> confirm(final String phone, final String code) {
-		return authService.confirm(phone, code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<AuthResponse> confirm(final UserConfirmPhoneRequest userConfirmPhoneRequest) {
+		return authService.confirm(userConfirmPhoneRequest).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<AuthResponse> confirmResend(final String phone) {
-		return authService.confirmResend(phone).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<AuthResponse> confirmResend(final UserPhoneConfirmResendRequest userPhoneConfirmResendRequest) {
+		return authService.confirmResend(userPhoneConfirmResendRequest).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
 	}
 
 	@Override
@@ -66,18 +76,20 @@ public class WicketAuthenticator implements AuthService {
 	}
 
 	@Override
-	public Observable<AuthResponse> logLocation(double longitude, double latitude, String token) {
-		return authService.logLocation(longitude, latitude, token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<AuthResponse> logLocation(final UserLogLocationRequest userLogLocationRequest) {
+		return authService.logLocation(userLogLocationRequest).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<AuthResponse> authorizePhone(String phone, String code) {
-		return authService.authorizePhone(phone, code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<AuthResponse> authorizePhone(final UserAuthorizeByPhoneRequest userAuthorizeByPhoneRequest) {
+		return authService.authorizePhone(userAuthorizeByPhoneRequest).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<AuthResponse> authorizeEmail(String email, String code) {
-		return authService.authorizePhone(email, code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<AuthResponse> authorizeEmail(final UserAuthorizeEmailByRequest userAuthorizeEmailByRequest) {
+		return authService.authorizeEmail(userAuthorizeEmailByRequest).subscribeOn(Schedulers.io()).observeOn(
+				AndroidSchedulers.mainThread());
 	}
 
 	@Override
@@ -86,27 +98,24 @@ public class WicketAuthenticator implements AuthService {
 	}
 
 	@Override
-	public Observable<AuthResponse> authenticate(String username, String password) {
-		return authService.authenticate(username, password).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<AuthResponse> authenticate(final UserAuthLoginPassRequest userAuthLoginPassRequest) {
+		return authService.authenticate(userAuthLoginPassRequest).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<AuthResponse> remindPassword(String email) {
-		return authService.remindPassword(email).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<AuthResponse> remindPassword(final UserRemindEmailRequest userRemindEmailRequest) {
+		return authService.remindPassword(userRemindEmailRequest).subscribeOn(Schedulers.io())
+		                  .observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<AuthResponse> changePhone(@Field(Protocol.FIELD_PHONE) String phone) {
-		return authService.changePhone(phone).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	public Observable<AuthResponse> changePhone(final UserRecoverPhoneRequest userRecoverPhoneRequest) {
+		return authService.changePhone(userRecoverPhoneRequest).subscribeOn(Schedulers.io())
+		                  .observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override
-	public Observable<UserResponse> updateUser(
-			@Field(Protocol.FIELD_TOKEN) final String token,
-			@Field(Protocol.FIELD_NAME) final String name,
-			@Field(Protocol.FIELD_EMAIL) final String email,
-			@Field(Protocol.FIELD_BIRTH) final String birth, @Field(Protocol.FIELD_AVATAR) final String avaUrl) {
-		return authService.updateUser(token, name, email, birth, avaUrl).subscribeOn(Schedulers.io()).observeOn(
-				AndroidSchedulers.mainThread());
+	public Observable<UserResponse> updateUser(final UserUpdateRequest userUpdateRequest) {
+		return authService.updateUser(userUpdateRequest).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 }
