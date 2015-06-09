@@ -17,7 +17,6 @@ import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
-import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
@@ -198,11 +197,6 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	public Observable<Restaurant> link(long orderId, double amount, double tip) {
 		return mDataService.link(orderId, amount, tip).subscribeOn(Schedulers.io()).observeOn(
 				AndroidSchedulers.mainThread());
-	}
-
-	@Override
-	public Observable<Config> getConfig() {
-		return mDataService.getConfig().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

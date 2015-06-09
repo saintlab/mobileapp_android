@@ -53,6 +53,7 @@ import com.omnom.android.notifier.api.observable.NotifierObservableApi;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.protocol.Protocol;
 import com.omnom.android.push.PushNotificationManager;
+import com.omnom.android.restaurateur.api.ConfigDataService;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
@@ -248,6 +249,9 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	protected RestaurateurObservableApi api;
 
 	@Inject
+	protected ConfigDataService configApi;
+
+	@Inject
 	protected Acquiring mAcquiring;
 
 	@Inject
@@ -402,7 +406,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mData = getIntent().getData();
 		mViewHelper = new ValidateViewHelper(this);
 		configurationService =
-				new ConfigurationService(this, authenticator, api, mAcquiring,
+				new ConfigurationService(this, authenticator, configApi, mAcquiring,
 				                         OmnomApplication.get(getActivity()).getAuthToken());
 	}
 
