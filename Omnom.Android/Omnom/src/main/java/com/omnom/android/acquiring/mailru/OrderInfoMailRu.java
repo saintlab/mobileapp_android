@@ -8,7 +8,7 @@ import com.omnom.android.currency.Money;
  */
 public class OrderInfoMailRu implements OrderInfo {
 	public static OrderInfoMailRu create(Money amount, String orderId, String orderMsg) {
-		return new OrderInfoMailRu(amount.getFractionalValue(), orderId, orderMsg);
+		return new OrderInfoMailRu(amount.getBaseValue().doubleValue(), orderId, orderMsg);
 	}
 
 	private double amount;
