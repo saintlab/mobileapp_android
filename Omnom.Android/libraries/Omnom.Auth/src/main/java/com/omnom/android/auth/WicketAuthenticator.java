@@ -42,11 +42,11 @@ public class WicketAuthenticator implements AuthService {
 		// final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
 		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-		final RestAdapter mRestAdapter = new RestAdapter.Builder()
-				.setRxSupport(new AuthRxSupport())
-				.setEndpoint(endpoint)
-				.setRequestInterceptor(new BaseRequestInterceptor(mContext))
-				.setLogLevel(logLevel).setConverter(new GsonConverter(gson)).build();
+		final BaseRequestInterceptor requestInterceptor = new BaseRequestInterceptor(mContext);
+		final RestAdapter mRestAdapter = new RestAdapter.Builder().setRequestInterceptor(requestInterceptor)
+		                                                          .setEndpoint(endpoint)
+		                                                          .setRxSupport(new AuthRxSupport(requestInterceptor))
+		                                                          .setLogLevel(logLevel).setConverter(new GsonConverter(gson)).build();
 		authService = mRestAdapter.create(AuthService.class);
 	}
 

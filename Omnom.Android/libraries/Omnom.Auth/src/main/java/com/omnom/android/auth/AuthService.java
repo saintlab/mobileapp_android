@@ -33,7 +33,7 @@ public interface AuthService {
 	@POST("/logout")
 	public Observable<AuthResponse> logout(@Header(com.omnom.android.protocol.Protocol.HEADER_AUTH_TOKEN) String token);
 
-	@POST("/register")
+	@POST("/login")
 	public Observable<AuthRegisterResponse> register(@Body AuthRegisterRequest request);
 
 	@POST("/confirm/phone")

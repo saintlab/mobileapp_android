@@ -47,7 +47,7 @@ public class AuthResponse {
 	}
 
 	public boolean hasError() {
-		return status.equals(STATUS_ERROR);
+		return STATUS_ERROR.equals(status) || error != null;
 	}
 
 	public String getStatus() {
