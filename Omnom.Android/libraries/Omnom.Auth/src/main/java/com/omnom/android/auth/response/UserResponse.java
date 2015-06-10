@@ -13,9 +13,9 @@ public class UserResponse extends AuthResponse {
 
 	@Expose
 	@SerializedName("time")
-	private Long serverTime;
+	private long serverTime;
 
-	private transient Long responseTime;
+	private transient long responseTime;
 
 	public UserData getUser() {
 		return user;
@@ -25,7 +25,7 @@ public class UserResponse extends AuthResponse {
 		this.user = user;
 	}
 
-	public Long getServerTime() {
+	public long getServerTime() {
 		return serverTime;
 	}
 
@@ -33,7 +33,7 @@ public class UserResponse extends AuthResponse {
 		this.serverTime = serverTime;
 	}
 
-	public Long getResponseTime() {
+	public long getResponseTime() {
 		return responseTime;
 	}
 
