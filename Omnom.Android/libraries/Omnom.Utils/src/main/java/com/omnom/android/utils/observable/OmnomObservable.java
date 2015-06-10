@@ -25,6 +25,26 @@ public class OmnomObservable {
 		void onRetrofitError(RetrofitError error);
 	}
 
+	public static class ObjectWrapper<T> {
+		private T mValue;
+
+		public ObjectWrapper() {
+			// do nothing
+		}
+
+		public ObjectWrapper(T value) {
+			mValue = value;
+		}
+
+		public T getValue() {
+			return mValue;
+		}
+
+		public void setValue(final T value) {
+			mValue = value;
+		}
+	}
+
 	public static void unsubscribe(Subscription subscription) {
 		if(isSubscribed(subscription)) {
 			subscription.unsubscribe();

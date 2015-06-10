@@ -1119,10 +1119,12 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	protected Observable<Pair<RestaurantResponse, MenuResponse>> concatMenuObservable(final Observable<RestaurantResponse>
 			                                                                                  restaurantObservable) {
+		final OmnomObservable.ObjectWrapper<RestaurantResponse> mRestaurantResponse = new OmnomObservable.ObjectWrapper<>();
 		return restaurantObservable.flatMap(
 				new Func1<RestaurantResponse, Observable<MenuResponse>>() {
 					@Override
 					public Observable<MenuResponse> call(final RestaurantResponse restaurantResponse) {
+						mRestaurantResponse.setValue(restaurantResponse);
 						if(restaurantResponse.hasOnlyRestaurant()) {
 							return RestaurantHelper.getMenuObservable(menuApi, restaurantResponse.getRestaurants().get(0));
 						}
@@ -1134,7 +1136,12 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 						mMenu = menu.getMenu();
 						return Pair.create(restaurant, menu);
 					}
-				});
+				}).onErrorReturn(new Func1<Throwable, Pair<RestaurantResponse, MenuResponse>>() {
+			@Override
+			public Pair<RestaurantResponse, MenuResponse> call(final Throwable throwable) {
+				return new Pair<>(mRestaurantResponse.getValue(), null);
+			}
+		});
 	}
 
 	protected void bindMenuData() {
