@@ -6,6 +6,8 @@ package com.omnom.android.socket.event;
 public interface SocketEvent {
 	public static final String EVENT_HANDSHAKE = "handshake";
 
+	public static final String EVENT_CONNECTED = "handshake";
+
 	public static final String EVENT_PAYMENT = "payment";
 
 	public static final String EVENT_ORDER_CREATE = "order_create";
@@ -17,4 +19,6 @@ public interface SocketEvent {
 	public static final String EVENT_JOIN = "join";
 
 	public static final String EVENT_LEAVE = "leave";
+
+	String getType();
 }

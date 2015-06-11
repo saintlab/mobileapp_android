@@ -1,12 +1,17 @@
 package com.omnom.android.activity.validate;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.graphics.Color;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
@@ -14,6 +19,8 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.RestaurantsListActivity;
+import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.entrance.EntranceDataHelper;
 import com.omnom.android.fragment.NoOrdersFragment;
 import com.omnom.android.fragment.SearchFragment;
 import com.omnom.android.menu.model.Item;
@@ -52,6 +59,8 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	private static final String TAG_SEARCH_FRAGMENT = "search_fragment";
 
 	private final ValidateActivity mActivity;
+
+	private final Handler mHandler;
 
 	@InjectView(R.id.loader)
 	protected LoaderView loader;
@@ -109,13 +118,19 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	protected View bottomView;
 
+	@Nullable
+	private EntranceData mEntranceData;
+
 	private ValueAnimator mColorAnimator;
 
 	private OmnomErrorHelper mErrorHelper;
 
+	private TableDataResponse mTable;
+
 	public ValidateViewHelper(ValidateActivity activity) {
 		mActivity = activity;
 		ButterKnife.inject(this, activity);
+		mHandler = new Handler();
 	}
 
 	public void onResume() {
@@ -128,7 +143,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	public void clearErrors(Restaurant restaurant, final boolean animateLogo) {
 		ButterKnife.apply(errorViews, ViewUtils.VISIBLITY, false);
-		ViewUtils.setVisible(txtErrorAdditional, false);
+		ViewUtils.setVisibleGone(txtErrorAdditional, false);
 		if(animateLogo) {
 			if(restaurant == null) {
 				loader.animateLogo(R.drawable.ic_fork_n_knife);
@@ -140,8 +155,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	}
 
 	public View.OnClickListener getBillClickListener() {
-		if(RestaurantHelper.isBar(mActivity.mRestaurant)
-				|| RestaurantHelper.isLunch(mActivity.mRestaurant)) {
+		if(EntranceDataHelper.isBar(mEntranceData) || RestaurantHelper.isLunch(mActivity.mRestaurant)) {
 			return mActivity.mOnOrderClickListener;
 		}
 		return mActivity.mOnBillClickListener;
@@ -176,8 +190,10 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	public void collapseSlidingPanelInstant() {
 		menuCategories.collapseInstant();
 		slidingPanel.smoothSlideToInstant(0);
-		ViewUtils.setVisible(imgProfile, true);
-		ViewUtils.setVisible(imgPrevious, true); // TODO: RestaurantHelper.isLunch?
+		imgProfile.setAlpha(1.0f);
+		imgPrevious.setAlpha(1.0f);
+		ViewUtils.setVisibleGone(imgProfile, true);
+		ViewUtils.setVisibleGone(imgPrevious, true); // TODO: RestaurantHelper.isLunch?
 		loader.showLogo();
 	}
 
@@ -235,14 +251,15 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 				final float loaderFactor = 1.0f - slideOffset;
 
 				if(loaderFactor < 0.85f) {
-					AnimationUtils.animateAlpha3(imgProfile, false);
-					AnimationUtils.animateAlpha3(imgPrevious, false);
-					AnimationUtils.animateAlpha3(txtBar, false);
+					AnimationUtils.animateAlphaGone(imgProfile, false);
+					AnimationUtils.animateAlphaGone(imgPrevious, false);
+					AnimationUtils.animateAlphaGone(txtBar, false);
+					AnimationUtils.animateAlphaGone(txtTable, false);
 					loader.hideLogo();
 				} else {
-					AnimationUtils.animateAlpha3(imgProfile, true);
-					AnimationUtils.animateAlpha3(imgPrevious, true);
-					AnimationUtils.animateAlpha3(txtBar, true);
+					AnimationUtils.animateAlphaGone(imgProfile, true);
+					AnimationUtils.animateAlphaGone(imgPrevious, true);
+					AnimationUtils.animateAlphaGone(txtBar, EntranceDataHelper.isBar(mEntranceData));
 					loader.showLogo();
 				}
 				loader.scaleDown((int) (loader.getLoaderSizeDefault() * loaderFactor), 0, null);
@@ -321,11 +338,78 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	private void updateProfile(final int backgroundResource, final boolean visible) {
 		imgProfile.setImageResource(backgroundResource);
-		ViewUtils.setVisible(imgProfile, visible);
+		ViewUtils.setVisibleGone(imgProfile, visible);
+		if(mTable != null) {
+			final boolean isTable = mEntranceData.getType() == EntranceData.TYPE_TABLE;
+			if(isTable) {
+				txtTable.setText(String.valueOf(mTable.getInternalId()));
+				if(visible && !ViewUtils.isVisible(txtTable)) {
+					if(txtTable.getTranslationX() == 0) {
+						ViewUtils.setVisibleGone(imgProfile, true);
+					}
+					animateTable();
+				} else {
+					ViewUtils.setVisibleGone(txtTable, visible);
+				}
+			} else {
+				ViewUtils.setVisibleGone(txtTable, false);
+			}
+		} else {
+			ViewUtils.setVisibleGone(txtTable, false);
+			imgProfile.setImageResource(backgroundResource);
+			ViewUtils.setVisibleGone(imgProfile, visible);
+		}
+	}
+
+	private void animateTable() {
+		final ViewTreeObserver viewTreeObserver = imgProfile.getViewTreeObserver();
+		if(viewTreeObserver.isAlive()) {
+			viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+				@Override
+				public void onGlobalLayout() {
+					AndroidUtils.removeOnGlobalLayoutListener(imgProfile, this);
+					final int animationDuration = mActivity.getResources().getInteger(R.integer.default_animation_duration_long);
+					AnimationUtils.animateAlpha(txtTable, true, new Runnable() {
+						@Override
+						public void run() {
+							final int translation = (imgProfile.getLeft() - txtTable.getLeft()) -
+									(txtTable.getWidth() - imgProfile.getWidth());
+							txtTable.animate()
+							        .translationX(translation)
+							        .setDuration(animationDuration)
+							        .setListener(new AnimatorListenerAdapter() {
+								        @Override
+								        public void onAnimationEnd(final Animator animation) {
+									        mHandler.postDelayed(new Runnable() {
+										        @Override
+										        public void run() {
+											        final boolean isMenuExpanded =
+													        slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED;
+											        AnimationUtils.animateAlphaSkipTag(txtTable, false, new Runnable() {
+												        @Override
+												        public void run() {
+													        AnimationUtils.animateAlphaSkipTag(imgProfile,
+													                                           !isMenuExpanded,
+													                                           null,
+													                                           animationDuration);
+												        }
+											        }, animationDuration);
+										        }
+									        }, animationDuration);
+								        }
+							        })
+							        .start();
+							AnimationUtils.animateAlphaSkipTag(imgProfile, false, null, animationDuration);
+						}
+					}, animationDuration);
+				}
+			});
+		}
 	}
 
 	protected void hideProfile() {
-		ViewUtils.setVisible(imgProfile, false);
+		ViewUtils.setVisibleGone(txtTable, false);
+		ViewUtils.setVisibleGone(imgProfile, false);
 	}
 
 	public View getPanelBottom() {
@@ -334,11 +418,11 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	public void beforeShowOrders() {
 		hideProfile();
-		ViewUtils.setVisible(imgPrevious, false);
-		ViewUtils.setVisible(getPanelBottom(), false);
+		ViewUtils.setVisibleGone(imgPrevious, false);
+		ViewUtils.setVisibleGone(getPanelBottom(), false);
 		AnimationUtils.animateAlpha(slidingPanel, false);
 		AnimationUtils.animateAlpha(menuGradientPanel, false);
-		ViewUtils.setVisible(txtLeave, false);
+		ViewUtils.setVisibleGone(txtLeave, false);
 		loader.animateLogo(R.drawable.ic_bill_white_normal);
 		loader.startProgressAnimation(10000, null);
 	}
@@ -348,11 +432,11 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		final boolean promoEnabled = false; //RestaurantHelper.isPromoEnabled(restaurant);
 		// FIXME: uncomment the code below when waiter call is implemented
 		final boolean waiterEnabled = false; //RestaurantHelper.isWaiterEnabled(restaurant);
-		final boolean isBar = RestaurantHelper.isBar(restaurant);
+		final boolean isBar = EntranceDataHelper.isBar(mEntranceData);
 		final boolean isLunch = RestaurantHelper.isLunch(restaurant);
 
 		if(bottomView == null) {
-			ViewUtils.setVisible(findById(mActivity, R.id.txt_bar), isBar);
+			ViewUtils.setVisibleGone(findById(mActivity, R.id.txt_bar), isBar);
 			if(isBar || isLunch) {
 				stubBottomMenu.setLayoutResource(R.layout.layout_bar);
 			} else {
@@ -397,7 +481,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 				                      showNoOrdersInfo(table);
 			                      }
 		                      });
-		ViewUtils.setVisible(txtErrorAdditional, true);
+		ViewUtils.setVisibleGone(txtErrorAdditional, true);
 		final int tableNumber = table != null ? table.getInternalId() : 0;
 		mErrorHelper.showNoOrders(new View.OnClickListener() {
 			@Override
@@ -414,15 +498,15 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	protected void onErrorClose(Restaurant mRestaurant, boolean mIsDemo) {
 		mActivity.clearErrors(true);
-		ViewUtils.setVisible(txtErrorAdditional, false);
+		ViewUtils.setVisibleGone(txtErrorAdditional, false);
 		loader.animateLogoFast(RestaurantHelper.getLogo(mRestaurant),
 		                       R.drawable.ic_bill_white_normal);
 		loader.showProgress(false);
 		mActivity.configureScreen(mRestaurant);
 		updateLightProfile(!mIsDemo);
-		ViewUtils.setVisible(imgPrevious, !mIsDemo);
-		ViewUtils.setVisible(txtLeave, mIsDemo);
-		ViewUtils.setVisible(getPanelBottom(), true);
+		ViewUtils.setVisibleGone(imgPrevious, !mIsDemo);
+		ViewUtils.setVisibleGone(txtLeave, mIsDemo);
+		ViewUtils.setVisibleGone(getPanelBottom(), true);
 		AnimationUtils.animateAlpha(menuGradientPanel, true);
 		AnimationUtils.animateAlpha(slidingPanel, true);
 	}
@@ -457,12 +541,12 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 		loader.scaleDown(null, new Runnable() {
 			@Override
 			public void run() {
-				ViewUtils.setVisible(getPanelBottom(), true);
+				ViewUtils.setVisibleGone(getPanelBottom(), true);
 				AnimationUtils.animateAlpha(menuGradientPanel, true);
 				AnimationUtils.animateAlpha(slidingPanel, true);
 				updateLightProfile(!isDemo);
-				ViewUtils.setVisible(imgPrevious, !isDemo);
-				ViewUtils.setVisible(txtLeave, isDemo);
+				ViewUtils.setVisibleGone(imgPrevious, !isDemo);
+				ViewUtils.setVisibleGone(txtLeave, isDemo);
 				loader.animateLogo(RestaurantHelper.getLogo(restaurant),
 				                   R.drawable.ic_fork_n_knife);
 				loader.showLogo();
@@ -473,6 +557,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	public void onDataLoaded(final Restaurant restaurant, final TableDataResponse table,
 	                         final boolean forwardToBill, final boolean
 			                         mIsDemo, final String requestId) {
+		mTable = table;
 		animateRestaurantLogo(restaurant);
 		loader.stopProgressAnimation();
 		loader.updateProgressMax(new Runnable() {
@@ -480,9 +565,9 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 			public void run() {
 				mActivity.configureScreen(restaurant);
 				updateLightProfile(!mIsDemo);
-				ViewUtils.setVisible(imgPrevious, !mIsDemo);
-				ViewUtils.setVisible(txtLeave, mIsDemo);
-				ViewUtils.setVisible(getPanelBottom(), true);
+				ViewUtils.setVisibleGone(imgPrevious, !mIsDemo);
+				ViewUtils.setVisibleGone(txtLeave, mIsDemo);
+				ViewUtils.setVisibleGone(getPanelBottom(), true);
 				AnimationUtils.animateAlpha(menuGradientPanel, true);
 				AnimationUtils.animateAlpha(slidingPanel, true);
 				getPanelBottom().animate().translationY(0)
@@ -493,7 +578,8 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 					loader.postDelayed(new Runnable() {
 						@Override
 						public void run() {
-							mActivity.showOrders(restaurant.orders(), requestId);
+							mActivity.onBill(mActivity.findViewById(R.id.btn_bill));
+							// mContext.showOrders(restaurant.orders(), requestId);
 						}
 					}, mActivity.getResources()
 					            .getInteger(R.integer.default_animation_duration_short));
@@ -533,13 +619,13 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	}
 
 	public void showBack(final boolean visible) {
-		ViewUtils.setVisible(imgPrevious, visible);
+		ViewUtils.setVisibleGone(imgPrevious, visible);
 	}
 
 	public void bindMenuData(final Menu menu, ValidateOrderHelper orderHelper) {
 		final boolean hasMenu = menu != null && !menu.isEmpty();
-		ViewUtils.setVisible(slidingPanel, hasMenu);
-		ViewUtils.setVisible(menuCategories, hasMenu);
+		ViewUtils.setVisibleGone(slidingPanel, hasMenu);
+		ViewUtils.setVisibleGone(menuCategories, hasMenu);
 		slidingPanel.setTouchEnabled(hasMenu);
 		if(menu != null) {
 			menuCategories.bind(menu, orderHelper.insureOrder());
@@ -555,7 +641,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	}
 
 	public void showSearchFragment(Map<String, Item> itemsByName) {
-		ViewUtils.setVisible(bottomView, false);
+		ViewUtils.setVisibleGone(bottomView, false);
 		mActivity.getSupportFragmentManager().beginTransaction()
 		         .addToBackStack(null)
 		         .setCustomAnimations(R.anim.slide_in_up,
@@ -568,7 +654,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 	}
 
 	public void onSearchFragmentClose() {
-		ViewUtils.setVisible(bottomView, true);
+		ViewUtils.setVisibleGone(bottomView, true);
 	}
 
 	public void showMenuItemDetails(final Item item) {
@@ -586,7 +672,16 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	public void hideMenu() {
 		slidingPanel.setTouchEnabled(false);
-		ViewUtils.setVisible(slidingPanel, false);
-		ViewUtils.setVisible(menuCategories, false);
+		ViewUtils.setVisibleGone(slidingPanel, false);
+		ViewUtils.setVisibleGone(menuCategories, false);
+	}
+
+	public void setEntranceData(final EntranceData entranceData) {
+		mEntranceData = entranceData;
+	}
+
+	public void onProfile() {
+		AnimationUtils.animateAlpha(imgProfile, true);
+		AnimationUtils.animateAlpha(txtTable, false);
 	}
 }

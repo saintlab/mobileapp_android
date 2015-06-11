@@ -5,3 +5,7 @@
 [submodule "Omnom.Android/libraries/recyclerview-animators"]
         path = Omnom.Android/libraries/recyclerview-animators
         url = https://github.com/Ch3D/recyclerview-animators
+
+[submodule "Omnom.Android/libraries/android-cropimage"]
+	path = Omnom.Android/libraries/android-cropimage
+	url = https://github.com/Ch3D/android-cropimage.git

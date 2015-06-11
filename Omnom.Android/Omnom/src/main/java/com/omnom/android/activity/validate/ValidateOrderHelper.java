@@ -8,6 +8,7 @@ import com.omnom.android.R;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
 import com.omnom.android.menu.model.Item;
 import com.omnom.android.menu.model.UserOrder;
+import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -39,9 +40,14 @@ public class ValidateOrderHelper {
 		if(mOrder == null) {
 			return;
 		}
+
 		final Item item = event.getItem();
-		mOrder.addItem(item, event.getCount());
-		mViewHelper.menuCategories.refresh(event);
+		// check whether item is already ordered - if true -> we shouldn't add recommendation items
+		// to avoid duplication
+		final UserOrderData userOrderData = mOrder.itemsTable().get(item.id());
+		final boolean alreadyOrdered = userOrderData != null && userOrderData.amount() > 0;
+		mOrder.addItem(item, event.getCount(), event.getSelectedModifiersIds());
+		mViewHelper.menuCategories.refresh(event, alreadyOrdered);
 		updateWishUi();
 	}
 
@@ -62,12 +68,12 @@ public class ValidateOrderHelper {
 		final boolean hasWishItems = mOrder != null && totalAmount.compareTo(BigDecimal.ZERO) > 0;
 
 		if(hasWishItems) {
-			ViewUtils.setVisible(btnOrder, true);
+			ViewUtils.setVisibleGone(btnOrder, true);
 			btnOrder.setText(AmountHelper.format(totalAmount) + mActivity.getString(R.string.currency_suffix_ruble));
 			btnOrder.setTextColor(Color.WHITE);
 			btnOrder.setBackgroundResource(R.drawable.btn_rounded_blue);
 		} else {
-			ViewUtils.setVisible(btnOrder, false);
+			ViewUtils.setVisibleGone(btnOrder, false);
 			btnOrder.setTextColor(Color.GRAY);
 			btnOrder.setText(mActivity.getString(R.string.your_order));
 			btnOrder.setBackgroundResource(R.drawable.btn_rounded_bordered_grey);
@@ -75,7 +81,7 @@ public class ValidateOrderHelper {
 
 		if(mActivity.getBottomView() != null) {
 			View btnBill = findById(mActivity.getBottomView(), R.id.btn_bill);
-			ViewUtils.setVisible(btnBill, !hasWishItems);
+			ViewUtils.setVisibleGone(btnBill, !hasWishItems);
 		}
 	}
 

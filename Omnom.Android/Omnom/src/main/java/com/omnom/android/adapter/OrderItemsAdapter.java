@@ -157,14 +157,14 @@ public class OrderItemsAdapter extends BaseAdapter {
 			holder.txtTitle.setTextColor(COLOR_TEXT_SELECTED);
 			holder.txtPrice.setTextColor(COLOR_TEXT_SELECTED);
 		} else {
-			ViewUtils.setVisible(holder.divider, position != getCount() - 1);
+			ViewUtils.setVisibleGone(holder.divider, position != getCount() - 1);
 			AndroidUtils.setBackground(holder.divider, mContext.getResources().getDrawable(R.drawable.divider_list_padding));
 			convertView.setBackgroundColor(mContext.getResources().getColor(android.R.color.transparent));
 			holder.txtTitle.setTextColor(COLOR_TEXT_NORMAL);
 			holder.txtPrice.setTextColor(mColorPriceNormal);
 		}
 		holder.txtTitle.setText(item.getTitle());
-		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPricePerItem()));
+		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPriceTotal()));
 	}
 
 	public void setSelected(final int position, final boolean selected) {

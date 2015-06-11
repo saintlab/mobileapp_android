@@ -70,7 +70,7 @@ public class ErrorEdit extends LinearLayout {
 		public void afterTextChanged(final Editable editable) {
 			clearError();
 			if(mShowClear && editView.isFocused()) {
-				ViewUtils.setVisible(btnClear, editable.length() > 0);
+				ViewUtils.setVisibleGone(btnClear, editable.length() > 0);
 			}
 		}
 
@@ -122,7 +122,7 @@ public class ErrorEdit extends LinearLayout {
 	public void clearError() {
 		editView.setError(false);
 		errorTextView.setText(StringUtils.EMPTY_STRING);
-		ViewUtils.setVisible(errorTextView, false);
+		ViewUtils.setVisibleGone(errorTextView, false);
 	}
 
 	private void processAttrs(AttributeSet attrs) {
@@ -172,10 +172,10 @@ public class ErrorEdit extends LinearLayout {
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(hasFocus) {
 					if(editView.getText().length() > 0 && mShowClear) {
-						ViewUtils.setVisible(btnClear, true);
+						ViewUtils.setVisibleGone(btnClear, true);
 					}
 				} else {
-					ViewUtils.setVisible(btnClear, false);
+					ViewUtils.setVisibleGone(btnClear, false);
 				}
 			}
 		});
@@ -259,7 +259,7 @@ public class ErrorEdit extends LinearLayout {
 		errorTextView.setText(msg);
 		errorTextView.setMovementMethod(LinkMovementMethod.getInstance());
 		editView.setError(true);
-		ViewUtils.setVisible(errorTextView, true);
+		ViewUtils.setVisibleGone(errorTextView, true);
 	}
 
 	public String getText() {

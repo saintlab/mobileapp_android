@@ -1,9 +1,10 @@
 package com.omnom.android.socket.listener;
 
-import com.omnom.android.socket.event.OrderCloseSocketEvent;
+import android.content.Context;
+import android.content.Intent;
+
 import com.omnom.android.socket.event.OrderCreateSocketEvent;
-import com.omnom.android.socket.event.PaymentSocketEvent;
-import com.omnom.android.utils.activity.OmnomActivity;
+import com.omnom.android.utils.Extras;
 import com.squareup.otto.Subscribe;
 
 /**
@@ -11,26 +12,15 @@ import com.squareup.otto.Subscribe;
  */
 public class OrderCreateEventListener extends BaseEventListener {
 
-    public interface OrderCreateListener {
-		void onOrderCreateEvent(OrderCreateSocketEvent event);
-	}
-
-	private OrderCreateListener mListener;
-
-	public OrderCreateEventListener(final OmnomActivity activity,
-                                    final OrderCreateListener listener) {
-		super(activity);
-		mListener = listener;
+	public OrderCreateEventListener(final Context context) {
+		super(context);
 	}
 
 	@Subscribe
 	public void onOrderCreateEvent(final OrderCreateSocketEvent event) {
-		mActivity.getActivity().runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mListener.onOrderCreateEvent(event);
-			}
-		});
+		final Intent intent = new Intent(Extras.ACTION_EVENT_ORDER_CREATE);
+		intent.putExtra(Extras.ACTION_EVENT_ORDER_CREATE, event);
+		mContext.sendOrderedBroadcast(intent, null);
 	}
 
 }

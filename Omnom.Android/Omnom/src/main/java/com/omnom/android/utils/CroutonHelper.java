@@ -4,10 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.support.annotation.Nullable;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import com.omnom.android.OmnomApplication;
+import com.omnom.android.auth.UserData;
+import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.order.PaymentData;
 import com.omnom.android.utils.utils.AmountHelper;
 
@@ -25,7 +29,7 @@ public class CroutonHelper {
 
 	@Nullable
 	public static Crouton createPaymentNotification(Activity activity, PaymentData data) {
-		if(data == null) {
+		if(data == null || activity == null) {
 			return null;
 		}
 
@@ -39,13 +43,42 @@ public class CroutonHelper {
 			}
 		};
 
-		final String name = data.getUser().getName();
-		final BigDecimal bd = BigDecimal.valueOf(data.getTransaction().getAmount() -
-												 data.getTransaction().getTip());
-		final BigDecimal subtract = bd.divide(DIVIDER);
-		final String msg = activity.getString(com.omnom.android.R.string.balk_notification_user_paid_,
-		                                      name,
-		                                      AmountHelper.format(subtract));
+		String msg;
+
+		final UserProfile userProfile = OmnomApplication.get(activity).getUserProfile();
+		final UserData user = userProfile != null ? userProfile.getUser() : null;
+		final boolean sameUser = user != null && data.getUser().getId() == user.getId();
+
+		final int tip = data.getTransaction().getTip();
+		final int amount = data.getTransaction().getAmount();
+
+		final BigDecimal paid = BigDecimal.valueOf(amount - tip);
+		final BigDecimal paidInRubles = paid.divide(DIVIDER);
+		final BigDecimal tipInRubles = BigDecimal.valueOf(tip).divide(DIVIDER);
+
+		if(sameUser && tip > 0 && paidInRubles.compareTo(BigDecimal.ZERO) <= 0) {
+			// current user paid only tip
+			msg = activity.getString(com.omnom.android.R.string.balk_notification_user_tips_only,
+			                         data.getUser().getName(),
+			                         AmountHelper.format(tipInRubles));
+		} else if(sameUser && tip > 0 && paidInRubles.compareTo(BigDecimal.ZERO) > 0) {
+			// current user paid some amount + tip
+			msg = activity.getString(com.omnom.android.R.string.balk_notification_user_paid_tips,
+			                         data.getUser().getName(),
+			                         AmountHelper.format(paidInRubles),
+			                         AmountHelper.format(tipInRubles));
+
+			// make text font smaller
+			((TextView) view.findViewById(com.omnom.android.R.id.txt_message)).setTextSize(TypedValue.COMPLEX_UNIT_PX,
+			                                                                               activity.getResources().getDimension(
+					                                                                               R.dimen.font_small));
+		} else {
+			// another user paid
+			msg = activity.getString(com.omnom.android.R.string.balk_notification_user_paid_,
+			                         data.getUser().getName(),
+			                         AmountHelper.format(paidInRubles));
+		}
+
 		((TextView) view.findViewById(com.omnom.android.R.id.txt_message)).setText(msg);
 		view.findViewById(com.omnom.android.R.id.btn_close).setOnClickListener(closeListener);
 		crouton.setOnClickListener(closeListener);

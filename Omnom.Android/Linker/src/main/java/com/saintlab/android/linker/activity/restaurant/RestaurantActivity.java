@@ -34,9 +34,9 @@ public class RestaurantActivity extends BaseActivity {
 		Parcelable selectedPlace = getIntent().getParcelableExtra(EXTRA_SELECTED_RESTAURANT);
 		Parcelable place = getIntent().getParcelableExtra(EXTRA_RESTAURANT);
 		if(selectedPlace != null) {
-			ViewUtils.setVisible(btnBack, true);
+			ViewUtils.setVisibleGone(btnBack, true);
 		} else if(place != null) {
-			ViewUtils.setVisible(btnBack, false);
+			ViewUtils.setVisibleGone(btnBack, false);
 		} else {
 			finish();
 		}

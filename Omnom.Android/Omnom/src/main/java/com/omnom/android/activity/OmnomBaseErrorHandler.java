@@ -21,6 +21,5 @@ public abstract class OmnomBaseErrorHandler extends BaseErrorHandler {
 	@Override
 	protected void onTokenExpired() {
 		((OmnomApplication) mActivity.getApplication()).logout();
-		LoginActivity.start(mActivity, mDataHolder);
 	}
 }

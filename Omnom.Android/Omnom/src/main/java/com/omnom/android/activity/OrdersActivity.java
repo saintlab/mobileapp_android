@@ -2,9 +2,12 @@ package com.omnom.android.activity;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.TextView;
@@ -12,38 +15,37 @@ import android.widget.TextView;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.activity.base.BaseOmnomFragmentActivity;
+import com.omnom.android.activity.helper.OmnomActivityHelper;
 import com.omnom.android.adapter.OrdersPagerAdapter;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
+import com.omnom.android.socket.ActivityPaymentBroadcastReceiver;
+import com.omnom.android.socket.OrderEventBroadcastReceiver;
+import com.omnom.android.socket.OrderEventIntentFilter;
+import com.omnom.android.socket.PaymentEventIntentFilter;
 import com.omnom.android.socket.event.OrderCloseSocketEvent;
 import com.omnom.android.socket.event.OrderCreateSocketEvent;
 import com.omnom.android.socket.event.OrderUpdateSocketEvent;
 import com.omnom.android.socket.event.PaymentSocketEvent;
-import com.omnom.android.socket.listener.ListenersSet;
-import com.omnom.android.socket.listener.OrderCloseEventListener;
-import com.omnom.android.socket.listener.OrderCreateEventListener;
-import com.omnom.android.socket.listener.OrderUpdateEventListener;
-import com.omnom.android.socket.listener.PaymentEventListener;
+import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.OrdersViewPager;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
-import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.Subscription;
 
 public class OrdersActivity extends BaseOmnomFragmentActivity
-		implements OrderCreateEventListener.OrderCreateListener,
-		           OrderUpdateEventListener.OrderUpdateListener,
-		           OrderCloseEventListener.OrderCloseListener {
+		implements OrderEventBroadcastReceiver.Listener, ActivityPaymentBroadcastReceiver.PaymentListener {
 
 	public static final int REQUEST_CODE_CARDS = 100;
 
@@ -103,13 +105,25 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 
 	private boolean mDemo;
 
-	private ListenersSet listenersSet;
-
 	private Restaurant mRestaurant;
 
-	@Subscribe
-	public void onPayment(final PaymentSocketEvent event) {
-		updateOrder(event.getPaymentData().getOrder());
+	private ActivityPaymentBroadcastReceiver mPaymentReceiver;
+
+	private PaymentEventIntentFilter mPaymentFilter;
+
+	private OrderEventBroadcastReceiver mOrderEventReceiver;
+
+	private OrderEventIntentFilter mOrderEventsFilter;
+
+	private Subscription mPaymentEventsSubscription;
+
+	@Override
+	protected void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		mPaymentReceiver = new ActivityPaymentBroadcastReceiver(this, this);
+		mOrderEventReceiver = new OrderEventBroadcastReceiver(this);
+		mPaymentFilter = new PaymentEventIntentFilter(IntentFilter.SYSTEM_HIGH_PRIORITY - 1);
+		mOrderEventsFilter = new OrderEventIntentFilter();
 	}
 
 	@Override
@@ -131,8 +145,14 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 	}
 
 	@Override
+	public void onOrderPaymentEvent(final PaymentSocketEvent event) {
+		final Order order = event.getPaymentData().getOrder();
+		updateOrder(order, true);
+	}
+
+	@Override
 	public void onOrderUpdateEvent(final OrderUpdateSocketEvent event) {
-		updateOrder(event.getOrder());
+		updateOrder(event.getOrder(), false);
 	}
 
 	@Override
@@ -155,7 +175,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 		}
 	}
 
-	private void updateOrder(final Order order) {
+	private void updateOrder(final Order order, final boolean skipDialog) {
 		final int position = replaceOrder(orders, order);
 		if(order != null && position >= 0 && mPagerAdapter != null) {
 			getActivity().runOnUiThread(new Runnable() {
@@ -164,7 +184,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 					mPagerAdapter.updateOrders(orders);
 					final Fragment currentFragment = findFragmentByPosition(position);
 					if(currentFragment != null) {
-						((OrderFragment) currentFragment).onOrderUpdate(order);
+						((OrderFragment) currentFragment).onOrderUpdate(order, skipDialog);
 					}
 				}
 			});
@@ -219,10 +239,6 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 
 	@Override
 	public void initUi() {
-        listenersSet = new ListenersSet(new PaymentEventListener(this),
-                       new OrderCreateEventListener(this, this),
-                       new OrderUpdateEventListener(this, this),
-		               new OrderCloseEventListener(this, this));
 		mPagerAdapter = new OrdersPagerAdapter(getSupportFragmentManager(), orders, requestId, bgColor);
 		mPager.setAdapter(mPagerAdapter);
 		margin = -(int) (((float) getResources().getDisplayMetrics().widthPixels * OrderFragment.FRAGMENT_SCALE_RATIO_SMALL) / 4.5);
@@ -237,24 +253,21 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(orders.size() > 0) {
-			final Order order = orders.get(0);
-			if(order != null) {
-				listenersSet.initTableSocket(order.getTableId());
-			}
-		}
+
+		registerReceiver(mPaymentReceiver, mPaymentFilter);
+		registerReceiver(mOrderEventReceiver, mOrderEventsFilter);
+		mPaymentEventsSubscription = OmnomActivityHelper.processPaymentEvents(getActivity());
+
+		OmnomActivityHelper.processPaymentEvents(getActivity());
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		listenersSet.onPause();
-	}
+		unregisterReceiver(mPaymentReceiver);
+		unregisterReceiver(mOrderEventReceiver);
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		listenersSet.onDestroy();
+		unsubscribe(mPaymentEventsSubscription);
 	}
 
 	@Override
@@ -270,6 +283,13 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 	@Override
 	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == Extras.REQUEST_CODE_LOGIN && resultCode == Activity.RESULT_OK) {
+			final OrderFragment currentFragment = (OrderFragment) mPagerAdapter.getCurrentFragment();
+			if(currentFragment != null) {
+				currentFragment.showCardsActivity();
+			}
+			return;
+		}
 		if(requestCode == REQUEST_CODE_CARDS && resultCode == RESULT_OK) {
 			close();
 		}
@@ -294,7 +314,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 				currentFragment.downscale(true);
 				AnimationUtils.animateAlpha(mTextInfo, true);
 				AnimationUtils.animateAlpha(mIndicator, true);
-				ViewUtils.setVisible(mBtnClose, true);
+				ViewUtils.setVisibleGone(mBtnClose, true);
 				return;
 			} else {
 				if(!currentFragment.onBackPressed()) {
@@ -347,7 +367,7 @@ public class OrdersActivity extends BaseOmnomFragmentActivity
 		mPager.setEnabled(visible);
 		AnimationUtils.animateAlpha(mTextInfo, visible);
 		AnimationUtils.animateAlpha(mIndicator, visible);
-		ViewUtils.setVisible(mBtnClose, visible);
+		ViewUtils.setVisibleGone(mBtnClose, visible);
 		final ObjectAnimator fl = getFragmentAnimation(position - 1, visible);
 		final ObjectAnimator fr = getFragmentAnimation(position + 1, visible);
 		if(fl != null && fr != null) {

@@ -29,7 +29,7 @@ public class BluetoothUtils {
 	}
 
 	public static boolean isAdapterStateOn(final BluetoothAdapter bluetoothAdapter) {
-		return bluetoothAdapter != null && bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON;
+		return bluetoothAdapter != null && bluetoothAdapter.getState() == BluetoothAdapter.STATE_ON;
 	}
 
 }

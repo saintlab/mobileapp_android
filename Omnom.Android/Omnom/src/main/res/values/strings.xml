@@ -18,6 +18,7 @@
     <string name="register_agreement">Нажимая «Далее» вы принимаете\nПользовательское соглашение</string>
     <string name="register_agreement_url">http://legal.saintlab.com/omnom/user-agreement/</string>
     <string name="register_agreement_mark">Пользовательское соглашение</string>
+    <string name="you_forgot_to_enter_birth_date">Вы забыли ввести дату рождения</string>
     <string name="you_forgot_to_enter_name">Вы забыли ввести имя</string>
     <string name="you_forgot_to_enter_phone">Вы забыли ввести номер телефона</string>
     <string name="you_forgot_to_enter_email">Вы забыли ввести e-mail</string>
@@ -123,6 +124,8 @@
     <string name="how_many_guests_will_pay">На&#160;скольких гостей делить?</string>
     <string name="welcome_to_">Добро пожаловать в&#160;%1$s</string>
     <string name="balk_notification_user_paid_">%1$s: оплачено по&#160;счету %2$s </string>
+    <string name="balk_notification_user_paid_tips">%1$s:&#160;оплачено&#160;по&#160;счету&#160;%2$s&#160; +&#160;чай&#160;%3$s&#160;</string>
+    <string name="balk_notification_user_tips_only">%1$s: чаевые %2$s </string>
     <string name="title_activity_restaurants_list">RestaurantsListActivity</string>
     <string name="title_activity_restaurant">RestaurantActivity</string>
     <string name="reserve_table">Бронировать\nстолик</string>
@@ -212,4 +215,19 @@
     <string name="info_money_back"><u>Почему списали деньги и когда их вернут?</u></string>
     <string name="info_no_sms"><u>Не пришла SMS?</u></string>
     <string name="wrong_checksum_short">Введена неверная проверочная сумма.</string>
+    <string name="support_unavailable">Извините, в данный момент поддержка не доступна. Пожалуйста, попробуйте позже</string>
+    <string name="license_agreement_clickable">Пользовательского соглашения</string>
+    <string name="license_agreement_info">Нажимая Далее, вы выражаете согласие с условиями Пользовательского соглашения</string>
+    <string name="enter_your_phone_number">Укажите ваш номер телефона</string>
+    <string name="wish_your_order_canceled">Ваш заказ отменён</string>
+    <string name="wish_your_order_ready">Ваш заказ готов</string>
+    <string name="wish_order_ready_info">Чтобы получить свой заказ, покажите бармену этот экран, или назовите ему номер и пин-код заказа.</string>
+    <string name="wish_order_canceled_info">Заказ не может быть выполнен заведением, и поэтому был отменён.\nОплата вернётся к вам на
+        карту\nв&#160;ближайшие несколько дней.</string>
+    <string name="barmen_tips_positive">+ Чай бармену :-)</string>
+    <string name="barmen_tips_negative">+ Чай бармену :-(</string>
+    <string name="unknown_user">Неизвестный пользователь</string>
+    <string name="wish_result_item">%1$s x %2$s</string>
+    <string name="unable_to_process_transaction">Ну удалость провести транзакцию. URL=</string>
+    <string name="change">Изменить</string>
 </resources>

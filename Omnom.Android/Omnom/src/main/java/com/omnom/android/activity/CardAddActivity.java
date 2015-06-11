@@ -19,6 +19,7 @@ import com.omnom.android.R;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
+import com.omnom.android.activity.animation.AddCardTransitionController;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.entrance.EntranceData;
@@ -27,9 +28,7 @@ import com.omnom.android.utils.CardDataTextWatcher;
 import com.omnom.android.utils.CardExpirationTextWatcher;
 import com.omnom.android.utils.CardNumberTextWatcher;
 import com.omnom.android.utils.CardUtils;
-import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
-import com.omnom.android.utils.utils.AnimationUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.ErrorEditText;
 import com.omnom.android.validator.Validator;
@@ -38,6 +37,8 @@ import com.omnom.android.validator.card.ExpirationDateValidator;
 import com.omnom.android.validator.card.PanValidator;
 import com.omnom.android.view.HeaderView;
 
+import java.lang.ref.WeakReference;
+
 import javax.inject.Inject;
 
 import butterknife.InjectView;
@@ -45,8 +46,6 @@ import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
@@ -77,12 +76,8 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 		public void onFocusChange(View v, boolean hasFocus) {
 			ErrorEditText editText = (ErrorEditText) v;
 			if(!hasFocus) {
-				String value = editText.getText().toString();
-				if(validator.validate(value)) {
-					editText.setError(false);
-				} else {
-					editText.setError(true);
-				}
+				final String value = editText.getText().toString();
+				editText.setError(!validator.validate(value));
 			} else {
 				editText.setError(false);
 			}
@@ -135,23 +130,6 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	@Inject
 	protected Acquiring mAcquiring;
 
-	private double mAmount;
-
-	private boolean mMinimized = false;
-
-	private int panelY;
-
-	private int cameraY;
-
-	private int cameraX;
-
-	private int panelX;
-
-	/**
-	 * Used for mixpanel analytics
-	 */
-	private boolean mScanUsed = false;
-
 	private Validator panValidator;
 
 	private Validator expDateValidator;
@@ -160,7 +138,7 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 
 	private int mType;
 
-	private Subscription mCardAddSubscribtion;
+	private AddCardTransitionController mTransitionController;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -172,17 +150,19 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 
 	@Override
 	public void initUi() {
+		mTransitionController = new AddCardTransitionController(new WeakReference<Activity>(this));
+
 		mCheckSaveCard.setChecked(true);
-		mPanelTop.setButtonRightEnabled(false);
-		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				AndroidUtils.hideKeyboard(mEditCardExpDate);
-				finish();
-			}
-		});
+		mPanelTop.setButtonRightEnabled(false)
+		         .setButtonLeft(R.string.cancel, new View.OnClickListener() {
+			         @Override
+			         public void onClick(final View v) {
+				         AndroidUtils.hideKeyboard(mEditCardExpDate);
+				         finish();
+			         }
+		         });
 		mCheckSaveCard.setChecked(mType != TYPE_ENTER_AND_PAY);
-		ViewUtils.setVisible(mCheckSaveCard, mType == TYPE_BIND_OR_PAY);
+		ViewUtils.setVisibleGone(mCheckSaveCard, mType == TYPE_BIND_OR_PAY);
 		setUpCardEditFields();
 	}
 
@@ -231,55 +211,9 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 
 	@Override
 	public void onTextChanged(final CharSequence s) {
-		animteCamera(mEditCardCvv.length() > 0 || mEditCardExpDate.length() > 0 || mEditCardNumber.length() > 0);
+		final boolean minimize = mEditCardCvv.length() > 0 || mEditCardExpDate.length() > 0 || mEditCardNumber.length() > 0;
+		mTransitionController.animteCamera(minimize);
 		mPanelTop.setButtonRightEnabled(validate());
-	}
-
-	private void animteCamera(final boolean minimize) {
-		int[] sp = new int[2];
-		mPanelCard.getLocationOnScreen(sp);
-		if(panelY == 0) {
-			panelY = sp[1];
-		}
-		if(panelX == 0) {
-			panelX = sp[0];
-		}
-
-		mImgCamera.getLocationOnScreen(sp);
-		if(cameraY == 0) {
-			cameraY = sp[1];
-		}
-		if(cameraX == 0) {
-			cameraX = sp[0];
-		}
-
-		if(mMinimized != minimize) {
-			final int v = (int) ((cameraY - panelY) / 1.5f);
-			if(minimize) {
-				AndroidUtils.setBackground(mImgCamera, null);
-				AnimationUtils.animateAlpha(mTextCamera, false);
-				mImgCamera.animate().x(mPanelCard.getMeasuredWidth() - mImgCamera.getMeasuredWidth()).start();
-				mImgCamera.animate().translationYBy(-v).start();
-				mEditCardCvv.animate().translationY(-v).start();
-				mEditCardExpDate.animate().translationY(-v).start();
-				mEditCardNumber.animate().translationY(-v).start();
-			} else {
-				AnimationUtils.animateAlpha(mTextCamera, true);
-				mImgCamera.animate().x(cameraX - panelX).start();
-				mImgCamera.animate().translationY(0).start();
-				mEditCardCvv.animate().translationY(0).start();
-				mEditCardExpDate.animate().translationY(0).start();
-				mEditCardNumber.animate().translationY(0).start();
-				AndroidUtils.setBackground(mImgCamera, getResources().getDrawable(R.drawable.scan_frame));
-			}
-			mMinimized = minimize;
-		}
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		OmnomObservable.unsubscribe(mCardAddSubscribtion);
 	}
 
 	@Override
@@ -295,7 +229,6 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 		}
 		if(requestCode == REQUEST_CODE_CARD_IO) {
 			if(data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
-				mScanUsed = true;
 				final CreditCard scanResult = data.getParcelableExtra(CardIOActivity.EXTRA_SCAN_RESULT);
 				postDelayed(350, new Runnable() {
 					@Override
@@ -312,15 +245,14 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 		final String pan = CardUtils.preparePan(mEditCardNumber.getText().toString());
 		final String expDate = CardUtils.prepareExpDate(mEditCardExpDate.getText().toString());
 		final String cvv = mEditCardCvv.getText().toString();
-		final String holder = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getCardHolder();
-		return new CardInfo.Builder()
-				.pan(pan)
-				.mixpanelPan(pan)
-				.expDate(expDate)
-				.cvv(cvv)
-				.holder(holder)
-				.addCard(true)
-				.build();
+		final String holder = getApp().getConfig().getAcquiringData().getCardHolder();
+		return new CardInfo.Builder().pan(pan)
+		                             .mixpanelPan(pan)
+		                             .expDate(expDate)
+		                             .cvv(cvv)
+		                             .holder(holder)
+		                             .addCard(true)
+		                             .build();
 	}
 
 	private void doBind() {
@@ -330,27 +262,27 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 
 		mPanelTop.showProgress(true);
 
-		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
-		UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
+		final OmnomApplication app = getApp();
+		final AcquiringData acquiringData = app.getConfig().getAcquiringData();
+		UserData wicketUser = app.getUserProfile().getUser();
 
-		mCardAddSubscribtion = AppObservable.bindActivity(this, mAcquiring.addCard(acquiringData, wicketUser, createCardInfo()))
-		                                    .subscribe(new Action1<AcquiringResponse>() {
-			                                    @Override
-			                                    public void call(final AcquiringResponse acquiringResponse) {
-				                                    if(acquiringResponse.getError() != null) {
-					                                    showToast(getActivity(), acquiringResponse.getError().getDescr());
-				                                    } else {
-					                                    setResult(RESULT_OK);
-					                                    finish();
-				                                    }
-			                                    }
-		                                    }, new Action1<Throwable>() {
-			                                    @Override
-			                                    public void call(final Throwable throwable) {
-				                                    showToast(getActivity(), R.string.unable_to_bind_card);
-				                                    Log.e(TAG, "doBind", throwable);
-			                                    }
-		                                    });
+		subscribe(mAcquiring.addCard(acquiringData, wicketUser, createCardInfo()), new Action1<AcquiringResponse>() {
+			@Override
+			public void call(final AcquiringResponse acquiringResponse) {
+				if(acquiringResponse.getError() != null) {
+					showToast(getActivity(), acquiringResponse.getError().getDescr());
+				} else {
+					setResult(RESULT_OK);
+					finish();
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(final Throwable throwable) {
+				showToast(getActivity(), R.string.unable_to_bind_card);
+				Log.e(TAG, "doBind", throwable);
+			}
+		});
 	}
 
 	private void doPay() {
@@ -427,7 +359,6 @@ public class CardAddActivity extends BaseOmnomModeSupportActivity implements Tex
 	@Override
 	protected void handleIntent(Intent intent) {
 		super.handleIntent(intent);
-		mAmount = intent.getDoubleExtra(EXTRA_ORDER_AMOUNT, 0);
 		mType = intent.getIntExtra(EXTRA_TYPE, TYPE_BIND);
 	}
 

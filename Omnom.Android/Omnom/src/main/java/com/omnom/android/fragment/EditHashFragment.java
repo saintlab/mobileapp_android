@@ -1,7 +1,6 @@
 package com.omnom.android.fragment;
 
 import android.app.Activity;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -190,7 +189,7 @@ public class EditHashFragment extends Fragment {
 				if(actionId == EditorInfo.IME_ACTION_DONE) {
 					if(!isBusy() && !editHash.getText().toString().isEmpty()) {
 						setBusy(true);
-						ViewUtils.setVisible(progressBar, true);
+						ViewUtils.setVisibleGone(progressBar, true);
 						editHash.setTextColor(getResources().getColor(R.color.enter_hash_color));
 						loadTable(editHash.getText().toString());
 					}
@@ -262,8 +261,8 @@ public class EditHashFragment extends Fragment {
 						if(!TextUtils.isEmpty(decodeResponse.getError())) {
 							showError(getString(R.string.error_unknown_hash));
 						} else if(decodeResponse.hasOnlyRestaurant()) {
-							ViewUtils.setVisible(progressBar, false);
-							ViewUtils.setVisible(imgSuccess, true);
+							ViewUtils.setVisibleGone(progressBar, false);
+							ViewUtils.setVisibleGone(imgSuccess, true);
 							Restaurant restaurant = decodeResponse.getRestaurants().get(0);
 							mTableFoundListener.onTableFound(decodeResponse.getRequestId(), restaurant, mMenu);
 						} else {
@@ -281,20 +280,19 @@ public class EditHashFragment extends Fragment {
 	private void onHashChange() {
 		isError = false;
 		txtEnterHash.setText(getString(R.string.enter_hash));
-		GradientDrawable drawable = (GradientDrawable) hashUnderline.getBackground();
-		drawable.setColor(getResources().getColor(R.color.enter_hash_color));
+		ViewUtils.setBackgroundDrawableColor(hashUnderline, getResources().getColor(R.color.enter_hash_color));
 		editHash.setTextColor(getResources().getColor(android.R.color.black));
 		txtEnterHash.setTextColor(getResources().getColor(R.color.qr_hint_color));
 	}
 
 	private void showError(final String message) {
 		setBusy(false);
-		ViewUtils.setVisible(progressBar, false);
+		ViewUtils.setVisibleGone(progressBar, false);
 		isError = true;
 		txtEnterHash.setText(message);
-		GradientDrawable drawable = (GradientDrawable) hashUnderline.getBackground();
-		int color = getResources().getColor(R.color.cadre_border);
-		drawable.setColor(color);
+
+		final int color = getResources().getColor(R.color.cadre_border);
+		ViewUtils.setBackgroundDrawableColor(hashUnderline, color);
 		editHash.setTextColor(color);
 		txtEnterHash.setTextColor(color);
 	}

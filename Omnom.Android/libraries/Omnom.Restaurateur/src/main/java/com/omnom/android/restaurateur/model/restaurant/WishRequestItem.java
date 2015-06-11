@@ -9,6 +9,13 @@ import java.util.List;
  * Created by Ch3D on 09.02.2015.
  */
 public class WishRequestItem {
+
+	public static final String ID_OMNOM_TIPS = "omnom-tips";
+
+	public static WishRequestItem createTip(final int tipsQuantity) {
+		return new WishRequestItem(ID_OMNOM_TIPS, tipsQuantity);
+	}
+
 	@Expose
 	private String id;
 

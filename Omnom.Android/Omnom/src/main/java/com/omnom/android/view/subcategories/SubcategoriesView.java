@@ -35,6 +35,7 @@ import com.omnom.android.utils.view.OmnomRecyclerView;
 import com.omnom.android.view.MenuSmoothScroller;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -150,7 +151,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 		mItemAnimationsSupported = AndroidUtils.isRecyclerItemAnimationSupported();
 
-		ViewUtils.setVisible(mFakeStickyHeader, false);
+		ViewUtils.setVisibleGone(mFakeStickyHeader, false);
 
 		mLayoutManager = new LinearLayoutManager(getContext());
 		mSmoothScroller = new MenuSmoothScroller(getContext(), mLayoutManager, MenuSmoothScroller.MODE_DEFAULT);
@@ -245,7 +246,7 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		mLayoutManager.scrollToPositionWithOffset(newPos, 0);
 		mMenuAdapter.notifyItemChanged(newPos);
 		if(!mMenuAdapter.hasExpandedGroups()) {
-			ViewUtils.setVisible(mFakeStickyHeader, false);
+			ViewUtils.setVisibleGone(mFakeStickyHeader, false);
 		}
 		restoreHeadersStyle();
 	}
@@ -257,6 +258,9 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 
 		final View btnApply = findById(v, R.id.btn_apply);
 		final int position = (Integer) btnApply.getTag(R.id.position);
+		final View panelDescription = findById(v, R.id.panel_description);
+		final int descrTop = panelDescription.getTop();
+		final int btnMarginTop = getApplyMarginTop(btnApply, panelDescription, descrTop);
 
 		if(top != 0) {
 			mSmoothScroller.setTargetPosition(childPosition);
@@ -266,13 +270,22 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 				public void run() {
 					final int btnTranslation = btnApply.getTop() - findById(v, R.id.txt_title).getTop();
 					final int contentTranslation = v.getTop();
-					showDetails(itemData.getItem(), position, findById(v, R.id.txt_title).getHeight(), contentTranslation, btnTranslation);
+					showDetails(itemData.getItem(), position, findById(v, R.id.txt_title).getHeight(), contentTranslation,
+					            btnTranslation, btnMarginTop);
 				}
 			}, getResources().getInteger(R.integer.default_animation_duration_short));
 		} else {
 			final int btnTranslation = btnApply.getTop() - findById(v, R.id.txt_title).getTop();
-			showDetails(itemData.getItem(), position, findById(v, R.id.txt_title).getHeight(), 0, btnTranslation);
+			showDetails(itemData.getItem(), position, findById(v, R.id.txt_title).getHeight(), 0, btnTranslation, btnMarginTop);
 		}
+	}
+
+	private int getApplyMarginTop(final View btnApply, final View panelDescription, final int descrTop) {
+		int btnMarginTop = 0;
+		if(panelDescription.getVisibility() == View.VISIBLE) {
+			btnMarginTop = btnApply.getTop() - descrTop - ((MarginLayoutParams) btnApply.getLayoutParams()).topMargin;
+		}
+		return btnMarginTop;
 	}
 
 	public void showAddFragment(final Item item, int pos) {
@@ -288,13 +301,15 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	}
 
 	public void showDetails(final Item item, final int position, final int titleSize, final int contentTranslation, final int
-			btnTranslation) {
+			btnTranslation, final int btnMarginTop) {
 		if(item == null) {
 			return;
 		}
 		if(!(item instanceof MenuCategoryItems.HeaderItem) && !(item instanceof MenuCategoryItems.SubHeaderItem)) {
-			MenuItemDetailsFragment
-					.show(getFragmentManager(), mMenu, mOrder, item, position, titleSize, contentTranslation, btnTranslation);
+			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position, titleSize,
+			                             contentTranslation,
+			                             btnTranslation,
+			                             btnMarginTop);
 		}
 	}
 
@@ -304,7 +319,8 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		}
 		if(!(item instanceof MenuCategoryItems.HeaderItem) && !(item instanceof MenuCategoryItems.SubHeaderItem)) {
 			final int position = mMenuAdapter.getItemPosition(item);
-			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position);
+			MenuItemDetailsFragment.show(getFragmentManager(), mMenu, mOrder, item, position,
+			                             getResources().getDimensionPixelSize(R.dimen.view_size_default));
 		}
 	}
 
@@ -316,16 +332,16 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	public void onPanelCollapsed(final View panel) {
 		mTouchEnabled = false;
 		mItemTouchListener.setTouchEnabled(mTouchEnabled);
-		AnimationUtils.animateAlpha3(mImgClose, false);
-		AnimationUtils.animateAlpha3(mImgSearch, false);
+		AnimationUtils.animateAlphaGone(mImgClose, false);
+		AnimationUtils.animateAlphaGone(mImgSearch, false);
 	}
 
 	@Override
 	public void onPanelExpanded(final View panel) {
 		mTouchEnabled = true;
 		mItemTouchListener.setTouchEnabled(mTouchEnabled);
-		AnimationUtils.animateAlpha3(mImgClose, true);
-		AnimationUtils.animateAlpha3(mImgSearch, true);
+		AnimationUtils.animateAlphaGone(mImgClose, true);
+		AnimationUtils.animateAlphaGone(mImgSearch, true);
 
 	}
 
@@ -341,10 +357,10 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	@OnClick(R.id.btn_close_menu)
 	public void onClose() {
 		mHeaderItemDecorator.restoreHeadersStyle();
-		ViewUtils.setVisible(mFakeStickyHeader, false);
+		ViewUtils.setVisibleGone(mFakeStickyHeader, false);
 		getActivity().collapseSlidingPanel();
-		AnimationUtils.animateAlpha3(mImgClose, false);
-		AnimationUtils.animateAlpha3(mImgSearch, false);
+		AnimationUtils.animateAlphaGone(mImgClose, false);
+		AnimationUtils.animateAlphaGone(mImgSearch, false);
 	}
 
 	@OnClick(R.id.btn_search_menu)
@@ -366,16 +382,26 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 		// Do nothing
 	}
 
-	public void refresh(final OrderUpdateEvent event) {
+	public void refresh(final OrderUpdateEvent event, final boolean alreadyOrdered) {
 		if(event == null || event.getItem() == null) {
 			return;
 		}
 		final Item item = event.getItem();
-		mOrder.addItem(item, event.getCount());
+
+		mOrder.addItem(item, event.getCount(), event.getSelectedModifiersIds());
 		mMenuAdapter.notifyItemChanged(event.getPosition());
+
+		final ArrayList<Integer> positions = mMenuAdapter.getItemPositions(item);
+		for(final Integer position : positions) {
+			mMenuAdapter.notifyItemChanged(position);
+		}
 
 		if(event.getPosition() > 0 && item.hasRecommendations()) {
 			if(event.getCount() > 0) {
+				if(alreadyOrdered) {
+					// skip
+					return;
+				}
 				final List<String> recommendations = item.recommendations();
 				final int size = recommendations.size();
 				for(int i = 0; i < size; i++) {
@@ -416,14 +442,14 @@ public class SubcategoriesView extends RelativeLayout implements SlidingUpPanelL
 	}
 
 	public void restoreHeadersStyle() {
-		ViewUtils.setVisible(mFakeStickyHeader, false);
+		ViewUtils.setVisibleGone(mFakeStickyHeader, false);
 		mHeaderItemDecorator.restoreHeadersStyle();
 	}
 
 	public void collapseInstant() {
 		restoreHeadersStyle();
-		ViewUtils.setVisible(mImgClose, false);
-		ViewUtils.setVisible(mImgSearch, false);
+		ViewUtils.setVisibleGone(mImgClose, false);
+		ViewUtils.setVisibleGone(mImgSearch, false);
 	}
 
 }

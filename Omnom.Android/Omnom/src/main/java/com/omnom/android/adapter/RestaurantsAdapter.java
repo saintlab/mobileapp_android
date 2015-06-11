@@ -68,13 +68,13 @@ public class RestaurantsAdapter extends BaseAdapter {
 			cover.setColor(RestaurantHelper.getBackgroundColor(item));
 			cover.animateLogo(logo, R.drawable.transparent, 0);
 
-			final String addressSmall = RestaurantHelper.getAddressSmall(context, item);
-			if(!TextUtils.isEmpty(addressSmall)) {
-				ViewUtils.setVisible(txtInfo, true);
-				txtInfo.setText(addressSmall);
+			final String address = RestaurantHelper.getAddress(context, item);
+			if(!TextUtils.isEmpty(address)) {
+				ViewUtils.setVisibleGone(txtInfo, true);
+				txtInfo.setText(address);
 				if(item.distance() != null) {
 					final String distance = StringUtils.formatDistance(item.distance());
-					final String addressWithDistance = addressSmall + " " + distance;
+					final String addressWithDistance = address + " " + distance;
 					SpannableString s = SpannableString.valueOf(addressWithDistance);
 					s.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.info_hint)),
 					          addressWithDistance.indexOf(distance), addressWithDistance.length(),
@@ -82,13 +82,13 @@ public class RestaurantsAdapter extends BaseAdapter {
 					txtInfo.setText(s);
 				}
 			} else {
-				ViewUtils.setVisible(txtInfo, false);
+				ViewUtils.setVisibleGone(txtInfo, false);
 			}
 			final String openedTime = RestaurantHelper.getOpenedTime(context, item, weekDay);
 			if(TextUtils.isEmpty(openedTime)) {
-				ViewUtils.setVisible(txtSchedule, false);
+				ViewUtils.setVisibleGone(txtSchedule, false);
 			} else {
-				ViewUtils.setVisible(txtSchedule, true);
+				ViewUtils.setVisibleGone(txtSchedule, true);
 				txtSchedule.setText(openedTime);
 			}
 		}

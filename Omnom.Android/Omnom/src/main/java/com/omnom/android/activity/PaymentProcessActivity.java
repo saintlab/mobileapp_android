@@ -25,10 +25,13 @@ import com.omnom.android.acquiring.demo.DemoAcquiring;
 import com.omnom.android.acquiring.mailru.OrderInfoMailRu;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.model.MailRuExtra;
+import com.omnom.android.acquiring.mailru.model.ThreedsData;
 import com.omnom.android.acquiring.mailru.response.AcquiringPollingResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponse;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.helper.PaymentDataTable;
+import com.omnom.android.activity.helper.PaymentDataWish;
 import com.omnom.android.activity.order.BaseOrderAcceptedActivity;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.entrance.BarEntranceData;
@@ -47,13 +50,10 @@ import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
-import com.omnom.android.socket.event.PaymentSocketEvent;
-import com.omnom.android.socket.listener.SilentPaymentEventListener;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.loader.LoaderError;
 import com.omnom.android.utils.loader.LoaderView;
-import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.validator.LongValidator;
@@ -66,14 +66,12 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.InjectViews;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 /**
  * Created by mvpotter on 24/11/14.
  */
-public class PaymentProcessActivity extends BaseOmnomModeSupportActivity implements SilentPaymentEventListener.PaymentListener {
+public class PaymentProcessActivity extends BaseOmnomModeSupportActivity {
 
 	public static final int SIMILAR_PAYMENTS_TIMEOUT = 60 * 1000;
 
@@ -83,34 +81,30 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 
 	private static final int REQUEST_THANKS = 100;
 
-	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
-	                         final Order order, CardInfo cardInfo, final boolean isDemo,
-	                         final Restaurant restaurant, EntranceData entranceData) {
+	public static void start(final Activity activity, final int code, final PaymentDataTable data, final boolean isDemo) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
-		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
-		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(restaurant));
-		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
-		intent.putExtra(Extras.EXTRA_ORDER, order);
+		intent.putExtra(Extras.EXTRA_RESTAURANT, data.getRestaurant());
+		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(data.getRestaurant()));
+		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, data.getDetails());
+		intent.putExtra(Extras.EXTRA_ORDER, data.getOrder());
 		intent.putExtra(Extras.EXTRA_PAYMENT_TYPE, MailRuExtra.PAYMENT_TYPE_ORDER);
-		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
+		intent.putExtra(Extras.EXTRA_CARD_DATA, data.getCardInfo());
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
-		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, entranceData);
+		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, data.getEntranceData());
 		activity.startActivityForResult(intent, code);
 	}
 
-	public static void start(final Activity activity, final int code, final OrderFragment.PaymentDetails details,
-	                         final UserOrder order, CardInfo cardInfo, WishResponse wishResponse, final boolean isDemo,
-	                         final Restaurant restaurant, EntranceData entranceData) {
+	public static void start(final Activity activity, final int code, final PaymentDataWish data, final boolean isDemo) {
 		final Intent intent = new Intent(activity, PaymentProcessActivity.class);
-		intent.putExtra(Extras.EXTRA_RESTAURANT, restaurant);
-		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(restaurant));
-		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, details);
-		intent.putExtra(Extras.EXTRA_USER_ORDER, order);
+		intent.putExtra(Extras.EXTRA_RESTAURANT, data.getRestaurant());
+		intent.putExtra(Extras.EXTRA_ACCENT_COLOR, RestaurantHelper.getBackgroundColor(data.getRestaurant()));
+		intent.putExtra(Extras.EXTRA_PAYMENT_DETAILS, data.getDetails());
+		intent.putExtra(Extras.EXTRA_USER_ORDER, data.getOrder());
 		intent.putExtra(Extras.EXTRA_PAYMENT_TYPE, MailRuExtra.PAYMENT_TYPE_WISH);
-		intent.putExtra(Extras.EXTRA_CARD_DATA, cardInfo);
-		intent.putExtra(Extras.EXTRA_WISH_RESPONSE, wishResponse);
+		intent.putExtra(Extras.EXTRA_CARD_DATA, data.getCardInfo());
+		intent.putExtra(Extras.EXTRA_WISH_RESPONSE, data.getWishResponse());
 		intent.putExtra(Extras.EXTRA_DEMO_MODE, isDemo);
-		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, entranceData);
+		intent.putExtra(Extras.EXTRA_ENTRANCE_DATA, data.getEntranceData());
 		activity.startActivityForResult(intent, code);
 	}
 
@@ -152,12 +146,6 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 
 	protected OmnomErrorHelper mErrorHelper;
 
-	private Subscription mBillSubscription;
-
-	private Subscription mPaySubscription;
-
-	private Subscription mCheckSubscription;
-
 	private OrderFragment.PaymentDetails mDetails;
 
 	@Nullable
@@ -169,12 +157,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 
 	private int mAccentColor;
 
-	private SilentPaymentEventListener mPaymentListener;
-
 	private String mTransactionUrl;
-
-	@Nullable
-	private PaymentSocketEvent mPaymentEvent;
 
 	private int mBillId;
 
@@ -195,23 +178,16 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	@Nullable
 	private Restaurant mRestaurant;
 
+	private boolean mFirstRun = true;
+
 	@Override
 	public void initUi() {
 		mPayChecker = new PaymentChecker(this);
 
-		mPaymentListener = new SilentPaymentEventListener(this, this);
 		mErrorHelper = new OmnomErrorHelper(loader, txtError, btnBottom, txtBottom, btnDemo, errorViews);
 		loader.scaleDown();
 		loader.setColor(getResources().getColor(android.R.color.black));
 		loader.setProgressColor(getResources().getColor(R.color.payment_progress_color));
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if(mOrder != null) {
-			mPaymentListener.initTableSocket(mOrder.getTableId());
-		}
 	}
 
 	@Override
@@ -226,13 +202,10 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	@Override
 	protected void onStart() {
 		super.onStart();
-		pay(mDetails.getAmount(), mDetails.getTip());
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		mPaymentListener.onPause();
+		if(mFirstRun) {
+			mFirstRun = false;
+			pay(mDetails.getAmount(), mDetails.getTip());
+		}
 	}
 
 	@Override
@@ -244,11 +217,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mPaymentListener.onDestroy();
 		loader.onDestroy();
-		OmnomObservable.unsubscribe(mBillSubscription);
-		OmnomObservable.unsubscribe(mPaySubscription);
-		OmnomObservable.unsubscribe(mCheckSubscription);
 	}
 
 	private void pay(final double amount, final int tip) {
@@ -269,39 +238,38 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	}
 
 	private void processPayment(final double amount, final int tip) {
-		final Activity activity = getActivity();
-
 		final BillRequest request = createBillRequest(amount);
-		mBillSubscription = AppObservable.bindActivity(activity, api.bill(request)).subscribe(new Action1<BillResponse>() {
-			@Override
-			public void call(final BillResponse response) {
-				final String status = response.getStatus();
-				if(BillResponse.STATUS_NEW.equals(status) && !response.hasErrors()) {
-					tryToPay(mCardInfo, response, amount, tip);
-				} else {
-					Log.w(TAG, "processPayment status = " + status);
-					if(response.getError() != null) {
-						Log.w(TAG, response.getError());
-					} else if(response.getErrors() != null) {
-						Log.w(TAG, response.getErrors().toString());
-					}
-					if(BillResponse.STATUS_RESTAURANT_NOT_AVAILABLE.equals(status)) {
-						mErrorHelper.showError(LoaderError.RESTAURANT_UNAVAILABLE, mFinishClickListener);
-					} else if(BillResponse.STATUS_PAID.equals(status) || BillResponse.STATUS_ORDER_CLOSED.equals(status)) {
-						onOrderClosed();
-					} else {
+		subscribe(api.bill(request),
+		          new Action1<BillResponse>() {
+			          @Override
+			          public void call(final BillResponse response) {
+				          final String status = response.getStatus();
+				          if(BillResponse.STATUS_NEW.equals(status) && !response.hasErrors()) {
+					          tryToPay(mCardInfo, response, amount, tip);
+				          } else {
+					          Log.w(TAG, "processPayment status = " + status);
+					          if(response.getError() != null) {
+						          Log.w(TAG, response.getError());
+					          } else if(response.getErrors() != null) {
+						          Log.w(TAG, response.getErrors().toString());
+					          }
+					          if(BillResponse.STATUS_RESTAURANT_NOT_AVAILABLE.equals(status)) {
+						          mErrorHelper.showError(LoaderError.RESTAURANT_UNAVAILABLE, mFinishClickListener);
+					          } else if(BillResponse.STATUS_PAID.equals(status) || BillResponse.STATUS_ORDER_CLOSED.equals(status)) {
+						          onOrderClosed();
+					          } else {
+						          onUnknownError();
+					          }
+
+				          }
+			          }
+		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					@Override
+					public void onError(Throwable throwable) {
+						Log.w(TAG, "processPayment", throwable);
 						onUnknownError();
 					}
-
-				}
-			}
-		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			@Override
-			public void onError(Throwable throwable) {
-				Log.w(TAG, "processPayment", throwable);
-				onUnknownError();
-			}
-		});
+				});
 	}
 
 	private BillRequest createBillRequest(final double amount) {
@@ -312,8 +280,9 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	}
 
 	private void tryToPay(final CardInfo card, BillResponse billData, final double amount, final int tip) {
-		final UserData user = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
+		final OmnomApplication app = getApp();
+		final UserData user = app.getUserProfile().getUser();
+		final AcquiringData acquiringData = app.getConfig().getAcquiringData();
 		pay(billData, card, acquiringData, user, amount, tip);
 	}
 
@@ -360,29 +329,29 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 			mPayChecker.onPrePayment(mDetails);
 		}
 
-		mPaySubscription = AppObservable.bindActivity(getActivity(), getAcquiring().pay(acquiringData, paymentInfo))
-		                                .subscribe(new Action1<AcquiringResponse>() {
-			                                @Override
-			                                public void call(final AcquiringResponse response) {
-				                                if(response.getError() != null) {
-					                                Log.w(TAG, response.getError().toString());
-					                                onPayError(response.getError());
-				                                } else {
-					                                mTransactionUrl = response.getUrl();
-					                                mDetails.setTransactionUrl(mTransactionUrl);
-					                                if(mPayChecker != null) {
-						                                mPayChecker.onPaymentRequested(mDetails);
-					                                }
-					                                checkResult(response);
-				                                }
-			                                }
-		                                }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			                                @Override
-			                                public void onError(Throwable throwable) {
-				                                Log.w(TAG, "pay", throwable);
-				                                onUnknownError();
-			                                }
-		                                });
+		subscribe(getAcquiring().pay(acquiringData, paymentInfo),
+		          new Action1<AcquiringResponse>() {
+			          @Override
+			          public void call(final AcquiringResponse response) {
+				          if(response.getError() != null) {
+					          Log.w(TAG, response.getError().toString());
+					          onPayError(response.getError());
+				          } else {
+					          mTransactionUrl = response.getUrl();
+					          mDetails.setTransactionUrl(mTransactionUrl);
+					          if(mPayChecker != null) {
+						          mPayChecker.onPaymentRequested(mDetails);
+					          }
+					          checkResult(response);
+				          }
+			          }
+		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					@Override
+					public void onError(Throwable throwable) {
+						Log.w(TAG, "pay", throwable);
+						onUnknownError();
+					}
+				});
 	}
 
 	private void onSimilarPayment(final AcquiringResponseError error) {
@@ -392,42 +361,50 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 	}
 
 	private void checkResult(final AcquiringResponse response) {
-		final String acsUrl = response.getAcsUrl();
-		if(!TextUtils.isEmpty(acsUrl)) {
-			onPayError(new AcquiringResponseError());
-//			if(response.getThreedsData() == null) {
-//				onPayError(new AcquiringResponseError());
-//			} else {
-//				final Uri acsUri = Uri.parse(acsUrl);
-//				final Uri requestUrl = acsUri.buildUpon()
-//				                             .appendQueryParameter(ThreedsData.MD, response.getThreedsData().getMD())
-//				                             .appendQueryParameter(ThreedsData.TERM_URL, response.getThreedsData().getTermUrl())
-//				                             .appendQueryParameter(ThreedsData.PA_REQ, response.getThreedsData().getPaReq()).build();
-//				ThreeDSWebActivity.start(this, requestUrl.toString(), REQUEST_CODE_HANDLE_THREE_DS);
-//			}
+		if(!TextUtils.isEmpty(response.getAcsUrl())) {
+			processThreeDs(response);
 		} else {
-			mCheckSubscription = AppObservable.bindActivity(getActivity(), getAcquiring().checkResult(response))
-			                                  .subscribe(new Action1<AcquiringPollingResponse>() {
-				                                  @Override
-				                                  public void call(final AcquiringPollingResponse response) {
-					                                  processResponse(response);
-				                                  }
-			                                  }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-				                                  @Override
-				                                  public void onError(Throwable throwable) {
-					                                  Log.w(TAG, "checkResult", throwable);
-					                                  onUnknownError();
-				                                  }
-			                                  });
+			subscribe(getAcquiring().checkResult(response),
+			          new Action1<AcquiringResponse>() {
+				          @Override
+				          public void call(final AcquiringResponse response) {
+					          processResponse(response);
+				          }
+			          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+						@Override
+						public void onError(Throwable throwable) {
+							Log.w(TAG, "checkResult", throwable);
+							onUnknownError();
+						}
+					});
 		}
 	}
 
-	private void processResponse(AcquiringPollingResponse response) {
-		Log.i(TAG, "status = " + response.getStatus());
-		if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
-			onPayOk(response);
+	private void processThreeDs(final AcquiringResponse response) {
+		final String acsUrl = response.getAcsUrl();
+		if(response.getThreedsData() == null) {
+			onPayError(new AcquiringResponseError());
 		} else {
-			onPayError(response.getError());
+			final Uri acsUri = Uri.parse(acsUrl);
+			final Uri requestUrl = acsUri.buildUpon()
+			                             .appendQueryParameter(ThreedsData.MD, response.getThreedsData().getMD())
+			                             .appendQueryParameter(ThreedsData.TERM_URL, response.getThreedsData().getTermUrl())
+			                             .appendQueryParameter(ThreedsData.PA_REQ, response.getThreedsData().getPaReq())
+			                             .build();
+			ThreeDSWebActivity.start(this, requestUrl.toString(), REQUEST_CODE_HANDLE_THREE_DS);
+		}
+	}
+
+	private void processResponse(AcquiringResponse response) {
+		Log.d(TAG, "status = " + response.getStatus());
+		if(!TextUtils.isEmpty(response.getAcsUrl())) {
+			processThreeDs(response);
+		} else {
+			if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
+				onPayOk(response);
+			} else {
+				onPayError(response.getError());
+			}
 		}
 	}
 
@@ -443,7 +420,7 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 					ThanksDemoActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor, mDetails.getAmount(), mDetails.getTip());
 				} else {
 					if(mEntranceData instanceof TableEntranceData) {
-						ThanksActivity.start(getActivity(), mOrder, mPaymentEvent, REQUEST_THANKS, mAccentColor);
+						ThanksActivity.start(getActivity(), mOrder, REQUEST_THANKS, mAccentColor);
 					} else {
 						if(mEntranceData instanceof BarEntranceData) {
 							final EntranceData barEntranceData = BarEntranceData.create(mWishResponse);
@@ -476,18 +453,14 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 
 	private void reportMixPanelSuccess() {
 		if(!mIsDemo && !BuildConfig.DEBUG) {
-			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-			                          new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
-			getMixPanelHelper().trackRevenue(MixPanelHelper.Project.OMNOM,
-			                                 String.valueOf(getUserData().getId()), mDetails, mBillData);
+			track(MixPanelHelper.Project.OMNOM, new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
+			trackRevenue(MixPanelHelper.Project.OMNOM, String.valueOf(getUserData().getId()), mDetails, mBillData);
 		}
 	}
 
 	private void reportMixPanelFail(final AcquiringResponseError error) {
 		if(!mIsDemo && !BuildConfig.DEBUG) {
-			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-			                          new PaymentMixpanelEvent(getUserData(), mDetails, mBillId,
-			                                                   mCardInfo, error));
+			track(MixPanelHelper.Project.OMNOM, new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo, error));
 		}
 	}
 
@@ -502,6 +475,16 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 			setResult(RESULT_OK);
 			finish();
 		}
+
+		if(requestCode == REQUEST_CODE_HANDLE_THREE_DS) {
+			if(resultCode == RESULT_OK) {
+				onPayOk(AcquiringPollingResponse.create(AcquiringPollingResponse.STATUS_OK));
+			} else {
+				final Uri uriData = (data != null && data.getData() != null) ? data.getData() : Uri.EMPTY;
+				onPayError(AcquiringResponseError.create("", getString(R.string.unable_to_process_transaction) + uriData.toString()));
+			}
+		}
+
 		if(requestCode == REQUEST_THANKS) {
 			if(resultCode == RESULT_OK) {
 				onPayOk(AcquiringPollingResponse.create(AcquiringResponse.STATUS_SUCCESS));
@@ -537,10 +520,5 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity impleme
 		mUserOrder = intent.getParcelableExtra(Extras.EXTRA_USER_ORDER);
 		mCardInfo = intent.getParcelableExtra(Extras.EXTRA_CARD_DATA);
 		mIsDemo = intent.getBooleanExtra(Extras.EXTRA_DEMO_MODE, false);
-	}
-
-	@Override
-	public void onPaymentEvent(final PaymentSocketEvent event) {
-		mPaymentEvent = event;
 	}
 }

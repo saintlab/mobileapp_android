@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -30,6 +29,7 @@ import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.utils.AndroidUtils;
+import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.view.HeaderView;
 import com.squareup.otto.Bus;
 
@@ -99,6 +99,8 @@ public class BillSplitFragment extends Fragment {
 
 	private int mListHeight;
 
+	private BillSplitPagerAdapter mAdapter;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		OmnomApplication.get(getActivity()).inject(this);
@@ -160,24 +162,22 @@ public class BillSplitFragment extends Fragment {
 			}
 		});
 
-		GradientDrawable sd = (GradientDrawable) mBtnCommit.getBackground();
-		sd.setColor(getResources().getColor(R.color.btn_pay_green));
-		sd.invalidateSelf();
+		ViewUtils.setBackgroundDrawableColor(mBtnCommit, getResources().getColor(R.color.btn_pay_green));
 
-		mHeader.setTxtTitleMedium(R.string.split_the_bill);
-		mHeader.setButtonLeftDrawable(R.drawable.ic_cross_black, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				hide();
-			}
-		});
+		mHeader.setTxtTitleMedium(R.string.split_the_bill)
+		       .setButtonLeftDrawable(R.drawable.ic_cross_black, new View.OnClickListener() {
+			       @Override
+			       public void onClick(final View v) {
+				       hide();
+			       }
+		       });
 
-		final BillSplitPagerAdapter adapter = new BillSplitPagerAdapter(getChildFragmentManager(), mOrder, mStates, mGuestsCount);
-		mPager.setAdapter(adapter);
+		mAdapter = new BillSplitPagerAdapter(getChildFragmentManager(), mOrder, mStates, mGuestsCount);
+		mPager.setAdapter(mAdapter);
 		mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageScrolled(final int i, final float v, final int i2) {
-				final Fragment currentFragment = adapter.getCurrentFragment();
+				final Fragment currentFragment = mAdapter.getCurrentFragment(i);
 				if(currentFragment instanceof SplitFragment) {
 					final SplitFragment f = (SplitFragment) currentFragment;
 					f.updateAmount();
@@ -186,7 +186,7 @@ public class BillSplitFragment extends Fragment {
 
 			@Override
 			public void onPageSelected(final int i) {
-				final Fragment currentFragment = adapter.getCurrentFragment();
+				final Fragment currentFragment = mAdapter.getCurrentFragment(i);
 				if(currentFragment instanceof SplitFragment) {
 					final SplitFragment f = (SplitFragment) currentFragment;
 					f.updateAmount();
@@ -195,11 +195,7 @@ public class BillSplitFragment extends Fragment {
 
 			@Override
 			public void onPageScrollStateChanged(final int i) {
-				final Fragment currentFragment = adapter.getCurrentFragment();
-				if(currentFragment instanceof SplitFragment) {
-					final SplitFragment f = (SplitFragment) currentFragment;
-					f.updateAmount();
-				}
+				// Do nothing
 			}
 		});
 		mPager.setCurrentItem(2 - mType);
@@ -257,6 +253,18 @@ public class BillSplitFragment extends Fragment {
 			mOrder = getArguments().getParcelable(ARG_ORDER);
 			mStates = getArguments().getParcelable(ARG_STATES);
 			mGuestsCount = getArguments().getInt(ARG_GUESTS, 1);
+		}
+	}
+
+	public void onOrderUpdate(final Order order) {
+		mOrder = order;
+		final Fragment item1 = mAdapter.getCurrentFragment(0);
+		if(item1 instanceof SplitFragment && !item1.isDetached() && !item1.isHidden()) {
+			((SplitFragment) item1).onOrderUpdate(order);
+		}
+		final Fragment item2 = mAdapter.getCurrentFragment(1);
+		if(item2 instanceof SplitFragment && !item2.isDetached() && !item2.isHidden()) {
+			((SplitFragment) item2).onOrderUpdate(order);
 		}
 	}
 }

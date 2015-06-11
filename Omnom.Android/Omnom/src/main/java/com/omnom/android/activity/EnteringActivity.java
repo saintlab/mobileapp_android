@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -36,8 +35,6 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	private static final String TAG = EnteringActivity.class.getSimpleName();
 
 	private static final int DEFAULT_SPLASH_DELAY = 2000;
-
-	private int mSplashDelay = DEFAULT_SPLASH_DELAY;
 
 	public static void start(BaseActivity context, int enterAnim, int exitAnim, int splashDelay, final int type) {
 		final Intent intent = createIntent(context, splashDelay, false);
@@ -83,6 +80,8 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	@InjectView(R.id.panel_bottom)
 	protected View mPanelBottom;
 
+	private int mSplashDelay = DEFAULT_SPLASH_DELAY;
+
 	private boolean skipSplash;
 
 	private SplashFragment splashFragment;
@@ -108,8 +107,7 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 		// check ACTION_MAIN and intent.data to in case if app was launched from push notification
 		if(Intent.ACTION_VIEW.equals(action) || (Intent.ACTION_MAIN.equals(action) && intent.getData() != null)) {
 			mData = intent.getData();
-			boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
-			if(mData != null && hasToken) {
+			if(mData != null) {
 				skipSplash = false;
 			}
 		}
@@ -127,16 +125,16 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 			enteringFragment = EnteringFragment.newInstance();
 			if(skipSplash) {
 				getSupportFragmentManager().beginTransaction()
-						.replace(R.id.fragment_container, enteringFragment)
-						.commit();
+				                           .replace(R.id.fragment_container, enteringFragment)
+				                           .commit();
 				showPanelBottom(false);
 			} else {
 				// During initial setup, plug in the details fragment.
 				mIsApplicationLaunch = intent.getBooleanExtra(EXTRA_APPLICATION_LAUNCH, true);
 				splashFragment = SplashFragment.newInstance(mIsApplicationLaunch);
 				getSupportFragmentManager().beginTransaction()
-						.replace(R.id.fragment_container, splashFragment)
-						.commit();
+				                           .replace(R.id.fragment_container, splashFragment)
+				                           .commit();
 			}
 		}
 	}
@@ -162,20 +160,15 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 	@Override
 	protected void onResume() {
 		super.onResume();
-		final boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
 		findViewById(android.R.id.content).postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (splashFragment != null) {
-					if (mData != null && hasToken) {
+				if(splashFragment != null) {
+					if(mData != null) {
 						splashFragment.animateValidation(mData);
 						return;
 					}
-					if (hasToken) {
-						splashFragment.animateValidation();
-					} else {
-						splashFragment.animateLogin();
-					}
+					splashFragment.animateValidation();
 				} else {
 					Log.w(TAG, "Splash fragment is null");
 				}
@@ -230,17 +223,12 @@ public class EnteringActivity extends BaseOmnomFragmentActivity implements Splas
 
 	@Override
 	public void onDataLoaded() {
-		boolean hasToken = !TextUtils.isEmpty(getPreferences().getAuthToken(getActivity()));
 		if(splashFragment != null) {
-			if(mData != null && hasToken) {
+			if(mData != null) {
 				splashFragment.animateValidation(mData);
 				return;
 			}
-			if(hasToken) {
-				splashFragment.animateValidation();
-			} else {
-				splashFragment.animateLogin();
-			}
+			splashFragment.animateValidation();
 		} else {
 			Log.w(TAG, "Splash fragment is null");
 		}

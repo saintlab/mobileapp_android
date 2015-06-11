@@ -22,6 +22,11 @@ public abstract class BarEntranceData implements EntranceData {
 		return new AutoParcel_BarEntranceData(response.internalTableId(), response.code());
 	}
 
+	@Override
+	public int getType() {
+		return TYPE_BAR;
+	}
+
 	@Nullable
 	public abstract String orderNumber();
 

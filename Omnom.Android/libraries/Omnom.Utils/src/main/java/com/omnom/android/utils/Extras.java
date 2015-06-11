@@ -6,10 +6,14 @@ import com.omnom.android.utils.preferences.Preferences;
  * Created by Ch3D on 14.08.2014.
  */
 public interface Extras extends Preferences {
+	public static final String EXTRA_FLAGS = "com.omnom.android.flags";
+
 	public static final String EXTRA_BEACON = "com.omnom.android.linker.beacon";
 	public static final String EXTRA_RESTAURANT = "com.omnom.android.linker.restaurant";
 	public static final String EXTRA_RESTAURANTS = "com.omnom.android.linker.restaurants";
 	public static final String EXTRA_USERNAME = "com.omnom.android.linker.username";
+	public static final String EXTRA_USER_DATA = "com.omnom.android.userdata";
+	public static final String EXTRA_USER_AVATAR = "com.omnom.android.userdata.avatar";
 	public static final String EXTRA_PASSWORD = "com.omnom.android.linker.password";
 	public static final String EXTRA_ERROR_CODE = "com.omnom.android.linker.error.code";
 	public static final String EXTRA_SELECTED_RESTAURANT = "com.omnom.android.linker.selected_restaurant";
@@ -37,6 +41,8 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_CONFIRM_TYPE = "com.omnom.android.user.phone.confirm_type";
 	public static final String EXTRA_CARD_DATA = "com.omnom.android.card.data";
 	public static final String EXTRA_WISH_RESPONSE = "com.omnom.android.wish.response";
+	public static final String EXTRA_WISH_ID = "com.omnom.android.wish.id";
+	public static final String EXTRA_WISH_STATUS = "com.omnom.android.wish.status";
 	public static final String EXTRA_TYPE = "com.omnom.android.type";
 	public static final String EXTRA_ORDER = "com.omnom.android.order";
 	public static final String EXTRA_ORDER_TIME = "com.omnom.android.order.time";
@@ -57,6 +63,7 @@ public interface Extras extends Preferences {
 	public static final String EXTRA_RESTAURANT_MENU_CATEGORY = "com.omnom.android.restaurant.menu.category";
 	public static final String EXTRA_POSITION = "com.omnom.android.position";
 	public static final String EXTRA_TRANSLATION_CONTENT = "com.omnom.android.extra.translation.content";
+	public static final String EXTRA_TRANSITION_PARAMS = "com.omnom.android.extra.transition.params";
 	public static final String EXTRA_TRANSLATION_TOP = "com.omnom.android.extra.translation.top";
 	public static final String EXTRA_TRANSLATION_BUTTON = "com.omnom.android.extra.translation.btn";
 	public static final String EXTRA_TITLE_SIZE = "com.omnom.android.extra.title.height";
@@ -80,9 +87,18 @@ public interface Extras extends Preferences {
 	public static final int EXTRA_LOADER_ANIMATION_FIXED = 2;
 
 	public static final int REQUEST_CODE_CHANGE_TABLE = 2000;
+	public static final int REQUEST_CODE_LOGIN = 3000;
+	public static final int REQUEST_CODE_LOGIN_CONFIRM = 3001;
 	public static final int RESULT_CODE_TABLE_CHANGED = 2001;
 	public static final int REQUEST_CODE_MENU_ITEM = 5001;
 	public static final int REQUEST_CODE_WISH_LIST = 5002;
 	public static final int REQUEST_CODE_MENU_SUBCATEGORY = 5003;
 	public static final int REQUEST_CODE_HANDLE_THREE_DS = 5004;
+	public static final int REQUEST_CODE_USER_PROFILE_EDIT = 6000;
+
+	public static final String ACTION_EVENT_PAYMENT = "com.saintlab.android.event.payment";
+	public static final String ACTION_EVENT_ORDER_CREATE = "com.saintlab.android.order.create";
+	public static final String ACTION_EVENT_ORDER_CLOSE = "com.saintlab.android.order.close";
+	public static final String ACTION_EVENT_ORDER_UPDATE = "com.saintlab.android.order.update";
+
 }

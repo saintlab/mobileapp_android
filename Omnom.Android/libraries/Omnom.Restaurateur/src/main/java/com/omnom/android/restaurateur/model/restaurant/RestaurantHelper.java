@@ -4,10 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
 
-import com.omnom.android.entrance.BarEntranceData;
-import com.omnom.android.entrance.EntranceData;
-import com.omnom.android.entrance.TableEntranceData;
-import com.omnom.android.entrance.TakeawayEntranceData;
 import com.omnom.android.menu.api.observable.MenuObservableApi;
 import com.omnom.android.menu.model.MenuResponse;
 import com.omnom.android.restaurateur.R;
@@ -31,14 +27,11 @@ public class RestaurantHelper {
 	public static String getAddress(final Context context, final Restaurant restaurant) {
 		final Address address = restaurant.address();
 		if(address != null) {
-			final String floor = !TextUtils.isEmpty(address.getFloor())
-					? address.getFloor() + context.getString(R.string.floor_suffix)
-					: StringUtils.EMPTY_STRING;
-			return StringUtils.concat(context.getString(R.string.restaurant_address_delimiter),
-			                          address.getCity(),
-			                          address.getStreet(),
-			                          address.getBuilding(),
-			                          floor);
+			if(!TextUtils.isEmpty(address.getCity())) {
+				return address.getCity() + StringUtils.NEXT_STRING + getAddressSmall(context, restaurant);
+			} else {
+				return getAddressSmall(context, restaurant);
+			}
 		}
 		return StringUtils.EMPTY_STRING;
 	}
@@ -46,15 +39,18 @@ public class RestaurantHelper {
 	public static String getAddressSmall(final Context context, final Restaurant restaurant) {
 		final Address address = restaurant.address();
 		if(address != null) {
-			final String floor = !TextUtils.isEmpty(address.getFloor())
-					? StringUtils.WHITESPACE + address.getFloor()
-					+ StringUtils.NON_BREAKING_WHITESPACE +
-					context.getString(R.string.floor_suffix) : StringUtils.EMPTY_STRING;
 			return StringUtils.concat(context.getString(R.string.restaurant_address_delimiter),
 			                          address.getStreet() + StringUtils.WHITESPACE + address.getBuilding(),
-			                          floor);
+			                          getFloorString(context, address));
 		}
 		return StringUtils.EMPTY_STRING;
+	}
+
+	private static String getFloorString(final Context context, final Address address) {
+		return !TextUtils.isEmpty(address.getFloor())
+				? StringUtils.WHITESPACE + address.getFloor()
+				+ StringUtils.NON_BREAKING_WHITESPACE +
+				context.getString(R.string.floor_suffix) : StringUtils.EMPTY_STRING;
 	}
 
 	public static String getLogo(Restaurant restaurant) {
@@ -222,28 +218,26 @@ public class RestaurantHelper {
 	}
 
 	public static boolean hasBar(final Restaurant restaurant) {
-		return restaurant.settings() != null && restaurant.settings().hasBar();
+		return restaurant != null && restaurant.entranceModes() != null
+				&& restaurant.entranceModes().contains(Restaurant.ENTRANCE_MODE_BAR);
 	}
 
 	public static boolean hasTableOrder(final Restaurant restaurant) {
-		return restaurant.settings() != null && restaurant.settings().hasTableOrder();
+		return restaurant != null && restaurant.entranceModes() != null
+				&& restaurant.entranceModes().contains(Restaurant.ENTRANCE_MODE_ON_TABLE);
 	}
 
-	public static boolean hasPreOrder(final Restaurant restaurant) {
-		return restaurant.settings() != null && restaurant.settings().hasPreOrder();
+	public static boolean hasLunch(final Restaurant restaurant) {
+		return restaurant != null && restaurant.entranceModes() != null
+				&& restaurant.entranceModes().contains(Restaurant.ENTRANCE_MODE_LUNCH);
 	}
 
 	public static boolean hasTakeaway(final Restaurant restaurant) {
-		return false;
+		return restaurant != null && restaurant.entranceModes() != null
+				&& restaurant.entranceModes().contains(Restaurant.ENTRANCE_MODE_TAKEAWAY);
 	}
 
-	public static EntranceData getEntranceData(final Restaurant restaurant) {
-		if(isBar(restaurant)) {
-			return BarEntranceData.create();
-		}
-		if(isTakeAway(restaurant)) {
-			return TakeawayEntranceData.create();
-		}
-		return TableEntranceData.create();
+	public static boolean isBarTipsEnabled(final Restaurant restaurant) {
+		return restaurant != null && restaurant.settings() != null && restaurant.settings().hasBarTips();
 	}
 }

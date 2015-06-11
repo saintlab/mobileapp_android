@@ -23,6 +23,7 @@ import com.omnom.android.menu.model.UserOrder;
 import com.omnom.android.menu.model.UserOrderData;
 import com.omnom.android.utils.utils.AnimationUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -99,7 +100,7 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 
 	private Modifiers mModifiers;
 
-	private MenuModifiersAdapter adapter;
+	private MenuModifiersAdapter mModifiersAdapter;
 
 	private View mView;
 
@@ -110,6 +111,8 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 	private int mModifierHeight;
 
 	private int mPosition;
+
+	private List<String> mSelectedModifierIds = new ArrayList<String>();
 
 	public MenuItemAddFragment() {
 		// Required empty public constructor
@@ -195,8 +198,8 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 		mAnimationDuration = getResources().getInteger(R.integer.default_animation_duration_quick);
 		mModifierHeight = getResources().getDimensionPixelSize(R.dimen.menu_modifier_height);
 
-		adapter = new MenuModifiersAdapter(view.getContext(), mModifiers, dishModifiers);
-		mExpandableListView.setAdapter(adapter);
+		mModifiersAdapter = new MenuModifiersAdapter(view.getContext(), mModifiers, dishModifiers, mOrder.getSelectedModifiers(mItem));
+		mExpandableListView.setAdapter(mModifiersAdapter);
 		mExpandableListView.setDivider(null);
 		mExpandableListView.setDividerHeight(0);
 
@@ -209,7 +212,7 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 				}
 				mBusy = true;
 
-				final int childrenCount = adapter.getChildrenCount(groupPosition);
+				final int childrenCount = mModifiersAdapter.getChildrenCount(groupPosition);
 				final int itemsHeight = childrenCount * mModifierHeight;
 				if(mExpandableListView.isGroupExpanded(groupPosition)) {
 					AnimationUtils.scaleHeight(mExpandableListView, mExpandableListView.getHeight() - itemsHeight,
@@ -264,7 +267,7 @@ public class MenuItemAddFragment extends BaseFragment implements ExpandableListV
 	@OnClick(R.id.btn_apply)
 	public void onApply(View v) {
 		if(mOrder != null && mItem != null) {
-			mBus.post(new OrderUpdateEvent(mItem, mCount, mPosition));
+			mBus.post(new OrderUpdateEvent(mItem, mCount, mPosition, mModifiersAdapter.getSelectedIds()));
 		}
 		getFragmentManager().popBackStack();
 	}

@@ -36,8 +36,6 @@ import com.squareup.otto.Subscribe;
 import javax.inject.Inject;
 
 import rx.Observable;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 public class ValidateActivityCamera extends ValidateActivity {
@@ -91,11 +89,7 @@ public class ValidateActivityCamera extends ValidateActivity {
 	@Inject
 	protected RestaurateurObservableApi api;
 
-	private Subscription mCheckQrSubscribtion;
-
 	private String mQrData;
-
-	private Subscription mValidateSubscribtion;
 
 	private int mOutAnimation;
 
@@ -132,13 +126,6 @@ public class ValidateActivityCamera extends ValidateActivity {
 		}
 
 		OmnomQRCaptureActivity.start(this, REQUEST_CODE_SCAN_QR);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		OmnomObservable.unsubscribe(mCheckQrSubscribtion);
-		OmnomObservable.unsubscribe(mValidateSubscribtion);
 	}
 
 	@Override
@@ -188,77 +175,74 @@ public class ValidateActivityCamera extends ValidateActivity {
 	}
 
 	private void findTable(final String tableData) {
-		final TableDataResponse[] table = new TableDataResponse[1];
-
-		mValidateSubscribtion = AppObservable.bindActivity(this, ValidationObservable.validateSmart(this, mIsDemo)
-		                                                                             .map(OmnomObservable.getValidationFunc(this,
-		                                                                                                                    getErrorHelper(),
-		                                                                                                                    mInternetErrorClickListener))
-		                                                                             .isEmpty())
-		                                     .subscribe(new Action1<Boolean>() {
-			                                     @Override
-			                                     public void call(Boolean hasNoErrors) {
-				                                     if(hasNoErrors) {
-					                                     loadTable(tableData);
-				                                     } else {
-					                                     reportMixPanel(null, OnTableMixpanelEvent.METHOD_QR, table[0]);
-					                                     startErrorTransition();
-					                                     final View viewById = findViewById(R.id.panel_bottom);
-					                                     if(viewById != null) {
-						                                     viewById.animate().translationY(200).start();
-					                                     }
-				                                     }
-			                                     }
-		                                     }, new Action1<Throwable>() {
-			                                     @Override
-			                                     public void call(Throwable throwable) {
-				                                     startErrorTransition();
-				                                     getErrorHelper().showInternetError(mInternetErrorClickListener);
-			                                     }
-		                                     });
+		subscribe(ValidationObservable.validateSmart(this, mIsDemo)
+		                              .map(OmnomObservable.getValidationFunc(this,
+		                                                                     getErrorHelper(),
+		                                                                     mInternetErrorClickListener))
+		                              .isEmpty(),
+		          new Action1<Boolean>() {
+			          @Override
+			          public void call(Boolean hasNoErrors) {
+				          if(hasNoErrors) {
+					          loadTable(tableData);
+				          } else {
+					          startErrorTransition();
+					          final View viewById = findViewById(R.id.panel_bottom);
+					          if(viewById != null) {
+						          viewById.animate().translationY(200).start();
+					          }
+				          }
+			          }
+		          }, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						startErrorTransition();
+						getErrorHelper().showInternetError(mInternetErrorClickListener);
+					}
+				});
 
 	}
 
 	@Override
 	protected void reportMixPanel(final String requestId, final String method, final TableDataResponse tableDataResponse) {
 		if(tableDataResponse != null) {
-			getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-			                          OnTableMixpanelEvent.create(requestId, getUserData(),
-			                                                      tableDataResponse.getRestaurantId(),
-			                                                      tableDataResponse.getId(), method));
+			track(MixPanelHelper.Project.OMNOM,
+			      OnTableMixpanelEvent.create(requestId, getUserData(),
+			                                  tableDataResponse.getRestaurantId(),
+			                                  tableDataResponse.getId(), method));
 		}
 	}
 
 	private void loadTable(final String data) {
 		final Observable<RestaurantResponse> restaurantObservable;
 		if(ACTION_LAUNCH_HASHCODE.equals(getIntent().getAction())) {
-			restaurantObservable = api.decode(new HashDecodeRequest(data), mPreloadBackgroundFunction);
+			restaurantObservable = api.decode(new HashDecodeRequest(data), mPreloadBgFunc);
 		} else {
-			restaurantObservable = api.decode(new QrDecodeRequest(data), mPreloadBackgroundFunction);
+			restaurantObservable = api.decode(new QrDecodeRequest(data), mPreloadBgFunc);
 		}
 
-		mCheckQrSubscribtion = AppObservable
-				.bindActivity(this, concatMenuObservable(restaurantObservable))
-				.subscribe(new Action1<Pair<RestaurantResponse, MenuResponse>>() {
-					@Override
-					public void call(final Pair<RestaurantResponse, MenuResponse> restaurantResponseMenuResponsePair) {
-						final RestaurantResponse decodeResponse = restaurantResponseMenuResponsePair.first;
-						if(decodeResponse.hasAuthError()) {
-							throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
-							                               new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
-							                                             decodeResponse.getError()));
-						}
-						if(!TextUtils.isEmpty(decodeResponse.getError())) {
-							getErrorHelper().showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
-						} else {
-							if(isExternalLaunch()) {
-								handleExternalLaunchResult(decodeResponse);
-							} else {
-								handleDecodeResponse(OnTableMixpanelEvent.METHOD_QR, decodeResponse);
-							}
-						}
-					}
-				}, onError);
+		subscribe(concatMenuObservable(restaurantObservable),
+		          new Action1<Pair<RestaurantResponse, MenuResponse>>() {
+			          @Override
+			          public void call(final Pair<RestaurantResponse, MenuResponse>
+					                           restaurantResponseMenuResponsePair) {
+				          final RestaurantResponse decodeResponse = restaurantResponseMenuResponsePair.first;
+				          if(decodeResponse.hasAuthError()) {
+					          throw new AuthServiceException(EXTRA_ERROR_WRONG_USERNAME | EXTRA_ERROR_WRONG_PASSWORD,
+					                                         new AuthError(EXTRA_ERROR_AUTHTOKEN_EXPIRED,
+					                                                       decodeResponse.getError()));
+				          }
+				          if(!TextUtils.isEmpty(decodeResponse.getError())) {
+					          getErrorHelper().showError(LoaderError.UNKNOWN_QR_CODE, mInternetErrorClickListener);
+				          } else {
+					          if(isExternalLaunch()) {
+						          handleExternalLaunchResult(decodeResponse);
+					          } else {
+						          handleDecodeResponse(OnTableMixpanelEvent.METHOD_QR, decodeResponse);
+					          }
+				          }
+			          }
+		          }, onError);
 	}
 
 	protected void handleExternalLaunchResult(final RestaurantResponse decodeResponse) {
@@ -271,8 +255,10 @@ public class ValidateActivityCamera extends ValidateActivity {
 			final TableDataResponse table = RestaurantHelper.getTable(restaurant);
 			if(table != null) {
 				reportMixPanel(decodeResponse.getRequestId(), method, table);
-				onDataLoaded(restaurant, RestaurantHelper.getTable(restaurant), RestaurantHelper.hasOrders(restaurant),
-				             decodeResponse.getRequestId());
+				onDataLoaded(restaurant,
+				             RestaurantHelper.getTable(restaurant),
+				             RestaurantHelper.hasOrders(restaurant) || RestaurantHelper.hasOnlyTable(restaurant),
+				             decodeResponse.getRequestId(), null);
 				// TODO: For debug purposes
 				//if(BuildConfig.DEBUG) {
 				//onDataLoaded(restaurant, restaurant.tables().get(0), true, decodeResponse.getRequestId());

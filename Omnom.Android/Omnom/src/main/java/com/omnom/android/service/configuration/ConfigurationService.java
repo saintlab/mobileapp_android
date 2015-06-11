@@ -6,6 +6,7 @@ import android.location.Location;
 import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
+import com.omnom.android.auth.request.UserLogLocationRequest;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
 import com.omnom.android.restaurateur.api.ConfigDataService;
@@ -32,24 +33,24 @@ public class ConfigurationService {
 
 	protected final AuthService authenticator;
 
-	protected final ConfigDataService mConfigDataService;
+	protected final ConfigDataService restaurantApi;
 
 	protected final Acquiring acquiring;
 
-	protected final LocationService locationService;
-
 	protected final String authToken;
+
+	protected LocationService locationService;
 
 	protected Context context;
 
 	public ConfigurationService(final Context context,
 	                            final AuthService authenticator,
-	                            final ConfigDataService configDataService,
+	                            final ConfigDataService configApi,
 	                            final Acquiring acquiring,
 	                            final String authToken) {
 		this.context = context;
 		this.authenticator = authenticator;
-		this.mConfigDataService = configDataService;
+		this.restaurantApi = configApi;
 		this.acquiring = acquiring;
 		this.authToken = authToken;
 		this.locationService = new LocationService(context);
@@ -76,7 +77,7 @@ public class ConfigurationService {
 	}
 
 	private Observable<Config> getConfigObservable() {
-		return mConfigDataService.getConfig().retry(RETRY_COUNT);
+		return restaurantApi.getConfig().retry(RETRY_COUNT);
 	}
 
 	/**
@@ -130,9 +131,7 @@ public class ConfigurationService {
 			return Observable.just(authResponse);
 		} else {
 			return authenticator.logLocation(
-					location.getLongitude(),
-					location.getLatitude(),
-					authToken)
+					new UserLogLocationRequest(location.getLongitude(), location.getLatitude(), authToken))
 			                    .onErrorReturn(new Func1<Throwable, AuthResponse>() {
 				                    @Override
 				                    public AuthResponse call(Throwable throwable) {
@@ -179,4 +178,8 @@ public class ConfigurationService {
 		                 });
 	}
 
+	public void onDestroy() {
+		locationService.onDestroy();
+		locationService = null;
+	}
 }

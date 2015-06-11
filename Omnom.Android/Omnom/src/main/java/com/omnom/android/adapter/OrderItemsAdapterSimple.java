@@ -45,7 +45,7 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 			mHasChanges = false;
 		}
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
-		ViewUtils.setVisible(holder.divider, position != getCount() - 1);
+		ViewUtils.setVisibleGone(holder.divider, position != getCount() - 1);
 		if(mIgnoreSelection || mCheckedStates.get(position - 1) || !mHasSelection) {
 			holder.txtTitle.setTextColor(mTextColorSelected);
 			holder.txtPrice.setTextColor(mTextColorSelected);
@@ -54,7 +54,7 @@ public class OrderItemsAdapterSimple extends OrderItemsAdapter {
 			holder.txtPrice.setTextColor(mTextColorDefault);
 		}
 		holder.txtTitle.setText(item.getTitle());
-		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPricePerItem()));
+		holder.txtPrice.setText(StringUtils.formatOrderItemPrice(item.getQuantity(), item.getPriceTotal()));
 	}
 
 	public void setIgnoreSelection(boolean ignoreSelection) {

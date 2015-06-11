@@ -9,4 +9,8 @@ public abstract class TableEntranceData implements EntranceData {
 		return new AutoParcel_TableEntranceData();
 	}
 
+	@Override
+	public int getType() {
+		return TYPE_TABLE;
+	}
 }

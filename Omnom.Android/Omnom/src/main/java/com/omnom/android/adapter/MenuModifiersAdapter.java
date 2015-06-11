@@ -18,6 +18,7 @@ import com.omnom.android.menu.model.Modifiers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -50,7 +51,9 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 			ButterKnife.inject(this, convertView);
 		}
 
-		public void bindChild(@Nullable final Modifier modifierGroup, @Nullable final Modifier modifierItem, boolean forceUncheck) {
+		public void bindChild(
+				@Nullable final Modifier modifierGroup,
+				@Nullable final Modifier modifierItem, boolean forceUncheck, final Boolean isSelected) {
 			if(modifierItem != null) {
 				txtTitle.setText(modifierItem.name());
 			}
@@ -59,6 +62,8 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 			cbSelected.setOnCheckedChangeListener(mListener);
 			if(forceUncheck) {
 				cbSelected.setChecked(false);
+			} else {
+				cbSelected.setChecked(isSelected);
 			}
 		}
 
@@ -89,11 +94,14 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 	@Nullable
 	private List<Modifier> mModifierList;
 
-	public MenuModifiersAdapter(Context context, Modifiers modifiers, List<Modifier> modifiersList) {
+	public MenuModifiersAdapter(Context context, Modifiers modifiers, List<Modifier> modifiersList, List<String> selectedIds) {
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
 		mModifiers = modifiers;
 		mModifierList = modifiersList;
+		for(final String selectedId : selectedIds) {
+			mSelection.put(selectedId, Boolean.TRUE);
+		}
 	}
 
 	@Override
@@ -198,7 +206,7 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 			holder.bindGroup(groupModifier);
 		} else {
 			final Modifier modifier = mModifiers.items().get(groupModifier.id());
-			holder.bindChild(modifier, modifier, false);
+			holder.bindChild(modifier, modifier, false, mSelection.get(modifier.id()));
 		}
 	}
 
@@ -222,7 +230,10 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 		final Modifier modifier = (Modifier) getChild(groupPosition, childPosition);
 		if(modifier != null && group != null) {
 			final boolean hasSelectionData = mSelection.get(modifier.id()) != null;
-			holder.bindChild(group, modifier, !hasSelectionData || (hasSelectionData && !mSelection.get(modifier.id())));
+			holder.bindChild(group,
+			                 modifier,
+			                 !hasSelectionData || (hasSelectionData && !mSelection.get(modifier.id())),
+			                 mSelection.get(modifier.id()));
 			holder.alpha(1, mContext.getResources().getInteger(R.integer.default_animation_duration_quick));
 		}
 	}
@@ -248,5 +259,15 @@ public class MenuModifiersAdapter extends BaseExpandableListAdapter implements C
 			}
 		}
 		notifyDataSetChanged();
+	}
+
+	public List<String> getSelectedIds() {
+		ArrayList<String> result = new ArrayList<String>();
+		for(final Map.Entry<String, Boolean> entry : mSelection.entrySet()) {
+			if(entry.getValue()) {
+				result.add(entry.getKey());
+			}
+		}
+		return result;
 	}
 }

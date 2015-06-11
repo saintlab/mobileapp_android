@@ -2,6 +2,8 @@ package com.omnom.android.utils.utils;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.drawable.GradientDrawable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -13,7 +15,8 @@ import java.util.List;
 import butterknife.ButterKnife;
 
 import static com.omnom.android.utils.utils.AnimationUtils.animateAlpha;
-import static com.omnom.android.utils.utils.AnimationUtils.animateAlpha2;
+import static com.omnom.android.utils.utils.AnimationUtils.animateAlphaGone;
+import static com.omnom.android.utils.utils.AnimationUtils.animateAlphaSkipTag;
 
 /**
  * Created by Ch3D on 29.07.2014.
@@ -44,7 +47,14 @@ public class ViewUtils {
 	public static final ButterKnife.Setter<View, Boolean> VISIBLITY_ALPHA2 = new ButterKnife.Setter<View, Boolean>() {
 		@Override
 		public void set(View view, Boolean value, int index) {
-			animateAlpha2(view, value);
+			animateAlphaSkipTag(view, value);
+		}
+	};
+
+	public static final ButterKnife.Setter<View, Boolean> VISIBLITY_ALPHA3 = new ButterKnife.Setter<View, Boolean>() {
+		@Override
+		public void set(View view, Boolean value, int index) {
+			animateAlphaGone(view, value);
 		}
 	};
 
@@ -53,7 +63,7 @@ public class ViewUtils {
 		public void set(View view, Boolean value, int index) {
 			if(view != null) {
 				view.setAlpha(value ? 1 : 0);
-				setVisible(view, value);
+				setVisibleGone(view, value);
 			}
 		}
 	};
@@ -64,6 +74,8 @@ public class ViewUtils {
 			view.setEnabled(value);
 		}
 	};
+
+	private static final String TAG = ViewUtils.class.getSimpleName();
 
 	public static int dipToPixels(final Context context, final float dips) {
 		final float scale = context.getResources().getDisplayMetrics().density;
@@ -83,21 +95,21 @@ public class ViewUtils {
 		}
 	}
 
-	public static void setVisible(View view, boolean visible) {
+	public static void setVisibleGone(View view, boolean visible) {
 		if(view != null) {
 			view.setVisibility(visible ? View.VISIBLE : View.GONE);
 			view.setTag(visible);
 		}
 	}
 
-	public static void setVisible2(View view, boolean visible) {
+	public static void setVisibleInvisible(View view, boolean visible) {
 		if(view != null) {
 			view.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
 			view.setTag(visible);
 		}
 	}
 
-	public static void setVisible(List<View> buttonViews, boolean visible) {
+	public static void setVisibleGone(List<View> buttonViews, boolean visible) {
 		ButterKnife.apply(buttonViews, VISIBLITY, visible);
 	}
 
@@ -160,5 +172,19 @@ public class ViewUtils {
 				container.removeView(view);
 			}
 		}
+	}
+
+	public static void setDrawableColor(final GradientDrawable sd, final int color) {
+		sd.setColor(color);
+		sd.invalidateSelf();
+	}
+
+	public static void setBackgroundDrawableColor(final View view, final int color) {
+		final GradientDrawable drawable = (GradientDrawable) view.getBackground();
+		if(drawable == null) {
+			Log.d(TAG, "Unable to set drawable color for view with id = " + view.getId());
+			return;
+		}
+		setDrawableColor(drawable, color);
 	}
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="endpoint_auth">http://wicket.laaaab.com</string>
+    <string name="endpoint_auth">http://omnom.laaaab.com</string>
     <string name="endpoint_menu">https://omnom.omnom.menu</string>
     <string name="endpoint_restaurateur">http://omnom.laaaab.com</string>
 </resources>

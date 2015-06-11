@@ -21,9 +21,6 @@ import dagger.Provides;
  */
 @Module(complete = false, library = true)
 public class RestaurateurModule {
-
-	public static final String PLATFORM_ANDROID = "Android";
-
 	private AuthTokenProvider tokenProvider;
 
 	private int mEndpointResId;
@@ -38,7 +35,7 @@ public class RestaurateurModule {
 
 	@Provides
 	@Singleton
-	RestaurateurObservableApi providerLinkerApi() {
+	RestaurateurObservableApi providerRestaurantApi() {
 		return RestaurateurDataProvider.create(
 				mContext.getString(mEndpointResId),
 				new BaseRequestInterceptor(mContext) {

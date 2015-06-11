@@ -41,7 +41,6 @@ import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.UserHelper;
-import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -59,8 +58,6 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.functions.Action1;
 
 import static com.omnom.android.mixpanel.MixPanelHelper.Project.OMNOM;
@@ -132,8 +129,6 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 
 	private CardInfo mCard;
 
-	private Subscription mCardVerifySubscribtion;
-
 	private UserData mUser;
 
 	private AcquiringData mAcquiringData;
@@ -143,8 +138,6 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 	private boolean mScanUsed;
 
 	private boolean isFirstEdit = true;
-
-	private Subscription mCardRegisterSubscription;
 
 	private int mType;
 
@@ -264,19 +257,20 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 			editText.requestFocus();
 			editText.setSelection(amount.length() - getCurrencySuffix().length());
 		}
-		UserProfile mUserProfile = OmnomApplication.get(getActivity()).getUserProfile();
+		final OmnomApplication app = getApp();
+		UserProfile mUserProfile = app.getUserProfile();
 		mUser = mUserProfile.getUser();
-		mAcquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
-		mPanelTop.setTitleBig(R.string.card_binding);
-		mPanelTop.setButtonRightEnabled(false);
-		mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
-		mPanelTop.setButtonLeftDrawable(R.drawable.btn_previous, new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				setResult(RESULT_CANCELED);
-				finish();
-			}
-		});
+		mAcquiringData = app.getConfig().getAcquiringData();
+		mPanelTop.setTitleBig(R.string.card_binding)
+		         .setButtonRightEnabled(false)
+		         .setButtonRight(R.string.bind, mVerifyClickListener)
+		         .setButtonLeftDrawable(R.drawable.btn_previous, new View.OnClickListener() {
+			         @Override
+			         public void onClick(final View v) {
+				         setResult(RESULT_CANCELED);
+				         finish();
+			         }
+		         });
 		initAmount();
 		if(mType == TYPE_BIND_CONFIRM) {
 			registerCard();
@@ -392,43 +386,40 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 			return;
 		}
 		mPanelTop.showProgress(true);
-		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
-		UserData wicketUser = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		mCardRegisterSubscription = AppObservable.bindActivity(this,
-		                                                       mAcquiring.registerCard(acquiringData, wicketUser, mCard)
-		                                                                 .delaySubscription(1000, TimeUnit.MILLISECONDS)
-		                                                      )
-		                                         .subscribe(
-				                                         new Action1<CardRegisterPollingResponse>() {
-					                                         @Override
-					                                         public void call(CardRegisterPollingResponse response) {
-						                                         if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
-							                                         reportMixPanelSuccess(mCard);
-							                                         mCard.setCardId(response.getCardId());
-							                                         mPanelTop.showProgress(false);
-							                                         mPanelTop.setButtonRightEnabled(true);
-							                                         mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
-							                                         final EditText editAmount = mEditAmount.getEditText();
-							                                         editAmount.setEnabled(true);
-							                                         AndroidUtils.showKeyboard(editAmount);
-						                                         } else {
-							                                         if(response.getError() != null) {
-								                                         reportMixPanelFail(mCard, response.getError());
-								                                         processCardRegisterError(response.getError().getDescr());
-							                                         } else {
-								                                         processCardRegisterError(getString(
-										                                         R.string.something_went_wrong_try_again));
-							                                         }
-						                                         }
-						                                         busy(false);
-					                                         }
-				                                         }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-					                                         @Override
-					                                         public void onError(Throwable throwable) {
-						                                         Log.w(TAG, "registerCard", throwable);
-						                                         processCardRegisterError(getCardRegisterErrorMessage(throwable));
-					                                         }
-				                                         });
+		final OmnomApplication app = getApp();
+		final AcquiringData acquiringData = app.getConfig().getAcquiringData();
+		UserData wicketUser = app.getUserProfile().getUser();
+		subscribe(mAcquiring.registerCard(acquiringData, wicketUser, mCard).delaySubscription(1000, TimeUnit.MILLISECONDS),
+		          new Action1<CardRegisterPollingResponse>() {
+			          @Override
+			          public void call(CardRegisterPollingResponse response) {
+				          if(AcquiringPollingResponse.STATUS_OK.equals(response.getStatus())) {
+					          reportMixPanelSuccess(mCard);
+					          mCard.setCardId(response.getCardId());
+					          mPanelTop.showProgress(false);
+					          mPanelTop.setButtonRightEnabled(true);
+					          mPanelTop.setButtonRight(R.string.bind, mVerifyClickListener);
+					          final EditText editAmount = mEditAmount.getEditText();
+					          editAmount.setEnabled(true);
+					          AndroidUtils.showKeyboard(editAmount);
+				          } else {
+					          if(response.getError() != null) {
+						          reportMixPanelFail(mCard, response.getError());
+						          processCardRegisterError(response.getError().getDescr());
+					          } else {
+						          processCardRegisterError(getString(
+								          R.string.something_went_wrong_try_again));
+					          }
+				          }
+				          busy(false);
+			          }
+		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					@Override
+					public void onError(Throwable throwable) {
+						Log.w(TAG, "registerCard", throwable);
+						processCardRegisterError(getCardRegisterErrorMessage(throwable));
+					}
+				});
 	}
 
 	private String getCardRegisterErrorMessage(final Throwable throwable) {
@@ -459,13 +450,11 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 	}
 
 	private void reportMixPanelSuccess(final CardInfo cardInfo) {
-		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo,
-		                                                                                 mScanUsed));
+		track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed));
 	}
 
 	private void reportMixPanelFail(final CardInfo cardInfo, final AcquiringResponseError error) {
-		OmnomApplication.getMixPanelHelper(this).track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed,
-		                                                                                 error));
+		track(OMNOM, new CardAddedMixpanelEvent(UserHelper.getUserData(this), cardInfo, mScanUsed, error));
 	}
 
 	public void verifyCard() {
@@ -479,31 +468,31 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 		busy(true);
 		mPanelTop.showProgress(true);
 		double amount = getConfirmAmount();
-		mCardVerifySubscribtion = AppObservable.bindActivity(this, mAcquiring.verifyCard(mAcquiringData, mUser, mCard, amount))
-		                                       .subscribe(new Action1<AcquiringResponse>() {
-			                                       @Override
-			                                       public void call(AcquiringResponse response) {
-				                                       if(response.getError() != null) {
-					                                       onVerificationError(getString(R.string.wrong_checksum_short));
-				                                       } else {
-					                                       mPanelTop.showProgress(false);
-					                                       setResult(RESULT_OK);
-					                                       finish();
-				                                       }
-				                                       busy(false);
-			                                       }
-		                                       }, new Action1<Throwable>() {
-			                                       @Override
-			                                       public void call(Throwable throwable) {
-				                                       Log.w(TAG, "verifyCard", throwable);
-				                                       CharSequence errorMessage = getString(R.string.something_went_wrong_try_again);
-				                                       if(ErrorUtils.isConnectionError(throwable)) {
-					                                       errorMessage = getString(R.string.err_no_internet);
-				                                       }
-				                                       onVerificationError(errorMessage);
-				                                       busy(false);
-			                                       }
-		                                       });
+		subscribe(mAcquiring.verifyCard(mAcquiringData, mUser, mCard, amount),
+		          new Action1<AcquiringResponse>() {
+			          @Override
+			          public void call(AcquiringResponse response) {
+				          if(response.getError() != null) {
+					          onVerificationError(getString(R.string.wrong_checksum_short));
+				          } else {
+					          mPanelTop.showProgress(false);
+					          setResult(RESULT_OK);
+					          finish();
+				          }
+				          busy(false);
+			          }
+		          }, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						Log.w(TAG, "verifyCard", throwable);
+						CharSequence errorMessage = getString(R.string.something_went_wrong_try_again);
+						if(ErrorUtils.isConnectionError(throwable)) {
+							errorMessage = getString(R.string.err_no_internet);
+						}
+						onVerificationError(errorMessage);
+						busy(false);
+					}
+				});
 	}
 
 	private double getConfirmAmount() {
@@ -581,13 +570,6 @@ public class CardConfirmActivity extends BaseOmnomModeSupportActivity
 			                           .commit();
 		}
 		super.onBackPressed();
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		OmnomObservable.unsubscribe(mCardVerifySubscribtion);
-		OmnomObservable.unsubscribe(mCardRegisterSubscription);
 	}
 
 	@Override

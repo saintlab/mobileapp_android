@@ -14,6 +14,7 @@ import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
+import com.omnom.android.restaurateur.model.restaurant.FileUploadReponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
@@ -25,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 import altbeacon.beacon.Beacon;
+import retrofit.mime.TypedFile;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -32,79 +34,83 @@ import rx.functions.Func1;
  * Created by Ch3D on 11.08.2014.
  */
 public interface RestaurateurObservableApi {
-	public Observable<Restaurant> getRestaurant(String restaurantId);
+	Observable<Restaurant> getRestaurant(String restaurantId);
 
 	Observable<Restaurant> getRestaurant(String restaurantId, Func1<Restaurant, Restaurant> funcMap);
 
-	public Observable<RestaurantsResponse> getRestaurants();
+	Observable<RestaurantsResponse> getRestaurants();
 
-	public Observable<RestaurantsResponse> getRestaurants(double latitude, double longitude);
+	Observable<RestaurantsResponse> getRestaurants(double latitude, double longitude);
 
-	public Observable<RestaurantsResponse> getRestaurantsAll();
+	Observable<RestaurantsResponse> getRestaurantsAll();
 
-	public Observable<RestaurantsResponse> getRestaurantsAll(double latitude, double longitude);
+	Observable<RestaurantsResponse> getRestaurantsAll(double latitude, double longitude);
 
-	public Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
+	Observable<BeaconDataResponse> buildBeacon(String restaurantId, int tableNumber, String uuid);
 
-	public Observable<RestaurantResponse> decode(BeaconDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
+	Observable<RestaurantResponse> decode(BeaconDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
 
-	public Observable<RestaurantResponse> decode(QrDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
+	Observable<RestaurantResponse> decode(QrDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
 
-	public Observable<RestaurantResponse> decode(HashDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
+	Observable<RestaurantResponse> decode(HashDecodeRequest request, Func1<RestaurantResponse, RestaurantResponse> funcMap);
 
-	public Observable<TableDataResponse> bind(String restaurantId,
+	Observable<TableDataResponse> bind(String restaurantId,
+	                                   int tableNumber,
+	                                   String qrData,
+	                                   Beacon beacon,
+	                                   Beacon oldBeacon);
+
+	Observable<TableDataResponse> bind(String id,
+	                                   int tableNumber,
+	                                   String qrData,
+	                                   BeaconDataResponse beaconData,
+	                                   Beacon beacon);
+
+	Observable<BeaconDataResponse> bindBeacon(String restaurantId,
 	                                          int tableNumber,
-	                                          String qrData,
 	                                          Beacon beacon,
 	                                          Beacon oldBeacon);
 
-	public Observable<TableDataResponse> bind(String id,
+	Observable<BeaconDataResponse> bindBeacon(String restaurantId,
 	                                          int tableNumber,
-	                                          String qrData,
 	                                          BeaconDataResponse beaconData,
 	                                          Beacon beacon);
 
-	public Observable<BeaconDataResponse> bindBeacon(String restaurantId,
-	                                                 int tableNumber,
-	                                                 Beacon beacon,
-	                                                 Beacon oldBeacon);
+	Observable<TableDataResponse> findBeacon(Beacon beacon);
 
-	public Observable<BeaconDataResponse> bindBeacon(String restaurantId,
-	                                                 int tableNumber,
-	                                                 BeaconDataResponse beaconData,
-	                                                 Beacon oldBeacon);
+	Observable<List<DemoTableData>> getDemoTable();
 
-	public Observable<TableDataResponse> findBeacon(Beacon beacon);
+	Observable<Restaurant> setRssiThreshold(String restaurantId, int rssi);
 
-	public Observable<List<DemoTableData>> getDemoTable();
+	Observable<TableDataResponse> checkQrCode(String qrData);
 
-	public Observable<Restaurant> setRssiThreshold(String restaurantId, int rssi);
+	Observable<TableDataResponse> bindQrCode(String restaurantId, int tableNumber, String qrData);
 
-	public Observable<TableDataResponse> checkQrCode(String qrData);
+	Observable<CardsResponse> getCards();
 
-	public Observable<TableDataResponse> bindQrCode(String restaurantId, int tableNumber, String qrData);
+	Observable<CardDeleteResponse> deleteCard(int cardId);
 
-	public Observable<CardsResponse> getCards();
+	Observable<WaiterCallResponse> waiterCall(String restaurantId, String tableId);
 
-	public Observable<CardDeleteResponse> deleteCard(int cardId);
+	Observable<WaiterCallResponse> waiterCallStop(String restaurantId, String tableId);
 
-	public Observable<WaiterCallResponse> waiterCall(String restaurantId, String tableId);
+	Observable<Restaurant> getMenu(String restaurantId);
 
-	public Observable<WaiterCallResponse> waiterCallStop(String restaurantId, String tableId);
+	Observable<OrdersResponse> getOrders(String restaurantId, String tableId);
 
-	public Observable<Restaurant> getMenu(String restaurantId);
+	Observable<Collection<OrderItem>> getRecommendations(String restaurantId);
 
-	public Observable<OrdersResponse> getOrders(String restaurantId, String tableId);
+	Observable<ResponseBase> newGuest(String restaurantId, String tableId);
 
-	public Observable<Collection<OrderItem>> getRecommendations(String restaurantId);
+	Observable<BillResponse> bill(BillRequest request);
 
-	public Observable<ResponseBase> newGuest(String restaurantId, String tableId);
+	Observable<Restaurant> link(long orderId, double amount, double tip);
 
-	public Observable<BillResponse> bill(BillRequest request);
+	Observable<SupportInfoResponse> getSupportInfo();
 
-	public Observable<Restaurant> link(long orderId, double amount, double tip);
+	Observable<WishResponse> wishes(String restId, WishRequest request);
 
-	public Observable<SupportInfoResponse> getSupportInfo();
+	Observable<WishResponse> getWish(String wishId);
 
-	public Observable<WishResponse> wishes(String restId, WishRequest request);
+	Observable<FileUploadReponse> updateAvatar(TypedFile image);
 }

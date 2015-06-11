@@ -202,8 +202,8 @@ public class DeliveryDetailsFragment extends BaseFragment {
 
 	private ArrayList<DeliveryAddressData> getMockAddressData() {
 		final ArrayList<DeliveryAddressData> data = new ArrayList<DeliveryAddressData>();
-		data.add(DeliveryAddressData.create("Банк Интеза", "Жопа жопенная, 2"));
-		data.add(DeliveryAddressData.create("Банк Рога Илоны", "Жопа жопенная, ff"));
+		data.add(DeliveryAddressData.create("Банк Интеза", "Адрес-адрес, 2"));
+		data.add(DeliveryAddressData.create("Банк Рога Илоны", "Адрес-адрес, ff"));
 		return data;
 	}
 

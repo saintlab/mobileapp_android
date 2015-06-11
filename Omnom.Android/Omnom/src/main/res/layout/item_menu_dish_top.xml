@@ -57,4 +57,10 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:background="@color/divider_light" />
 
+    <View
+        android:id="@+id/delimiter_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/menu_header" />
+
 </LinearLayout>

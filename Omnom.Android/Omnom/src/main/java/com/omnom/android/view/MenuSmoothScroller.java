@@ -25,8 +25,11 @@ public class MenuSmoothScroller extends LinearSmoothScroller {
 
 	private final int mMode;
 
+	private final Context mContext;
+
 	public MenuSmoothScroller(final Context context, LinearLayoutManager layoutManager, int mode) {
 		super(context);
+		mContext = context;
 		mLayoutManager = layoutManager;
 		mMode = mode;
 	}
@@ -37,11 +40,21 @@ public class MenuSmoothScroller extends LinearSmoothScroller {
 	}
 
 	@Override
+	protected int calculateTimeForScrolling(final int dx) {
+		return mContext.getResources().getInteger(R.integer.default_animation_duration_short);
+	}
+
+	@Override
+	protected int calculateTimeForDeceleration(final int dx) {
+		return mContext.getResources().getInteger(R.integer.default_animation_duration_short);
+	}
+
+	@Override
 	public int calculateDyToMakeVisible(final View view, final int snapPreference) {
-		if (mMode == MODE_DEFAULT) {
+		if(mMode == MODE_DEFAULT) {
 			return super.calculateDyToMakeVisible(view, snapPreference);
 		}
-		if (mMode == MODE_TOP) {
+		if(mMode == MODE_TOP) {
 			final RecyclerView.LayoutManager layoutManager = getLayoutManager();
 			return !layoutManager.canScrollVertically() ? 0 :
 					-view.getTop() + view.getResources().getDimensionPixelSize(R.dimen.view_size_default);

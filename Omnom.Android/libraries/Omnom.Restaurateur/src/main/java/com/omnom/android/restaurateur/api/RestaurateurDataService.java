@@ -20,6 +20,7 @@ import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
+import com.omnom.android.restaurateur.model.restaurant.FileUploadReponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
@@ -35,10 +36,13 @@ import java.util.List;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
+import retrofit.http.Multipart;
 import retrofit.http.POST;
 import retrofit.http.PUT;
+import retrofit.http.Part;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import retrofit.mime.TypedFile;
 import rx.Observable;
 
 /**
@@ -135,6 +139,9 @@ public interface RestaurateurDataService {
 	Observable<WishResponse> wishes(@Path(Protocol.FIELD_ID) String restaurantId,
 	                                @Body WishRequest request);
 
+	@GET("/wishes/{id}")
+	Observable<WishResponse> getWish(@Path(Protocol.FIELD_ID) String wishId);
+
 	@PUT("/restaurants/{id}")
 	Observable<Restaurant> setRssiThreshold(@Path(Protocol.FIELD_ID) String restaurantId,
 	                                        @Body RssiThresholdRequest request);
@@ -146,4 +153,8 @@ public interface RestaurateurDataService {
 
 	@GET("/support")
 	Observable<SupportInfoResponse> getSupportInfo();
+
+	@Multipart
+	@POST("/images/upload")
+	Observable<FileUploadReponse> updateAvatar(@Part("image") TypedFile image);
 }

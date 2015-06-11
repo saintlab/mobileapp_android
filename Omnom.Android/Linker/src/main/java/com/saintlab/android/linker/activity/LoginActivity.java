@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
+import com.omnom.android.auth.request.UserRemindEmailRequest;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.utils.Extras;
@@ -200,7 +201,7 @@ public class LoginActivity extends BaseActivity {
 	@OnClick(R.id.btn_remind_password)
 	protected void doRemindPassword() {
 		if(validate(R.string.please_enter_username, mEditLogin)) {
-			authenticator.remindPassword(getTextValue(mEditLogin)).subscribe(new Action1<AuthResponse>() {
+			authenticator.remindPassword(new UserRemindEmailRequest(getTextValue(mEditLogin))).subscribe(new Action1<AuthResponse>() {
 				@Override
 				public void call(AuthResponse result) {
 					if(!result.hasError()) {

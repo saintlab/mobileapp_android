@@ -16,9 +16,13 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.activity.base.BaseOmnomActivity;
 import com.omnom.android.auth.AuthService;
+import com.omnom.android.auth.request.UserAuthorizeByPhoneRequest;
+import com.omnom.android.auth.request.UserConfirmPhoneRequest;
+import com.omnom.android.auth.request.UserPhoneConfirmResendRequest;
 import com.omnom.android.auth.response.AuthResponse;
+import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.utils.ObservableUtils;
-import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.view.HeaderView;
@@ -28,9 +32,8 @@ import javax.inject.Inject;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Observable;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
@@ -125,16 +128,18 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	private int type;
 
-	private Subscription mConfirmSubscription;
-
-	private Subscription mRequestCodeSubscription;
-
 	@Override
 	public void initUi() {
-		topPanel.setRigthButtonVisibile(false);
-		topPanel.setTitle(R.string.enter);
-		topPanel.setContentVisibility(false, true);
-		topPanel.setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 1);
+		topPanel.setRigthButtonVisibile(false)
+		        .setTitle(R.string.enter)
+		        .setContentVisibility(false, true)
+		        .setPaging(UserRegisterActivity.FAKE_PAGE_COUNT, 1)
+		        .setButtonLeftDrawable(R.drawable.btn_previous, new View.OnClickListener() {
+			        @Override
+			        public void onClick(final View v) {
+				        onBackPressed();
+			        }
+		        });
 
 		edit1.addTextChangedListener(new Watcher(edit1));
 		edit2.addTextChangedListener(new Watcher(edit2));
@@ -164,40 +169,53 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	private void doConfirm() {
 		btnRequestCode.setEnabled(false);
-		mConfirmSubscription = AppObservable.bindActivity(this, getAuthObservable()).subscribe(new Action1<AuthResponse>() {
-			@Override
-			public void call(final AuthResponse authResponse) {
-				if(!authResponse.hasError()) {
-					((OmnomApplication) getApplication()).cacheAuthToken(authResponse.getToken());
-					topPanel.setContentVisibility(false, false);
-					finish();
-					EnteringActivity.start(ConfirmPhoneActivity.this, R.anim.fake_fade_in_instant, R.anim.fake_fade_out_instant, 0, type);
-				} else {
-					edit1.setText(StringUtils.EMPTY_STRING);
-					edit2.setText(StringUtils.EMPTY_STRING);
-					edit3.setText(StringUtils.EMPTY_STRING);
-					edit4.setText(StringUtils.EMPTY_STRING);
-					edit1.requestFocus();
-					final Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
-					panelDigits.startAnimation(animation);
-				}
-				btnRequestCode.setEnabled(true);
-			}
-		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			@Override
-			public void onError(Throwable throwable) {
-				Log.e(TAG, "doConfirm ", throwable);
-				finish();
-			}
-		});
+		final OmnomApplication omnomApp = getApp();
+		final Observable<UserResponse> userResponseObservable = getAuthObservable().flatMap(
+				new Func1<AuthResponse, Observable<UserResponse>>() {
+					@Override
+					public Observable<UserResponse> call(final AuthResponse authResponse) {
+						if(!authResponse.hasError()) {
+							final String token = authResponse.getToken();
+							omnomApp.cacheAuthToken(token);
+							return authenticator.getUser(token);
+						} else {
+							edit1.setText(StringUtils.EMPTY_STRING);
+							edit2.setText(StringUtils.EMPTY_STRING);
+							edit3.setText(StringUtils.EMPTY_STRING);
+							edit4.setText(StringUtils.EMPTY_STRING);
+							edit1.requestFocus();
+							final Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
+							panelDigits.startAnimation(animation);
+						}
+						return Observable.empty();
+					}
+				});
+
+		subscribe(userResponseObservable,
+		          new Action1<UserResponse>() {
+			          @Override
+			          public void call(final UserResponse authResponse) {
+				          omnomApp.cacheUserProfile(new UserProfile(authResponse));
+				          topPanel.setContentVisibility(false, false);
+				          setResult(RESULT_OK);
+				          finish();
+				          btnRequestCode.setEnabled(true);
+			          }
+		          }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+					@Override
+					public void onError(Throwable throwable) {
+						Log.e(TAG, "doConfirm ", throwable);
+						finish();
+					}
+				});
 	}
 
 	private Observable<AuthResponse> getAuthObservable() {
 		Observable<AuthResponse> observable;
 		if(type == TYPE_REGISTER) {
-			observable = authenticator.confirm(phone, getCode());
+			observable = authenticator.confirm(new UserConfirmPhoneRequest(phone, getCode()));
 		} else if(type == TYPE_LOGIN) {
-			observable = authenticator.authorizePhone(phone, getCode());
+			observable = authenticator.authorizePhone(new UserAuthorizeByPhoneRequest(phone, getCode()));
 		} else {
 			throw new RuntimeException("Wrong confirm type = " + type);
 		}
@@ -213,13 +231,6 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		super.handleIntent(intent);
 		phone = intent.getStringExtra(EXTRA_PHONE);
 		type = intent.getIntExtra(EXTRA_CONFIRM_TYPE, TYPE_REGISTER);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		OmnomObservable.unsubscribe(mConfirmSubscription);
-		OmnomObservable.unsubscribe(mRequestCodeSubscription);
 	}
 
 	@Override
@@ -249,27 +260,28 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 
 	@OnClick(R.id.btn_request_code)
 	protected void onRequestCode() {
-		mRequestCodeSubscription =
-				AppObservable.bindActivity(this, getRequestCodeObservable()).subscribe(new Action1<AuthResponse>() {
-					@Override
-					public void call(AuthResponse authResponse) {
-						// handle result if necessary
-					}
-				}, new Action1<Throwable>() {
-					@Override
-					public void call(Throwable throwable) {
-						Log.w(TAG, "onRequestCode", throwable);
-					}
-				});
+		subscribe(getRequestCodeObservable(),
+		          new Action1<AuthResponse>() {
+			          @Override
+			          public void call(AuthResponse authResponse) {
+				          // handle result if necessary
+			          }
+		          },
+		          new Action1<Throwable>() {
+			          @Override
+			          public void call(Throwable throwable) {
+				          Log.w(TAG, "onRequestCode", throwable);
+			          }
+		          });
 		startRequestCodeTimeout();
 	}
 
 	private Observable<AuthResponse> getRequestCodeObservable() {
 		Observable<AuthResponse> observable;
 		if(type == TYPE_REGISTER) {
-			observable = authenticator.confirmResend(phone);
+			observable = authenticator.confirmResend(new UserPhoneConfirmResendRequest(phone));
 		} else if(type == TYPE_LOGIN) {
-			observable = authenticator.authorizePhone(phone, StringUtils.EMPTY_STRING);
+			observable = authenticator.authorizePhone(new UserAuthorizeByPhoneRequest(phone, StringUtils.EMPTY_STRING));
 		} else {
 			throw new RuntimeException("Wrong confirm type = " + type);
 		}
