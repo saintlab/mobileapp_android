@@ -8,7 +8,7 @@ import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.response.AuthResponse;
 import com.omnom.android.auth.response.UserResponse;
-import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
+import com.omnom.android.restaurateur.api.ConfigDataService;
 import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.service.location.LocationService;
 import com.omnom.android.utils.utils.LocationUtils;
@@ -26,15 +26,13 @@ import rx.schedulers.Schedulers;
  */
 public class ConfigurationService {
 
-	private static final int RETRY_COUNT = 5;
-
 	public static final int LOCATION_UPDATE_TIMEOUT = 2000;
 
-	protected Context context;
+	private static final int RETRY_COUNT = 5;
 
 	protected final AuthService authenticator;
 
-	protected final RestaurateurObservableApi restaurantApi;
+	protected final ConfigDataService mConfigDataService;
 
 	protected final Acquiring acquiring;
 
@@ -42,14 +40,16 @@ public class ConfigurationService {
 
 	protected final String authToken;
 
+	protected Context context;
+
 	public ConfigurationService(final Context context,
 	                            final AuthService authenticator,
-	                            final RestaurateurObservableApi restaurantApi,
+	                            final ConfigDataService configDataService,
 	                            final Acquiring acquiring,
 	                            final String authToken) {
 		this.context = context;
 		this.authenticator = authenticator;
-		this.restaurantApi = restaurantApi;
+		this.mConfigDataService = configDataService;
 		this.acquiring = acquiring;
 		this.authToken = authToken;
 		this.locationService = new LocationService(context);
@@ -62,20 +62,21 @@ public class ConfigurationService {
 	 */
 	public Observable<ConfigurationResponse> getConfigurationObservable() {
 		return Observable.zip(getConfigObservable(),
-							  getCombinedUserAndLocationObservables(),
-				new Func2<Config, ConfigurationResponse, ConfigurationResponse>() {
-					@Override
-					public ConfigurationResponse call(final Config config, final ConfigurationResponse configurationResponse) {
-						return new ConfigurationResponse(configurationResponse.getUserResponse(),
-														 config,
-														 configurationResponse.getLocation(),
-														 configurationResponse.getLogLocationResponse());
-					}
-				}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		                      getCombinedUserAndLocationObservables(),
+		                      new Func2<Config, ConfigurationResponse, ConfigurationResponse>() {
+			                      @Override
+			                      public ConfigurationResponse call(final Config config, final ConfigurationResponse
+					                      configurationResponse) {
+				                      return new ConfigurationResponse(configurationResponse.getUserResponse(),
+				                                                       config,
+				                                                       configurationResponse.getLocation(),
+				                                                       configurationResponse.getLogLocationResponse());
+			                      }
+		                      }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	private Observable<Config> getConfigObservable() {
-		return restaurantApi.getConfig().retry(RETRY_COUNT);
+		return mConfigDataService.getConfig().retry(RETRY_COUNT);
 	}
 
 	/**
@@ -85,17 +86,17 @@ public class ConfigurationService {
 	 */
 	private Observable<UserResponse> getUserObservable() {
 		return authenticator.getUser(authToken)
-				.retry(RETRY_COUNT)
-				.flatMap(new Func1<UserResponse, Observable<UserResponse>>() {
-					@Override
-					public Observable<UserResponse> call(final UserResponse userResponse) {
-						if (userResponse.hasError()) {
-							throw new IllegalStateException("User is required");
-						}
-						userResponse.setResponseTime(System.currentTimeMillis());
-						return Observable.just(userResponse);
-					}
-				});
+		                    .retry(RETRY_COUNT)
+		                    .flatMap(new Func1<UserResponse, Observable<UserResponse>>() {
+			                    @Override
+			                    public Observable<UserResponse> call(final UserResponse userResponse) {
+				                    if(userResponse.hasError()) {
+					                    throw new IllegalStateException("User is required");
+				                    }
+				                    userResponse.setResponseTime(System.currentTimeMillis());
+				                    return Observable.just(userResponse);
+			                    }
+		                    });
 	}
 
 	/**
@@ -105,15 +106,15 @@ public class ConfigurationService {
 	 */
 	private Observable<Location> getLocationObservable() {
 		return locationService.getLocation()
-				.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
-				.timeout(LOCATION_UPDATE_TIMEOUT, TimeUnit.MILLISECONDS,
-						 Observable.just(LocationUtils.getLastKnownLocation(context)))
-				.onErrorReturn(new Func1<Throwable, Location>() {
-					@Override
-					public Location call(Throwable throwable) {
-						return LocationUtils.getLastKnownLocation(context);
-					}
-				});
+		                      .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+		                      .timeout(LOCATION_UPDATE_TIMEOUT, TimeUnit.MILLISECONDS,
+		                               Observable.just(LocationUtils.getLastKnownLocation(context)))
+		                      .onErrorReturn(new Func1<Throwable, Location>() {
+			                      @Override
+			                      public Location call(Throwable throwable) {
+				                      return LocationUtils.getLastKnownLocation(context);
+			                      }
+		                      });
 	}
 
 	/**
@@ -123,7 +124,7 @@ public class ConfigurationService {
 	 * @return observable of location log result
 	 */
 	private Observable<AuthResponse> getLogLocationObservable(final Location location) {
-		if (location == null) {
+		if(location == null) {
 			AuthResponse authResponse = new AuthResponse();
 			authResponse.setStatus(AuthResponse.STATUS_ERROR);
 			return Observable.just(authResponse);
@@ -132,16 +133,16 @@ public class ConfigurationService {
 					location.getLongitude(),
 					location.getLatitude(),
 					authToken)
-					.onErrorReturn(new Func1<Throwable, AuthResponse>() {
-						@Override
-						public AuthResponse call(Throwable throwable) {
-							final AuthError authError = new AuthError(0, throwable.getMessage());
-							final AuthResponse authResponse = new AuthResponse();
-							authResponse.setStatus(AuthResponse.STATUS_ERROR);
-							authResponse.setError(authError);
-							return authResponse;
-						}
-					});
+			                    .onErrorReturn(new Func1<Throwable, AuthResponse>() {
+				                    @Override
+				                    public AuthResponse call(Throwable throwable) {
+					                    final AuthError authError = new AuthError(0, throwable.getMessage());
+					                    final AuthResponse authResponse = new AuthResponse();
+					                    authResponse.setStatus(AuthResponse.STATUS_ERROR);
+					                    authResponse.setError(authError);
+					                    return authResponse;
+				                    }
+			                    });
 		}
 	}
 
@@ -153,29 +154,29 @@ public class ConfigurationService {
 	 */
 	private Observable<ConfigurationResponse> getCombinedUserAndLocationObservables() {
 		return Observable.zip(getUserObservable(),
-							  getLocationObservable(),
-				new Func2<UserResponse, Location, ConfigurationResponse>() {
-					@Override
-					public ConfigurationResponse call(UserResponse userResponse, Location location) {
-						return new ConfigurationResponse(userResponse, null, location, null);
-					}
-				})
-				.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-				.flatMap(new Func1<ConfigurationResponse, Observable<? extends ConfigurationResponse>>() {
-					@Override
-					public Observable<? extends ConfigurationResponse> call(final ConfigurationResponse configurationResponse) {
-						return getLogLocationObservable(configurationResponse.getLocation())
-								.map(new Func1<AuthResponse, ConfigurationResponse>() {
-									@Override
-									public ConfigurationResponse call(final AuthResponse authResponse) {
-										return new ConfigurationResponse(configurationResponse.getUserResponse(),
-																		 null,
-																		 configurationResponse.getLocation(),
-																		 authResponse);
-									}
-								});
-					}
-				});
+		                      getLocationObservable(),
+		                      new Func2<UserResponse, Location, ConfigurationResponse>() {
+			                      @Override
+			                      public ConfigurationResponse call(UserResponse userResponse, Location location) {
+				                      return new ConfigurationResponse(userResponse, null, location, null);
+			                      }
+		                      })
+		                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+		                 .flatMap(new Func1<ConfigurationResponse, Observable<? extends ConfigurationResponse>>() {
+			                 @Override
+			                 public Observable<? extends ConfigurationResponse> call(final ConfigurationResponse configurationResponse) {
+				                 return getLogLocationObservable(configurationResponse.getLocation())
+						                 .map(new Func1<AuthResponse, ConfigurationResponse>() {
+							                 @Override
+							                 public ConfigurationResponse call(final AuthResponse authResponse) {
+								                 return new ConfigurationResponse(configurationResponse.getUserResponse(),
+								                                                  null,
+								                                                  configurationResponse.getLocation(),
+								                                                  authResponse);
+							                 }
+						                 });
+			                 }
+		                 });
 	}
 
 }

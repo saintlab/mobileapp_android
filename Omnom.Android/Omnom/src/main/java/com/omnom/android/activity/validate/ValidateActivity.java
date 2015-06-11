@@ -53,6 +53,7 @@ import com.omnom.android.notifier.api.observable.NotifierObservableApi;
 import com.omnom.android.preferences.PreferenceHelper;
 import com.omnom.android.protocol.Protocol;
 import com.omnom.android.push.PushNotificationManager;
+import com.omnom.android.restaurateur.api.ConfigDataService;
 import com.omnom.android.restaurateur.api.observable.RestaurateurObservableApi;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.WaiterCallResponse;
@@ -248,6 +249,9 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	protected RestaurateurObservableApi api;
 
 	@Inject
+	protected ConfigDataService configApi;
+
+	@Inject
 	protected Acquiring mAcquiring;
 
 	@Inject
@@ -402,7 +406,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mData = getIntent().getData();
 		mViewHelper = new ValidateViewHelper(this);
 		configurationService =
-				new ConfigurationService(this, authenticator, api, mAcquiring,
+				new ConfigurationService(this, authenticator, configApi, mAcquiring,
 				                         OmnomApplication.get(getActivity()).getAuthToken());
 	}
 
@@ -614,6 +618,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		                                 }, new Action1<Throwable>() {
 			                                 @Override
 			                                 public void call(Throwable throwable) {
+				                                 Log.e(TAG, "loadConfigs", throwable);
 				                                 if(throwable.getCause() instanceof UnknownHostException) {
 					                                 getErrorHelper().showInternetError(loadConfigsErrorListener);
 				                                 } else {
@@ -665,11 +670,13 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		getMixPanelHelper().addApi(OMNOM_ANDROID, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));
 	}
 
-	private void correctMixpanelTime(final UserResponse userResponse) {
+	private void correctMixpanelTime(@Nullable final UserResponse userResponse) {
+		if(userResponse == null) {
+			return;
+		}
 		final MixPanelHelper mixPanelHelper = getMixPanelHelper();
 		if(mixPanelHelper != null) {
-			final Long timeDiff = TimeUnit.SECONDS.toMillis(userResponse.getServerTime()) -
-					userResponse.getResponseTime();
+			final long timeDiff = TimeUnit.SECONDS.toMillis(userResponse.getServerTime()) - userResponse.getResponseTime();
 			mixPanelHelper.setTimeDiff(timeDiff);
 		}
 	}
@@ -920,7 +927,11 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	/**
 	 * Report about user sign up or login
 	 */
-	private void reportMixPanel(UserResponse userResponse) {
+	private void reportMixPanel(@Nullable final UserResponse userResponse) {
+		if(userResponse == null) {
+			return;
+		}
+
 		final UserData user = userResponse.getUser();
 
 		switch(mType) {

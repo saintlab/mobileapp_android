@@ -120,7 +120,7 @@ public class MixPanelHelper {
 	public void track(final Project project, final String event, final Object request) {
 		try {
 			JSONObject json;
-			if (request instanceof List) {
+			if(request instanceof List) {
 				json = new JSONObject();
 				json.put("list", new JSONArray(mGson.toJson(request)));
 			} else {
@@ -220,8 +220,8 @@ public class MixPanelHelper {
 		});
 	}
 
-	public void setTimeDiff(final Long timeDiff) {
-		this.timeDiff = timeDiff == null ? 0 : timeDiff;
+	public void setTimeDiff(final long timeDiff) {
+		this.timeDiff = timeDiff;
 	}
 
 	private void addTimestamp(final JSONObject json) {

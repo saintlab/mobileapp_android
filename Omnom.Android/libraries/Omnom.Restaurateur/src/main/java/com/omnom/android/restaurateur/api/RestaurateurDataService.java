@@ -13,7 +13,6 @@ import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
-import com.omnom.android.restaurateur.model.config.Config;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
@@ -36,7 +35,6 @@ import java.util.List;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
-import retrofit.http.Headers;
 import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
@@ -111,11 +109,6 @@ public interface RestaurateurDataService {
 	Observable<Restaurant> link(@Path(Protocol.FIELD_ORDER_ID) long orderId,
 	                            @Path(Protocol.FIELD_AMOUNT) double amount,
 	                            @Path(Protocol.FIELD_TIP) double tip);
-
-	// Token for getting configuration even if user is not specified
-	@Headers("X-Authentication-Token: uv5zoaRsh9uff1yiSh8Dub4oc0hum3")
-	@GET("/mobile/config")
-	Observable<Config> getConfig();
 
 	@POST("/qr/bind")
 	Observable<TableDataResponse> bindQrCode(@Body QRCodeBindRequest request);
