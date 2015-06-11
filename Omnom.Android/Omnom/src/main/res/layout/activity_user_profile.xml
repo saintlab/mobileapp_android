@@ -122,7 +122,9 @@
                 style="@style/Button.UserProfile.Data">
             </Button>
 
-            <include layout="@layout/delimiter_profile_vertical"/>
+            <include
+                android:id="@+id/delimiter_support"
+                layout="@layout/delimiter_profile_vertical"/>
 
             <Button
                 android:id="@+id/btn_facebook"

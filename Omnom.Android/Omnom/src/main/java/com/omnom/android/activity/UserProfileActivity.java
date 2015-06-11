@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -36,8 +37,8 @@ import com.omnom.android.utils.drawable.RoundedDrawable;
 import com.omnom.android.utils.observable.BaseErrorHandler;
 import com.omnom.android.utils.observable.OmnomObservable;
 import com.omnom.android.utils.utils.AndroidUtils;
-import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
+import com.omnom.android.utils.utils.DialogUtils;
 import com.omnom.android.utils.utils.StringUtils;
 import com.omnom.android.utils.utils.ViewUtils;
 
@@ -54,6 +55,7 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
+import static butterknife.ButterKnife.findById;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
@@ -113,6 +115,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 
 	private String mTableId;
 
+	@Nullable
 	private String supportPhone;
 
 	@Override
@@ -181,9 +184,14 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 						initUserData(userResponse.getUser());
 
 						final SupportInfoResponse supportInfoResponse = response.second;
-						if(!supportInfoResponse.hasErrors()) {
+						final boolean hasSupportNumber = !supportInfoResponse.hasErrors();
+						if(hasSupportNumber) {
 							supportPhone = supportInfoResponse.getPhone();
+						} else {
+							AnimationUtils.scaleHeight(findById(getActivity(), R.id.btn_support), 0);
 						}
+						AnimationUtils.animateAlpha(findById(getActivity(), R.id.btn_support), hasSupportNumber);
+						AnimationUtils.animateAlpha(findById(getActivity(), R.id.delimiter_support), hasSupportNumber);
 					}
 				}, new BaseErrorHandler(getActivity()) {
 					@Override
@@ -201,14 +209,22 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 	}
 
 	private Observable<Pair<UserResponse, SupportInfoResponse>> getProfileObservable(final String token) {
-		return Observable.zip(authenticator.getUser(token), api.getSupportInfo(),
-				new Func2<UserResponse, SupportInfoResponse, Pair<UserResponse, SupportInfoResponse>>() {
-					@Override
-					public Pair<UserResponse, SupportInfoResponse> call(final UserResponse userResponse,
-					                 final SupportInfoResponse supportInfoResponse) {
-						return new Pair<UserResponse, SupportInfoResponse>(userResponse, supportInfoResponse);
-					}
-				}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+		return Observable.zip(authenticator.getUser(token), api.getSupportInfo().onErrorReturn(
+				                      new Func1<Throwable, SupportInfoResponse>() {
+					                      @Override
+					                      public SupportInfoResponse call(final Throwable throwable) {
+						                      final SupportInfoResponse nullSupportResponse = new SupportInfoResponse();
+						                      nullSupportResponse.setError(getString(R.string.error_server_unavailable_please_try_again));
+						                      return nullSupportResponse;
+					                      }
+				                      }),
+		                      new Func2<UserResponse, SupportInfoResponse, Pair<UserResponse, SupportInfoResponse>>() {
+			                      @Override
+			                      public Pair<UserResponse, SupportInfoResponse> call(final UserResponse userResponse,
+			                                                                          final SupportInfoResponse supportInfoResponse) {
+				                      return new Pair<UserResponse, SupportInfoResponse>(userResponse, supportInfoResponse);
+			                      }
+		                      }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	private void initAppInfo() {
@@ -250,10 +266,10 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 			AndroidUtils.setBackground(mImgUser, null);
 			mImgUser.setPadding(0, 0, 0, 0);
 			OmnomApplication.getPicasso(this).load(url)
-								.placeholder(placeholderDrawable)
-			                    .resize(dimension, dimension).centerCrop()
-			                    .transform(RoundTransformation.create(dimension, 0))
-								.into(mImgUser);
+			                .placeholder(placeholderDrawable)
+			                .resize(dimension, dimension).centerCrop()
+			                .transform(RoundTransformation.create(dimension, 0))
+			                .into(mImgUser);
 		}
 	}
 
