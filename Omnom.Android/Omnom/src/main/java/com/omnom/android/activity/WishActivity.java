@@ -534,8 +534,7 @@ public class WishActivity extends BaseOmnomModeSupportActivity implements View.O
 			@Override
 			public void call(final WishResponse wishResponse) {
 				final PaymentDetails paymentDetails = new PaymentDetails(
-						amountToPay.doubleValue(),
-						amountTips.intValue() * 100,
+						amountToPay.doubleValue(), 0,
 						TipsWay.MANUAL_PERCENTAGES,
 						tips.getValue(),
 						SplitWay.WASNT_USED);
