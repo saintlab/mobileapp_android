@@ -29,14 +29,12 @@ import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
-import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.restaurateur.retrofit.RestaurateurRxSupport;
 import com.omnom.android.restaurateur.serializer.OrdersResponseSerializer;
 import com.omnom.android.utils.generation.AutoParcelAdapterFactory;
 
 import java.util.Collection;
-import java.util.List;
 
 import altbeacon.beacon.Beacon;
 import retrofit.RequestInterceptor;
@@ -82,7 +80,7 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	}
 
 	@Override
-	public Observable<List<DemoTableData>> getDemoTable() {
+	public Observable<RestaurantResponse> getDemoTable() {
 		return mDataService.getDemoTable().subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}

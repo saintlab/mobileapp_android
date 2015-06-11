@@ -50,7 +50,10 @@ public class ThanksDemoActivity extends ThanksActivity {
 			postDelayed(getResources().getInteger(R.integer.default_animation_duration_short), new Runnable() {
 				@Override
 				public void run() {
-					final UserData user = getApp().getUserProfile().getUser();
+					UserData user = getApp().getUserProfile().getUser();
+					if(user == UserData.NULL) {
+						user = UserData.createDemoUser(getString(R.string.demo_user_name));
+					}
 					final PaymentSocketEvent demoEvent = PaymentSocketEvent.createDemoEvent(user,
 					                                                                        mAmount,
 					                                                                        (int) AmountHelper.toDouble(mTips));

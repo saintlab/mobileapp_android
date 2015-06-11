@@ -26,12 +26,10 @@ import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
-import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.RestaurantTablesResponse;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
 import java.util.Collection;
-import java.util.List;
 
 import retrofit.http.Body;
 import retrofit.http.DELETE;
@@ -132,8 +130,8 @@ public interface RestaurateurDataService {
 	@POST("/ibeacons/find")
 	Observable<TableDataResponse> findBeacon(@Body BeaconFindRequest request);
 
-	@GET("/ibeacons/demo")
-	Observable<List<DemoTableData>> getDemoTable();
+	@POST("/v2/decode/demo")
+	Observable<RestaurantResponse> getDemoTable();
 
 	@POST("/restaurants/{id}/wishes")
 	Observable<WishResponse> wishes(@Path(Protocol.FIELD_ID) String restaurantId,

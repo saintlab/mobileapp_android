@@ -19,11 +19,9 @@ import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
-import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 
 import java.util.Collection;
-import java.util.List;
 
 import altbeacon.beacon.Beacon;
 import retrofit.mime.TypedFile;
@@ -78,7 +76,7 @@ public interface RestaurateurObservableApi {
 
 	Observable<TableDataResponse> findBeacon(Beacon beacon);
 
-	Observable<List<DemoTableData>> getDemoTable();
+	Observable<RestaurantResponse> getDemoTable();
 
 	Observable<Restaurant> setRssiThreshold(String restaurantId, int rssi);
 

@@ -230,4 +230,5 @@
     <string name="wish_result_item">%1$s x %2$s</string>
     <string name="unable_to_process_transaction">Ну удалость провести транзакцию. URL=</string>
     <string name="change">Изменить</string>
+    <string name="demo_user_name">Вы</string>
 </resources>

@@ -69,7 +69,6 @@ import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
-import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.service.configuration.ConfigurationResponse;
 import com.omnom.android.service.configuration.ConfigurationService;
@@ -986,30 +985,31 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		if(mIsDemo) {
 			if(mRestaurant == null || mTable == null) {
 				mViewHelper.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration));
-				api.getDemoTable().flatMap(new Func1<List<DemoTableData>, Observable<MenuResponse>>() {
+				api.getDemoTable().flatMap(new Func1<RestaurantResponse, Observable<MenuResponse>>() {
 					@Override
-					public Observable<MenuResponse> call(final List<DemoTableData> demoTableResponse) {
-						if(demoTableResponse.size() > 0) {
-							final DemoTableData demoTableData = demoTableResponse.get(0);
-							if(demoTableData != null && demoTableData.getRestaurant() != null) {
-								return menuApi.getMenu(demoTableData.getRestaurant().id());
+					public Observable<MenuResponse> call(final RestaurantResponse demoTableResponse) {
+						if(demoTableResponse.getRestaurants().size() > 0) {
+							final Restaurant demoRestaurant = demoTableResponse.getRestaurants().get(0);
+							final TableDataResponse demoTableData = demoRestaurant.tables().get(0);
+							if(demoTableData != null && demoTableData != null) {
+								return menuApi.getMenu(demoRestaurant.id());
 							}
 						}
 						return Observable.just(new MenuResponse());
 					}
-				}, new Func2<List<DemoTableData>, MenuResponse, Pair<List<DemoTableData>, MenuResponse>>() {
+				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
 					@Override
-					public Pair<List<DemoTableData>, MenuResponse> call(final List<DemoTableData> restaurant,
-					                                                    final MenuResponse menu) {
+					public Pair<RestaurantResponse, MenuResponse> call(final RestaurantResponse restaurant,
+					                                                   final MenuResponse menu) {
 						mMenu = menu.getMenu();
 						return Pair.create(restaurant, menu);
 					}
-				}).subscribe(new Action1<Pair<List<DemoTableData>, MenuResponse>>() {
+				}).subscribe(new Action1<Pair<RestaurantResponse, MenuResponse>>() {
 					@Override
-					public void call(final Pair<List<DemoTableData>, MenuResponse> listMenuResponsePair) {
-						final List<DemoTableData> demoTableResponse = listMenuResponsePair.first;
-						final DemoTableData data = demoTableResponse.get(0);
-						onDataLoaded(data.getRestaurant(), data.getTable(), mEntranceData);
+					public void call(final Pair<RestaurantResponse, MenuResponse> listMenuResponsePair) {
+						final RestaurantResponse demoRestaurantResponse = listMenuResponsePair.first;
+						final Restaurant demoRest = demoRestaurantResponse.getRestaurants().get(0);
+						onDataLoaded(demoRest, demoRest.tables().get(0), mEntranceData);
 					}
 				}, onError);
 				mFirstRun = false;

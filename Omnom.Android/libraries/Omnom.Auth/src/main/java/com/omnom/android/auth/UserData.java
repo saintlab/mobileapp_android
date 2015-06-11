@@ -29,6 +29,11 @@ public class UserData implements Parcelable {
 		}
 	};
 
+	public static UserData createDemoUser(String name) {
+		return new UserData(-1, name, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING,
+		                    StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
+	}
+
 	@Expose
 	private int id;
 

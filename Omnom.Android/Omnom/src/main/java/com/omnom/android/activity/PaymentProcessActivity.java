@@ -238,6 +238,11 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity {
 	}
 
 	private void processPayment(final double amount, final int tip) {
+		if(mIsDemo) {
+			final BillResponse billData = new BillResponse();
+			tryToPay(mCardInfo, billData, amount, tip);
+			return;
+		}
 		final BillRequest request = createBillRequest(amount);
 		subscribe(api.bill(request),
 		          new Action1<BillResponse>() {

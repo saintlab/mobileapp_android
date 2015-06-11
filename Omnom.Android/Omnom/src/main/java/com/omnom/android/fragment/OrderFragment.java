@@ -60,7 +60,6 @@ import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.UserHelper;
-import com.omnom.android.utils.activity.OmnomActivity;
 import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.AnimationUtils;
@@ -834,10 +833,11 @@ public class OrderFragment extends Fragment {
 	}
 
 	private boolean checkUser() {
-		final OmnomApplication app = OmnomApplication.get(getActivity());
-		if(TextUtils.isEmpty(app.getAuthToken())) {
-			LoginActivity.start((OmnomActivity) getActivity(),
-			                    AndroidUtils.getDevicePhoneNumber(getActivity(), R.string.phone_country_code),
+		final OrdersActivity activity = (OrdersActivity) getActivity();
+		final OmnomApplication app = OmnomApplication.get(activity.getBaseContext());
+		if(!activity.isDemo() && TextUtils.isEmpty(app.getAuthToken())) {
+			LoginActivity.start(activity,
+			                    AndroidUtils.getDevicePhoneNumber(activity, R.string.phone_country_code),
 			                    Extras.REQUEST_CODE_LOGIN);
 			return true;
 		}
