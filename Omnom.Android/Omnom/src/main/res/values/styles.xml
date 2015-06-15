@@ -35,6 +35,10 @@
         <item name="android:windowBackground">@drawable/bg_wood</item>
     </style>
 
+    <style name="Theme.CropImage" parent="Theme.White.Light">
+        <item name="android:buttonStyle">@style/Button.CropImage</item>
+        <item name="android:windowBackground">@null</item>
+    </style>
 
     <style name="Theme.Wood.Red" parent="AppTheme">
         <item name="android:windowBackground">@drawable/bg_wood_red</item>
@@ -140,7 +144,6 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:singleLine">true</item>
-        <item name="android:paddingTop">24dp</item>
         <item name="android:textAppearance">?android:textAppearanceLarge</item>
         <!--<item name="fontPath">fonts/Futura-LSF-Omnom-LE-Regular.otf</item>-->
     </style>
@@ -355,6 +358,10 @@
         <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
     </style>
 
+    <style name="Button.CropImage">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
     <style name="Button.Fragment.Bottom" parent="android:Widget.Holo.ImageButton" />
 
     <style name="Button.Fragment.Bottom.Close">
@@ -365,6 +372,23 @@
         <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:background">@drawable/ic_cross_black</item>
         <item name="android:contentDescription">@null</item>
+    </style>
+
+    <style name="Button.Pay">
+        <item name="android:background">@drawable/btn_pay</item>
+    </style>
+
+    <style name="Button.Pay.Green">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/pay_button_height</item>
+        <item name="android:minWidth">@dimen/pay_button_minimum_width</item>
+        <item name="android:layout_marginTop">@dimen/activity_horizontal_margin_medium</item>
+        <item name="android:layout_marginBottom">@dimen/pay_button_margin_bottom</item>
+        <item name="android:background">@drawable/btn_pay_green</item>
+        <item name="android:textColor">@drawable/text_color_selector_white</item>
+        <item name="android:textSize">@dimen/font_medium</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_alignParentBottom">true</item>
     </style>
 
 </resources>

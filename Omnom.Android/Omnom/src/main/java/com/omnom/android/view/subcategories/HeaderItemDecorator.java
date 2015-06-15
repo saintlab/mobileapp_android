@@ -181,7 +181,7 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 
 				if(item.getParent() instanceof CategoryData) {
 					final CategoryData cat = (CategoryData) item.getParent();
-					ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, true);
+					ViewUtils.setVisibleGone(mSubcategoriesView.mFakeStickyHeader, true);
 					drawSelectedBackground(mSubcategoriesView.mFakeStickyHeader);
 					((TextView) mSubcategoriesView.mFakeStickyHeader.findViewById(R.id.txt_title)).setText(cat.getName());
 				} else {
@@ -189,7 +189,6 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 				}
 			}
 		} else {
-			ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, false);
 			RecyclerView.ViewHolder header = getHeaderViewByItem(childViewHolder);
 			if(header == null) {
 				return;
@@ -197,12 +196,23 @@ public class HeaderItemDecorator extends RecyclerView.ItemDecoration {
 			mFakeHeader = childViewHolder;
 			final MultiLevelRecyclerAdapter.Data item = mMenuAdapter.getItemAt(header.getPosition());
 			if(item == null || item.isGroup()) {
+				ViewUtils.setVisibleGone(mSubcategoriesView.mFakeStickyHeader, false);
 				return;
 			}
+
+			ViewUtils.setVisibleGone(mSubcategoriesView.mFakeStickyHeader, true);
+			drawSelectedBackground(mSubcategoriesView.mFakeStickyHeader);
+			final CharSequence title = ((TextView) header.itemView.findViewById(R.id.txt_title)).getText();
+			((TextView) mSubcategoriesView.mFakeStickyHeader.findViewById(R.id.txt_title)).setText(title);
+			if(nextIsHeader) {
+				mSubcategoriesView.mFakeStickyHeader.setTranslationY(header.itemView.getTop());
+			} else {
+				mSubcategoriesView.mFakeStickyHeader.setTranslationY(0);
+			}
+
 			RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) header.itemView.getLayoutParams();
 			if(!lp.isItemRemoved() && !lp.isViewInvalid()) {
-				drawHeader(c, (int) ViewCompat.getTranslationY(header.itemView) - getDy(nextIsHeader, decoratedBottom),
-				           header.itemView);
+				drawHeader(c, (int) ViewCompat.getTranslationY(header.itemView) - getDy(nextIsHeader, decoratedBottom), header.itemView);
 			}
 		}
 	}

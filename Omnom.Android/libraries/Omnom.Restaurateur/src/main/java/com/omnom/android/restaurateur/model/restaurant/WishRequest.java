@@ -10,11 +10,32 @@ import java.util.List;
  */
 public class WishRequest {
 
+	public static final String TAG_TAKEAWAY = "take-away";
+
 	@Expose
 	private List<WishRequestItem> items;
 
 	@Expose
-	private int time;
+	private WishComments comments;
+
+	@Expose
+	private String tags;
+
+	public String getTags() {
+		return tags;
+	}
+
+	public void setTags(final String tags) {
+		this.tags = tags;
+	}
+
+	public WishComments getComments() {
+		return comments;
+	}
+
+	public void setComments(final WishComments comments) {
+		this.comments = comments;
+	}
 
 	public List<WishRequestItem> getItems() {
 		return items;
@@ -31,11 +52,4 @@ public class WishRequest {
 		items.add(item);
 	}
 
-	public int getTime() {
-		return time;
-	}
-
-	public void setTime(final int time) {
-		this.time = time;
-	}
 }

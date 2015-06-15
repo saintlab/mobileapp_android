@@ -173,4 +173,8 @@ public abstract class OmnomSocketBase implements OmnomSocket {
 		}
 		mBus.post(event);
 	}
+
+	public boolean isConnected() {
+		return mSocket != null && mSocket.connected();
+	}
 }

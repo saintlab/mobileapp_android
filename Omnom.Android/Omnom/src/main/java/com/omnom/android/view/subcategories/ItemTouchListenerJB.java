@@ -4,8 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
-import hugo.weaving.DebugLog;
-
 import static com.omnom.android.view.subcategories.SubcategoriesView.OnCollapsedTouchListener;
 
 /**
@@ -20,7 +18,6 @@ public class ItemTouchListenerJB extends ItemTouchListenerBase {
 	}
 
 	@Override
-	@DebugLog
 	public boolean onInterceptTouchEvent(final RecyclerView rv, final MotionEvent e) {
 		if(!mTouchEnabled) {
 			switch(e.getAction()) {

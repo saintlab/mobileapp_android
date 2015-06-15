@@ -7,6 +7,7 @@ import com.omnom.android.utils.generation.AutoGson;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,17 +62,25 @@ public abstract class UserOrder implements Parcelable {
 		return result;
 	}
 
-	public void addItem(final Item item, int count) {
+	public void addItem(final Item item, int count, final List<String> selectedModifiersIds) {
 		if(item == Item.NULL || item == null) {
 			// skip
 		}
-		itemsTable().put(item.id(), UserOrderData.create(count, item));
+		itemsTable().put(item.id(), UserOrderData.create(count, item, selectedModifiersIds));
 	}
 
 	public void updateData(final UserOrder resultOrder) {
 		itemsTable().clear();
 		for(UserOrderData orderData : resultOrder.getSelectedItems()) {
-			addItem(orderData.item(), orderData.amount());
+			addItem(orderData.item(), orderData.amount(), orderData.modifiers());
 		}
+	}
+
+	public List<String> getSelectedModifiers(final Item item) {
+		final UserOrderData userOrderData = itemsTable().get(item.id());
+		if(userOrderData != null && userOrderData.amount() > 0) {
+			return userOrderData.modifiers();
+		}
+		return Collections.EMPTY_LIST;
 	}
 }

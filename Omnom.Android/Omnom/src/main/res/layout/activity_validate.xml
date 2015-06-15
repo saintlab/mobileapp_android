@@ -140,6 +140,7 @@
                     android:textStyle="bold"
                     android:textIsSelectable="true"
                     android:textAppearance="?android:textAppearanceLarge"
+                    android:visibility="gone"
                     omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
                 <TextView

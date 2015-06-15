@@ -50,7 +50,7 @@ public class ValidateActivityShortcut extends ValidateActivityCamera {
 		TableDataResponse table = RestaurantHelper.getTable(restaurant);
 		reportMixPanel(requestId, OnTableMixpanelEvent.METHOD_HASH, table);
 		mMenu = menu;
-		onDataLoaded(restaurant, table, RestaurantHelper.hasOrders(restaurant), requestId);
+		onDataLoaded(restaurant, table, RestaurantHelper.hasOrders(restaurant), requestId, null);
 	}
 
 	@Override

@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -26,6 +25,8 @@ import com.omnom.android.acquiring.api.Acquiring;
 import com.omnom.android.acquiring.mailru.model.CardInfo;
 import com.omnom.android.acquiring.mailru.response.AcquiringResponseError;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.helper.PaymentDataTable;
+import com.omnom.android.activity.helper.PaymentDataWish;
 import com.omnom.android.adapter.CardsAdapter;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.entrance.EntranceData;
@@ -40,7 +41,6 @@ import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
-import com.omnom.android.socket.listener.PaymentEventListener;
 import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.observable.OmnomObservable;
@@ -62,7 +62,6 @@ import butterknife.OnClick;
 import butterknife.Optional;
 import rx.Observable;
 import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -170,10 +169,6 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 
 	private int mAccentColor;
 
-	private Subscription mCardsSubscription;
-
-	private Subscription mDeleteCardSubscription;
-
 	private PreferenceProvider mPreferences;
 
 	@Nullable
@@ -185,8 +180,6 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 
 	private String mTableId;
 
-	private PaymentEventListener mPaymentListener;
-
 	private boolean isPaymentRequest = true;
 
 	@Nullable
@@ -196,6 +189,8 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 
 	@Nullable
 	private Restaurant mRestaurant;
+
+	private Subscription mCardsSubscription;
 
 	@Override
 	public void finish() {
@@ -231,8 +226,8 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 
 	@Override
 	public void initUi() {
-		ViewUtils.setVisible(mDelimiter, true);
-		mPreferences = OmnomApplication.get(getActivity()).getPreferences();
+		ViewUtils.setVisibleGone(mDelimiter, true);
+		mPreferences = getPreferences();
 
 		mPanelTop.setButtonLeft(R.string.cancel, new View.OnClickListener() {
 			@Override
@@ -249,16 +244,12 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 			});
 		}
 
-		if(!TextUtils.isEmpty(mTableId)) {
-			mPaymentListener = new PaymentEventListener(this);
-		}
-
 		if(mDetails != null && mBtnPay != null) {
 			final String text = AmountHelper.format(mDetails.getAmount()) + getString(R.string.currency_suffix_ruble);
 			mBtnPay.setText(getString(R.string.pay_amount, text));
-			GradientDrawable sd = (GradientDrawable) mBtnPay.getBackground();
-			sd.setColor(getResources().getColor(R.color.btn_pay_green));
-			sd.invalidateSelf();
+
+			ViewUtils.setBackgroundDrawableColor(mBtnPay, getResources().getColor(R.color.btn_pay_green));
+
 			if(!mIsDemo) {
 				mBtnPay.setEnabled(false);
 			}
@@ -276,7 +267,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 						adapter.notifyDataSetChanged();
 					}
 				} else {
-					String cvv = OmnomApplication.get(activity).getConfig().getAcquiringData().getTestCvv();
+					String cvv = getApp().getConfig().getAcquiringData().getTestCvv();
 					final CardInfo cardInfo = new CardInfo.Builder()
 							.cardId(card.getExternalCardId())
 							.cvv(cvv)
@@ -314,64 +305,66 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	}
 
 	private void removeCard(final Card card) {
-		final AcquiringData acquiringData = OmnomApplication.get(getActivity()).getConfig().getAcquiringData();
-		final UserData userData = OmnomApplication.get(getActivity()).getUserProfile().getUser();
-		final String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
+		final OmnomApplication app = OmnomApplication.get(getActivity());
+		final AcquiringData acquiringData = app.getConfig().getAcquiringData();
+		final UserData userData = app.getUserProfile().getUser();
+		final String cvv = app.getConfig().getAcquiringData().getTestCvv();
 		final CardInfo cardInfo = new CardInfo.Builder()
 				.cardId(card.getExternalCardId())
 				.pan(card.getMaskedPan())
 				.mixpanelPan(card.getMaskedPanMixpanel())
 				.cvv(cvv)
 				.build();
-		mDeleteCardSubscription = AppObservable.bindActivity(this, mAcquiring.deleteCard(acquiringData, userData, cardInfo))
-		                                       .flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
-				                                       Observable<CardDeleteResponse>>() {
-			                                       @Override
-			                                       public Observable<CardDeleteResponse> call(com.omnom.android.acquiring.mailru
-					                                                                                  .response.CardDeleteResponse
-					                                                                                  cardDeleteResponse) {
-				                                       if(cardDeleteResponse.isSuccess()) {
-					                                       reportMixPanelSuccess(cardInfo);
-					                                       return api.deleteCard(card.getId());
-				                                       } else {
-					                                       if(cardDeleteResponse.getError() != null) {
-						                                       reportMixPanelFail(cardInfo, cardDeleteResponse.getError());
-					                                       }
-					                                       throw new AcquiringResponseException(cardDeleteResponse.getError());
-				                                       }
-			                                       }
-		                                       }).subscribe(new Action1<CardDeleteResponse>() {
-					@Override
-					public void call(CardDeleteResponse cardDeleteResponse) {
-						if(cardDeleteResponse.isSuccess()) {
-							onRemoveSuccess(card);
-						} else {
-							if(cardDeleteResponse.getError() != null) {
-								cardRemovalError();
-							} else if(cardDeleteResponse.hasErrors()) {
-								if(cardDeleteResponse.hasCommonError()) {
-									cardRemovalError(cardDeleteResponse.getErrors().getCommon());
-								}
-							}
+		subscribe(mAcquiring.deleteCard(acquiringData, userData, cardInfo)
+		                    .flatMap(new Func1<com.omnom.android.acquiring.mailru.response.CardDeleteResponse,
+				                    Observable<CardDeleteResponse>>() {
+			                    @Override
+			                    public Observable<CardDeleteResponse> call(com.omnom.android.acquiring.mailru
+					                                                               .response.CardDeleteResponse
+					                                                               cardDeleteResponse) {
+				                    if(cardDeleteResponse.isSuccess()) {
+					                    reportMixPanelSuccess(cardInfo);
+					                    return api.deleteCard(card.getId());
+				                    } else {
+					                    if(cardDeleteResponse.getError() != null) {
+						                    reportMixPanelFail(cardInfo, cardDeleteResponse.getError());
+					                    }
+					                    throw new AcquiringResponseException(cardDeleteResponse.getError());
+				                    }
+			                    }
+		                    }), new Action1<CardDeleteResponse>() {
+			@Override
+			public void call(CardDeleteResponse cardDeleteResponse) {
+				if(cardDeleteResponse.isSuccess()) {
+					onRemoveSuccess(card);
+				} else {
+					if(cardDeleteResponse.getError() != null) {
+						cardRemovalError();
+					} else if(cardDeleteResponse.hasErrors()) {
+						if(cardDeleteResponse.hasCommonError()) {
+							cardRemovalError(cardDeleteResponse.getErrors().getCommon());
 						}
 					}
-				}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-					@Override
-					public void onError(Throwable throwable) {
-						cardRemovalError();
-					}
-				});
+				}
+			}
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			@Override
+			public void onError(Throwable throwable) {
+				cardRemovalError();
+			}
+		});
 	}
 
 	private void reportMixPanelSuccess(final CardInfo cardInfo) {
-		getMixPanelHelper().track(OMNOM, new CardDeletedMixpanelEvent(getUserData(), cardInfo));
+		track(OMNOM, new CardDeletedMixpanelEvent(getUserData(), cardInfo));
 	}
 
 	private void reportMixPanelFail(final CardInfo cardInfo, final AcquiringResponseError error) {
-		getMixPanelHelper().track(OMNOM, new CardDeletedMixpanelEvent(getUserData(), cardInfo, error));
+		track(OMNOM, new CardDeletedMixpanelEvent(getUserData(), cardInfo, error));
 	}
 
 	private void onRemoveSuccess(final Card card) {
+		isPaymentRequest = false;
 		final CardsAdapter adapter = (CardsAdapter) mList.getAdapter();
 		adapter.remove(card);
 		updateCardsSelection(adapter, card);
@@ -403,8 +396,8 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	private void loadCards() {
 		OmnomObservable.unsubscribe(mCardsSubscription);
 
-		mPanelTop.showProgress(true);
-		mPanelTop.showButtonRight(false);
+		mPanelTop.showProgress(true)
+		         .showButtonRight(false);
 
 		final Drawable divider = mList.getDivider();
 		if(divider != null) {
@@ -414,32 +407,31 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 		if(mIsDemo) {
 			final List<DemoCard> demoCards = Arrays.asList(new DemoCard());
 			mList.setAdapter(new CardsAdapter(getActivity(), demoCards, true));
-			mPanelTop.showProgress(false);
-			mPanelTop.showButtonRight(true);
+			mPanelTop.showProgress(false)
+			         .showButtonRight(true);
 		} else {
 			mList.setAdapter(null);
-			mCardsSubscription = AppObservable.bindActivity(this, api.getCards().delaySubscription(1000, TimeUnit.MILLISECONDS))
-			                                  .subscribe(
-					                                  new Action1<CardsResponse>() {
-						                                  @Override
-						                                  public void call(final CardsResponse cards) {
-							                                  final List<Card> cardsList = cards.getCards();
-							                                  mList.setAdapter(new CardsAdapter(getActivity(), cardsList, false));
-							                                  boolean isSelected = selectCard((CardsAdapter) mList.getAdapter(),
-							                                                                  mPreferences.getCardId(getActivity()));
-							                                  if(mBtnPay != null) {
-								                                  mBtnPay.setEnabled(isSelected);
-							                                  }
-							                                  mPanelTop.showProgress(false);
-							                                  mPanelTop.showButtonRight(true);
-						                                  }
-					                                  }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-						                                  @Override
-						                                  public void onError(Throwable throwable) {
-							                                  mPanelTop.showProgress(false);
-							                                  mPanelTop.showButtonRight(true);
-						                                  }
-					                                  });
+			mCardsSubscription = subscribe(api.getCards().delaySubscription(1000, TimeUnit.MILLISECONDS),
+			                               new Action1<CardsResponse>() {
+				                               @Override
+				                               public void call(final CardsResponse cards) {
+					                               final CardsAdapter adapter = new CardsAdapter(getActivity(), cards.getCards(), false);
+					                               mList.setAdapter(adapter);
+					                               boolean isSelected = selectCard(adapter, mPreferences.getCardId(getActivity()));
+					                               if(mBtnPay != null) {
+						                               mBtnPay.setEnabled(isSelected);
+					                               }
+					                               mPanelTop.showProgress(false)
+					                                        .showButtonRight(true);
+				                               }
+			                               },
+			                               new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+				                               @Override
+				                               public void onError(Throwable throwable) {
+					                               mPanelTop.showProgress(false)
+					                                        .showButtonRight(true);
+				                               }
+			                               });
 		}
 	}
 
@@ -502,7 +494,7 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 		if(mList != null && mList.getAdapter() != null) {
 			final Card card = ((CardsAdapter) mList.getAdapter()).getSelectedCard();
 			if(card != null) {
-				String cvv = OmnomApplication.get(getActivity()).getConfig().getAcquiringData().getTestCvv();
+				String cvv = getApp().getConfig().getAcquiringData().getTestCvv();
 				final CardInfo cardInfo = new CardInfo.Builder()
 						.cardId(cardId)
 						.pan(card.getMaskedPan())
@@ -517,11 +509,24 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	private void pay(final CardInfo cardInfo) {
 		if(mDetails != null) {
 			if(mOrder != null) {
-				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mOrder, cardInfo, mIsDemo, mRestaurant,
-				                             mEntranceData);
+				final PaymentDataTable data = new PaymentDataTable.Builder().setOrder(mOrder)
+				                                                            .setCardInfo(cardInfo)
+				                                                            .setDetails(mDetails)
+				                                                            .setEntranceData(mEntranceData)
+				                                                            .setRestaurant(mRestaurant)
+				                                                            .build();
+
+				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, data, mIsDemo);
 			} else {
-				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, mDetails, mUserOrder, cardInfo, mWishResponse, mIsDemo,
-				                             mRestaurant, mEntranceData);
+				final PaymentDataWish data = new PaymentDataWish.Builder().setOrder(mUserOrder)
+				                                                          .setCardInfo(cardInfo)
+				                                                          .setDetails(mDetails)
+				                                                          .setEntranceData(mEntranceData)
+				                                                          .setRestaurant(mRestaurant)
+				                                                          .setWishResponse(mWishResponse)
+				                                                          .build();
+
+				PaymentProcessActivity.start(getActivity(), REQUEST_PAYMENT, data, mIsDemo);
 			}
 		}
 	}
@@ -550,16 +555,6 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 		}
 	}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		if(mPaymentListener != null) {
-			mPaymentListener.onPause();
-		}
-		OmnomObservable.unsubscribe(mCardsSubscription);
-		OmnomObservable.unsubscribe(mDeleteCardSubscription);
-	}
-
 	public void onAdd() {
 		int type = CardAddActivity.TYPE_BIND;
 		if(mDetails != null) {
@@ -570,19 +565,8 @@ public class CardsActivity extends BaseOmnomModeSupportActivity {
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		if(mPaymentListener != null) {
-			mPaymentListener.onPause();
-		}
-	}
-
-	@Override
 	protected void onResume() {
 		super.onResume();
 		loadCards();
-		if(mPaymentListener != null) {
-			mPaymentListener.initTableSocket(mTableId);
-		}
 	}
 }

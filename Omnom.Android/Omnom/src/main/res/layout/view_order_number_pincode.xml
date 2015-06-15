@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="@layout/activity_order_accepted">
+
+    <LinearLayout
+        android:id="@+id/order_number_continer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginRight="@dimen/activity_vertical_margin_small"
+            android:gravity="center_horizontal"
+            android:includeFontPadding="false"
+            android:text="@string/order_number"
+            android:textSize="@dimen/font_medium"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+        <TextView
+            android:id="@+id/txt_order_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="center_horizontal"
+            android:includeFontPadding="false"
+            android:paddingTop="@dimen/activity_vertical_margin_xsmall"
+            android:text="XXXX"
+            android:textSize="@dimen/font_xlarge"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/pin_code_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginRight="@dimen/activity_vertical_margin_small"
+            android:gravity="bottom"
+            android:includeFontPadding="false"
+            android:text="@string/pin_code"
+            android:textSize="@dimen/font_medium"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+        <TextView
+            android:id="@+id/txt_pin_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="center_horizontal"
+            android:includeFontPadding="false"
+            android:paddingTop="@dimen/activity_vertical_margin_xsmall"
+            android:text="XXXX"
+            android:textSize="@dimen/font_xlarge"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    </LinearLayout>
+</merge>

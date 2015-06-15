@@ -33,7 +33,7 @@ public class TakeawayOrderAcceptedActivity extends BaseOrderAcceptedActivity {
 	@Override
 	public void initUi() {
 		super.initUi();
-		ViewUtils.setVisible(txtOrderTime, true);
+		ViewUtils.setVisibleGone(txtOrderTime, true);
 		final TakeawayEntranceData takeawayEntranceData = (TakeawayEntranceData) mEntranceData;
 		txtOrderTime.setText(ORDER_TIME_FORMAT.format(takeawayEntranceData.orderTime()));
 		txtCheckOrder.setText(getString(R.string.order_will_be_waiting_for_you,

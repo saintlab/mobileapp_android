@@ -5,6 +5,10 @@ import android.content.Intent;
 
 import com.omnom.android.utils.preferences.PreferenceProvider;
 
+import rx.Observable;
+import rx.Subscription;
+import rx.functions.Action1;
+
 /**
  * Created by Ch3D on 31.07.2014.
  */
@@ -22,12 +26,16 @@ public interface OmnomActivity {
 
 	void start(Intent intent, boolean finish);
 
-	public Activity getActivity();
+	Activity getActivity();
 
-	public int getLayoutResource();
+	int getLayoutResource();
 
-	public void initUi();
+	void initUi();
 
-	public PreferenceProvider getPreferences();
+	PreferenceProvider getPreferences();
+
+	Subscription subscribe(final Observable observable, final Action1<? extends Object> onNext, final Action1<Throwable> onError);
+
+	void unsubscribe(final Subscription subscription);
 
 }

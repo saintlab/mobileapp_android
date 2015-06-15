@@ -37,6 +37,10 @@ public abstract class ItemTouchListenerBase implements RecyclerView.OnItemTouchL
 	}
 
 	protected void onActionUp(final MotionEvent e) {
+		if(mRect == null) {
+			// skip
+			return;
+		}
 		if(mRect.contains((int) e.getX(), (int) e.getY())) {
 			final View childViewUnder = mView.mListView.findChildViewUnder(e.getX(), e.getY());
 			mView.onGroupClick(childViewUnder, true);

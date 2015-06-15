@@ -98,7 +98,7 @@ public class AcquiringMailRu implements Acquiring {
 	}
 
 	@Override
-	public Observable<AcquiringPollingResponse> checkResult(final AcquiringResponse acquiringResponse) {
+	public Observable<AcquiringResponse> checkResult(final AcquiringResponse acquiringResponse) {
 		return PollingObservable.create(acquiringResponse).retry(new Func2<Integer, Throwable, Boolean>() {
 			@Override
 			public Boolean call(final Integer integer, final Throwable throwable) {
@@ -165,14 +165,14 @@ public class AcquiringMailRu implements Acquiring {
 
 	@Override
 	public Observable<AcquiringResponse> addCard(final AcquiringData acquiringData, final UserData user, final CardInfo cardInfo) {
-		final ExtraData extra = MailRuExtra.create(0, StringUtils.EMPTY_STRING, MailRuExtra.PAYMENT_TYPE_ORDER);
+		final ExtraData extra = MailRuExtra.create(0, StringUtils.EMPTY_STRING, MailRuExtra.PAYMENT_TYPE_CARD);
 		final OrderInfoMailRu order = OrderInfoMailRu.create(AMOUNT_ADD_CARD, StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
 		final PaymentInfo paymentInfo = PaymentInfoFactory.create(AcquiringType.MAIL_RU, user, cardInfo, extra, order);
 
 		return pay(acquiringData, paymentInfo)
-				.flatMap(new Func1<AcquiringResponse, Observable<AcquiringPollingResponse>>() {
+				.flatMap(new Func1<AcquiringResponse, Observable<AcquiringResponse>>() {
 					@Override
-					public Observable<AcquiringPollingResponse> call(final AcquiringResponse acquiringResponse) {
+					public Observable<AcquiringResponse> call(final AcquiringResponse acquiringResponse) {
 						return checkResult(acquiringResponse);
 					}
 				}).flatMap(new Func1<AcquiringPollingResponse, Observable<AcquiringResponse>>() {

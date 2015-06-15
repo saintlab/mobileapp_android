@@ -71,6 +71,6 @@ public class DeliveryDateAdapter extends DeliveryDataAdapterBase<String, Deliver
 			holder.mTxtTitle.setText(dayOfWeek);
 		}
 
-		ViewUtils.setVisible2(holder.mCheckedIndicator, isItemChecked(position));
+		ViewUtils.setVisibleInvisible(holder.mCheckedIndicator, isItemChecked(position));
 	}
 }

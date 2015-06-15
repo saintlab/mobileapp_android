@@ -1,0 +1,66 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:omnom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#aa000000"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin_small"
+        android:padding="8dp"
+        android:orientation="vertical"
+        android:animateLayoutChanges="true"
+        android:duplicateParentState="false"
+        android:gravity="center"
+        android:layout_gravity="bottom">
+
+        <TextView
+            android:id="@+id/txt_delete"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Удалить текущий снимок"
+            android:textColor="@color/error_red"
+            android:background="@android:color/white"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
+
+        <TextView
+            android:id="@+id/txt_photo"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Сделать снимок"
+            android:textColor="@color/light_blue"
+            android:background="@android:color/white"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
+
+        <TextView
+            android:id="@+id/txt_media"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Выбрать из библиотеки"
+            android:textColor="@color/light_blue"
+            android:background="@android:color/white"
+            omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -18,15 +18,16 @@ public class BillSplitPagerAdapter extends FragmentStatePagerAdapter {
 
 	public static final int PAGES_COUNT = 2;
 
-	private Order mOrder;
-
 	private final SparseBooleanArrayParcelable mStates;
+
+	private Order mOrder;
 
 	private int mGuestsCount;
 
-	private Fragment mCurrentFragment;
+	private Fragment[] mCurrentFragments = new Fragment[PAGES_COUNT];
 
-	public BillSplitPagerAdapter(final FragmentManager fm, final Order order, final SparseBooleanArrayParcelable states, final int guestsCount) {
+	public BillSplitPagerAdapter(final FragmentManager fm, final Order order, final SparseBooleanArrayParcelable states, final int
+			guestsCount) {
 		super(fm);
 		mOrder = order;
 		mStates = states;
@@ -44,20 +45,31 @@ public class BillSplitPagerAdapter extends FragmentStatePagerAdapter {
 		return super.getPageTitle(position);
 	}
 
-	public Fragment getCurrentFragment() {
-		return mCurrentFragment;
+	public Fragment getCurrentFragment(int pos) {
+		if(pos >= PAGES_COUNT) {
+			return null;
+		}
+		return mCurrentFragments[pos];
 	}
 
 	@Override
 	public void setPrimaryItem(final ViewGroup container, final int position, final Object object) {
-		if(getCurrentFragment() != object) {
-			if(mCurrentFragment != null && object instanceof SplitFragment && mCurrentFragment != object) {
+		if(getCurrentFragment(position) != object) {
+			if(mCurrentFragments[position] != null && object instanceof SplitFragment && mCurrentFragments[position] != object) {
 				SplitFragment sf = (SplitFragment) object;
 				sf.updateAmount();
 			}
-			mCurrentFragment = (Fragment) object;
+			mCurrentFragments[position] = (Fragment) object;
 		}
 		super.setPrimaryItem(container, position, object);
+	}
+
+	@Override
+	public void destroyItem(final ViewGroup container, final int position, final Object object) {
+		super.destroyItem(container, position, object);
+		if(position < PAGES_COUNT) {
+			mCurrentFragments[position] = null;
+		}
 	}
 
 	@Override

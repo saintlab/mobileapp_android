@@ -7,6 +7,8 @@ import com.google.gson.annotations.Expose;
  */
 public class SupportInfoResponse extends ResponseBase {
 
+	public static final SupportInfoResponse NULL = new SupportInfoResponse();
+
 	@Expose
 	private String phone;
 

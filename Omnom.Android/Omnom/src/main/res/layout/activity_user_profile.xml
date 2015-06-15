@@ -1,5 +1,4 @@
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:omnom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -9,80 +8,105 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
             android:baselineAligned="false"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_sign_in"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/activity_vertical_margin_xxlarge"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin_xxlarge"
+                android:text="Войти в аккаунт"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/text_blue" />
 
             <ImageView
                 android:id="@+id/img_user"
-                android:layout_marginTop="72dp"
                 android:layout_width="@dimen/profile_avatar_size"
                 android:layout_height="@dimen/profile_avatar_size"
-                android:src="@drawable/empty_avatar"
-                android:contentDescription="@null"/>
+                android:layout_marginTop="72dp"
+                android:contentDescription="@null"
+                android:src="@drawable/empty_avatar" />
 
-            <TextView
-                android:id="@+id/txt_username"
-                android:includeFontPadding="false"
-                android:textSize="24sp"
-                style="@style/TextView.User.Data"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingBottom="24dp"
+                android:paddingTop="24dp">
 
-            <TextView
-                android:id="@+id/txt_login"
-                android:includeFontPadding="false"
-                style="@style/TextView.User.Data.Hint"
-                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+                <TextView
+                    android:id="@+id/txt_username"
+                    style="@style/TextView.User.Data"
+                    android:includeFontPadding="false"
+                    android:textSize="24sp" />
 
-            <TextView
-                android:id="@+id/txt_info"
-                style="@style/TextView.User.Data.Hint"
-                android:paddingBottom="32dp"
-                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+                <TextView
+                    android:id="@+id/txt_login"
+                    style="@style/TextView.User.Data.Hint"
+                    android:includeFontPadding="false"
+                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
-            <include layout="@layout/delimiter_profile_vertical"/>
+                <TextView
+                    android:id="@+id/txt_info"
+                    style="@style/TextView.User.Data.Hint"
+                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
+
+            </LinearLayout>
+
+            <include
+                android:id="@+id/delimiter_cards_top"
+                layout="@layout/delimiter_profile_vertical" />
 
             <Button
                 android:id="@+id/btn_my_cards"
-                android:text="@string/bound_cards"
-                style="@style/Button.UserProfile.Data.Expandable"/>
+                style="@style/Button.UserProfile.Data.Expandable"
+                android:text="@string/bound_cards" />
 
-            <include layout="@layout/delimiter_profile_vertical"/>
-
+            <include
+                android:id="@+id/delimiter_cards_bottom"
+                layout="@layout/delimiter_profile_vertical" />
 
             <LinearLayout
                 android:id="@+id/panel_table_number"
+                style="@style/Button.Selectable"
                 android:layout_width="match_parent"
                 android:layout_height="?android:listPreferredItemHeight"
+                android:clickable="true"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/activity_horizontal_margin_medium"
-                android:paddingRight="@dimen/activity_horizontal_margin_medium"
-                android:gravity="center_vertical"
-                android:clickable="true"
-                style="@style/Button.Selectable">
+                android:paddingRight="@dimen/activity_horizontal_margin_medium">
 
                 <TextView
-                    android:text="@string/table"
-                    android:drawableRight="@null"
+                    style="@style/Button.UserProfile.Data"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="match_parent"
-                    android:padding="0dp"
+                    android:layout_weight="1"
                     android:background="@null"
-                    android:duplicateParentState="true"
                     android:clickable="false"
-                    style="@style/Button.UserProfile.Data"/>
+                    android:drawableRight="@null"
+                    android:duplicateParentState="true"
+                    android:padding="0dp"
+                    android:text="@string/table" />
 
                 <TextView
                     android:id="@+id/txt_table_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="@dimen/drawable_padding_default"
-                    android:textColor="@color/blue_bright"
                     android:drawableLeft="@drawable/ic_profile_table_marker"
+                    android:drawablePadding="@dimen/drawable_padding_default"
                     android:textAppearance="?android:textAppearanceLarge"
-                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+                    android:textColor="@color/blue_bright"
+                    omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
                 <!--ImageView
                     android:layout_gravity="center"
@@ -94,99 +118,110 @@
 
             <include
                 android:id="@+id/delimiter_table_number"
-                layout="@layout/delimiter_profile_vertical"/>
+                layout="@layout/delimiter_profile_vertical" />
 
             <TextView
+                style="@style/TextView.User.Hint"
                 android:layout_height="?android:listPreferredItemHeight"
-                android:paddingLeft="@dimen/activity_horizontal_margin_medium"
-                android:paddingBottom="@dimen/activity_vertical_margin_small"
-                android:text="@string/about_title"
                 android:layout_gravity="left"
                 android:gravity="bottom"
-                android:textAppearance="?android:textAppearance"
-                style="@style/TextView.User.Hint"/>
+                android:paddingBottom="@dimen/activity_vertical_margin_small"
+                android:paddingLeft="@dimen/activity_horizontal_margin_medium"
+                android:text="@string/about_title"
+                android:textAppearance="?android:textAppearance" />
 
-            <include layout="@layout/delimiter_profile_vertical"/>
+            <include layout="@layout/delimiter_profile_vertical" />
 
             <Button
                 android:id="@+id/btn_feedback"
-                android:text="@string/feedback"
-                style="@style/Button.UserProfile.Data">
-            </Button>
+                style="@style/Button.UserProfile.Data"
+                android:text="@string/feedback"></Button>
 
-            <include layout="@layout/delimiter_profile_vertical"/>
+            <include layout="@layout/delimiter_profile_vertical" />
 
             <Button
                 android:id="@+id/btn_support"
-                android:text="@string/support"
-                style="@style/Button.UserProfile.Data">
-            </Button>
+                style="@style/Button.UserProfile.Data"
+                android:text="@string/support"></Button>
 
+            <include layout="@layout/delimiter_profile_vertical" />
             <include
                 android:id="@+id/delimiter_support"
                 layout="@layout/delimiter_profile_vertical"/>
 
             <Button
                 android:id="@+id/btn_facebook"
-                android:gravity="center_vertical"
+                style="@style/Button.UserProfile.Data"
                 android:clickable="true"
-                android:text="@string/facebook_title"
-                android:textColor="@color/blue_bright"
                 android:drawableLeft="@drawable/ic_facebook"
                 android:drawablePadding="@dimen/drawable_padding_default"
-                style="@style/Button.UserProfile.Data">
-            </Button>
+                android:gravity="center_vertical"
+                android:text="@string/facebook_title"
+                android:textColor="@color/blue_bright"></Button>
 
-            <include layout="@layout/delimiter_profile_vertical"/>
+            <include layout="@layout/delimiter_profile_vertical" />
 
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_margin="@dimen/activity_vertical_margin_small"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_fork_n_knife_icon_profile"/>
+                android:src="@drawable/ic_fork_n_knife_icon_profile" />
 
             <TextView
                 android:id="@+id/txt_app_info"
+                style="@style/TextView.User.Hint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="@dimen/activity_vertical_margin"
                 android:gravity="center"
-                style="@style/TextView.User.Hint"
-                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf"/>
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
-            <include layout="@layout/delimiter_profile_vertical"/>
+            <include
+                android:id="@+id/delimiter_logout"
+                layout="@layout/delimiter_profile_vertical" />
 
             <Button
                 android:id="@+id/btn_bottom"
+                style="@android:style/Widget.Holo.Button.Borderless"
                 android:layout_width="fill_parent"
                 android:layout_height="?android:listPreferredItemHeight"
                 android:text="@string/logout_user"
-                android:textColor="@color/error_red"
                 android:textAppearance="?android:textAppearanceMedium"
-                style="@android:style/Widget.Holo.Button.Borderless"/>
+                android:textColor="@color/error_red" />
 
         </LinearLayout>
     </ScrollView>
 
     <ImageView
         android:id="@+id/btn_back"
-        android:scaleType="centerInside"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/ic_cross_black"/>
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_cross_black" />
+
+    <TextView
+        android:id="@+id/txt_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:paddingRight="12dp"
+        android:gravity="center"
+        android:layout_gravity="right|top"
+        android:text="@string/change"
+        android:textColor="@drawable/text_color_selector"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        omnom:fontPath="fonts/Futura-LSF-Omnom-LE-Regular.otf" />
 
     <FrameLayout
         android:id="@+id/dark_transparent_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        android:background="@color/black_overlay"/>
+        android:background="@color/black_overlay"
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent" />
 
 </FrameLayout>

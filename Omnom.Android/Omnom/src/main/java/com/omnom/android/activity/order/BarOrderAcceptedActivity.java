@@ -42,8 +42,8 @@ public class BarOrderAcceptedActivity extends BaseOrderAcceptedActivity {
 	@Override
 	public void initUi() {
 		super.initUi();
-		ViewUtils.setVisible(orderNumberContainer, true);
-		ViewUtils.setVisible(pinCodeContainer, true);
+		ViewUtils.setVisibleGone(orderNumberContainer, true);
+		ViewUtils.setVisibleGone(pinCodeContainer, true);
 		final BarEntranceData barEntranceData = (BarEntranceData) mEntranceData;
 		txtOrderNumber.setText(String.valueOf(barEntranceData.orderNumber()));
 		txtPinCode.setText(String.valueOf(barEntranceData.pinCode()));

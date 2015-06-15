@@ -121,8 +121,11 @@ public class AnimationUtils {
 		animateAlpha(view, visible, view.getResources().getInteger(R.integer.default_animation_duration_short));
 	}
 
-	public static void animateAlpha2(final View view, final boolean visible) {
-		animateAlpha2(view, visible, null, view.getResources().getInteger(R.integer.default_animation_duration_short));
+	/**
+	 * Animate view's alpha skipping current visibility-tag value
+	 */
+	public static void animateAlphaSkipTag(final View view, final boolean visible) {
+		animateAlphaSkipTag(view, visible, null, view.getResources().getInteger(R.integer.default_animation_duration_short));
 	}
 
 	public static void animateAlpha(final View view, final boolean visible, long duration) {
@@ -145,7 +148,7 @@ public class AnimationUtils {
 
 		view.setAlpha(visible ? 0 : 1);
 		if(visible) {
-			ViewUtils.setVisible(view, visible);
+			ViewUtils.setVisibleGone(view, visible);
 		}
 		view.setTag(visible);
 		view.animate().setDuration(duration).
@@ -154,7 +157,10 @@ public class AnimationUtils {
 				    alpha(visible ? 1 : 0).start();
 	}
 
-	public static void animateAlpha3(final View view, final boolean visible) {
+	/**
+	 * Animate view's alpha and set visibility to {@link android.view.View#VISIBLE} or {@link android.view.View#GONE}
+	 */
+	public static void animateAlphaGone(final View view, final boolean visible) {
 		if(view == null) {
 			return;
 		}
@@ -165,7 +171,7 @@ public class AnimationUtils {
 		}
 		view.setAlpha(visible ? 0 : 1);
 		if(visible) {
-			ViewUtils.setVisible(view, visible);
+			ViewUtils.setVisibleGone(view, visible);
 		}
 		view.setTag(visible);
 		view.animate().setDuration(view.getResources().getInteger(R.integer.default_animation_duration_short)).
@@ -174,19 +180,27 @@ public class AnimationUtils {
 					    @Override
 					    public void onAnimationEnd(Animator animation) {
 						    if(!visible) {
-							    ViewUtils.setVisible(view, false);
+							    ViewUtils.setVisibleGone(view, false);
 						    }
+					    }
+
+					    @Override
+					    public void onAnimationCancel(final Animator animation) {
+						    ViewUtils.setVisibleGone(view, visible);
 					    }
 				    }).alpha(visible ? 1 : 0).start();
 	}
 
-	public static void animateAlpha2(final View view, final boolean visible, final Runnable callback, long duration) {
+	/**
+	 * Animate view's alpha skipping current visibility-tag value
+	 */
+	public static void animateAlphaSkipTag(final View view, final boolean visible, final Runnable callback, long duration) {
 		if(view == null) {
 			return;
 		}
 		view.setAlpha(visible ? 0 : 1);
 		if(visible) {
-			ViewUtils.setVisible2(view, visible);
+			ViewUtils.setVisibleInvisible(view, visible);
 		}
 		view.setTag(visible);
 		view.animate().setDuration(duration).
@@ -353,11 +367,12 @@ public class AnimationUtils {
 		va.start();
 	}
 
-	public static void smoothScrollToPositionFromTop(final AbsListView view, final int position, final int duration, final Runnable callback) {
+	public static void smoothScrollToPositionFromTop(final AbsListView view, final int position, final int duration, final Runnable
+			callback) {
 		View child = getChildAtPosition(view, position);
 		// There's no need to scroll if child is already at top or view is already scrolled to its end
-		if ((child != null) && ((child.getTop() == 0) || ((child.getTop() > 0) && !view.canScrollVertically(1)))) {
-			if (callback != null) {
+		if((child != null) && ((child.getTop() == 0) || ((child.getTop() > 0) && !view.canScrollVertically(1)))) {
+			if(callback != null) {
 				view.post(callback);
 			}
 			return;
@@ -366,7 +381,7 @@ public class AnimationUtils {
 		view.setOnScrollListener(new AbsListView.OnScrollListener() {
 			@Override
 			public void onScrollStateChanged(final AbsListView view, final int scrollState) {
-				if (scrollState == SCROLL_STATE_IDLE) {
+				if(scrollState == SCROLL_STATE_IDLE) {
 					view.setOnScrollListener(null);
 
 					// Fix for scrolling bug
@@ -374,7 +389,7 @@ public class AnimationUtils {
 						@Override
 						public void run() {
 							view.setSelection(position);
-							if (callback != null) {
+							if(callback != null) {
 								view.post(callback);
 							}
 						}
@@ -398,10 +413,19 @@ public class AnimationUtils {
 
 	private static View getChildAtPosition(final AdapterView view, final int position) {
 		final int index = position - view.getFirstVisiblePosition();
-		if ((index >= 0) && (index < view.getChildCount())) {
+		if((index >= 0) && (index < view.getChildCount())) {
 			return view.getChildAt(index);
 		} else {
 			return null;
+		}
+	}
+
+	public static void translationY(final int value, final View... views) {
+		if(views == null || views.length < 1) {
+			return;
+		}
+		for(final View view : views) {
+			view.animate().translationY(value).start();
 		}
 	}
 }

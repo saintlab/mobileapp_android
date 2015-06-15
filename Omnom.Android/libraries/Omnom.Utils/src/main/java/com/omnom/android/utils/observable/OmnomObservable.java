@@ -20,6 +20,31 @@ import rx.functions.Func1;
  * Created by Ch3D on 02.09.2014.
  */
 public class OmnomObservable {
+
+	public interface RetrofitErrorHandle {
+		void onRetrofitError(RetrofitError error);
+	}
+
+	public static class ObjectWrapper<T> {
+		private T mValue;
+
+		public ObjectWrapper() {
+			// do nothing
+		}
+
+		public ObjectWrapper(T value) {
+			mValue = value;
+		}
+
+		public T getValue() {
+			return mValue;
+		}
+
+		public void setValue(final T value) {
+			mValue = value;
+		}
+	}
+
 	public static void unsubscribe(Subscription subscription) {
 		if(isSubscribed(subscription)) {
 			subscription.unsubscribe();
@@ -66,10 +91,6 @@ public class OmnomObservable {
 				// do nothing
 			}
 		};
-	}
-
-	public interface RetrofitErrorHandle {
-		void onRetrofitError(RetrofitError error);
 	}
 
 	public static Action1<Throwable> loggerOnError(final String tag, final RetrofitErrorHandle errorHandler) {

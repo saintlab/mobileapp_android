@@ -4,10 +4,13 @@ import android.location.Location;
 import android.os.Bundle;
 
 import com.omnom.android.OmnomApplication;
-import com.omnom.android.activity.helper.ActivityHelper;
+import com.omnom.android.activity.helper.LocationActivityHelper;
 import com.omnom.android.activity.helper.OmnomActivityHelper;
 import com.omnom.android.auth.UserData;
+import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.MixPanelHelper;
+import com.omnom.android.mixpanel.model.MixpanelEvent;
+import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.utils.UserHelper;
 import com.omnom.android.utils.activity.BaseActivity;
 
@@ -16,7 +19,7 @@ import com.omnom.android.utils.activity.BaseActivity;
  */
 public abstract class BaseOmnomActivity extends BaseActivity {
 
-	protected ActivityHelper activityHelper;
+	protected LocationActivityHelper locationHelper;
 
 	private boolean isBusy;
 
@@ -27,18 +30,33 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		activityHelper = new OmnomActivityHelper(getActivity());
+		locationHelper = new OmnomActivityHelper(getActivity());
+	}
+
+	protected final OmnomApplication getApp() {
+		return OmnomApplication.get(getActivity());
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		activityHelper.onStart();
+		locationHelper.onStart();
+	}
+
+	protected final void track(final MixPanelHelper.Project project, final MixpanelEvent event) {
+		getMixPanelHelper().track(project, event);
+	}
+
+	public void trackRevenue(final MixPanelHelper.Project project, final String userId,
+	                         final OrderFragment.PaymentDetails details,
+	                         final BillResponse billData) {
+
+		getMixPanelHelper().trackRevenue(project, userId, details, billData);
 	}
 
 	@Override
 	protected void onDestroy() {
-		activityHelper.onDestroy();
+		locationHelper.onDestroy();
 		getMixPanelHelper().flush();
 		super.onDestroy();
 	}
@@ -56,7 +74,7 @@ public abstract class BaseOmnomActivity extends BaseActivity {
 	}
 
 	protected Location getLocation() {
-		return activityHelper.getLocation();
+		return locationHelper.getLocation();
 	}
 
 }

@@ -16,6 +16,9 @@ import com.squareup.otto.Bus;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import rx.Observable;
+import rx.Subscription;
+import rx.functions.Action1;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
@@ -57,6 +60,12 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 		super.onResume();
 		mHelper.onResume();
 		mBus.register(this);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mHelper.onDestroy();
 	}
 
 	@Override
@@ -154,6 +163,17 @@ public abstract class BaseActivity extends Activity implements OmnomActivity, Ex
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	public Subscription subscribe(final Observable observable, final Action1<? extends Object> onNext, final Action1<Throwable>
+			onError) {
+		return mHelper.subscribe(observable, onNext, onError);
+	}
+
+	@Override
+	public void unsubscribe(final Subscription subscription) {
+		mHelper.unsubscribe(subscription);
 	}
 
 	@Override

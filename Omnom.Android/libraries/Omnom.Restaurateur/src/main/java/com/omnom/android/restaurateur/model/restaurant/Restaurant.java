@@ -17,13 +17,15 @@ import auto.parcel.AutoParcel;
 @AutoParcel
 @AutoGson
 public abstract class Restaurant implements Parcelable {
-	public static final String ENTRANCE_MODE_TAKEAWAY = "takeaway";
+	public static final String ENTRANCE_MODE_TAKEAWAY = "take-away";
 
 	public static final String ENTRANCE_MODE_BAR = "bar";
 
 	public static final String ENTRANCE_MODE_LUNCH = "lunch";
 
-	public static final String ENTRANCE_MODE_DEFAULT = "default";
+	public static final String ENTRANCE_MODE_ON_TABLE = "on-table";
+
+	public static final String ENTRANCE_MODE_FOR_HERE = "for-here";
 
 	public static final String ENTRANCE_MODE_NONE = "none";
 
@@ -70,6 +72,9 @@ public abstract class Restaurant implements Parcelable {
 
 	@Nullable
 	public abstract List<Order> orders();
+
+	@Nullable
+	public abstract List<String> entranceModes();
 
 	@Nullable
 	public abstract String entranceMode();

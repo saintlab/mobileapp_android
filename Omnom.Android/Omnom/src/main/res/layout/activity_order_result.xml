@@ -1,0 +1,102 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:gravity="top"
+    android:orientation="vertical">
+
+    <com.omnom.android.view.HeaderView
+        android:id="@+id/panel_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_size_default"
+        android:background="@color/list_header"
+        android:padding="@dimen/activity_horizontal_margin_small" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/main_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp" />
+
+                <TextView
+                    android:id="@+id/txt_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="@dimen/activity_vertical_margin"
+                    android:text="Ваш заказ готов"
+                    android:textColor="@color/order_accepted_color"
+                    android:textSize="@dimen/font_xxlarge" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp" />
+
+                <TextView
+                    android:id="@+id/txt_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:includeFontPadding="false"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="@dimen/activity_vertical_margin_small"
+                    android:text="Чтобы получить свой заказ, покажите бармену этот экран, или назовите ему номер и пин-код заказа."
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textColor="@color/info_hint" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp" />
+
+                <include layout="@layout/view_order_number_pincode" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="-1dp"
+                    android:background="@drawable/bg_bill_footer" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

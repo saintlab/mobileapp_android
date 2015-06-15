@@ -40,7 +40,7 @@ public class RestaurateurMixpanelModule {
 
 	@Provides
 	@Singleton
-	RestaurateurObservableApi providerLinkerApi() {
+	RestaurateurObservableApi provideRestaurantApi() {
 		return RestaurateurMixpanelProxy.create(
 				mContext.getString(mEndpointResId),
 				new BaseRequestInterceptor(mContext) {

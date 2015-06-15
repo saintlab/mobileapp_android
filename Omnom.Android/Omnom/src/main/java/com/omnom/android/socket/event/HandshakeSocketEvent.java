@@ -17,4 +17,9 @@ public class HandshakeSocketEvent extends BaseSocketEvent {
 	public boolean isSuccess() {
 		return mSuccess;
 	}
+
+	@Override
+	public String getType() {
+		return EVENT_HANDSHAKE;
+	}
 }

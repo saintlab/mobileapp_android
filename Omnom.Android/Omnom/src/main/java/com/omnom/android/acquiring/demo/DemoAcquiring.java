@@ -47,14 +47,14 @@ public class DemoAcquiring implements Acquiring {
 	}
 
 	@Override
-	public Observable<AcquiringPollingResponse> checkResult(final AcquiringResponse acquiringResponse) {
-		return new Observable<AcquiringPollingResponse>(new Observable.OnSubscribe<AcquiringPollingResponse>() {
+	public Observable<AcquiringResponse> checkResult(final AcquiringResponse acquiringResponse) {
+		return new Observable<AcquiringResponse>(new Observable.OnSubscribe<AcquiringResponse>() {
 			@Override
-			public void call(Subscriber<? super AcquiringPollingResponse> subscriber) {
-				final AcquiringPollingResponse response = new AcquiringPollingResponse();
-				response.setStatus(AcquiringPollingResponse.STATUS_OK);
-				response.setUrl(HTTP_OMNOM_MENU);
-				subscriber.onNext(response);
+			public void call(Subscriber<? super AcquiringResponse> subscriber) {
+				final AcquiringResponse resp = new AcquiringResponse();
+				resp.setStatus(AcquiringPollingResponse.STATUS_OK);
+				resp.setUrl(HTTP_OMNOM_MENU);
+				subscriber.onNext(resp);
 				subscriber.onCompleted();
 			}
 		}) {};

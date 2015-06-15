@@ -16,7 +16,6 @@ import com.omnom.android.restaurateur.model.bill.BillRequest;
 import com.omnom.android.restaurateur.model.bill.BillResponse;
 import com.omnom.android.restaurateur.model.cards.CardDeleteResponse;
 import com.omnom.android.restaurateur.model.cards.CardsResponse;
-import com.omnom.android.restaurateur.model.config.AcquiringData;
 import com.omnom.android.restaurateur.model.decode.BeaconDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.HashDecodeRequest;
 import com.omnom.android.restaurateur.model.decode.QrDecodeRequest;
@@ -24,25 +23,24 @@ import com.omnom.android.restaurateur.model.decode.RestaurantResponse;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.qrcode.QRCodeBindRequest;
+import com.omnom.android.restaurateur.model.restaurant.FileUploadReponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.RssiThresholdRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
-import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.restaurateur.retrofit.RestaurateurRxSupport;
-import com.omnom.android.restaurateur.serializer.MailRuSerializer;
 import com.omnom.android.restaurateur.serializer.OrdersResponseSerializer;
 import com.omnom.android.utils.generation.AutoParcelAdapterFactory;
 
 import java.util.Collection;
-import java.util.List;
 
 import altbeacon.beacon.Beacon;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
+import retrofit.mime.TypedFile;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -56,7 +54,6 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 		// final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
 		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
 		final Gson gson = new GsonBuilder()
-				.registerTypeAdapter(AcquiringData.class, new MailRuSerializer())
 				.registerTypeAdapter(OrdersResponse.class, new OrdersResponseSerializer())
 				.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
 				.registerTypeAdapterFactory(new AutoParcelAdapterFactory())
@@ -83,7 +80,7 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	}
 
 	@Override
-	public Observable<List<DemoTableData>> getDemoTable() {
+	public Observable<RestaurantResponse> getDemoTable() {
 		return mDataService.getDemoTable().subscribeOn(
 				Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
@@ -207,6 +204,16 @@ public class RestaurateurDataProvider implements RestaurateurObservableApi {
 	@Override
 	public Observable<WishResponse> wishes(final String restId, final WishRequest request) {
 		return mDataService.wishes(restId, request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<WishResponse> getWish(final String wishId) {
+		return mDataService.getWish(wishId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public Observable<FileUploadReponse> updateAvatar(final TypedFile file) {
+		return mDataService.updateAvatar(file).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 	}
 
 	@Override

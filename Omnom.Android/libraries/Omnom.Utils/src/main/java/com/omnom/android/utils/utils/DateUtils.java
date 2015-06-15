@@ -2,6 +2,7 @@ package com.omnom.android.utils.utils;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -79,6 +80,9 @@ public final class DateUtils {
 
 	@Nullable
 	public static Date parseDate(SimpleDateFormat dateFormat, String s) {
+		if(TextUtils.isEmpty(s)) {
+			return new Date();
+		}
 		try {
 			return dateFormat.parse(s);
 		} catch(ParseException e) {

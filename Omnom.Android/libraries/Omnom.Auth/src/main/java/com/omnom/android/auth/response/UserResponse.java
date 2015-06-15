@@ -8,6 +8,9 @@ import com.omnom.android.auth.UserData;
  * Created by Ch3D on 25.09.2014.
  */
 public class UserResponse extends AuthResponse {
+
+	public static final UserResponse NULL = new UserResponse(UserData.NULL, STATUS_SUCCESS);
+
 	@Expose
 	private UserData user;
 
@@ -16,6 +19,11 @@ public class UserResponse extends AuthResponse {
 	private long serverTime;
 
 	private transient long responseTime;
+
+	public UserResponse(final UserData user, final String status) {
+		this.user = user;
+		setStatus(status);
+	}
 
 	public UserData getUser() {
 		return user;

@@ -1,9 +1,5 @@
 package com.omnom.android.fragment;
 
-import com.omnom.android.R;
-import com.omnom.android.utils.OmnomFont;
-import com.omnom.android.utils.utils.AndroidUtils;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -20,6 +16,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.omnom.android.R;
+import com.omnom.android.utils.OmnomFont;
+import com.omnom.android.utils.utils.AndroidUtils;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,166 +32,172 @@ import butterknife.OnClick;
 
 public class SearchFragment<T extends Parcelable> extends Fragment {
 
-    public static final String ARG_NAMES = "names";
+	public interface ItemClickListener<T> {
 
-    public static final String ARG_ITEMS = "items";
+		void onItemClick(T item);
+	}
 
-    @InjectView(R.id.edit_search)
-    protected EditText editSearch;
+	public interface FragmentCloseListener {
 
-    @InjectView(R.id.list)
-    protected ListView list;
+		void onFragmentClose();
+	}
 
-    @InjectView(R.id.empty)
-    protected TextView txtEmpty;
+	public static final String ARG_NAMES = "names";
 
-    protected List<String> itemsNames;
+	public static final String ARG_ITEMS = "items";
 
-    protected Map<String, T> itemsByName;
+	public static <T extends Parcelable> Fragment newInstance(final Map<String, T> itemsByName) {
+		final Fragment fragment = new SearchFragment<T>();
+		final Bundle bundle = new Bundle();
+		bundle.putStringArrayList(ARG_NAMES, new ArrayList<String>(itemsByName.keySet()));
+		bundle.putParcelableArrayList(ARG_ITEMS, new ArrayList<T>(itemsByName.values()));
+		fragment.setArguments(bundle);
+		return fragment;
+	}
 
-    protected ItemClickListener<T> itemClickListener;
+	@InjectView(R.id.edit_search)
+	protected EditText editSearch;
 
-    protected FragmentCloseListener fragmentCloseListener;
+	@InjectView(R.id.list)
+	protected ListView list;
 
-    protected ArrayAdapter<String> adapter;
+	@InjectView(R.id.empty)
+	protected TextView txtEmpty;
 
-    public static <T extends Parcelable> Fragment newInstance(final Map<String, T> itemsByName) {
-        final Fragment fragment = new SearchFragment<T>();
-        final Bundle bundle = new Bundle();
-        bundle.putStringArrayList(ARG_NAMES, new ArrayList<String>(itemsByName.keySet()));
-        bundle.putParcelableArrayList(ARG_ITEMS, new ArrayList<T>(itemsByName.values()));
-        fragment.setArguments(bundle);
-        return fragment;
-    }
+	protected List<String> itemsNames;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        itemsByName = new LinkedHashMap<String, T>();
-        if (getArguments() != null) {
-            itemsNames = getArguments().getStringArrayList(ARG_NAMES);
-            List<T> items = getArguments().getParcelableArrayList(ARG_ITEMS);
-            if (items.size() != itemsNames.size()) {
-                throw new IllegalArgumentException(
-                        "Number of names is not equals to number of items");
-            }
-            for (int i = 0; i < itemsNames.size(); i++) {
-                itemsByName.put(itemsNames.get(i), items.get(i));
-            }
-        }
-    }
+	protected Map<String, T> itemsByName;
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        addItemClickListener(activity);
-        addFragmentCloseListener(activity);
-    }
+	protected ItemClickListener<T> itemClickListener;
 
-    private void addItemClickListener(Activity activity) {
-        try {
-            itemClickListener = (ItemClickListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement ItemClickListener");
-        }
-    }
+	protected FragmentCloseListener fragmentCloseListener;
 
-    private void addFragmentCloseListener(Activity activity) {
-        try {
-            fragmentCloseListener = (FragmentCloseListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(
-                    activity.toString() + " must implement FragmentCloseListener");
-        }
-    }
+	protected ArrayAdapter<String> adapter;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
-        final ViewGroup view = (ViewGroup) inflater
-                .inflate(R.layout.fragment_search, container, false);
-        AndroidUtils.applyFont(getActivity(), view, OmnomFont.LSF_LE_REGULAR);
-        ButterKnife.inject(this, view);
-        return view;
-    }
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		itemsByName = new LinkedHashMap<String, T>();
+		if(getArguments() != null) {
+			itemsNames = getArguments().getStringArrayList(ARG_NAMES);
+			List<T> items = getArguments().getParcelableArrayList(ARG_ITEMS);
+			if(items.size() != itemsNames.size()) {
+				throw new IllegalArgumentException(
+						"Number of names is not equals to number of items");
+			}
+			for(int i = 0; i < itemsNames.size(); i++) {
+				itemsByName.put(itemsNames.get(i), items.get(i));
+			}
+		}
+	}
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        AndroidUtils.applyFont(getActivity(), list, OmnomFont.LSF_LE_REGULAR);
-        adapter = new ArrayAdapter<String>(getActivity(), R.layout.item_search_list, R.id.txt_name,
-                itemsNames);
-        editSearch.setHint(itemsNames.get(new Random().nextInt(itemsNames.size())) + "...");
-        list.setAdapter(adapter);
-        list.setEmptyView(txtEmpty);
-        // empty header and footer are required for top and bottom dividers.
-        list.addHeaderView(new View(getActivity()));
-        list.addFooterView(new View(getActivity()));
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (itemClickListener != null) {
-                    itemClickListener.onItemClick(
-                            itemsByName.get((String) parent.getItemAtPosition(position)));
-                }
-            }
-        });
-        editSearch.addTextChangedListener(new TextWatcher() {
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		addItemClickListener(activity);
+		addFragmentCloseListener(activity);
+	}
 
-            @Override
-            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                adapter.getFilter().filter(cs);
-            }
+	private void addItemClickListener(Activity activity) {
+		try {
+			itemClickListener = (ItemClickListener) activity;
+		} catch(ClassCastException e) {
+			throw new ClassCastException(activity.toString() + " must implement ItemClickListener");
+		}
+	}
 
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                    int arg3) {
-            }
+	private void addFragmentCloseListener(Activity activity) {
+		try {
+			fragmentCloseListener = (FragmentCloseListener) activity;
+		} catch(ClassCastException e) {
+			throw new ClassCastException(
+					activity.toString() + " must implement FragmentCloseListener");
+		}
+	}
 
-            @Override
-            public void afterTextChanged(Editable arg0) {
-            }
-        });
-    }
+	@Override
+	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+	                         @Nullable Bundle savedInstanceState) {
+		final ViewGroup view = (ViewGroup) inflater
+				.inflate(R.layout.fragment_search, container, false);
+		AndroidUtils.applyFont(getActivity(), view, OmnomFont.LSF_LE_REGULAR);
+		ButterKnife.inject(this, view);
+		return view;
+	}
 
-    @OnClick(R.id.btn_close)
-    protected void onClose() {
-        getFragmentManager().popBackStack();
-    }
+	@Override
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		AndroidUtils.applyFont(getActivity(), list, OmnomFont.LSF_LE_REGULAR);
+		adapter = new ArrayAdapter<String>(getActivity(), R.layout.item_search_list, R.id.txt_name,
+		                                   itemsNames);
+		editSearch.setHint(itemsNames.get(new Random().nextInt(itemsNames.size())) + "...");
+		list.setAdapter(adapter);
+		list.setEmptyView(txtEmpty);
+		// empty header and footer are required for top and bottom dividers.
+		list.addHeaderView(new View(getActivity()));
+		list.addFooterView(new View(getActivity()));
+		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				if(itemClickListener != null) {
+					itemClickListener.onItemClick(
+							itemsByName.get((String) parent.getItemAtPosition(position)));
+				}
+			}
+		});
+		editSearch.addTextChangedListener(new TextWatcher() {
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        editSearch.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                AndroidUtils.showKeyboard(editSearch);
-            }
-        }, 350);
-    }
+			@Override
+			public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+				adapter.getFilter().filter(cs);
+			}
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (fragmentCloseListener != null) {
-            fragmentCloseListener.onFragmentClose();
-        }
-    }
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+			                              int arg3) {
+			}
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        AndroidUtils.hideKeyboard(editSearch, null);
-    }
+			@Override
+			public void afterTextChanged(Editable arg0) {
+			}
+		});
+	}
 
-    public interface ItemClickListener<T> {
+	@OnClick(R.id.btn_close)
+	protected void onClose() {
+		AndroidUtils.hideKeyboard(editSearch, null);
+		txtEmpty.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				getFragmentManager().popBackStack();
+			}
+		}, getResources().getInteger(R.integer.default_animation_duration_short));
+	}
 
-        void onItemClick(T item);
-    }
+	@Override
+	public void onStart() {
+		super.onStart();
+		editSearch.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				AndroidUtils.showKeyboard(editSearch);
+			}
+		}, getResources().getInteger(R.integer.default_animation_duration_short));
+	}
 
-    public interface FragmentCloseListener {
+	@Override
+	public void onPause() {
+		super.onPause();
+		if(fragmentCloseListener != null) {
+			fragmentCloseListener.onFragmentClose();
+		}
+	}
 
-        void onFragmentClose();
-    }
+	@Override
+	public void onStop() {
+		super.onStop();
+		AndroidUtils.hideKeyboard(editSearch, null);
+	}
 
 }

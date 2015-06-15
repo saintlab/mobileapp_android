@@ -21,8 +21,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-import static com.omnom.android.utils.utils.AndroidUtils.showToast;
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -114,7 +112,6 @@ public class TakeawayTimeFragment extends BaseFragment {
 	@OnClick(R.id.btn_ok)
 	public void onOk() {
 		final int timeValue = TIME_VALUES[timePicker.getValue()];
-		showToast(getActivity(), "Selected time = " + timeValue);
 		mBus.post(new TakeawayTimePickedEvent(timeValue));
 		getFragmentManager().popBackStack();
 	}

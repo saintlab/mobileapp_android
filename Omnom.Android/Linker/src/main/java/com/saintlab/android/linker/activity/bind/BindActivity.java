@@ -269,7 +269,7 @@ public class BindActivity extends BaseActivity {
 			}
 		}
 		onRestaurantLoaded((Restaurant) intent.getParcelableExtra(EXTRA_RESTAURANT));
-		ViewUtils.setVisible(mBtnBack, intent.getBooleanExtra(EXTRA_SHOW_BACK, false));
+		ViewUtils.setVisibleGone(mBtnBack, intent.getBooleanExtra(EXTRA_SHOW_BACK, false));
 	}
 
 	@OnClick(R.id.btn_back)
@@ -419,8 +419,8 @@ public class BindActivity extends BaseActivity {
 				bindTable();
 			}
 		});
-		ViewUtils.setVisible(mPanelBottom, true);
-		ViewUtils.setVisible(mBtnBottom, true);
+		ViewUtils.setVisibleGone(mPanelBottom, true);
+		ViewUtils.setVisibleGone(mBtnBottom, true);
 		rssiProvider.updateRssiThreshold(restaurant);
 	}
 
@@ -462,8 +462,8 @@ public class BindActivity extends BaseActivity {
 						});
 			}
 		} else {
-			ViewUtils.setVisible(mPanelBottom, true);
-			ViewUtils.setVisible(mBtnProfile, true);
+			ViewUtils.setVisibleGone(mPanelBottom, true);
+			ViewUtils.setVisibleGone(mBtnProfile, true);
 		}
 	}
 

@@ -118,7 +118,7 @@ public class DeliveryAddressAdapter extends DeliveryDataAdapterBase<DeliveryAddr
 				final DeliveryAddressData item = getItem(position);
 				holder.mTxtTitle.setText(item.name());
 				holder.mTxtInfo.setText(item.address());
-				ViewUtils.setVisible2(holder.mCheckedIndicator, isItemChecked(position));
+				ViewUtils.setVisibleInvisible(holder.mCheckedIndicator, isItemChecked(position));
 				break;
 
 			case VIEW_TYPE_FOOTER:

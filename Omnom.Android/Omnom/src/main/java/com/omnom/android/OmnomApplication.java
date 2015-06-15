@@ -2,10 +2,14 @@ package com.omnom.android;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.omnom.android.menu.MenuModule;
 import com.omnom.android.mixpanel.MixPanelHelper;
 import com.omnom.android.modules.AcquiringModuleMailRuMixpanel;
@@ -23,8 +27,13 @@ import com.omnom.android.push.PushNotificationManager;
 import com.omnom.android.restaurateur.model.UserProfile;
 import com.omnom.android.restaurateur.model.beacon.BeaconFindRequest;
 import com.omnom.android.restaurateur.model.config.Config;
+import com.omnom.android.restaurateur.model.table.TableDataResponse;
+import com.omnom.android.socket.PaymentEventIntentFilter;
+import com.omnom.android.socket.event.PaymentSocketEvent;
+import com.omnom.android.socket.listener.TableSocketListener;
 import com.omnom.android.utils.AuthTokenProvider;
 import com.omnom.android.utils.BaseOmnomApplication;
+import com.omnom.android.utils.Extras;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.preferences.PreferenceProvider;
 import com.omnom.android.utils.utils.StringUtils;
@@ -33,12 +42,14 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
 
 import javax.inject.Inject;
 
 import dagger.ObjectGraph;
+import io.fabric.sdk.android.Fabric;
 import rx.functions.Action1;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
@@ -73,7 +84,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 	private JsonPreferenceProvider preferenceHelper;
 
-	private Stack<Activity> activityStack = new Stack<Activity>();
+	private HashSet<Activity> activityStack = new HashSet<Activity>();
 
 	private MixPanelHelper mixPanelHelper;
 
@@ -84,6 +95,10 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	private BeaconFindRequest cachedBeacon;
 
 	private Picasso _lazy_Picasso;
+
+	private TableSocketListener mTableSocketListener;
+
+	private Stack<PaymentSocketEvent> mPaymentEvents;
 
 	protected List<Object> getModules() {
 		return Arrays.asList(new AndroidModule(this),
@@ -114,10 +129,18 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		// FIXME: possible migration to bugsense
-		// Fabric.with(this, new Crashlytics());
+		// LeakCanary.install(this);
+		Fabric.with(this, new Crashlytics());
 		CalligraphyConfig.initDefault(OmnomFont.OSF_REGULAR.getPath(), R.attr.fontPath);
 		mixPanelHelper = new MixPanelHelper();
+		mPaymentEvents = new Stack<PaymentSocketEvent>();
+
+		registerReceiver(new BroadcastReceiver() {
+			@Override
+			public void onReceive(final Context context, final Intent intent) {
+				mPaymentEvents.add(intent.<PaymentSocketEvent>getParcelableExtra(Extras.EXTRA_PAYMENT_EVENT));
+			}
+		}, new PaymentEventIntentFilter(IntentFilter.SYSTEM_LOW_PRIORITY + 1));
 
 		objectGraph = ObjectGraph.create(getModules().toArray());
 		for(final Object obj : injectList) {
@@ -131,7 +154,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
 			@Override
 			public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-				activityStack.push(activity);
+				activityStack.add(activity);
 			}
 
 			@Override
@@ -161,7 +184,7 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 
 			@Override
 			public void onActivityDestroyed(Activity activity) {
-				activityStack.pop();
+				activityStack.remove(activity);
 			}
 		});
 	}
@@ -252,5 +275,36 @@ public class OmnomApplication extends BaseOmnomApplication implements AuthTokenP
 		final int memoryClass = am.getMemoryClass();
 		// Target ~25% of the available heap.
 		return 1024 * 1024 * memoryClass / 4;
+	}
+
+	public void connectTableSocket(final TableDataResponse table) {
+		// clear previous unhandled events
+		mPaymentEvents.clear();
+
+		// check whether there is an active socket
+		if(mTableSocketListener != null) {
+			mTableSocketListener.disconnect();
+		}
+
+		// initiate new connection
+		mTableSocketListener = new TableSocketListener(this);
+		mTableSocketListener.connect(table);
+	}
+
+	public void disconnectTableSocket() {
+		// clear previous unhandled events
+		mPaymentEvents.clear();
+
+		if(mTableSocketListener != null) {
+			mTableSocketListener.disconnect();
+		}
+	}
+
+	public List<PaymentSocketEvent> getPaymentEvents() {
+		return mPaymentEvents;
+	}
+
+	public void clearPaymentEvents() {
+		mPaymentEvents.clear();
 	}
 }

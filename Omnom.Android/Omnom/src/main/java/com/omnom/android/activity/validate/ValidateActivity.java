@@ -1,7 +1,9 @@
 package com.omnom.android.activity.validate;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -28,16 +30,20 @@ import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.activity.RestaurantActivity;
 import com.omnom.android.activity.RestaurantsListActivity;
 import com.omnom.android.activity.UserProfileActivity;
-import com.omnom.android.activity.ValidateActivityBle;
+import com.omnom.android.activity.ValidateActivityBle18;
 import com.omnom.android.activity.ValidateActivityBle21;
 import com.omnom.android.activity.ValidateActivityCamera;
 import com.omnom.android.activity.ValidateActivityShortcut;
 import com.omnom.android.activity.WishActivity;
 import com.omnom.android.activity.base.BaseOmnomModeSupportActivity;
+import com.omnom.android.activity.helper.OmnomActivityHelper;
 import com.omnom.android.auth.AuthService;
 import com.omnom.android.auth.AuthServiceException;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.auth.response.UserResponse;
+import com.omnom.android.entrance.EntranceData;
+import com.omnom.android.entrance.EntranceDataFactory;
+import com.omnom.android.entrance.EntranceDataHelper;
 import com.omnom.android.fragment.SearchFragment;
 import com.omnom.android.fragment.menu.MenuItemDetailsFragment;
 import com.omnom.android.fragment.menu.OrderUpdateEvent;
@@ -63,11 +69,11 @@ import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrdersResponse;
 import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantHelper;
-import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.service.configuration.ConfigurationResponse;
 import com.omnom.android.service.configuration.ConfigurationService;
-import com.omnom.android.socket.listener.PaymentEventListener;
+import com.omnom.android.socket.ActivityPaymentBroadcastReceiver;
+import com.omnom.android.socket.PaymentEventIntentFilter;
 import com.omnom.android.utils.ObservableUtils;
 import com.omnom.android.utils.activity.BaseActivity;
 import com.omnom.android.utils.activity.BaseFragmentActivity;
@@ -102,7 +108,6 @@ import butterknife.OnClick;
 import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -189,10 +194,19 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		context.start(intent, enterAnim, exitAnim, true);
 	}
 
+	public static void start(final OmnomActivity context, final int enterAnim,
+	                         final int exitAnim, final int animationType,
+	                         final Restaurant restaurant, final EntranceData entranceData) {
+		Intent intent = createIntent(context.getActivity(), animationType, false, ValidateActivity.TYPE_DEFAULT, null, false);
+		intent.putExtra(EXTRA_RESTAURANT, restaurant);
+		intent.putExtra(EXTRA_ENTRANCE_DATA, entranceData);
+		context.start(intent, enterAnim, exitAnim, true);
+	}
+
 	private static Intent createIntent(final Context context, final int animationType,
 	                                   final boolean isDemo, final int userEnterType, final Uri data) {
 		final boolean hasBle = BluetoothUtils.hasBleSupport(context);
-		final Class validateActivityBleClass = AndroidUtils.isLollipop() ? ValidateActivityBle21.class : ValidateActivityBle.class;
+		final Class validateActivityBleClass = AndroidUtils.isLollipop() ? ValidateActivityBle21.class : ValidateActivityBle18.class;
 		final boolean isBleReadyDevice = hasBle & AndroidUtils.isJellyBeanMR2();
 
 		final Intent intent = new Intent(context,
@@ -278,7 +292,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	protected boolean mSkipViewRendering = false;
 
-	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBackgroundFunction;
+	protected Func1<RestaurantResponse, RestaurantResponse> mPreloadBgFunc;
 
 	@Nullable
 	protected Menu mMenu;
@@ -321,6 +335,8 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}
 	};
 
+	private BroadcastReceiver mPaymentReceiver;
+
 	/**
 	 * ConfirmPhoneActivity.TYPE_LOGIN or ConfirmPhoneActivity.TYPE_REGISTER
 	 */
@@ -331,12 +347,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	private int mAnimationType;
 
 	private boolean mWaiterCalled;
-
-	private Subscription mOrdersSubscription;
-
-	private Subscription mWaiterCallSubscribtion;
-
-	private Subscription mDataSubscription;
 
 	private com.omnom.android.utils.drawable.TransitionDrawable bgTransitionDrawable;
 
@@ -385,11 +395,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}
 	};
 
-	private PaymentEventListener mPaymentListener;
-
 	private ConfigurationService configurationService;
-
-	private Subscription mErrValidationSubscription;
 
 	private View.OnClickListener loadConfigsErrorListener = new View.OnClickListener() {
 		@Override
@@ -398,6 +404,10 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}
 	};
 
+	private Subscription mPaymentEventsSubscription;
+
+	private PaymentEventIntentFilter mPaymentFilter;
+
 	protected OmnomErrorHelper getErrorHelper() {return mViewHelper.getErrorHelper();}
 
 	@Override
@@ -405,9 +415,11 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		super.onCreate(savedInstanceState);
 		mData = getIntent().getData();
 		mViewHelper = new ValidateViewHelper(this);
-		configurationService =
-				new ConfigurationService(this, authenticator, configApi, mAcquiring,
-				                         OmnomApplication.get(getActivity()).getAuthToken());
+		configurationService = new ConfigurationService(getApplicationContext(), authenticator, configApi, mAcquiring,
+		                                                getApp().getAuthToken());
+
+		mPaymentReceiver = new ActivityPaymentBroadcastReceiver(this);
+		mPaymentFilter = new PaymentEventIntentFilter(IntentFilter.SYSTEM_HIGH_PRIORITY - 1);
 	}
 
 	@Override
@@ -429,8 +441,8 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	private void startValidation() {
 		if(!mSkipViewRendering) {
-			if(mRestaurant != null && mRestaurant.settings().hasBar()) {
-				handleBar(mRestaurant);
+			if(RestaurantHelper.isBar(mRestaurant) || (EntranceDataHelper.isBar(mEntranceData))) {
+				handleBar(mRestaurant, mEntranceData);
 				return;
 			}
 
@@ -443,7 +455,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}
 	}
 
-	private void handleBar(final Restaurant restaurant) {
+	private void handleBar(final Restaurant restaurant, final EntranceData entranceData) {
 		mViewHelper.updateLoader(mRestaurant);
 		mViewHelper.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration));
 
@@ -451,8 +463,9 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 			@Override
 			public void call(final MenuResponse menuResponse) {
 				mMenu = menuResponse.getMenu();
-				mEntranceData = RestaurantHelper.getEntranceData(restaurant);
-				onDataLoaded(restaurant, TableDataResponse.NULL);
+				ensureEntranceData(entranceData, mRestaurant);
+				mViewHelper.setEntranceData(mEntranceData);
+				onDataLoaded(restaurant, TableDataResponse.NULL, mEntranceData);
 				mSkipViewRendering = true;
 			}
 		}, onError);
@@ -460,21 +473,31 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mFirstRun = false;
 	}
 
+	private void ensureEntranceData(final EntranceData entranceData, final Restaurant restaurant) {
+		if(entranceData == null) {
+			mEntranceData = EntranceDataFactory.create(restaurant);
+		} else {
+			mEntranceData = entranceData;
+		}
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		registerReceiver(mPaymentReceiver, mPaymentFilter);
+		mPaymentEventsSubscription = OmnomActivityHelper.processPaymentEvents(getActivity());
 		mOrderHelper.updateWishUi();
 		mViewHelper.onResume();
-
-		if(mPaymentListener != null && mTable != null) {
-			mPaymentListener.initTableSocket(mTable);
-		}
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mPaymentListener.onPause();
+
+		unregisterReceiver(mPaymentReceiver);
+		unsubscribe(mPaymentEventsSubscription);
+
 		if(mRestaurant == null) {
 			mViewHelper.onPause();
 		}
@@ -496,14 +519,11 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		getApp().disconnectTableSocket();
+		configurationService.onDestroy();
 		mOrderHelper = null;
 		mViewHelper.onDestroy();
 		mViewHelper = null;
-		OmnomObservable.unsubscribe(mOrdersSubscription);
-		OmnomObservable.unsubscribe(mWaiterCallSubscribtion);
-		OmnomObservable.unsubscribe(mDataSubscription);
-		OmnomObservable.unsubscribe(mErrValidationSubscription);
-		mPaymentListener.onDestroy();
 	}
 
 	@Override
@@ -552,7 +572,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		mViewHelper.init();
 		mOrderHelper = new ValidateOrderHelper(this, mViewHelper);
 
-		mPaymentListener = new PaymentEventListener(this);
 		bgTransitionDrawable = new com.omnom.android.utils.drawable.TransitionDrawable(
 				getResources().getInteger(R.integer.default_animation_duration_short),
 				new Drawable[]{new ColorDrawable(getResources().getColor(R.color.transparent)),
@@ -561,7 +580,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		bgTransitionDrawable.setCrossFadeEnabled(true);
 		mViewHelper.setBackground(bgTransitionDrawable);
 
-		mPreloadBackgroundFunction = new Func1<RestaurantResponse, RestaurantResponse>() {
+		mPreloadBgFunc = new Func1<RestaurantResponse, RestaurantResponse>() {
 			@Override
 			public RestaurantResponse call(final RestaurantResponse decodeResponse) {
 				final List<Restaurant> restaurants = decodeResponse.getRestaurants();
@@ -594,78 +613,78 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		final int validateDuration = getResources().getInteger(R.integer.omnom_validate_duration);
 		mViewHelper.startProgressAnimation(locationUpdateTimeout + validateDuration);
 
-		mDataSubscription = AppObservable.bindActivity(this, configurationService.getConfigurationObservable())
-		                                 .subscribe(new Action1<ConfigurationResponse>() {
-			                                 @Override
-			                                 public void call(ConfigurationResponse configurationResponse) {
-				                                 final ValidateActivity activity = ValidateActivity.this;
-				                                 final UserResponse userResponse = configurationResponse.getUserResponse();
-				                                 updateConfiguration(configurationResponse.getConfig());
-				                                 correctMixpanelTime(userResponse);
-				                                 reportMixPanel(userResponse);
-				                                 OmnomApplication.get(getActivity()).cacheUserProfile(new UserProfile(userResponse));
+		subscribe(configurationService.getConfigurationObservable()
+				, new Action1<ConfigurationResponse>() {
+			@Override
+			public void call(ConfigurationResponse configurationResponse) {
+				final UserResponse userResponse = configurationResponse.getUserResponse();
+				updateConfiguration(configurationResponse.getConfig());
+				correctMixpanelTime(userResponse);
+				reportMixPanel(userResponse);
+				getApp().cacheUserProfile(new UserProfile(userResponse));
 
-				                                 getMixPanelHelper().track(MixPanelHelper.Project.OMNOM,
-				                                                           new AppLaunchMixpanelEvent(userResponse.getUser()));
-				                                 final boolean hasBle = BluetoothUtils.hasBleSupport(activity);
-				                                 final boolean bleEnabled = BluetoothUtils.isBluetoothEnabled(getActivity());
-				                                 if((!hasBle || (hasBle && !bleEnabled)) && !isExternalLaunch()) {
-					                                 validateShowRestaurants();
-				                                 } else {
-					                                 decode(false);
-				                                 }
-			                                 }
-		                                 }, new Action1<Throwable>() {
-			                                 @Override
-			                                 public void call(Throwable throwable) {
-				                                 Log.e(TAG, "loadConfigs", throwable);
-				                                 if(throwable.getCause() instanceof UnknownHostException) {
-					                                 getErrorHelper().showInternetError(loadConfigsErrorListener);
-				                                 } else {
-					                                 getErrorHelper().showUnknownError(loadConfigsErrorListener);
-				                                 }
-			                                 }
-		                                 });
+				track(MixPanelHelper.Project.OMNOM,
+				      new AppLaunchMixpanelEvent(userResponse.getUser()));
+				final boolean hasBle = BluetoothUtils.hasBleSupport(ValidateActivity.this);
+				final boolean bleEnabled = BluetoothUtils.isBluetoothEnabled(getActivity());
+				if((!hasBle || (hasBle && !bleEnabled)) && !isExternalLaunch()) {
+					validateShowRestaurants();
+				} else {
+					decode(false);
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				Log.e(TAG, "loadConfigs", throwable);
+				if(throwable.getCause() instanceof UnknownHostException) {
+					getErrorHelper().showInternetError(loadConfigsErrorListener);
+				} else {
+					getErrorHelper().showUnknownError(loadConfigsErrorListener);
+				}
+			}
+		});
 	}
 
 	private void validateShowRestaurants() {
-		mErrValidationSubscription = AppObservable.bindActivity(ValidateActivity.this,
-		                                                        ValidationObservable.validate(ValidateActivity.this)
-		                                                                            .map(OmnomObservable.getValidationFunc(
-				                                                                            ValidateActivity.this,
-				                                                                            getErrorHelper(),
-				                                                                            new View.OnClickListener() {
-					                                                                            @Override
-					                                                                            public void onClick(View v) {
-						                                                                            validate();
-					                                                                            }
-				                                                                            })).isEmpty())
-		                                          .subscribe(new Action1<Boolean>() {
-			                                          @Override
-			                                          public void call(Boolean hasNoErrors) {
-				                                          if(hasNoErrors) {
-					                                          mViewHelper.showRestaurants();
-				                                          }
-			                                          }
-		                                          }, new Action1<Throwable>() {
-			                                          @Override
-			                                          public void call(Throwable throwable) {
-				                                          getErrorHelper().showInternetError(new View.OnClickListener() {
-					                                          @Override
-					                                          public void onClick(View v) {
-						                                          validate();
-					                                          }
-				                                          });
-			                                          }
-		                                          });
+		subscribe(ValidationObservable.validate(ValidateActivity.this)
+		                              .map(OmnomObservable.getValidationFunc(
+				                              ValidateActivity.this,
+				                              getErrorHelper(),
+				                              new View.OnClickListener() {
+					                              @Override
+					                              public void onClick(View v) {
+						                              validate();
+					                              }
+				                              })).isEmpty(),
+		          new Action1<Boolean>() {
+			          @Override
+			          public void call(Boolean hasNoErrors) {
+				          if(hasNoErrors) {
+					          mViewHelper.showRestaurants();
+				          }
+			          }
+		          }, new Action1<Throwable>() {
+					@Override
+					public void call(Throwable throwable) {
+						getErrorHelper().showInternetError(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								validate();
+							}
+						});
+					}
+				});
 	}
 
 	private void updateConfiguration(final Config config) {
-		mPushManager.register();
-		OmnomApplication.get(getActivity()).cacheConfig(config);
+		final OmnomApplication app = getApp();
+
+		app.cacheConfig(config);
 		if(mAcquiring instanceof AcquiringMailRu) {
 			((AcquiringMailRu) mAcquiring).changeEndpoint(config.getAcquiringData().getBaseUrl());
 		}
+		mPushManager.register();
 		getMixPanelHelper().addApi(OMNOM, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelToken()));
 		getMixPanelHelper().addApi(OMNOM_ANDROID, MixpanelAPI.getInstance(this, config.getTokens().getMixpanelTokenAndroid()));
 	}
@@ -699,9 +718,6 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 					}
 				}
 			});
-		}
-		if(mTable != null) {
-			mPaymentListener.initTableSocket(mTable);
 		}
 		mFirstRun = false;
 	}
@@ -766,37 +782,37 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	private void loadOrders(final View v) {
 		mViewHelper.translatePanelBottom(0);
-		mOrdersSubscription = AppObservable.bindActivity(getActivity(), api.getOrders(mTable.getRestaurantId(), mTable.getId()))
-		                                   .subscribe(new Action1<OrdersResponse>() {
-			                                   @Override
-			                                   public void call(final OrdersResponse ordersResponse) {
-				                                   mViewHelper.stopProgressAnimation();
-				                                   mViewHelper.updateProgressMax(new Runnable() {
-					                                   @Override
-					                                   public void run() {
-						                                   v.setEnabled(true);
-						                                   if(!ordersResponse.getOrders().isEmpty()) {
-							                                   showOrders(ordersResponse.getOrders(), ordersResponse.getRequestId());
-						                                   } else {
-							                                   startErrorTransition();
-							                                   mViewHelper.onOrderError(mRestaurant, mTable, mIsDemo);
-						                                   }
-					                                   }
-				                                   });
-			                                   }
-		                                   }, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
-			                                   @Override
-			                                   public void onError(Throwable throwable) {
-				                                   v.setEnabled(true);
-				                                   startErrorTransition();
-				                                   getErrorHelper().showUnknownError(new View.OnClickListener() {
-					                                   @Override
-					                                   public void onClick(View v) {
-						                                   mViewHelper.onErrorClose(mRestaurant, mIsDemo);
-					                                   }
-				                                   });
-			                                   }
-		                                   });
+		subscribe(api.getOrders(mTable.getRestaurantId(), mTable.getId())
+				, new Action1<OrdersResponse>() {
+			@Override
+			public void call(final OrdersResponse ordersResponse) {
+				mViewHelper.stopProgressAnimation();
+				mViewHelper.updateProgressMax(new Runnable() {
+					@Override
+					public void run() {
+						v.setEnabled(true);
+						if(!ordersResponse.getOrders().isEmpty()) {
+							showOrders(ordersResponse.getOrders(), ordersResponse.getRequestId());
+						} else {
+							startErrorTransition();
+							mViewHelper.onOrderError(mRestaurant, mTable, mIsDemo);
+						}
+					}
+				});
+			}
+		}, new ObservableUtils.BaseOnErrorHandler(getActivity()) {
+			@Override
+			public void onError(Throwable throwable) {
+				v.setEnabled(true);
+				startErrorTransition();
+				getErrorHelper().showUnknownError(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						mViewHelper.onErrorClose(mRestaurant, mIsDemo);
+					}
+				});
+			}
+		});
 	}
 
 	protected void showOrders(final List<Order> orders, final String requestId) {
@@ -819,7 +835,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		} else {
 			observable = api.waiterCallStop(mRestaurant.id(), mTable.getId());
 		}
-		mWaiterCallSubscribtion = AppObservable.bindActivity(this, observable).subscribe(new Action1<WaiterCallResponse>() {
+		subscribe(observable, new Action1<WaiterCallResponse>() {
 			@Override
 			public void call(WaiterCallResponse tableDataResponse) {
 				if(tableDataResponse.isSuccess()) {
@@ -879,16 +895,18 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	public void onProfile(View v) {
 		final int tableNumber = mTable != null ? mTable.getInternalId() : 0;
 		final String tableId = mTable != null ? mTable.getId() : null;
+		mViewHelper.onProfile();
 		UserProfileActivity.startSliding(this, tableNumber, tableId);
 	}
 
-	protected void onDataLoaded(final Restaurant restaurant, @Nullable TableDataResponse table) {
-		onDataLoaded(restaurant, table, false, StringUtils.EMPTY_STRING);
+	protected void onDataLoaded(final Restaurant restaurant, @Nullable TableDataResponse table, final EntranceData entranceData) {
+		onDataLoaded(restaurant, table, false, StringUtils.EMPTY_STRING, entranceData);
 	}
 
 	protected void onDataLoaded(final Restaurant restaurant, final TableDataResponse table,
 	                            final boolean forwardToBill,
-	                            final String requestId) {
+	                            final String requestId,
+	                            final EntranceData entranceData) {
 
 		if(table == null) {
 			RestaurantActivity.start(this, restaurant, true);
@@ -897,10 +915,13 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 		mRestaurant = restaurant;
 		mTable = table;
-		mEntranceData = RestaurantHelper.getEntranceData(mRestaurant);
+
+		getApp().connectTableSocket(table);
+
+		ensureEntranceData(entranceData, mRestaurant);
+		mViewHelper.setEntranceData(mEntranceData);
 		bindMenuData();
 
-		mPaymentListener.initTableSocket(mTable);
 		onNewGuest(mTable);
 		animateRestaurantBackground(restaurant);
 		mViewHelper.onDataLoaded(restaurant, table, forwardToBill, mIsDemo, requestId);
@@ -964,30 +985,31 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		if(mIsDemo) {
 			if(mRestaurant == null || mTable == null) {
 				mViewHelper.startProgressAnimation(getResources().getInteger(R.integer.omnom_validate_duration));
-				api.getDemoTable().flatMap(new Func1<List<DemoTableData>, Observable<MenuResponse>>() {
+				api.getDemoTable().flatMap(new Func1<RestaurantResponse, Observable<MenuResponse>>() {
 					@Override
-					public Observable<MenuResponse> call(final List<DemoTableData> demoTableResponse) {
-						if(demoTableResponse.size() > 0) {
-							final DemoTableData demoTableData = demoTableResponse.get(0);
-							if(demoTableData != null && demoTableData.getRestaurant() != null) {
-								return menuApi.getMenu(demoTableData.getRestaurant().id());
+					public Observable<MenuResponse> call(final RestaurantResponse demoTableResponse) {
+						if(demoTableResponse.getRestaurants().size() > 0) {
+							final Restaurant demoRestaurant = demoTableResponse.getRestaurants().get(0);
+							final TableDataResponse demoTableData = demoRestaurant.tables().get(0);
+							if(demoTableData != null && demoTableData != null) {
+								return menuApi.getMenu(demoRestaurant.id());
 							}
 						}
 						return Observable.just(new MenuResponse());
 					}
-				}, new Func2<List<DemoTableData>, MenuResponse, Pair<List<DemoTableData>, MenuResponse>>() {
+				}, new Func2<RestaurantResponse, MenuResponse, Pair<RestaurantResponse, MenuResponse>>() {
 					@Override
-					public Pair<List<DemoTableData>, MenuResponse> call(final List<DemoTableData> restaurant,
-					                                                    final MenuResponse menu) {
+					public Pair<RestaurantResponse, MenuResponse> call(final RestaurantResponse restaurant,
+					                                                   final MenuResponse menu) {
 						mMenu = menu.getMenu();
 						return Pair.create(restaurant, menu);
 					}
-				}).subscribe(new Action1<Pair<List<DemoTableData>, MenuResponse>>() {
+				}).subscribe(new Action1<Pair<RestaurantResponse, MenuResponse>>() {
 					@Override
-					public void call(final Pair<List<DemoTableData>, MenuResponse> listMenuResponsePair) {
-						final List<DemoTableData> demoTableResponse = listMenuResponsePair.first;
-						final DemoTableData data = demoTableResponse.get(0);
-						onDataLoaded(data.getRestaurant(), data.getTable());
+					public void call(final Pair<RestaurantResponse, MenuResponse> listMenuResponsePair) {
+						final RestaurantResponse demoRestaurantResponse = listMenuResponsePair.first;
+						final Restaurant demoRest = demoRestaurantResponse.getRestaurants().get(0);
+						onDataLoaded(demoRest, demoRest.tables().get(0), mEntranceData);
 					}
 				}, onError);
 				mFirstRun = false;
@@ -1048,7 +1070,8 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		}
 
 		// User in already in a restaurant there is no need to send them notification
-		final PreferenceHelper preferences = (PreferenceHelper) OmnomApplication.get(getActivity()).getPreferences();
+		final PreferenceHelper preferences = (PreferenceHelper) getPreferences();
+
 		preferences.saveNotificationDetails(this, restaurant.id());
 		final TableDataResponse table = RestaurantHelper.getTable(restaurant);
 		if(table != null) {
@@ -1056,7 +1079,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				@Override
 				public void run() {
 					reportMixPanel(requestId, method, table);
-					onDataLoaded(restaurant, table);
+					onDataLoaded(restaurant, table, mEntranceData);
 				}
 			});
 		} else {
@@ -1102,10 +1125,12 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 	protected Observable<Pair<RestaurantResponse, MenuResponse>> concatMenuObservable(final Observable<RestaurantResponse>
 			                                                                                  restaurantObservable) {
+		final OmnomObservable.ObjectWrapper<RestaurantResponse> mRestaurantResponse = new OmnomObservable.ObjectWrapper<>();
 		return restaurantObservable.flatMap(
 				new Func1<RestaurantResponse, Observable<MenuResponse>>() {
 					@Override
 					public Observable<MenuResponse> call(final RestaurantResponse restaurantResponse) {
+						mRestaurantResponse.setValue(restaurantResponse);
 						if(restaurantResponse.hasOnlyRestaurant()) {
 							return RestaurantHelper.getMenuObservable(menuApi, restaurantResponse.getRestaurants().get(0));
 						}
@@ -1117,7 +1142,12 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 						mMenu = menu.getMenu();
 						return Pair.create(restaurant, menu);
 					}
-				});
+				}).onErrorReturn(new Func1<Throwable, Pair<RestaurantResponse, MenuResponse>>() {
+			@Override
+			public Pair<RestaurantResponse, MenuResponse> call(final Throwable throwable) {
+				return new Pair<>(mRestaurantResponse.getValue(), null);
+			}
+		});
 	}
 
 	protected void bindMenuData() {

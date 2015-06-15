@@ -25,7 +25,6 @@ import com.omnom.android.restaurateur.model.restaurant.Restaurant;
 import com.omnom.android.restaurateur.model.restaurant.RestaurantsResponse;
 import com.omnom.android.restaurateur.model.restaurant.WishRequest;
 import com.omnom.android.restaurateur.model.restaurant.WishResponse;
-import com.omnom.android.restaurateur.model.table.DemoTableData;
 import com.omnom.android.restaurateur.model.table.TableDataResponse;
 import com.omnom.android.restaurateur.retrofit.RestaurateurRxSupport;
 import com.omnom.android.restaurateur.serializer.MailRuSerializer;
@@ -37,7 +36,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Collection;
-import java.util.List;
 
 import altbeacon.beacon.Beacon;
 import retrofit.RequestInterceptor;
@@ -97,11 +95,11 @@ public class RestaurateurMixpanelProxy extends RestaurateurDataProvider {
 	}
 
 	@Override
-	public Observable<List<DemoTableData>> getDemoTable() {
+	public Observable<RestaurantResponse> getDemoTable() {
 		mMixHelper.track(OMNOM_ANDROID, "restarateur.getDemoTable ->", StringUtils.EMPTY_STRING);
-		return super.getDemoTable().doOnNext(new Action1<List<DemoTableData>>() {
+		return super.getDemoTable().doOnNext(new Action1<RestaurantResponse>() {
 			@Override
-			public void call(List<DemoTableData> response) {
+			public void call(RestaurantResponse response) {
 				mMixHelper.track(OMNOM_ANDROID, "restarateur.getDemoTable <-", response);
 			}
 		});
@@ -211,6 +209,17 @@ public class RestaurateurMixpanelProxy extends RestaurateurDataProvider {
 			}
 		});
 	}
+
+	//	@Override
+	//	public Observable<Config> getConfig(String token) {
+	//		mMixHelper.track(OMNOM_ANDROID, "restarateur.getConfig ->", StringUtils.EMPTY_STRING);
+	//		return super.getConfig(token).doOnNext(new Action1<Config>() {
+	//			@Override
+	//			public void call(Config response) {
+	//				mMixHelper.track(OMNOM_ANDROID, "restarateur.getConfig <-", response);
+	//			}
+	//		});
+	//	}
 
 	@Override
 	public Observable<SupportInfoResponse> getSupportInfo() {

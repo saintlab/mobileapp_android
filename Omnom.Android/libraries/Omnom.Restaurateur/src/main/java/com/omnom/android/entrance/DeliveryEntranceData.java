@@ -13,6 +13,11 @@ public abstract class DeliveryEntranceData implements EntranceData {
 		return new AutoParcel_DeliveryEntranceData(orderTime, deliveryAddress, deliveryTime);
 	}
 
+	@Override
+	public int getType() {
+		return TYPE_DELIVERY;
+	}
+
 	@Nullable
 	public abstract Date orderTime();
 

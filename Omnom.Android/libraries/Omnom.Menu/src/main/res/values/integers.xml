@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="menu_order_items_max">10</integer>
+    <integer name="menu_order_items_max">10000</integer>
     <integer name="menu_order_items_min">0</integer>
     <integer name="menu_order_items_default">1</integer>
 </resources>

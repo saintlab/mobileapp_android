@@ -41,7 +41,7 @@ public class LunchOrderAcceptedActivity extends BaseOrderAcceptedActivity {
 	@Override
 	public void initUi() {
 		super.initUi();
-		ViewUtils.setVisible(txtOrderTime, true);
+		ViewUtils.setVisibleGone(txtOrderTime, true);
 		final DeliveryEntranceData deliveryEntranceData = (DeliveryEntranceData) mEntranceData;
 		final Date deliveryTime = deliveryEntranceData.deliveryTime();
 		txtOrderTime.setText(ORDER_TIME_FORMAT.format(deliveryEntranceData.orderTime()));

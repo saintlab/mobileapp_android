@@ -46,7 +46,7 @@ class SingleTapDetector extends GestureDetector.SimpleOnGestureListener {
 				mSubcategoriesView.restoreHeaderView(mListView.getChildViewHolder(child));
 			}
 			if(!mMenuAdapter.hasExpandedGroups()) {
-				ViewUtils.setVisible(mSubcategoriesView.mFakeStickyHeader, false);
+				ViewUtils.setVisibleGone(mSubcategoriesView.mFakeStickyHeader, false);
 			}
 			return true;
 		}

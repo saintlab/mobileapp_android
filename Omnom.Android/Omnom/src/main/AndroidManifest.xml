@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.omnom.android">
+<manifest
+    package="com.omnom.android"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -114,8 +115,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="omnom" />
+                <data
+                    android:host="app"
+                    android:scheme="omnom" />
             </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -191,9 +195,14 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Wood"
-            android:windowSoftInputMode="stateAlwaysHidden">
+            android:windowSoftInputMode="stateAlwaysHidden"/>
 
-        </activity>
+        <activity
+            android:name=".activity.ValidateActivityBle18"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood"
+            android:windowSoftInputMode="stateAlwaysHidden" />
 
         <activity
             android:name=".activity.ValidateActivityCamera"
@@ -323,6 +332,46 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.White.Light"
             android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity
+            android:name=".activity.UserProfileEditActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White.Light"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity
+            android:name="com.android.camera.CropImage"
+            android:theme="@style/Theme.CropImage" />
+
+        <activity
+            android:name=".activity.ThreeDSWebActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.White.Light"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity
+            android:name=".activity.OrderResultActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Wood.Light"
+            android:windowSoftInputMode="stateAlwaysHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="omnom.mobi"
+                    android:pathPattern=".*"
+                    android:scheme="https" />
+
+                <data
+                    android:host="omnom.mobi"
+                    android:pathPattern=".*"
+                    android:scheme="http" />
+
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

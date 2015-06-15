@@ -19,14 +19,14 @@ public class ChangePhoneSuccessActivity extends BaseOmnomActivity {
 
 	@Override
 	public void initUi() {
-		topPanel.setTitleBig(R.string.change_phone_title);
-		topPanel.setButtonRight(R.string.ready, new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				setResult(RESULT_OK);
-				finish();
-			}
-		});
+		topPanel.setTitleBig(R.string.change_phone_title)
+		        .setButtonRight(R.string.ready, new View.OnClickListener() {
+			        @Override
+			        public void onClick(View v) {
+				        setResult(RESULT_OK);
+				        finish();
+			        }
+		        });
 	}
 
 	@Override

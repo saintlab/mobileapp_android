@@ -5,7 +5,7 @@ import android.location.Location;
 /**
  * Created by mvpotter on 1/27/2015.
  */
-public interface ActivityHelper extends com.omnom.android.utils.activity.helper.ActivityHelper {
+public interface LocationActivityHelper extends com.omnom.android.utils.activity.helper.ActivityHelper {
 
 	Location getLocation();
 

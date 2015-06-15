@@ -78,7 +78,7 @@ public class ErrorHelper {
 			mTxtBottom.setText(error.getButtonTextId());
 		}
 		mBtnBottom.setOnClickListener(onClickListener);
-		ViewUtils.setVisible(mBtnDemo, false);
+		ViewUtils.setVisibleGone(mBtnDemo, false);
 	}
 
 	public void showErrorDemo(final LoaderError error, View.OnClickListener onClickListener) {
@@ -91,7 +91,7 @@ public class ErrorHelper {
 			}
 		});
 		mTxtError.setText(error.getErrorId());
-		ViewUtils.setVisible(mBtnDemo, true);
+		ViewUtils.setVisibleGone(mBtnDemo, true);
 		mTxtBottom.setCompoundDrawablesWithIntrinsicBounds(error.getmBtnDrawableId(), 0, 0, 0);
 		mTxtBottom.setText(error.getButtonTextId());
 		mBtnBottom.setOnClickListener(onClickListener);

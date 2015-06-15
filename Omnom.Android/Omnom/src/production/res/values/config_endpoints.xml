@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="endpoint_auth">https://wicket.omnom.menu</string>
+    <string name="endpoint_auth">https://omnom.omnom.menu</string>
     <string name="endpoint_restaurateur">https://omnom.omnom.menu</string>
     <string name="endpoint_menu">http://omnom.stand.saintlab.com</string>
 </resources>
