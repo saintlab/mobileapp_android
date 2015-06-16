@@ -1,5 +1,6 @@
 package com.omnom.android.activity.animation;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -30,7 +31,13 @@ public class MenuItemTransitionController extends FragmentActivityTransitionCont
 			return;
 		}
 
-		final View btnApply = activity.findViewById(R.id.btn_apply);
+		final Fragment itemDetailsFragment = activity.getSupportFragmentManager().findFragmentByTag(MenuItemDetailsFragment.TAG);
+		if(itemDetailsFragment == null || itemDetailsFragment.getView() == null) {
+			return;
+		}
+
+		final View view = itemDetailsFragment.getView();
+		final View btnApply = view.findViewById(R.id.btn_apply);
 
 		final int imgSize = activity.getResources().getDimensionPixelSize(R.dimen.menu_dish_image_height);
 		final int applyMarginTop = transitionParams.getApplyMarginTop();
@@ -39,7 +46,7 @@ public class MenuItemTransitionController extends FragmentActivityTransitionCont
 		final int applyTop = transitionParams.getApplyTop();
 		final int top = btnApply.getTop();
 
-		final View mFragmentView = activity.findViewById(R.id.root_frame);
+		final View mFragmentView = view.findViewById(R.id.root_frame);
 		final View panelRecommendations = mFragmentView.findViewById(R.id.panel_bottom);
 		final View title = mFragmentView.findViewById(R.id.txt_title);
 		final TextView info = (TextView) mFragmentView.findViewById(R.id.txt_info);

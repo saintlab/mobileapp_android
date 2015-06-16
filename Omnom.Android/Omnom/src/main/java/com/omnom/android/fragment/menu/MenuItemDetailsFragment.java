@@ -314,8 +314,9 @@ public class MenuItemDetailsFragment extends BaseFragment implements View.OnClic
 		if(mOrder == null) {
 			mOrder = UserOrder.create();
 		}
+		final View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_menu_item_details, null);
 		mTransitionController = new MenuItemTransitionController(new WeakReference<FragmentActivity>(getActivity()));
-		return getActivity().getLayoutInflater().inflate(R.layout.fragment_menu_item_details, null);
+		return view;
 	}
 
 	@Override
