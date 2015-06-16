@@ -509,9 +509,11 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 	}
 
 	public void clearErrors(boolean animateLogo) {
-		mViewHelper.hideProfile();
-		mViewHelper.clearErrors(mRestaurant, animateLogo);
-		if(bgTransitionDrawable.isTransitioned()) {
+		if(mViewHelper != null) {
+			mViewHelper.hideProfile();
+			mViewHelper.clearErrors(mRestaurant, animateLogo);
+		}
+		if(bgTransitionDrawable != null && bgTransitionDrawable.isTransitioned()) {
 			bgTransitionDrawable.reverseTransition();
 		}
 	}
