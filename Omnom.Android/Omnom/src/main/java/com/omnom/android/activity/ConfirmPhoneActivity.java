@@ -195,7 +195,9 @@ public class ConfirmPhoneActivity extends BaseOmnomActivity {
 		          new Action1<UserResponse>() {
 			          @Override
 			          public void call(final UserResponse authResponse) {
-				          omnomApp.cacheUserProfile(new UserProfile(authResponse));
+				          final UserProfile user = new UserProfile(authResponse);
+				          omnomApp.cacheUserProfile(user);
+				          getMixPanelHelper().trackUserLogin(getActivity(), user.getUser());
 				          topPanel.setContentVisibility(false, false);
 				          setResult(RESULT_OK);
 				          finish();

@@ -177,4 +177,8 @@ public class UserData implements Parcelable {
 		dest.writeString(avatar);
 		dest.writeString(birthDate);
 	}
+
+	public boolean isNull() {
+		return this == NULL || getId() <= 0;
+	}
 }

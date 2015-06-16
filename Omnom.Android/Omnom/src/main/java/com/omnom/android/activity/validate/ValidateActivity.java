@@ -622,8 +622,8 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				final UserResponse userResponse = configurationResponse.getUserResponse();
 				updateConfiguration(configurationResponse.getConfig());
 				correctMixpanelTime(userResponse);
-				reportMixPanel(userResponse);
 				getApp().cacheUserProfile(new UserProfile(userResponse));
+				reportMixPanel(userResponse);
 
 				track(MixPanelHelper.Project.OMNOM,
 				      new AppLaunchMixpanelEvent(userResponse.getUser()));
@@ -959,7 +959,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 
 		switch(mType) {
 			case ConfirmPhoneActivity.TYPE_LOGIN:
-				getMixPanelHelper().trackUserLogin(MixPanelHelper.Project.ALL, this, user);
+				getMixPanelHelper().trackUserLogin(this, user);
 				break;
 
 			case ConfirmPhoneActivity.TYPE_REGISTER:
@@ -967,7 +967,7 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 				break;
 
 			case TYPE_DEFAULT:
-				getMixPanelHelper().trackUserDefault(MixPanelHelper.Project.ALL, this, user);
+				getMixPanelHelper().trackUserDefault(MixPanelHelper.Project.ALL, user);
 				break;
 		}
 	}
