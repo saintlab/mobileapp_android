@@ -2,13 +2,13 @@ package com.omnom.android.mixpanel;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Looper;
 import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
-import com.omnom.android.BuildConfig;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
@@ -27,14 +27,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Ch3D on 03.10.2014.
  */
 public class MixPanelHelper {
 
-	public static enum Project {
+	public enum Project {
 		ALL, OMNOM, OMNOM_ANDROID
 	}
 
@@ -61,8 +60,6 @@ public class MixPanelHelper {
 	public static final String KEY_DATA = "data";
 
 	public static final String KEY_TIMESTAMP = "timestamp";
-
-	public static final String MIXPANEL_PUSH_ID = "1021785355576";
 
 	private static final String TAG = MixPanelHelper.class.getSimpleName();
 
@@ -226,17 +223,20 @@ public class MixPanelHelper {
 
 	private void addTimestamp(final JSONObject json) {
 		try {
-			final Long currentTime = System.currentTimeMillis();
-			final Long timestamp = currentTime + timeDiff;
-			json.put(KEY_MIXPANEL_TIME, TimeUnit.MILLISECONDS.toSeconds(timestamp));
-			json.put(KEY_TIMESTAMP, sSimpleDateFormatter.format(new Date(timestamp)));
+			// TODO: Use x-server-time header
+			// final Long currentTime = System.currentTimeMillis();
+			// final Long timestamp = currentTime + timeDiff;
+			final Date date = new Date();
+			json.put(KEY_MIXPANEL_TIME, date.getTime());
+			json.put(KEY_TIMESTAMP, sSimpleDateFormatter.format(date));
 		} catch(JSONException e) {
 			Log.e(TAG, "track", e);
 		}
 	}
 
 	public void trackUserLogin(final Project project, Context context, final UserData user) {
-		if(user == null) {
+		if(user == null || user == UserData.NULL) {
+
 			return;
 		}
 		final String id = String.valueOf(user.getId());
@@ -252,7 +252,7 @@ public class MixPanelHelper {
 	}
 
 	public void trackUserRegister(final Project project, final Context context, final UserData user) {
-		if(user == null) {
+		if(user == null || user == UserData.NULL) {
 			return;
 		}
 		final String id = String.valueOf(user.getId());
@@ -270,7 +270,7 @@ public class MixPanelHelper {
 	}
 
 	public void trackUserDefault(final Project project, final Context context, final UserData user) {
-		if(user == null) {
+		if(user == null || user == UserData.NULL) {
 			return;
 		}
 		// TODO:
@@ -286,6 +286,9 @@ public class MixPanelHelper {
 	}
 
 	public JSONObject toJson(UserData user) {
+		if(user == UserData.NULL) {
+			throw new RuntimeException("wrong user");
+		}
 		final JSONObject jsonUser = new JSONObject();
 		try {
 			jsonUser.put(USER_ID, user.getId());
@@ -310,22 +313,23 @@ public class MixPanelHelper {
 	}
 
 	private void execute(final Project project, final Command command) {
+		if(Looper.getMainLooper().getThread() != Thread.currentThread()) {
+			throw new RuntimeException("wrong thread");
+		}
+
 		if(mMixpanelApiMap == null) {
 			Log.w(TAG, "MixpanelApiMap is null");
 			return;
 		}
-		if(BuildConfig.DEBUG) {
-			// skip analytics in debug mode
-			return;
-		}
-		if(mMixpanelApiMap == null || mMixpanelApiMap.isEmpty()) {
-			Log.w(TAG, "mMixpanelApiMap is not set");
+		if(mMixpanelApiMap.isEmpty()) {
+			Log.w(TAG, "mMixpanelApiMap is empty");
 		}
 		if(project == Project.ALL) {
 			Collection<MixpanelAPI> mixpanelAPIs = mMixpanelApiMap.values();
 			for(MixpanelAPI api : mixpanelAPIs) {
 				if(api != null) {
 					command.execute(api);
+					Log.w(TAG, "sent to " + project.name());
 				} else {
 					Log.w(TAG, "Mixpanel api is null for project " + project.name());
 				}
@@ -334,6 +338,7 @@ public class MixPanelHelper {
 			MixpanelAPI api = mMixpanelApiMap.get(project);
 			if(api != null) {
 				command.execute(api);
+				Log.w(TAG, "sent to " + project.name());
 			} else {
 				Log.w(TAG, "Mixpanel API is not set for project " + project.name());
 			}
