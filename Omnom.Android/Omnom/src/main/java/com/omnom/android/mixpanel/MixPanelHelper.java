@@ -2,7 +2,6 @@ package com.omnom.android.mixpanel;
 
 import android.content.Context;
 import android.os.Build;
-import android.os.Looper;
 import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
@@ -313,10 +312,6 @@ public class MixPanelHelper {
 	}
 
 	private void execute(final Project project, final Command command) {
-		if(Looper.getMainLooper().getThread() != Thread.currentThread()) {
-			throw new RuntimeException("wrong thread");
-		}
-
 		if(mMixpanelApiMap == null) {
 			Log.w(TAG, "MixpanelApiMap is null");
 			return;
