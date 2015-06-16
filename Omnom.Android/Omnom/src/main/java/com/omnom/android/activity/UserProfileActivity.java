@@ -58,7 +58,6 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
-import static butterknife.ButterKnife.findById;
 import static com.omnom.android.utils.utils.AndroidUtils.showToast;
 import static com.omnom.android.utils.utils.AndroidUtils.showToastLong;
 
@@ -448,6 +447,7 @@ public class UserProfileActivity extends BaseOmnomFragmentActivity {
 				          if(!authResponseBase.hasError()) {
 					          ((OmnomApplication) getApplication()).clearUserData();
 					          showUserData(false);
+					          getMixPanelHelper().trackUserLogout();
 				          } else {
 					          showToast(getActivity(), R.string.error_unknown_server_error);
 				          }

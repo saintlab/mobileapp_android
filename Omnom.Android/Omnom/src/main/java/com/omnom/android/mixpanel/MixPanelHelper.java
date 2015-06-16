@@ -233,9 +233,8 @@ public class MixPanelHelper {
 		}
 	}
 
-	public void trackUserLogin(final Project project, Context context, final UserData user) {
-		if(user == null || user == UserData.NULL) {
-
+	public void trackUserLogin(Context context, final UserData user) {
+		if(user == null || user.isNull()) {
 			return;
 		}
 		final String id = String.valueOf(user.getId());
@@ -251,7 +250,7 @@ public class MixPanelHelper {
 	}
 
 	public void trackUserRegister(final Project project, final Context context, final UserData user) {
-		if(user == null || user == UserData.NULL) {
+		if(user == null || user.isNull()) {
 			return;
 		}
 		final String id = String.valueOf(user.getId());
@@ -268,8 +267,8 @@ public class MixPanelHelper {
 		});
 	}
 
-	public void trackUserDefault(final Project project, final Context context, final UserData user) {
-		if(user == null || user == UserData.NULL) {
+	public void trackUserDefault(final Project project, final UserData user) {
+		if(user == null || user.isNull()) {
 			return;
 		}
 		// TODO:
@@ -340,4 +339,12 @@ public class MixPanelHelper {
 		}
 	}
 
+	public void trackUserLogout() {
+		execute(Project.ALL, new Command() {
+			@Override
+			public void execute(final MixpanelAPI api) {
+				api.reset();
+			}
+		});
+	}
 }
