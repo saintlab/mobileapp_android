@@ -8,6 +8,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.omnom.android.BuildConfig;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.fragment.OrderFragment;
 import com.omnom.android.mixpanel.model.MixpanelEvent;
@@ -72,9 +73,11 @@ public class MixPanelHelper {
 
 	private final Gson mGson;
 
+	private final boolean DEBUG = BuildConfig.DEBUG;
+
 	private Map<Project, MixpanelAPI> mMixpanelApiMap;
 
-	private Long timeDiff = 0L;
+	private long timeDiff = 0;
 
 	public MixPanelHelper() {
 		mMixpanelApiMap = new HashMap<Project, MixpanelAPI>();
@@ -124,7 +127,9 @@ public class MixPanelHelper {
 			}
 			track(project, event, json);
 		} catch(JSONException e) {
-			Log.e(TAG, "track", e);
+			if(DEBUG) {
+				Log.e(TAG, "track", e);
+			}
 		}
 	}
 
@@ -134,7 +139,9 @@ public class MixPanelHelper {
 			json.put(KEY_DATA, data);
 			track(project, event, json);
 		} catch(JSONException e) {
-			Log.e(TAG, "track", e);
+			if(DEBUG) {
+				Log.e(TAG, "track", e);
+			}
 		}
 	}
 
@@ -144,7 +151,9 @@ public class MixPanelHelper {
 			json.put(KEY_DATA, new JSONArray(mGson.toJson(data)));
 			track(project, event, json);
 		} catch(JSONException e) {
-			Log.e(TAG, "track", e);
+			if(DEBUG) {
+				Log.e(TAG, "track", e);
+			}
 		}
 	}
 
@@ -154,7 +163,9 @@ public class MixPanelHelper {
 			json.put(KEY_DATA, json.toString());
 			track(project, event, json);
 		} catch(JSONException e) {
-			Log.e(TAG, "track", e);
+			if(DEBUG) {
+				Log.e(TAG, "track", e);
+			}
 		}
 	}
 
@@ -163,7 +174,9 @@ public class MixPanelHelper {
 			final JSONObject json = new JSONObject(mGson.toJson(event));
 			track(project, event.getName(), json);
 		} catch(JSONException e) {
-			Log.e(TAG, "track", e);
+			if(DEBUG) {
+				Log.e(TAG, "track", e);
+			}
 		}
 	}
 
@@ -229,7 +242,9 @@ public class MixPanelHelper {
 			json.put(KEY_MIXPANEL_TIME, date.getTime());
 			json.put(KEY_TIMESTAMP, sSimpleDateFormatter.format(date));
 		} catch(JSONException e) {
-			Log.e(TAG, "track", e);
+			if(DEBUG) {
+				Log.e(TAG, "track", e);
+			}
 		}
 	}
 
@@ -296,7 +311,9 @@ public class MixPanelHelper {
 			jsonUser.put(USER_EMAIL, user.getEmail());
 			jsonUser.put(USER_PHONE, user.getPhone());
 		} catch(JSONException e) {
-			Log.e(TAG, "toJson", e);
+			if(DEBUG) {
+				Log.e(TAG, "toJson", e);
+			}
 		}
 		return jsonUser;
 	}
@@ -312,29 +329,35 @@ public class MixPanelHelper {
 
 	private void execute(final Project project, final Command command) {
 		if(mMixpanelApiMap == null) {
-			Log.w(TAG, "MixpanelApiMap is null");
+			if(DEBUG) {
+				Log.w(TAG, "MixpanelApiMap is null");
+			}
 			return;
 		}
 		if(mMixpanelApiMap.isEmpty()) {
-			Log.w(TAG, "mMixpanelApiMap is empty");
+			if(DEBUG) {
+				Log.w(TAG, "mMixpanelApiMap is empty");
+			}
 		}
 		if(project == Project.ALL) {
 			Collection<MixpanelAPI> mixpanelAPIs = mMixpanelApiMap.values();
 			for(MixpanelAPI api : mixpanelAPIs) {
 				if(api != null) {
 					command.execute(api);
-					Log.w(TAG, "sent to " + project.name());
 				} else {
-					Log.w(TAG, "Mixpanel api is null for project " + project.name());
+					if(DEBUG) {
+						Log.w(TAG, "Mixpanel api is null for project " + project.name());
+					}
 				}
 			}
 		} else {
 			MixpanelAPI api = mMixpanelApiMap.get(project);
 			if(api != null) {
 				command.execute(api);
-				Log.w(TAG, "sent to " + project.name());
 			} else {
-				Log.w(TAG, "Mixpanel API is not set for project " + project.name());
+				if(DEBUG) {
+					Log.w(TAG, "Mixpanel API is not set for project " + project.name());
+				}
 			}
 		}
 	}

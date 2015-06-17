@@ -43,9 +43,13 @@ public class PushWooshService extends PushGCMIntentService {
 
 	public static final String EVENT_PUSH_RECEIVED = "PUSH_RECEIVED";
 
+	public static final String EVENT_PUSH_NOTIFICATION_SHOWN = "PUSH_NOTIFICATION_SHOWN";
+
 	public static final String ARG_WISH_ID = "id";
 
 	public static final String ARG_WISH_STATUS = "status";
+
+	public static final String EXTRA_SHOW_TABLE_ORDERS = "show_table_orders";
 
 	private static final String TAG = PushWooshService.class.getSimpleName();
 
@@ -71,8 +75,14 @@ public class PushWooshService extends PushGCMIntentService {
 	protected void onMessage(final Context context, final Intent intent) {
 		if(LOG_ENABLED) {
 			Log.d(TAG, "onMessage : " + intent);
+			OmnomApplication.getMixPanelHelper(context).track(MixPanelHelper.Project.OMNOM_ANDROID,
+			                                                  EVENT_PUSH_RECEIVED,
+			                                                  new Object[]{
+					                                                  intent.getStringExtra(ARG_WISH),
+					                                                  intent.getStringExtra(ARG_ANDROID_PAYLOAD)
+			                                                  });
 		}
-		if(Boolean.TRUE.toString().equals(intent.getStringExtra("show_table_orders"))) {
+		if(Boolean.TRUE.toString().equals(intent.getStringExtra(EXTRA_SHOW_TABLE_ORDERS))) {
 			showNotification(context, intent);
 		} else {
 			showWishNotification(context, intent);
@@ -100,7 +110,7 @@ public class PushWooshService extends PushGCMIntentService {
 	}
 
 	private void notify(Context context, String title, String info, Intent intent) {
-		reportPushReceived(context, intent);
+		reportPushNotificationShown(context, intent);
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 		final Notification notification = builder.setAutoCancel(true)
@@ -171,17 +181,17 @@ public class PushWooshService extends PushGCMIntentService {
 		nm.notify(0, notification);
 	}
 
-	private void reportPushReceived(final Context context, final Intent intent) {
+	private void reportPushNotificationShown(final Context context, final Intent intent) {
 		if(intent != null) {
 			OmnomApplication.getMixPanelHelper(context).track(MixPanelHelper.Project.OMNOM_ANDROID,
-			                                                  EVENT_PUSH_RECEIVED,
+			                                                  EVENT_PUSH_NOTIFICATION_SHOWN,
 			                                                  new Object[]{
-					                                                  intent.getStringExtra(ARG_ANDROID_PAYLOAD),
-					                                                  intent.getStringExtra(ARG_HASH)
+					                                                  intent.getStringExtra(Extras.EXTRA_WISH_ID),
+					                                                  intent.getStringExtra(Extras.EXTRA_WISH_STATUS)
 			                                                  });
 		} else {
 			OmnomApplication.getMixPanelHelper(context).track(MixPanelHelper.Project.OMNOM_ANDROID,
-			                                                  EVENT_PUSH_RECEIVED,
+			                                                  EVENT_PUSH_NOTIFICATION_SHOWN,
 			                                                  "Intent is empty");
 		}
 	}

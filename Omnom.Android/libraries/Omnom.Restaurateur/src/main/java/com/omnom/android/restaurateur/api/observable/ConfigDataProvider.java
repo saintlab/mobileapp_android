@@ -24,7 +24,7 @@ public class ConfigDataProvider implements ConfigDataService {
 
 	public static ConfigDataProvider create(final String dataEndPoint, final RequestInterceptor interceptor) {
 		// final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
-		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
+		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.NONE;
 		final Gson gson = new GsonBuilder()
 				.registerTypeAdapter(AcquiringData.class, new MailRuSerializer())
 				.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
