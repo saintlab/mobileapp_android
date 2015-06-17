@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.omnom.android.BuildConfig;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.PaymentChecker;
 import com.omnom.android.R;
@@ -76,6 +75,8 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity {
 	public static final int SIMILAR_PAYMENTS_TIMEOUT = 60 * 1000;
 
 	public static final String TRANSACTION_ALREADY_PROCESSED_EARLIER = "TRANSACTION_ALREADY_PROCESSED_EARLIER";
+
+	public static final String QUERY_PARAM_CODE = "code";
 
 	private static final String TAG = PaymentProcessActivity.class.getSimpleName();
 
@@ -457,14 +458,14 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity {
 	}
 
 	private void reportMixPanelSuccess() {
-		if(!mIsDemo && !BuildConfig.DEBUG) {
+		if(!mIsDemo) {
 			track(MixPanelHelper.Project.OMNOM, new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo));
 			trackRevenue(MixPanelHelper.Project.OMNOM, String.valueOf(getUserData().getId()), mDetails, mBillData);
 		}
 	}
 
 	private void reportMixPanelFail(final AcquiringResponseError error) {
-		if(!mIsDemo && !BuildConfig.DEBUG) {
+		if(!mIsDemo) {
 			track(MixPanelHelper.Project.OMNOM, new PaymentMixpanelEvent(getUserData(), mDetails, mBillId, mCardInfo, error));
 		}
 	}
@@ -476,9 +477,19 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity {
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(resultCode == RESULT_OK && requestCode == REQUEST_THANKS) {
-			setResult(RESULT_OK);
-			finish();
+		if(requestCode == REQUEST_THANKS) {
+			if(resultCode == RESULT_OK) {
+				setResult(RESULT_OK);
+				finish();
+			} else {
+				if(data != null && data.hasExtra(EXTRA_URI)) {
+					final Uri responseUri = data.getParcelableExtra(EXTRA_URI);
+					final String code = responseUri.getQueryParameter(QUERY_PARAM_CODE);
+					onPayError(AcquiringResponseError.create(code, code));
+				} else {
+					onPayError(AcquiringResponseError.create(StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING));
+				}
+			}
 		}
 
 		if(requestCode == REQUEST_CODE_HANDLE_THREE_DS) {
@@ -487,20 +498,6 @@ public class PaymentProcessActivity extends BaseOmnomModeSupportActivity {
 			} else {
 				final Uri uriData = (data != null && data.getData() != null) ? data.getData() : Uri.EMPTY;
 				onPayError(AcquiringResponseError.create("", getString(R.string.unable_to_process_transaction) + uriData.toString()));
-			}
-		}
-
-		if(requestCode == REQUEST_THANKS) {
-			if(resultCode == RESULT_OK) {
-				onPayOk(AcquiringPollingResponse.create(AcquiringResponse.STATUS_SUCCESS));
-			} else {
-				if(data != null && data.hasExtra(EXTRA_URI)) {
-					Uri responseUri = data.getParcelableExtra(EXTRA_URI);
-					onPayError(AcquiringResponseError.create(responseUri.getQueryParameter("code"),
-					                                         responseUri.getQueryParameter("code")));
-				} else {
-					onPayError(AcquiringResponseError.create(StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING));
-				}
 			}
 		}
 	}
