@@ -57,7 +57,7 @@ public class RestaurateurMixpanelProxy extends RestaurateurDataProvider {
 	public static RestaurateurDataProvider create(final String dataEndPoint, final RequestInterceptor interceptor, final MixPanelHelper
 			mixPanelHelper) {
 		// final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
-		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
+		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.NONE;
 		final Gson gson = new GsonBuilder()
 				.registerTypeAdapter(AcquiringData.class, new MailRuSerializer())
 				.registerTypeAdapter(OrdersResponse.class, new OrdersResponseSerializer())

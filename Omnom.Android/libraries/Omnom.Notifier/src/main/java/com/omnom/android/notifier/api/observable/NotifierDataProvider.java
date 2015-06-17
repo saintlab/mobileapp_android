@@ -24,7 +24,7 @@ public class NotifierDataProvider implements NotifierObservableApi {
 
 	public static NotifierDataProvider create(final String dataEndPoint, final RequestInterceptor interceptor) {
 		// final RestAdapter.LogLevel logLevel = BuildConfig.DEBUG ? RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
-		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
+		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.NONE;
 		final Gson gson = new GsonBuilder()
 				.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
 				.registerTypeAdapterFactory(new AutoParcelAdapterFactory())

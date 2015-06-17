@@ -24,7 +24,7 @@ import rx.schedulers.Schedulers;
 public class MenuDataProvider implements MenuObservableApi {
 
 	public static MenuDataProvider create(final String dataEndPoint, final RequestInterceptor interceptor) {
-		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
+		final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.NONE;
 		final Gson gson = new GsonBuilder()
 				.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
 				.registerTypeAdapterFactory(new AutoParcelAdapterFactory())
