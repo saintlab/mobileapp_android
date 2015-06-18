@@ -2,7 +2,6 @@ package com.omnom.android.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -12,6 +11,7 @@ import android.view.ViewGroup;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.EnteringPagerAdapter;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.view.ViewPagerIndicatorCircle;
 
 import butterknife.ButterKnife;
@@ -20,7 +20,7 @@ import butterknife.InjectView;
 /**
  * Created by mvpotter on 12/3/2014.
  */
-public class EnteringFragment extends Fragment {
+public class EnteringFragment extends BaseFragment {
 
 	@InjectView(R.id.pager)
 	protected ViewPager mPager;

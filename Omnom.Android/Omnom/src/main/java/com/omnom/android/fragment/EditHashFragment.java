@@ -3,7 +3,6 @@ package com.omnom.android.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -22,6 +21,7 @@ import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.auth.AuthError;
 import com.omnom.android.auth.AuthServiceException;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.menu.api.observable.MenuObservableApi;
 import com.omnom.android.menu.model.Menu;
 import com.omnom.android.menu.model.MenuResponse;
@@ -57,7 +57,7 @@ import static com.omnom.android.utils.Extras.EXTRA_ERROR_WRONG_USERNAME;
 /**
  * Created by mvpotter on 2/6/2015.
  */
-public class EditHashFragment extends Fragment {
+public class EditHashFragment extends BaseFragment {
 
 	public interface EnterHashPanelCloseListener {
 		void onEnterHashPanelClose();

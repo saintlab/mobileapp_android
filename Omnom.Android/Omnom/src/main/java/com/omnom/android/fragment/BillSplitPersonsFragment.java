@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.utils.AmountHelper;
@@ -27,7 +28,7 @@ import butterknife.InjectView;
 /**
  * Created by Ch3D on 11.11.2014.
  */
-public class BillSplitPersonsFragment extends Fragment implements NumberPicker.OnValueChangeListener, SplitFragment {
+public class BillSplitPersonsFragment extends BaseFragment implements NumberPicker.OnValueChangeListener, SplitFragment {
 	private static final String ARG_ORDER = "order";
 
 	private static final String ARG_GUESTS = "guests";

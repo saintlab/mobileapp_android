@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.utils.AndroidUtils;
 
@@ -30,7 +31,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class SearchFragment<T extends Parcelable> extends Fragment {
+public class SearchFragment<T extends Parcelable> extends BaseFragment {
 
 	public interface ItemClickListener<T> {
 

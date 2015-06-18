@@ -173,11 +173,11 @@ public class SplashFragment extends Fragment {
 		final int animationDuration = getResources().getInteger(R.integer.splash_animation_duration);
 
 		// translating up animation
-		final AnimationBuilder translationSmallBuilder = AnimationBuilder.create(getActivity(), 0, (int) upperLogoPoint);
-		translationSmallBuilder.setDuration(animationDuration);
 		final List<View> views = new ArrayList<View>();
 		views.add(imgFork);
 		views.add(imgForkLarge);
+		final AnimationBuilder translationSmallBuilder = AnimationBuilder.create(getActivity(), views, 0, (int) upperLogoPoint);
+		translationSmallBuilder.setDuration(animationDuration);
 		final ValueAnimator translationAnimator = AnimationUtils.prepareTranslation(views, null, translationSmallBuilder);
 		translationAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
@@ -190,7 +190,7 @@ public class SplashFragment extends Fragment {
 		final DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		float end = (int) (displayMetrics.widthPixels * LoaderView.LOADER_WIDTH_SCALE + 0.5);
 		float start = getResources().getDimension(R.dimen.loader_size_huge);
-		AnimationBuilder builder = AnimationBuilder.create(getActivity(), (int) start, (int) end);
+		AnimationBuilder builder = AnimationBuilder.create(getActivity(), imgMultiply, (int) start, (int) end);
 		builder.setDuration(getResources().getInteger(R.integer.splash_animation_duration));
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override

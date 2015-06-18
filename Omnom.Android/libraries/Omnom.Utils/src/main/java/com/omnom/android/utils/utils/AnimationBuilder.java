@@ -4,10 +4,13 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
 import com.omnom.android.utils.R;
+
+import java.util.Collections;
 
 /**
  * Created by Ch3D on 30.07.2014.
@@ -17,15 +20,24 @@ public class AnimationBuilder {
 		public void invoke(ValueAnimator animation);
 	}
 
-	public static AnimationBuilder create(Context context, int... values) {
-		AnimationBuilder animationBuilder = new AnimationBuilder().ofInt(values);
+	public static AnimationBuilder create(Context context, View view, int... values) {
+		return create(context, Collections.singleton(view), values);
+	}
+
+	public static AnimationBuilder create(Context context, Iterable<View> views, int... values) {
+		AnimationBuilder animationBuilder = new AnimationBuilder(views).ofInt(values);
 		animationBuilder.initDefaults(context);
 		return animationBuilder;
 	}
 
+	private final Iterable<View> mViews;
+
 	private ValueAnimator animator;
 
-	private AnimationBuilder() {
+	private Runnable mEndAction;
+
+	private AnimationBuilder(final Iterable<View> views) {
+		mViews = views;
 	}
 
 	public void setDuration(long duration) {
@@ -35,6 +47,9 @@ public class AnimationBuilder {
 	private void initDefaults(final Context context) {
 		animator.setDuration(context.getResources().getInteger(R.integer.default_animation_duration_long));
 		animator.setInterpolator(new AccelerateDecelerateInterpolator());
+		for(final View view : mViews) {
+			view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+		}
 	}
 
 	public AnimationBuilder ofInt(int... values) {
@@ -46,7 +61,7 @@ public class AnimationBuilder {
 		animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
-				if (lisetener != null) {
+				if(lisetener != null) {
 					lisetener.invoke(animation);
 				}
 			}
@@ -55,18 +70,29 @@ public class AnimationBuilder {
 	}
 
 	public AnimationBuilder onEnd(final Runnable action) {
-		animator.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				if (action != null) {
-					action.run();
-				}
-			}
-		});
+		mEndAction = action;
 		return this;
 	}
 
 	public ValueAnimator build() {
+		animator.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationCancel(final Animator animation) {
+				for(final View view : mViews) {
+					view.setLayerType(View.LAYER_TYPE_NONE, null);
+				}
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				for(final View view : mViews) {
+					view.setLayerType(View.LAYER_TYPE_NONE, null);
+				}
+				if(mEndAction != null) {
+					mEndAction.run();
+				}
+			}
+		});
 		return animator;
 	}
 

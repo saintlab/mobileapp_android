@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.UserProfileActivity;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.utils.utils.AndroidUtils;
 import com.omnom.android.utils.utils.ClickSpan;
 
@@ -21,7 +22,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 /**
  * Created by Ch3D on 06.01.2015.
  */
-public class ChangeTableFragment extends Fragment {
+public class ChangeTableFragment extends BaseFragment {
 
 	private static final String ARG_TABLE_NUMBER = "table_number";
 

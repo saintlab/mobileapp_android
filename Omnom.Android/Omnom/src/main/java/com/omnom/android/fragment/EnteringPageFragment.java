@@ -4,7 +4,6 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +12,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.omnom.android.R;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.loader.LoaderView;
 import com.omnom.android.utils.utils.AndroidUtils;
 
 import static butterknife.ButterKnife.findById;
 
-public class EnteringPageFragment extends Fragment {
+public class EnteringPageFragment extends BaseFragment {
 	private static final String ARG_COLOR = "color";
 
 	private static final String ARG_ICON = "icon";

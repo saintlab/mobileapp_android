@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.BillSplitPagerAdapter;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.restaurateur.model.order.Order;
@@ -44,7 +45,7 @@ import butterknife.InjectView;
 /**
  * Created by Ch3D on 11.11.2014.
  */
-public class BillSplitFragment extends Fragment {
+public class BillSplitFragment extends BaseFragment {
 	public static final String TAG = BillSplitFragment.class.getSimpleName();
 
 	public static final int SPLIT_TYPE_PERSON = 1;

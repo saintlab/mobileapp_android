@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,22 +13,20 @@ import android.widget.HeaderViewListAdapter;
 import com.omnom.android.OmnomApplication;
 import com.omnom.android.R;
 import com.omnom.android.adapter.OrderItemsAdapter;
+import com.omnom.android.fragment.base.BaseListFragment;
 import com.omnom.android.restaurateur.model.order.Order;
 import com.omnom.android.restaurateur.model.order.OrderItem;
 import com.omnom.android.utils.SparseBooleanArrayParcelable;
 import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AnimationUtils;
-import com.squareup.otto.Bus;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import javax.inject.Inject;
-
 /**
  * Created by Ch3D on 11.11.2014.
  */
-public class BillItemsFragment extends ListFragment implements SplitFragment {
+public class BillItemsFragment extends BaseListFragment implements SplitFragment {
 
 	private static final String ARG_ORDER = "order";
 
@@ -43,9 +40,6 @@ public class BillItemsFragment extends ListFragment implements SplitFragment {
 		fragment.setArguments(args);
 		return fragment;
 	}
-
-	@Inject
-	protected Bus mBus;
 
 	private Order mOrder;
 
