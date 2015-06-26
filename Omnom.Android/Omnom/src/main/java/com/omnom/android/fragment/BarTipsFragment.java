@@ -37,11 +37,11 @@ public class BarTipsFragment extends BaseFragment {
 
 	public static final String PERCENT_SUFFIX = "%";
 
+	public static final String SYM_PLUS = "+";
+
 	private static final String ARG_VALUE = "tips_value";
 
 	private static final String ARG_AMOUNT = "order_amount";
-
-	public static final String SYM_PLUS = "+";
 
 	public static BarTipsFragment newInstance(int currenValue, final double amount) {
 		final BarTipsFragment fragment = new BarTipsFragment();

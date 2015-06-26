@@ -613,6 +613,13 @@ public abstract class ValidateActivity extends BaseOmnomModeSupportActivity
 		clearErrors(true);
 		final int locationUpdateTimeout = ConfigurationService.LOCATION_UPDATE_TIMEOUT;
 		final int validateDuration = getResources().getInteger(R.integer.omnom_validate_duration);
+
+		if(mViewHelper == null || isFinishing()) {
+			// actualy this means that activity is in the process of finishing/destroying
+			// and some animation callback called this part of code. We can safely skip this
+			return;
+		}
+
 		mViewHelper.startProgressAnimation(locationUpdateTimeout + validateDuration);
 
 		subscribe(configurationService.getConfigurationObservable()

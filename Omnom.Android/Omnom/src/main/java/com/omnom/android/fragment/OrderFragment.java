@@ -45,6 +45,7 @@ import com.omnom.android.activity.OrdersActivity;
 import com.omnom.android.adapter.OrderItemsAdapterSimple;
 import com.omnom.android.auth.UserData;
 import com.omnom.android.entrance.TableEntranceData;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.fragment.events.OrderSplitCommitEvent;
 import com.omnom.android.fragment.events.SplitHideEvent;
 import com.omnom.android.listener.DecimalKeyListener;
@@ -69,7 +70,6 @@ import com.omnom.android.utils.utils.ViewUtils;
 import com.omnom.android.utils.view.OmnomListView;
 import com.omnom.android.view.AmountEditText;
 import com.omnom.android.view.HeaderView;
-import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.math.BigDecimal;
@@ -89,7 +89,7 @@ import butterknife.Optional;
 
 import static butterknife.ButterKnife.findById;
 
-public class OrderFragment extends Fragment {
+public class OrderFragment extends BaseFragment {
 	public static final int MODE_AMOUNT = 0;
 
 	public static final int MODE_TIPS = 1;
@@ -352,9 +352,6 @@ public class OrderFragment extends Fragment {
 		fragment.setArguments(args);
 		return fragment;
 	}
-
-	@Inject
-	protected Bus mBus;
 
 	@Inject
 	protected RestaurateurObservableApi api;

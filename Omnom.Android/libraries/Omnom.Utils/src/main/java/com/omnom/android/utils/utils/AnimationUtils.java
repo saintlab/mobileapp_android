@@ -36,14 +36,25 @@ public class AnimationUtils {
 
 		private boolean isCallbackLaunched;
 
+		public OmnomAnimatorListenerAdapter(final View view) {
+			this(view, null);
+		}
+
 		public OmnomAnimatorListenerAdapter(final View view, final Runnable callback) {
 			this.view = view;
 			this.callback = callback;
 			isCallbackLaunched = false;
+			view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+		}
+
+		@Override
+		public void onAnimationCancel(final Animator animation) {
+			view.setLayerType(View.LAYER_TYPE_NONE, null);
 		}
 
 		@Override
 		public void onAnimationEnd(Animator animation) {
+			view.setLayerType(View.LAYER_TYPE_NONE, null);
 			if(callback != null && !isCallbackLaunched) {
 				view.post(callback);
 				isCallbackLaunched = true;
@@ -174,11 +185,13 @@ public class AnimationUtils {
 			ViewUtils.setVisibleGone(view, visible);
 		}
 		view.setTag(visible);
+		view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 		view.animate().setDuration(view.getResources().getInteger(R.integer.default_animation_duration_short)).
 				setInterpolator(new AccelerateDecelerateInterpolator()).
 				    setListener(new AnimatorListenerAdapter() {
 					    @Override
 					    public void onAnimationEnd(Animator animation) {
+						    view.setLayerType(View.LAYER_TYPE_NONE, null);
 						    if(!visible) {
 							    ViewUtils.setVisibleGone(view, false);
 						    }
@@ -186,6 +199,7 @@ public class AnimationUtils {
 
 					    @Override
 					    public void onAnimationCancel(final Animator animation) {
+						    view.setLayerType(View.LAYER_TYPE_NONE, null);
 						    ViewUtils.setVisibleGone(view, visible);
 					    }
 				    }).alpha(visible ? 1 : 0).start();
@@ -210,20 +224,20 @@ public class AnimationUtils {
 	}
 
 	public static void translateUp(final Context context, final Iterable<View> views, final int translation, final Runnable endCallback) {
-		final AnimationBuilder builder = AnimationBuilder.create(context, 0, -translation);
+		final AnimationBuilder builder = AnimationBuilder.create(context, views, 0, -translation);
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
 	public static void translateUp(final Context context, final Iterable<View> views, final int translation, final Runnable endCallback,
 	                               final long duration) {
-		final AnimationBuilder builder = AnimationBuilder.create(context, 0, -translation);
+		final AnimationBuilder builder = AnimationBuilder.create(context, views, 0, -translation);
 		builder.setDuration(duration);
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
 	public static void translateDown(final Context context, final Iterable<View> views, final int translation,
 	                                 final Runnable endCallback) {
-		final AnimationBuilder builder = AnimationBuilder.create(context, -translation, 0);
+		final AnimationBuilder builder = AnimationBuilder.create(context, views, -translation, 0);
 		prepareTranslation(views, endCallback, builder).start();
 	}
 
@@ -239,7 +253,7 @@ public class AnimationUtils {
 	}
 
 	public static void scaleWidth(final View view, final int width, final Runnable updateCallback, final Runnable endCallback) {
-		AnimationBuilder builder = AnimationBuilder.create(view.getContext(), view.getMeasuredWidth(), width);
+		AnimationBuilder builder = AnimationBuilder.create(view.getContext(), view, view.getMeasuredWidth(), width);
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
 			public void invoke(ValueAnimator animation) {
@@ -258,7 +272,7 @@ public class AnimationUtils {
 
 	public static void scaleWidth(final View view, final int width, final long duration,
 	                              final Runnable endCallback) {
-		AnimationBuilder builder = AnimationBuilder.create(view.getContext(), view.getMeasuredWidth(), width);
+		AnimationBuilder builder = AnimationBuilder.create(view.getContext(), view, view.getMeasuredWidth(), width);
 		builder.setDuration(duration);
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
@@ -274,12 +288,13 @@ public class AnimationUtils {
 	}
 
 	public static void scaleHeight(final View view, int height) {
-		AnimationBuilder.create(view.getContext(), view.getMeasuredHeight(), height).addListener(new AnimationBuilder.UpdateLisetener() {
-			@Override
-			public void invoke(ValueAnimator animation) {
-				ViewUtils.setHeight(view, (Integer) animation.getAnimatedValue());
-			}
-		}).build().start();
+		AnimationBuilder.create(view.getContext(), view, view.getMeasuredHeight(), height).addListener(
+				new AnimationBuilder.UpdateLisetener() {
+					@Override
+					public void invoke(ValueAnimator animation) {
+						ViewUtils.setHeight(view, (Integer) animation.getAnimatedValue());
+					}
+				}).build().start();
 	}
 
 	public static void scaleHeight(final View view, int height, Runnable endCallback) {
@@ -287,20 +302,20 @@ public class AnimationUtils {
 	}
 
 	public static void scaleHeight(final View view, int height, Runnable endCallback, final long duration) {
-		final AnimationBuilder animationBuilder = AnimationBuilder.create(view.getContext(), view.getMeasuredHeight(), height).addListener(
-				new AnimationBuilder
-						.UpdateLisetener() {
-					@Override
-					public void invoke(ValueAnimator animation) {
-						ViewUtils.setHeight(view, (Integer) animation.getAnimatedValue());
-					}
-				});
+		final AnimationBuilder animationBuilder = AnimationBuilder.create(view.getContext(), view, view.getMeasuredHeight(), height)
+		                                                          .addListener(new AnimationBuilder.UpdateLisetener() {
+			                                                          @Override
+			                                                          public void invoke(ValueAnimator animation) {
+				                                                          ViewUtils.setHeight(view, (Integer) animation
+						                                                          .getAnimatedValue());
+			                                                          }
+		                                                          });
 		animationBuilder.setDuration(duration);
 		animationBuilder.onEnd(endCallback).build().start();
 	}
 
 	public static void scaleHeight(final View view, int height, long duration) {
-		AnimationBuilder builder = AnimationBuilder.create(view.getContext(), view.getMeasuredHeight(), height);
+		AnimationBuilder builder = AnimationBuilder.create(view.getContext(), view, view.getMeasuredHeight(), height);
 		builder.setDuration(duration);
 		builder.addListener(new AnimationBuilder.UpdateLisetener() {
 			@Override
@@ -425,7 +440,7 @@ public class AnimationUtils {
 			return;
 		}
 		for(final View view : views) {
-			view.animate().translationY(value).start();
+			view.animate().translationY(value).setListener(new OmnomAnimatorListenerAdapter(view, null)).start();
 		}
 	}
 }

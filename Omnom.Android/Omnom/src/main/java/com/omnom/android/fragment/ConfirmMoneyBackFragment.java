@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.fragment.PayOnceFragment.VisibilityListener;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.utils.AndroidUtils;
 
@@ -17,7 +18,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class ConfirmMoneyBackFragment extends Fragment {
+public class ConfirmMoneyBackFragment extends BaseFragment {
 
 	public static Fragment newInstance() {
 		return new ConfirmMoneyBackFragment();

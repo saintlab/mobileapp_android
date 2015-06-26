@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.omnom.android.R;
 import com.omnom.android.activity.CardConfirmActivity;
+import com.omnom.android.fragment.base.BaseFragment;
 import com.omnom.android.utils.OmnomFont;
 import com.omnom.android.utils.utils.AmountHelper;
 import com.omnom.android.utils.utils.AndroidUtils;
@@ -24,7 +25,7 @@ import butterknife.InjectView;
 /**
  * Created by mvpotter on 12/3/2014.
  */
-public class PayOnceFragment extends Fragment {
+public class PayOnceFragment extends BaseFragment {
 
 	/**
 	 * Listener for pay button click event.
