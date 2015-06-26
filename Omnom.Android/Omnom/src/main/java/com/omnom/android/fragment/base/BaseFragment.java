@@ -1,6 +1,6 @@
 package com.omnom.android.fragment.base;
 
-import android.os.Bundle;
+import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.animation.Animation;
@@ -43,21 +43,15 @@ public abstract class BaseFragment extends Fragment {
 	}
 
 	@Override
-	public void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	public void onAttach(final Activity activity) {
+		super.onAttach(activity);
 		OmnomApplication.get(getActivity()).inject(this);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
 		mBus.register(this);
 	}
 
 	@Override
-	public void onPause() {
-		super.onPause();
+	public void onDetach() {
+		super.onDetach();
 		mBus.unregister(this);
 	}
-
 }
