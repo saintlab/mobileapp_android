@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
@@ -493,19 +492,6 @@ public class OrderFragment extends BaseFragment {
 
 	private String getCurrencySuffix() {
 		return getString(R.string.currency_suffix_ruble);
-	}
-
-	@Override
-	public void onAttach(final Activity activity) {
-		super.onAttach(activity);
-		OmnomApplication.get(getActivity()).inject(this);
-		mBus.register(this);
-	}
-
-	@Override
-	public void onDetach() {
-		super.onDetach();
-		mBus.unregister(this);
 	}
 
 	@Subscribe

@@ -127,6 +127,8 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	private TableDataResponse mTable;
 
+	private boolean mTableAnimated = false;
+
 	public ValidateViewHelper(ValidateActivity activity) {
 		mActivity = activity;
 		ButterKnife.inject(this, activity);
@@ -363,7 +365,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 
 	private void animateTable() {
 		final ViewTreeObserver viewTreeObserver = imgProfile.getViewTreeObserver();
-		if(viewTreeObserver.isAlive()) {
+		if(viewTreeObserver.isAlive() && !mTableAnimated) {
 			viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 				@Override
 				public void onGlobalLayout() {
@@ -374,6 +376,7 @@ public class ValidateViewHelper implements SubcategoriesView.OnCollapsedTouchLis
 						public void run() {
 							final int translation = (imgProfile.getLeft() - txtTable.getLeft()) -
 									(txtTable.getWidth() - imgProfile.getWidth());
+							mTableAnimated = true;
 							txtTable.animate()
 							        .translationX(translation)
 							        .setDuration(animationDuration)
