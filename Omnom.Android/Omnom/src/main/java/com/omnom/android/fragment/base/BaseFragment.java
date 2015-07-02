@@ -2,7 +2,6 @@ package com.omnom.android.fragment.base;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
-import android.view.View;
 import android.view.animation.Animation;
 
 import com.omnom.android.OmnomApplication;
@@ -21,7 +20,6 @@ public abstract class BaseFragment extends Fragment {
 	public Animation onCreateAnimation(final int transit, final boolean enter, final int nextAnim) {
 		final Animation animation = super.onCreateAnimation(transit, enter, nextAnim);
 		if(animation != null && getView() != null) {
-			getView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
 			animation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
 				public void onAnimationStart(final Animation animation) {
@@ -30,7 +28,6 @@ public abstract class BaseFragment extends Fragment {
 
 				@Override
 				public void onAnimationEnd(final Animation animation) {
-					getView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
 				}
 
 				@Override

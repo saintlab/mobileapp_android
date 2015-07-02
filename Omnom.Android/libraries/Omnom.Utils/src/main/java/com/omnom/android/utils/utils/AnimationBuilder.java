@@ -47,9 +47,6 @@ public class AnimationBuilder {
 	private void initDefaults(final Context context) {
 		animator.setDuration(context.getResources().getInteger(R.integer.default_animation_duration_long));
 		animator.setInterpolator(new AccelerateDecelerateInterpolator());
-		for(final View view : mViews) {
-			view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-		}
 	}
 
 	public AnimationBuilder ofInt(int... values) {
@@ -78,16 +75,10 @@ public class AnimationBuilder {
 		animator.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationCancel(final Animator animation) {
-				for(final View view : mViews) {
-					view.setLayerType(View.LAYER_TYPE_NONE, null);
-				}
 			}
 
 			@Override
 			public void onAnimationEnd(Animator animation) {
-				for(final View view : mViews) {
-					view.setLayerType(View.LAYER_TYPE_NONE, null);
-				}
 				if(mEndAction != null) {
 					mEndAction.run();
 				}
