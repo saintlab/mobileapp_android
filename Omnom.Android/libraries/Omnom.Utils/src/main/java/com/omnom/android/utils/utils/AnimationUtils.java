@@ -44,17 +44,14 @@ public class AnimationUtils {
 			this.view = view;
 			this.callback = callback;
 			isCallbackLaunched = false;
-			view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 		}
 
 		@Override
 		public void onAnimationCancel(final Animator animation) {
-			view.setLayerType(View.LAYER_TYPE_NONE, null);
 		}
 
 		@Override
 		public void onAnimationEnd(Animator animation) {
-			view.setLayerType(View.LAYER_TYPE_NONE, null);
 			if(callback != null && !isCallbackLaunched) {
 				view.post(callback);
 				isCallbackLaunched = true;
@@ -185,13 +182,11 @@ public class AnimationUtils {
 			ViewUtils.setVisibleGone(view, visible);
 		}
 		view.setTag(visible);
-		view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 		view.animate().setDuration(view.getResources().getInteger(R.integer.default_animation_duration_short)).
 				setInterpolator(new AccelerateDecelerateInterpolator()).
 				    setListener(new AnimatorListenerAdapter() {
 					    @Override
 					    public void onAnimationEnd(Animator animation) {
-						    view.setLayerType(View.LAYER_TYPE_NONE, null);
 						    if(!visible) {
 							    ViewUtils.setVisibleGone(view, false);
 						    }
@@ -199,7 +194,6 @@ public class AnimationUtils {
 
 					    @Override
 					    public void onAnimationCancel(final Animator animation) {
-						    view.setLayerType(View.LAYER_TYPE_NONE, null);
 						    ViewUtils.setVisibleGone(view, visible);
 					    }
 				    }).alpha(visible ? 1 : 0).start();
